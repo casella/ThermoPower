@@ -718,10 +718,6 @@ Casella</a>:<br>
     connect(Sink.flange, V3.outlet) annotation (points=[66, 0; 54, 0]);
     connect(Cmd3.y,       V3.theta) 
       annotation (points=[39, 38; 39, 24; 44, 24; 44, 8], style(color=3));
-  initial equation 
-    V1.w=1;
-    V2.Av=V1.Av;
-    V3.Av=V1.Av;
   end ValveZeroFlow;
   
   model ValveZeroFlow2 "Test case for valves with zero flowrate" 
@@ -2543,7 +2539,7 @@ Casella</a>:<br>
     // total length
     parameter Length Lhex=10;
     // internal diameter
-    parameter Diameter Dhex=0.02;
+    parameter Diameter Dhex=0.06;
     // wall thickness
     parameter Thickness thhex=0;
     // internal radius
@@ -2580,7 +2576,7 @@ During the simulation, the inlet specific enthalpy and heat flux are changed, wh
     <li>t=50 s. The heat flow is reduced to zero in 2s. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the pressure and flowrate rise again rapidly to the inlet values.</li> 
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...150] sec <br> 
 Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6 
 </p>
@@ -2592,7 +2588,6 @@ Algorithm Tolerance = 1e-6
 </HTML>"),
       experimentSetupOutput(equdistant=false));
     ThermoPower.Test.Flow1D2ph_check hex(
-      redeclare package Medium=Medium,
       N=Nnodes,
       L=Lhex,
       omega=omegahex,
@@ -2606,24 +2601,27 @@ Algorithm Tolerance = 1e-6
       pstartout=10e5,
       wnom=1,
       FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-      initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+      initOpt=ThermoPower.Choices.Init.Options.steadyState,
+      redeclare package Medium = Medium) 
                    annotation (extent=[-30,-10; -10,10]);
-    ThermoPower.Water.ValveLin valve(Kv=1/10e5) 
+    ThermoPower.Water.ValveLin valve(Kv=1/10e5, redeclare package Medium = 
+          Medium) 
       annotation (extent=[18, -10; 38, 10]);
     ThermoPower.Thermal.HeatSource1D heatSource(
       N=Nnodes,
       L=Lhex,
       omega=omegahex) annotation (extent=[-30, 8; -10, 28]);
-    ThermoPower.Water.SinkP Sink(p0=1e5) annotation (extent=[52, -10; 72, 10]);
+    ThermoPower.Water.SinkP Sink(p0=1e5, redeclare package Medium = Medium) 
+                                         annotation (extent=[52, -10; 72, 10]);
     Modelica.Blocks.Sources.Step hIn(
       height=1e5,
       offset=6e5,
       startTime=50)   annotation (extent=[-100, 10; -80, 30]);
     Modelica.Blocks.Sources.Ramp extPower(
-      duration=30,
       height=30e5,
-      startTime=10)  annotation (extent=[-80, 40; -60, 60]);
-    ThermoPower.Water.SourceW Source(w0=1) 
+      startTime=10,
+      duration=30)   annotation (extent=[-80, 40; -60, 60]);
+    ThermoPower.Water.SourceW Source(w0=1, redeclare package Medium = Medium) 
       annotation (extent=[-68, -10; -48, 10]);
     Modelica.Blocks.Sources.Ramp extPower2(
       duration=10,
@@ -3375,7 +3373,7 @@ Casella</a>:<br>
 </ul>
 </HTML>"));
   end Flow1D_check;
-
+  
   model Flow1D2ph_check 
     "Extended Flow1D2ph model with mass & energy balance computation" 
     extends Water.Flow1D2ph;
@@ -3410,67 +3408,97 @@ Casella</a>:<br>
 </ul>
 </HTML>"));
   end Flow1D2ph_check;
-
+  
   model WaterPump "Test case for WaterPump" 
     annotation (
       Diagram,
       experiment(StopTime=10, Tolerance=1e-006),
       Documentation(info="<HTML>
 <p>This model tests the <tt>Pump</tt> model with the check valve option active.
-<p>The sink pressure is varied sinusoidally with a period of 10 s, so as to operate the pump in all the possible working conditions, including stopped flow.
+<p>The valve is opened at time t=1s. The sink pressure is then increased so as to operate the pump in all the possible working conditions, including stopped flow.
 <p>
 Simulation Interval = [0...10] sec <br> 
 Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6 
-<p><b>Revision history:</b></p>
+</HTML>", revisions="<html>
 <ul>
+<li><i>5 Nov 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+       Updated.</li>
 <li><i>5 Feb 2004</i>
     by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco
 Schiavo</a>:<br>
        First release.</li>
 </ul>
-</HTML>"));
+
+</html>"));
     package Medium=Modelica.Media.Water.WaterIF97_ph;
     ThermoPower.Water.SourceP Source(p0=1e5, h=1.5e5) 
-      annotation (extent=[-86, 24; -66, 44]);
+      annotation (extent=[-80,-20; -60,0]);
     ThermoPower.Water.ValveLin ValveLin1(Kv=1e-5) 
-      annotation (extent=[8, 22; 28, 42]);
+      annotation (extent=[14,-22; 34,-2]);
     ThermoPower.Water.SinkP SinkP1(p0=3e5) 
-      annotation (extent=[42, 22; 62, 42]);
+      annotation (extent=[48,-22; 68,-2]);
+  /*
+  ThermoPower.Water.Pump Pump1(
+    rho0=1000,
+    pin_start=1e5,
+    pout_start=4e5,
+    hstart=1e5,
+    ThermalCapacity=true,
+    V=0.01,
+    P_cons={800,1800,2000},
+    head_nom={60,30,0},
+    q_nom={0,0.001,0.0015},
+  redeclare package Medium = Modelica.Media.Water.StandardWater,
+  redeclare package SatMedium = Modelica.Media.Water.StandardWater,
+    ComputeNPSHa=true,
+    CheckValve=true,
+    initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+                        annotation (extent=[-54,26; -34,46]);
+*/
     ThermoPower.Water.Pump Pump1(
       rho0=1000,
       pin_start=1e5,
       pout_start=4e5,
       hstart=1e5,
-      ThermalCapacity=true,
       V=0.01,
-      P_cons={800,1800,2000},
-      head_nom={60,30,0},
-      q_nom={0,0.001,0.0015},
-    redeclare package Medium = Modelica.Media.Water.StandardWater,
-    redeclare package SatMedium = Modelica.Media.Water.StandardWater,
+      redeclare package Medium = Modelica.Media.Water.StandardWater,
+      redeclare package SatMedium = Modelica.Media.Water.StandardWater,
       ComputeNPSHa=true,
       CheckValve=true,
-      initOpt=ThermoPower.Choices.Init.Options.steadyState) 
-                          annotation (extent=[-54,26; -34,46]);
-    Modelica.Blocks.Sources.Constant Constant1 
-      annotation (extent=[-72, 64; -52, 84]);
-    Modelica.Blocks.Sources.Sine Sine1(
-      amplitude=5e5,
-      freqHz=0.1,
-      offset=3e5,
-      startTime=0)   annotation (extent=[78, 66; 58, 86]);
+      redeclare function flowCharacteristic = 
+          ThermoPower.Functions.PumpCharacteristics.quadraticFlow (
+          q_nom = {0,0.001,0.0015}, head_nom={60,30,0}),
+      redeclare function powerCharacteristic = 
+          ThermoPower.Functions.PumpCharacteristics.quadraticPower (q_nom={0,
+              0.001,0.0015}, W_nom={350,500,600}),
+      initOpt=ThermoPower.Choices.Init.Options.noInit,
+      Np0=2,
+      usePowerCharacteristic=true) 
+                          annotation (extent=[-46,-20; -26,0]);
+    
+    Modelica.Blocks.Sources.Ramp Ramp1(
+      height=4e5,
+      offset=4e5,
+      duration=4,
+      startTime=4) annotation (extent=[0,40; 20,60]);
+    Modelica.Blocks.Sources.Step Step1(
+      height=1,
+      startTime=1,
+      offset=1e-6) annotation (extent=[-60,22; -40,42]);
   equation 
     connect(ValveLin1.outlet, SinkP1.flange) 
-      annotation (points=[28, 32; 42, 32]);
+      annotation (points=[34,-12; 48,-12]);
     connect(Source.flange, Pump1.infl) 
-      annotation (points=[-66,34; -58,34; -58,38.2; -52,38.2]);
-    connect(Constant1.y,       ValveLin1.cmd) annotation (points=[-51, 74; -16,
-           74; -16, 72; 18, 72; 18, 40], style(color=3));
-    connect(Sine1.y,       SinkP1.in_p0) annotation (points=[57, 76; 52, 76;
-          52, 40.8; 48, 40.8], style(color=3));
+      annotation (points=[-60,-10; -52,-10; -52,-7.8; -44,-7.8]);
     connect(Pump1.outfl, ValveLin1.inlet) 
-      annotation (points=[-38,43.2; -14,43.2; -14,32; 8,32]);
+      annotation (points=[-30,-2.8; -8,-2.8; -8,-12; 14,-12]);
+    connect(Ramp1.y, SinkP1.in_p0) annotation (points=[21,50; 54,50; 54,-3.2],
+        style(color=74, rgbcolor={0,0,127}));
+    connect(Step1.y, ValveLin1.cmd) annotation (points=[-39,32; -18,32; -18,12;
+          24,12; 24,-4], style(color=74, rgbcolor={0,0,127}));
   end WaterPump;
   
   model WaterPumpMech "Test case for WaterPumpMech" 
@@ -3489,8 +3517,13 @@ Simulation Interval = [0...25] sec <br>
 Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6 
 </p>
-<p><b>Revision history:</b></p>
+</html>
+", revisions="<html>
 <ul>
+<li><i>5 Nov 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+       Updated.</li>
         <li><i>5 Feb 2004</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>, 
         First release.</li>
 </ul>
@@ -3499,15 +3532,18 @@ Algorithm Tolerance = 1e-6
     ThermoPower.Water.PumpMech Pump(
       rho0=1000,
       n0=100,
-      head_nom={60,30,0},
-      q_nom={0,0.001,0.0015},
       pin_start=1e5,
       pout_start=4e5,
-      V=1,
-      P_cons={200,1000,1500},
-      ThermalCapacity=true,
+      V=0.001,
     redeclare package Medium = Modelica.Media.Water.StandardWater,
-      initOpt=ThermoPower.Choices.Init.Options.noInit) 
+      initOpt=ThermoPower.Choices.Init.Options.noInit,
+      redeclare function flowCharacteristic = 
+          ThermoPower.Functions.PumpCharacteristics.quadraticFlow (q_nom={0,0.001,
+              0.0015}, head_nom={60,30,0}),
+      usePowerCharacteristic=true,
+      redeclare function powerCharacteristic = 
+          ThermoPower.Functions.PumpCharacteristics.quadraticPower (q_nom={0,
+              0.001,0.0015}, W_nom={350,500,600})) 
                             annotation (extent=[-18, 6; 4, 28]);
     ThermoPower.Water.SourceP Source annotation (extent=[-56, 10; -36, 30]);
     ThermoPower.Water.ValveLin Valve(Kv=1e-5) 
@@ -3522,8 +3558,8 @@ Algorithm Tolerance = 1e-6
     Modelica.Blocks.Sources.Ramp Ramp2(
       duration=5,
       height=380,
-      offset=0,
-      startTime=2)  annotation (extent=[-60, -34; -40, -14]);
+      startTime=2,
+      offset=0.01)  annotation (extent=[-60, -34; -40, -14]);
     SimpleMotor SimpleMotor1(
       Rm=20,
       Lm=0.1,
@@ -3540,7 +3576,7 @@ Algorithm Tolerance = 1e-6
     connect(Valve.outlet, Sink.flange) annotation (points=[34, 24; 48, 24]);
     connect(Ramp2.y,       SimpleMotor1.inPort) 
       annotation (points=[-39, -24; -29.9, -24], style(color=3));
-    connect(SimpleMotor1.flange_b, Pump.MechPort) annotation (points=[-9.2,-24; 
+    connect(SimpleMotor1.flange_b, Pump.MechPort) annotation (points=[-9.2,-24;
           -6,-24; -6,0; 4,0; 4,18.98; 3.45,18.98],     style(color=0));
   end WaterPumpMech;
   
@@ -4149,10 +4185,6 @@ Algorithm Tolerance = 1e-4
     connect(Constant2.y, T1c.temperature_nodeN) annotation (points=[-35,80; 58,
           80; 58,41.6], style(color=74, rgbcolor={0,0,127}));
   end TestConvHT2N;
-  
-  
-  
-  
   
   model TestGasFlow1D 
     package Medium=Modelica.Media.IdealGases.MixtureGases.AirSteam;
@@ -5637,325 +5669,9 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     
   end TestGT;
   
-  model TestCylinderThermalStress 
-    import Modelica.SIunits.*;
-    parameter Integer Nr = 10 "Number of radial nodes in cylinder";
-    
-    annotation (uses(Modelica(version="2.1")), Diagram,
-      experiment(StopTime=25000),
-      experimentSetupOutput,
-      Documentation(info="<html>
-This model tests the <tt>Thermal.CylinderThermalStress</tt> model. Convective heat transfer is assumed at the external cylinder surface, and thermal insulation at the internal surface. 
-
-<p>Simulate for 25000 s. The model starts at steady-state. At time t = 100, the external temperature is increased by 100 K. The cylinder heats up in about 20000 s.
-</html>"));
-  public 
-    ThermoPower.Thermal.CylinderThermalStress CylinderThermalStress(
-      Nr=10,
-      nodeDistribution=ThermoPower.Choices.CylinderFourier.NodeDistribution.
-          thickExternal,
-      rint=76e-3,
-      rext=358.32e-3,
-      redeclare ThermoPower.Thermal.MaterialProperties.Metals.CarbonSteel_A106C
-        metal[Nr]) 
-      annotation (extent=[-16,0; 16,-26]);
-    ThermoPower.Thermal.TempSource1D TempSource1D(N=1) 
-      annotation (extent=[-10,18; 10,38]);
-    Modelica.Blocks.Sources.Step FluidTemperature(
-      offset=300,
-      startTime=100,
-      height=100)    annotation (extent=[-28,34; -14,46]);
-    ThermoPower.Thermal.ConvHT ConvHT(N=1, gamma=1e6) 
-      annotation (extent=[-10,0; 10,20]);
-  equation 
-    connect(FluidTemperature.y, TempSource1D.temperature) annotation (points=[
-          -13.3,40; 0,40; 0,32], style(color=74, rgbcolor={0,0,127}));
-    connect(TempSource1D.wall, ConvHT.side1) 
-      annotation (points=[0,25; 0,13], style(color=45, rgbcolor={255,127,0}));
-    connect(ConvHT.side2, CylinderThermalStress.externalBoundary) annotation (
-        points=[0,6.9; 0,-9.1], style(color=45, rgbcolor={255,127,0}));
-  end TestCylinderThermalStress;
   annotation (uses(ThermoPower(version="2"), Modelica(version="2.2"),
       UserInteraction(version="0.52")),                                version=
         "1");
-  
-  model TestTurbineStress 
-    import Modelica.SIunits.*;
-    
-    replaceable package Water = Modelica.Media.Water.WaterIF97_ph 
-      extends Modelica.Media.Interfaces.PartialTwoPhaseMedium 
-      "Generic water model";
-    
-    parameter AngularVelocity omega_nom = 314 "Steam turbine angular velocity";
-    parameter Pressure steamHPNomPressure = 129.6e5 "Nominal HP steam pressure";
-    parameter MassFlowRate steamHPNomFlowRate = 70.591 
-      "Nominal HP steam flow rate";
-    parameter Pressure steamIPNomPressure = 27.5e5 "Nominal IP steam pressure";
-    parameter MassFlowRate steamIPNomFlowRate = 13.5 
-      "Nominal IP steam flow rate";
-    parameter Pressure steamLPNomPressure = 6.5e5 "Nominal LP steam pressure";
-    parameter SpecificEnthalpy hinNom_HP = 3.47e6 
-      "Nominal HP inlet specific enthalpy";
-    parameter SpecificEnthalpy hinNom_IP = 3.554e6 
-      "Nominal IP inlet specific enthalpy";
-    parameter SpecificEnthalpy houtNom_HP = 3.10e6 
-      "Nominal HP inlet specific enthalpy";
-    parameter SpecificEnthalpy houtNom_IP = 3.128e6 
-      "Nominal IP inlet specific enthalpy";
-    parameter Area Kt_HP = 0.0023 "HP turbine flow coefficient";
-    parameter Area Kt_IP = 0.013 "IP turbine flow coefficient";
-    
-    ThermoPower.Water.SteamTurbineStodola_htc SteamTurbineHP(
-      redeclare package Medium = Water,
-      Kt=Kt_HP,
-      pstart_in=steamHPNomPressure,
-      pstart_out=steamIPNomPressure,
-      hstartin=hinNom_HP,
-      hstartout=houtNom_HP,
-      wnom=steamHPNomFlowRate,
-      rotorDiameter=0.7,
-      statorDiameter=0.8) 
-      annotation (extent=[-46,-16; -16,16]);
-    annotation (Diagram,
-      experiment(StopTime=60000),
-      experimentSetupOutput,
-      Documentation(info="<html>
-This model tests <tt>TurbineThermoMechanicalStress</tt>. 
-
-<p>Simulate for 60000 s. The turbine starts in a hot, steady state. At t = 0, the steam flow is brought to zero. At t = 30000, the steam flow is brought back to full throttle.
-</html>"));
-    ThermoPower.Water.SinkP SinkLP(
-      redeclare package Medium = Water,
-      h=houtNom_IP,
-      p0=steamLPNomPressure)       annotation (extent=[50,30; 70,50]);
-    ThermoPower.Water.SteamTurbineStodola_htc SteamTurbineIP(
-      redeclare package Medium = Water,
-      pstart_in=steamIPNomPressure,
-      pstart_out=steamLPNomPressure,
-      hstartin=hinNom_IP,
-      hstartout=houtNom_IP,
-      wnom=steamIPNomFlowRate,
-      Kt=Kt_IP,
-      statorDiameter=1.1,
-      rotorDiameter=1.0) 
-      annotation (extent=[-4,-16; 26,16]);
-    Modelica.Mechanics.Rotational.ConstantSpeed ReferenceSpeed(w_fixed=omega_nom) 
-      annotation (extent=[72,-12; 48,12]);
-    ThermoPower.Water.SinkP SinkHP(
-      redeclare package Medium = Water,
-      h=houtNom_HP,
-      p0=steamIPNomPressure)       annotation (extent=[50,56; 70,76]);
-    ThermoPower.Thermal.TurbineThermoMechanicalStress ThermoMechanicalStressHP(
-      rint=0.075,
-      rext=SteamTurbineHP.rotorDiameter/2,
-      Nr=10,
-      nodeDistribution=ThermoPower.Choices.CylinderFourier.NodeDistribution.
-          thickExternal,
-      Tstartext=842.64,
-      Tstartint=842.64) 
-      annotation (extent=[-42,-42; -22,-62]);
-    ThermoPower.Thermal.TurbineThermoMechanicalStress ThermoMechanicalStressIP(
-      Nr=10,
-      rint=0.075,
-      rext=SteamTurbineIP.rotorDiameter/2,
-      nodeDistribution=ThermoPower.Choices.CylinderFourier.NodeDistribution.
-          thickExternal,
-      Tstartint=807.179,
-      Tstartext=807.179) 
-      annotation (extent=[22,-42; 2,-62]);
-    ThermoPower.Thermal.ConvHT_htc SteamMetalHT_HP(final N=1,
-      TstartF1=842.64,
-      TstartFN=842.64,
-      TstartO1=842.64,
-      TstartON=842.64) 
-      annotation (extent=[-44,-42; -20,-22]);
-    ThermoPower.Thermal.ConvHT_htc SteamMetalHT_IP(final N=1,
-      TstartF1=807.179,
-      TstartFN=807.179,
-      TstartO1=807.179,
-      TstartON=807.179) 
-      annotation (extent=[0,-42; 24,-22]);
-    ThermoPower.Water.SourceW SourceHP(
-      redeclare package Medium = Water,
-      p0=steamHPNomPressure,
-      h=hinNom_HP,
-      w0=steamHPNomFlowRate) annotation (extent=[-90,24; -70,44]);
-    Modelica.Blocks.Sources.Ramp HPFlowRateDown(
-      startTime=0,
-      height=-steamHPNomFlowRate,
-      offset=steamHPNomFlowRate,
-      duration=4800) annotation (extent=[-96,-2; -84,10]);
-    Modelica.Blocks.Sources.Ramp HPFlowRateUp(
-      duration=4800,
-      height=steamHPNomFlowRate,
-      offset=0,
-      startTime=30000) annotation (extent=[-96,-22; -84,-10]);
-    Modelica.Blocks.Math.Add Add annotation (extent=[-76,-10; -68,-2]);
-    ThermoPower.Water.SourceW SourceIP(
-      redeclare package Medium = Water,
-      w0=steamIPNomFlowRate,
-      p0=steamIPNomPressure,
-      h=hinNom_IP) annotation (extent=[-90,52; -70,72]);
-  equation 
-    connect(SteamTurbineHP.shaft_b, SteamTurbineIP.shaft_a) 
-      annotation (points=[-21.4,0; 1.1,0], style(color=0, rgbcolor={0,0,0}));
-    connect(SteamTurbineIP.outlet, SinkLP.flange) 
-      annotation (points=[22.55,12.8; 37.275,12.8; 37.275,40; 50,40]);
-    connect(ReferenceSpeed.flange, SteamTurbineIP.shaft_b) 
-      annotation (points=[48,0; 20.6,0], style(color=0, rgbcolor={0,0,0}));
-    connect(SinkHP.flange, SteamTurbineHP.outlet) 
-      annotation (points=[50,66; -12,66; -12,12.8; -19.45,12.8]);
-    connect(ThermoMechanicalStressIP.shaft, SteamTurbineIP.shaft_b) annotation (
-       points=[21,-52; 26,-52; 26,0; 20.6,0], style(color=0, rgbcolor={0,0,0}));
-    connect(ThermoMechanicalStressHP.shaft, SteamTurbineHP.shaft_a) annotation (
-       points=[-41,-52; -46,-52; -46,0; -40.9,0], style(color=0, rgbcolor={0,0,
-            0}));
-    connect(SteamMetalHT_HP.otherside, ThermoMechanicalStressHP.
-      externalBoundary) annotation (points=[-32,-35; -32,-49], style(color=45,
-          rgbcolor={255,127,0}));
-    connect(SteamMetalHT_HP.fluidside, SteamTurbineHP.fluidAtRotorSurface) 
-      annotation (points=[-32,-29; -32,-22; -14,-22; -14,18; -30.85,18; -30.85,
-          6.88], style(color=45, rgbcolor={255,128,0}));
-    connect(SteamMetalHT_IP.otherside, ThermoMechanicalStressIP.
-      externalBoundary) annotation (points=[12,-35; 12,-49], style(color=45,
-          rgbcolor={255,127,0}));
-    connect(SteamMetalHT_IP.fluidside, SteamTurbineIP.fluidAtRotorSurface) 
-      annotation (points=[12,-29; 12,-22; -6,-22; -6,18; 11.15,18; 11.15,6.88],
-        style(color=45, rgbcolor={255,128,0}));
-    connect(SourceHP.flange, SteamTurbineHP.inlet) 
-      annotation (points=[-70,34; -58,34; -58,12.64; -42.25,12.64]);
-    connect(HPFlowRateDown.y, Add.u1) annotation (points=[-83.4,4; -80,4; -80,
-          -3.6; -76.8,-3.6], style(color=74, rgbcolor={0,0,127}));
-    connect(HPFlowRateUp.y, Add.u2) annotation (points=[-83.4,-16; -80,-16; -80,
-          -8.4; -76.8,-8.4], style(color=74, rgbcolor={0,0,127}));
-    connect(Add.y, SourceHP.in_w0) annotation (points=[-67.6,-6; -64,-6; -64,20;
-          -94,20; -94,46; -84,46; -84,40], style(color=74, rgbcolor={0,0,127}));
-    connect(SourceIP.flange, SteamTurbineIP.inlet) 
-      annotation (points=[-70,62; -48,62; -48,34; -0.25,34; -0.25,12.64]);
-  end TestTurbineStress;
-  
-  model TestHeaderStress 
-    
-    import Modelica.SIunits.*;
-    
-    replaceable package Water = Modelica.Media.Water.WaterIF97_ph 
-      extends Modelica.Media.Interfaces.PartialTwoPhaseMedium 
-      "Generic water model";
-    
-    parameter Pressure steamNomPressure = 176e5 "Nominal steam pressure";
-    parameter MassFlowRate steamNomFlowRate = 140 "Nominal steam flow rate";
-    parameter Temperature steamNomTemperature = 240 - Modelica.Constants.T_zero 
-      "Nominal steam temperature";
-    parameter SpecificEnthalpy hinNom = Water.h_pT(steamNomPressure,steamNomTemperature) 
-      "Nominal inlet specific enthalpy";
-    
-    ThermoPower.Thermal.ConvHT_htc FluidMetalHT(final N=1,
-      TstartF1=steamNomTemperature,
-      TstartFN=steamNomTemperature,
-      TstartO1=steamNomTemperature,
-      TstartON=steamNomTemperature) 
-      annotation (extent=[-16,22; 16,2]);
-    annotation (Diagram,
-      experiment(StopTime=2000),
-      experimentSetupOutput,
-      Documentation(info="<html>
-This model tests <tt>CylinderThermoMechanicalStress</tt>, by simulating a transient on a water header.
-
-<p>Simulate for 2000 s. The inlet temperature is increased at time t = 300, and then decreased at time t = 600.
-</html>"));
-    ThermoPower.Water.Header_htc Header_htc(
-      redeclare package Medium = Water,
-      D=0.31,
-      V=0.98,
-      S=12.66,
-      pstartin=steamNomPressure,
-      pstartout=steamNomPressure,
-      initOpt=ThermoPower.Choices.Init.Options.steadyState,
-      hstart=hinNom) 
-      annotation (extent=[-10,-20; 10,0]);
-    ThermoPower.Water.SourceW SourceW(
-      w0=steamNomFlowRate,
-      p0=steamNomPressure,
-      redeclare package Medium = Water,
-      h=hinNom)                        annotation (extent=[-88,-20; -68,0]);
-    ThermoPower.Thermal.CylinderThermoMechanicalStress 
-      HeaderThermoMechanicalStress(
-      Nr=10,
-      nodeDistribution=ThermoPower.Choices.CylinderFourier.NodeDistribution.
-          thickInternal,
-      rint=0.155,
-      rext=0.235,
-      Tstartint=steamNomTemperature,
-      Tstartext=steamNomTemperature,
-      initOpt=ThermoPower.Choices.Init.Options.steadyState,
-      mechanicalStandard=ThermoPower.Choices.CylinderMechanicalStress.
-          MechanicalStandard.TRDstandard) annotation (extent=[14,46; -14,18]);
-    ThermoPower.Water.SensT SensTWin(redeclare package Medium = Water) 
-      annotation (extent=[-50,-16; -30,4]);
-    ThermoPower.Water.PressDropLin PressDrop(redeclare package Medium = Water,
-        R=steamNomPressure/steamNomFlowRate) annotation (extent=[30,-20; 50,0]);
-    ThermoPower.Water.SinkP SinkP1(redeclare package Medium = Water, p0=0) 
-      annotation (extent=[62,-20; 82,0]);
-    Modelica.Blocks.Sources.Ramp inFlowDown(
-      offset=steamNomFlowRate,
-      duration=600,
-      startTime=600,
-      height=-0.1*steamNomFlowRate) annotation (extent=[-82,44; -72,54]);
-    Modelica.Blocks.Sources.Ramp inEnthalpyUp(
-      offset=hinNom,
-      duration=120,
-      startTime=300,
-      height=3.5e5) annotation (extent=[-82,62; -72,72]);
-    Modelica.Blocks.Sources.Ramp inEnthalpyDown(
-      offset=0,
-      startTime=600,
-      duration=600,
-      height=-5e5) annotation (extent=[-82,78; -72,88]);
-    Modelica.Blocks.Math.Add Add1 annotation (extent=[-64,72; -58,78]);
-    Modelica.Blocks.Sources.Ramp inFlowUp(
-      offset=steamNomFlowRate,
-      startTime=300,
-      duration=120,
-      height=0.1*steamNomFlowRate) annotation (extent=[-82,28; -72,38]);
-    Modelica.Blocks.Math.Add Add2 annotation (extent=[-64,38; -58,44]);
-    Modelica.Blocks.Continuous.FirstOrder LowPass(T=16) 
-      annotation (extent=[-52,70; -42,80]);
-  equation 
-    connect(Header_htc.InternalSurface, FluidMetalHT.fluidside)  annotation (
-        points=[0,-4.3; 0,9],                      style(color=45, rgbcolor={
-            255,127,0}));
-    connect(HeaderThermoMechanicalStress.internalBoundary, FluidMetalHT.otherside) 
-      annotation (points=[-1.77636e-015,27.8; -1.77636e-015,22; 0,22; 0,15],
-                                             style(color=45, rgbcolor={255,127,0}));
-    connect(HeaderThermoMechanicalStress.internalPressure, Header_htc.outlet) 
-      annotation (points=[12.6,32; 20,32; 20,-10; 10,-10],     style(color=3,
-          rgbcolor={0,0,255}));
-    connect(SourceW.flange, SensTWin.inlet) 
-      annotation (points=[-68,-10; -46,-10]);
-    connect(SensTWin.outlet, Header_htc.inlet) 
-      annotation (points=[-34,-10; -10.1,-10]);
-    connect(PressDrop.inlet, Header_htc.outlet) 
-      annotation (points=[30,-10; 10,-10]);
-    connect(PressDrop.outlet, SinkP1.flange) 
-      annotation (points=[50,-10; 62,-10]);
-    connect(inEnthalpyUp.y, Add1.u2) annotation (points=[-71.5,67; -68.75,67;
-          -68.75,73.2; -64.6,73.2], style(color=74, rgbcolor={0,0,127}));
-    connect(inEnthalpyDown.y, Add1.u1) annotation (points=[-71.5,83; -68,83;
-          -68,76.8; -64.6,76.8], style(color=74, rgbcolor={0,0,127}));
-    connect(inFlowDown.y, Add2.u1) annotation (points=[-71.5,49; -68,49; -68,
-          42.8; -64.6,42.8], style(color=74, rgbcolor={0,0,127}));
-    connect(inFlowUp.y, Add2.u2) annotation (points=[-71.5,33; -68,33; -68,39.2;
-          -64.6,39.2], style(color=74, rgbcolor={0,0,127}));
-    connect(Add2.y, SourceW.in_w0) annotation (points=[-57.7,41; -54,41; -54,6;
-          -82,6; -82,-4], style(color=74, rgbcolor={0,0,127}));
-    connect(Add1.y, LowPass.u) annotation (points=[-57.7,75; -53,75], style(
-          color=74, rgbcolor={0,0,127}));
-    connect(LowPass.y, SourceW.in_h) annotation (points=[-41.5,75; -36,75; -36,
-          10; -74,10; -74,-4], style(color=74, rgbcolor={0,0,127}));
-    
-  initial equation 
-    der(LowPass.y) = 0;
-  end TestHeaderStress;
   
   model TestEvaporatorTemp 
     extends Water.EvaporatorBase(
@@ -5994,7 +5710,7 @@ This model tests <tt>CylinderThermoMechanicalStress</tt>, by simulating a transi
     hout=2.9e6;
     der(p)=0;
   end TestEvaporatorTemp;
-
+  
   model TestEvaporatorFlux 
     extends Water.EvaporatorBase(
       redeclare package Medium=Modelica.Media.Water.StandardWater,
@@ -6025,4 +5741,73 @@ This model tests <tt>CylinderThermoMechanicalStress</tt>, by simulating a transi
     hout=4e5;
     der(p)=0;
   end TestEvaporatorFlux;
+  
+  model TestFanMech 
+    Gas.FanMech FanMech1(redeclare package Medium = 
+          Modelica.Media.Air.SimpleAir,
+      rho0=1.23,
+      n0=590,
+      pin_start=1e5,
+      redeclare function flowCharacteristic = flowChar,
+      bladePos0=0.8,
+      pout_start=1e5 + 5000,
+      q_single_start=0) annotation (extent=[-68,-28; -34,8]);
+    Gas.SinkP SinkP1(redeclare package Medium = Modelica.Media.Air.SimpleAir) 
+      annotation (extent=[4,12; 24,32]);
+    Gas.SourceP SourceP1(redeclare package Medium = 
+          Modelica.Media.Air.SimpleAir) annotation (extent=[-100,-16; -78,6]);
+    annotation (
+      Diagram,
+      experiment(StopTime=50, Algorithm="Dassl"),
+      experimentSetupOutput(equdistant=false));
+    Modelica.Mechanics.Rotational.ConstantSpeed ConstantSpeed1(w_fixed=
+          Modelica.SIunits.Conversions.from_rpm(590)) 
+      annotation (extent=[90,-16; 70,4]);
+    function flowChar = Functions.FanCharacteristics.quadraticFlowBlades (
+      bladePos_nom={0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85},
+      q_nom =      [   0,    0,  100,  300,  470,  620,  760,  900, 1000, 1100, 1300, 1500;
+                      70,  125,  310,  470,  640,  820, 1000, 1200, 1400, 1570, 1700, 1900;
+                     100,  200,  370,  530,  700,  900, 1100, 1300, 1500, 1750, 2000, 2300],
+      H_nom =      [3100, 3800, 3700, 3850, 4200, 4350, 4700, 4900, 5300, 5600, 5850, 6200;
+                    2000, 3000, 3000, 3000, 3000, 3200, 3200, 3300, 3600, 4200, 5000, 5500;
+                    1000, 2000, 2000, 2000, 2000, 1750, 1750, 2000, 2350, 2500, 2850, 3200]);
+    Modelica.Blocks.Sources.Ramp Ramp1(
+      startTime=1,
+      height=0.55,
+      duration=9,
+      offset=0.30) annotation (extent=[-100,40; -80,60]);
+    Modelica.Blocks.Sources.Step Step1(
+      startTime=15,
+      height=-1,
+      offset=1) annotation (extent=[-30,54; -10,74]);
+    Modelica.Mechanics.Rotational.Inertia Inertia1(w(start=Modelica.SIunits.Conversions.from_rpm(590)),
+        J=10000) annotation (extent=[-18,-16; 2,4]);
+    Gas.PressDrop PressDrop1(
+      wnom=2000*1.229,
+      FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
+      dpnom=6000,
+      rhonom=1.229,
+      redeclare package Medium = Modelica.Media.Air.SimpleAir) 
+      annotation (extent=[-28,14; -8,34]);
+    Modelica.Mechanics.Rotational.Clutch Clutch1(fn_max=1e6) 
+      annotation (extent=[30,-16; 50,4]);
+  equation 
+    connect(SourceP1.flange, FanMech1.infl) annotation (points=[-78,-5; -68,-5;
+          -68,-6.04; -64.6,-6.04], style(color=76, rgbcolor={159,159,223}));
+    connect(Ramp1.y, FanMech1.in_bladePos) annotation (points=[-79,50; -57.8,50; 
+          -57.8,3.68], style(color=74, rgbcolor={0,0,127}));
+    connect(FanMech1.MechPort, Inertia1.flange_a) annotation (points=[-34.85,
+          -6.4; -26.425,-6.4; -26.425,-6; -18,-6], style(color=0, rgbcolor={0,0,
+            0}));
+    connect(PressDrop1.outlet, SinkP1.flange) annotation (points=[-8,24; 0,24;
+          0,22; 4,22], style(color=76, rgbcolor={159,159,223}));
+    connect(FanMech1.outfl, PressDrop1.inlet) annotation (points=[-40.8,2.96; 
+          -40.4,2.96; -40.4,24; -28,24], style(color=76, rgbcolor={159,159,223}));
+    connect(Inertia1.flange_b, Clutch1.flange_a) 
+      annotation (points=[2,-6; 30,-6], style(color=0, rgbcolor={0,0,0}));
+    connect(Clutch1.flange_b, ConstantSpeed1.flange) 
+      annotation (points=[50,-6; 70,-6], style(color=0, rgbcolor={0,0,0}));
+    connect(Step1.y, Clutch1.f_normalized) annotation (points=[-9,64; 40,64; 40,
+          5], style(color=74, rgbcolor={0,0,127}));
+  end TestFanMech;
 end Test;
