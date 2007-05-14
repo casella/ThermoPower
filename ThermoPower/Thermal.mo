@@ -42,7 +42,7 @@ This package contains models to compute the material properties needed to model 
         Temperature T "Material temperature";
       end PartialMaterial;
     end Interfaces;
-
+    
     package Common "Implementation of material property models" 
       model MaterialTable 
         "Material property model based on table data and polynomial interpolations" 
@@ -135,10 +135,9 @@ This model computes the thermal and mechanical properties of a generic material.
       end MaterialTable;
     end Common;
     
-    
     package Functions 
       "Utility functions. Provide conversions and interpolation for table data." 
-      function CtoK 
+      function CtoKTable 
         extends Modelica.SIunits.Conversions.ConversionIcon;
         
         input Real[:,:] table_degC;
@@ -149,7 +148,7 @@ This model computes the thermal and mechanical properties of a generic material.
         for i in 1:size(table_degC,1) loop
           table_degK[i,1] := Modelica.SIunits.Conversions.from_degC(table_degC[i, 1]);
         end for;
-      end CtoK;
+      end CtoKTable;
       
       package Polynomials_Temp "Temporary Functions operating on polynomials (including polynomial fitting), extracted from Modelica.Media.Incompressible.TableBased;
    only to be used in Material.MaterialTable" 
@@ -201,16 +200,16 @@ This model computes the thermal and mechanical properties of a generic material.
           final density = 7763,
           final poissonRatio = 0.3,
           tableYoungModulus=
-            Functions.CtoK([ 21, 1.923e11]),
-          tableUltimateStress = Functions.CtoK([ 21, 4.83e8]),
+            Functions.CtoKTable([ 21, 1.923e11]),
+          tableUltimateStress = Functions.CtoKTable([ 21, 4.83e8]),
           tableYieldStress=
-            Functions.CtoK([ 21, 2.76e8]),
+            Functions.CtoKTable([ 21, 2.76e8]),
           tableLinearExpansionCoefficient=
-            Functions.CtoK([ 21, 10.93e-6]),
+            Functions.CtoKTable([ 21, 10.93e-6]),
           tableSpecificHeatCapacity=
-            Functions.CtoK([ 21, 478.2]),
+            Functions.CtoKTable([ 21, 478.2]),
           tableThermalConductivity=
-            Functions.CtoK([ 21, 62.30]));
+            Functions.CtoKTable([ 21, 62.30]));
       end StandardSteel;
       
       model CarbonSteel_A106C 
@@ -220,20 +219,20 @@ This model computes the thermal and mechanical properties of a generic material.
           final density = 7763,
           final poissonRatio = 0.3,
           tableYoungModulus=
-            Functions.CtoK([ 21, 1.923e11;  93, 1.910e11; 149, 1.889e11; 204, 1.861e11; 260, 1.820e11;
+            Functions.CtoKTable([ 21, 1.923e11;  93, 1.910e11; 149, 1.889e11; 204, 1.861e11; 260, 1.820e11;
                             316, 1.772e11; 371, 1.710e11; 427, 1.613e11; 482, 1.491e11; 538, 1.373e11]),
-          tableUltimateStress = Functions.CtoK([ 21, 4.83e8]),
+          tableUltimateStress = Functions.CtoKTable([ 21, 4.83e8]),
           tableYieldStress=
-            Functions.CtoK([ 21, 2.76e8;  93, 2.50e8; 149, 2.45e8; 204, 2.37e8; 260, 2.23e8;
+            Functions.CtoKTable([ 21, 2.76e8;  93, 2.50e8; 149, 2.45e8; 204, 2.37e8; 260, 2.23e8;
                             316, 2.05e8; 371, 1.98e8; 427, 1.84e8; 482, 1.75e8; 538, 1.57e8]),
           tableLinearExpansionCoefficient=
-            Functions.CtoK([ 21, 10.93e-6;  93, 11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6;
+            Functions.CtoKTable([ 21, 10.93e-6;  93, 11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6;
                             316, 13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538, 14.35e-6]),
           tableSpecificHeatCapacity=
-            Functions.CtoK([ 21, 478.2;  93, 494.1; 149, 510.4; 204, 526.3; 260, 541.0;
+            Functions.CtoKTable([ 21, 478.2;  93, 494.1; 149, 510.4; 204, 526.3; 260, 541.0;
                             316, 556.9; 371, 581.2; 427, 608.8; 482, 665.3; 538, 684.6]),
           tableThermalConductivity=
-            Functions.CtoK([ 21, 62.30;  93, 60.31; 149, 57.45; 204, 54.68; 260, 51.57;
+            Functions.CtoKTable([ 21, 62.30;  93, 60.31; 149, 57.45; 204, 54.68; 260, 51.57;
                             316, 48.97; 371, 46.38; 427, 43.96; 482, 41.18; 538, 39.11]));
       end CarbonSteel_A106C;
       
@@ -244,20 +243,20 @@ This model computes the thermal and mechanical properties of a generic material.
           final density = 7763,
           final poissonRatio = 0.3,
           tableYoungModulus=
-            Functions.CtoK([ 21, 1.923e11;  93, 1.910e11; 149, 1.889e11; 204, 1.861e11; 260, 1.820e11;
+            Functions.CtoKTable([ 21, 1.923e11;  93, 1.910e11; 149, 1.889e11; 204, 1.861e11; 260, 1.820e11;
                             316, 1.772e11; 371, 1.710e11; 427, 1.613e11; 482, 1.491e11; 538, 1.373e11]),
-          tableUltimateStress = Functions.CtoK([ 21, 4.1412e8]),
+          tableUltimateStress = Functions.CtoKTable([ 21, 4.1412e8]),
           tableYieldStress=
-            Functions.CtoK([ 40, 2.41e8; 100, 2.18e8; 150, 2.14e8; 200, 2.08e8; 250, 1.98e8;
+            Functions.CtoKTable([ 40, 2.41e8; 100, 2.18e8; 150, 2.14e8; 200, 2.08e8; 250, 1.98e8;
                             300, 1.83e8; 350, 1.75e8; 400, 1.68e8; 450, 1.56e8; 475, 1.54e8]),
           tableLinearExpansionCoefficient=
-            Functions.CtoK([ 21, 10.93e-6;  93, 11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6;
+            Functions.CtoKTable([ 21, 10.93e-6;  93, 11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6;
                             316, 13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538, 14.35e-6]),
           tableSpecificHeatCapacity=
-            Functions.CtoK([ 21, 478.2;  93, 494.1; 149, 510.4; 204, 526.3; 260, 541.0;
+            Functions.CtoKTable([ 21, 478.2;  93, 494.1; 149, 510.4; 204, 526.3; 260, 541.0;
                             316, 556.9; 371, 581.2; 427, 608.8; 482, 665.3; 538, 684.6]),
           tableThermalConductivity=
-            Functions.CtoK([ 21, 62.30;  93, 60.31; 149, 57.45; 204, 54.68; 260, 51.57;
+            Functions.CtoKTable([ 21, 62.30;  93, 60.31; 149, 57.45; 204, 54.68; 260, 51.57;
                             316, 48.97; 371, 46.38; 427, 43.96; 482, 41.18; 538, 39.11]));
       end CarbonSteel_A106B;
       
@@ -268,20 +267,20 @@ This model computes the thermal and mechanical properties of a generic material.
           final density = 7763,
           final poissonRatio = 0.3,
           tableYoungModulus=
-            Functions.CtoK([ 21, 2.061e11;  93, 2.034e11; 149, 1.999e11; 204, 1.972e11; 260, 1.930e11;
+            Functions.CtoKTable([ 21, 2.061e11;  93, 2.034e11; 149, 1.999e11; 204, 1.972e11; 260, 1.930e11;
                             316, 1.889e11; 371, 1.834e11; 427, 1.772e11; 482, 1.689e11; 538, 1.586e11]),
-          tableUltimateStress = Functions.CtoK([ 21, 4.1412e8]),
+          tableUltimateStress = Functions.CtoKTable([ 21, 4.1412e8]),
           tableYieldStress=
-            Functions.CtoK([ 21, 2.07e8;  93, 1.92e8; 149, 1.87e8; 204, 1.86e8; 260, 1.86e8;
+            Functions.CtoKTable([ 21, 2.07e8;  93, 1.92e8; 149, 1.87e8; 204, 1.86e8; 260, 1.86e8;
                             316, 1.86e8; 371, 1.86e8; 427, 1.84e8; 482, 1.77e8; 538, 1.63e8]),
           tableLinearExpansionCoefficient=
-            Functions.CtoK([ 21, 10.93e-6;  93, 11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6;
+            Functions.CtoKTable([ 21, 10.93e-6;  93, 11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6;
                             316, 13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538, 14.35e-6]),
           tableSpecificHeatCapacity=
-            Functions.CtoK([ 21, 478.2;  93, 494.1; 149, 510.4; 204, 526.3; 260, 541.0;
+            Functions.CtoKTable([ 21, 478.2;  93, 494.1; 149, 510.4; 204, 526.3; 260, 541.0;
                             316, 556.9; 371, 581.2; 427, 608.8; 482, 665.3; 538, 684.6]),
           tableThermalConductivity=
-            Functions.CtoK([ 21, 62.30;  93, 60.31; 149, 57.45; 204, 54.68; 260, 51.57;
+            Functions.CtoKTable([ 21, 62.30;  93, 60.31; 149, 57.45; 204, 54.68; 260, 51.57;
                             316, 48.97; 371, 46.38; 427, 43.96; 482, 41.18; 538, 39.11]));
       end AlloySteel_A335P22;
       
@@ -292,24 +291,24 @@ This model computes the thermal and mechanical properties of a generic material.
           final density = 7763,
           final poissonRatio = 0.3,
           tableYoungModulus=
-            Functions.CtoK([ 25, 2.050e11; 100, 2.000e11; 150, 1.960e11; 200, 1.930e11; 250, 1.900e11;
+            Functions.CtoKTable([ 25, 2.050e11; 100, 2.000e11; 150, 1.960e11; 200, 1.930e11; 250, 1.900e11;
                             300, 1.870e11; 350, 1.830e11; 400, 1.790e11; 450, 1.740e11; 475, 1.720e11;
                             500, 1.697e11; 550, 1.648e11]),
-          tableUltimateStress = Functions.CtoK([ 21, 4.1404e8]),
+          tableUltimateStress = Functions.CtoKTable([ 21, 4.1404e8]),
           tableYieldStress=
-            Functions.CtoK([ 40, 2.07e8; 100, 1.92e8; 150, 1.85e8; 200, 1.81e8; 250, 1.79e8;
+            Functions.CtoKTable([ 40, 2.07e8; 100, 1.92e8; 150, 1.85e8; 200, 1.81e8; 250, 1.79e8;
                             300, 1.76e8; 350, 1.66e8; 400, 1.56e8; 425, 1.55e8; 450, 1.51e8;
                             475, 1.46e8; 500, 1.43e8; 525, 1.39e8]),
           tableLinearExpansionCoefficient=
-            Functions.CtoK([ 50, 10.49e-6; 100, 11.08e-6; 150, 11.63e-6; 200, 12.14e-6; 250, 12.60e-6;
+            Functions.CtoKTable([ 50, 10.49e-6; 100, 11.08e-6; 150, 11.63e-6; 200, 12.14e-6; 250, 12.60e-6;
                             300, 13.02e-6; 350, 13.40e-6; 400, 13.74e-6; 425, 13.89e-6; 450, 14.02e-6;
                             500, 14.28e-6; 550, 14.50e-6]),
           tableSpecificHeatCapacity=
-            Functions.CtoK([ 25, 439.5; 100, 477.2; 150, 498.1; 200, 523.3; 250, 540.0;
+            Functions.CtoKTable([ 25, 439.5; 100, 477.2; 150, 498.1; 200, 523.3; 250, 540.0;
                             300, 560.9; 350, 577.5; 400, 602.8; 425, 611.2; 450, 627.9;
                             475, 644.6; 500, 657.2; 550, 690.7]),
           tableThermalConductivity=
-            Functions.CtoK([ 25, 41.9; 100, 42.2; 150, 41.9; 200, 41.4; 250, 40.6;
+            Functions.CtoKTable([ 25, 41.9; 100, 42.2; 150, 41.9; 200, 41.4; 250, 40.6;
                             300, 39.7; 350, 38.5; 400, 37.4; 425, 36.7; 450, 36.3;
                             475, 35.7; 500, 35.0; 550, 34.0]));
       end AlloySteel_A335P12;
@@ -333,6 +332,14 @@ This model computes the thermal and mechanical properties of a generic material.
     
   end MaterialProperties;
   extends Modelica.Icons.Library;
+  connector HT = Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a 
+    "Thermal port for 1-dim. heat transfer";
+  connector HThtc 
+    "Thermal port for 1-dim. heat transfer with heat transfer coefficient" 
+    extends HT;
+    ThermalConductance gamma "Heat transfer coefficient";
+  end HThtc;
+  
   connector DHT "Distributed Heat Terminal" 
     annotation (Icon(Rectangle(extent=[-100, 100; 100, -100], style(color=45,
                fillColor=45))));
@@ -346,7 +353,44 @@ This model computes the thermal and mechanical properties of a generic material.
     CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
   end DHThtc;
   
-  model DHThtc_to_DHT "Conversion from a DHThtc to a DHT connector" 
+  model HThtc_HT "Conversion from a HThtc to a HT connector" 
+    
+    annotation (Diagram, Icon(
+        Text(
+          extent=[-84,38; -28,64],
+          style(
+            color=0,
+            rgbcolor={0,0,0},
+            thickness=4,
+            arrow=1,
+            fillPattern=1),
+          string="HThtc"),
+        Text(
+          extent=[54,-74; 108,-48],
+          style(
+            color=0,
+            rgbcolor={0,0,0},
+            arrow=1,
+            fillPattern=1),
+          string="HT    "),
+        Rectangle(extent=[-100,100; 100,-100], style(
+            color=1,
+            rgbcolor={255,0,0},
+            arrow=1)),
+        Line(points=[-96,0; 96,0], style(
+            color=1,
+            rgbcolor={255,0,0},
+            arrow=1,
+            fillPattern=1))));
+    
+    HT outHT annotation (extent=[100,-10; 120,10]);
+    HThtc inHThtc annotation (extent=[-120,-10; -100,10]);
+  equation 
+    outHT.T = inHThtc.T;
+    outHT.Q_flow = inHThtc.Q_flow;
+  end HThtc_HT;
+  
+  model DHThtc_DHT "Conversion from a DHThtc to a DHT connector" 
     DHT outDHT(N=N) annotation (extent=[100,80; 110,-80]);
     DHThtc inDHThtc(N=N) annotation (extent=[-110,80; -100,-80], rotation=90);
     
@@ -383,20 +427,20 @@ This model computes the thermal and mechanical properties of a generic material.
   equation 
     outDHT.T[1:N] = inDHThtc.T[1:N];
     outDHT.phi[1:N] = inDHThtc.phi[1:N];
-  end DHThtc_to_DHT;
+  end DHThtc_DHT;
   
-  model HeatPort_to_DHT 
+  model HT_DHT 
     parameter Area exchangeSurface "Heat exchange surface";
     annotation (Icon(
         Text(
-          extent=[-84,38; -28,64],
+          extent=[-96,38; -40,64],
           style(
             color=0,
             rgbcolor={0,0,0},
             thickness=4,
             arrow=1,
             fillPattern=1),
-          string="HeatPort"),
+          string="HT"),
         Text(
           extent=[44,-74; 98,-48],
           string="DHT    ",
@@ -413,12 +457,46 @@ This model computes the thermal and mechanical properties of a generic material.
         Rectangle(extent=[-100,100; 100,-100], style(color=1, rgbcolor={255,0,0}))),
         Diagram);
     DHT outDHT(final N=1) annotation (extent=[100,-80; 110,80]);
-    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a inHeatPort 
-      annotation (extent=[-120,-12; -100,10]);
+    HT inHT annotation (extent=[-120,-12; -100,10]);
   equation 
-    outDHT.T[1] = inHeatPort.T;
-    outDHT.phi[1] = inHeatPort.Q_flow/exchangeSurface;
-  end HeatPort_to_DHT;
+    outDHT.T[1] = inHT.T;
+    outDHT.phi[1] = inHT.Q_flow/exchangeSurface;
+  end HT_DHT;
+  
+  model HThtc_DHThtc 
+    parameter Area exchangeSurface "Heat exchange surface";
+    annotation (Icon(
+        Text(
+          extent=[-94,38; -38,64],
+          style(
+            color=0,
+            rgbcolor={0,0,0},
+            thickness=4,
+            arrow=1,
+            fillPattern=1),
+          string="HThtc"),
+        Text(
+          extent=[36,-74; 90,-48],
+          style(
+            color=0,
+            rgbcolor={0,0,0},
+            arrow=1,
+            fillPattern=1),
+          string="DHThtc"),
+        Line(points=[-96,0; 96,0], style(
+            color=1,
+            rgbcolor={255,0,0},
+            arrow=1,
+            fillPattern=1)),
+        Rectangle(extent=[-100,100; 100,-100], style(color=1, rgbcolor={255,0,0}))),
+        Diagram);
+    DHThtc outDHThtc(final N=1) annotation (extent=[100,-80; 110,80]);
+    HThtc inHThtc annotation (extent=[-120,-12; -100,10]);
+  equation 
+    outDHThtc.T[1] = inHThtc.T;
+    outDHThtc.phi[1] = inHThtc.Q_flow/exchangeSurface;
+    outDHThtc.gamma[1] = inHThtc.gamma/exchangeSurface;
+  end HThtc_DHThtc;
   
   model MetalTube "Cylindrical metal tube" 
     extends Icons.MetalWall;
@@ -429,10 +507,12 @@ This model computes the thermal and mechanical properties of a generic material.
     parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
     parameter ThermalConductivity lambda "Thermal conductivity";
     parameter Boolean WallRes=true "Wall conduction resistance accounted for";
-    parameter Temperature Tstart1=300 "Temperature start value - first node";
-    parameter Temperature TstartN=300 "Temperature start value - last node";
+    parameter Temperature Tstart1=300 "Temperature start value - first node" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Temperature TstartN=300 "Temperature start value - last node" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     constant Real pi=Modelica.Constants.pi;
     AbsoluteTemperature T[N](start=linspace(Tstart1,TstartN,N)) 
       "Node temperatures";
@@ -510,13 +590,17 @@ This model computes the thermal and mechanical properties of a generic material.
     parameter CoefficientOfHeatTransfer gamma 
       "Constant heat transfer coefficient";
     parameter Temperature Tstart11=300 
-      "Temperature start value - side 1 node 1";
+      "Temperature start value - side 1 node 1" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Temperature Tstart1N=300 
-      "Temperature start value - side 1 node N";
+      "Temperature start value - side 1 node N" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Temperature Tstart21=300 
-      "Temperature start value - side 2 node 1";
+      "Temperature start value - side 2 node 1" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Temperature Tstart2N=300 
-      "Temperature start value - side 2 node N";
+      "Temperature start value - side 2 node N" 
+      annotation(Dialog(tab = "Initialisation"));
     DHT side1(N=N, T(start=linspaceExt(Tstart11,Tstart1N,N))) 
                    annotation (extent=[-40, 20; 40, 40]);
     DHT side2(N=N, T(start=linspaceExt(Tstart11,Tstart1N,N))) 
@@ -547,13 +631,17 @@ This model computes the thermal and mechanical properties of a generic material.
     parameter CoefficientOfHeatTransfer gamma 
       "Constant heat transfer coefficient";
     parameter Temperature Tstart11=300 
-      "Temperature start value - side 1 node 1";
+      "Temperature start value - side 1 node 1" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Temperature Tstart1N=300 
-      "Temperature start value - side 1 node N";
+      "Temperature start value - side 1 node N" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Temperature Tstart21=300 
-      "Temperature start value - side 2 node 1";
+      "Temperature start value - side 2 node 1" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Temperature Tstart2N=300 
-      "Temperature start value - side 2 node N";
+      "Temperature start value - side 2 node N" 
+      annotation(Dialog(tab = "Initialisation"));
     DHT side1(N=N1, T(start=linspaceExt(Tstart11,Tstart1N,N1))) 
                    annotation (extent=[-40, 20; 40, 40]);
     DHT side2(N=N2, T(start=linspaceExt(Tstart11,Tstart1N,N2))) 
@@ -720,11 +808,8 @@ This model computes the thermal and mechanical properties of a generic material.
           string="%name",
           style(color=46))), Documentation(info="<HTML>
 <p>Model of a simple convective heat transfer mechanism between two 1D objects having (possibly) different nodes, with a constant heat transfer coefficient.
-
 <p>The heat flux through each node of side with a larger number of nodes is computed as a function of the difference between the node temperatures and the corresponding temperatures on the other side, obtained by linear interpolation.
-
 <p>The corresponding heat flux on the side with fewer nodes is computed so that the averaged heat flux around those nodes is equal to the averaged heat flux on the corresponding intervals on the other side.
-
 </HTML>", revisions="<html>
 <ul>
 <li><i>12 May 2005</i>
@@ -737,19 +822,19 @@ This model computes the thermal and mechanical properties of a generic material.
   
   model ConvHT_htc "Convective heat exchange (externally supplied h.t.c.)" 
     extends Icons.HeatFlow;
-    Thermal.DHThtc fluidside(N=N, T(start=linspaceExt(TstartF1,TstartFN,N))) 
-                                  annotation (extent=[-40,20; 40,40]);
     parameter Integer N=2 "Number of Nodes";
     parameter Temperature TstartF1=300 
-      "Temperature start value - fluid side node 1";
+      "Temperature start value - fluid side node 1" annotation(Dialog(tab = "Initialisation"));
     parameter Temperature TstartFN=300 
-      "Temperature start value - fluid side node N";
+      "Temperature start value - fluid side node N" annotation(Dialog(tab = "Initialisation"));
     parameter Temperature TstartO1=300 
-      "Temperature start value - other side node 1";
+      "Temperature start value - other side node 1" annotation(Dialog(tab = "Initialisation"));
+    parameter Temperature TstartON=300 
+      "Temperature start value - other side node N" annotation(Dialog(tab = "Initialisation"));
     Thermal.DHT otherside(N=N, T(start=linspaceExt(TstartF1,TstartFN,N))) 
                                annotation (extent=[-40,-40; 40,-20]);
-    parameter Temperature TstartON=300 
-      "Temperature start value - other side node N";
+    Thermal.DHThtc fluidside(N=N, T(start=linspaceExt(TstartF1,TstartFN,N))) 
+                                  annotation (extent=[-40,20; 40,40]);
   equation 
     for j in 1:N loop
       fluidside.phi[j] = fluidside.gamma[j]*(fluidside.T[j] - otherside.T[j]) 
@@ -785,12 +870,20 @@ This model computes the thermal and mechanical properties of a generic material.
   model CounterCurrent "Counter-current heat transfer adaptor" 
     extends Icons.HeatFlow;
     parameter Integer N=2 "Number of Nodes";
+    parameter Boolean counterCurrent = true 
+      "Swap temperature and flux vector order";
+    
     Thermal.DHT side1(N=N) annotation (extent=[-40, 20; 40, 40]);
     Thermal.DHT side2(N=N) annotation (extent=[-40, -42; 40, -20]);
   equation 
     // Swap temperature and flux vector order
-    side1.phi = - side2.phi[N:-1:1];
-    side1.T = side2.T[N:-1:1];
+    if counterCurrent then
+      side1.phi = - side2.phi[N:-1:1];
+      side1.T = side2.T[N:-1:1];
+    else
+      side1.phi = - side2.phi;
+      side1.T = side2.T;
+    end if;
     annotation (Icon(
         Polygon(points=[-74, 2; -48, 8; -74, 16; -56, 8; -74, 2], style(color=
                0, fillColor=0)),
@@ -800,13 +893,19 @@ This model computes the thermal and mechanical properties of a generic material.
           extent=[-100, -46; 100, -70],
           string="%name",
           style(color=46))), Documentation(info="<HTML>
-<p>This component can be used to model counter-current heat transfer: the temperature of node <tt>j</tt> on side 1 is equal to the temperature of note <tt>N-j+1</tt> on side 2; heat fluxes behave correspondingly.
+<p>This component can be used to model counter-current heat transfer. The temperature and flux vectors on one side are swapped with respect to the other side. This means that the temperature of node <tt>j</tt> on side 1 is equal to the temperature of note <tt>N-j+1</tt> on side 2; heat fluxes behave correspondingly.
+<p>
+The swapping is performed if the counterCurrent parameter is true (default value).
 </HTML>", revisions="<html>
 <ul>
+<li><i>25 Aug 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       <tt>counterCurrent</tt> parameter added.</li>
 <li><i>1 Oct 2003</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
+
 </html>
 "));
   end CounterCurrent;
@@ -976,11 +1075,14 @@ model CylinderFourier
   parameter Length rint "Internal radius";
   parameter Length rext "External radius";
   parameter Temperature Tstartint=300 
-      "Temperature start value at rint (first node)";
+      "Temperature start value at rint (first node)" 
+    annotation(Dialog(tab = "Initialisation"));
   parameter Temperature Tstartext=300 
-      "Temperature start value at rext (last node)";
+      "Temperature start value at rext (last node)" 
+    annotation(Dialog(tab = "Initialisation"));
    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" 
+                            annotation(Dialog(tab = "Initialisation"));
     
   protected 
   parameter Length r[Nr](fixed=false) "Node radii";
@@ -1017,17 +1119,15 @@ model CylinderFourier
         extent=[-98,-44; 102,-72],
         style(color=46),
         string="%name")),
-    DymolaStoredErrors, 
+    DymolaStoredErrors,
       Documentation(info="<html>
 This is the 1D thermal model of a solid hollow cylinder by Fourier's equations. 
-
 <p>The model is axis-symmetric, has one node in the longitudinal direction, and <tt>Nr</tt> nodes in the radial direction. The two connectors correspond to the internal and external surfaces; if one of the surface is thermally insulated, just leave the connector unconnected (no connection on a <tt>DHT</tt> connector means zero heat flux). The temperature-dependent properties of the material are described by the replaceable <tt>MaterialModel</tt> model.
-
 <p><b>Modelling options</b></p>
 The radial distribution of the nodes can be chosen by selecting the value of <tt>nodeDistribution</tt>:
 <ul>
 <li> <tt>Choices.CylinderFourier.NodeDistribution.thickInternal</tt> quadratic distribution, nodes are thickest near the internal surface; 
-<li> <tt>Choices.CylinderFourier.NodeDistribution.thickEnternal</tt> quadratic distribution, nodes are thickest near the external surface; 
+<li> <tt>Choices.CylinderFourier.NodeDistribution.thickExternal</tt> quadratic distribution, nodes are thickest near the external surface; 
 <li> <tt>Choices.CylinderFourier.NodeDistribution.thickBoth</tt> quadratic distribution, nodes are thickest near both surfaces.
 </ul>
 </html>", revisions="<html>
@@ -1036,7 +1136,6 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
     by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
        First release.</li>
 </ul>
-
 </html>"));
   ThermoPower.Thermal.DHT internalBoundary(final N=1) 
     annotation (extent=[-20,20; 20,40]);
@@ -1083,6 +1182,15 @@ initial equation
   B[Nr] = 0;
   C[Nr] = 0;
     
+  // Initial conditions
+  if initOpt == Choices.Init.Options.noInit then
+    // do nothing
+  elseif initOpt == Choices.Init.Options.steadyState then
+    der(T[2:Nr-1]) = zeros(Nr-2);
+  else
+    assert(false, "Unsupported initialisation option");
+  end if;
+    
 equation 
   // Metal temperature equations
   metal[1:Nr].T = T[1:Nr];
@@ -1101,139 +1209,10 @@ equation
     
   // Mean temperature
   Tm = sum(T)/Nr;
-initial equation 
-  // Initial conditions
-  if initOpt == Choices.Init.Options.noInit then
-    // do nothing
-  elseif initOpt == Choices.Init.Options.steadyState then
-    der(T[2:Nr-1]) = zeros(Nr-2);
-  else
-    assert(false, "Unsupported initialisation option");
-  end if;
 end CylinderFourier;
   
-model CylinderThermalStress "Thermal stress model in a hollow cylinder" 
-  extends CylinderFourier;
-  import Modelica.SIunits.*;
-    
-  NormalStress extThermalStress[3] "Thermal stress at the external surface";
-  NormalStress intThermalStress[3] "Thermal stress at the internal surface";
-    
-  annotation (Diagram, Icon(Text(
-          extent=[-80,20; 80,-20], 
-          string="sigma", 
-          style(color=7, rgbcolor={255,255,255}))),
-    Documentation(info="<html>
-This model extends <tt>CylinderFourier</tt> by adding the computation of the three components of the thermal stress at the internal and external surfaces.
-</html>", revisions="<html>
-<ul>
-<li><i>10 May 2005</i>
-    by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-equation 
-  // Thermal stresses
-  intThermalStress[1] = 0 "Radial stress at rint";
-  intThermalStress[2] = metal[1].linearExpansionCoefficient*metal[1].youngModulus
-               /(1-metal[1].poissonRatio)*(Tm-T[1]) "Tangential stress at rint";
-  intThermalStress[3] = metal[1].linearExpansionCoefficient*metal[1].youngModulus
-               /(1-metal[1].poissonRatio)*(Tm-T[1]) "Axial stress at rint";
-  extThermalStress[1] = 0 "Radial stress at rext";
-  extThermalStress[2] = metal[Nr].linearExpansionCoefficient*metal[Nr].youngModulus
-               /(1-metal[Nr].poissonRatio)*(Tm-T[Nr]) 
-      "Tangential stress at rext";
-  extThermalStress[3] = metal[Nr].linearExpansionCoefficient*metal[Nr].youngModulus
-               /(1-metal[Nr].poissonRatio)*(Tm-T[Nr]) "Axial stress at rext";
-end CylinderThermalStress;
   
-  model CylinderThermoMechanicalStress 
-    "Thermo-mechanical stress model in a hollow cylinder" 
-    extends CylinderThermalStress;
-    import ThermoPower.Choices.CylinderMechanicalStress.MechanicalStandard;
-    
-    parameter MechanicalStandard.Temp mechanicalStandard "Mechanical standard";
-    parameter Real Kt=1 "Machine geometric factor for thermal stresses";
-    parameter Real Kp=1 "Machine geometric factor for mechanical stresses";
-    
-    Water.Flange internalPressure "Internal pressure of the cylinder" 
-      annotation (extent=[-96,-6; -84,6]);
-    
-    NormalStress intMechanicalStress[3];
-    NormalStress extMechanicalStress[3];
-    annotation (Diagram, Icon,
-      Documentation(revisions="<html>
-<ul>
-<li><i>10 May 2005</i>
-    by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
-       First release.</li>
-</ul>
-</html>", info="<html>
-This model extends <tt>CylinderThermalStress</tt> by adding the computation of the mechanical stress due to the pressure of a fluid inside the hollow. A <tt>Flange</tt> connector is provided to connect to the fluid flow.
-<p>This model can be used to describe the stress state in a header or drum boiler.</p>
-</html>"));
-    
-  equation 
-    internalPressure.w = 0;
-    
-    // Mechanical stresses
-    if mechanicalStandard == MechanicalStandard.TRDstandard then
-      intMechanicalStress[1] = 0.5*internalPressure.p*(rint+rext)/(rext-rint) 
-        "Radial stress at rint";
-      intMechanicalStress[2] = 0 "Tangential stress at rint";
-      intMechanicalStress[3] = 0 "Axial stress at rint";
-    elseif mechanicalStandard == MechanicalStandard.ASMEstandard then
-      intMechanicalStress[1] = -internalPressure.p "Radial stress at rint";
-      intMechanicalStress[2] = internalPressure.p*((rext/rint)^2+1)/((rext/rint)^2-1) 
-        "Tangential stress at rint";
-      intMechanicalStress[3] = internalPressure.p/((rext/rint)^2-1) 
-        "Axial stress at rint";
-    else
-      assert(true,"Unsupported MechanicalStandard type");
-    end if;
-    
-    extMechanicalStress[1] = 0 "Radial stress at rext";
-    extMechanicalStress[2] = 0 "Tangential stress at rext";
-    extMechanicalStress[3] = 0 "Axial stress at rext";
-    
-  end CylinderThermoMechanicalStress;
   
-  model TurbineThermoMechanicalStress 
-    extends CylinderThermalStress;
-    
-    Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-      annotation (extent=[-96,-6; -84,6]);
-    NormalStress intMechanicalStress[3];
-    NormalStress extMechanicalStress[3];
-    annotation (Diagram, Icon,
-      Documentation(revisions="<html>
-<ul>
-<li><i>10 May 2005</i>
-    by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
-       First release.</li>
-</ul>
-</html>",   info="<html>
-This model extends <tt>CylinderThermalStress</tt> by adding the computation of the mechanical stress due to the centrifugal forces in a rotating cylinder. A rotational shaft connector is provided to connect to the shaft model.
-
-<p>This model can be used to describe the stress state in the section of a steam turbine shaft corresponding to a single blade row.</p>
-</html>"));
-  equation 
-    // Boundary conditions
-    shaft.tau = 0;
-    
-    // Mechanical stresses
-    intMechanicalStress[1] = 0 "Radial stress at rint";
-    intMechanicalStress[2] = (3+metal[1].poissonRatio)/4 * metal[1].density*der(shaft.phi)^2
-       *(rext^2+(1-metal[1].poissonRatio)/(3+metal[1].poissonRatio)*rint^2) 
-      "Tangential stress at rint";
-    intMechanicalStress[3] = 0 "Axial stress at rint";
-    
-    extMechanicalStress[1] = 0 "Radial stress at rext";
-    extMechanicalStress[2] = (3+metal[Nr].poissonRatio)/4 * metal[Nr].density*der(shaft.phi)^2
-      *(rint^2+(1-metal[Nr].poissonRatio)/(3+metal[Nr].poissonRatio)*rext^2) 
-      "Tangential stress at rext";
-    extMechanicalStress[3] = 0 "Axial stress at rext";
-  end TurbineThermoMechanicalStress;
   
   function linspaceExt "Extended linspace handling also the N=1 case" 
   input Real x1;
