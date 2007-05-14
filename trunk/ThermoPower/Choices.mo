@@ -71,6 +71,24 @@ package Choices "Choice enumerations for ThermoPower models"
           choice=ThermoPower.Choices.Flow1D.FFtypes.NoFriction "No friction"));
       end Temp;
     end FFtypes;
+    
+    package HCtypes 
+      "Type, constants and menu choices to select the location of the hydraulic capacitance" 
+      annotation (preferedView="text");
+      import Modelica.Icons;
+      extends Icons.Enumeration;
+      constant Integer Middle = 0 "Middle of the pipe";
+      constant Integer Upstream = 1 "At the inlet";
+      constant Integer Downstream = 2 "At the outlet";
+      type Temp 
+        "Temporary type with choices for menus (until enumerations are available)" 
+        extends Integer(min=0, max=2);
+        annotation (Evaluate=true, choices(
+          choice=ThermoPower.Choices.Flow1D.HCtypes.Middle "Middle of the pipe",
+          choice=ThermoPower.Choices.Flow1D.HCtypes.Upstream "At the inlet",
+          choice=ThermoPower.Choices.Flow1D.HCtypes.Downstream "At the outlet"));
+      end Temp;
+    end HCtypes;
   end Flow1D;
   
   package PressDrop 
@@ -102,7 +120,7 @@ package Choices "Choice enumerations for ThermoPower models"
       constant Integer Av = 0 "Av (metric) flow coefficient";
       constant Integer Kv = 1 "Kv (metric) flow coefficient";
       constant Integer Cv = 2 "Cv (US) flow coefficient";
-      constant Integer OpPoint = 3 "Av defined by initial equation";
+      constant Integer OpPoint = 3 "Av defined by nominal operating point";
       type Temp 
         "Temporary type with choices for menus (until enumerations are available)" 
         extends Integer(min=0, max=3);
@@ -114,7 +132,7 @@ package Choices "Choice enumerations for ThermoPower models"
           choice=ThermoPower.Choices.Valve.CvTypes.Cv 
               "Cv (US) flow coefficient",
           choice=ThermoPower.Choices.Valve.CvTypes.OpPoint 
-              "Av defined by initial equation"));
+              "Av defined by nominal operating point"));
       end Temp;
     end CvTypes;
   end Valve;
