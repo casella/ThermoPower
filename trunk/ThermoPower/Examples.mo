@@ -22,7 +22,7 @@ package Examples "Application examples"
         Tmstart=545,
         tauc=5,
         gv=150,
-        hlstart=1.15e5, 
+        hlstart=1.15e5,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                 annotation (extent=[-70,14; -30,54]);
       Water.SourceW FeedWater(h=1.1059e6) 
@@ -76,7 +76,7 @@ Casella</a>:<br>
         hstartin=1.15e6,
         hstartout=1.15e6,
         pstartout=61.18e5,
-        DynamicMomentum=false, 
+        DynamicMomentum=false,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                           annotation (extent=[-96, -50; -60, -14], rotation=-90);
       Water.Flow1D2ph Risers(
@@ -98,7 +98,7 @@ Casella</a>:<br>
         pstartin=61.18e5,
         pstartout=60.06e5,
         wnom=0.23,
-        hstartin=1.15e6, 
+        hstartin=1.15e6,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                   annotation (extent=[-8, -66; -32, -42], rotation=90);
       Water.Flow1D2ph Pipe2Drum(
@@ -119,7 +119,7 @@ Casella</a>:<br>
         e=9.9e-4,
         hstartin=1.6e6,
         hstartout=1.6e6,
-        pstartin=60.06e5, 
+        pstartin=60.06e5,
         initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) 
                          annotation (extent=[-8,-8; -32,18],   rotation=90);
       Water.SinkW Blowdown(w0=0) annotation (extent=[-50, -14; -36, 4]);
@@ -140,7 +140,7 @@ Casella</a>:<br>
         hstartout=2.777e6,
         pstartin=60e5,
         pstartout=59e5,
-        Cfnom=0.004, 
+        Cfnom=0.004,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[-26, 38; -6, 58]);
       Water.Flow1D2phDB SH(
@@ -160,7 +160,7 @@ Casella</a>:<br>
         pstartin=59e5,
         pstartout=57e5,
         N=5,
-        e=1.7e-3, 
+        e=1.7e-3,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                   annotation (extent=[0,38; 20,58]);
       Water.Flow1D2ph Pipe2Valve(
@@ -181,7 +181,7 @@ Casella</a>:<br>
         hstartout=2.8e6,
         pstartin=56e5,
         pstartout=54.5e5,
-        Cfnom=0.004, 
+        Cfnom=0.004,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[30,38; 50,58]);
       Water.ValveVap Valve(
@@ -211,7 +211,7 @@ Casella</a>:<br>
         hstart=1.1e6,
         Tmstart=540,
         pstartin=61.18e5,
-        pstartout=61.18e5, 
+        pstartout=61.18e5,
         initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) 
                         annotation (extent=[-78, -84; -58, -64]);
       Water.Header HeaderUpper(
@@ -223,7 +223,7 @@ Casella</a>:<br>
         pstartin=60.2e5,
         pstartout=60.2e5,
         Tmstart=540,
-        hstart=1.6e6, 
+        hstart=1.6e6,
         initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) 
                       annotation (extent=[-30, -36; -10, -16], rotation=90);
       Thermal.ConvHT DowncomerExchange(N=2, gamma=1800) 
@@ -247,7 +247,7 @@ Casella</a>:<br>
         lambda=19,
         WallRes=true,
         Tstart1=540,
-        TstartN=540, 
+        TstartN=540,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[-54, -44; -34, -20], rotation=90);
       Thermal.MetalTube RisersWalls(
@@ -259,7 +259,7 @@ Casella</a>:<br>
         WallRes=true,
         N=7,
         Tstart1=548,
-        TstartN=548, 
+        TstartN=548,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
              annotation (extent=[4, -66; 24, -42], rotation=90);
       Thermal.MetalTube Pipe2DrumWall(
@@ -271,7 +271,7 @@ Casella</a>:<br>
         lambda=19,
         WallRes=true,
         Tstart1=548,
-        TstartN=548, 
+        TstartN=548,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[12, -8; 32, 18], rotation=90);
       Thermal.MetalTube Pipe2SHWall(
@@ -283,7 +283,7 @@ Casella</a>:<br>
         lambda=19,
         WallRes=true,
         Tstart1=548,
-        TstartN=548, 
+        TstartN=548,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[-26, 66; -6, 92], rotation=180);
       Thermal.MetalTube SHWall(
@@ -295,7 +295,7 @@ Casella</a>:<br>
         WallRes=true,
         Tstart1=551,
         TstartN=551,
-        N=5, 
+        N=5,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
              annotation (extent=[0, 66; 20, 92], rotation=180);
       Thermal.MetalTube Pipe2ValveWall(
@@ -307,7 +307,7 @@ Casella</a>:<br>
         WallRes=true,
         N=2,
         Tstart1=548,
-        TstartN=548, 
+        TstartN=548,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[30,66; 50,92],   rotation=180);
       Water.PressDrop PressDrop(
@@ -783,7 +783,7 @@ Casella</a>:<br>
         Cfnom=0.004,
         wnf=1,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        N=2, 
+        N=2,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[-26,26; -6,46]);
       Water.Flow1D2phDB SH(
@@ -804,7 +804,7 @@ Casella</a>:<br>
         N=5,
         e=1.7e-3,
         wnf=0.1,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook, 
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                   annotation (extent=[0,24; 20,44]);
       Water.Flow1D2ph Pipe2Valve(
@@ -825,7 +825,7 @@ Casella</a>:<br>
         Cfnom=0.004,
         HydraulicCapacitance=1,
         wnf=1,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom, 
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[30,24; 50,44]);
       Water.ValveVap Valve(
@@ -857,7 +857,7 @@ Casella</a>:<br>
         WallRes=true,
         Tstart1=548,
         TstartN=548,
-        N=2, 
+        N=2,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[-26,54; -6,80],   rotation=180);
       Thermal.MetalTube SHWall(
@@ -869,7 +869,7 @@ Casella</a>:<br>
         WallRes=true,
         Tstart1=551,
         TstartN=551,
-        N=5, 
+        N=5,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
              annotation (extent=[0,52; 20,78],   rotation=180);
       Thermal.MetalTube Pipe2ValveWall(
@@ -881,7 +881,7 @@ Casella</a>:<br>
         WallRes=true,
         N=2,
         Tstart1=548,
-        TstartN=548, 
+        TstartN=548,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (extent=[28,52; 48,78],   rotation=180);
       Water.Drum2States DrumBoiler(
@@ -892,7 +892,7 @@ Casella</a>:<br>
         Vldstart=pi*r^2*H/2,
         Vdcr=0.0628,
         Mmd=93,
-        Mmdcr=270, 
+        Mmdcr=270,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                         annotation (extent=[-62,8; -42,28]);
       Modelica.Thermal.HeatTransfer.PrescribedHeatFlow RisersHeat 
@@ -1070,13 +1070,13 @@ Casella</a>:<br>
     equation 
       connect(hfeed.y, Plant.FeedWaterEnthalpy) annotation (points=[-41,54; 0,
             54; 0,46.39; 42.27,46.39], style(color=74, rgbcolor={0,0,127}));
-      connect(Qsh.y, Plant.SHPower) annotation (points=[1,90; 20,90; 20,53.68; 
+      connect(Qsh.y, Plant.SHPower) annotation (points=[1,90; 20,90; 20,53.68;
             42.27,53.68], style(color=74, rgbcolor={0,0,127}));
-      connect(wfeed.y, Plant.FeedWaterFlow) annotation (points=[-11,-10; -8,-10; 
+      connect(wfeed.y, Plant.FeedWaterFlow) annotation (points=[-11,-10; -8,-10;
             -8,39.1; 42.27,39.1], style(color=74, rgbcolor={0,0,127}));
-      connect(Qev.y, Plant.RiserPower) annotation (points=[21,20; 29.635,20; 
+      connect(Qev.y, Plant.RiserPower) annotation (points=[21,20; 29.635,20;
             29.635,19.12; 42.27,19.12], style(color=74, rgbcolor={0,0,127}));
-      connect(ValveOpening.y, Plant.ValveOpening) annotation (points=[41,-70; 
+      connect(ValveOpening.y, Plant.ValveOpening) annotation (points=[41,-70;
             54,-70; 54,-38; 28,-38; 28,11.02; 42.27,11.02], style(color=74,
             rgbcolor={0,0,127}));
     end CISESim2States;
@@ -1163,7 +1163,7 @@ Casella</a>:<br>
         L=Lt*Nr,
         N=Nr + 1,
         hstartin=1e5,
-        hstartout=2.7e5, 
+        hstartout=2.7e5,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                          extends Water.Flow1D 
                                annotation (extent=[-12,-52; 8,-32]);
@@ -1221,9 +1221,9 @@ This is the model of a very simple heat recovery boiler. The modelling assumptio
         L=Lt*Nr,
         N=Nr + 1,
         Tstart1=300,
-        TstartN=340, 
+        TstartN=340,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) "Tube" 
-                                          annotation (extent=[-12,6; 8,-14]);
+                                          annotation (extent=[-12,8; 8,-12]);
       Flow1DGasHT GasSide(redeclare package Medium = GasMedium,
         L=Lb,
         omega=St/Lb,
@@ -1235,7 +1235,7 @@ This is the model of a very simple heat recovery boiler. The modelling assumptio
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         Tstartin=670,
         Tstartout=370,
-        QuasiStatic=StaticGasBalances, 
+        QuasiStatic=StaticGasBalances,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                                annotation (extent=[8,56; -14,36]);
       Gas.FlangeA gasInlet(redeclare package Medium=GasMedium) 
@@ -1253,11 +1253,8 @@ This is the model of a very simple heat recovery boiler. The modelling assumptio
     equation 
       connect(WaterMetalHT.fluidside, WaterSide.wall) annotation (points=[-2,
             -25; -2,-37], style(color=3, rgbcolor={0,0,255}));
-      connect(TubeWalls.int, WaterMetalHT.otherside)  annotation (points=[-2,-7; 
+      connect(TubeWalls.int, WaterMetalHT.otherside)  annotation (points=[-2,-5;
             -2,-19],  style(color=45, rgbcolor={255,127,0}));
-      connect(TubeWalls.ext, TubeWalls.int)   annotation (points=[-2,-0.9; -2,
-            -2; 0,-2; 2,-4; -2,-4; -2,-7],
-                                   style(color=45, rgbcolor={255,127,0}));
       connect(waterInlet, WaterSide.infl) 
         annotation (points=[-90,-50; -56,-50; -56,-42; -12,-42]);
       connect(WaterSide.outfl, waterOutlet) 
@@ -1266,8 +1263,8 @@ This is the model of a very simple heat recovery boiler. The modelling assumptio
             46; -14,46],     style(color=76, rgbcolor={159,159,223}));
       connect(GasSide.infl, gasInlet) annotation (points=[8,46; 50,46; 50,50;
             90,50], style(color=76, rgbcolor={159,159,223}));
-      connect(CounterCurrent1.side2, TubeWalls.ext) annotation (points=[-2,12.9; 
-            -2,-0.9],style(color=45, rgbcolor={255,127,0}));
+      connect(CounterCurrent1.side2, TubeWalls.ext) annotation (points=[-2,12.9;
+            -2,1.1], style(color=45, rgbcolor={255,127,0}));
       connect(CounterCurrent1.side1, ConvHT_htc1.otherside) annotation (points=[-2,
             19; -2,27],       style(color=45, rgbcolor={255,127,0}));
       connect(ConvHT_htc1.fluidside, GasSide.wall) annotation (points=[-2,33;
@@ -1453,9 +1450,9 @@ Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model
       connect(ValveOpening, ValveOpeningActuator.u) annotation (points=[-105,
             1.77636e-015; -88,1.77636e-015; -88,-31; -69.2,-31], style(color=74,
             rgbcolor={0,0,127}));
-      connect(GasInTSensor.y, GasIn_T) annotation (points=[1.4,50; -8,50; -8,64; 
+      connect(GasInTSensor.y, GasIn_T) annotation (points=[1.4,50; -8,50; -8,64;
             78,64; 78,38; 107,38], style(color=74, rgbcolor={0,0,127}));
-      connect(Valve.cmd, ValveOpeningActuator.y) annotation (points=[41,-0.4; 
+      connect(Valve.cmd, ValveOpeningActuator.y) annotation (points=[41,-0.4;
             41,-31; -55.4,-31], style(color=74, rgbcolor={0,0,127}));
       connect(WaterInTSensor.y, WaterIn_T) annotation (points=[24.6,-47; 104,
             -47],                    style(color=74, rgbcolor={0,0,127}));
@@ -1670,7 +1667,6 @@ This model allows to simulate an open loop transient, starting from the guess in
               82,-8.4; 82,-60; 100,-60], style(color=74, rgbcolor={0,0,127}));
       end OpenLoopSimulator;
       
-      
       model OpenLoopSimulatorHtc 
         extends OpenLoopSimulator(Plant(Boiler(gamma_nom(fixed=false))));
       initial equation 
@@ -1795,7 +1791,7 @@ This model simulates simple digital control system for the HRB. The water outlet
               6,-30; 6,-10; 18.5,-10], style(color=74, rgbcolor={0,0,127}));
         connect(DigitalPI1.CSport, Plant.GasFlowRate) annotation (points=[0,
               13.52; 8,13.52; 8,11; 19.1,11], style(color=74, rgbcolor={0,0,127}));
-        connect(TWOutSetPoint.y, DigitalPI1.SPport) annotation (points=[-59,10; 
+        connect(TWOutSetPoint.y, DigitalPI1.SPport) annotation (points=[-59,10;
               -46,10; -46,13.52; -24.7,13.52], style(color=74, rgbcolor={0,0,
                 127}));
         connect(Plant.WaterOut_T, DigitalPI1.PVport) annotation (points=[80.9,

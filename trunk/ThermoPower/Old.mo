@@ -2115,7 +2115,7 @@ density and temperature computations across the saturation boundaries, which in 
 </html>
 "));
   end Header_explicit;
-
+  
   package HRB_Old "Heat recovery boiler models" 
     model HRB "Heat recovery boiler model" 
       constant Real pi=Modelica.Constants.pi;

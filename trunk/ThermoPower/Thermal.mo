@@ -333,11 +333,11 @@ This model computes the thermal and mechanical properties of a generic material.
   end MaterialProperties;
   extends Modelica.Icons.Library;
   connector HT = Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a 
-    "Thermal port for 1-dim. heat transfer";
+    "Thermal port for lumped parameter heat transfer";
   connector HThtc 
-    "Thermal port for 1-dim. heat transfer with heat transfer coefficient" 
+    "Thermal port for lumped parameter heat transfer with heat transfer coefficient" 
     extends HT;
-    ThermalConductance gamma "Heat transfer coefficient";
+    ThermalConductance G "Thermal conductance";
   end HThtc;
   
   connector DHT "Distributed Heat Terminal" 
@@ -353,11 +353,10 @@ This model computes the thermal and mechanical properties of a generic material.
     CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
   end DHThtc;
   
-  model HThtc_HT "Conversion from a HThtc to a HT connector" 
-    
+  model HThtc_HT "HThtc to HT adaptor" 
     annotation (Diagram, Icon(
         Text(
-          extent=[-84,38; -28,64],
+          extent=[-86,-4; 32,96],
           style(
             color=0,
             rgbcolor={0,0,0},
@@ -366,225 +365,216 @@ This model computes the thermal and mechanical properties of a generic material.
             fillPattern=1),
           string="HThtc"),
         Text(
-          extent=[54,-74; 108,-48],
+          extent=[-10,-92; 96,-20],
           style(
             color=0,
             rgbcolor={0,0,0},
-            arrow=1,
-            fillPattern=1),
-          string="HT    "),
-        Rectangle(extent=[-100,100; 100,-100], style(
-            color=1,
-            rgbcolor={255,0,0},
-            arrow=1)),
-        Line(points=[-96,0; 96,0], style(
-            color=1,
-            rgbcolor={255,0,0},
-            arrow=1,
-            fillPattern=1))));
-    
-    HT outHT annotation (extent=[100,-10; 120,10]);
-    HThtc inHThtc annotation (extent=[-120,-10; -100,10]);
-  equation 
-    outHT.T = inHThtc.T;
-    outHT.Q_flow = inHThtc.Q_flow;
-  end HThtc_HT;
-  
-  model DHThtc_DHT "Conversion from a DHThtc to a DHT connector" 
-    DHT outDHT(N=N) annotation (extent=[100,80; 110,-80]);
-    DHThtc inDHThtc(N=N) annotation (extent=[-110,80; -100,-80], rotation=90);
-    
-    parameter Integer N(min=1)=2 "Number of nodes";
-    
-    annotation (Diagram, Icon(
-        Text(
-          extent=[-84,38; -28,64],
-          string="DHThtc",
-          style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=4,
-            arrow=1,
-            fillPattern=1)),
-        Text(
-          extent=[44,-74; 98,-48],
-          string="DHT    ",
-          style(
-            color=0,
-            rgbcolor={0,0,0},
-            arrow=1,
-            fillPattern=1)),
-        Rectangle(extent=[-100,100; 100,-100], style(
-            color=1,
-            rgbcolor={255,0,0},
-            arrow=1)),
-        Line(points=[-96,0; 96,0], style(
-            color=1,
-            rgbcolor={255,0,0},
-            arrow=1,
-            fillPattern=1))));
-    
-  equation 
-    outDHT.T[1:N] = inDHThtc.T[1:N];
-    outDHT.phi[1:N] = inDHThtc.phi[1:N];
-  end DHThtc_DHT;
-  
-  model HT_DHT 
-    parameter Area exchangeSurface "Heat exchange surface";
-    annotation (Icon(
-        Text(
-          extent=[-96,38; -40,64],
-          style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=4,
             arrow=1,
             fillPattern=1),
           string="HT"),
-        Text(
-          extent=[44,-74; 98,-48],
-          string="DHT    ",
-          style(
-            color=0,
-            rgbcolor={0,0,0},
-            arrow=1,
-            fillPattern=1)),
-        Line(points=[-96,0; 96,0], style(
+        Rectangle(extent=[-100,100; 100,-100], style(
             color=1,
             rgbcolor={255,0,0},
-            arrow=1,
-            fillPattern=1)),
-        Rectangle(extent=[-100,100; 100,-100], style(color=1, rgbcolor={255,0,0}))),
-        Diagram);
-    DHT outDHT(final N=1) annotation (extent=[100,-80; 110,80]);
-    HT inHT annotation (extent=[-120,-12; -100,10]);
+            arrow=1)),
+        Line(points=[100,100; -100,-100], style(color=1, rgbcolor={255,0,0}))));
+    HT HT_port 
+             annotation (extent=[100,-20; 140,20]);
+    HThtc HThtc_port 
+                  annotation (extent=[-140,-20; -100,20]);
   equation 
-    outDHT.T[1] = inHT.T;
-    outDHT.phi[1] = inHT.Q_flow/exchangeSurface;
-  end HT_DHT;
+    HT_port.T = HThtc_port.T;
+    HT_port.Q_flow = HThtc_port.Q_flow;
+  end HThtc_HT;
   
-  model HThtc_DHThtc 
-    parameter Area exchangeSurface "Heat exchange surface";
-    annotation (Icon(
+  model DHThtc_DHT "DHThtc to DHT adapter" 
+    
+    DHT DHT_port(N=N) 
+                    annotation (extent=[100,40; 120,-40]);
+    DHThtc DHThtc_port( N=N) 
+                         annotation (extent=[-120,40; -100,-40], rotation=90);
+    
+    parameter Integer N(min=1)=2 "Number of nodes";
+    
+    annotation (Diagram, Icon(
         Text(
-          extent=[-94,38; -38,64],
+          extent=[-90,10; 40,100],
           style(
             color=0,
             rgbcolor={0,0,0},
             thickness=4,
             arrow=1,
             fillPattern=1),
-          string="HThtc"),
+          string="DHThtc"),
         Text(
-          extent=[36,-74; 90,-48],
+          extent=[-10,-92; 96,-20],
           style(
             color=0,
             rgbcolor={0,0,0},
             arrow=1,
             fillPattern=1),
-          string="DHThtc"),
-        Line(points=[-96,0; 96,0], style(
-            color=1,
-            rgbcolor={255,0,0},
+          string="DHT"),
+        Rectangle(extent=[-100,100; 100,-100], style(
+            color=45,
+            rgbcolor={255,128,0},
+            arrow=1)),
+        Line(points=[100,100; -100,-100], style(color=45, rgbcolor={255,128,0}))));
+    
+  equation 
+    DHT_port.T = DHThtc_port.T;
+    DHT_port.phi + DHThtc_port.phi = zeros(N);
+  end DHThtc_DHT;
+  
+  model HT_DHT "HT to DHT adaptor" 
+    parameter Integer N = 1 "Number of nodes on DHT side";
+    parameter Area exchangeSurface "Area of heat transfer surface";
+    HT HT_port annotation (extent=[-140,-16; -100,24]);
+    DHT DHT_port(N=N) annotation (extent=[100,-40; 120,40]);
+  equation 
+    for i in 1:N loop
+      DHT_port.T[i] = HT_port.T "Uniform temperature distribution on DHT side";
+    end for;
+    if N == 1 then
+      // Uniform flow distribution
+      DHT_port.phi[1]*exchangeSurface + HT_port.Q_flow = 0 "Energy balance";
+    else
+      // Piecewise linear flow distribution
+      sum(DHT_port.phi[1:N-1]+DHT_port.phi[2:N])/2*exchangeSurface/(N-1) + HT_port.Q_flow = 0 
+        "Energy balance";
+    end if;
+    annotation (Icon(
+        Polygon(points=[-100,100; -100,-100; 100,100; -100,100], style(
+            color=42,
+            rgbcolor={185,0,0},
+            fillColor=42,
+            rgbfillColor={185,0,0})),
+        Polygon(points=[100,100; 100,-100; -100,-100; 100,100], style(
+            color=45,
+            rgbcolor={255,128,0},
+            fillColor=45,
+            rgbfillColor={255,128,0},
+            fillPattern=1)),
+        Text(
+          extent=[-74,10; 24,88],
+          string="HT",
+          style(
+            color=7,
+            rgbcolor={255,255,255},
+            thickness=4,
             arrow=1,
             fillPattern=1)),
-        Rectangle(extent=[-100,100; 100,-100], style(color=1, rgbcolor={255,0,0}))),
+        Text(
+          extent=[-16,-84; 82,-6],
+          style(
+            color=7,
+            rgbcolor={255,255,255},
+            thickness=4,
+            arrow=1,
+            fillPattern=1),
+          string="DHT"),
+        Rectangle(extent=[-100,100; 100,-100], style(
+            color=0,
+            rgbcolor={0,0,0},
+            pattern=0))),
         Diagram);
-    DHThtc outDHThtc(final N=1) annotation (extent=[100,-80; 110,80]);
-    HThtc inHThtc annotation (extent=[-120,-12; -100,10]);
+  end HT_DHT;
+  
+  model HThtc_DHThtc "HThtc to DHThtc adaptor" 
+    parameter Integer N = 1 "Number of nodes on DHT side";
+    parameter Area exchangeSurface "Heat exchange surface";
+    HThtc HT_port    annotation (extent=[-140,-20; -100,22]);
+    DHThtc DHT_port(final N=1)    annotation (extent=[100,-40; 120,40]);
   equation 
-    outDHThtc.T[1] = inHThtc.T;
-    outDHThtc.phi[1] = inHThtc.Q_flow/exchangeSurface;
-    outDHThtc.gamma[1] = inHThtc.gamma/exchangeSurface;
+    for i in 1:N loop
+      DHT_port.T[i] = HT_port.T "Uniform temperature distribution on DHT side";
+      DHT_port.gamma[i] = HT_port.G/exchangeSurface 
+        "Uniform h.t.c. distribution on DHT side";
+    end for;
+    sum(DHT_port.phi)*exchangeSurface/N +HT_port.Q_flow = 0 "Energy balance";
+    annotation (Icon(
+        Polygon(points=[-100,100; -100,-100; 100,100; -100,100], style(
+            color=42,
+            rgbcolor={185,0,0},
+            fillColor=42,
+            rgbfillColor={185,0,0})),
+        Polygon(points=[100,100; 100,-100; -100,-100; 100,100], style(
+            color=45,
+            rgbcolor={255,128,0},
+            fillColor=45,
+            rgbfillColor={255,128,0},
+            fillPattern=1)),
+        Text(
+          extent=[-92,16; 30,90],
+          style(
+            color=7,
+            rgbcolor={255,255,255},
+            thickness=4,
+            arrow=1,
+            fillPattern=1),
+          string="HT_htc"),
+        Text(
+          extent=[-40,-100; 94,-30],
+          style(
+            color=7,
+            rgbcolor={255,255,255},
+            thickness=4,
+            arrow=1,
+            fillPattern=1),
+          string="DHT_htc"),
+        Rectangle(extent=[-100,100; 100,-100], style(
+            color=0,
+            rgbcolor={0,0,0},
+            pattern=0))),
+        Diagram);
   end HThtc_DHThtc;
   
-  model MetalTube "Cylindrical metal tube" 
-    extends Icons.MetalWall;
-    parameter Integer N(min=1)=2 "Number of nodes";
-    parameter Length L "Tube length";
-    parameter Length rint "Internal radius (single tube)";
-    parameter Length rext "External radius (single tube)";
-    parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
-    parameter ThermalConductivity lambda "Thermal conductivity";
-    parameter Boolean WallRes=true "Wall conduction resistance accounted for";
-    parameter Temperature Tstart1=300 "Temperature start value - first node" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature TstartN=300 "Temperature start value - last node" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
-    constant Real pi=Modelica.Constants.pi;
-    AbsoluteTemperature T[N](start=linspace(Tstart1,TstartN,N)) 
-      "Node temperatures";
-    Area Am "Area of the metal tube cross-section";
-    DHT int(N=N, T(start = linspace(Tstart1,TstartN,N))) "Internal surface" 
-                 annotation (extent=[-40, 20; 40, 40]);
-    DHT ext(N=N, T(start = linspace(Tstart1,TstartN,N))) "External surface" 
-                 annotation (extent=[-40, -42; 40, -20]);
+  model ConvHTLumped "Lumped parameter convective heat transfer" 
+    extends Icons.HeatFlow;
+    parameter ThermalConductance G "Constant thermal conductance";
+    HT side1       annotation (extent=[-40, 20; 40, 40]);
+    HT side2       annotation (extent=[-40,-20; 40,-42]);
+  equation 
+    side1.Q_flow = G*(side1.T - side2.T) "Convective heat transfer";
+    side1.Q_flow = - side2.Q_flow "Energy balance";
     annotation (Icon(
         Text(
-          extent=[-94, 52; -42, 24],
-          style(
-            color=0,
-            fillColor=10,
-            fillPattern=7),
-          string="Int"),
-        Text(
-          extent=[-88, -24; -40, -50],
-          style(
-            color=0,
-            fillColor=10,
-            fillPattern=7),
-          string="Ext"),
-        Text(
-          extent=[-100, -44; 100, -72],
+          extent=[-98,-76; 102,-100],
           string="%name",
           style(color=46))), Documentation(info="<HTML>
-<p>This is the model of a cylindrical tube of solid material.
-<p>The heat capacity (which is lumped at the center of the tube thickness) is accounted for, as well as the thermal resistance due to the finite heat conduction coefficient. Longitudinal heat conduction is neglected.
-<p><b>Modelling options</b></p>
-<p>The following options are available to specify the valve flow coefficient in fully open conditions:
-<ul>
-<li><tt>WallRes = false</tt>: the thermal resistance of the tube wall is neglected.
-<li><tt>WallRes = true</tt>: the thermal resistance of the tube wall is accounted for.
-</ul>
+<p>Model of a simple convective heat transfer mechanism between two lumped parameter objects, with a constant heat transfer coefficient.
 </HTML>", revisions="<html>
-<ul>
-<li><i>30 May 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Initialisation support added.</li>
-<li><i>1 Oct 2003</i>
+<li><i>28 Dic 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>
-"),   Diagram);
-  equation 
-    Am = (rext^2 - rint^2)*pi "Area of the metal cross section";
-    rhomcm*Am*der(T) = rint*2*pi*int.phi + rext*2*pi*ext.phi "Energy balance";
-    if WallRes then
-      int.phi = lambda/(rint*log((rint + rext)/(2*rint)))*(int.T - T) 
-        "Heat conduction through the internal half-thickness";
-      ext.phi = lambda/(rext*log((2*rext)/(rint + rext)))*(ext.T - T) 
-        "Heat conduction through the external half-thickness";
-    else
-      // No temperature gradients across the thickness
-      int.T = T;
-      ext.T = T;
-    end if;
-  initial equation 
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-    elseif initOpt == Choices.Init.Options.steadyState then
-      der(T) = zeros(N);
-    elseif initOpt == Choices.Init.Options.steadyStateNoT then
-    // do nothing
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
-  end MetalTube;
+</html>"));
+  end ConvHTLumped;
   
-  model ConvHT "Convective heat transfer" 
+  model ConvHTLumped_htc 
+    "Lumped parameter convective heat transfer between a HT and a HThtc" 
+    extends Icons.HeatFlow;
+    HT otherside               annotation (extent=[-40,-20; 40,-40]);
+    HThtc fluidside               annotation (extent=[-40,20; 40,40]);
+  equation 
+    fluidside.Q_flow = fluidside.G*(fluidside.T - otherside.T) 
+      "Convective heat transfer";
+    fluidside.Q_flow + otherside.Q_flow = 0 "Energy balance";
+    annotation (Icon(
+        Text(
+          extent=[-100,-74; 100,-100],
+          string="%name",
+          style(color=46))),     Documentation(info="<HTML>
+<p>Model of a simple convective heat transfer mechanism between two lumped parameter objects. The heat transfer coefficient is supplied by the <tt>fluidside</tt> connector.
+</HTML>",
+        revisions="<html>
+<li><i>28 Dic 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+      Diagram);
+  end ConvHTLumped_htc;
+  
+  model ConvHT "1D Convective heat transfer" 
     extends Icons.HeatFlow;
     parameter Integer N=2 "Number of Nodes";
     parameter CoefficientOfHeatTransfer gamma 
@@ -624,7 +614,7 @@ This model computes the thermal and mechanical properties of a generic material.
   end ConvHT;
   
   model ConvHT2N 
-    "Convective heat transfer between two surfaces with a different number of nodes" 
+    "1D Convective heat transfer between two DHT connectors with a different number of nodes" 
     extends Icons.HeatFlow;
     parameter Integer N1(min=1)=2 "Number of nodes on side 1";
     parameter Integer N2(min=1)=2 "Number of nodes on side 2";
@@ -820,7 +810,7 @@ This model computes the thermal and mechanical properties of a generic material.
       DymolaStoredErrors);
   end ConvHT2N;
   
-  model ConvHT_htc "Convective heat exchange (externally supplied h.t.c.)" 
+  model ConvHT_htc "1D Convective heat transfer between a DHT and a DHT_htc" 
     extends Icons.HeatFlow;
     parameter Integer N=2 "Number of Nodes";
     parameter Temperature TstartF1=300 
@@ -867,12 +857,12 @@ This model computes the thermal and mechanical properties of a generic material.
 "),   Diagram);
   end ConvHT_htc;
   
-  model CounterCurrent "Counter-current heat transfer adaptor" 
+  model CounterCurrent 
+    "Counter-current heat transfer adaptor for 1D heat transfer" 
     extends Icons.HeatFlow;
     parameter Integer N=2 "Number of Nodes";
     parameter Boolean counterCurrent = true 
       "Swap temperature and flux vector order";
-    
     Thermal.DHT side1(N=N) annotation (extent=[-40, 20; 40, 40]);
     Thermal.DHT side2(N=N) annotation (extent=[-40, -42; 40, -20]);
   equation 
@@ -1062,8 +1052,180 @@ The latter options can be useful when two or more components are connected direc
     extends HeatSource1D(redeclare Thermal.DHThtc wall);
   end HeatSource1Dhtc;
   
+  model MetalTube "Cylindrical metal tube - 1 radial node and N axial nodes" 
+    extends Icons.MetalWall;
+    parameter Integer N(min=1)=2 "Number of nodes";
+    parameter Length L "Tube length";
+    parameter Length rint "Internal radius (single tube)";
+    parameter Length rext "External radius (single tube)";
+    parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
+    parameter ThermalConductivity lambda "Thermal conductivity";
+    parameter Boolean WallRes=true "Wall conduction resistance accounted for";
+    parameter Temperature Tstart1=300 "Temperature start value - first node" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Temperature TstartN=300 "Temperature start value - last node" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
+    constant Real pi=Modelica.Constants.pi;
+    AbsoluteTemperature T[N](start=linspaceExt(Tstart1,TstartN,N)) 
+      "Node temperatures";
+    Area Am "Area of the metal tube cross-section";
+    DHT int(N=N, T(start = linspaceExt(Tstart1,TstartN,N))) "Internal surface" 
+                 annotation (extent=[-40, 20; 40, 40]);
+    DHT ext(N=N, T(start = linspaceExt(Tstart1,TstartN,N))) "External surface" 
+                 annotation (extent=[-40, -42; 40, -20]);
+    annotation (Icon(
+        Text(
+          extent=[-100,60; -40,20],
+          style(
+            color=0,
+            fillColor=10,
+            fillPattern=7),
+          string="Int"),
+        Text(
+          extent=[-100,-20; -40,-60],
+          style(
+            color=0,
+            fillColor=10,
+            fillPattern=7),
+          string="Ext"),
+        Text(
+          extent=[-138,-60; 142,-100],
+          string="%name",
+          style(color=46))), Documentation(info="<HTML>
+<p>This is the model of a cylindrical tube of solid material.
+<p>The heat capacity (which is lumped at the center of the tube thickness) is accounted for, as well as the thermal resistance due to the finite heat conduction coefficient. Longitudinal heat conduction is neglected.
+<p><b>Modelling options</b></p>
+<p>The following options are available:
+<ul>
+<li><tt>WallRes = false</tt>: the thermal resistance of the tube wall is neglected.
+<li><tt>WallRes = true</tt>: the thermal resistance of the tube wall is accounted for.
+</ul>
+</HTML>", revisions="<html>
+<ul>
+<li><i>30 May 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Initialisation support added.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"),   Diagram);
+  equation 
+    Am = (rext^2 - rint^2)*pi "Area of the metal cross section";
+    rhomcm*Am*der(T) = rint*2*pi*int.phi + rext*2*pi*ext.phi "Energy balance";
+    if WallRes then
+      int.phi = lambda/(rint*log((rint + rext)/(2*rint)))*(int.T - T) 
+        "Heat conduction through the internal half-thickness";
+      ext.phi = lambda/(rext*log((2*rext)/(rint + rext)))*(ext.T - T) 
+        "Heat conduction through the external half-thickness";
+    else
+      // No temperature gradients across the thickness
+      int.T = T;
+      ext.T = T;
+    end if;
+  initial equation 
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.steadyState then
+      der(T) = zeros(N);
+    elseif initOpt == Choices.Init.Options.steadyStateNoT then
+    // do nothing
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+  end MetalTube;
+
+    model MetalWall "Generic metal wall - 1 radial node and N axial nodes" 
+      extends ThermoPower.Icons.MetalWall;
+      parameter Integer N(min=1)=2 "Number of nodes";
+      parameter Modelica.SIunits.Mass M "Mass";
+      parameter Modelica.SIunits.Area Sint "Internal surface";
+      parameter Modelica.SIunits.Area Sext "External surface";
+      parameter Modelica.SIunits.SpecificHeatCapacity cm 
+      "Specific heat capacity of metal";
+      parameter Modelica.SIunits.Temperature Tstart1=300 
+      "Temperature start value - first node" 
+        annotation(Dialog(tab = "Initialisation"));
+      parameter Modelica.SIunits.Temperature TstartN=300 
+      "Temperature start value - last node" 
+        annotation(Dialog(tab = "Initialisation"));
+      parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
+      "Initialisation option"   annotation(Dialog(tab = "Initialisation"));
+      constant Real pi=Modelica.Constants.pi;
+      ThermoPower.AbsoluteTemperature T[N](start=ThermoPower.Thermal.linspaceExt(
+            Tstart1,
+            TstartN,
+            N)) "Node temperatures";
+      ThermoPower.Thermal.DHT int(N=N, T(start=ThermoPower.Thermal.linspaceExt(
+                  Tstart1,
+                  TstartN,
+                  N))) "Internal surface" 
+                   annotation (extent=[-40, 20; 40, 40]);
+      ThermoPower.Thermal.DHT ext(N=N, T(start=ThermoPower.Thermal.linspaceExt(
+                  Tstart1,
+                  TstartN,
+                  N))) "External surface" 
+                   annotation (extent=[-40, -42; 40, -20]);
+      annotation (Icon(
+          Text(
+            extent=[-100,60; -40,20],
+            style(
+              color=0,
+              fillColor=10,
+              fillPattern=7),
+            string="Int"),
+          Text(
+            extent=[-100,-20; -40,-60],
+            style(
+              color=0,
+              fillColor=10,
+              fillPattern=7),
+            string="Ext"),
+          Text(
+            extent=[-138,-60; 142,-100],
+            string="%name",
+            style(color=46))), Documentation(info="<HTML>
+<p>This is the model of a cylindrical tube of solid material.
+<p>The heat capacity (which is lumped at the center of the tube thickness) is accounted for, as well as the thermal resistance due to the finite heat conduction coefficient. Longitudinal heat conduction is neglected.
+<p><b>Modelling options</b></p>
+<p>The following options are available:
+<ul>
+<li><tt>WallRes = false</tt>: the thermal resistance of the tube wall is neglected.
+<li><tt>WallRes = true</tt>: the thermal resistance of the tube wall is accounted for.
+</ul>
+</HTML>",   revisions="<html>
+<ul>
+<li><i>30 May 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Initialisation support added.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"),     Diagram);
+    equation 
+      (cm*M)*der(T) = Sint*int.phi + Sext*ext.phi "Energy balance";
+        // No temperature gradients across the thickness
+        int.T = T;
+        ext.T = T;
+    initial equation 
+      if initOpt == ThermoPower.Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
+        der(T) = zeros(N);
+      elseif initOpt == ThermoPower.Choices.Init.Options.steadyStateNoT then
+      // do nothing
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+    end MetalWall;
+  
 model CylinderFourier 
-    "Thermal model of a hollow cylinder by Fourier's equation" 
+    "Thermal model of a hollow cylinder by Fourier's equation - 1 axial node and Nr radial nodes" 
   import Modelica.SIunits.*;
   import ThermoPower.Choices.CylinderFourier.NodeDistribution;
   extends Icons.MetalWall;
@@ -1080,17 +1242,17 @@ model CylinderFourier
   parameter Temperature Tstartext=300 
       "Temperature start value at rext (last node)" 
     annotation(Dialog(tab = "Initialisation"));
-   parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+  parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
       "Initialisation option" 
                             annotation(Dialog(tab = "Initialisation"));
     
+  Length r[Nr](fixed=false) "Node radii";
   protected 
-  parameter Length r[Nr](fixed=false) "Node radii";
-  parameter Length r1_2[Nr-1](fixed=false) "Slice mean radii";
-  parameter Length r_lin[Nr](fixed=false) "Linearly distributed radii";
-  parameter Real A[Nr](fixed=false);
-  parameter Real B[Nr](fixed=false);
-  parameter Real C[Nr](fixed=false);
+  Length r1_2[Nr-1](fixed=false) "Slice mean radii";
+  Length r_lin[Nr](fixed=false) "Linearly distributed radii";
+  Real A[Nr](fixed=false);
+  Real B[Nr](fixed=false);
+  Real C[Nr](fixed=false);
     
   public 
   Temperature T[Nr](start=linspace(Tstartint,Tstartext,Nr)) 
@@ -1126,12 +1288,16 @@ This is the 1D thermal model of a solid hollow cylinder by Fourier's equations.
 <p><b>Modelling options</b></p>
 The radial distribution of the nodes can be chosen by selecting the value of <tt>nodeDistribution</tt>:
 <ul>
+<li> <tt>Choices.CylinderFourier.NodeDistribution.uniform</tt> uniform distribution, nodes are equally spaced; 
 <li> <tt>Choices.CylinderFourier.NodeDistribution.thickInternal</tt> quadratic distribution, nodes are thickest near the internal surface; 
 <li> <tt>Choices.CylinderFourier.NodeDistribution.thickExternal</tt> quadratic distribution, nodes are thickest near the external surface; 
 <li> <tt>Choices.CylinderFourier.NodeDistribution.thickBoth</tt> quadratic distribution, nodes are thickest near both surfaces.
 </ul>
 </html>", revisions="<html>
 <ul>
+<li><i>30 Dec 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Bugs fixed in boundary condition and node distribution.</li>
 <li><i>1 May 2005</i>
     by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
        First release.</li>
@@ -1142,15 +1308,17 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
   ThermoPower.Thermal.DHT externalBoundary(final N=1) 
     annotation (extent=[-20,-40; 20,-20]);
     
-initial equation 
+equation 
   // Generation of the temperature node distribution 
   r_lin = linspace(rint,rext,Nr) "Linearly distributed node radii";
   for i in 1:Nr loop
-    if nodeDistribution == NodeDistribution.thickInternal then
-      r[i]= 1/(rext-rint)*(r_lin[i]-rint)^2+rint 
+    if nodeDistribution == NodeDistribution.uniform then
+      r[i]= r_lin[i] "Uniform distribution of node radii";
+    elseif nodeDistribution == NodeDistribution.thickInternal then
+      r[i]= rint + 1/(rext-rint)*(r_lin[i]-rint)^2 
           "Quadratically distributed node radii - thickest at rint";
     elseif nodeDistribution == NodeDistribution.thickExternal then
-      r[i]= 1/(rext-rint)*(r_lin[i]-rext)^2+rint 
+      r[i]= rext - 1/(rext-rint)*(rext-r_lin[i])^2 
           "Quadratically distributed node radii - thickest at rext";
     elseif nodeDistribution == NodeDistribution.thickBoth then
       if r_lin[i] <= (rint+rext)/2 then
@@ -1182,16 +1350,6 @@ initial equation
   B[Nr] = 0;
   C[Nr] = 0;
     
-  // Initial conditions
-  if initOpt == Choices.Init.Options.noInit then
-    // do nothing
-  elseif initOpt == Choices.Init.Options.steadyState then
-    der(T[2:Nr-1]) = zeros(Nr-2);
-  else
-    assert(false, "Unsupported initialisation option");
-  end if;
-    
-equation 
   // Metal temperature equations
   metal[1:Nr].T = T[1:Nr];
     
@@ -1205,14 +1363,21 @@ equation
   internalBoundary.T[1] = T[1];
   externalBoundary.T[1] = T[Nr];
   internalBoundary.phi[1] = -metal[1].thermalConductivity*(T[2] -  T[1]) /(r[2] -  r[1]);
-  externalBoundary.phi[1] = -metal[Nr].thermalConductivity*(T[Nr] - T[Nr-1])/(r[Nr] - r[Nr-1]);
+  externalBoundary.phi[1] = metal[Nr].thermalConductivity*(T[Nr] - T[Nr-1])/(r[Nr] - r[Nr-1]);
     
   // Mean temperature
-  Tm = sum(T)/Nr;
+  Tm = 1/(rext^2-rint^2) * sum((T[i]*r[i]+T[i+1]*r[i+1])*(r[i+1]-r[i]) for i in 1:Nr-1);
+//  Tm = sum(T)/Nr;
+initial equation 
+  // Initial conditions
+  if initOpt == Choices.Init.Options.noInit then
+    // do nothing
+  elseif initOpt == Choices.Init.Options.steadyState then
+    der(T[2:Nr-1]) = zeros(Nr-2);
+  else
+    assert(false, "Unsupported initialisation option");
+  end if;
 end CylinderFourier;
-  
-  
-  
   
   function linspaceExt "Extended linspace handling also the N=1 case" 
   input Real x1;
