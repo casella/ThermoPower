@@ -363,13 +363,15 @@ The latter options can be useful when two or more components are connected direc
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
-    parameter Pressure pstart=101325 "Pressure start value";
-    parameter AbsoluteTemperature Tstart=300 "Temperature start value";
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
-      "Start gas composition";
     parameter Volume V "Inner volume";
+    parameter Pressure pstart=101325 "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
+      "Start gas composition" annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     
     Mass M "Total mass";
     InternalEnergy E "Total internal energy";
@@ -383,11 +385,13 @@ The latter options can be useful when two or more components are connected direc
       annotation (extent=[-120,-20; -80,20]);
     FlangeB outlet(redeclare package Medium = Medium) 
       annotation (extent=[80,-20; 120,20]);
+    Thermal.HT thermalPort 
+      annotation (extent=[-40,60; 40,80]);
   equation 
     M = gas.d*V "Gas mass";
     E = M*gas.u "Gas internal energy";
     der(M) = inlet.w + outlet.w "Mass balance";
-    der(E) = inlet.w*hi + outlet.w*ho "Energy balance";
+    der(E) = inlet.w*hi + outlet.w*ho + thermalPort.Q_flow "Energy balance";
     for j in 1:Medium.nXi loop
       M*der(gas.Xi[j]) = inlet.w*(Xi_i[j] - gas.Xi[j]) + outlet.w*(Xi_o[j] - gas.Xi[j]) 
         "Independent component mass balance";
@@ -402,8 +406,8 @@ The latter options can be useful when two or more components are connected direc
       Xi_i = gas.Xi;
     end if;
     if outlet.w >= 0 then
-      ho = inlet.hAB;
-      Xi_o = inlet.XAB;
+      ho = outlet.hAB;
+      Xi_o = outlet.XAB;
     else
       ho = gas.h;
       Xi_o = gas.Xi;
@@ -414,6 +418,7 @@ The latter options can be useful when two or more components are connected direc
     outlet.XBA = gas.Xi;
     inlet.p = gas.p;
     outlet.p = gas.p;
+    thermalPort.T = gas.T;
     
     Tr=noEvent(M/max(abs(outlet.w),Modelica.Constants.eps)) "Residence time";
   initial equation 
@@ -446,7 +451,8 @@ The latter options can be useful when two or more components are connected direc
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),   Icon);
+</html>"),   Icon,
+      Diagram);
   end Plenum;
   
     model Header "Header with metal walls for gas flows" 
@@ -456,17 +462,19 @@ The latter options can be useful when two or more components are connected direc
         p(start=pstart, stateSelect=StateSelect.prefer),
         T(start=Tstart, stateSelect=StateSelect.prefer),
         Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
-      parameter Pressure pstart=101325 "Pressure start value";
-      parameter AbsoluteTemperature Tstart=300 "Temperature start value";
-      parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
-      "Start gas composition";
       parameter AbsoluteTemperature Tmstart=300 "Metal wall start temperature";
       parameter Volume V "Inner volume";
       parameter Area S=0 "Inner surface";
       parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient" annotation(Evaluate = true);
       parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate = true);
+      parameter Pressure pstart=101325 "Pressure start value" 
+        annotation(Dialog(tab = "Initialisation"));
+      parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
+        annotation(Dialog(tab = "Initialisation"));
+      parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
+      "Start gas composition"   annotation(Dialog(tab = "Initialisation"));
       parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option"   annotation(Dialog(tab = "Initialisation"));
     
       Mass M "Gas total mass";
       InternalEnergy E "Gas total energy";
@@ -481,11 +489,14 @@ The latter options can be useful when two or more components are connected direc
         annotation (extent=[-120,-20; -80,20]);
       FlangeB outlet(redeclare package Medium = Medium) 
         annotation (extent=[80,-20; 120,20]);
+      Thermal.HT thermalPort 
+        annotation (extent=[-40,60; 40,80]);
     equation 
       M = gas.d*V "Gas mass";
       E = gas.u*M "Gas internal energy";
       der(M) = inlet.w + outlet.w "Mass balance";
-      der(E) = inlet.w*hi + outlet.w*ho - gamma*S*(gas.T - Tm) "Energy balance";
+      der(E) = inlet.w*hi + outlet.w*ho - gamma*S*(gas.T - Tm)
+               + thermalPort.Q_flow "Energy balance";
       for j in 1:Medium.nXi loop
         M*der(gas.Xi[j]) = inlet.w*(Xi_i[j] - gas.Xi[j]) + outlet.w*(Xi_o[j] - gas.Xi[j]) 
         "Independent component mass balance";
@@ -517,6 +528,7 @@ The latter options can be useful when two or more components are connected direc
       outlet.p = gas.p;
       outlet.hBA = gas.h;
       outlet.XBA = gas.Xi;
+      thermalPort.T = gas.T;
     
       Tr=noEvent(M/max(abs(outlet.w),Modelica.Constants.eps)) "Residence time";
     initial equation 
@@ -557,7 +569,7 @@ The latter options can be useful when two or more components are connected direc
        First release.</li>
 </ul>
 </html>
-"));
+"),   Diagram);
     end Header;
   
   model Mixer "Mixer with metal walls for gas flows" 
@@ -567,17 +579,20 @@ The latter options can be useful when two or more components are connected direc
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
-    parameter Pressure pstart=101325 "Pressure start value";
-    parameter AbsoluteTemperature Tstart=300 "Temperature start value";
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
-      "Start gas composition";
     parameter Volume V "Inner volume";
     parameter Area S=0 "Inner surface";
     parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient" annotation(Evaluate = true);
     parameter HeatCapacity Cm=0 "Metal heat capacity" annotation(Evaluate = true);
-    parameter Temperature Tmstart=300 "metal wall start temperature";
+    parameter Pressure pstart=101325 "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
+      "Start gas composition" annotation(Dialog(tab = "Initialisation"));
+    parameter Temperature Tmstart=300 "Metal wall start temperature" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     
     Mass M "Gas total mass";
     InternalEnergy E "Gas total energy";
@@ -613,14 +628,16 @@ The latter options can be useful when two or more components are connected direc
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),   Icon);
     
+    Thermal.HT thermalPort 
+      annotation (extent=[-38,60; 42,80]);
   equation 
     M = gas.d*V "Gas mass";
     E = M*gas.u "Gas internal energy";
     der(M) = in1.w + in2.w + out.w "Mass balance";
-    der(E) = in1.w*hi1 + in2.w*hi2 + out.w*ho - gamma*S*(gas.T - Tm) 
-      "Energy balance";
+    der(E) = in1.w*hi1 + in2.w*hi2 + out.w*ho - gamma*S*(gas.T - Tm)
+       + thermalPort.Q_flow "Energy balance";
     for j in 1:Medium.nX loop
       M*der(gas.X[j]) = in1.w*(Xi1[j] - gas.X[j]) + in2.w*(Xi2[j] - gas.X[j])
          + out.w*(Xo[j] - gas.X[j]) "Independent component mass balance";
@@ -662,6 +679,7 @@ The latter options can be useful when two or more components are connected direc
     out.p   = gas.p;
     out.hBA = gas.h;
     out.XBA = gas.X;
+    thermalPort.T = gas.T;
     
     Tr=noEvent(M/max(abs(out.w),Modelica.Constants.eps)) "Residence time";
   initial equation 
@@ -826,10 +844,6 @@ The latter options can be useful when two or more components are connected direc
     Medium.BaseProperties gas(
        p(start=pstart), T(start=Tstart),
        Xi(start=Xstart[1:Medium.nXi]));
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
-      "Start gas composition";
-    parameter Pressure pstart=101325 "Start pressure value";
-    parameter AbsoluteTemperature Tstart=300 "Start temperature value";
     parameter MassFlowRate wnom "Nominal mass flowrate";
     parameter FFtypes.Temp FFtype = FFtypes.Kf "Friction factor type";
     parameter Real Kf(fixed = if FFtype == FFtypes.Kf then true else false,
@@ -841,6 +855,12 @@ The latter options can be useful when two or more components are connected direc
     parameter Real wnf=0.01 
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
+    parameter Pressure pstart=101325 "Start pressure value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tstart=300 "Start temperature value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
+      "Start gas composition" annotation(Dialog(tab = "Initialisation"));
   protected 
     parameter Real Kfl(fixed=false) "Linear friction coefficient";
   public 
@@ -856,6 +876,7 @@ The latter options can be useful when two or more components are connected direc
       Kf = K/(2*A^2)*Kfc;
     end if;
     Kfl = wnom*wnf*Kf "Linear friction factor";
+    assert(Kf >= 0, "Negative friction coefficient");
   equation 
     // Set fluid properties
     if inlet.w >= 0 then
@@ -1055,36 +1076,69 @@ The latter options can be useful when two or more components are connected direc
     extends Icons.Gas.Valve;
     import ThermoPower.Choices.Valve.CvTypes;
     replaceable package Medium=Modelica.Media.Interfaces.PartialMedium;
-    Medium.BaseProperties gas(p(start=pnom),T(start=Tstart),
+    Medium.BaseProperties gas(p(start=pin_start),T(start=Tstart),
                               Xi(start=Xstart[1:Medium.nXi]),
-                              d(start=pnom/(8314/30*Tstart)),
-                              state(p(start=pnom),T(start=Tstart)));
-    parameter Pressure pnom=101325 "Nominal inlet pressure";
-    parameter AbsoluteTemperature Tstart=300 "Start temperature";
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
-      "start gas composition";
-    parameter MassFlowRate wnom=0 "Nominal mass flowrate";
-    parameter Pressure dpnom "Nominal pressure drop";
-    parameter Area Av(min=0, fixed = if CvData == CvTypes.Av then true else false)=0 
-      "Av (metric) flow coefficient";
-    parameter Real Kv=0 "Kv (metric) flow coefficient [m^3/h]";
-    parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]";
-    parameter Real b=0.01 "Regularisation factor";
-    parameter Real Fxtnom=0.5 "Nominal Fk*xt critical ratio";
-    parameter CvTypes.Temp CvData "Selection of flow coefficient";
+                              d(start=pnom/(8314/30*Tstart)));
+    parameter CvTypes.Temp CvData = CvTypes.Av "Selection of flow coefficient";
+    parameter Area Av(fixed = if CvData==CvTypes.Av then true else false,
+      start = wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))=0 
+      "Av (metric) flow coefficient" 
+      annotation(Dialog(group = "Flow Coefficient",
+                        enable = (CvData==CvTypes.Av)));
+    parameter Real Kv(unit="m^3/h")=0 "Kv (metric) flow coefficient" 
+      annotation(Dialog(group = "Flow Coefficient",
+                        enable = (CvData==CvTypes.Kv)));
+    parameter Real Cv(unit="USG/min")=0 "Cv (US) flow coefficient" 
+      annotation(Dialog(group = "Flow Coefficient",
+                        enable = (CvData==CvTypes.Cv)));
+    parameter Real pnom "Nominal inlet pressure" 
+      annotation(Dialog(group="Nominal operating point"));
+    parameter Pressure dpnom "Nominal pressure drop" 
+      annotation(Dialog(group="Nominal operating point"));
+    parameter MassFlowRate wnom=0 "Nominal mass flowrate" 
+      annotation(Dialog(group="Nominal operating point"));
+    parameter Density rhonom = 1000 "Nominal density" 
+      annotation(Dialog(group="Nominal operating point",
+                        enable = (CvData==CvTypes.OpPoint)));
+    parameter Real thetanom = 1 "Nominal valve opening" 
+      annotation(Dialog(group="Nominal operating point",
+                        enable = (CvData==CvTypes.OpPoint)));
     parameter Boolean CheckValve=false "Reverse flow stopped";
-    replaceable function FlowChar=Functions.linear "Flow characteristic";
-    replaceable function xtfun=Functions.one "Critical ratio characteristic";
-    function sqrtR = Functions.sqrtReg(delta = b*dpnom);
-    MassFlowRate w;
+    parameter Real b=0.01 "Regularisation factor";
+    
+    replaceable function FlowChar = Functions.ValveCharacteristics.linear 
+      extends Functions.ValveCharacteristics.baseFun "Flow characteristic" 
+      annotation(choicesAllMatching=true);
+    parameter Real Fxt_full=0.5 "Fk*xt critical ratio at full opening";
+    replaceable function xtfun = Functions.ValveCharacteristics.one 
+      extends Functions.ValveCharacteristics.baseFun 
+      "Critical ratio characteristic";
+    parameter Pressure pin_start = pnom "Inlet pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Pressure pout_start = pnom-dpnom "Inlet pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tstart=300 "Start temperature" 
+      annotation(Dialog(tab="Initialisation"));
+    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
+      "Start gas composition";
+    MassFlowRate w "Mass Flow Rate";
+    Pressure dp "Pressure drop";
     Real Fxt;
     Real x "Pressure drop ratio";
     Real xs "Saturated pressure drop ratio";
     Real Y "Compressibility factor";
+    Medium.AbsolutePressure p "Inlet pressure";
+  protected 
+    function sqrtR = Functions.sqrtReg(delta = b*dpnom);
+    parameter Real Fxt_nom(fixed=false) "Nominal Fxt";
+    parameter Real x_nom(fixed=false) "Nominal pressure drop ratio";
+    parameter Real xs_nom(fixed=false) "Nominal saturated pressure drop ratio";
+    parameter Real Y_nom(fixed=false) "Nominal compressibility factor";
     
-    FlangeA inlet(redeclare package Medium = Medium, w(start=wnom), p(start=pnom)) 
+  public 
+    FlangeA inlet(redeclare package Medium = Medium, w(start=wnom), p(start=pin_start)) 
       annotation (extent=[-120,-20; -80,20]);
-    FlangeB outlet(redeclare package Medium = Medium, w(start=-wnom), p(start=pnom-dpnom)) 
+    FlangeB outlet(redeclare package Medium = Medium, w(start=-wnom), p(start=pout_start)) 
       annotation (extent=[80,-20; 120,20]);
     Modelica.Blocks.Interfaces.RealInput theta 
       annotation (extent=[-10,62; 10,82], rotation=270);
@@ -1093,6 +1147,22 @@ The latter options can be useful when two or more components are connected direc
       Av = 2.7778e-5*Kv;
     elseif CvData == CvTypes.Cv then
       Av = 2.4027e-5*Cv;
+    end if;
+    assert(CvData>=0 and CvData<=3, "Invalid CvData");
+    
+    if CvData == CvTypes.OpPoint then
+      // Determination of Av by the nominal operating point conditions
+      Fxt_nom = Fxt_full*xtfun(thetanom);
+      x_nom = dpnom/pnom;
+      xs_nom = smooth(0, if x_nom > Fxt_nom then Fxt_nom else x_nom);
+      Y_nom = 1 - abs(xs_nom)/(3*Fxt_nom);
+      wnom = FlowChar(thetanom)*Av*Y_nom*sqrt(rhonom)*sqrtR(pnom*xs_nom);
+    else
+      // Dummy values
+      Fxt_nom = 0;
+      x_nom = 0;
+      xs_nom = 0;
+      Y_nom = 0;
     end if;
   equation 
     inlet.w + outlet.w = 0 "Mass balance";
@@ -1103,22 +1173,24 @@ The latter options can be useful when two or more components are connected direc
     gas.h = inlet.hBA;
     gas.Xi = inlet.XBA;
     
-    Fxt = Fxtnom*xtfun(theta);
-    x = (inlet.p - outlet.p)/inlet.p;
+    p = noEvent(if inlet.p>=outlet.p then inlet.p else outlet.p);
+    Fxt = Fxt_full*xtfun(theta);
+    dp = inlet.p - outlet.p;
+    x = dp/p;
     xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
     Y = 1 - abs(xs)/(3*Fxt);
     if CheckValve then
       w = FlowChar(theta)*Av*Y*sqrt(gas.d)*
-          smooth(0, if xs>=0 then sqrtR(inlet.p*xs) else 0);
+          smooth(0, if xs>=0 then sqrtR(p*xs) else 0);
     else
-      w = FlowChar(theta)*Av*Y*sqrt(gas.d)*sqrtR(inlet.p*xs);
+      w = FlowChar(theta)*Av*Y*sqrt(gas.d)*sqrtR(p*xs);
     end if;
     
     // Energy balance
     inlet.hAB = outlet.hAB;
     inlet.hBA = outlet.hBA;
     
-    // Independent component mass balances
+    // Mass balances of independent components
     inlet.XAB = outlet.XAB;
     inlet.XBA = outlet.XBA;
     
@@ -1183,25 +1255,32 @@ The latter options can be useful when two or more components are connected direc
     parameter Boolean QuasiStatic=false 
       "Quasi-static model (mass, energy and momentum static balances" annotation(Evaluate=true);
     parameter Integer HydraulicCapacitance=2 "1: Upstream, 2: Downstream";
-    parameter AbsoluteTemperature Tstartin=300 "Inlet temperature start value";
+    parameter AbsoluteTemperature Tstartin=300 "Inlet temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstartout=300 
-      "Outlet temperature start value";
-    parameter Pressure pstart=101325 "Pressure start value";
+      "Outlet temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Pressure pstart=101325 "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Real wnf=0.01 
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
+    parameter MassFraction Xstart[nX]=Medium.reference_X 
+      "Start gas composition" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
+  protected 
     parameter Integer nXi=Medium.nXi "number of independent mass fractions";
     parameter Integer nX=Medium.nX "total number of mass fractions";
-    parameter MassFraction Xstart[nX]=Medium.reference_X 
-      "Start gas composition";
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
     constant Real g=Modelica.Constants.g_n;
+  public 
     FlangeA infl(redeclare package Medium = Medium, w(start=wnom)) 
                      annotation (extent=[-120,-20; -80,20]);
     FlangeB outfl(redeclare package Medium = Medium, w(start=-wnom)) 
     annotation (extent=[80,-20; 120,20]);
-    replaceable Thermal.DHT wall(N=N) annotation (extent=[-60,40; 60,60]);
+    replaceable Thermal.DHT wall(N=N) annotation (extent=[-60,40; 60,60],
+      Dialog(enable = false));
     Medium.BaseProperties gas[N](
       p(start=ones(N)*pstart),
       T(start=linspace(Tstartin,Tstartout,N)),
@@ -1478,18 +1557,21 @@ The latter options can be useful when two or more components are connected direc
     replaceable package Air=Modelica.Media.Interfaces.PartialMedium;
     replaceable package Fuel=Modelica.Media.Interfaces.PartialMedium;
     replaceable package Exhaust=Modelica.Media.Interfaces.PartialMedium;
-    parameter Pressure pstart=101325 "Pressure start value";
-    parameter AbsoluteTemperature Tstart=300 "Temperature start value";
-    parameter MassFraction Xstart[Exhaust.nX]=Exhaust.
-        reference_X "Start flue gas composition";
     parameter Volume V "Inner volume";
     parameter Area S=0 "Inner surface";
     parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient" annotation(Evaluate = true);
     parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate = true);
-    parameter Temperature Tmstart=300 "Metal wall start temperature";
+    parameter Temperature Tmstart=300 "Metal wall start temperature" 
+      annotation(Dialog(tab="Initialisation"));
     parameter SpecificEnthalpy HH "Lower Heating value of fuel";
+    parameter Pressure pstart=101325 "Pressure start value" 
+      annotation(Dialog(tab="Initialisation"));
+    parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
+      annotation(Dialog(tab="Initialisation"));
+    parameter MassFraction Xstart[Exhaust.nX]=Exhaust.reference_X 
+      "Start flue gas composition" annotation(Dialog(tab="Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab="Initialisation"));
     Exhaust.BaseProperties fluegas(p(start=pstart),T(start=Tstart),
                                    X(start=Xstart[1:Exhaust.nXi]));
     Mass M "Gas total mass";
@@ -1629,16 +1711,18 @@ This model extends the CombustionChamber Base model, with the definition of the 
     parameter Boolean explicitIsentropicEnthalpy=true 
       "isentropicEnthalpy function used";
     parameter Real eta_mech=0.98 "mechanical efficiency";
-    parameter Modelica.SIunits.Pressure pstart_in "inlet start pressure";
-    parameter Modelica.SIunits.Pressure pstart_out "outlet start pressure";
+    parameter Modelica.SIunits.Pressure pstart_in "inlet start pressure" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Modelica.SIunits.Pressure pstart_out "outlet start pressure" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter ThermoPower.AbsoluteTemperature Tdes_in 
       "inlet design temperature";
     parameter ThermoPower.AbsoluteTemperature Tstart_in = Tdes_in 
-      "inlet start temperature";
+      "inlet start temperature" annotation(Dialog(tab = "Initialisation"));
     parameter ThermoPower.AbsoluteTemperature Tstart_out 
-      "outlet start temperature";
+      "outlet start temperature" annotation(Dialog(tab = "Initialisation"));
     parameter Modelica.SIunits.MassFraction Xstart[Medium.nX]=Medium.reference_X 
-      "start gas composition";
+      "start gas composition" annotation(Dialog(tab = "Initialisation"));
     Medium.BaseProperties gas_in(
       p(start=pstart_in),
       T(start=Tstart_in),
@@ -1839,16 +1923,18 @@ This model adds the performance characteristics to the Compressor_Base model, by
     parameter Boolean explicitIsentropicEnthalpy=true 
       "isentropicEnthalpy function used";
     parameter Real eta_mech=0.98 "mechanical efficiency";
-    parameter Modelica.SIunits.Pressure pstart_in "inlet start pressure";
-    parameter Modelica.SIunits.Pressure pstart_out "outlet start pressure";
     parameter ThermoPower.AbsoluteTemperature Tdes_in 
       "inlet design temperature";
+    parameter Modelica.SIunits.Pressure pstart_in "inlet start pressure" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Modelica.SIunits.Pressure pstart_out "outlet start pressure" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter ThermoPower.AbsoluteTemperature Tstart_in = Tdes_in 
-      "inlet start temperature";
+      "inlet start temperature" annotation(Dialog(tab = "Initialisation"));
     parameter ThermoPower.AbsoluteTemperature Tstart_out 
-      "outlet start temperature";
+      "outlet start temperature" annotation(Dialog(tab = "Initialisation"));
     parameter Modelica.SIunits.MassFraction Xstart[Medium.nX]=Medium.reference_X 
-      "start gas composition";
+      "start gas composition" annotation(Dialog(tab = "Initialisation"));
     
     Medium.BaseProperties gas_in(
       p(start=pstart_in),
@@ -2111,10 +2197,12 @@ This model extends the Turbine_Base model with the calculation of the performanc
     replaceable package Air=Modelica.Media.Interfaces.PartialMedium;
     replaceable package Fuel=Modelica.Media.Interfaces.PartialMedium;
     replaceable package Exhaust=Modelica.Media.Interfaces.PartialMedium;
-    parameter Modelica.SIunits.Pressure pstart "start pressure value";
-    parameter ThermoPower.AbsoluteTemperature Tstart "start temperature value";
+    parameter Modelica.SIunits.Pressure pstart "start pressure value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter ThermoPower.AbsoluteTemperature Tstart "start temperature value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Modelica.SIunits.MassFraction Xstart[Air.nX]=Air.reference_X 
-      "start gas composition";
+      "start gas composition" annotation(Dialog(tab = "Initialisation"));
     constant Modelica.SIunits.Pressure pnom=1.013e5 "ISO reference pressure";
     constant AbsoluteTemperature Tnom=288.15 "ISO reference temperature";
     parameter SpecificEnthalpy HH "Lower Heating value";
@@ -2399,4 +2487,220 @@ The packages Medium are redeclared and a mass balance determines the composition
     MassFlowRate.y=wia_ISO;
   end GTunit;
   
+  partial model FanBase "Base model for fans" 
+    extends Icons.Gas.Fan;
+    import Modelica.SIunits.Conversions.NonSIunits.*;
+    replaceable package Medium = Water.StandardWater extends 
+      Modelica.Media.Interfaces.PartialMedium "Medium model";
+    Medium.BaseProperties inletFluid(p(start=pin_start),h(start=hstart)) 
+      "Fluid properties at the inlet";
+    replaceable function flowCharacteristic = 
+        Functions.FanCharacteristics.baseFlow 
+      "Head vs. q_flow characteristic at nominal speed and density" 
+      annotation(Dialog(group="Characteristics"), choicesAllMatching=true);
+    parameter Boolean usePowerCharacteristic = false 
+      "Use powerCharacteristic (vs. efficiencyCharacteristic)" 
+       annotation(Dialog(group="Characteristics"));
+    replaceable function powerCharacteristic = 
+      Functions.FanCharacteristics.basePower 
+      "Power consumption vs. q_flow at nominal speed and density" 
+      annotation(Dialog(group="Characteristics", enable = usePowerCharacteristic),
+                 choicesAllMatching=true);
+    replaceable function efficiencyCharacteristic = 
+      Functions.FanCharacteristics.constantEfficiency(eta_nom = 0.8) 
+      extends Functions.PumpCharacteristics.baseEfficiency 
+      "Efficiency vs. q_flow at nominal speed and density" 
+      annotation(Dialog(group="Characteristics",enable = not usePowerCharacteristic),
+                 choicesAllMatching=true);
+    parameter Integer Np0(min=1) = 1 "Nominal number of fans in parallel";
+    parameter Real bladePos0 = 1 "Nominal blade position";
+    parameter Density rho0=1.229 "Nominal Gas Density" 
+       annotation(Dialog(group="Characteristics"));
+    parameter AngularVelocity_rpm n0=1500 "Nominal rotational speed" 
+       annotation(Dialog(group="Characteristics"));
+    parameter Volume V=0 "Fan Internal Volume"  annotation(Evaluate=true);
+    parameter Boolean CheckValve=false "Reverse flow stopped";
+    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+      "Initialisation option" annotation(Dialog(tab="Initialisation"));
+    parameter Pressure pin_start "Inlet Pressure Start Value" 
+      annotation(Dialog(tab="Initialisation"));
+    parameter Pressure pout_start "Outlet Pressure Start Value" 
+      annotation(Dialog(tab="Initialisation"));
+    parameter VolumeFlowRate q_single_start=0 
+      "Volume Flow Rate Start Value (single pump)" 
+      annotation(Dialog(tab="Initialisation"));
+    parameter SpecificEnthalpy hstart=1e5 "Fluid Specific Enthalpy Start Value"
+      annotation(Dialog(tab="Initialisation"));
+    parameter Density rho_start=rho0 "Inlet Density start value" 
+      annotation(Dialog(tab="Initialisation"));
+    MassFlowRate w_single(start=q_single_start*rho_start) 
+      "Mass flow rate (single fan)";
+    MassFlowRate w = Np*w_single "Mass flow rate (total)";
+    VolumeFlowRate q_single "Volume flow rate (single fan)";
+    VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
+    Pressure dp "Outlet pressure minus inlet pressure";
+    SpecificEnergy H = dp/rho "Specific energy";
+    Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
+    Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";
+    Medium.SpecificEnthalpy hout(start=hstart) "Enthalpy of outgoing fluid";
+    LiquidDensity rho "Gas density";
+    Medium.Temperature Tin "Gas inlet temperature";
+    AngularVelocity_rpm n "Shaft r.p.m.";
+    PerUnit bladePos "Blade position";
+    Integer Np(min=1) "Number of fans in parallel";
+    Power W_single "Power Consumption (single fan)";
+    Power W = Np*W_single "Power Consumption (total)";
+    constant Power W_eps=1e-8 
+      "Small coefficient to avoid numerical singularities";
+    constant AngularVelocity_rpm n_eps=1e-6;
+    Real eta "Fan efficiency";
+    Real s "Auxiliary Variable";
+    Gas.FlangeA infl(
+      p(start=pin_start),
+      hAB(start=hstart),
+      redeclare package Medium = Medium) 
+      annotation (extent=[-100, 2; -60, 42]);
+    Gas.FlangeB outfl(
+      p(start=pout_start),
+      hBA(start=hstart),
+      redeclare package Medium = Medium) 
+      annotation (extent=[40,52; 80,92]);
+    Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps" 
+      annotation (extent=[18, 70; 38, 90], rotation=-90);
+    Modelica.Blocks.Interfaces.RealInput in_bladePos 
+      annotation (extent=[-50,66; -30,86], rotation=-90);
+  equation 
+    // Number of fans in parallel
+    Np = in_Np;
+    if cardinality(in_Np)==0 then
+      in_Np = Np0 "Number of fans selected by parameter";
+    end if;
+    
+    // Blade position
+    bladePos = in_bladePos;
+    if cardinality(in_bladePos)==0 then
+      in_bladePos = bladePos0 "Blade postion selected by parameter";
+    end if;
+    
+    // Fluid properties
+    inletFluid.p=infl.p;
+    inletFluid.h=hin;
+    rho = inletFluid.d;
+    Tin = inletFluid.T;
+    
+      // Flow equations
+    q_single = w_single/rho;
+    if noEvent(s > 0 or (not CheckValve)) then
+      // Flow characteristics when check valve is open
+      q_single = s;
+      H = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps),bladePos);
+    else
+      // Flow characteristics when check valve is closed
+      H = (n/n0)^2*flowCharacteristic(0) - s;
+      q_single = 0;
+    end if;
+    
+    // Power consumption  
+    if usePowerCharacteristic then
+      W_single = (n/n0)^3*(rho/rho0)*powerCharacteristic(q_single*n0/(n+n_eps),bladePos) 
+        "Power consumption (single fan)";
+      eta = (dp*q_single)/(W_single + W_eps) "Hydraulic efficiency";
+    else
+      eta = efficiencyCharacteristic(q_single*n0/(n+n_eps),bladePos);
+      W_single = dp*q_single/eta;
+    end if;
+    
+    // Boundary conditions
+    dp = outfl.p - infl.p;
+    w = infl.w "Fan total flow rate";
+    if w >= 0 then
+      hin = infl.hBA;
+    else
+      hin = outfl.hAB;
+    end if;
+    infl.hAB = hout;
+    outfl.hBA = hout;
+    h = hout;
+    
+    // Mass and energy balances
+    infl.w + outfl.w = 0 "Mass balance";
+    if V>0 then
+      (rho*V*der(h)) = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single 
+        "Energy balance";
+    else
+      0 = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single "Energy balance";
+    end if;
+    
+  initial equation 
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.steadyState then
+      if V>0 then
+        der(h)=0;
+      end if;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+    
+    annotation (
+      Icon,
+      Diagram,
+      Documentation(info="<HTML>
+<p>This is the base model for the <tt>FanMech</tt> fan model.
+<p>The model describes a fan, or a group of <tt>Np</tt> identical fans, with optional blade angle regulation. The fan model is based on the theory of kinematic similarity: the fan characteristics are given for nominal operating conditions (rotational speed and fluid density), and then adapted to actual operating condition, according to the similarity equations. 
+<p>In order to avoid singularities in the computation of the outlet enthalpy at zero flowrate, the thermal capacity of the fluid inside the fan body can be taken into account.
+<p>The model can either support reverse flow conditions or include a built-in check valve to avoid flow reversal.
+<p><b>Modelling options</b></p>
+<p> The nominal flow characteristic (specific energy vs. volume flow rate) is given by the the replaceable function <tt>flowCharacteristic</tt>. If the blade angles are fixed, it is possible to use implementations which ignore the <tt>bladePos</tt> input.
+<p> The fan energy balance can be specified in two alternative ways:
+<ul>
+<li><tt>usePowerCharacteristic = false</tt> (default option): the replaceable function <tt>efficiencyCharacteristic</tt> (efficiency vs. volume flow rate in nominal conditions) is used to determine the efficiency, and then the power consumption. The default is a constant efficiency of 0.8.
+<li><tt>usePowerCharacteristic = true</tt>: the replaceable function <tt>powerCharacteristic</tt> (power consumption vs. volume flow rate in nominal conditions) is used to determine the power consumption, and then the efficiency.
+</ul>
+<p>
+Several functions are provided in the package <tt>Functions.FanCharacteristics</tt> to specify the characteristics as a function of some operating points at nominal conditions.
+<p>Depending on the value of the <tt>checkValve</tt> parameter, the model either supports reverse flow conditions, or includes a built-in check valve to avoid flow reversal.
+<p>If the <tt>in_Np</tt> input connector is wired, it provides the number of fans in parallel; otherwise,  <tt>Np0</tt> parallel fans are assumed.</p>
+<p>It is possible to take into account the heat capacity of the fluid inside the fan by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
+<p>The <tt>CheckValve</tt> parameter determines whether the fan has a built-in check valve or not.
+</HTML>",
+        revisions="<html>
+<ul>
+<li><i>10 Nov 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+      Adapted from the <tt>Water.PumpBase</tt> model.</li>
+</ul>
+</html>"));
+  end FanBase;
+  
+  model FanMech 
+    extends FanBase;
+    Angle phi "Shaft angle";
+    AngularVelocity omega "Shaft angular velocity";
+    Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort 
+      annotation (extent=[80,6; 110,34]);
+  equation 
+    n = Modelica.SIunits.Conversions.to_rpm(omega) "Rotational speed";
+    
+    // Mechanical boundary condition
+    phi = MechPort.phi;
+    omega = der(phi);
+    W = omega*MechPort.tau;
+    
+    annotation (Diagram, Icon(
+        Rectangle(extent=[60,28; 86,12],   style(
+            color=76,
+            gradient=2,
+            fillColor=9))),
+      Documentation(info="<HTML>
+<p>This model describes a fan (or a group of <tt>Np</tt> fans in parallel) with a mechanical rotational connector for the shaft, to be used when the pump drive has to be modelled explicitly. In the case of <tt>Np</tt> fans in parallel, the mechanical connector is relative to a single fan.
+<p>The model extends <tt>FanBase</tt>
+ </HTML>", revisions="<html>
+<ul>
+<li><i>10 Nov 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+      Adapted from the <tt>Water.PumpBase</tt> model.</li>
+</ul>
+</html>"));
+  end FanMech;
 end Gas;
