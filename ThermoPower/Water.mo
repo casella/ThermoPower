@@ -456,12 +456,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Position H=0 "Elevation of outlet over inlet" annotation (Evaluate=true);
     parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient" annotation(Evaluate=true);
     parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate=true);
-    parameter Pressure pstartin=1.01325e5 "Inlet pressure start value";
-    parameter Pressure pstartout=1.01325e5 "Outlet pressure start value";
-    parameter SpecificEnthalpy hstart=1e5 "Specific enthalpy start value";
-    parameter AbsoluteTemperature Tmstart=300 "Metal wall start temperature";
+    parameter Pressure pstartin=1.01325e5 "Inlet pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Pressure pstartout=1.01325e5 "Outlet pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hstart=1e5 "Specific enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tmstart=300 "Metal wall start temperature" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     FlangeA inlet(p(start=pstartin), hAB(start=hstart),
       redeclare package Medium = Medium) 
                   annotation (extent=[-122, -20; -80, 20]);
@@ -481,7 +485,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
     Time Tr "Residence time";
     replaceable Thermal.DHT InternalSurface "Internal surface of metal wall" 
-                     annotation (extent=[-24,50; 24,64]);
+      annotation (extent=[-24,50; 24,64],
+                  Dialog(enable = false));
   equation 
     // Set fluid properties
     fluid.p=p;
@@ -581,12 +586,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends Header(redeclare Thermal.DHThtc InternalSurface(final N=1) 
         "Fluid at internal surface");
     parameter Length D "Inner diameter";
-  equation 
-    InternalSurface.T[1] = fluid.T;
-    InternalSurface.gamma[1] = (0.023*
-      (4/Modelica.Constants.pi*inlet.w/(2*D*Medium.dynamicViscosity(fluid.state)))^0.8*
-      Medium.prandtlNumber(fluid.state)^0.4)*(Medium.thermalConductivity(fluid.state)/D);
-    annotation (Documentation(info="<html>
+    
+  annotation (Documentation(info="<html>
 Extends <tt>Header</tt> by adding the computation of the heat transfer coefficient by Dittus-Boelter equation
 </html>", revisions="<html>
 <ul>
@@ -594,7 +595,23 @@ Extends <tt>Header</tt> by adding the computation of the heat transfer coefficie
     by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"), Diagram);
+  equation 
+    InternalSurface.T[1] = fluid.T;
+    /*
+  if (InternalSurface.phi[1]>0) then
+    InternalSurface.gamma[1] = (0.023*
+      (4*inlet.w/(Modelica.Constants.pi*D*Medium.dynamicViscosity(fluid.state)))^0.8*
+      Medium.prandtlNumber(fluid.state)^0.4)*(Medium.thermalConductivity(fluid.state)/D);
+  else
+    InternalSurface.gamma[1] = (0.023*
+      (4*inlet.w/(Modelica.Constants.pi*D*Medium.dynamicViscosity(fluid.state)))^0.8*
+      Medium.prandtlNumber(fluid.state)^0.3)*(Medium.thermalConductivity(fluid.state)/D);
+  end if;
+  */
+      InternalSurface.gamma[1] = (0.023*
+        (4*inlet.w/(Modelica.Constants.pi*D*Medium.dynamicViscosity(fluid.state)))^0.8*
+        Medium.prandtlNumber(fluid.state)^0.4)*(Medium.thermalConductivity(fluid.state)/D);
   end Header_htc;
   
   model Mixer "Mixer with metal walls for water/steam flows" 
@@ -608,11 +625,14 @@ Extends <tt>Header</tt> by adding the computation of the heat transfer coefficie
     parameter CoefficientOfHeatTransfer gamma=0 
       "Internal Heat Transfer Coefficient" annotation(Evaluate=true);
     parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate=true);
-    parameter Pressure pstart=1e5 "Pressure start value";
-    parameter Enthalpy hstart=1e5 "Enthalpy start value";
-    parameter AbsoluteTemperature Tmstart=300 "Wall temperature start value";
+    parameter Pressure pstart=1e5 "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Enthalpy hstart=1e5 "Enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tmstart=300 "Wall temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     FlangeA in1(p(start=pstart), hAB(start=hstart),redeclare package Medium=Medium) 
                 annotation (extent=[-100, 40; -60, 80]);
     FlangeA in2(p(start=pstart), hAB(start=hstart),redeclare package Medium=Medium) 
@@ -711,8 +731,10 @@ Extends <tt>Header</tt> by adding the computation of the heat transfer coefficie
     parameter Area A "Cross-sectional area";
     parameter Volume V0=0 "Volume at zero level";
     parameter Pressure pext=1.01325e5 "Surface pressure";
-    parameter Length ystart "Start level";
-    parameter SpecificEnthalpy hstart=1e5;
+    parameter Length ystart "Start level" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hstart=1e5 
+      annotation(Dialog(tab = "Initialisation"));
     Length y(start=ystart, stateSelect=StateSelect.prefer) "Level";
     Volume V "Liquid volume";
     Mass M "Liquid mass";
@@ -728,7 +750,7 @@ Extends <tt>Header</tt> by adding the computation of the heat transfer coefficie
     FlangeB outlet(redeclare package Medium=Medium) 
                    annotation (extent=[60, -80; 100, -40]);
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
   equation 
     // Set liquid properties
     liquid.p=pext;
@@ -786,6 +808,7 @@ Extends <tt>Header</tt> by adding the computation of the heat transfer coefficie
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     extends Icons.Water.Tube;
     import ThermoPower.Choices.Flow1D.FFtypes;
+    import ThermoPower.Choices.Flow1D.HCtypes;
     parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
     parameter Integer Nt=1 "Number of tubes in parallel";
     parameter Distance L "Tube length" annotation(Evaluate=true);
@@ -802,16 +825,21 @@ Extends <tt>Header</tt> by adding the computation of the heat transfer coefficie
     parameter Real Cfnom=0 "Nominal Fanning friction factor";
     parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
     parameter Boolean DynamicMomentum=false "Inertial phenomena accounted for" annotation(Evaluate = true);
-    parameter Integer HydraulicCapacitance=2 "1: Upstream, 2: Downstream";
-    parameter SpecificEnthalpy hstartin=1e5 "Inlet enthalpy start value";
-    parameter SpecificEnthalpy hstartout=1e5 "Outlet enthalpy start value";
-    parameter Pressure pstartin=1e5 "Inlet pressure start value";
-    parameter Pressure pstartout=1e5 "Outlet pressure start value";
+    parameter HCtypes.Temp HydraulicCapacitance = HCtypes.Downstream 
+      "Location of the hydraulic capacitance";
+    parameter Pressure pstartin=1e5 "Inlet pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Pressure pstartout=1e5 "Outlet pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hstartin=1e5 "Inlet enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hstartout=1e5 "Outlet enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Real wnf=0.01 
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     constant Real g=Modelica.Constants.g_n;
     FlangeA infl(p(start=pstartin),w(start=wnom),hAB(start=hstartin),
       redeclare package Medium = Medium) 
@@ -820,7 +848,8 @@ Extends <tt>Header</tt> by adding the computation of the heat transfer coefficie
       redeclare package Medium = Medium) 
                   annotation (extent=[80, -20; 120, 20]);
     replaceable ThermoPower.Thermal.DHT wall(N=N) 
-      annotation (extent=[-40, 40; 40, 60]);
+      annotation (extent=[-40, 40; 40, 60],
+                  Dialog(enable = false));
     Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
     Time Tr "Residence time";
   protected 
@@ -856,8 +885,14 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       h(start=linspace(hstartin, hstartout, N))) 
       "Properties of the fluid at the nodes";
     Length omega_hyd "Wet perimeter (single tube)";
-    Pressure Dpfric "Pressure drop due to friction";
+    Pressure Dpfric "Pressure drop due to friction (total)";
+    Pressure Dpfric1 
+      "Pressure drop due to friction (from inlet to capacitance)";
+    Pressure Dpfric2 
+      "Pressure drop due to friction (from capacitance to outlet)";
     Pressure Dpstat "Pressure drop due to static head";
+    MassFlowRate win "Flow rate at the inlet (single tube)";
+    MassFlowRate wout "Flow rate at the outlet (single tube)";
     Real Kf "Hydraulic friction coefficient";
     Real Kfl "Linear friction coefficient";
     Real dwdt "Dynamic momentum term";
@@ -895,7 +930,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
 <li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
 <li>The longitudinal heat diffusion term is neglected.
-<li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
+<li>The energy balance equation is written by assuming a uniform pressure distribution; the compressibility effects are lumped at the inlet, at the outlet, or at the middle of the pipe.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
 </ul>
 <p>The mass, momentum and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional) and N-1 specific enthalpies.
@@ -911,13 +946,17 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 <li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).
 <li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul>
 <p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
-<p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass buildup term depending on the pressure is lumped at the outlet, while the optional momentum buildup term depending on the flowrate is lumped at the inlet; therefore, the state variables are the outlet pressure and the inlet flowrate. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
+<p>If <tt>HydraulicCapacitance = HCtypes.Downstream</tt> (default option) then the compressibility effect depending on the pressure derivative is lumped at the outlet, while the optional dynamic momentum term depending on the flowrate is lumped at the inlet; therefore, the state variables are the outlet pressure and the inlet flowrate. If <tt>HydraulicCapacitance = HCtypes.Upstream</tt> the reverse takes place.
+ If <tt>HydraulicCapacitance = HCtypes.Middle</tt>, the compressibility effect is lumped at the middle of the pipe; to use this option, an odd number of nodes N is required.
 <p>Start values for the pressure and flowrate state variables are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
 <p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt > 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
 <p>This models makes the temperature and external heat flow distributions available to connected components through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
 </HTML>",
         revisions="<html>
 <ul>
+<li><i>16 Sep 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Option to lump compressibility at the middle added.</li>
 <li><i>30 May 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Initialisation support added.</li>
@@ -978,9 +1017,27 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     
     sum(dMdt) = (infl.w + outfl.w)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
-    Dpfric = if FFtype == FFtypes.NoFriction then 0 else 
-              noEvent(Kf*abs(w) + Kfl)*w*sum(vbar)/(N - 1) 
-      "Pressure drop due to friction";
+    Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
+    if FFtype == FFtypes.NoFriction then
+      Dpfric1 = 0;
+      Dpfric2 = 0;
+    elseif HydraulicCapacitance == 0 then
+      assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
+      Dpfric1 = noEvent(Kf*abs(win)  + Kfl)*win* sum(vbar[1:integer((N-1)/2)])/(N-1) 
+        "Pressure drop from inlet to capacitance";
+      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar[1+integer((N-1)/2):N-1])/(N-1) 
+        "Pressure drop from capacitance to outlet";
+    elseif HydraulicCapacitance == 1 then
+      Dpfric1 = 0 "Pressure drop from inlet to capacitance";
+      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar)/(N - 1) 
+        "Pressure drop from capacitance to outlet";
+    elseif HydraulicCapacitance == 2 then
+      Dpfric1 = noEvent(Kf*abs(win) + Kfl)*win*sum(vbar)/(N - 1) 
+        "Pressure drop from inlet to capacitance";
+      Dpfric2 = 0 "Pressure drop from capacitance to outlet";
+    else
+       assert(false, "Unsupported HydraulicCapacitance option");
+    end if "Pressure drop due to friction";
     Dpstat = if abs(dzdx)<1e-6 then 0 else g*l*dzdx*sum(rhobar) 
       "Pressure drop due to static head";
     for j in 1:N - 1 loop
@@ -1013,16 +1070,21 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       u[j] = w/(rho[j]*A);
     end for;
     
-    // Selection of representative pressure and flow rate variables
-    if HydraulicCapacitance == 1 then
-      p = infl.p;
-      w = -outfl.w/Nt;
-    else
-      p = outfl.p;
-      w = infl.w/Nt;
-    end if;
-    
     // Boundary conditions
+    win = infl.w/Nt;
+    wout = -outfl.w/Nt;
+    if HydraulicCapacitance == 0 then
+      p = infl.p - Dpfric1 - Dpstat/2;
+      w = win;
+    elseif HydraulicCapacitance == 1 then
+      p = infl.p;
+      w = wout;
+    elseif HydraulicCapacitance == 2 then
+      p = outfl.p;
+      w = win;
+    else
+      assert(false, "Unsupported HydraulicCapacitance option");
+    end if;
     infl.hAB = htilde[1];
     outfl.hBA = htilde[N - 1];
     if w >= 0 then
@@ -2797,7 +2859,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     constant MassFlowRate wzero=1e-9 
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
-    parameter Pressure pstart=1e5 "Pressure start value";
+    parameter Pressure pstart=1e5 "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
     FlangeB out(p(start=pstart), redeclare package Medium = Medium) 
                 annotation (extent=[40, -20; 80, 20]);
     FlangeA in1(p(start=pstart), redeclare package Medium = Medium) 
@@ -2837,7 +2900,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     constant MassFlowRate wzero=1e-9 
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
-    parameter Pressure pstart=1e5 "Pressure start value";
+    parameter Pressure pstart=1e5 "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
     FlangeA in1(p(start=pstart), redeclare package Medium = Medium) 
                                   annotation (extent=[-80, -20; -40, 20]);
     FlangeB out1(p(start=pstart), redeclare package Medium = Medium) 
@@ -3159,6 +3223,18 @@ The latter options can be useful when two or more components are connected direc
     extends Icons.Water.Drum;
     replaceable package Medium = StandardWater extends 
       Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model";
+    parameter Volume Vd "Drum volume";
+    parameter Volume Vdcr "Volume of downcomer and risers";
+    parameter Mass Mmd "Drum metal mass";
+    parameter Mass Mmdcr "Metal mass of downcomer and risers";
+    parameter SpecificHeatCapacity cm "Specific heat capacity of the metal";
+    parameter Pressure pstart "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Volume Vldstart "Start value of drum water volume" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
+    
     Medium.SaturationProperties sat "Saturation conditions";
     FlangeA feed(redeclare package Medium = Medium) 
                  annotation (extent=[-110,-64; -70,-24]);
@@ -3188,15 +3264,6 @@ The latter options can be useful when two or more components are connected direc
     Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat 
       "Metal wall thermal port" 
       annotation (extent=[-28,-100; 28,-80]);
-    parameter Volume Vd "Drum volume";
-    parameter Volume Vdcr "Volume of downcomer and risers";
-    parameter Mass Mmd "Drum metal mass";
-    parameter Mass Mmdcr "Metal mass of downcomer and risers";
-    parameter SpecificHeatCapacity cm "Specific heat capacity of the metal";
-    parameter Pressure pstart "Pressure start value";
-    parameter Volume Vldstart "Start value of drum water volume";
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
     Mass Ml "Liquid water mass";
     Mass Mv "Steam mass";
     Mass M "Total liquid+steam mass";
@@ -3284,13 +3351,18 @@ The latter options can be useful when two or more components are connected direc
     parameter Real afd=0.05 "Ratio of feedwater in downcomer flowrate";
     parameter Real avr=1.2 "Phase separation efficiency coefficient";
     parameter Integer DrumOrientation=0 "0: Horizontal; 1: Vertical";
-    parameter Pressure pstart=1e5 "Pressure start value";
-    parameter SpecificEnthalpy hlstart=1e5 "Liquid enthalpy start value";
-    parameter SpecificEnthalpy hvstart=2.78e6 "Vapour enthalpy start value";
-    parameter Temperature Tmstart=300 "Metal wall temperature start value";
-    parameter Length ystart=0 "Start level value";
+    parameter Pressure pstart=1e5 "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hlstart=1e5 "Liquid enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hvstart=2.78e6 "Vapour enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Temperature Tmstart=300 "Metal wall temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Length ystart=0 "Start level value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     constant Real g=Modelica.Constants.g_n;
     constant Real pi=Modelica.Constants.pi;
     
@@ -3561,17 +3633,35 @@ The latter options can be useful when two or more components are connected direc
     replaceable package Medium = StandardWater extends 
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.BaseProperties fluid(p(start=pnom));
-    parameter CvTypes.Temp CvData "Selection of flow coefficient";
-    parameter Area Av(fixed = if CvData==CvTypes.Av then true else false)=0 
-      "Av (metric) flow coefficient";
-    parameter Real Kv(unit="m^3/h")=0 "Kv (metric) flow coefficient";
-    parameter Real Cv(unit="USG/min")=0 "Cv (US) flow coefficient";
-    parameter Real pnom "Nominal inlet pressure";
-    parameter Pressure dpnom "Nominal pressure drop";
-    parameter MassFlowRate wnom=0 "Nominal mass flowrate";
+    parameter CvTypes.Temp CvData = CvTypes.Av "Selection of flow coefficient";
+    parameter Area Av(fixed = if CvData==CvTypes.Av then true else false,
+      start = wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))=0 
+      "Av (metric) flow coefficient" 
+      annotation(Dialog(group = "Flow Coefficient",
+                        enable = (CvData==CvTypes.Av)));
+    parameter Real Kv(unit="m^3/h")=0 "Kv (metric) flow coefficient" 
+      annotation(Dialog(group = "Flow Coefficient",
+                        enable = (CvData==CvTypes.Kv)));
+    parameter Real Cv(unit="USG/min")=0 "Cv (US) flow coefficient" 
+      annotation(Dialog(group = "Flow Coefficient",
+                        enable = (CvData==CvTypes.Cv)));
+    parameter Real pnom "Nominal inlet pressure" 
+      annotation(Dialog(group="Nominal operating point"));
+    parameter Pressure dpnom "Nominal pressure drop" 
+      annotation(Dialog(group="Nominal operating point"));
+    parameter MassFlowRate wnom=0 "Nominal mass flowrate" 
+      annotation(Dialog(group="Nominal operating point"));
+    parameter Density rhonom = 1000 "Nominal density" 
+      annotation(Dialog(group="Nominal operating point",
+                        enable = (CvData==CvTypes.OpPoint)));
+    parameter Real thetanom = 1 "Nominal valve opening" 
+      annotation(Dialog(group="Nominal operating point",
+                        enable = (CvData==CvTypes.OpPoint)));
     parameter Boolean CheckValve=false "Reverse flow stopped";
     parameter Real b=0.01 "Regularisation factor";
-    replaceable function FlowChar = Functions.linear "Flow characteristic";
+    replaceable function FlowChar = Functions.ValveCharacteristics.linear 
+      extends Functions.ValveCharacteristics.baseFun "Flow characteristic" 
+      annotation(choicesAllMatching=true);
     MassFlowRate w "Mass flow rate";
     LiquidDensity rho "Inlet density";
     Medium.Temperature Tin;
@@ -3592,20 +3682,25 @@ The latter options can be useful when two or more components are connected direc
       Documentation(info="<HTML>
 <p>This is the base model for the <tt>ValveLiq</tt>, <tt>ValveLiqChoked</tt>, and <tt>ValveVap</tt> valve models. The model is based on the IEC 534 / ISA S.75 standards for valve sizing.
 <p>The model optionally supports reverse flow conditions (assuming symmetrical behaviour) or check valve operation, and has been suitably modified to avoid numerical singularities at zero pressure drop. 
-<p>The flow characteristic can be customised.
 <p><b>Modelling options</b></p>
 <p>The following options are available to specify the valve flow coefficient in fully open conditions:
 <ul><li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.Av</tt>: the flow coefficient is given by the metric <tt>Av</tt> coefficient (m^2).
 <li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.Kv</tt>: the flow coefficient is given by the metric <tt>Kv</tt> coefficient (m^3/h).
 <li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.Cv</tt>: the flow coefficient is given by the US <tt>Cv</tt> coefficient (USG/min).
-<li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.OpPoint</tt>: the flow coefficient must be specified by an additional initial equation (e.g. <tt>w=0.5</tt>); the start value given by <tt>Av</tt> is used to initialise the numerical solution of the equation.
+<li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.OpPoint</tt>: the flow coefficient is specified by the nominal operating point:  <tt>pnom</tt>, <tt>dpnom</tt>, <tt>wnom</tt>, <tt>rhonom</tt>, <tt>thetanom</tt> (in forward flow).
 </ul>
 <p>The nominal pressure drop <tt>dpnom</tt> must always be specified; to avoid numerical singularities, the flow characteristic is modified for pressure drops less than <tt>b*dpnom</tt> (the default value is 1% of the nominal pressure drop). Increase this parameter if numerical instabilities occur in valves with very low pressure drops.
 <p>If <tt>CheckValve</tt> is true, then the flow is stopped when the outlet pressure is higher than the inlet pressure; otherwise, reverse flow takes place.
-<p>The default flow characteristic <tt>FlowChar</tt> is linear; this can be replaced by any user-defined function (e.g. equal percentage, quick opening, etc.).
+<p>The default flow characteristic <tt>FlowChar</tt> is linear; it can be replaced by functions taken from <tt>Functions.ValveCharacteristics</tt>, or by any suitable user-defined function extending <tt>Functions.ValveCharacteristics.baseFun</tt>.
 </HTML>",
         revisions="<html>
 <ul>
+<li><i>5 Nov 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Moved replaceable characteristics to Function.ValveCharacteristics package.</li>
+<li><i>29 Sep 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Re-introduced valve sizing by an operating point.</li>
 <li><i>6 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Enumeration-type choice of CvData.</li>
@@ -3651,6 +3746,7 @@ The latter options can be useful when two or more components are connected direc
   
   model ValveLiq "Valve for liquid water flow" 
     extends ValveBase;
+    import ThermoPower.Choices.Valve.CvTypes;
     annotation (
       Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
       Diagram,
@@ -3675,6 +3771,12 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
        First release.</li>
 </ul>
 </HTML>"));
+  initial equation 
+    if CvData == CvTypes.OpPoint then
+      wnom = FlowChar(thetanom)*Av*sqrt(rhonom)*sqrtR(dpnom) 
+        "Determination of Av by the operating point";
+    end if;
+    
   equation 
     if CheckValve then
       w = FlowChar(theta)*Av*sqrt(rho)*smooth(0,if dp>=0 then sqrtR(dp) else 0);
@@ -3685,19 +3787,28 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
   
   model ValveVap "Valve for steam flow" 
     extends ValveBase;
-    parameter Real Fxtnom=0.5 "Nominal Fk*xt critical ratio";
-    replaceable function xtfun = Functions.one "Critical ratio characteristic";
-    Real Fxt;
+    import ThermoPower.Choices.Valve.CvTypes;
+    parameter Real Fxt_full=0.5 "Fk*xt critical ratio at full opening";
+    replaceable function xtfun = Functions.ValveCharacteristics.one 
+      extends Functions.ValveCharacteristics.baseFun 
+      "Critical ratio characteristic";
     Real x "Pressure drop ratio";
     Real xs "Saturated pressure drop ratio";
     Real Y "Compressibility factor";
+    Real Fxt "Fxt coefficient";
+    Medium.AbsolutePressure p "Inlet pressure";
+  protected 
+    parameter Real Fxt_nom(fixed=false) "Nominal Fxt";
+    parameter Real x_nom(fixed=false) "Nominal pressure drop ratio";
+    parameter Real xs_nom(fixed=false) "Nominal saturated pressure drop ratio";
+    parameter Real Y_nom(fixed=false) "Nominal compressibility factor";
     annotation (
       Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
       Diagram,
       Documentation(info="<HTML>
 <p>Liquid water valve model according to the IEC 534/ISA S.75 standards for valve sizing, compressible fluid. <p>
 Extends the <tt>ValveBase</tt> model (see the corresponding documentation for common valve features).
-<p>The product Fk*xt is given by the parameter <tt>Fxtnom</tt>, and is assumed constant by default. The relative change (per unit) of the xt coefficient with the valve opening can be specified by customising the <tt>xtfun</tt> function.
+<p>The product Fk*xt is given by the parameter <tt>Fxt_full</tt>, and is assumed constant by default. The relative change (per unit) of the xt coefficient with the valve opening can be specified by customising the <tt>xtfun</tt> function.
 </HTML>",
         revisions="<html>
 <ul>
@@ -3716,16 +3827,32 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
        First release.</li>
 </ul>
 </HTML>"));
+  initial equation 
+    if CvData == CvTypes.OpPoint then
+      // Determination of Av by the nominal operating point conditions
+      Fxt_nom = Fxt_full*xtfun(thetanom);
+      x_nom = dpnom/pnom;
+      xs_nom = smooth(0, if x_nom > Fxt_nom then Fxt_nom else x_nom);
+      Y_nom = 1 - abs(xs_nom)/(3*Fxt_nom);
+      wnom = FlowChar(thetanom)*Av*Y_nom*sqrt(rhonom)*sqrtR(pnom*xs_nom);
+    else
+      // Dummy values
+      Fxt_nom = 0;
+      x_nom = 0;
+      xs_nom = 0;
+      Y_nom = 0;
+    end if;
   equation 
-    Fxt = Fxtnom*xtfun(theta);
-    x = dp/inlet.p;
+    p = noEvent(if dp>=0 then inlet.p else outlet.p);
+    Fxt = Fxt_full*xtfun(theta);
+    x = dp/p;
     xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
     Y = 1 - abs(xs)/(3*Fxt);
     if CheckValve then
       w = FlowChar(theta)*Av*Y*sqrt(rho)*
-          smooth(0,if xs>=0 then sqrtR(inlet.p*xs) else 0);
+          smooth(0,if xs>=0 then sqrtR(p*xs) else 0);
     else
-      w = FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(inlet.p*xs);
+      w = FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(p*xs);
     end if;
   end ValveVap;
   
@@ -3733,9 +3860,10 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     "Valve for liquid water flow, allows choked flow conditions" 
     extends ValveBase(redeclare replaceable package Medium = StandardWater extends 
         Modelica.Media.Interfaces.PartialTwoPhaseMedium);
+    import ThermoPower.Choices.Valve.CvTypes;
     parameter Real Flnom=0.9 "Liquid pressure recovery factor";
-    replaceable function FlowChar = Functions.linear "Flow characteristic";
-    replaceable function Flfun = Functions.one 
+    replaceable function Flfun = Functions.ValveCharacteristics.one 
+      extends Functions.ValveCharacteristics.baseFun 
       "Pressure recovery characteristic";
     MassFlowRate w "Mass flowrate";
     Real Ff "Ff coefficient (see IEC/ISA standard)";
@@ -3750,6 +3878,7 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
 Extends the <tt>ValveBase</tt> model (see the corresponding documentation for common valve features).<p>
 The model operating range includes choked flow operation, which takes place for low outlet pressures due to flashing in the vena contracta; otherwise, non-choking conditions are assumed.
 <p>The default liquid pressure recovery coefficient <tt>Fl</tt> is constant and given by the parameter <tt>Flnom</tt>. The relative change (per unit) of the recovery coefficient can be specified as a given function of the valve opening by customising the <tt>Flfun</tt> function.
+<p>If the flow coefficient is specified in terms of a nominal operating point, this should be in non-chocked conditions.
 </HTML>",
         revisions="<html>
 <ul>
@@ -3768,6 +3897,11 @@ li><i>1 Jul 2004</i>
        First release.</li>
 </ul>
 </HTML>"));
+  initial equation 
+    if CvData == CvTypes.OpPoint then
+      wnom = FlowChar(theta)*Av*sqrt(rhonom)*sqrtR(dpnom) 
+        "Determination of Av by the operating point";
+    end if;
   equation 
     pv = Medium.saturationPressure(Tin);
     Ff = 0.96 - 0.28*sqrt(pv/Medium.fluidConstants[1].criticalPressure);
@@ -3793,53 +3927,63 @@ li><i>1 Jul 2004</i>
     replaceable package SatMedium = 
         Modelica.Media.Interfaces.PartialTwoPhaseMedium 
       "Saturated medium model (required only for NPSH computation)";
+    replaceable function flowCharacteristic = 
+        Functions.PumpCharacteristics.baseFlow 
+      "Head vs. q_flow characteristic at nominal speed and density" 
+      annotation(Dialog(group="Characteristics"), choicesAllMatching=true);
+    parameter Boolean usePowerCharacteristic = false 
+      "Use powerCharacteristic (vs. efficiencyCharacteristic)" 
+       annotation(Dialog(group="Characteristics"));
+    replaceable function powerCharacteristic = 
+      Functions.PumpCharacteristics.basePower 
+      "Power consumption vs. q_flow at nominal speed and density" 
+      annotation(Dialog(group="Characteristics", enable = usePowerCharacteristic),
+                 choicesAllMatching=true);
+    replaceable function efficiencyCharacteristic = 
+      Functions.PumpCharacteristics.constantEfficiency(eta_nom = 0.8) 
+      extends Functions.PumpCharacteristics.baseEfficiency 
+      "Efficiency vs. q_flow at nominal speed and density" 
+      annotation(Dialog(group="Characteristics",enable = not usePowerCharacteristic),
+                 choicesAllMatching=true);
     parameter Integer Np0(min=1) = 1 "Nominal number of pumps in parallel";
-    parameter Pressure pin_start "Inlet Pressure Start Value";
-    parameter Pressure pout_start "Outlet Pressure Start Value";
-    parameter SpecificEnthalpy hstart=1e5 "Fluid Specific Enthalpy Start Value";
-    parameter Density rho0=1000 "Nominal Liquid Density";
-    parameter AngularVelocity_rpm n0=1500 "Nominal rotational speed";
-    parameter Volume V "Pump Internal Volume";
-    parameter Real etaMech(
-      min=0,
-      max=1) = 0.98 "Mechanical Efficiency";
-    parameter Boolean OpPoints = true;
-    parameter Height head_nom[3] "Pump head for three operating points";
-    parameter VolumeFlowRate q_nom[3] 
-      "Volume flow rate for three operating points (single pump)";
-    parameter Power P_cons[3] 
-      "Power consumption for three operating points (single pump)";
+    parameter Density rho0=1000 "Nominal Liquid Density" 
+       annotation(Dialog(group="Characteristics"));
+    parameter AngularVelocity_rpm n0=1500 "Nominal rotational speed" 
+       annotation(Dialog(group="Characteristics"));
+    parameter Volume V=0 "Pump Internal Volume" annotation(Evaluate=true);
     parameter Boolean CheckValve=false "Reverse flow stopped";
-    parameter Boolean ThermalCapacity=false "Fluid heat capacity accounted for";
     parameter Boolean ComputeNPSHa=false "Compute NPSH Available at the inlet";
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+      "Initialisation option" annotation(Dialog(tab="Initialisation"));
+    parameter Pressure pin_start "Inlet Pressure Start Value" 
+      annotation(Dialog(tab="Initialisation"));
+    parameter Pressure pout_start "Outlet Pressure Start Value" 
+      annotation(Dialog(tab="Initialisation"));
+    parameter SpecificEnthalpy hstart=1e5 "Fluid Specific Enthalpy Start Value"
+      annotation(Dialog(tab="Initialisation"));
     constant Acceleration g=Modelica.Constants.g_n;
-    LiquidDensity rho "Liquid density";
-    Medium.Temperature Tin "Liquid inlet temperature";
-    MassFlowRate w "Mass flowrate (single pump)";
+    MassFlowRate w_single "Mass flow rate (single pump)";
+    MassFlowRate w = Np*w_single "Mass flow rate (total)";
+    VolumeFlowRate q_single "Volume flow rate (single pump)";
+    VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
+    Pressure dp "Outlet pressure minus inlet pressure";
+    Height head = dp/(rho*g) "Pump head";
     Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";
     Medium.SpecificEnthalpy hout(start=hstart) "Enthalpy of outgoing fluid";
+    LiquidDensity rho "Liquid density";
+    Medium.Temperature Tin "Liquid inlet temperature";
     AngularVelocity_rpm n "Shaft r.p.m.";
     Integer Np(min=1) "Number of pumps in parallel";
-    
-    Power P "Power Consumption (single pump)";
-    Power Ptot "Power Consumption (total)";
-    constant Power P_eps=1e-8 
+    Power W_single "Power Consumption (single pump)";
+    Power W = Np*W_single "Power Consumption (total)";
+    constant Power W_eps=1e-8 
       "Small coefficient to avoid numerical singularities";
-    Power Phyd "Hydraulic power (single pump)";
-    Real eta "Global Efficiency";
-    Length NPSHa "Net Positive Suction Head available";
+    constant AngularVelocity_rpm n_eps=1e-6;
+    Real eta "Pump efficiency";
+    Height NPSHa "Net Positive Suction Head available";
     Medium.AbsolutePressure pv "Saturated liquid pressure";
-    Boolean FlowOn(start=true);
     Real s "Auxiliary Variable";
-    parameter Real A(fixed=false) "Flow characteristics coefficient";
-    parameter Real B(fixed=false) "Flow characteristics coefficient";
-    parameter Real C(fixed=false) "Flow characteristics coefficient";
-    parameter Real D(fixed=false) "Consumption characteristics coefficient";
-    parameter Real E(fixed=false) "Consumption characteristics coefficient";
-    parameter Real F(fixed=false) "Consumption characteristics coefficient";
     FlangeA infl(p(start=pin_start),hAB(start=hstart),
       redeclare package Medium = Medium) 
       annotation (extent=[-100, 2; -60, 42]);
@@ -3848,40 +3992,34 @@ li><i>1 Jul 2004</i>
       annotation (extent=[40,52; 80,92]);
     Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps" 
       annotation (extent=[18, 70; 38, 90], rotation=-90);
-  initial equation 
-    // Computation of flow characteristics coefficients from the nominal
-    // operating points
-    if OpPoints then
-      head_nom[1]*g = -A*q_nom[1]^2 + B*q_nom[1] + C;
-      head_nom[2]*g = -A*q_nom[2]^2 + B*q_nom[2] + C;
-      head_nom[3]*g = -A*q_nom[3]^2 + B*q_nom[3] + C;
-      P_cons[1] = D*(n0^2)*q_nom[1] - E*n0*(q_nom[1]^2) + F*(n0^2);
-      P_cons[2] = D*(n0^2)*q_nom[2] - E*n0*(q_nom[2]^2) + F*(n0^2);
-      P_cons[3] = D*(n0^2)*q_nom[3] - E*n0*(q_nom[3]^2) + F*(n0^2);
-    end if;
   equation 
+    // Number of pumps in parallel
     Np = in_Np;
     if cardinality(in_Np)==0 then
       in_Np = Np0 "Number of pumps selected by parameter";
     end if;
     
-    infl.w + outfl.w = 0 "Mass balance";
-    w = infl.w/Np "Single pump flow rate";
-    FlowOn = s > 0;
-    
-    if (FlowOn or (not CheckValve)) then
-      // Flow characteristics when check valve is not active
-      w = s;
-      (outfl.p - infl.p)/rho = -A*(w/rho)^2 + B*(n/n0)*w/rho + C*(n/n0)^2;
+    // Flow equations
+    q_single = w_single/rho;
+    if noEvent(s > 0 or (not CheckValve)) then
+      // Flow characteristics when check valve is open
+      q_single = s;
+      head = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps));
     else
-      // Flow characteristics when check valve is active
-      (outfl.p - infl.p)/rho = C*(n/n0)^2 - s*1e3;
-      w = 0;
+      // Flow characteristics when check valve is closed
+      head = (n/n0)^2*flowCharacteristic(0) - s;
+      q_single = 0;
     end if;
     
-    P = D*(n^2)*(w/rho) - E*n*((w/rho)^2) + F*(n^2) 
-      "Power consumption (single pump)";
-    Ptot = P*Np "Power consumption (total)";
+    // Power consumption  
+    if usePowerCharacteristic then
+      W_single = (n/n0)^3*(rho/rho0)*powerCharacteristic(q_single*n0/(n+n_eps)) 
+        "Power consumption (single pump)";
+      eta = (dp*q_single)/(W_single + W_eps) "Hydraulic efficiency";
+    else
+      eta = efficiencyCharacteristic(q_single*n0/(n+n_eps));
+      W_single = dp*q_single/eta;
+    end if;
     
     // Fluid properties
     inletFluid.p=infl.p;
@@ -3890,6 +4028,8 @@ li><i>1 Jul 2004</i>
     Tin = inletFluid.T;
     
     // Boundary conditions
+    dp = outfl.p - infl.p;
+    w = infl.w "Pump total flow rate";
     if w >= 0 then
       hin = infl.hBA;
     else
@@ -3899,19 +4039,19 @@ li><i>1 Jul 2004</i>
     outfl.hBA = hout;
     h = hout;
     
-    if ThermalCapacity then
-      (rho*V*der(h)) = (outfl.w/Np)*hout + (infl.w/Np)*hin + Phyd 
+    // Mass and energy balances
+    infl.w + outfl.w = 0 "Mass balance";
+    if V>0 then
+      (rho*V*der(h)) = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single 
         "Energy balance";
     else
-      0 = (outfl.w/Np)*hout + (infl.w/Np)*hin + Phyd "Energy balance";
+      0 = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single "Energy balance";
     end if;
-    Phyd = P*etaMech "Power to the fluid";
-    eta = ((outfl.p - infl.p)*w/rho)/(P + P_eps) "Hydraulic efficiency";
     
     // NPSH computations
     if ComputeNPSHa then
       pv=SatMedium.saturationPressure(inletFluid.T);
-      NPSHa=(infl.p-pv)/(rho*Modelica.Constants.g_n);
+      NPSHa=(infl.p-pv)/(rho*g);
     else
       pv=0;
       NPSHa=0;
@@ -3920,7 +4060,7 @@ li><i>1 Jul 2004</i>
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
-      if ThermalCapacity then
+      if V>0 then
         der(h)=0;
       end if;
     else
@@ -3933,20 +4073,31 @@ li><i>1 Jul 2004</i>
       Documentation(info="<HTML>
 <p>This is the base model for the <tt>Pump</tt> and <tt>
 PumpMech</tt> pump models.
-<p>The model describes a centrifugal pump, or a group of <tt>Np</tt> identical pumps in parallel. The hydraulic characteristic (head vs. flowrate) is represented, as well as the pump power consumption.
+<p>The model describes a centrifugal pump, or a group of <tt>Np</tt> identical pumps in parallel. The pump model is based on the theory of kinematic similarity: the pump characteristics are given for nominal operating conditions (rotational speed and fluid density), and then adapted to actual operating condition, according to the similarity equations. 
 <p>In order to avoid singularities in the computation of the outlet enthalpy at zero flowrate, the thermal capacity of the fluid inside the pump body can be taken into account.
 <p>The model can either support reverse flow conditions or include a built-in check valve to avoid flow reversal.
 <p><b>Modelling options</b></p>
-<p>The following options are available to specify the pump characteristics:
-<ul><li><tt>OpPoints = false</tt>: the coefficients of the characteristics must be specified by 6 additional initial equations
-<li><tt>OpPoints = true</tt>: the characteristics are specified by providing a vector of three operating points (in terms of heads <tt>head[3]</tt>, volume flow rate <tt>q[3]</tt>, power consumption <tt>P_cons[3]</tt>, nominal fluid density <tt>rho0</tt>, and nominal rotational speed <tt>n0</tt>) for a single pump.
+<p> The nominal hydraulic characteristic (head vs. volume flow rate) is given by the the replaceable function <tt>flowCharacteristic</tt>. 
+<p> The pump energy balance can be specified in two alternative ways:
+<ul>
+<li><tt>usePowerCharacteristic = false</tt> (default option): the replaceable function <tt>efficiencyCharacteristic</tt> (efficiency vs. volume flow rate in nominal conditions) is used to determine the efficiency, and then the power consumption. The default is a constant efficiency of 0.8.
+<li><tt>usePowerCharacteristic = true</tt>: the replaceable function <tt>powerCharacteristic</tt> (power consumption vs. volume flow rate in nominal conditions) is used to determine the power consumption, and then the efficiency.
 </ul>
+<p>
+Several functions are provided in the package <tt>Functions.PumpCharacteristics</tt> to specify the characteristics as a function of some operating points at nominal conditions.
+<p>Depending on the value of the <tt>checkValve</tt> parameter, the model either supports reverse flow conditions, or includes a built-in check valve to avoid flow reversal.
+
 <p>If the <tt>in_Np</tt> input connector is wired, it provides the number of pumps in parallel; otherwise,  <tt>Np0</tt> parallel pumps are assumed.</p>
-<p>If <tt>ThermalCapacity</tt> is set to true, the heat capacity of the fluid inside the pump is taken into account: this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flowrate. If zero flowrate conditions are always avoided, this effect can be neglected by setting <tt>ThermalCapacity</tt> to false, thus avoiding a fast state variable in the model.
+<p>It is possible to take into account the heat capacity of the fluid inside the pump by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
 <p>The <tt>CheckValve</tt> parameter determines whether the pump has a built-in check valve or not.
+<p>If <tt>computeNPSHa = true</tt>, the available net positive suction head is also computed; this requires a two-phase medium model to provide the fluid saturation pressure.
 </HTML>",
         revisions="<html>
 <ul>
+<li><i>5 Nov 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+      Model restructured according to kinematic similarity theory.<br>
+      Characteristics now specified by replaceable functions.</li>
 <li><i>6 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        <tt>CharData</tt> substituted by <tt>OpPoints</tt></li>
@@ -4016,7 +4167,7 @@ PumpMech</tt> pump models.
     // Mechanical boundary condition
     phi = MechPort.phi;
     omega = der(phi);
-    P = omega*MechPort.tau;
+    W = omega*MechPort.tau;
     
     n = Modelica.SIunits.Conversions.to_rpm(omega) "Rotational speed";
     annotation (
@@ -4181,6 +4332,19 @@ Input variables changed. This function now computes the heat transfer coefficien
   partial model SteamTurbineBase "Steam turbine" 
     replaceable package Medium = ThermoPower.Water.StandardWater extends 
       Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter Boolean explicitIsentropicEnthalpy=true 
+      "Outlet enthalpy computed by isentropicEnthalpy function";
+    parameter Pressure pstart_in "Inlet pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Pressure pstart_out "Outlet pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Medium.SpecificEnthalpy hstartin "Inlet enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter Medium.SpecificEnthalpy hstartout "Outlet enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter MassFlowRate wnom "Inlet nominal flowrate";
+    parameter Real eta_mech=0.98 "Mechanical efficiency";
+    
    annotation (Icon(
         Polygon(points=[-28, 76; -28, 28; -22, 28; -22, 82; -60, 82; -60,
               76; -28, 76], style(
@@ -4206,11 +4370,9 @@ Input variables changed. This function now computes the heat transfer coefficien
       Documentation(info="<html>
 <p>This base model contains the basic interface, parameters and definitions for steam turbine models. It lacks the actual performance characteristics, i.e. two more equations to determine the flow rate and the efficiency.
 <p>This model does not include any shaft inertia by itself; if that is needed, connect a <tt>Modelica.Mechanics.Rotational.Inertia</tt> model to one of the shaft connectors.
-
 <p><b>Modelling options</b></p>
 <p>The following options are available to calculate the enthalpy of the outgoing steam:
 <ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is given equating the specific entropy of the inlet steam <tt>steam_in</tt> and of a fictional steam state <tt>steam_iso</tt>, which has the same pressure of the outgoing steam, both computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
-
 </html>", revisions="<html>
 <ul>
 <li><i>20 Apr 2005</i>
@@ -4221,15 +4383,6 @@ Input variables changed. This function now computes the heat transfer coefficien
       uses(ThermoPower(version="2"), Modelica(version="2.2")));
     Medium.BaseProperties steam_in(p(start=pstart_in),h(start=hstartin));
     Medium.BaseProperties steam_iso(p(start=pstart_out),h(start=hstartout));
-    
-    parameter Boolean explicitIsentropicEnthalpy=true 
-      "Outlet enthalpy computed by isentropicEnthalpy function";
-    parameter Pressure pstart_in "Inlet pressure start value";
-    parameter Pressure pstart_out "Outlet pressure start value";
-    parameter Medium.SpecificEnthalpy hstartin "Inlet enthalpy start value";
-    parameter Medium.SpecificEnthalpy hstartout "Outlet enthalpy start value";
-    parameter MassFlowRate wnom "Inlet nominal flowrate";
-    parameter Real eta_mech=0.98 "Mechanical efficiency";
     
     Angle phi "shaft rotation angle";
     Torque tau "net torque acting on the turbine";
@@ -4338,12 +4491,28 @@ Input variables changed. This function now computes the heat transfer coefficien
       DymolaStoredErrors);
     
   equation 
-    // Heat transfer coefficient calculation:
+    // Heat transfer coefficient calculation
+    /*
+  if (fluidAtRotorSurface.phi[1]>0) then
     fluidAtRotorSurface.gamma[1] =
-      0.023*( (inlet.w/(Modelica.Constants.pi*rotorDiameter/2*Medium.dynamicViscosity(steam_in.state)))^2
-             +(omega*rotorDiameter/2*(statorDiameter-rotorDiameter)*steam_in.d/(2*Medium.dynamicViscosity(steam_in.state)))^2)^0.4*
+      0.023*( (2*inlet.w/(Modelica.Constants.pi*(rotorDiameter+statorDiameter)*Medium.dynamicViscosity(steam_in.state)))^2
+             +(omega*(statorDiameter^2-rotorDiameter^2)/(4*Medium.dynamicViscosity(steam_in.state))*steam_in.d)^2)^0.4*
            Medium.prandtlNumber(steam_in.state)^0.4*
            (Medium.thermalConductivity(steam_in.state)/(statorDiameter-rotorDiameter));
+  else
+    fluidAtRotorSurface.gamma[1] =
+      0.023*( (2*inlet.w/(Modelica.Constants.pi*(rotorDiameter+statorDiameter)*Medium.dynamicViscosity(steam_in.state)))^2
+             +(omega*(statorDiameter^2-rotorDiameter^2)/(4*Medium.dynamicViscosity(steam_in.state))*steam_in.d)^2)^0.4*
+           Medium.prandtlNumber(steam_in.state)^0.3*
+           (Medium.thermalConductivity(steam_in.state)/(statorDiameter-rotorDiameter));
+  end if;
+  */
+    
+      fluidAtRotorSurface.gamma[1] =
+        0.023*( (2*inlet.w/(Modelica.Constants.pi*(rotorDiameter+statorDiameter)*Medium.dynamicViscosity(steam_in.state)))^2
+               +(omega*(statorDiameter^2-rotorDiameter^2)/(4*Medium.dynamicViscosity(steam_in.state))*steam_in.d)^2)^0.4*
+             Medium.prandtlNumber(steam_in.state)^0.4*
+             (Medium.thermalConductivity(steam_in.state)/(statorDiameter-rotorDiameter));
     
     // Fluid temperature at rotor surface
     fluidAtRotorSurface.T[1] = steam_in.T;
@@ -4353,7 +4522,20 @@ Input variables changed. This function now computes the heat transfer coefficien
     replaceable package Medium = StandardWater extends 
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     extends Icons.Water.SteamTurbineUnit;
-    Medium.BaseProperties fluid_in(p(start=pnom),h(start=hstartin));
+    parameter Real pnom "Inlet nominal pressure";
+    parameter Real wnom "Inlet nominal flowrate";
+    parameter PerUnit eta_iso "Isentropic efficiency";
+    parameter PerUnit eta_mech=0.98 "Mechanical efficiency";
+    parameter PerUnit hpFraction "Fraction of power provided by the HP turbine";
+    parameter Time T_HP "Time constant of HP mechanical power response";
+    parameter Time T_LP "Time constant of LP mechanical power response";
+    parameter Pressure pstartin = pnom "Inlet start pressure" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hstartin "Inlet enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hstartout "Outlet enthalpy start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    Medium.BaseProperties fluid_in(p(start=pstart_in),h(start=hstartin));
     FlangeA inlet(redeclare package Medium = Medium) 
                   annotation (extent=[-120,50; -80,90]);
     FlangeB outlet(redeclare package Medium = Medium) 
@@ -4362,16 +4544,6 @@ Input variables changed. This function now computes the heat transfer coefficien
       annotation (extent=[-110,-14; -84,14]);
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
       annotation (extent=[86,-14; 112,14]);
-    parameter Real pnom "Inlet nominal pressure";
-    parameter Real wnom "Inlet nominal flowrate";
-    parameter PerUnit eta_iso "Isentropic efficiency";
-    parameter PerUnit eta_mech=0.98 "Mechanical efficiency";
-    parameter PerUnit hpFraction "Fraction of power provided by the HP turbine";
-    parameter Time T_HP "Time constant of HP mechanical power response";
-    parameter Time T_LP "Time constant of LP mechanical power response";
-    parameter Pressure pstartin "Inlet start pressure";
-    parameter SpecificEnthalpy hstartin "Inlet enthalpy start value";
-    parameter SpecificEnthalpy hstartout "Outlet enthalpy start value";
     MassFlowRate w "Mass flowrate";
     Angle phi "Shaft rotation angle";
     AngularVelocity omega "Shaft angular velocity";
@@ -4609,4 +4781,5 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
 This model is not yet complete
 </html>"));
   end EvaporatorBase;
+  
 end Water;
