@@ -161,11 +161,11 @@ package Fluid "Modelica_Fluid compatible components"
 </ul>
 </html>"));
     end SinkP;
-
+    
   partial model Flow1DBase 
-    "Basic interface for 1-dimensional water/steam fluid flow models" 
-    replaceable package Medium = Modelica.Media.Water.StandardWater extends
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      "Basic interface for 1-dimensional water/steam fluid flow models" 
+    replaceable package Medium = Modelica.Media.Water.StandardWater extends 
+        Modelica.Media.Interfaces.PartialMedium "Medium model";
     extends Icons.Water.Tube;
     import ThermoPower.Choices.Flow1D.FFtypes;
     parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
@@ -178,7 +178,7 @@ package Fluid "Modelica_Fluid compatible components"
     parameter MassFlowRate wnom "Nominal mass flowrate (total)";
     parameter FFtypes.Temp FFtype "Friction Factor Type" annotation(Evaluate = true);
     parameter Real Kfnom(unit = "Pa.kg/m^3/(kg/s)^2", min=0)=0 
-      "Nominal hydraulic resistance coefficient";
+        "Nominal hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop (friction term only!)";
     parameter Density rhonom=0 "Nominal inlet density";
     parameter Real Cfnom=0 "Nominal Fanning friction factor";
@@ -190,22 +190,22 @@ package Fluid "Modelica_Fluid compatible components"
     parameter Pressure pstartin=1e5 "Inlet pressure start value";
     parameter Pressure pstartout=1e5 "Outlet pressure start value";
     parameter Real wnf=0.01 
-      "Fraction of nominal flow rate at which linear friction equals turbulent friction";
+        "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+        "Initialisation option";
     constant Real g=Modelica.Constants.g_n;
     Modelica_Fluid.Interfaces.FluidPort_a infl(p(start=pstartin),
       m_flow(start=wnom),h(start=hstartin), redeclare package Medium = Medium) 
                  annotation (extent=[-120, -20; -80, 20]);
     Modelica_Fluid.Interfaces.FluidPort_b outfl(p(start=pstartout),
-      m_flow(start=-wnom),h(start=hstartout), redeclare package Medium = Medium)
+      m_flow(start=-wnom),h(start=hstartout), redeclare package Medium = Medium) 
                   annotation (extent=[80, -20; 120, 20]);
     replaceable ThermoPower.Thermal.DHT wall(N=N) 
       annotation (extent=[-40, 40; 40, 60]);
     Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
     Time Tr "Residence time";
-  protected 
+    protected 
     parameter Real dzdx = H/L "Slope" annotation(Evaluate=true);
     parameter Length l = L/(N - 1) "Length of a single volume" annotation(Evaluate = true);
     annotation (Documentation(info="<HTML>
@@ -231,12 +231,12 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 </ul>
 </html>"));
   end Flow1DBase;
-
+    
   model Flow1D2ph 
-    "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)" 
-    extends Flow1DBase(redeclare replaceable
-      package Medium = Modelica.Media.Water.StandardWater extends
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
+      "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)" 
+    extends Flow1DBase(redeclare replaceable package Medium = 
+                       Modelica.Media.Water.StandardWater extends 
+          Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
     import ThermoPower.Choices.Flow1D.FFtypes;
     package SmoothMedium=Medium(final smoothModel = true);
     constant Pressure pzero=10 "Small deltap for calculations";
@@ -244,7 +244,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     constant SpecificEnthalpy hzero=1e-3 "Small value for deltah";
     SmoothMedium.BaseProperties fluid[N](each p(start=pstartin),
       h(start=linspace(hstartin, hstartout, N))) 
-      "Properties of the fluid at the nodes";
+        "Properties of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
     Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
@@ -264,7 +264,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Medium.Temperature T[N] "Fluid temperature";
     Medium.Temperature Ts "Saturated water temperature";
     Medium.SpecificEnthalpy h[N](start=linspace(hstartin, hstartout, N)) 
-      "Fluid specific enthalpy";
+        "Fluid specific enthalpy";
     Medium.SpecificEnthalpy htilde[N - 1](start=ones(N - 1)*hstartin + (1:(N - 1))/(
           N - 1)*(hstartout - hstartin)) "Enthalpy state variables";
     Medium.SpecificEnthalpy hl "Saturated liquid temperature";
@@ -274,28 +274,28 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     LiquidDensity rhol "Saturated liquid density";
     GasDensity rhov "Saturated vapour density";
     Mass M "Fluid mass";
-  protected 
+    protected 
     DerEnthalpyByPressure dhldp 
-      "Derivative of saturated liquid enthalpy by pressure";
+        "Derivative of saturated liquid enthalpy by pressure";
     DerEnthalpyByPressure dhvdp 
-      "Derivative of saturated vapour enthalpy by pressure";
+        "Derivative of saturated vapour enthalpy by pressure";
     Density rhobar[N - 1] "Fluid average density";
     DerDensityByPressure drdp[N] "Derivative of density by pressure";
     DerDensityByPressure drbdp[N - 1] 
-      "Derivative of average density by pressure";
+        "Derivative of average density by pressure";
     DerDensityByPressure drldp 
-      "Derivative of saturated liquid density by pressure";
+        "Derivative of saturated liquid density by pressure";
     DerDensityByPressure drl_dp 
-      "Derivative of liquid density by pressure just before saturation";
+        "Derivative of liquid density by pressure just before saturation";
     DerDensityByPressure drvdp 
-      "Derivative of saturated vapour density by pressure";
+        "Derivative of saturated vapour density by pressure";
     DerDensityByPressure drv_dp 
-      "Derivative of vapour density by pressure just before saturation";
+        "Derivative of vapour density by pressure just before saturation";
     SpecificVolume vbar[N - 1] "Average specific volume";
     HeatFlux phibar[N - 1] "Average heat flux";
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     DerDensityByEnthalpy drbdh[N - 1] 
-      "Derivative of average density by enthalpy";
+        "Derivative of average density by enthalpy";
     Real AA;
     Real BB;
     Real CC;
@@ -395,24 +395,24 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       assert(Kf[j]>=0, "Negative friction coefficient");
       Kfl[j] = wnom*wnf*Kf[j];
     end for;
-    
+      
     // Dynamic momentum term
     if DynamicMomentum then
       dwdt = der(w);
     else
       dwdt = 0;
     end if;
-    
+      
     sum(dMdt) = (infl.m_flow/Nt + outfl.m_flow/Nt) "Mass balance";
     sum(dpf) = Dpfric "Total pressure drop due to friction";
     Dpstat = if abs(dzdx)<1e-6 then 0 else g*l*dzdx*sum(rhobar) 
-      "Pressure drop due to static head";
+        "Pressure drop due to static head";
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
     for j in 1:(N - 1) loop
       A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
          l*omega*phibar[j] "Energy balance";
       dMdt[j] = A*l*(drbdh[j]*der(htilde[j]) + drbdp[j]*der(p)) 
-        "Mass balance for each volume";
+          "Mass balance for each volume";
       // Average volume quantities
       vbar[j] = 1/rhobar[j] "Average specific volume";
       wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
@@ -471,7 +471,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
            + BB*(rhov - rho[j + 1]))/(h[j + 1] - h[j]);
       end if;
     end for;
-    
+      
     // Saturated fluid property calculations
     sat.psat=p;
     sat.Tsat=Medium.saturationTemperature(p);
@@ -493,7 +493,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     BB = ((hv - hl)*(rhov*drldp - rhol*drvdp)/(rhol - rhov) + dhldp*rhol -
       dhvdp*rhov)/(rhol - rhov);
     CC = (hv - hl)/(1/rhov - 1/rhol);
-    
+      
     // Fluid property calculations
     for j in 1:N loop
       fluid[j].p=p;
@@ -506,7 +506,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       x[j]=noEvent(if h[j]<=hl then 0 else 
                 if h[j]>=hv then 1 else (h[j]-hl)/(hv-hl));
     end for;
-    
+      
     // Selection of representative pressure and flow rate variables
     if HydraulicCapacitance == 1 then
       p = infl.p;
@@ -515,7 +515,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       p = outfl.p;
       w = infl.m_flow/Nt;
     end if;
-    
+      
     // Boundary conditions
     infl.H_flow=semiLinear(infl.m_flow,infl.h,htilde[1]);
     outfl.H_flow=semiLinear(outfl.m_flow,outfl.h,htilde[N - 1]);
@@ -528,11 +528,11 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     end if;
     T = wall.T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
-    
+      
     Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
     M=sum(rhobar)*A*l "Fluid mass (single tube)";
     Tr=noEvent(M/max(infl.m_flow/Nt,Modelica.Constants.eps)) "Residence time";
-    
+      
   initial equation 
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -547,7 +547,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       assert(false, "Unsupported initialisation option");
     end if;
   end Flow1D2ph;
-
+    
   model TestFlow1D2ph "Test case for Flow1D2ph" 
     package Medium=Modelica.Media.Water.StandardWater;
     import Modelica.Constants.*;
@@ -626,7 +626,7 @@ Algorithm Tolerance = 1e-6
       startTime=50)   annotation (extent=[-100, 10; -80, 30]);
     Modelica.Blocks.Sources.Ramp extPower(
       height=30e5,
-      startTime=10, 
+      startTime=10,
       duration=30)   annotation (extent=[-80, 40; -60, 60]);
     SourceW Source(w0=1, redeclare package Medium = Medium) 
       annotation (extent=[-68, -10; -48, 10]);
@@ -654,7 +654,7 @@ Algorithm Tolerance = 1e-6
     connect(hIn.y,       Source.in_h) 
       annotation (points=[-79, 20; -54, 20; -54, 6], style(color=3));
   end TestFlow1D2ph;
-
+    
     partial model ValveBase "Base model for valves" 
       import ThermoPower;
       extends Icons.Water.Valve;
@@ -1255,8 +1255,8 @@ Schiavo</a>:<br>
         annotation (points=[-36,43.2; -14,43.2; -14,32; 8,32]);
     end WaterPumpTest;
   end Water;
-
-  package Gas
+  
+  package Gas 
   model SourceW "Flowrate source for gas flows" 
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
@@ -1264,11 +1264,11 @@ Schiavo</a>:<br>
     parameter Pressure p0=101325 "Nominal pressure";
     parameter AbsoluteTemperature T=300 "Nominal temperature";
     parameter MassFraction Xnom[Medium.nX]=Medium.reference_X 
-      "Nominal gas composition";
+        "Nominal gas composition";
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
     parameter HydraulicConductance G=0 "HydraulicConductance";
     MassFlowRate w;
-    Modelica_Fluid.Interfaces.FluidPort_b flange(redeclare package Medium =
+    Modelica_Fluid.Interfaces.FluidPort_b flange(redeclare package Medium = 
             Medium)  annotation (extent=[80, -20; 120, 20]);
     Modelica.Blocks.Interfaces.RealInput in_w0 
       annotation (extent=[-70,40; -50,60], rotation=-90);
@@ -1276,32 +1276,32 @@ Schiavo</a>:<br>
       annotation (extent=[10,60; -10,40], rotation=-270);
     Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] 
       annotation (extent=[50,40; 70,60], rotation=-90);
-  equation
+  equation 
     if G == 0 then
       flange.m_flow = -w;
     else
       flange.m_flow = -w + (flange.p - p0)*G;
     end if;
-    
+      
     w = in_w0;
     if cardinality(in_w0)==0 then
       in_w0 = w0 "Flow rate set by parameter";
     end if;
-    
+      
     gas.T = in_T;
     if cardinality(in_T)==0 then
       in_T = T "Temperature set by parameter";
     end if;
-    
+      
     gas.Xi = in_X[1:Medium.nXi];
     if cardinality(in_X)==0 then
       in_X = Xnom "Composition set by parameter";
     end if;
-    
+      
     flange.p = gas.p;
     flange.H_flow = semiLinear(flange.m_flow,flange.h,gas.h);
     flange.mXi_flow = semiLinear(flange.m_flow,flange.Xi,gas.Xi);
-    
+      
     annotation (Documentation(info="<html>
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>,whose default value is <tt>Medium.reference_X</tt> .
@@ -1323,7 +1323,7 @@ Schiavo</a>:<br>
 </ul>
 </html>"));
   end SourceW;
-
+    
   model SourceP "Pressure source for gas flows" 
     extends Icons.Gas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
@@ -1332,8 +1332,8 @@ Schiavo</a>:<br>
     parameter HydraulicResistance R=0 "Hydraulic resistance";
     parameter AbsoluteTemperature T=300 "Nominal temperature";
     parameter MassFraction Xnom[Medium.nX]=Medium.reference_X 
-      "Nominal gas composition";
-    
+        "Nominal gas composition";
+      
     Modelica_Fluid.Interfaces.FluidPort_b flange(redeclare package Medium=Medium) 
       annotation (extent=[80,-20; 120,20]);
     Modelica.Blocks.Interfaces.RealInput in_p 
@@ -1348,25 +1348,25 @@ Schiavo</a>:<br>
     else
       flange.p = gas.p + flange.m_flow*R;
     end if;
-    
+      
     gas.p = in_p;
     if cardinality(in_p)==0 then
       in_p = p0 "Pressure set by parameter";
     end if;
-    
+      
     gas.T = in_T;
     if cardinality(in_T)==0 then
       in_T = T "Temperature set by parameter";
     end if;
-    
+      
     gas.Xi = in_X[1:Medium.nXi];
     if cardinality(in_X)==0 then
       in_X = Xnom "Composition set by parameter";
     end if;
-    
+      
     flange.H_flow = semiLinear(flange.m_flow,flange.h,gas.h);
     flange.mXi_flow = semiLinear(flange.m_flow,flange.Xi,gas.Xi);
-    
+      
     annotation (Icon, Diagram,
       Documentation(info="<html>
 <p><b>Modelling options</b></p>
@@ -1390,7 +1390,7 @@ Schiavo</a>:<br>
 </html>
 "));
   end SourceP;
-  
+    
   model SinkP "Pressure sink for gas flows" 
     extends Icons.Gas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
@@ -1398,10 +1398,10 @@ Schiavo</a>:<br>
     parameter Pressure p0=101325 "Nominal pressure";
     parameter AbsoluteTemperature T=300 "Nominal temperature";
     parameter MassFraction Xnom[Medium.nX]=Medium.reference_X 
-      "Nominal gas composition";
+        "Nominal gas composition";
     parameter HydraulicResistance R=0 "Hydraulic Resistance";
-    
-    Modelica_Fluid.Interfaces.FluidPort_a flange(redeclare package Medium=Medium)
+      
+    Modelica_Fluid.Interfaces.FluidPort_a flange(redeclare package Medium=Medium) 
       annotation (extent=[-120,-20; -80,20]);
     Modelica.Blocks.Interfaces.RealInput in_p 
       annotation (extent=[-77,47; -52,72], rotation=-90);
@@ -1415,25 +1415,25 @@ Schiavo</a>:<br>
     else
       flange.p = gas.p + flange.m_flow*R;
     end if;
-    
+      
     gas.p = in_p;
     if cardinality(in_p)==0 then
       in_p = p0 "Pressure set by parameter";
     end if;
-    
+      
     gas.T = in_T;
     if cardinality(in_T)==0 then
       in_T =T "Temperature set by parameter";
     end if;
-    
+      
     gas.Xi = in_X[1:Medium.nXi];
     if cardinality(in_X)==0 then
       in_X = Xnom "Composition set by parameter";
     end if;
-    
+      
     flange.H_flow = semiLinear(flange.m_flow,flange.h,gas.h);
     flange.mXi_flow = semiLinear(flange.m_flow,flange.Xi,gas.Xi);
-    
+      
     annotation (Documentation(info="<html>
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>, whose default value is <tt>Medium.reference_X</tt> .
@@ -1456,11 +1456,11 @@ Schiavo</a>:<br>
 </ul>
 </html>"));
   end SinkP;
-
+    
   model Flow1D "1-dimensional fluid flow model for gas (finite volumes)" 
     extends Icons.Gas.Tube;
     import ThermoPower.Choices.Flow1D.FFtypes;
-    replaceable package Medium=ThermoPower.Media.FlueGas
+    replaceable package Medium=ThermoPower.Media.FlueGas 
       extends ThermoPower.Media.GenericGas;
     parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
     parameter Integer Nt=1 "Number of tubes in parallel";
@@ -1478,23 +1478,25 @@ Schiavo</a>:<br>
     parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
     parameter Boolean DynamicMomentum=false "Inertial phenomena accounted for"  annotation(Evaluate=true);
     parameter Boolean UniformComposition=true 
-      "Uniform gas composition is assumed" annotation(Evaluate=true);
+        "Uniform gas composition is assumed" 
+                                           annotation(Evaluate=true);
     parameter Boolean QuasiStatic=false 
-      "Quasi-static model (mass, energy and momentum static balances" annotation(Evaluate=true);
+        "Quasi-static model (mass, energy and momentum static balances" 
+                                                                      annotation(Evaluate=true);
     parameter Integer HydraulicCapacitance=2 "1: Upstream, 2: Downstream";
     parameter AbsoluteTemperature Tstartin=300 "Inlet temperature start value";
     parameter AbsoluteTemperature Tstartout=300 
-      "Outlet temperature start value";
+        "Outlet temperature start value";
     parameter Pressure pstart=101325 "Pressure start value";
     parameter Real wnf=0.01 
-      "Fraction of nominal flow rate at which linear friction equals turbulent friction";
+        "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
     parameter Integer nXi=Medium.nXi "number of independent mass fractions";
     parameter Integer nX=Medium.nX "total number of mass fractions";
     parameter MassFraction Xstart[nX]=Medium.reference_X 
-      "Start gas composition";
+        "Start gas composition";
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option";
+        "Initialisation option";
     constant Real g=Modelica.Constants.g_n;
     Modelica_Fluid.Interfaces.FluidPort_a infl(redeclare package Medium = Medium,
       m_flow(start=wnom)) annotation (extent=[-120,-20; -80,20]);
@@ -1506,7 +1508,7 @@ Schiavo</a>:<br>
       T(start=linspace(Tstartin,Tstartout,N)),
       state(p(start=ones(N)*pstart),
       T(start=ones(N)*Tstartin+(0:(N-1))/(N-1)*(Tstartout-Tstartin)))) 
-      "Gas nodal properties";
+        "Gas nodal properties";
       // Xi(start=fill(Xstart[1:nXi],N)),
       // X(start=fill(Xstart,N)),
     Pressure Dpfric "Pressure drop due to friction";
@@ -1527,22 +1529,22 @@ Schiavo</a>:<br>
     Time Tr "Residence time";
     Mass M "Gas Mass";
     Real Q "Total heat flow through the wall (all Nt tubes)";
-  protected 
+    protected 
     parameter Real dzdx = H/L "Slope";
     parameter Length l = L/(N - 1) "Length of a single volume";
     Density rhobar[N - 1] "Fluid average density";
     SpecificVolume vbar[N - 1] "Fluid average specific volume";
     HeatFlux phibar[N - 1] "Average heat flux";
     DerDensityByTemperature drbdT[N - 1] 
-      "Derivative of average density by temperature";
+        "Derivative of average density by temperature";
     DerDensityByPressure drbdp[N - 1] 
-      "Derivative of average density by pressure";
+        "Derivative of average density by pressure";
     Density drbdX[N - 1, nX] "Derivative of average density by composition";
     Medium.SpecificHeatCapacity cvbar[N - 1] "Average cv";
     Real dMdt[N - 1] "Derivative of mass in a finite volume";
     Medium.SpecificHeatCapacity cv[N];
     Medium.DerDensityByTemperature dddT[N] 
-      "Derivative of density by temperature";
+        "Derivative of density by temperature";
     Medium.DerDensityByPressure dddp[N] "Derivative of density by pressure";
     Medium.Density dddX[N,nX] "Derivative of density by composition";
   equation 
@@ -1568,16 +1570,16 @@ Schiavo</a>:<br>
     end if;
     assert(Kf>=0, "Negative friction coefficient");
     Kfl = wnom/Nt*wnf*Kf "Linear friction factor";
-    
+      
     // Dynamic momentum term
     dwdt = if DynamicMomentum and not QuasiStatic then 
               der(w) else 0;
-    
+      
     sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpfric = 0 "Momentum balance";
     Dpfric = (if FFtype == FFtypes.NoFriction then 0 else 
               noEvent(Kf*abs(w) + Kfl)*w*sum(vbar)/(N - 1)) 
-      "Pressure drop due to friction";
+        "Pressure drop due to friction";
     for j in 1:N - 1 loop
       if not QuasiStatic then
         // Dynamic mass and energy balances
@@ -1585,7 +1587,7 @@ Schiavo</a>:<br>
           l*omega*phibar[j] "Energy balance";
         dMdt[j] = A*l*(drbdT[j]*der(Ttilde[j]) + drbdp[j]*der(p) + vector(drbdX[j, :])*
           vector(der(Xtilde[if UniformComposition then 1 else j, :]))) 
-          "Mass balance";
+            "Mass balance";
         // Average volume quantities
         rhobar[j] = (gas[j].d + gas[j + 1].d)/2;
         drbdp[j] = (dddp[j] + dddp[j + 1])/2;
@@ -1612,15 +1614,15 @@ Schiavo</a>:<br>
     if Medium.fixedX then
       Xtilde = fill(Medium.reference_X, 1);
     elseif QuasiStatic then
-      Xtilde = fill(if w>=0 then infl.Xi else outfl.Xi, size(Xtilde,1))
-        "Gas composition equal to actual inlet";
+      Xtilde = fill(if w>=0 then infl.Xi else outfl.Xi, size(Xtilde,1)) 
+          "Gas composition equal to actual inlet";
     elseif UniformComposition then
       der(Xtilde[1, :]) = 1/L*sum(u)/N*(gas[1].X - gas[N].X) 
-        "Partial mass balance for the whole pipe";
+          "Partial mass balance for the whole pipe";
     else
       for j in 1:N - 1 loop
         der(Xtilde[j, :]) = (u[j + 1] + u[j])/(2*l)*(gas[j].X - gas[j + 1].X) 
-          "Partial mass balance for single volume";
+            "Partial mass balance for single volume";
       end for;
     end if;
     for j in 1:N loop
@@ -1644,7 +1646,7 @@ Schiavo</a>:<br>
         dddX[j,:]= zeros(nX);
       end if;
     end for;
-    
+      
     // Selection of representative pressure and flow rate variables
     if HydraulicCapacitance == 1 then
       p = infl.p;
@@ -1653,7 +1655,7 @@ Schiavo</a>:<br>
       p = outfl.p;
       w = infl.m_flow/Nt;
     end if;
-    
+      
     // Boundary conditions
     infl.H_flow=semiLinear(infl.m_flow,infl.h,gas[1].h);
     outfl.H_flow=semiLinear(outfl.m_flow,outfl.h,gas[N].h);
@@ -1676,7 +1678,7 @@ Schiavo</a>:<br>
     end if;
     gas.T = wall.T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
-    
+      
     M=sum(rhobar)*A*l "Total gas mass";
     Tr=noEvent(M/max(infl.m_flow/Nt,Modelica.Constants.eps)) "Residence time";
   initial equation 
@@ -1698,7 +1700,7 @@ Schiavo</a>:<br>
    else
       assert(false, "Unsupported initialisation option");
     end if;
-    
+      
     annotation (Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
       Diagram, Documentation(info="<html>
 <p>This model describes the flow of a gas in a rigid tube. The basic modelling assumptions are:
@@ -1750,7 +1752,7 @@ Schiavo</a>:<br>
 </ul>
 </html>"));
   end Flow1D;
-
+    
   model TestGasFlow1D 
     package Medium=ThermoPower.Media.FlueGas;
     parameter Integer Nnodes=10 "number of Nodes";
@@ -1758,19 +1760,19 @@ Schiavo</a>:<br>
     parameter Modelica.SIunits.Diameter Dihex=0.02 "internal diameter";
     parameter Modelica.SIunits.Radius rhex=Dihex/2 "internal radius";
     parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex 
-      "internal perimeter";
+        "internal perimeter";
     parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2 
-      "internal cross section";
+        "internal cross section";
     parameter Real Cfhex=0.005 "friction coefficient";
     parameter Modelica.SIunits.MassFlowRate whex=0.05 
-      "nominal (and initial) mass flow rate";
+        "nominal (and initial) mass flow rate";
     parameter Modelica.SIunits.Pressure phex=3e5 "initial pressure";
     parameter Temperature Tinhex=300 "initial inlet temperature";
     parameter Temperature Touthex=300 "initial outlet temperature";
    // parameter Temperature deltaT=10 "height of temperature step";
     parameter Modelica.SIunits.EnergyFlowRate W=1e3 "height of power step";
     parameter Real deltaX[2]={.25,-.25} "offset and height of composition step";
-    
+      
     SourceW SourceW1(
       redeclare package Medium = Medium,
       p0=phex,
@@ -1839,7 +1841,7 @@ Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6 
 </HTML>"));
   end TestGasFlow1D;
-
+    
   model ValveLin "Valve for gas flows with linear pressure drop" 
     extends Icons.Gas.Valve;
     replaceable package Medium=Modelica.Media.Interfaces.PartialMedium;
@@ -1849,7 +1851,7 @@ Algorithm Tolerance = 1e-6
     MassFraction Xi[Medium.nXi] "Independent component mass fractions";
     Modelica_Fluid.Interfaces.FluidPort_a inlet(redeclare package Medium = Medium) 
       annotation (extent=[-120,-20; -80,20]);
-    Modelica_Fluid.Interfaces.FluidPort_b outlet(redeclare package Medium = Medium)
+    Modelica_Fluid.Interfaces.FluidPort_b outlet(redeclare package Medium = Medium) 
       annotation (extent=[80,-20; 120,20]);
     annotation (Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
       Diagram,
@@ -1874,18 +1876,18 @@ Algorithm Tolerance = 1e-6
     w = Kv*cmd*(inlet.p-outlet.p) "Flow characteristics";
     inlet.m_flow + outlet.m_flow = 0;
     w = inlet.m_flow;
-
+      
     // Energy balance
     inlet.H_flow=semiLinear(inlet.m_flow,inlet.h,h);
     outlet.H_flow=semiLinear(outlet.m_flow,outlet.h,h);
     inlet.H_flow + outlet.H_flow=0;
-
+      
     // Independent components mass balance
     inlet.mXi_flow=semiLinear(inlet.m_flow,inlet.Xi,Xi);
     outlet.mXi_flow=semiLinear(outlet.m_flow,outlet.Xi,Xi);
     inlet.mXi_flow + outlet.mXi_flow=zeros(Medium.nXi);
   end ValveLin;
-
+    
     model TestValv "Test case for valves" 
       package Medium = ThermoPower.Media.FlueGas;
       SourceP SourceP1(p0=10e5,
@@ -1897,7 +1899,7 @@ Algorithm Tolerance = 1e-6
       SinkP SinkP1(p0=1e5,
       redeclare package Medium = Medium) 
         annotation (extent=[64, -4; 84, 16]);
-      ValveLin V1(Kv=1.5/9e5, redeclare package Medium = Medium)
+      ValveLin V1(Kv=1.5/9e5, redeclare package Medium = Medium) 
                   annotation (extent=[-50, 58; -30, 78]);
       ValveLin V2(Kv=1.2/5e5, redeclare package Medium = Medium) 
                   annotation (extent=[-38, 26; -18, 46]);

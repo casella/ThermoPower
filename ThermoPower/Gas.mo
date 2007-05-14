@@ -1015,7 +1015,7 @@ The latter options can be useful when two or more components are connected direc
     replaceable package Medium=Modelica.Media.Interfaces.PartialMedium;
     Modelica.Blocks.Interfaces.RealOutput p annotation (extent=[48,50; 60,70]);
     Flange flange(redeclare package Medium = Medium) 
-      annotation (extent=[60,40; 100,80]);
+      annotation (extent=[-20,-60; 20,-20]);
   equation 
     flange.w = 0 "Mass balance";
     flange.p = p "Sensor output";
@@ -1032,6 +1032,51 @@ The latter options can be useful when two or more components are connected direc
 </ul>
 </html>"), Icon);
   end SensP;
+  
+  model SensQ "Volume Flow Rate sensor for gas flows" 
+    extends Icons.Gas.SensThrough;
+    replaceable package Medium=Modelica.Media.Interfaces.PartialMedium;
+    Medium.BaseProperties gas "Gas properties";
+    FlangeA inlet(redeclare package Medium = Medium) 
+      annotation (extent=[-80,-60; -40,-20]);
+    FlangeB outlet(redeclare package Medium = Medium) 
+      annotation (extent=[40,-60; 80,-20]);
+    Modelica.Blocks.Interfaces.RealOutput q "Volume flow rate" 
+                                            annotation (extent=[56,50; 76,70]);
+    MassFlowRate w "Mass flow rate";
+  equation 
+    inlet.w + outlet.w=0 "Mass balance";
+    inlet.p = outlet.p "Momentum balance";
+    w = inlet.w;
+    
+    // Energy balance
+    inlet.hBA=outlet.hBA;
+    inlet.hAB=outlet.hAB;
+    
+    // Independent composition mass balances
+    inlet.XBA=outlet.XBA;
+    inlet.XAB=outlet.XAB;
+    
+    // Gas properties
+    gas.p = inlet.p;
+    gas.h =  noEvent(if w >= 0 then inlet.hBA else outlet.hAB);
+    gas.Xi = noEvent(if w >= 0 then inlet.XBA else outlet.XAB);
+    
+    q = inlet.w/gas.d "Sensor output";
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>20 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+      Adapted to Modelica.Media.</li>
+<li><i>5 Mar 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>", info="<html>
+<p>This component can be inserted in a hydraulic circuit to measure the flowrate of the fluid flowing through it.
+<p>Flow reversal is supported.
+</html>"));
+  end SensQ;
   
   model ValveLin "Valve for gas flows with linear pressure drop" 
     extends Icons.Gas.Valve;
@@ -1177,11 +1222,11 @@ The latter options can be useful when two or more components are connected direc
     Fxt = Fxt_full*xtfun(theta);
     dp = inlet.p - outlet.p;
     x = dp/p;
-    xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
-    Y = 1 - abs(xs)/(3*Fxt);
+    xs = noEvent(smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x));
+    Y = noEvent(1 - abs(xs)/(3*Fxt));
     if CheckValve then
       w = FlowChar(theta)*Av*Y*sqrt(gas.d)*
-          smooth(0, if xs>=0 then sqrtR(p*xs) else 0);
+          noEvent(smooth(0, if xs>=0 then sqrtR(p*xs) else 0));
     else
       w = FlowChar(theta)*Av*Y*sqrt(gas.d)*sqrtR(p*xs);
     end if;
@@ -1281,6 +1326,7 @@ The latter options can be useful when two or more components are connected direc
     annotation (extent=[80,-20; 120,20]);
     replaceable Thermal.DHT wall(N=N) annotation (extent=[-60,40; 60,60],
       Dialog(enable = false));
+  public 
     Medium.BaseProperties gas[N](
       p(start=ones(N)*pstart),
       T(start=linspace(Tstartin,Tstartout,N)),
@@ -1317,14 +1363,15 @@ The latter options can be useful when two or more components are connected direc
       "Derivative of average density by temperature";
     DerDensityByPressure drbdp[N - 1] 
       "Derivative of average density by pressure";
-    Density drbdX[N - 1, nX] "Derivative of average density by composition";
+    Real drbdX[N - 1, nX](unit="kg/m3") 
+      "Derivative of average density by composition";
     Medium.SpecificHeatCapacity cvbar[N - 1] "Average cv";
     Real dMdt[N - 1] "Derivative of mass in a finite volume";
     Medium.SpecificHeatCapacity cv[N];
     Medium.DerDensityByTemperature dddT[N] 
       "Derivative of density by temperature";
     Medium.DerDensityByPressure dddp[N] "Derivative of density by pressure";
-    Medium.Density dddX[N,nX] "Derivative of density by composition";
+    Real dddX[N,nX](unit="kg/m3") "Derivative of density by composition";
   equation 
   //All equations are referred to a single tube
     // Friction factor selection
@@ -2546,7 +2593,7 @@ The packages Medium are redeclared and a mass balance determines the composition
     LiquidDensity rho "Gas density";
     Medium.Temperature Tin "Gas inlet temperature";
     AngularVelocity_rpm n "Shaft r.p.m.";
-    PerUnit bladePos "Blade position";
+    Real bladePos "Blade position";
     Integer Np(min=1) "Number of fans in parallel";
     Power W_single "Power Consumption (single fan)";
     Power W = Np*W_single "Power Consumption (total)";
@@ -2579,12 +2626,12 @@ The packages Medium are redeclared and a mass balance determines the composition
     // Blade position
     bladePos = in_bladePos;
     if cardinality(in_bladePos)==0 then
-      in_bladePos = bladePos0 "Blade postion selected by parameter";
+      in_bladePos = bladePos0 "Blade position selected by parameter";
     end if;
     
-    // Fluid properties
+    // Fluid properties (always uses the properties upstream of the inlet flange)
     inletFluid.p=infl.p;
-    inletFluid.h=hin;
+    inletFluid.h=infl.hBA;
     rho = inletFluid.d;
     Tin = inletFluid.T;
     
@@ -2613,22 +2660,22 @@ The packages Medium are redeclared and a mass balance determines the composition
     // Boundary conditions
     dp = outfl.p - infl.p;
     w = infl.w "Fan total flow rate";
-    if w >= 0 then
-      hin = infl.hBA;
-    else
-      hin = outfl.hAB;
-    end if;
-    infl.hAB = hout;
-    outfl.hBA = hout;
-    h = hout;
+    hin = if w >= 0 then infl.hBA else h;
+    hout = if w >= 0 then h else outfl.hAB;
     
-    // Mass and energy balances
+    // Mass balance
     infl.w + outfl.w = 0 "Mass balance";
+    
+    // Energy balance
     if V>0 then
       (rho*V*der(h)) = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single 
-        "Energy balance";
+        "Dynamic energy balance (single fan)";
+      outfl.hBA = h;
+      infl.hAB = h;
     else
-      0 = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single "Energy balance";
+      outfl.hBA = infl.hBA + W_single/w "Energy balance for w > 0";
+      infl.hAB = outfl.hAB + W_single/w "Energy balance for w < 0";
+      h = if w>=0 then outfl.hBA else infl.hAB "Definition of h";
     end if;
     
   initial equation 
@@ -2685,7 +2732,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     // Mechanical boundary condition
     phi = MechPort.phi;
     omega = der(phi);
-    W = omega*MechPort.tau;
+    W_single = omega*MechPort.tau;
     
     annotation (Diagram, Icon(
         Rectangle(extent=[60,28; 86,12],   style(

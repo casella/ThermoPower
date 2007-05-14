@@ -5,16 +5,19 @@ package Choices "Choice enumerations for ThermoPower models"
       annotation(preferedView="text");
       import Modelica.Icons;
       extends Icons.Enumeration;
-      constant Integer thickInternal = 0 
+      constant Integer uniform = 0 "Uniform distribution of node radii";
+      constant Integer thickInternal = 1 
         "Quadratically distributed node radii - thickest at rint";
-      constant Integer thickExternal = 1 
+      constant Integer thickExternal = 2 
         "Quadratically distributed node radii - thickest at rext";
-      constant Integer thickBoth = 2 
+      constant Integer thickBoth = 3 
         "Quadratically distributed node radii - thickest at both extremes";
       type Temp 
         "Temporary type with choices for menus (until enumerations are available)" 
-        extends Integer( min=0, max=2);
+        extends Integer( min=0, max=3);
         annotation(Evaluate = true, choices(
+          choice=ThermoPower.Choices.CylinderFourier.NodeDistribution.uniform 
+              "Uniform distribution of node radii",
           choice=ThermoPower.Choices.CylinderFourier.NodeDistribution.thickInternal 
               "Quadratically distributed node radii - thickest at rint",
           choice=ThermoPower.Choices.CylinderFourier.NodeDistribution.thickExternal 

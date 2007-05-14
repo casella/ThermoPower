@@ -2562,7 +2562,7 @@ Casella</a>:<br>
         height=0.55),
       Diagram,
       experiment(
-        StopTime=100,
+        StopTime=120,
         NumberOfIntervals=2000,
         Tolerance=1e-009),
       Documentation(info="<HTML>
@@ -2572,16 +2572,18 @@ During the simulation, the inlet specific enthalpy and heat flux are changed, wh
 <ul>
     <li>t=0 s. The initial state of the water is subcooled liquid.
     <li>t=10 s. Ramp increase of the applied heat flow. The water starts boiling and is blown out of the outlet, whose pressure and flowrate undergo a transient increase. At the end of the transient the outlet fluid is in superheated vapour state.</li>
-    <li>t=30 s. Step increase of the inlet enthalpy</li> 
-    <li>t=50 s. The heat flow is reduced to zero in 2s. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the pressure and flowrate rise again rapidly to the inlet values.</li> 
+    <li>t=70 s. Step increase of the inlet enthalpy</li> 
+    <li>t=100 s. The heat flow is reduced to zero in 10s. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li> 
 </ul>
 <p>
-Simulation Interval = [0...150] sec <br> 
+Simulation Interval = [0...160] sec <br> 
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-9 
 </p>
 <p><b>Revision history:</b></p>
 <ul>
+    <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>, 
+    Parameters updated.</li>
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>, 
     First release.</li>
 </ul>
@@ -2603,49 +2605,50 @@ Algorithm Tolerance = 1e-6
       FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
       initOpt=ThermoPower.Choices.Init.Options.steadyState,
       redeclare package Medium = Medium) 
-                   annotation (extent=[-30,-10; -10,10]);
+                   annotation (extent=[-22,-28; -2,-8]);
     ThermoPower.Water.ValveLin valve(Kv=1/10e5, redeclare package Medium = 
           Medium) 
-      annotation (extent=[18, -10; 38, 10]);
+      annotation (extent=[26,-28; 46,-8]);
     ThermoPower.Thermal.HeatSource1D heatSource(
       N=Nnodes,
       L=Lhex,
-      omega=omegahex) annotation (extent=[-30, 8; -10, 28]);
+      omega=omegahex) annotation (extent=[-22,-10; -2,10]);
     ThermoPower.Water.SinkP Sink(p0=1e5, redeclare package Medium = Medium) 
-                                         annotation (extent=[52, -10; 72, 10]);
+                                         annotation (extent=[60,-28; 80,-8]);
     Modelica.Blocks.Sources.Step hIn(
       height=1e5,
-      offset=6e5,
-      startTime=50)   annotation (extent=[-100, 10; -80, 30]);
+      offset=4e5,
+      startTime=70)   annotation (extent=[-92,-8; -72,12]);
     Modelica.Blocks.Sources.Ramp extPower(
       height=30e5,
       startTime=10,
-      duration=30)   annotation (extent=[-80, 40; -60, 60]);
+      duration=30)   annotation (extent=[-72,22; -52,42]);
     ThermoPower.Water.SourceW Source(w0=1, redeclare package Medium = Medium) 
-      annotation (extent=[-68, -10; -48, 10]);
+      annotation (extent=[-60,-28; -40,-8]);
     Modelica.Blocks.Sources.Ramp extPower2(
       duration=10,
       height=-30e5,
-      startTime=70) annotation (extent=[-80, 74; -60, 94]);
-    Modelica.Blocks.Math.Add Add1 annotation (extent=[-38, 54; -18, 74]);
+      startTime=100) 
+                    annotation (extent=[-72,56; -52,76]);
+    Modelica.Blocks.Math.Add Add1 annotation (extent=[-30,36; -10,56]);
     Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) 
-      annotation (extent=[16, 48; 36, 68]);
+      annotation (extent=[24,30; 44,50]);
   equation 
     connect(heatSource.wall, hex.wall) 
-      annotation (points=[-20,15; -20,5],   style(color=45));
-    connect(hex.outfl, valve.inlet) annotation (points=[-10,0; 18,0]);
-    connect(valve.outlet, Sink.flange) annotation (points=[38, 0; 52, 0]);
-    connect(Source.flange, hex.infl) annotation (points=[-48,0; -30,0]);
+      annotation (points=[-12,-3; -12,-13], style(color=45));
+    connect(hex.outfl, valve.inlet) annotation (points=[-2,-18; 26,-18]);
+    connect(valve.outlet, Sink.flange) annotation (points=[46,-18; 60,-18]);
+    connect(Source.flange, hex.infl) annotation (points=[-40,-18; -22,-18]);
     connect(extPower2.y,Add1.u1) 
-      annotation (points=[-59, 84; -40, 70], style(color=3));
+      annotation (points=[-51,66; -32,52],   style(color=3));
     connect(extPower.y,Add1.u2) 
-      annotation (points=[-59, 50; -40, 58], style(color=3));
-    connect(Add1.y,       heatSource.power) annotation (points=[-17, 64; -4,
-          64; -4, 40; -20, 40; -20, 22], style(color=3));
-    connect(xValve.y,       valve.cmd) annotation (points=[37, 58; 52, 58; 52,
-           28; 28, 28; 28, 8], style(color=3));
+      annotation (points=[-51,32; -32,40],   style(color=3));
+    connect(Add1.y,       heatSource.power) annotation (points=[-9,46; 4,46; 4,
+          22; -12,22; -12,4],            style(color=3));
+    connect(xValve.y,       valve.cmd) annotation (points=[45,40; 60,40; 60,10;
+          36,10; 36,-10],      style(color=3));
     connect(hIn.y,       Source.in_h) 
-      annotation (points=[-79, 20; -54, 20; -54, 6], style(color=3));
+      annotation (points=[-71,2; -46,2; -46,-12],    style(color=3));
   end TestFlow1D2ph;
   
   model TestFlow1D2phDB "Test case for Flow1D2phDB" 
@@ -3476,8 +3479,8 @@ Schiavo</a>:<br>
               0.001,0.0015}, W_nom={350,500,600}),
       initOpt=ThermoPower.Choices.Init.Options.noInit,
       Np0=2,
-      usePowerCharacteristic=true) 
-                          annotation (extent=[-46,-20; -26,0]);
+      usePowerCharacteristic=true,
+      n0=1500)            annotation (extent=[-46,-20; -26,0]);
     
     Modelica.Blocks.Sources.Ramp Ramp1(
       height=4e5,
@@ -5794,14 +5797,14 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
   equation 
     connect(SourceP1.flange, FanMech1.infl) annotation (points=[-78,-5; -68,-5;
           -68,-6.04; -64.6,-6.04], style(color=76, rgbcolor={159,159,223}));
-    connect(Ramp1.y, FanMech1.in_bladePos) annotation (points=[-79,50; -57.8,50; 
+    connect(Ramp1.y, FanMech1.in_bladePos) annotation (points=[-79,50; -57.8,50;
           -57.8,3.68], style(color=74, rgbcolor={0,0,127}));
     connect(FanMech1.MechPort, Inertia1.flange_a) annotation (points=[-34.85,
           -6.4; -26.425,-6.4; -26.425,-6; -18,-6], style(color=0, rgbcolor={0,0,
             0}));
     connect(PressDrop1.outlet, SinkP1.flange) annotation (points=[-8,24; 0,24;
           0,22; 4,22], style(color=76, rgbcolor={159,159,223}));
-    connect(FanMech1.outfl, PressDrop1.inlet) annotation (points=[-40.8,2.96; 
+    connect(FanMech1.outfl, PressDrop1.inlet) annotation (points=[-40.8,2.96;
           -40.4,2.96; -40.4,24; -28,24], style(color=76, rgbcolor={159,159,223}));
     connect(Inertia1.flange_b, Clutch1.flange_a) 
       annotation (points=[2,-6; 30,-6], style(color=0, rgbcolor={0,0,0}));

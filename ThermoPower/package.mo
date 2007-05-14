@@ -471,7 +471,7 @@ package ThermoPower "Open library for thermal power plant simulation"
             Line(points=[0, 20; 0, -20], style(color=0)),
             Ellipse(extent=[-40, 100; 40, 20], style(color=0)),
             Line(points=[40, 60; 60, 60]),
-            Text(extent=[-100, -52; 100, -86], string="%name")));
+            Text(extent=[-130,-80; 132,-124],  string="%name")));
       equation 
       
       end SensP;
@@ -866,6 +866,12 @@ This package contains general-purpose functions and models
         consumption := c[1] + q_flow*c[2] + q_flow^2*c[3];
       end quadraticPower;
     
+      function constantPower "Constant power consumption characteristic" 
+          extends basePower;
+        input Modelica.SIunits.Power power = 0 "Constant power consumption";
+      algorithm 
+        consumption := power;
+      end constantPower;
     end PumpCharacteristics;
   
     package ValveCharacteristics "Functions for valve characteristics" 
@@ -991,29 +997,11 @@ This characteristic is such that the relative change of the flow coefficient is 
         "Volume flow rate for three operating points at N_pos blade positionings";
         input Modelica.SIunits.Height H_nom[3,:] 
         "Specific work for three operating points at N_pos blade positionings";
-    protected 
-        Integer N_pos=size(bladePos_nom,1);
-        Integer i;
-        Real c[3,N_pos] = quadraticFlowBladesCoeff(bladePos_nom, q_nom,H_nom) 
-        "Coefficients of quadratic specific work characteristic";
-        Real alpha;
-        Real q_min;
+        input Real slope_s(unit = "(J/kg)/(m3/s)", max = 0) = 0 
+        "Slope of flow characteristic at stalling conditions (must be negative)";
       algorithm 
-        // Flow equation: H = c[1] + q_flow*c[2] + q_flow^2*c[3];
-        i := N_pos-1;
-        while bladePos <= bladePos_nom[i] and i > 1 loop
-          i := i - 1;
-        end while;
-        alpha := (bladePos-bladePos_nom[i])/(bladePos_nom[i+1]-bladePos_nom[i]);
-        q_min :=-((1 - alpha)*c[2, i] + alpha*c[2, i + 1])/(2*((1 - alpha)*c[3, i] +
-          alpha*c[3, i + 1]));
-        H:= if q_flow > q_min then 
-             ((1-alpha)*c[1,i] + alpha*c[1,i+1]) +
-             ((1-alpha)*c[2,i] + alpha*c[2,i+1])*q_flow +
-             ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_flow^2 else 
-             ((1-alpha)*c[1,i] + alpha*c[1,i+1]) +
-             ((1-alpha)*c[2,i] + alpha*c[2,i+1])*q_min +
-             ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_min^2;
+        H := Utilities.quadraticFlowBlades(q_flow, bladePos, bladePos_nom,
+             Utilities.quadraticFlowBladesCoeff(bladePos_nom, q_nom, H_nom), slope_s);
       end quadraticFlowBlades;
     
       function polynomialFlow "Polynomial flow characteristic, fixed blades" 
@@ -1067,24 +1055,61 @@ This characteristic is such that the relative change of the flow coefficient is 
         consumption := c[1] + q_flow*c[2] + q_flow^2*c[3];
       end quadraticPower;
     
-      function quadraticFlowBladesCoeff 
-        extends Modelica.Icons.Function;
-        input Real bladePos_nom[:];
-        input Modelica.SIunits.VolumeFlowRate q_nom[3,:] 
-        "Volume flow rate for three operating points at N_pos blade positionings";
-        input Modelica.SIunits.Height H_nom[3,:] 
-        "Specific work for three operating points at N_pos blade positionings";
-        output Real c[3,size(bladePos_nom,1)] 
-        "Coefficients of quadratic specific work characteristic";
-    protected 
-        Integer N_pos=size(bladePos_nom,1);
-        Real q_nom2[3];
-      algorithm 
-        for j in 1:N_pos loop
-         q_nom2 := {q_nom[1, j]^2,q_nom[2, j]^2,q_nom[3, j]^2};
-         c[:,j] := Modelica.Math.Matrices.solve([ones(3),q_nom[:,j],q_nom2], H_nom[:,j]);
-        end for;
-      end quadraticFlowBladesCoeff;
+      package Utilities 
+        function quadraticFlowBlades 
+        "Quadratic flow characteristic, movable blades" 
+          extends Modelica.Icons.Function;
+          input Modelica.SIunits.VolumeFlowRate q_flow;
+          input Real bladePos;
+          input Real bladePos_nom[:];
+          input Real c[:,:] 
+          "Coefficients of quadratic specific work characteristic";
+          input Real slope_s(unit = "(J/kg)/(m3/s)", max = 0) = 0 
+          "Slope of flow characteristic at stalling conditions (must be negative)";
+          output SpecificEnergy H "Specific Energy";
+      protected 
+          Integer N_pos=size(bladePos_nom,1);
+          Integer i;
+          Real alpha;
+          Real q_s "Volume flow rate at stalling conditions";
+        algorithm 
+          // Flow equation: H = c[1] + q_flow*c[2] + q_flow^2*c[3];
+          i := N_pos-1;
+          while bladePos <= bladePos_nom[i] and i > 1 loop
+            i := i - 1;
+          end while;
+          alpha := (bladePos-bladePos_nom[i])/(bladePos_nom[i+1]-bladePos_nom[i]);
+          q_s :=(slope_s-((1 - alpha)*c[2, i] + alpha*c[2, i + 1]))/
+                (2*((1 - alpha)*c[3, i] + alpha*c[3, i + 1]));
+          H:= if q_flow > q_s then 
+               ((1-alpha)*c[1,i] + alpha*c[1,i+1]) +
+               ((1-alpha)*c[2,i] + alpha*c[2,i+1])*q_flow +
+               ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_flow^2 else 
+               ((1-alpha)*c[1,i] + alpha*c[1,i+1]) +
+               ((1-alpha)*c[2,i] + alpha*c[2,i+1])*q_s +
+               ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_s^2 +
+               (q_flow - q_s)*slope_s;
+        end quadraticFlowBlades;
+      
+        function quadraticFlowBladesCoeff 
+          extends Modelica.Icons.Function;
+          input Real bladePos_nom[:];
+          input Modelica.SIunits.VolumeFlowRate q_nom[3,:] 
+          "Volume flow rate for three operating points at N_pos blade positionings";
+          input Modelica.SIunits.Height H_nom[3,:] 
+          "Specific work for three operating points at N_pos blade positionings";
+          output Real c[3,size(bladePos_nom,1)] 
+          "Coefficients of quadratic specific work characteristic";
+      protected 
+          Integer N_pos=size(bladePos_nom,1);
+          Real q_nom2[3];
+        algorithm 
+          for j in 1:N_pos loop
+           q_nom2 := {q_nom[1, j]^2,q_nom[2, j]^2,q_nom[3, j]^2};
+           c[:,j] := Modelica.Math.Matrices.solve([ones(3),q_nom[:,j],q_nom2], H_nom[:,j]);
+          end for;
+        end quadraticFlowBladesCoeff;
+      end Utilities;
     end FanCharacteristics;
   end Functions;
 
@@ -1149,7 +1174,7 @@ under the terms of the <b>Modelica license</b>, see the license conditions
 and the accompanying <b>disclaimer</b> in the documentation of package
 Modelica in file \"Modelica/package.mo\".
 <p><b>Copyright &copy; 2002-2004, Politecnico di Milano.</b></p>
-</HTML>"), uses(Modelica(version="2.2")),
+</HTML>"), uses(Modelica(version="2.2.1")),
     version="2",
     conversion(from(
         version="1",
