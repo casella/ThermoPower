@@ -555,6 +555,30 @@ package ThermoPower "Open library for thermal power plant simulation"
       equation 
       
       end GasTurbineUnit;
+    
+      partial model Fan 
+        annotation (Icon(
+            Polygon(points=[-38,-24; -58,-60; 62,-60; 42,-24; -38,-24], style(
+              color=10,
+              rgbcolor={95,95,95},
+              thickness=4,
+              fillColor=76,
+              rgbfillColor={170,170,255})),
+            Ellipse(extent=[-60, 80; 60, -40], style(
+              color=76,
+              rgbcolor={170,170,255},
+              gradient=3,
+              fillColor=76,
+              rgbfillColor={170,170,255})),
+            Polygon(points=[-30, 52; -30, -8; 48, 20; -30, 52], style(
+                pattern=0,
+                gradient=2,
+                fillColor=7)),
+            Text(extent=[-100, -64; 100, -90], string="%name",
+            style(color=10, rgbcolor={95,95,95}))));
+      equation 
+      
+      end Fan;
     end Gas;
   end Icons;
 
@@ -727,6 +751,341 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     annotation (Documentation(info="<HTML>
 This package contains general-purpose functions and models
 </HTML>"));
+    package PumpCharacteristics "Functions for pump characteristics" 
+    import NonSI = Modelica.SIunits.Conversions.NonSIunits;
+    
+      partial function baseFlow "Base class for pump flow characteristics" 
+        extends Modelica.Icons.Function;
+        input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
+        output Modelica.SIunits.Height head "Pump head";
+      end baseFlow;
+    
+      partial function basePower 
+      "Base class for pump power consumption characteristics" 
+        extends Modelica.Icons.Function;
+        input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
+        output Modelica.SIunits.Power consumption "Power consumption";
+      end basePower;
+    
+      partial function baseEfficiency 
+      "Base class for efficiency characteristics" 
+        extends Modelica.Icons.Function;
+        input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
+        output Real eta "Efficiency";
+      end baseEfficiency;
+    
+      function linearFlow "Linear flow characteristic" 
+        extends baseFlow;
+        input Modelica.SIunits.VolumeFlowRate q_nom[2] 
+        "Volume flow rate for two operating points (single pump)";
+        input Modelica.SIunits.Height head_nom[2] 
+        "Pump head for two operating points";
+    protected 
+        constant Real g = Modelica.Constants.g_n;
+        /* Linear system to determine the coefficients:
+  head_nom[1]*g = c[1] + q_nom[1]*c[2];
+  head_nom[2]*g = c[1] + q_nom[2]*c[2];
+  */
+        Real c[2] = Modelica.Math.Matrices.solve([ones(2),q_nom],head_nom*g) 
+        "Coefficients of linear head curve";
+      algorithm 
+        // Flow equation: head * g = q*c[1] + c[2];
+        head := 1/g * (c[1] + q_flow*c[2]);
+      end linearFlow;
+    
+      function quadraticFlow "Quadratic flow characteristic" 
+        extends baseFlow;
+        input Modelica.SIunits.VolumeFlowRate q_nom[3] 
+        "Volume flow rate for three operating points (single pump)";
+        input Modelica.SIunits.Height head_nom[3] 
+        "Pump head for three operating points";
+    protected 
+        constant Real g = Modelica.Constants.g_n;
+        Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
+        "Squared nominal flow rates";
+        /* Linear system to determine the coefficients:
+  head_nom[1]*g = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  head_nom[2]*g = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  head_nom[3]*g = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+        Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],head_nom*g) 
+        "Coefficients of quadratic head curve";
+      algorithm 
+        // Flow equation: head * g = c[1] + q_flow*c[2] + q_flow^2*c[3];
+        head := 1/g * (c[1] + q_flow*c[2] + q_flow^2*c[3]);
+      end quadraticFlow;
+    
+      function polynomialFlow "Polynomial flow characteristic" 
+        extends baseFlow;
+        input Modelica.SIunits.VolumeFlowRate q_nom[:] 
+        "Volume flow rate for three operating points (single pump)";
+        input Modelica.SIunits.Height head_nom[:] 
+        "Pump head for three operating points";
+    protected 
+        constant Real g = Modelica.Constants.g_n;
+        Integer N = size(q_nom,1) "Number of nominal operating points";
+        Real q_nom_pow[N,N] = {{q_nom[j]^(i-1) for j in 1:N} for i in 1:N} 
+        "Rows: different operating points; columns: increasing powers";
+        /* Linear system to determine the coefficients (example N=3):
+  head_nom[1]*g = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  head_nom[2]*g = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  head_nom[3]*g = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+        Real c[N] = Modelica.Math.Matrices.solve(q_nom_pow,head_nom*g) 
+        "Coefficients of polynomial head curve";
+      algorithm 
+        // Flow equation (example N=3): head * g = c[1] + q_flow*c[2] + q_flow^2*c[3];
+        // Note: the implementation is numerically efficient only for low values of Na
+        head := 1/g * sum(q_flow^(i-1)*c[i] for i in 1:N);
+      end polynomialFlow;
+    
+      function constantEfficiency "Constant efficiency characteristic" 
+         extends baseEfficiency;
+         input Real eta_nom "Nominal efficiency";
+      algorithm 
+        eta := eta_nom;
+      end constantEfficiency;
+    
+      function quadraticPower "Quadratic power consumption characteristic" 
+        extends basePower;
+        input Modelica.SIunits.VolumeFlowRate q_nom[3] 
+        "Volume flow rate for three operating points (single pump)";
+        input Modelica.SIunits.Power W_nom[3] 
+        "Power consumption for three operating points";
+    protected 
+        Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
+        "Squared nominal flow rates";
+        /* Linear system to determine the coefficients:
+  W_nom[1]*g = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  W_nom[2]*g = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  W_nom[3]*g = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+        Real c[3] = Modelica.Math.Matrices.solve([ones(3),q_nom,q_nom2],W_nom) 
+        "Coefficients of quadratic power consumption curve";
+      algorithm 
+        consumption := c[1] + q_flow*c[2] + q_flow^2*c[3];
+      end quadraticPower;
+    
+    end PumpCharacteristics;
+  
+    package ValveCharacteristics "Functions for valve characteristics" 
+      partial function baseFun "Base class for valve characteristics" 
+        extends Modelica.Icons.Function;
+        input Real pos "Stem position (per unit)";
+        output Real rc "Relative coefficient (per unit)";
+      end baseFun;
+    
+      function linear "Linear characteristic" 
+        extends baseFun;
+      algorithm 
+        rc := pos;
+      end linear;
+    
+      function one "Constant characteristic" 
+        extends baseFun;
+      algorithm 
+        rc := 1;
+      end one;
+    
+      function quadratic "Quadratic characteristic" 
+        extends baseFun;
+      algorithm 
+        rc := pos*pos;
+      end quadratic;
+    
+      function equalPercentage "Equal percentage characteristic" 
+        extends baseFun;
+        input Real rangeability = 20 "Rangeability";
+        input Real delta = 0.01;
+      algorithm 
+        rc := if pos > delta then rangeability^(pos-1) else 
+                pos/delta*rangeability^(delta-1);
+        annotation (Documentation(info="<html>
+This characteristic is such that the relative change of the flow coefficient is proportional to the change in the stem position:
+<p> d(rc)/d(pos) = k d(pos).
+<p> The constant k is expressed in terms of the rangeability, i.e. the ratio between the maximum and the minimum useful flow coefficient:
+<p> rangeability = exp(k) = rc(1.0)/rc(0.0).
+<p> The theoretical characteristic has a non-zero opening when pos = 0; the implemented characteristic is modified so that the valve closes linearly when pos &lt delta.
+</html>"));
+      end equalPercentage;
+    
+      function sinusoidal "Sinusoidal characteristic" 
+        extends baseFun;
+      import Modelica.Math.*;
+      import Modelica.Constants.*;
+      algorithm 
+        rc := sin(pos*pi/2);
+      end sinusoidal;
+    end ValveCharacteristics;
+  
+    package FanCharacteristics "Functions for fan characteristics" 
+      import NonSI = Modelica.SIunits.Conversions.NonSIunits;
+    
+      partial function baseFlow "Base class for fan flow characteristics" 
+        extends Modelica.Icons.Function;
+        input VolumeFlowRate q_flow "Volumetric flow rate";
+        input Real bladePos = 1 "Blade position";
+        output SpecificEnergy H "Specific Energy";
+      end baseFlow;
+    
+      partial function basePower 
+      "Base class for fan power consumption characteristics" 
+        extends Modelica.Icons.Function;
+        input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
+        input Real bladePos = 1 "Blade position";
+        output Modelica.SIunits.Power consumption "Power consumption";
+      end basePower;
+    
+      partial function baseEfficiency 
+      "Base class for efficiency characteristics" 
+        extends Modelica.Icons.Function;
+        input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
+        input Real bladePos = 1 "Blade position";
+        output Real eta "Efficiency";
+      end baseEfficiency;
+    
+      function linearFlow "Linear flow characteristic, fixed blades" 
+        extends baseFlow;
+        input Modelica.SIunits.VolumeFlowRate q_nom[2] 
+        "Volume flow rate for two operating points (single fan)";
+        input Modelica.SIunits.Height H_nom[2] 
+        "Specific energy for two operating points";
+        /* Linear system to determine the coefficients:
+  H_nom[1] = c[1] + q_nom[1]*c[2];
+  H_nom[2] = c[1] + q_nom[2]*c[2];
+  */
+    protected 
+        Real c[2] = Modelica.Math.Matrices.solve([ones(2),q_nom],H_nom) 
+        "Coefficients of linear head curve";
+      algorithm 
+        // Flow equation: head = q*c[1] + c[2];
+        H := c[1] + q_flow*c[2];
+      end linearFlow;
+    
+      function quadraticFlow "Quadratic flow characteristic, fixed blades" 
+        extends baseFlow;
+        input Modelica.SIunits.VolumeFlowRate q_nom[3] 
+        "Volume flow rate for three operating points (single fan)";
+        input Modelica.SIunits.Height H_nom[3] 
+        "Specific work for three operating points";
+    protected 
+        Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
+        "Squared nominal flow rates";
+        /* Linear system to determine the coefficients:
+  H_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  H_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  H_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+        Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],H_nom) 
+        "Coefficients of quadratic specific work characteristic";
+      algorithm 
+        // Flow equation: H = c[1] + q_flow*c[2] + q_flow^2*c[3];
+        H := c[1] + q_flow*c[2] + q_flow^2*c[3];
+      end quadraticFlow;
+    
+      function quadraticFlowBlades 
+      "Quadratic flow characteristic, movable blades" 
+        extends baseFlow;
+        input Real bladePos_nom[:];
+        input Modelica.SIunits.VolumeFlowRate q_nom[3,:] 
+        "Volume flow rate for three operating points at N_pos blade positionings";
+        input Modelica.SIunits.Height H_nom[3,:] 
+        "Specific work for three operating points at N_pos blade positionings";
+    protected 
+        Integer N_pos=size(bladePos_nom,1);
+        Integer i;
+        Real c[3,N_pos] = quadraticFlowBladesCoeff(bladePos_nom, q_nom,H_nom) 
+        "Coefficients of quadratic specific work characteristic";
+        Real alpha;
+        Real q_min;
+      algorithm 
+        // Flow equation: H = c[1] + q_flow*c[2] + q_flow^2*c[3];
+        i := N_pos-1;
+        while bladePos <= bladePos_nom[i] and i > 1 loop
+          i := i - 1;
+        end while;
+        alpha := (bladePos-bladePos_nom[i])/(bladePos_nom[i+1]-bladePos_nom[i]);
+        q_min :=-((1 - alpha)*c[2, i] + alpha*c[2, i + 1])/(2*((1 - alpha)*c[3, i] +
+          alpha*c[3, i + 1]));
+        H:= if q_flow > q_min then 
+             ((1-alpha)*c[1,i] + alpha*c[1,i+1]) +
+             ((1-alpha)*c[2,i] + alpha*c[2,i+1])*q_flow +
+             ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_flow^2 else 
+             ((1-alpha)*c[1,i] + alpha*c[1,i+1]) +
+             ((1-alpha)*c[2,i] + alpha*c[2,i+1])*q_min +
+             ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_min^2;
+      end quadraticFlowBlades;
+    
+      function polynomialFlow "Polynomial flow characteristic, fixed blades" 
+        extends baseFlow;
+        input Modelica.SIunits.VolumeFlowRate q_nom[:] 
+        "Volume flow rate for N operating points (single fan)";
+        input Modelica.SIunits.Height H_nom[:] 
+        "Specific work for N operating points";
+    protected 
+        Integer N = size(q_nom,1) "Number of nominal operating points";
+        Real q_nom_pow[N,N] = {{q_nom[j]^(i-1) for j in 1:N} for i in 1:N} 
+        "Rows: different operating points; columns: increasing powers";
+        /* Linear system to determine the coefficients (example N=3):
+  H_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  H_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  H_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+        Real c[N] = Modelica.Math.Matrices.solve(q_nom_pow,H_nom) 
+        "Coefficients of polynomial specific work curve";
+      algorithm 
+        // Flow equation (example N=3): H = c[1] + q_flow*c[2] + q_flow^2*c[3];
+        // Note: the implementation is numerically efficient only for low values of Na
+        H := sum(q_flow^(i-1)*c[i] for i in 1:N);
+      end polynomialFlow;
+    
+      function constantEfficiency "Constant efficiency characteristic" 
+         extends baseEfficiency;
+         input Real eta_nom "Nominal efficiency";
+      algorithm 
+        eta := eta_nom;
+      end constantEfficiency;
+    
+      function quadraticPower 
+      "Quadratic power consumption characteristic, fixed blades" 
+        extends basePower;
+        input Modelica.SIunits.VolumeFlowRate q_nom[3] 
+        "Volume flow rate for three operating points (single fan)";
+        input Modelica.SIunits.Power W_nom[3] 
+        "Power consumption for three operating points";
+    protected 
+        Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
+        "Squared nominal flow rates";
+        /* Linear system to determine the coefficients:
+  W_nom[1]*g = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  W_nom[2]*g = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  W_nom[3]*g = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+        Real c[3] = Modelica.Math.Matrices.solve([ones(3),q_nom,q_nom2],W_nom) 
+        "Coefficients of quadratic power consumption curve";
+      algorithm 
+        consumption := c[1] + q_flow*c[2] + q_flow^2*c[3];
+      end quadraticPower;
+    
+      function quadraticFlowBladesCoeff 
+        extends Modelica.Icons.Function;
+        input Real bladePos_nom[:];
+        input Modelica.SIunits.VolumeFlowRate q_nom[3,:] 
+        "Volume flow rate for three operating points at N_pos blade positionings";
+        input Modelica.SIunits.Height H_nom[3,:] 
+        "Specific work for three operating points at N_pos blade positionings";
+        output Real c[3,size(bladePos_nom,1)] 
+        "Coefficients of quadratic specific work characteristic";
+    protected 
+        Integer N_pos=size(bladePos_nom,1);
+        Real q_nom2[3];
+      algorithm 
+        for j in 1:N_pos loop
+         q_nom2 := {q_nom[1, j]^2,q_nom[2, j]^2,q_nom[3, j]^2};
+         c[:,j] := Modelica.Math.Matrices.solve([ones(3),q_nom[:,j],q_nom2], H_nom[:,j]);
+        end for;
+      end quadraticFlowBladesCoeff;
+    end FanCharacteristics;
   end Functions;
 
 
@@ -1050,6 +1409,78 @@ Modelica in file \"Modelica/package.mo\".
       connection.f=f;
       connection.W=W;
     end Load;
+  
+    model PowerSensor "Measures power flow through the component" 
+      PowerConnection port_a annotation (extent=[-110,-10; -90,10]);
+      PowerConnection port_b annotation (extent=[90,-12; 110,8]);
+    annotation (Diagram, Icon(
+          Ellipse(extent=[-70,70; 70,-70],   style(color=0, fillColor=7)),
+          Line(points=[0,70; 0,40],   style(color=0)),
+          Line(points=[22.9,32.8; 40.2,57.3],   style(color=0)),
+          Line(points=[-22.9,32.8; -40.2,57.3],   style(color=0)),
+          Line(points=[37.6,13.7; 65.8,23.9],   style(color=0)),
+          Line(points=[-37.6,13.7; -65.8,23.9],   style(color=0)),
+          Line(points=[0,0; 9.02,28.6],   style(color=0)),
+          Polygon(points=[-0.48,31.6; 18,26; 18,57.2; -0.48,31.6],     style(
+              color=0,
+              fillColor=0,
+              fillPattern=1)),
+          Ellipse(extent=[-5,5; 5,-5],   style(
+              color=0,
+              gradient=0,
+              fillColor=0,
+              fillPattern=1)),
+             Text(
+            extent=[-29,-11; 30,-70],
+            style(color=0),
+          string="W"),
+          Line(points=[-70,0; -90,0],   style(color=0)),
+          Line(points=[100,0; 70,0], style(color=0, rgbcolor={0,0,0})),
+          Text(extent=[-148,88; 152,128],   string="%name"),
+        Line(points=[0,-70; 0,-84], style(color=0, rgbcolor={0,0,0}))));
+      Modelica.Blocks.Interfaces.RealOutput W(
+          redeclare type SignalType = Power) 
+      "Power flowing from port_a to port_b" 
+          annotation (extent=[-10,-104; 10,-84], rotation=-90);
+    equation 
+      port_a.W+port_b.W = 0;
+      port_a.f = port_b.f;
+      W = port_a.W;
+    end PowerSensor;
+  
+    model FrequencySensor "Measures the frequency at the connector" 
+      PowerConnection port annotation (extent=[-110,-10; -90,10]);
+    annotation (Diagram, Icon(
+          Ellipse(extent=[-70,70; 70,-70],   style(color=0, fillColor=7)),
+          Line(points=[0,70; 0,40],   style(color=0)),
+          Line(points=[22.9,32.8; 40.2,57.3],   style(color=0)),
+          Line(points=[-22.9,32.8; -40.2,57.3],   style(color=0)),
+          Line(points=[37.6,13.7; 65.8,23.9],   style(color=0)),
+          Line(points=[-37.6,13.7; -65.8,23.9],   style(color=0)),
+          Line(points=[0,0; 9.02,28.6],   style(color=0)),
+          Polygon(points=[-0.48,31.6; 18,26; 18,57.2; -0.48,31.6],     style(
+              color=0,
+              fillColor=0,
+              fillPattern=1)),
+          Ellipse(extent=[-5,5; 5,-5],   style(
+              color=0,
+              gradient=0,
+              fillColor=0,
+              fillPattern=1)),
+             Text(
+            extent=[-29,-11; 30,-70],
+            style(color=0),
+          string="f"),
+          Line(points=[-70,0; -90,0],   style(color=0)),
+          Line(points=[100,0; 70,0], style(color=0, rgbcolor={0,0,0})),
+          Text(extent=[-148,88; 152,128],   string="%name")));
+      Modelica.Blocks.Interfaces.RealOutput f(
+          redeclare type SignalType = Frequency) "Frequency at the connector" 
+          annotation (extent=[92,-10; 112,10], rotation=0);
+    equation 
+      port.W = 0;
+      f = port.f;
+    end FrequencySensor;
   end Electrical;
 
 end ThermoPower;
