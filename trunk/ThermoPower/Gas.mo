@@ -356,6 +356,56 @@ The latter options can be useful when two or more components are connected direc
     
   end SinkW;
   
+  model ThroughW "Prescribes the flow rate across the component" 
+    extends Icons.Gas.SourceW;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    
+    FlangeA inlet(redeclare package Medium = Medium) 
+      annotation (extent=[-120,-20; -80,20]);
+    FlangeB outlet(redeclare package Medium=Medium) 
+      annotation (extent=[80,-20; 120,20]);
+    Modelica.Blocks.Interfaces.RealInput in_w0 
+      annotation (extent=[-70,40; -50,60], rotation=-90);
+    
+    MassFlowRate w "Mass flow rate";
+    
+  equation 
+    inlet.w + outlet.w = 0 "Mass balance";
+    inlet.w = w "Flow characteristics";
+    
+    w = in_w0;
+    if cardinality(in_w0) == 0 then
+      in_w0 = w0 "Flow rate set by parameter";
+    end if;
+    
+    // Energy and partial mass balance
+    inlet.hAB = outlet.hAB;
+    inlet.hBA = outlet.hBA;
+    inlet.XAB = outlet.XAB;
+    inlet.XBA = outlet.XBA;
+    
+    annotation (Icon, uses(Modelica(version="1.6")),
+      Documentation(info="<html>
+<p><b>Modelling options</b></p>
+<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>,whose default value is <tt>Medium.reference_X</tt> .
+<p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the outgoing flowrate decreases proportionally to the outlet pressure.</p>
+<p>If the <tt>in_w0</tt> connector is wired, then the source massflowrate is given by the corresponding signal, otherwise it is fixed to <tt>w0</tt>.</p>
+<p>If the <tt>in_T</tt> connector is wired, then the source temperature is given by the corresponding signal, otherwise it is fixed to <tt>T</tt>.</p>
+<p>If the <tt>in_X</tt> connector is wired, then the source massfraction is given by the corresponding signal, otherwise it is fixed to <tt>Xnom</tt>.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>19 Nov 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>w0fix</tt> and <tt>Tfix</tt> and <tt>Xfix</tt>; the connection of external signals is now detected automatically.</li> <br> Adapted to Modelica.Media
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+      Diagram);
+  end ThroughW;
+
   model Plenum "Rigid adiabatic volume" 
     extends Icons.Gas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
