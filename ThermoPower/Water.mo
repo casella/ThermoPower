@@ -804,6 +804,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstartout=1e5 "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter SpecificEnthalpy hstart[N] = linspace(hstartin, hstartout, N) 
+      "Start value of enthalpy vector (initialized by default)" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Real wnf=0.01 
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
@@ -829,6 +832,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 </HTML>
 ", revisions="<html>
 <ul>
+<li><i>23 Jul 2007</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Added hstart for more detailed initialization of enthalpy vector.</li>
 <li><i>30 May 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Initialisation support added.</li>
@@ -872,10 +878,10 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
     Velocity u[N] "Fluid velocity";
     Medium.Temperature T[N] "Fluid temperature";
-    Medium.SpecificEnthalpy h[N](start=linspace(hstartin, hstartout, N)) 
+    Medium.SpecificEnthalpy h[N](start=hstart) 
       "Fluid specific enthalpy at the nodes";
-    Medium.SpecificEnthalpy htilde[N - 1](start=ones(N - 1)*hstartin + (1:(N - 1))/(
-          N - 1)*(hstartout - hstartin)) "Enthalpy state variables";
+    Medium.SpecificEnthalpy htilde[N - 1](start=hstart[2:N]) 
+      "Enthalpy state variables";
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
@@ -1150,18 +1156,20 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Real Kfl[N - 1] "Linear friction coefficient";
     Real Cf[N - 1] "Fanning friction factor";
     Real dwdt "Dynamic momentum term";
-    Medium.AbsolutePressure p(start=if HydraulicCapacitance==1 then pstartin else 
-           pstartout) "Fluid pressure for property calculations";
+    Medium.AbsolutePressure p(
+     start=if HydraulicCapacitance==1 then pstartin else pstartout,
+     stateSelect = StateSelect.prefer) 
+      "Fluid pressure for property calculations";
     Pressure dpf[N - 1] "Pressure drop due to friction between two nodes";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
     Velocity u[N] "Fluid velocity";
     Medium.Temperature T[N] "Fluid temperature";
     Medium.Temperature Ts "Saturated water temperature";
-    Medium.SpecificEnthalpy h[N](start=linspace(hstartin, hstartout, N)) 
-      "Fluid specific enthalpy";
-    Medium.SpecificEnthalpy htilde[N - 1](start=ones(N - 1)*hstartin + (1:(N - 1))/(
-          N - 1)*(hstartout - hstartin)) "Enthalpy state variables";
+    Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
+    Medium.SpecificEnthalpy htilde[N - 1](
+      start=hstart[2:N],
+      stateSelect = StateSelect.prefer) "Enthalpy state variables";
     Medium.SpecificEnthalpy hl "Saturated liquid temperature";
     Medium.SpecificEnthalpy hv "Saturated vapour temperature";
     Real x[N] "Steam quality";
@@ -1189,8 +1197,10 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     SpecificVolume vbar[N - 1] "Average specific volume";
     HeatFlux phibar[N - 1] "Average heat flux";
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
-    DerDensityByEnthalpy drbdh[N - 1] 
-      "Derivative of average density by enthalpy";
+    DerDensityByEnthalpy drbdh1[N - 1] 
+      "Derivative of average density by left enthalpy";
+    DerDensityByEnthalpy drbdh2[N - 1] 
+      "Derivative of average density by right enthalpy";
     Real AA;
     Real BB;
     Real CC;
@@ -1212,7 +1222,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 <p>The mass, momentum, and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional) and N-1 specific enthalpies.
 <p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
 <p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
-<p>Flow reversal is fully supported.
+<p>The model assumes that the mass flow rate is always from the inlet to the outlet. Small reverse flow is allowed (e.g. when closing a valve at the outlet), but the model will not account for it explicitly.
 <p><b>Modelling options</b></p>
 <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater than or equal to 2.
 <p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
@@ -1221,13 +1231,17 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 <li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
 <li><tt>FFtype = FFtypes.Cfnom</tt>: the friction coefficient is computed by giving the (constant) value of the Fanning friction factor <tt>Cfnom</tt>.
 <li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).
-<li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul><p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass buildup term depending on the pressure is lumped at the outlet, while the optional momentum buildup term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
+<li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul><p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass storage term depending on the pressure is lumped at the outlet, while the optional momentum storage term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
 <p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
 <p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt > 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
 <p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
 </HTML>",
         revisions="<html>
 <ul>
+<li><i>23 Jul 2007</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Corrected error in the mass balance equation, which lead to loss/gain of
+       mass during transients.</li>
 <li><i>30 May 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Initialisation support added.</li>
@@ -1303,64 +1317,77 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     for j in 1:(N - 1) loop
       A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
          l*omega*phibar[j] "Energy balance";
-      dMdt[j] = A*l*(drbdh[j]*der(htilde[j]) + drbdp[j]*der(p)) 
+      dMdt[j] = A*l*(drbdh1[j]*der(h[j]) + drbdh2[j]*der(h[j+1]) + drbdp[j]*der(p)) 
         "Mass balance for each volume";
       // Average volume quantities
       vbar[j] = 1/rhobar[j] "Average specific volume";
       wbar[j] = infl.w/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
       dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else 
                 noEvent(Kf[j]*abs(w) + Kfl[j])*w*vbar[j]);
-      drbdh[j] = if noEvent(abs(h[j + 1] - h[j]) < hzero) then (drdh[j] +
-        drdh[j + 1])/2 else (rho[j + 1] - rho[j])/(h[j + 1] - h[j]);
       if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1] >
           hv) or p >= (pc - pzero) or abs(h[j + 1] - h[j]) < hzero) then
         // 1-phase or almost uniform properties
-        rhobar[j] = (rho[j] + rho[j + 1])/2;
-        drbdp[j] = (drdp[j] + drdp[j + 1])/2;
+        rhobar[j] = (rho[j] + rho[j+1])/2;
+        drbdp[j] = (drdp[j] + drdp[j+1])/2;
+        drbdh1[j] = drdh[j]/2;
+        drbdh2[j] = drdh[j+1]/2;
       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]
            <= hv) then
         // 2-phase
-        rhobar[j] = CC*log(rho[j]/rho[j + 1])/(h[j + 1] - h[j]);
-        drbdp[j] = (AA*log(rho[j]/rho[j + 1]) + BB*(rho[j] - rho[j + 1]))/(h[
-          j + 1] - h[j]);
+        rhobar[j] = CC*log(rho[j]/rho[j+1]) / (h[j+1] - h[j]);
+        drbdp[j] = (AA*log(rho[j]/rho[j+1]) + BB*(rho[j] - rho[j+1])) /
+                   (h[j+1] - h[j]);
+        drbdh1[j] = (rhobar[j] - rho[j]) / (h[j+1] - h[j]);
+        drbdh2[j] = (rho[j+1] - rhobar[j]) / (h[j+1] - h[j]);
       elseif noEvent(h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv) then
         // liquid/2-phase
-        rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + CC*log(rhol/rho[j + 1]))
-          /(h[j + 1] - h[j]);
-        drbdp[j] = ((drdp[j] + drl_dp)*(hl - h[j])/2 + AA*log(rhol/rho[j + 1])
-           + BB*(rhol - rho[j + 1]))/(h[j + 1] - h[j]);
+        rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + CC*log(rhol/rho[j+1])) /
+                    (h[j+1] - h[j]);
+        drbdp[j] = ((drdp[j] + drl_dp)*(hl - h[j])/2 + AA*log(rhol/rho[j+1]) +
+                    BB*(rhol - rho[j+1])) / (h[j+1] - h[j]);
+        drbdh1[j] = (rhobar[j] - (rho[j]+rhol)/2 + drdh[j]*(hl-h[j])/2) / (h[j+1] - h[j]);
+        drbdh2[j] = (rho[j+1] - rhobar[j]) / (h[j+1] - h[j]);
       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then
         // 2-phase/vapour
-        rhobar[j] = (CC*log(rho[j]/rhov) + (rhov + rho[j + 1])*(h[j + 1] - hv)
-          /2)/(h[j + 1] - h[j]);
-        drbdp[j] = (AA*log(rho[j]/rhov) + BB*(rho[j] - rhov) + (drv_dp + drdp[
-          j + 1])*(h[j + 1] - hv)/2)/(h[j + 1] - h[j]);
+        rhobar[j] = (CC*log(rho[j]/rhov) + (rhov + rho[j+1])*(h[j+1] - hv)/2) /
+                    (h[j+1] - h[j]);
+        drbdp[j] = (AA*log(rho[j]/rhov) + BB*(rho[j] - rhov) +
+                    (drv_dp + drdp[j+1])*(h[j+1] - hv)/2) / (h[j + 1] - h[j]);
+        drbdh1[j] = (rhobar[j] - rho[j]) / (h[j+1] - h[j]);
+        drbdh2[j] = ((rhov+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hv)/2) / (h[j+1] - h[j]);
       elseif noEvent(h[j] < hl and h[j + 1] > hv) then
         // liquid/2-phase/vapour
-        rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + CC*log(rhol/rhov) + (
-          rhov + rho[j + 1])*(h[j + 1] - hv)/2)/(h[j + 1] - h[j]);
-        drbdp[j] = ((rho[j] + drl_dp)*(hl - h[j])/2 + AA*log(rhol/rhov) + BB*
-          (rhol - rhov) + (drv_dp + drdp[j + 1])*(h[j + 1] - hv)/2)/(h[j + 1]
-           - h[j]);
+        rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + CC*log(rhol/rhov) +
+                     (rhov + rho[j+1])*(h[j+1] - hv)/2) / (h[j+1] - h[j]);
+        drbdp[j] = ((drdp[j] + drl_dp)*(hl - h[j])/2 + AA*log(rhol/rhov) +
+                    BB*(rhol - rhov) + (drv_dp + drdp[j+1])*(h[j+1] - hv)/2) /
+                   (h[j+1] - h[j]);
+        drbdh1[j] = (rhobar[j] - (rho[j]+rhol)/2 + drdh[j]*(hl-h[j])/2) / (h[j+1] - h[j]);
+        drbdh2[j] = ((rhov+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hv)/2) / (h[j+1] - h[j]);
       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then
         // 2-phase/liquid
-        rhobar[j] = (CC*log(rho[j]/rhol) + (rhol + rho[j + 1])*(h[j + 1] - hl)
-          /2)/(h[j + 1] - h[j]);
+        rhobar[j] = (CC*log(rho[j]/rhol) + (rhol + rho[j+1])*(h[j+1] - hl)/2) /
+                    (h[j+1] - h[j]);
         drbdp[j] = (AA*log(rho[j]/rhol) + BB*(rho[j] - rhol) + (drl_dp + drdp[
           j + 1])*(h[j + 1] - hl)/2)/(h[j + 1] - h[j]);
+        drbdh1[j] = (rhobar[j] - rho[j]) / (h[j+1] - h[j]);
+        drbdh2[j] = ((rhol+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hl)/2) / (h[j+1] - h[j]);
       elseif noEvent(h[j] > hv and h[j + 1] < hl) then
         // vapour/2-phase/liquid
         rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + CC*log(rhov/rhol) + (
           rhol + rho[j + 1])*(h[j + 1] - hl)/2)/(h[j + 1] - h[j]);
-        drbdp[j] = ((drdp[j] + drv_dp)*(hv - h[j])/2 + AA*log(rhov/rhol) + BB
-          *(rhov - rhol) + (drl_dp + drdp[j + 1])*(h[j + 1] - hl)/2)/(h[j + 1]
-           - h[j]);
+        drbdp[j] = ((drdp[j] + drv_dp)*(hv - h[j])/2 + AA*log(rhov/rhol) +
+                     BB*(rhov - rhol) + (drl_dp + drdp[j + 1])*(h[j + 1] - hl)/2) /
+                   (h[j+1] - h[j]);
+        drbdh1[j] = (rhobar[j] - (rho[j]+rhov)/2 + drdh[j]*(hv-h[j])/2) / (h[j+1] - h[j]);
+        drbdh2[j] = ((rhol+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hl)/2) / (h[j+1] - h[j]);
       else
         // vapour/2-phase
-        rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + CC*log(rhov/rho[j + 1]))
-          /(h[j + 1] - h[j]);
-        drbdp[j] = ((drdp[j] + drv_dp)*(hv - h[j])/2 + AA*log(rhov/rho[j + 1])
-           + BB*(rhov - rho[j + 1]))/(h[j + 1] - h[j]);
+        rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + CC*log(rhov/rho[j + 1])) / (h[j + 1] - h[j]);
+        drbdp[j] = ((drdp[j] + drv_dp)*(hv - h[j])/2 + AA*log(rhov/rho[j + 1]) +
+                     BB*(rhov - rho[j + 1])) / (h[j + 1] - h[j]);
+        drbdh1[j] = (rhobar[j] - (rho[j]+rhov)/2 + drdh[j]*(hv-h[j])/2) / (h[j+1] - h[j]);
+        drbdh2[j] = (rho[j+1] - rhobar[j]) / (h[j+1] - h[j]);
       end if;
     end for;
     
@@ -1410,13 +1437,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     // Boundary conditions
     infl.hAB = htilde[1];
     outfl.hBA = htilde[N - 1];
-    if w >= 0 then
       h[1] = infl.hBA;
       h[2:N] = htilde;
-    else
-      h[N] = outfl.hAB;
-      h[1:N - 1] = htilde;
-    end if;
     T = wall.T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
     
@@ -1791,8 +1813,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Velocity u[N] "Fluid velocity";
     HeatFlux phi[N] "External heat flux";
     Medium.Temperature T[N] "Fluid temperature";
-    Medium.SpecificEnthalpy h[N](start=linspace(hstartin, hstartout, N)) 
-      "Fluid specific enthalpy";
+    Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
     Medium.Density rho[N] "Fluid density";
     SpecificVolume v[N] "Fluid specific volume";
   protected 
@@ -2137,8 +2158,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Velocity u[N] "Fluid velocity";
     HeatFlux phi[N] "External heat flux";
     Medium.Temperature T[N] "Fluid temperature";
-    Medium.SpecificEnthalpy h[N](start=(ones(N)*hstartin + (0:(N - 1))/(N - 1)*(
-          hstartout - hstartin))) "Fluid specific enthalpy";
+    Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
     Medium.Density rho[N] "Fluid density";
     SpecificVolume v[N] "Fluid specific volume";
     
