@@ -2531,7 +2531,7 @@ Casella</a>:<br>
           -12,13.1], style(color=45, rgbcolor={255,127,0}));
   end TestFlow1DfemF;
   
-  model TestFlow1D2ph "Test case for Flow1D2ph" 
+  model TestFlow1D2phA "Test case for Flow1D2ph" 
     package Medium=Modelica.Media.Water.WaterIF97_ph;
     import Modelica.Constants.*;
     // number of Nodes
@@ -2550,6 +2550,10 @@ Casella</a>:<br>
     parameter Area Ahex=pi*rhex^2;
     // friction factor
     parameter Real Cfhex=0.005;
+    Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
+    Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
+    Modelica.SIunits.Mass Merr "Mass balance error";
+    
     annotation (
       Coordsys(
         extent=[-100, -100; 100, 100],
@@ -2562,26 +2566,28 @@ Casella</a>:<br>
         height=0.55),
       Diagram,
       experiment(
-        StopTime=120,
-        NumberOfIntervals=2000,
+        StopTime=250, 
+        NumberOfIntervals=2000, 
         Tolerance=1e-009),
       Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>Flow1D2ph</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow).<br>
+<p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as an evaporator.<br>
 This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water.<br> 
 During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant:
 <ul>
     <li>t=0 s. The initial state of the water is subcooled liquid.
     <li>t=10 s. Ramp increase of the applied heat flow. The water starts boiling and is blown out of the outlet, whose pressure and flowrate undergo a transient increase. At the end of the transient the outlet fluid is in superheated vapour state.</li>
-    <li>t=70 s. Step increase of the inlet enthalpy</li> 
-    <li>t=100 s. The heat flow is reduced to zero in 10s. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li> 
+    <li>t=100 s. Step increase of the inlet enthalpy</li> 
+    <li>t=150 s. The heat flow is brought back to zero. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li> 
 </ul>
 <p>
-Simulation Interval = [0...160] sec <br> 
+Simulation Interval = [0...250] sec <br> 
 Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-9 
 </p>
 <p><b>Revision history:</b></p>
 <ul>
+    <li><i>26 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>, 
+    Parameters updated.</li>
     <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>, 
     Parameters updated.</li>
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>, 
@@ -2589,7 +2595,7 @@ Algorithm Tolerance = 1e-9
 </ul>
 </HTML>"),
       experimentSetupOutput(equdistant=false));
-    ThermoPower.Test.Flow1D2ph_check hex(
+    ThermoPower.Water.Flow1D2ph hex(
       N=Nnodes,
       L=Lhex,
       omega=omegahex,
@@ -2606,8 +2612,8 @@ Algorithm Tolerance = 1e-9
       initOpt=ThermoPower.Choices.Init.Options.steadyState,
       redeclare package Medium = Medium) 
                    annotation (extent=[-22,-28; -2,-8]);
-    ThermoPower.Water.ValveLin valve(Kv=1/10e5, redeclare package Medium = 
-          Medium) 
+    ThermoPower.Water.ValveLin valve(           redeclare package Medium = 
+          Medium, Kv=0.4/10e5) 
       annotation (extent=[26,-28; 46,-8]);
     ThermoPower.Thermal.HeatSource1D heatSource(
       N=Nnodes,
@@ -2615,21 +2621,22 @@ Algorithm Tolerance = 1e-9
       omega=omegahex) annotation (extent=[-22,-10; -2,10]);
     ThermoPower.Water.SinkP Sink(p0=1e5, redeclare package Medium = Medium) 
                                          annotation (extent=[60,-28; 80,-8]);
-    Modelica.Blocks.Sources.Step hIn(
+    Modelica.Blocks.Sources.Ramp hIn(
       height=1e5,
       offset=4e5,
-      startTime=70)   annotation (extent=[-92,-8; -72,12]);
+      duration=2,
+      startTime=100)  annotation (extent=[-92,-8; -72,12]);
     Modelica.Blocks.Sources.Ramp extPower(
-      height=30e5,
       startTime=10,
-      duration=30)   annotation (extent=[-72,22; -52,42]);
-    ThermoPower.Water.SourceW Source(w0=1, redeclare package Medium = Medium) 
+      duration=50, 
+      height=12e5)   annotation (extent=[-72,22; -52,42]);
+    ThermoPower.Water.SourceW Source(      redeclare package Medium = Medium, w0
+        =0.4) 
       annotation (extent=[-60,-28; -40,-8]);
     Modelica.Blocks.Sources.Ramp extPower2(
       duration=10,
-      height=-30e5,
-      startTime=100) 
-                    annotation (extent=[-72,56; -52,76]);
+      startTime=150, 
+      height=-12e5) annotation (extent=[-72,56; -52,76]);
     Modelica.Blocks.Math.Add Add1 annotation (extent=[-30,36; -10,56]);
     Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) 
       annotation (extent=[24,30; 44,50]);
@@ -2649,8 +2656,271 @@ Algorithm Tolerance = 1e-9
           36,10; 36,-10],      style(color=3));
     connect(hIn.y,       Source.in_h) 
       annotation (points=[-71,2; -46,2; -46,-12],    style(color=3));
-  end TestFlow1D2ph;
+    Mhex = hex.M;
+    der(Mbal) = hex.infl.w + hex.outfl.w;
+    Merr = Mhex-Mbal;
+  initial equation 
+    Mbal = Mhex;
+  end TestFlow1D2phA;
   
+  model TestFlow1D2phB "Test case for Flow1D2ph" 
+    package Medium=Modelica.Media.Water.WaterIF97_ph;
+    import Modelica.Constants.*;
+    // number of Nodes
+    parameter Integer Nnodes=10;
+    // total length
+    parameter Length Lhex=10;
+    // internal diameter
+    parameter Diameter Dhex=0.06;
+    // wall thickness
+    parameter Thickness thhex=0;
+    // internal radius
+    parameter Radius rhex=Dhex/2;
+    // internal perimeter
+    parameter Length omegahex=Dhex;
+    // internal cross section
+    parameter Area Ahex=pi*rhex^2;
+    // friction factor
+    parameter Real Cfhex=0.005;
+    Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
+    Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
+    Modelica.SIunits.Mass Merr "Mass balance error";
+    
+    annotation (
+      Coordsys(
+        extent=[-100, -100; 100, 100],
+        grid=[2, 2],
+        component=[20, 20]),
+      Window(
+        x=0.01,
+        y=0.03,
+        width=0.59,
+        height=0.55),
+      Diagram,
+      experiment(
+        StopTime=250, 
+        NumberOfIntervals=2000, 
+        Tolerance=1e-009),
+      Documentation(info="<HTML>
+<p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as an evaporator.<br>
+This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water. The outlet pressure is kept constant, emulating perfect pressure control.<br> 
+During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant:
+<ul>
+    <li>t=0 s. The initial state of the water is subcooled liquid.
+    <li>t=10 s. Ramp increase of the applied heat flow. The water starts boiling and is blown out of the outlet, whose flowrate undergo a transient increase. At the end of the transient the outlet fluid is in superheated vapour state.</li>
+    <li>t=100 s. Step increase of the inlet enthalpy</li> 
+    <li>t=150 s. The heat flow is brought back to zero. The vapour collapses, causing a suddend decrease in the outlet flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li> 
+</ul>
+<p>
+Simulation Interval = [0...250] sec <br> 
+Integration Algorithm = DASSL <br>
+Algorithm Tolerance = 1e-9 
+</p>
+<p><b>Revision history:</b></p>
+<ul>
+    <li><i>26 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>, 
+    Parameters updated.</li>
+    <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>, 
+    Parameters updated.</li>
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>, 
+    First release.</li>
+</ul>
+</HTML>"),
+      experimentSetupOutput(equdistant=false));
+    ThermoPower.Water.Flow1D2ph hex(
+      N=Nnodes,
+      L=Lhex,
+      omega=omegahex,
+      Dhyd=Dhex,
+      A=Ahex,
+      Cfnom=0.005,
+      DynamicMomentum=false,
+      hstartin=6e5,
+      hstartout=6e5,
+      pstartin=10e5,
+      pstartout=10e5,
+      wnom=1,
+      FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+      initOpt=ThermoPower.Choices.Init.Options.steadyState,
+      redeclare package Medium = Medium) 
+                   annotation (extent=[-10,-28; 10,-8]);
+    ThermoPower.Thermal.HeatSource1D heatSource(
+      N=Nnodes,
+      L=Lhex,
+      omega=omegahex) annotation (extent=[-10,-10; 10,10]);
+    ThermoPower.Water.SinkP Sink(        redeclare package Medium = Medium, p0=
+          11e5)                          annotation (extent=[60,-28; 80,-8]);
+    Modelica.Blocks.Sources.Ramp hIn(
+      height=1e5,
+      offset=4e5,
+      duration=2,
+      startTime=100)  annotation (extent=[-92,-8; -72,12]);
+    Modelica.Blocks.Sources.Ramp extPower(
+      startTime=10,
+      duration=50, 
+      height=12e5)   annotation (extent=[-72,22; -52,42]);
+    ThermoPower.Water.SourceW Source(      redeclare package Medium = Medium, w0
+        =0.4) 
+      annotation (extent=[-60,-28; -40,-8]);
+    Modelica.Blocks.Sources.Ramp extPower2(
+      duration=10,
+      startTime=150, 
+      height=-12e5) annotation (extent=[-72,56; -52,76]);
+    Modelica.Blocks.Math.Add Add1 annotation (extent=[-30,36; -10,56]);
+  equation 
+    connect(heatSource.wall, hex.wall) 
+      annotation (points=[0,-3; 0,-13],     style(color=45));
+    connect(Source.flange, hex.infl) annotation (points=[-40,-18; -10,-18]);
+    connect(extPower2.y,Add1.u1) 
+      annotation (points=[-51,66; -32,52],   style(color=3));
+    connect(extPower.y,Add1.u2) 
+      annotation (points=[-51,32; -32,40],   style(color=3));
+    connect(Add1.y,       heatSource.power) annotation (points=[-9,46; 0,46; 0,
+          4],                            style(color=3));
+    connect(hIn.y,       Source.in_h) 
+      annotation (points=[-71,2; -46,2; -46,-12],    style(color=3));
+    Mhex = hex.M;
+    der(Mbal) = hex.infl.w + hex.outfl.w;
+    Merr = Mhex-Mbal;
+  initial equation 
+    Mbal = Mhex;
+  equation 
+    connect(hex.outfl, Sink.flange) annotation (points=[10,-18; 60,-18]);
+  end TestFlow1D2phB;
+
+  model TestFlow1D2phC "Test case for Flow1D2ph" 
+    package Medium=Modelica.Media.Water.WaterIF97_ph;
+    import Modelica.Constants.*;
+    // number of Nodes
+    parameter Integer Nnodes=10;
+    // total length
+    parameter Length Lhex=10;
+    // internal diameter
+    parameter Diameter Dhex=0.06;
+    // wall thickness
+    parameter Thickness thhex=0;
+    // internal radius
+    parameter Radius rhex=Dhex/2;
+    // internal perimeter
+    parameter Length omegahex=Dhex;
+    // internal cross section
+    parameter Area Ahex=pi*rhex^2;
+    // friction factor
+    parameter Real Cfhex=0.005;
+    Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
+    Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
+    Modelica.SIunits.Mass Merr "Mass balance error";
+    
+    annotation (
+      Coordsys(
+        extent=[-100, -100; 100, 100],
+        grid=[2, 2],
+        component=[20, 20]),
+      Window(
+        x=0.01,
+        y=0.03,
+        width=0.59,
+        height=0.55),
+      Diagram,
+      experiment(
+        StopTime=600, 
+        NumberOfIntervals=2000, 
+        Tolerance=1e-009),
+      Documentation(info="<HTML>
+<p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as a condenser.<br>
+This model represent the fluid side of a condenser with an applied external heat flow. The operating fluid is water.<br> 
+During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant:
+<ul>
+    <li>t=0 s. The initial state of the water is superheated vapour.
+    <li>t=10 s. Ramp increase of the heat flow extracted from the component. The steam condenses, causing a reduction of pressure and a flow rate transient decrease. At the end of the transient the outlet fluid is in subcooled liquid state.</li>
+    <li>t=300 s. Step increase of the inlet enthalpy</li> 
+    <li>t=400 s. The heat flow is brought back to zero. The fluids evaporates, causing an increase of pressure and a surge of flow rate at the outlet..</li> 
+</ul>
+<p>
+Simulation Interval = [0...600] sec <br> 
+Integration Algorithm = DASSL <br>
+Algorithm Tolerance = 1e-9 
+</p>
+<p><b>Revision history:</b></p>
+<ul>
+    <li><i>26 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>, 
+    Parameters updated.</li>
+    <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>, 
+    Parameters updated.</li>
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>, 
+    First release.</li>
+</ul>
+</HTML>"),
+      experimentSetupOutput(equdistant=false));
+    Water.Flow1D2ph hex(
+      N=Nnodes,
+      L=Lhex,
+      omega=omegahex,
+      Dhyd=Dhex,
+      A=Ahex,
+      Cfnom=0.005,
+      DynamicMomentum=false,
+      pstartin=10e5,
+      pstartout=10e5,
+      wnom=1,
+      FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+      initOpt=ThermoPower.Choices.Init.Options.steadyState,
+      redeclare package Medium = Medium, 
+      hstartin=3.2e6, 
+      hstartout=3.26e6) 
+                   annotation (extent=[-22,-28; -2,-8]);
+    ThermoPower.Water.ValveLin valve(           redeclare package Medium = 
+          Medium, Kv=0.2/10e5) 
+      annotation (extent=[26,-28; 46,-8]);
+    ThermoPower.Thermal.HeatSource1D heatSource(
+      N=Nnodes,
+      L=Lhex,
+      omega=omegahex) annotation (extent=[-22,-10; -2,10]);
+    ThermoPower.Water.SinkP Sink(p0=1e5, redeclare package Medium = Medium) 
+                                         annotation (extent=[60,-28; 80,-8]);
+    Modelica.Blocks.Sources.Ramp hIn(
+      height=1e5,
+      duration=2,
+      offset=3.2e6, 
+      startTime=300)  annotation (extent=[-94,-8; -74,12]);
+    Modelica.Blocks.Sources.Ramp extPower(
+      startTime=10, 
+      height=-6e5, 
+      duration=200)  annotation (extent=[-72,24; -52,44]);
+    ThermoPower.Water.SourceW Source(      redeclare package Medium = Medium, w0
+        =0.2) 
+      annotation (extent=[-60,-28; -40,-8]);
+    Modelica.Blocks.Sources.Ramp extPower2(
+      duration=150, 
+      height=+6e5, 
+      startTime=400) 
+                    annotation (extent=[-72,54; -52,74]);
+    Modelica.Blocks.Math.Add Add1 annotation (extent=[-30,36; -10,56]);
+    Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) 
+      annotation (extent=[24,30; 44,50]);
+  equation 
+    connect(heatSource.wall, hex.wall) 
+      annotation (points=[-12,-3; -12,-13], style(color=45));
+    connect(hex.outfl, valve.inlet) annotation (points=[-2,-18; 26,-18]);
+    connect(valve.outlet, Sink.flange) annotation (points=[46,-18; 60,-18]);
+    connect(Source.flange, hex.infl) annotation (points=[-40,-18; -22,-18]);
+    connect(extPower2.y,Add1.u1) 
+      annotation (points=[-51,64; -32,52],   style(color=3));
+    connect(extPower.y,Add1.u2) 
+      annotation (points=[-51,34; -32,40],   style(color=3));
+    connect(Add1.y,       heatSource.power) annotation (points=[-9,46; 4,46; 4,
+          22; -12,22; -12,4],            style(color=3));
+    connect(xValve.y,       valve.cmd) annotation (points=[45,40; 60,40; 60,10;
+          36,10; 36,-10],      style(color=3));
+    connect(hIn.y,       Source.in_h) 
+      annotation (points=[-73,2; -46,2; -46,-12],    style(color=3));
+    Mhex = hex.M;
+    der(Mbal) = hex.infl.w + hex.outfl.w;
+    Merr = Mhex-Mbal;
+  initial equation 
+    Mbal = Mhex;
+  end TestFlow1D2phC;
+
   model TestFlow1D2phDB "Test case for Flow1D2phDB" 
     package Medium=Modelica.Media.Water.WaterIF97_ph;
     import Modelica.Constants.*;
@@ -2793,8 +3063,8 @@ Algorithm Tolerance = 1e-8
            63; -42.65, 93.2; -17.4, 93.2], style(color=3));
     connect(DT.y,Add2.u2)             annotation (points=[-25.4, 77; -22.7,
           77; -22.7, 84.8; -17.4, 84.8], style(color=3));
-    connect(tempSource.temperature_nodeN,Add2.y)        annotation (points=[-16,
-          44.8; -16,60; 8,60; 8,89; -1.3,89],    style(color=3));
+    connect(tempSource.temperature_nodeN,Add2.y)        annotation (points=[-16,44.8; 
+          -16,60; 8,60; 8,89; -1.3,89],          style(color=3));
   end TestFlow1D2phDB;
   
   model TestFlow1D2phDB_hf "Test case for Flow1D2ph" 
@@ -3377,40 +3647,6 @@ Casella</a>:<br>
 </HTML>"));
   end Flow1D_check;
   
-  model Flow1D2ph_check 
-    "Extended Flow1D2ph model with mass & energy balance computation" 
-    extends Water.Flow1D2ph;
-    
-    SpecificEnergy Etot;
-    SpecificEnergy Evol[N - 1];
-    Mass Mtot;
-    Mass Mvol[N - 1];
-    Real balM;
-    Real balE;
-  equation 
-    for j in 1:N - 1 loop
-      Mvol[j] = A*l*rhobar[j];
-      Evol[j] = Mvol[j]*((h[j] + h[j + 1])/2 - p/rhobar[j]);
-    end for;
-    // M is computed in base class
-    Mtot = M;
-    Etot = sum(Evol);
-    balM = infl.w + outfl.w;
-    
-    balE = infl.w*(if infl.w > 0 then infl.hBA else infl.hAB) + outfl.w*(if 
-      outfl.w > 0 then outfl.hAB else outfl.hBA) + sum(wall.phi[1:N - 1] +
-      wall.phi[2:N])/2*omega*l;
-    annotation (Documentation(info="<HTML>
-<p>This model extends <tt>Water.Flow1D2ph</tt> by adding the computation of mass and energy flows and buildups. It can be used to check the correctness of the <tt>Water.Flow1D</tt> model.</p>
-<p><b>Revision history:</b></p>
-<ul>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
-Casella</a>:<br>
-       First release.</li>
-</ul>
-</HTML>"));
-  end Flow1D2ph_check;
   
   model WaterPump "Test case for WaterPump" 
     annotation (
