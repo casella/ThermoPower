@@ -190,4 +190,28 @@ package Choices "Choice enumerations for ThermoPower models"
       end Temp;
     end Options;
   end Init;
+
+  package FlowReversal "Options for flow reversal support" 
+    package Options 
+      "Type, constants and menu choices to select the flow reversal support options" 
+      
+      annotation (preferedView="text");
+      extends Modelica.Icons.Enumeration;
+      constant Integer fullFlowReversal = 0 "Full flow reversal support";
+      constant Integer smallFlowReversal = 1 
+        "Small flow reversal allowed (approx. model)";
+      constant Integer noFlowReversal = 2 "Flow reversal is not allowed";
+      type Temp 
+        "Temporary type with choices for menus (until enumerations are available)" 
+        extends Integer(min=0, max=2);
+        annotation (Evaluate=true, choices(
+          choice=ThermoPower.Choices.FlowReversal.fullFlowReversal 
+              "Full flow reversal support",
+          choice=ThermoPower.Choices.FlowReversal.smallFlowReversal 
+              "Small flow reversal allowed (approx. model)",
+          choice=ThermoPower.Choices.FlowReversal.noFlowReversal 
+              "Flow reversal is not allowed"));
+      end Temp;
+    end Options;
+  end FlowReversal;
 end Choices;
