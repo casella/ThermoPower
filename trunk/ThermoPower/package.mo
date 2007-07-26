@@ -2,33 +2,24 @@ package ThermoPower "Open library for thermal power plant simulation"
   import Modelica.Math.*;
   import Modelica.SIunits.*;
 
-
   type HydraulicConductance = Real (final quantity="HydraulicConductance",
         final unit="(kg/s)/Pa");
-
 
   type HydraulicResistance = Real (final quantity="HydraulicResistance", final unit
       =      "Pa/(kg/s)");
 
-
   type PerUnit = Real (
                      final quantity="PerUnit",final unit="pu");
 
-
   type Density = Modelica.SIunits.Density (start=40) "generic start value";
-
 
   type LiquidDensity = Density (start=1000) "start value for liquids";
 
-
   type GasDensity = Density (start=5) "start value for gases/vapours";
-
 
   type AbsoluteTemperature = Temperature (start=300) "generic temperature";
 
-
   type AbsolutePressure = Pressure (start=1e5) "generic pressure";
-
 
   package Icons "Icons for ThermoPower library" 
     extends Modelica.Icons.Library;
@@ -582,7 +573,6 @@ package ThermoPower "Open library for thermal power plant simulation"
     end Gas;
   end Icons;
 
-
   package Functions "Miscellaneous functions" 
     extends Modelica.Icons.Library;
     function linear 
@@ -925,7 +915,7 @@ This characteristic is such that the relative change of the flow coefficient is 
     end ValveCharacteristics;
   
     package FanCharacteristics "Functions for fan characteristics" 
-      import NonSI = Modelica.SIunits.Conversions.NonSIunits;
+    import NonSI = Modelica.SIunits.Conversions.NonSIunits;
     
       partial function baseFlow "Base class for fan flow characteristics" 
         extends Modelica.Icons.Function;
@@ -1113,7 +1103,6 @@ This characteristic is such that the relative change of the flow coefficient is 
     end FanCharacteristics;
   end Functions;
 
-
   annotation (Documentation(info="<HTML>
 <p><h2>General Information</h2></p>
 <p>The ThermoFluid library is an open Modelica library for the dynamic modeling of thermal power plants.
@@ -1123,14 +1112,14 @@ This characteristic is such that the relative change of the flow coefficient is 
 </ul>
 <p>The papers are available from the <a href=\"mailto:francesco.casella@polimi.it\">authors</a> upon request, or can be downloaded from the <a href=\"http://www.elet.polimi.it/upload/casella/thermopower/\">library home page</a>.
 <p>The ThermoPower library uses the medium models provided by the Modelica.Media library, which is freely available from the <a href= \"http://www.modelica.org/\">Modelica Association</a> web site.
-
+ 
 <p><h2>Library home page</h2></p>
 <p>For additional information and library updates, consult the <a href=\"http://www.elet.polimi.it/upload/casella/thermopower/\"> 
 library home page</a>, and the <a href=\"http://sourceforge.net/projects/thermopower/\"> ThermoPower project page </a> on SourceForge.net.
 <p>Contributions to the library are welcome: please contact the authors if you are interested.
-
+ 
 <p><h2>Release notes:</h2></p>
-
+ 
 <h3>Version 2.0 (<i>10 Jun 2005</i>)</h3>
 <ul>
     <li>The new Modelica 2.2 standard library is used.
@@ -1152,7 +1141,7 @@ library home page</a>, and the <a href=\"http://sourceforge.net/projects/thermop
     <li>Finite element model of thermohydraulic two-phase flow added.
     <li>Simplified models for the connection to the power system added in the <tt>Electrical</tt> package.
 </ul>
-
+ 
 <h3>Version 1.1 (<i>15 Feb 2004</i>)</h3>
 <ul>
     <li>No default values for parameters whose values must be set explicitly by the user.
@@ -1174,13 +1163,12 @@ under the terms of the <b>Modelica license</b>, see the license conditions
 and the accompanying <b>disclaimer</b> in the documentation of package
 Modelica in file \"Modelica/package.mo\".
 <p><b>Copyright &copy; 2002-2004, Politecnico di Milano.</b></p>
-</HTML>"), uses(Modelica(version="2.2.1")),
+</HTML>"), uses(Modelica(version="2.2.2")),
     version="2",
     conversion(from(
         version="1",
         script="ConvertFromThermoPower_1.mos",
         version="")));
-
 
   package Electrical "Simplified models of electric power components" 
     extends Modelica.Icons.Library;
@@ -1507,5 +1495,4 @@ Modelica in file \"Modelica/package.mo\".
       f = port.f;
     end FrequencySensor;
   end Electrical;
-
 end ThermoPower;
