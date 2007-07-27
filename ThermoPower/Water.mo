@@ -796,6 +796,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean DynamicMomentum=false "Inertial phenomena accounted for" annotation(Evaluate = true);
     parameter HCtypes.Temp HydraulicCapacitance = HCtypes.Downstream 
       "Location of the hydraulic capacitance";
+    parameter Boolean avoidInletEnthalpyDerivative = false 
+      "Avoid inlet enthalpy derivative";
     parameter Pressure pstartin=1e5 "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pstartout=1e5 "Outlet pressure start value" 
@@ -1147,8 +1149,6 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       h(start=linspace(hstartin, hstartout, N))) 
       "Properties of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
-    Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
-    Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction";
     Pressure Dpstat "Pressure drop due to static head";
@@ -1188,12 +1188,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       "Derivative of average density by pressure";
     DerDensityByPressure drldp 
       "Derivative of saturated liquid density by pressure";
-    DerDensityByPressure drl_dp 
-      "Derivative of liquid density by pressure just before saturation";
     DerDensityByPressure drvdp 
       "Derivative of saturated vapour density by pressure";
-    DerDensityByPressure drv_dp 
-      "Derivative of vapour density by pressure just before saturation";
     SpecificVolume vbar[N - 1] "Average specific volume";
     HeatFlux phibar[N - 1] "Average heat flux";
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
@@ -1202,8 +1198,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     DerDensityByEnthalpy drbdh2[N - 1] 
       "Derivative of average density by right enthalpy";
     Real AA;
-    Real BB;
-    Real CC;
+    Real AA1;
     Real dMdt[N - 1] "Derivative of fluid mass in each volume";
     annotation (
       Diagram,
@@ -1226,6 +1221,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 <p><b>Modelling options</b></p>
 <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater than or equal to 2.
 <p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
+<p>The density is computed assuming a linear distribution of the specific
+enthalpy between the nodes; this requires the availability of the time derivative of the inlet enthalpy. If this is not available, it is possible to set <tt>avoidInletEnthalpyDerivative</tt> to true, which will cause the mean density of the first volume to be approximated as its outlet density, thus avoiding the need of the inlet enthalpy derivative.
 <p>The following options are available to specify the friction coefficient:
 <ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
 <li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
@@ -1238,7 +1235,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 </HTML>",
         revisions="<html>
 <ul>
-<li><i>23 Jul 2007</i>
+<li><i>27 Jul 2007</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Corrected error in the mass balance equation, which lead to loss/gain of
        mass during transients.</li>
@@ -1287,8 +1284,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
           f_colebrook(w, Dhyd/A, e,
             Medium.dynamicViscosity(fluid[j].state))*Kfc else 
           f_colebrook_2ph(w, Dhyd/A, e,
-            Medium.dynamicViscosity(bubble),
-            Medium.dynamicViscosity(dew),x[j])*Kfc;
+            Medium.dynamicViscosity(Medium.setBubbleState(sat,1)),
+            Medium.dynamicViscosity(Medium.setDewState(sat,1)),x[j])*Kfc;
         Kf[j] = Cf[j]*omega_hyd*l/(2*A^3);
       elseif FFtype == FFtypes.NoFriction then
         Cf[j] = 0;
@@ -1324,7 +1321,13 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       wbar[j] = infl.w/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
       dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else 
                 noEvent(Kf[j]*abs(w) + Kfl[j])*w*vbar[j]);
-      if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1] >
+      if avoidInletEnthalpyDerivative and j == 1 then
+        // first volume properties computed by the outlet properties
+        rhobar[j] = rho[j+1];
+        drbdp[j] = drdp[j+1];
+        drbdh1[j] = 0;
+        drbdh2[j] = drdh[j+1];
+      elseif noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1] >
           hv) or p >= (pc - pzero) or abs(h[j + 1] - h[j]) < hzero) then
         // 1-phase or almost uniform properties
         rhobar[j] = (rho[j] + rho[j+1])/2;
@@ -1334,58 +1337,69 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]
            <= hv) then
         // 2-phase
-        rhobar[j] = CC*log(rho[j]/rho[j+1]) / (h[j+1] - h[j]);
-        drbdp[j] = (AA*log(rho[j]/rho[j+1]) + BB*(rho[j] - rho[j+1])) /
+        rhobar[j] = AA*log(rho[j]/rho[j+1]) / (h[j+1] - h[j]);
+        drbdp[j] = (AA1*log(rho[j]/rho[j+1]) +
+                    AA*(1/rho[j] * drdp[j] - 1/rho[j+1] * drdp[j+1])) /
                    (h[j+1] - h[j]);
         drbdh1[j] = (rhobar[j] - rho[j]) / (h[j+1] - h[j]);
         drbdh2[j] = (rho[j+1] - rhobar[j]) / (h[j+1] - h[j]);
       elseif noEvent(h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv) then
         // liquid/2-phase
-        rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + CC*log(rhol/rho[j+1])) /
+        rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + AA*log(rhol/rho[j+1])) /
                     (h[j+1] - h[j]);
-        drbdp[j] = ((drdp[j] + drl_dp)*(hl - h[j])/2 + AA*log(rhol/rho[j+1]) +
-                    BB*(rhol - rho[j+1])) / (h[j+1] - h[j]);
+        drbdp[j] = ((drdp[j] + drldp)*(hl - h[j])/2 + (rho[j]+rhol)/2 * dhldp +
+                     AA1*log(rhol/rho[j+1]) +
+                     AA*(1/rhol * drldp - 1/rho[j+1] * drdp[j+1])) / (h[j+1] - h[j]);
         drbdh1[j] = (rhobar[j] - (rho[j]+rhol)/2 + drdh[j]*(hl-h[j])/2) / (h[j+1] - h[j]);
         drbdh2[j] = (rho[j+1] - rhobar[j]) / (h[j+1] - h[j]);
       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then
         // 2-phase/vapour
-        rhobar[j] = (CC*log(rho[j]/rhov) + (rhov + rho[j+1])*(h[j+1] - hv)/2) /
+        rhobar[j] = (AA*log(rho[j]/rhov) + (rhov + rho[j+1])*(h[j+1] - hv)/2) /
                     (h[j+1] - h[j]);
-        drbdp[j] = (AA*log(rho[j]/rhov) + BB*(rho[j] - rhov) +
-                    (drv_dp + drdp[j+1])*(h[j+1] - hv)/2) / (h[j + 1] - h[j]);
+        drbdp[j] = (AA1*log(rho[j]/rhov) +
+                    AA*(1/rho[j] * drdp[j] - 1/rhov *drvdp) +
+                    (drvdp + drdp[j+1])*(h[j+1] - hv)/2 - (rhov+rho[j+1])/2 * dhvdp) /
+                   (h[j + 1] - h[j]);
         drbdh1[j] = (rhobar[j] - rho[j]) / (h[j+1] - h[j]);
-        drbdh2[j] = ((rhov+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hv)/2) / (h[j+1] - h[j]);
+        drbdh2[j] = ((rhov+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hv)/2) /
+                    (h[j+1] - h[j]);
       elseif noEvent(h[j] < hl and h[j + 1] > hv) then
         // liquid/2-phase/vapour
-        rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + CC*log(rhol/rhov) +
+        rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + AA*log(rhol/rhov) +
                      (rhov + rho[j+1])*(h[j+1] - hv)/2) / (h[j+1] - h[j]);
-        drbdp[j] = ((drdp[j] + drl_dp)*(hl - h[j])/2 + AA*log(rhol/rhov) +
-                    BB*(rhol - rhov) + (drv_dp + drdp[j+1])*(h[j+1] - hv)/2) /
+        drbdp[j] = ((drdp[j] + drldp)*(hl - h[j])/2 + (rho[j]+rhol)/2 * dhldp +
+                    AA1*log(rhol/rhov) + AA*(1/rhol * drldp - 1/rhov * drvdp) +
+                    (drvdp + drdp[j+1])*(h[j+1] - hv)/2 - (rhov+rho[j+1])/2 * dhvdp) /
                    (h[j+1] - h[j]);
         drbdh1[j] = (rhobar[j] - (rho[j]+rhol)/2 + drdh[j]*(hl-h[j])/2) / (h[j+1] - h[j]);
         drbdh2[j] = ((rhov+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hv)/2) / (h[j+1] - h[j]);
       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then
         // 2-phase/liquid
-        rhobar[j] = (CC*log(rho[j]/rhol) + (rhol + rho[j+1])*(h[j+1] - hl)/2) /
+        rhobar[j] = (AA*log(rho[j]/rhol) + (rhol + rho[j+1])*(h[j+1] - hl)/2) /
                     (h[j+1] - h[j]);
-        drbdp[j] = (AA*log(rho[j]/rhol) + BB*(rho[j] - rhol) + (drl_dp + drdp[
-          j + 1])*(h[j + 1] - hl)/2)/(h[j + 1] - h[j]);
+        drbdp[j] = (AA1*log(rho[j]/rhol) +
+                    AA*(1/rho[j] * drdp[j] - 1/rhol * drldp) +
+                    (drldp + drdp[j+1])*(h[j+1] - hl)/2 - (rhol + rho[j+1])/2 * dhldp) /
+                   (h[j + 1] - h[j]);
         drbdh1[j] = (rhobar[j] - rho[j]) / (h[j+1] - h[j]);
         drbdh2[j] = ((rhol+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hl)/2) / (h[j+1] - h[j]);
       elseif noEvent(h[j] > hv and h[j + 1] < hl) then
         // vapour/2-phase/liquid
-        rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + CC*log(rhov/rhol) + (
-          rhol + rho[j + 1])*(h[j + 1] - hl)/2)/(h[j + 1] - h[j]);
-        drbdp[j] = ((drdp[j] + drv_dp)*(hv - h[j])/2 + AA*log(rhov/rhol) +
-                     BB*(rhov - rhol) + (drl_dp + drdp[j + 1])*(h[j + 1] - hl)/2) /
+        rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + AA*log(rhov/rhol) +
+                     (rhol + rho[j+1])*(h[j+1] - hl)/2) / (h[j+1] - h[j]);
+        drbdp[j] = ((drdp[j] + drvdp)*(hv - h[j])/2 + (rho[j]+rhov)/2 * dhvdp +
+                    AA1*log(rhov/rhol) +
+                    AA*(1/rhov * drvdp - 1/rhol * drldp) +
+                    (drldp + drdp[j+1])*(h[j+1] - hl)/2 - (rhol+rho[j+1])/2 * dhldp) /
                    (h[j+1] - h[j]);
         drbdh1[j] = (rhobar[j] - (rho[j]+rhov)/2 + drdh[j]*(hv-h[j])/2) / (h[j+1] - h[j]);
         drbdh2[j] = ((rhol+rho[j+1])/2 - rhobar[j] + drdh[j+1]*(h[j+1]-hl)/2) / (h[j+1] - h[j]);
       else
         // vapour/2-phase
-        rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + CC*log(rhov/rho[j + 1])) / (h[j + 1] - h[j]);
-        drbdp[j] = ((drdp[j] + drv_dp)*(hv - h[j])/2 + AA*log(rhov/rho[j + 1]) +
-                     BB*(rhov - rho[j + 1])) / (h[j + 1] - h[j]);
+        rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + AA*log(rhov/rho[j+1])) / (h[j+1] - h[j]);
+        drbdp[j] = ((drdp[j] + drvdp)*(hv - h[j])/2 + (rho[j]+rhov)/2 * dhvdp +
+                    AA1*log(rhov/rho[j+1]) + AA*(1/rhov * drvdp - 1/rho[j+1] * drdp[j+1])) /
+                   (h[j + 1] - h[j]);
         drbdh1[j] = (rhobar[j] - (rho[j]+rhov)/2 + drdh[j]*(hv-h[j])/2) / (h[j+1] - h[j]);
         drbdh2[j] = (rho[j+1] - rhobar[j]) / (h[j+1] - h[j]);
       end if;
@@ -1394,8 +1408,6 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     // Saturated fluid property calculations
     sat = Medium.setSat_p(p);
     Ts=sat.Tsat;
-    bubble=Medium.setBubbleState(sat,1);
-    dew=Medium.setDewState(sat,1);
     rhol=Medium.bubbleDensity(sat);
     rhov=Medium.dewDensity(sat);
     hl=Medium.bubbleEnthalpy(sat);
@@ -1404,13 +1416,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     drvdp=Medium.dDewDensity_dPressure(sat);
     dhldp=Medium.dBubbleEnthalpy_dPressure(sat);
     dhvdp=Medium.dDewEnthalpy_dPressure(sat);
-    drl_dp=Medium.density_derp_h(bubble);
-    drv_dp=Medium.density_derp_h(dew);
-    AA = ((dhvdp - dhldp)*(rhol - rhov)*rhol*rhov - (hv - hl)*(rhov^2*drldp
-       - rhol^2*drvdp))/(rhol - rhov)^2;
-    BB = ((hv - hl)*(rhov*drldp - rhol*drvdp)/(rhol - rhov) + dhldp*rhol -
-      dhvdp*rhov)/(rhol - rhov);
-    CC = (hv - hl)/(1/rhov - 1/rhol);
+    AA = (hv - hl)/(1/rhov - 1/rhol);
+    AA1 = ((dhvdp - dhldp)*(rhol - rhov)*rhol*rhov
+            - (hv - hl)*(rhov^2*drldp - rhol^2*drvdp))/(rhol - rhov)^2;
     
     // Fluid property calculations
     for j in 1:N loop
