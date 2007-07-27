@@ -796,7 +796,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean DynamicMomentum=false "Inertial phenomena accounted for" annotation(Evaluate = true);
     parameter HCtypes.Temp HydraulicCapacitance = HCtypes.Downstream 
       "Location of the hydraulic capacitance";
-    parameter Boolean avoidInletEnthalpyDerivative = false 
+    parameter Boolean avoidInletEnthalpyDerivative = true 
       "Avoid inlet enthalpy derivative";
     parameter Pressure pstartin=1e5 "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -1477,6 +1477,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       "Coefficient of heat transfer for boiling flow";
     parameter Real xCHF=0.9 
       "Steam quality corresponding to the Critical Heat Flux";
+    Medium.ThermodynamicState bubble "Bubble point state";
+    Medium.ThermodynamicState dew "Dew point state";
   protected 
     CoefficientOfHeatTransfer gamma[N] "Raw heat transfer coefficient";
     CoefficientOfHeatTransfer gamma_ls "H.t.c. just before bubble point";
@@ -1496,6 +1498,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     hCHF = hl + xCHF*(hv - hl) 
       "Specific enthalpy corresponding to critical heat flux";
     // Saturated fluid properties
+    bubble = Medium.setBubbleState(sat,1);
+    dew = Medium.setDewState(sat,1);
     mu_ls =  Medium.dynamicViscosity(bubble);
     k_ls =  Medium.thermalConductivity(bubble);
     cp_ls = Medium.heatCapacity_cp(bubble);
@@ -1613,6 +1617,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     "1-dimensional fluid flow model for 2-phase boiling flow (finite volumes, 2-phase, Chen correlation)" 
     extends Flow1D2ph(redeclare Thermal.DHThtc wall);
     parameter Real xCHF=0.9 "Steam quality corresponding to Critical Heat Flux";
+    Medium.ThermodynamicState bubble "Bubble point state";
+    Medium.ThermodynamicState dew "Dew point state";
   protected 
     CoefficientOfHeatTransfer gamma[N] "Raw heat transfer coefficient";
     CoefficientOfHeatTransfer gamma_ls "H.t.c. just before bubble point";
@@ -1634,6 +1640,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     hCHF = hl + xCHF*(hv - hl) 
       "Specific enthalpy corresponding to critical heat flux";
     // Saturated water and steam properties
+    bubble = Medium.setBubbleState(sat,1);
+    dew = Medium.setDewState(sat,1);
     mu_ls =  Medium.dynamicViscosity(bubble);
     k_ls =  Medium.thermalConductivity(bubble);
     cp_ls = Medium.heatCapacity_cp(bubble);
