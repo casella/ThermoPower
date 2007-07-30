@@ -2,24 +2,33 @@ package ThermoPower "Open library for thermal power plant simulation"
   import Modelica.Math.*;
   import Modelica.SIunits.*;
 
+
   type HydraulicConductance = Real (final quantity="HydraulicConductance",
         final unit="(kg/s)/Pa");
+
 
   type HydraulicResistance = Real (final quantity="HydraulicResistance", final unit
       =      "Pa/(kg/s)");
 
+
   type PerUnit = Real (
                      final quantity="PerUnit",final unit="pu");
 
+
   type Density = Modelica.SIunits.Density (start=40) "generic start value";
+
 
   type LiquidDensity = Density (start=1000) "start value for liquids";
 
+
   type GasDensity = Density (start=5) "start value for gases/vapours";
+
 
   type AbsoluteTemperature = Temperature (start=300) "generic temperature";
 
+
   type AbsolutePressure = Pressure (start=1e5) "generic pressure";
+
 
   package Icons "Icons for ThermoPower library" 
     extends Modelica.Icons.Library;
@@ -573,6 +582,7 @@ package ThermoPower "Open library for thermal power plant simulation"
     end Gas;
   end Icons;
 
+
   package Functions "Miscellaneous functions" 
     extends Modelica.Icons.Library;
     function linear 
@@ -754,7 +764,8 @@ This package contains general-purpose functions and models
       "Base class for pump power consumption characteristics" 
         extends Modelica.Icons.Function;
         input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
-        output Modelica.SIunits.Power consumption "Power consumption";
+        output Modelica.SIunits.Power consumption 
+        "Power consumption at nominal density";
       end basePower;
     
       partial function baseEfficiency 
@@ -770,17 +781,16 @@ This package contains general-purpose functions and models
         "Volume flow rate for two operating points (single pump)";
         input Modelica.SIunits.Height head_nom[2] 
         "Pump head for two operating points";
-    protected 
-        constant Real g = Modelica.Constants.g_n;
         /* Linear system to determine the coefficients:
-  head_nom[1]*g = c[1] + q_nom[1]*c[2];
-  head_nom[2]*g = c[1] + q_nom[2]*c[2];
+  head_nom[1] = c[1] + q_nom[1]*c[2];
+  head_nom[2] = c[1] + q_nom[2]*c[2];
   */
-        Real c[2] = Modelica.Math.Matrices.solve([ones(2),q_nom],head_nom*g) 
+    protected 
+        Real c[2] = Modelica.Math.Matrices.solve([ones(2),q_nom],head_nom) 
         "Coefficients of linear head curve";
       algorithm 
-        // Flow equation: head * g = q*c[1] + c[2];
-        head := 1/g * (c[1] + q_flow*c[2]);
+        // Flow equation: head = q*c[1] + c[2];
+        head :=  c[1] + q_flow*c[2];
       end linearFlow;
     
       function quadraticFlow "Quadratic flow characteristic" 
@@ -790,52 +800,67 @@ This package contains general-purpose functions and models
         input Modelica.SIunits.Height head_nom[3] 
         "Pump head for three operating points";
     protected 
-        constant Real g = Modelica.Constants.g_n;
         Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
         "Squared nominal flow rates";
         /* Linear system to determine the coefficients:
-  head_nom[1]*g = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
-  head_nom[2]*g = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
-  head_nom[3]*g = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  head_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  head_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
   */
-        Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],head_nom*g) 
+        Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],head_nom) 
         "Coefficients of quadratic head curve";
       algorithm 
-        // Flow equation: head * g = c[1] + q_flow*c[2] + q_flow^2*c[3];
-        head := 1/g * (c[1] + q_flow*c[2] + q_flow^2*c[3]);
+        // Flow equation: head = c[1] + q_flow*c[2] + q_flow^2*c[3];
+        head := c[1] + q_flow*c[2] + q_flow^2*c[3];
       end quadraticFlow;
     
       function polynomialFlow "Polynomial flow characteristic" 
         extends baseFlow;
         input Modelica.SIunits.VolumeFlowRate q_nom[:] 
-        "Volume flow rate for three operating points (single pump)";
+        "Volume flow rate for N operating points (single pump)";
         input Modelica.SIunits.Height head_nom[:] 
-        "Pump head for three operating points";
+        "Pump head for N operating points";
     protected 
-        constant Real g = Modelica.Constants.g_n;
         Integer N = size(q_nom,1) "Number of nominal operating points";
         Real q_nom_pow[N,N] = {{q_nom[j]^(i-1) for j in 1:N} for i in 1:N} 
         "Rows: different operating points; columns: increasing powers";
         /* Linear system to determine the coefficients (example N=3):
-  head_nom[1]*g = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
-  head_nom[2]*g = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
-  head_nom[3]*g = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  head_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  head_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
   */
-        Real c[N] = Modelica.Math.Matrices.solve(q_nom_pow,head_nom*g) 
+        Real c[N] = Modelica.Math.Matrices.solve(q_nom_pow,head_nom) 
         "Coefficients of polynomial head curve";
       algorithm 
-        // Flow equation (example N=3): head * g = c[1] + q_flow*c[2] + q_flow^2*c[3];
-        // Note: the implementation is numerically efficient only for low values of Na
-        head := 1/g * sum(q_flow^(i-1)*c[i] for i in 1:N);
+        // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
+        // Note: the implementation is numerically efficient only for low values of N
+        head := sum(q_flow^(i-1)*c[i] for i in 1:N);
       end polynomialFlow;
     
-      function constantEfficiency "Constant efficiency characteristic" 
-         extends baseEfficiency;
-         input Real eta_nom "Nominal efficiency";
+      function constantPower "Constant power consumption characteristic" 
+          extends basePower;
+        input Modelica.SIunits.Power power = 0 "Constant power consumption";
       algorithm 
-        eta := eta_nom;
-      end constantEfficiency;
-    
+        consumption := power;
+      end constantPower;
+
+      function linearPower "Linear power consumption characteristic" 
+        extends basePower;
+        input Modelica.SIunits.VolumeFlowRate q_nom[2] 
+        "Volume flow rate for two operating points (single pump)";
+        input Modelica.SIunits.Power W_nom[2] 
+        "Power consumption for two operating points";
+        /* Linear system to determine the coefficients:
+  W_nom[1] = c[1] + q_nom[1]*c[2];
+  W_nom[2] = c[1] + q_nom[2]*c[2];
+  */
+    protected 
+        Real c[2] = Modelica.Math.Matrices.solve([ones(2),q_nom],W_nom) 
+        "Coefficients of quadratic power consumption curve";
+      algorithm 
+        consumption := c[1] + q_flow*c[2];
+      end linearPower;
+
       function quadraticPower "Quadratic power consumption characteristic" 
         extends basePower;
         input Modelica.SIunits.VolumeFlowRate q_nom[3] 
@@ -846,22 +871,24 @@ This package contains general-purpose functions and models
         Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
         "Squared nominal flow rates";
         /* Linear system to determine the coefficients:
-  W_nom[1]*g = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
-  W_nom[2]*g = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
-  W_nom[3]*g = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  W_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  W_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  W_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
   */
         Real c[3] = Modelica.Math.Matrices.solve([ones(3),q_nom,q_nom2],W_nom) 
         "Coefficients of quadratic power consumption curve";
       algorithm 
         consumption := c[1] + q_flow*c[2] + q_flow^2*c[3];
       end quadraticPower;
-    
-      function constantPower "Constant power consumption characteristic" 
-          extends basePower;
-        input Modelica.SIunits.Power power = 0 "Constant power consumption";
+
+      function constantEfficiency "Constant efficiency characteristic" 
+         extends baseEfficiency;
+         input Real eta_nom "Nominal efficiency";
       algorithm 
-        consumption := power;
-      end constantPower;
+        eta := eta_nom;
+      end constantEfficiency;
+    
+    
     end PumpCharacteristics;
   
     package ValveCharacteristics "Functions for valve characteristics" 
@@ -1103,6 +1130,7 @@ This characteristic is such that the relative change of the flow coefficient is 
     end FanCharacteristics;
   end Functions;
 
+
   annotation (Documentation(info="<HTML>
 <p><h2>General Information</h2></p>
 <p>The ThermoFluid library is an open Modelica library for the dynamic modeling of thermal power plants.
@@ -1169,6 +1197,7 @@ Modelica in file \"Modelica/package.mo\".
         version="1",
         script="ConvertFromThermoPower_1.mos",
         version="")));
+
 
   package Electrical "Simplified models of electric power components" 
     extends Modelica.Icons.Library;
