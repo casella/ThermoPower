@@ -3934,9 +3934,6 @@ li><i>1 Jul 2004</i>
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.BaseProperties inletFluid(p(start=pin_start),h(start=hstart)) 
       "Fluid properties at the inlet";
-    replaceable package SatMedium = 
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium 
-      "Saturated medium model (required only for NPSH computation)";
     replaceable function flowCharacteristic = 
         Functions.PumpCharacteristics.baseFlow 
       "Head vs. q_flow characteristic at nominal speed and density" 
@@ -3963,7 +3960,6 @@ li><i>1 Jul 2004</i>
        annotation(Dialog(group="Characteristics"));
     parameter Volume V=0 "Pump Internal Volume" annotation(Evaluate=true);
     parameter Boolean CheckValve=false "Reverse flow stopped";
-    parameter Boolean ComputeNPSHa=false "Compute NPSH Available at the inlet";
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
       "Initialisation option" annotation(Dialog(tab="Initialisation"));
     parameter Pressure pin_start "Inlet Pressure Start Value" 
@@ -3995,8 +3991,6 @@ li><i>1 Jul 2004</i>
       "Small coefficient to avoid numerical singularities";
     constant AngularVelocity_rpm n_eps=1e-6;
     Real eta "Pump efficiency";
-    Height NPSHa "Net Positive Suction Head available";
-    Medium.AbsolutePressure pv "Saturated liquid pressure";
     Real s "Auxiliary Variable";
     FlangeA infl(p(start=pin_start),hAB(start=hstart),
       redeclare package Medium = Medium) 
@@ -4062,14 +4056,6 @@ li><i>1 Jul 2004</i>
       0 = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single "Energy balance";
     end if;
     
-    // NPSH computations
-    if ComputeNPSHa then
-      pv=SatMedium.saturationPressure(inletFluid.T);
-      NPSHa=(infl.p-pv)/(rho*g);
-    else
-      pv=0;
-      NPSHa=0;
-    end if;
   initial equation 
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -4173,6 +4159,24 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </html>"));
   end Pump;
   
+  model PumpNPSH 
+    extends Pump(redeclare replaceable package Medium = 
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium);
+    Height NPSHa "Net Positive Suction Head available";
+    Medium.AbsolutePressure pv "Saturated liquid pressure";
+  equation 
+    pv=Medium.saturationPressure(inletFluid.T);
+    NPSHa=(infl.p-pv)/(rho*g);
+    annotation (Documentation(info="<html>Same as Pump. Additionally, the net positive suction head available is computed. Requires a two-phase medium model to compute the saturation properties.
+</html>", revisions="<html>
+<ul>
+<li><i>30 Jul 2007</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Added (removed NPSH from Pump model).</li>
+</ul>
+</html>"));
+  end PumpNPSH;
+
   model PumpMech "Centrifugal pump with mechanical connector for the shaft" 
     extends PumpBase;
     extends Icons.Water.PumpMech;
