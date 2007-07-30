@@ -2623,7 +2623,7 @@ Algorithm Tolerance = 1e-9
     Modelica.Blocks.Sources.Ramp hIn(
       height=1e5,
       offset=4e5,
-      startTime=100, 
+      startTime=100,
       duration=2)     annotation (extent=[-92,-8; -72,12]);
     Modelica.Blocks.Sources.Ramp extPower(
       startTime=10,
@@ -2661,7 +2661,7 @@ Algorithm Tolerance = 1e-9
   initial equation 
     Mbal = Mhex;
   end TestFlow1D2phA;
-
+  
   model TestFlow1D2phB "Test case for Flow1D2ph" 
     package Medium=Modelica.Media.Water.WaterIF97_ph;
     import Modelica.Constants.*;
@@ -2729,7 +2729,7 @@ Algorithm Tolerance = 1e-9
       wnom=1,
       FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
       initOpt=ThermoPower.Choices.Init.Options.steadyState,
-      redeclare package Medium = Medium, 
+      redeclare package Medium = Medium,
       avoidInletEnthalpyDerivative=true) 
                    annotation (extent=[-22,-28; -2,-8]);
     ThermoPower.Water.ValveLin valve(           redeclare package Medium = 
@@ -3238,16 +3238,16 @@ Algorithm Tolerance = 1e-9
     end for;
     annotation (
       experiment(
-        StopTime=19, 
-        NumberOfIntervals=5000, 
+        StopTime=19,
+        NumberOfIntervals=5000,
         Tolerance=1e-009),
-      experimentSetupOutput, 
+      experimentSetupOutput,
       Documentation(info="<html>
 This model checks the dynamic mass balance equations of Flow1D2ph, by prescribing enthalpy and pressure values that will ensure complete coverage of the different cases.
 </html>"));
     
   end CheckFlow1D2phMassBalance;
-
+  
   model TestFlow1D2phDB "Test case for Flow1D2phDB" 
     package Medium=Modelica.Media.Water.WaterIF97_ph;
     import Modelica.Constants.*;
@@ -3975,11 +3975,12 @@ Casella</a>:<br>
   end Flow1D_check;
   
   model WaterPump "Test case for WaterPump" 
+    
     annotation (
       Diagram,
       experiment(StopTime=10, Tolerance=1e-006),
       Documentation(info="<HTML>
-<p>This model tests the <tt>Pump</tt> model with the check valve option active.
+<p>This model tests the <tt>Pump</tt> model with the check valve option active. Two pumps in parallel are simulated.
 <p>The valve is opened at time t=1s. The sink pressure is then increased so as to operate the pump in all the possible working conditions, including stopped flow.
 <p>
 Simulation Interval = [0...10] sec <br> 
@@ -3987,6 +3988,10 @@ Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6 
 </HTML>", revisions="<html>
 <ul>
+<li><i>30 Jul 2007</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+       Updated.</li>
 <li><i>5 Nov 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
@@ -3998,7 +4003,6 @@ Schiavo</a>:<br>
 </ul>
 
 </html>"));
-    package Medium=Modelica.Media.Water.WaterIF97_ph;
     ThermoPower.Water.SourceP Source(p0=1e5, h=1.5e5) 
       annotation (extent=[-80,-20; -60,0]);
     ThermoPower.Water.ValveLin ValveLin1(Kv=1e-5) 
@@ -4023,15 +4027,13 @@ Schiavo</a>:<br>
     initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                         annotation (extent=[-54,26; -34,46]);
 */
-    ThermoPower.Water.Pump Pump1(
+    Water.PumpNPSH Pump1(
       rho0=1000,
       pin_start=1e5,
       pout_start=4e5,
       hstart=1e5,
       V=0.01,
       redeclare package Medium = Modelica.Media.Water.StandardWater,
-      redeclare package SatMedium = Modelica.Media.Water.StandardWater,
-      ComputeNPSHa=true,
       CheckValve=true,
       redeclare function flowCharacteristic = 
           ThermoPower.Functions.PumpCharacteristics.quadraticFlow (
@@ -4042,24 +4044,25 @@ Schiavo</a>:<br>
       initOpt=ThermoPower.Choices.Init.Options.noInit,
       Np0=2,
       usePowerCharacteristic=true,
-      n0=1500)            annotation (extent=[-46,-20; -26,0]);
+      n0=1500)            annotation (extent=[-42,-20; -22,0]);
     
     Modelica.Blocks.Sources.Ramp Ramp1(
-      height=4e5,
-      offset=4e5,
       duration=4,
-      startTime=4) annotation (extent=[0,40; 20,60]);
-    Modelica.Blocks.Sources.Step Step1(
+      startTime=4, 
+      height=6e5, 
+      offset=1e5)  annotation (extent=[0,40; 20,60]);
+    Modelica.Blocks.Sources.Ramp Step1(
       height=1,
       startTime=1,
-      offset=1e-6) annotation (extent=[-60,22; -40,42]);
+      offset=1e-6, 
+      duration=1)  annotation (extent=[-60,22; -40,42]);
   equation 
     connect(ValveLin1.outlet, SinkP1.flange) 
       annotation (points=[34,-12; 48,-12]);
     connect(Source.flange, Pump1.infl) 
-      annotation (points=[-60,-10; -52,-10; -52,-7.8; -44,-7.8]);
+      annotation (points=[-60,-10; -52,-10; -52,-7.8; -40,-7.8]);
     connect(Pump1.outfl, ValveLin1.inlet) 
-      annotation (points=[-30,-2.8; -8,-2.8; -8,-12; 14,-12]);
+      annotation (points=[-26,-2.8; -8,-2.8; -8,-12; 14,-12]);
     connect(Ramp1.y, SinkP1.in_p0) annotation (points=[21,50; 54,50; 54,-3.2],
         style(color=74, rgbcolor={0,0,127}));
     connect(Step1.y, ValveLin1.cmd) annotation (points=[-39,32; -18,32; -18,12;
