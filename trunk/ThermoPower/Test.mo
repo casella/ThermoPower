@@ -4048,13 +4048,13 @@ Schiavo</a>:<br>
     
     Modelica.Blocks.Sources.Ramp Ramp1(
       duration=4,
-      startTime=4, 
-      height=6e5, 
+      startTime=4,
+      height=6e5,
       offset=1e5)  annotation (extent=[0,40; 20,60]);
     Modelica.Blocks.Sources.Ramp Step1(
       height=1,
       startTime=1,
-      offset=1e-6, 
+      offset=1e-6,
       duration=1)  annotation (extent=[-60,22; -40,42]);
   equation 
     connect(ValveLin1.outlet, SinkP1.flange) 
@@ -4754,8 +4754,10 @@ Algorithm Tolerance = 1e-4
           80; 58,41.6], style(color=74, rgbcolor={0,0,127}));
   end TestConvHT2N;
   
-  model TestGasFlow1D 
-    package Medium=Modelica.Media.IdealGases.MixtureGases.AirSteam;
+  model TestGasFlow1DA 
+    replaceable package Medium = 
+        Modelica.Media.IdealGases.SingleGases.N2 
+      extends Modelica.Media.Interfaces.PartialMedium;
     parameter Integer Nnodes=10 "number of Nodes";
     parameter Modelica.SIunits.Length Lhex=200 "total length";
     parameter Modelica.SIunits.Diameter Dihex=0.02 "internal diameter";
@@ -4772,7 +4774,9 @@ Algorithm Tolerance = 1e-4
     parameter Temperature Touthex=300 "initial outlet temperature";
    // parameter Temperature deltaT=10 "height of temperature step";
     parameter Modelica.SIunits.EnergyFlowRate W=1e3 "height of power step";
-    parameter Real deltaX[2]={.25,-.25} "offset and height of composition step";
+    Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
+    Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
+    Modelica.SIunits.Mass Merr "Mass balance error";
     
     Gas.SourceW SourceW1(
       redeclare package Medium = Medium,
@@ -4787,7 +4791,7 @@ Algorithm Tolerance = 1e-4
       annotation (extent=[-48,-2; -28,18]);
     Gas.SensT SensT2(redeclare package Medium = Medium) 
       annotation (extent=[46,-2; 66,18]);
-    Gas.Flow1D Flow1D1(
+    Gas.Flow1D hex(
       redeclare package Medium = Medium,
       N=Nnodes,
       L=Lhex,
@@ -4799,7 +4803,6 @@ Algorithm Tolerance = 1e-4
       Tstartin=Tinhex,
       Tstartout=Touthex,
       pstart=phex,
-      UniformComposition=true,
       FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
       initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                     annotation (extent=[-14,-6; 6,14]);
@@ -4821,21 +4824,21 @@ Algorithm Tolerance = 1e-4
       startTime=10) annotation (extent=[-110,14; -90,34]);
     Modelica.Blocks.Sources.Step Step2(
       height=-0.2,
-      offset=1,
-      startTime=30) 
+      offset=1, 
+      startTime=40) 
       annotation (extent=[8,46; 28,66]);
   equation 
     connect(SourceW1.flange, SensT1.inlet) annotation (points=[-60,4; -44,4],
         style(color=76, rgbcolor={159,159,223}));
-    connect(SensT1.outlet, Flow1D1.infl)   annotation (points=[-32,4; -14,4],
+    connect(SensT1.outlet, hex.infl)       annotation (points=[-32,4; -14,4],
         style(color=76, rgbcolor={159,159,223}));
-    connect(Flow1D1.outfl, ValveLin1.inlet)   annotation (points=[6,4; 20,4],
+    connect(hex.outfl, ValveLin1.inlet)       annotation (points=[6,4; 20,4],
         style(color=76, rgbcolor={159,159,223}));
     connect(ValveLin1.outlet, SensT2.inlet) annotation (points=[40,4; 50,4],
         style(color=76, rgbcolor={159,159,223}));
     connect(SensT2.outlet, SinkP1.flange) annotation (points=[62,4; 76,4],
         style(color=76, rgbcolor={159,159,223}));
-    connect(HeatSource1D1.wall, Flow1D1.wall)   annotation (points=[-6,27; -6,
+    connect(HeatSource1D1.wall, hex.wall)       annotation (points=[-6,27; -6,
           9; -4,9],     style(color=45, rgbcolor={255,127,0}));
     connect(Step1.y, HeatSource1D1.power) annotation (points=[-9,60; -6,60;
           -6,34], style(color=74, rgbcolor={0,0,127}));
@@ -4843,18 +4846,64 @@ Algorithm Tolerance = 1e-4
         style(color=74, rgbcolor={0,0,127}));
     connect(Step2.y, ValveLin1.cmd) annotation (points=[29,56; 42,56; 42,32;
           30,32; 30,11], style(color=74, rgbcolor={0,0,127}));
-    annotation (Diagram, experiment(StopTime=50),
+    annotation (Diagram, experiment(StopTime=60, Tolerance=1e-007),
       Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Gas.Flow1D</tt> (fluid side of a heat exchanger, finite volumes).<br>
-The model starts at steady state. At t = 10 s, step variation of the temperature of the fluid entering the heat exchanger. At t = 20 s, step variation of the thermal flow entering the heat exchanger lateral surface. At t = 30 s, step reduction of the outlet valve opening.
+The model starts at steady state. At t = 10 s, step variation of the temperature of the fluid entering the heat exchanger. At t = 20 s, step variation of the thermal flow entering the heat exchanger lateral surface. At t = 50 s, step reduction of the outlet valve opening.<br>
+The working fluid is pure nitrogen.
 </ul>
 <p>
-Simulation Interval = [0...50] sec <br> 
+Simulation Interval = [0...60] sec <br> 
 Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6 
-</HTML>"));
-  end TestGasFlow1D;
+</HTML>"),
+      experimentSetupOutput);
+    Mhex = hex.M;
+    der(Mbal) = hex.infl.w + hex.outfl.w;
+    Merr = Mhex-Mbal;
+  initial equation 
+    Mbal = Mhex;
+    
+  end TestGasFlow1DA;
   
+  model TestGasFlow1DB 
+    extends TestGasFlow1DA(
+      redeclare package Medium = 
+          Modelica.Media.IdealGases.MixtureGases.CombustionAir);
+    parameter Real deltaX[2]={.05,-.05} "height of composition step";
+    
+    annotation (
+      experiment(StopTime=50), 
+      experimentSetupOutput, 
+      Diagram, 
+      Documentation(info="<html>
+Same as <tt>TestGasFlow1DA</tt>, but with mixture fluid (CombustionAir) and UniformComposition = true. The inlet composition is changed stepwise at time t = 30;
+</html>"));
+    Modelica.Blocks.Sources.Step[2] Step3(
+      height=deltaX,
+      startTime=30,
+      offset=Medium.reference_X) 
+                    annotation (extent=[-98,58; -78,78]);
+  equation 
+    connect(Step3.y, SourceW1.in_X) annotation (points=[-77,68; -64,68; -64,9], 
+        style(color=74, rgbcolor={0,0,127}));
+  end TestGasFlow1DB;
+  
+  
+  model TestGasFlow1DC 
+    extends TestGasFlow1DB(hex(UniformComposition=false));
+    annotation (Documentation(info="<html>
+Same as <tt>TestGasFlow1DB</tt>, but with UniformComposition = false. The outlet composition transient is computed with greater accuracy.
+</html>"));
+  end TestGasFlow1DC;
+
+  model TestGasFlow1DD 
+    extends TestGasFlow1DB(hex(QuasiStatic=true));
+    annotation (Documentation(info="<html>
+Same as <tt>TestGasFlow1DB</tt>, but with QuasiStatic = true; the model is purely algebraic (no mass and energy storage).
+</html>"));
+  end TestGasFlow1DD;
+
   model TestGasPlenum 
     package Medium=Modelica.Media.IdealGases.MixtureGases.CombustionAir;
     annotation (Diagram, Documentation(info="<html>
