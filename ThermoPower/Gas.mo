@@ -405,7 +405,7 @@ The latter options can be useful when two or more components are connected direc
 </html>"),
       Diagram);
   end ThroughW;
-
+  
   model Plenum "Rigid adiabatic volume" 
     extends Icons.Gas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
@@ -1350,6 +1350,8 @@ The latter options can be useful when two or more components are connected direc
     parameter Boolean QuasiStatic=false 
       "Quasi-static model (mass, energy and momentum static balances" annotation(Evaluate=true);
     parameter Integer HydraulicCapacitance=2 "1: Upstream, 2: Downstream";
+    parameter Boolean avoidInletEnthalpyDerivative = true 
+      "Avoid inlet enthalpy derivative";
     parameter AbsoluteTemperature Tstartin=300 "Inlet temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstartout=300 
@@ -1392,8 +1394,9 @@ The latter options can be useful when two or more components are connected direc
     Real dwdt "Time derivative of mass flow rate";
     Real Cf "Fanning friction factor";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
-    AbsoluteTemperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))
-          /(N - 1)*(Tstartout - Tstartin)) "Temperature state variables";
+    AbsoluteTemperature Ttilde[N - 1](
+      start=ones(N - 1)*Tstartin + (1:(N - 1))/(N - 1)*(Tstartout - Tstartin),
+      stateSelect=StateSelect.prefer) "Temperature state variables";
     Real Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
         stateSelect=StateSelect.prefer) "Composition state variables";
@@ -1409,12 +1412,16 @@ The latter options can be useful when two or more components are connected direc
     Density rhobar[N - 1] "Fluid average density";
     SpecificVolume vbar[N - 1] "Fluid average specific volume";
     HeatFlux phibar[N - 1] "Average heat flux";
-    DerDensityByTemperature drbdT[N - 1] 
-      "Derivative of average density by temperature";
     DerDensityByPressure drbdp[N - 1] 
       "Derivative of average density by pressure";
-    Real drbdX[N - 1, nX](unit="kg/m3") 
-      "Derivative of average density by composition";
+    DerDensityByTemperature drbdT1[N - 1] 
+      "Derivative of average density by left temperature";
+    DerDensityByTemperature drbdT2[N - 1] 
+      "Derivative of average density by right temperature";
+    Real drbdX1[N - 1, nX](unit="kg/m3") 
+      "Derivative of average density by left composition";
+    Real drbdX2[N - 1, nX](unit="kg/m3") 
+      "Derivative of average density by right composition";
     Medium.SpecificHeatCapacity cvbar[N - 1] "Average cv";
     Real dMdt[N - 1] "Derivative of mass in a finite volume";
     Medium.SpecificHeatCapacity cv[N];
@@ -1460,14 +1467,34 @@ The latter options can be useful when two or more components are connected direc
         // Dynamic mass and energy balances
         A*l*rhobar[j]*cvbar[j]*der(Ttilde[j]) + wbar[j]*(gas[j + 1].h - gas[j].h) =
           l*omega*phibar[j] "Energy balance";
-        dMdt[j] = A*l*(drbdT[j]*der(Ttilde[j]) + drbdp[j]*der(p) + vector(drbdX[j, :])*
-          vector(der(Xtilde[if UniformComposition then 1 else j, :]))) 
+        dMdt[j] = A*l*(drbdp[j]*der(p)+
+                       drbdT1[j]*der(gas[j].T) + drbdT2[j]*der(gas[j+1].T) +
+                       vector(drbdX1[j, :])*vector(der(gas[j].X))+
+                       vector(drbdX2[j, :])*vector(der(gas[j+1].X))) 
           "Mass balance";
+  /*
+      dMdt[j] = A*l*(drbdT[j]*der(Ttilde[j]) + drbdp[j]*der(p) + vector(drbdX[j, :])*
+      vector(der(Xtilde[if UniformComposition then 1 else j, :]))) 
+      "Mass balance";
+*/
         // Average volume quantities
-        rhobar[j] = (gas[j].d + gas[j + 1].d)/2;
-        drbdp[j] = (dddp[j] + dddp[j + 1])/2;
-        drbdT[j] = (dddT[j] + dddT[j + 1])/2;
-        drbdX[j, :] = (dddX[j,:] + dddX[j + 1,:])/2;
+        if avoidInletEnthalpyDerivative and j == 1 then
+        // first volume properties computed by the volume outlet properties
+          rhobar[j] = gas[j+1].d;
+          drbdp[j] = dddp[j+1];
+          drbdT1[j] = 0;
+          drbdT2[j] = dddT[j+1];
+          drbdX1[j, :] = zeros(size(Xtilde,2));
+          drbdX2[j, :] = dddX[j+1,:];
+        else
+        // volume properties computed by averaging
+          rhobar[j] = (gas[j].d + gas[j+1].d)/2;
+          drbdp[j] = (dddp[j] + dddp[j+1])/2;
+          drbdT1[j] = dddT[j]/2;
+          drbdT2[j] = dddT[j+1]/2;
+          drbdX1[j, :] = dddX[j,:]/2;
+          drbdX2[j, :] = dddX[j+1,:]/2;
+        end if;
         vbar[j] = 1/rhobar[j];
         wbar[j] = infl.w/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
         cvbar[j]=(cv[j]+cv[j+1])/2;
@@ -1478,14 +1505,16 @@ The latter options can be useful when two or more components are connected direc
         // Dummy values for unused average quantities
         rhobar[j] = 0;
         drbdp[j] = 0;
-        drbdT[j] = 0;
-        drbdX[j, :] = zeros(nX);
+        drbdT1[j] = 0;
+        drbdT2[j] = 0;
+        drbdX1[j, :] = zeros(nX);
+        drbdX2[j, :] = zeros(nX);
         vbar[j] = 0;
         wbar[j] = infl.w/Nt;
         cvbar[j]= 0;
       end if;
     end for;
-    Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
+    Q = Nt*l*omega*sum(phibar) "Total heat flow through the lateral boundary";
     if Medium.fixedX then
       Xtilde = fill(Medium.reference_X, 1);
     elseif QuasiStatic then
@@ -1536,21 +1565,31 @@ The latter options can be useful when two or more components are connected direc
     outfl.hBA = gas[N].h;
     infl.XAB = gas[1].Xi;
     outfl.XBA = gas[N].Xi;
-    if w >= 0 then
+    
       gas[1].h = infl.hBA;
       gas[2:N].T = Ttilde;
       gas[1].Xi = infl.XBA;
       for j in 2:N loop
         gas[j].Xi = Xtilde[if UniformComposition then 1 else j - 1, 1:nXi];
       end for;
-    else
-      gas[N].h = outfl.hAB;
-      gas[1:N - 1].T = Ttilde;
-      gas[N].Xi = outfl.XAB;
-      for j in 1:N - 1 loop
-        gas[j].Xi = Xtilde[if UniformComposition then 1 else j, 1:nXi];
-      end for;
-    end if;
+  /*
+  if w >= 0 then
+    gas[1].h = infl.hBA;
+    gas[2:N].T = Ttilde;
+    gas[1].Xi = infl.XBA;
+    for j in 2:N loop
+      gas[j].Xi = Xtilde[if UniformComposition then 1 else j - 1, 1:nXi];
+    end for;
+  else
+    gas[N].h = outfl.hAB;
+    gas[1:N - 1].T = Ttilde;
+    gas[N].Xi = outfl.XAB;
+    for j in 1:N - 1 loop
+      gas[j].Xi = Xtilde[if UniformComposition then 1 else j, 1:nXi];
+    end for;
+  end if;
+*/
+    
     gas.T = wall.T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
     
