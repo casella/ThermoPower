@@ -1357,6 +1357,9 @@ The latter options can be useful when two or more components are connected direc
     parameter AbsoluteTemperature Tstartout=300 
       "Outlet temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tstart[N]=linspace(Tstartin,Tstartout,N) 
+      "Start value of temperature vector (initialized by default)" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pstart=101325 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Real wnf=0.01 
@@ -1381,7 +1384,7 @@ The latter options can be useful when two or more components are connected direc
   public 
     Medium.BaseProperties gas[N](
       p(start=ones(N)*pstart),
-      T(start=linspace(Tstartin,Tstartout,N)),
+      T(start=Tstart),
       state(p(start=ones(N)*pstart),
       T(start=ones(N)*Tstartin+(0:(N-1))/(N-1)*(Tstartout-Tstartin)))) 
       "Gas nodal properties";

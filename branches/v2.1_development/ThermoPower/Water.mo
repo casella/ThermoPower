@@ -859,8 +859,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     extends Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
     Medium.BaseProperties fluid[N](each p(start=pstartin),
-      h(start=linspace(hstartin, hstartout, N))) 
-      "Properties of the fluid at the nodes";
+      h(start=hstart)) "Properties of the fluid at the nodes";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction (total)";
     Pressure Dpfric1 
@@ -1146,8 +1145,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SpecificEnthalpy hzero=1e-3 "Small value for deltah";
     SmoothMedium.BaseProperties fluid[N](each p(start=pstartin),
-      h(start=linspace(hstartin, hstartout, N))) 
-      "Properties of the fluid at the nodes";
+      h(start=hstart)) "Properties of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction";
@@ -1807,8 +1805,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     import Modelica.Math.*;
     import ThermoPower.Choices.Flow1D.FFtypes;
     Medium.BaseProperties fluid[N](each p(start=pstartin),
-      h(start=linspace(hstartin, hstartout, N))) 
-      "Properties of the fluid at the nodes";
+      h(start=hstart)) "Properties of the fluid at the nodes";
     parameter Real alpha(
       min=0,
       max=1) = 1 "Numerical stabilization coefficient";
@@ -4176,7 +4173,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </html>"));
   end PumpNPSH;
-
+  
   model PumpMech "Centrifugal pump with mechanical connector for the shaft" 
     extends PumpBase;
     extends Icons.Water.PumpMech;
