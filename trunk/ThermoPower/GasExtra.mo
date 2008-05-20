@@ -411,7 +411,7 @@ double tabHI(12,4)   # table for HI_iso=h(ZLPout_iso,Tsync)
       
       Modelica.Mechanics.Rotational.ConstantSpeed ConstantSpeed1(w_fixed=5.23) 
         annotation (extent=[-92,-10; -72,10]);
-      ThermoPower.Gas.Compressor_low Compressor11_1(
+      Compressor_low Compressor11_1(
         redeclare package Medium=Medium,
         pstart_in=0.35e5,
         pstart_out=8.3e5,
@@ -420,7 +420,7 @@ double tabHI(12,4)   # table for HI_iso=h(ZLPout_iso,Tsync)
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.file,
         fileName="D:/mati_nuovo/ThermoPower/table/Compr_low.txt",
         Ndesign=523.3)           annotation (extent=[-50,12; -30,32]);
-      Gas.Turbine_low Turbine_low1(
+      Turbine_low Turbine_low1(
         redeclare package Medium = Medium,
         Tstart_in=691,
         Tstart_out=560,
@@ -724,7 +724,7 @@ public */
         w0=0.317) 
                  annotation (extent=[-38,40; -18,60]);
     equation 
-      connect(GTunit1.shaft_b, Inertia1.flange_a) annotation (points=[7.54,10;
+      connect(GTunit1.shaft_b, Inertia1.flange_a) annotation (points=[7.54,10; 
             26.68,10; 26.68,-16; 34,-16], style(color=0, rgbcolor={0,0,0}));
       connect(ConstantSpeed1.flange, Inertia1.flange_b) annotation (points=[82,
             -16; 54,-16],            style(color=0, rgbcolor={0,0,0}));
@@ -732,7 +732,8 @@ public */
             50; -14,24.4; -15,24.4],
                                    style(color=76, rgbcolor={159,159,223}));
      annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram);
-      connect(GTunit1.FlueGas_out, SinkP1.flange) annotation (points=[5.7,16; 34,16],
+      connect(GTunit1.FlueGas_out, SinkP1.flange) annotation (points=[5.7,16; 
+            34,16],
           style(color=76, rgbcolor={159,159,223}));
       connect(GTunit1.Air_in, SourceP1.flange) annotation (points=[-35.7,16; -80,
             16], style(color=76, rgbcolor={159,159,223}));
@@ -827,8 +828,8 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         wnom=158.5,
         Tstart=1267.33)        annotation (extent=[-60,28; -40,48]);
     equation 
-      connect(Turbine.outlet, SinkP1.flange)     annotation (points=[-7.8,38; 14,
-            38],          style(color=76, rgbcolor={159,159,223}));
+      connect(Turbine.outlet, SinkP1.flange)     annotation (points=[-7.8,38; 
+            14,38],       style(color=76, rgbcolor={159,159,223}));
       connect(Turbine.shaft_b, Inertia1.flange_a)     annotation (points=[-8.43,
             30; -4,30; -4,6; 4,6],
                                style(color=0, rgbcolor={0,0,0}));
