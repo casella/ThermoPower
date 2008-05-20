@@ -1190,8 +1190,8 @@ it can be redistributed and/or modified
 under the terms of the <b>Modelica license</b>, see the license conditions
 and the accompanying <b>disclaimer</b> in the documentation of package
 Modelica in file \"Modelica/package.mo\".
-<p><b>Copyright &copy; 2002-2004, Politecnico di Milano.</b></p>
-</HTML>"), uses(Modelica(version="2.2.2")),
+<p><b>Copyright &copy; 2002-2008, Politecnico di Milano.</b></p>
+</HTML>"), uses(Modelica(version="2.2.1")),
     version="2",
     conversion(from(
         version="1",
