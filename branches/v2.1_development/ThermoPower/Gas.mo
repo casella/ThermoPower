@@ -759,6 +759,12 @@ The latter options can be useful when two or more components are connected direc
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     constant MassFlowRate wzero=1e-9 
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
+    parameter Boolean rev_inlet1 = true "Allow flow reversal at inlet1";
+    parameter Boolean rev_inlet2 = true "Allow flow reversal at inlet2";
+    parameter Boolean rev_outlet = true "Allow flow reversal at outlet";
+    parameter Boolean checkFlowDirection = false 
+      "Check flow direction: active -true-, deactive -false-" 
+                                                 annotation (Dialog(enable = not rev_inlet1 or not rev_inlet2 or not rev_outlet));
     FlangeA inlet1(redeclare package Medium = Medium) 
       annotation (extent=[-80,20; -40,60]);
     FlangeA inlet2(redeclare package Medium = Medium) 
@@ -773,20 +779,26 @@ The latter options can be useful when two or more components are connected direc
     inlet2.p = outlet.p;
     
     // Energy balance
-    outlet.hBA = if inlet2.w < 0 then inlet1.hBA else if inlet1.w < 0 then inlet2.hBA else (
-      inlet1.hBA*(inlet1.w + wzero) + inlet2.hBA*inlet2.w)/(inlet1.w + wzero + inlet2.w);
-    inlet1.hAB = if inlet2.w < 0 then outlet.hAB else if outlet.w < 0 then inlet2.hBA else (
-      outlet.hAB*(outlet.w + wzero) + inlet2.hBA*inlet2.w)/(outlet.w + wzero + inlet2.w);
-    inlet2.hAB = if inlet1.w < 0 then outlet.hAB else if outlet.w < 0 then inlet1.hBA else (
-      outlet.hAB*(outlet.w + wzero) + inlet1.hBA*inlet1.w)/(outlet.w + wzero + inlet1.w);
+    outlet.hBA = if (inlet2.w < 0 and rev_inlet2) then inlet1.hBA else if (inlet1.w < 0 and rev_inlet1) then inlet2.hBA else (
+      inlet1.hBA*(inlet1.w + wzero) + inlet2.hBA*(inlet2.w + wzero))/(inlet1.w + 2*wzero + inlet2.w);
+    inlet1.hAB = if (inlet2.w < 0 and rev_inlet2) then outlet.hAB else if (outlet.w < 0 or not rev_outlet) then inlet2.hBA else (
+      outlet.hAB*(outlet.w + wzero) + inlet2.hBA*(inlet2.w + wzero))/(outlet.w + 2*wzero + inlet2.w);
+    inlet2.hAB = if (inlet1.w < 0 and rev_inlet1) then outlet.hAB else if (outlet.w < 0 or not rev_outlet) then inlet1.hBA else (
+      outlet.hAB*(outlet.w + wzero) + inlet1.hBA*(inlet1.w + wzero))/(outlet.w + 2*wzero + inlet1.w);
     
     // Independent component mass balances
-    outlet.XBA = if inlet2.w < 0 then inlet1.XBA else if inlet1.w < 0 then inlet2.XBA else (
-      inlet1.XBA*(inlet1.w + wzero) + inlet2.XBA*inlet2.w)/(inlet1.w + wzero + inlet2.w);
-    inlet1.XAB = if inlet2.w < 0 then outlet.XAB else if outlet.w < 0 then inlet2.XBA else (
-      outlet.XAB*(outlet.w + wzero) + inlet2.XBA*inlet2.w)/(outlet.w + wzero + inlet2.w);
-    inlet2.XAB = if inlet1.w < 0 then outlet.XAB else if outlet.w < 0 then inlet1.XBA else (
-      outlet.XAB*(outlet.w + wzero) + inlet1.XBA*inlet1.w)/(outlet.w + wzero + inlet1.w);
+    outlet.XBA = if (inlet2.w < 0 and rev_inlet2) then inlet1.XBA else if (inlet1.w < 0 and rev_inlet1) then inlet2.XBA else (
+      inlet1.XBA*(inlet1.w + wzero) + inlet2.XBA*(inlet2.w + wzero))/(inlet1.w + 2*wzero + inlet2.w);
+    inlet1.XAB = if (inlet2.w < 0 and rev_inlet2) then outlet.XAB else if (outlet.w < 0 or not rev_outlet) then inlet2.XBA else (
+      outlet.XAB*(outlet.w + wzero) + inlet2.XBA*(inlet2.w + wzero))/(outlet.w + 2*wzero + inlet2.w);
+    inlet2.XAB = if (inlet1.w < 0 and rev_inlet1) then outlet.XAB else if (outlet.w < 0 or not rev_outlet) then inlet1.XBA else (
+      outlet.XAB*(outlet.w + wzero) + inlet1.XBA*(inlet1.w + wzero))/(outlet.w + 2*wzero + inlet1.w);
+    
+    //Check flow direction
+    assert( not checkFlowDirection or ((rev_inlet1 or inlet1.w >= 0) and 
+                                       (rev_inlet2 or inlet2.w >= 0) and 
+                                       (rev_outlet or outlet.w <= 0)),
+                                      "Flow reversal not supported");
     annotation (Icon,
   Documentation(info="<html>
 <p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
@@ -809,6 +821,12 @@ The latter options can be useful when two or more components are connected direc
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     constant MassFlowRate wzero=1e-9 
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
+    parameter Boolean rev_inlet = true "Allow flow reversal at inlet";
+    parameter Boolean rev_outlet1 = true "Allow flow reversal at outlet1";
+    parameter Boolean rev_outlet2 = true "Allow flow reversal at outlet2";
+    parameter Boolean checkFlowDirection = false 
+      "Check flow direction: active -true-, deactive -false-" 
+                                                 annotation (Dialog(enable = not rev_inlet or not rev_outlet1 or not rev_outlet2));
     FlangeA inlet(redeclare package Medium = Medium) 
       annotation (extent=[-80,-20; -40,20]);
     FlangeB outlet1(redeclare package Medium = Medium) 
@@ -836,20 +854,26 @@ The latter options can be useful when two or more components are connected direc
     outlet2.p=inlet.p;
     
     // Energy balance
-    outlet1.hBA= if inlet.w<0 then outlet2.hAB else if outlet2.w<0 then inlet.hBA else 
-      (inlet.hBA*(inlet.w+wzero)+outlet2.hAB*outlet2.w)/(inlet.w+wzero+outlet2.w);
-    outlet2.hBA= if inlet.w<0 then outlet1.hAB else if outlet1.w<0 then inlet.hBA else 
-      (inlet.hBA*(inlet.w+wzero)+outlet1.hAB*outlet1.w)/(inlet.w+wzero+outlet1.w);
-    inlet.hAB= if outlet1.w<0 then outlet2.hAB else if outlet2.w<0 then outlet1.hAB else 
-      (outlet1.hAB*(outlet1.w+wzero)+outlet2.hAB*outlet2.w)/(outlet1.w+wzero+outlet2.w);
+    outlet1.hBA= if (inlet.w<0 and rev_inlet) then outlet2.hAB else if (outlet2.w<0 or not rev_outlet2) then inlet.hBA else 
+      (inlet.hBA*(inlet.w+wzero)+outlet2.hAB*(outlet2.w+wzero))/(inlet.w+2*wzero+outlet2.w);
+    outlet2.hBA= if (inlet.w<0 and rev_inlet) then outlet1.hAB else if (outlet1.w<0 or not rev_outlet1) then inlet.hBA else 
+      (inlet.hBA*(inlet.w+wzero)+outlet1.hAB*(outlet1.w+wzero))/(inlet.w+2*wzero+outlet1.w);
+    inlet.hAB= if (outlet1.w<0 or not rev_outlet1) then outlet2.hAB else if (outlet2.w<0 or not rev_outlet2) then outlet1.hAB else 
+      (outlet1.hAB*(outlet1.w+wzero)+outlet2.hAB*(outlet2.w+wzero))/(outlet1.w+2*wzero+outlet2.w);
     
     // Independent component mass balances
-    outlet1.XBA= if inlet.w<0 then outlet2.XAB else if outlet2.w<0 then inlet.XBA else 
-      (inlet.XBA*(inlet.w+wzero)+outlet2.XAB*outlet2.w)/(inlet.w+wzero+outlet2.w);
-    outlet2.XBA= if inlet.w<0 then outlet1.XAB else if outlet1.w<0 then inlet.XBA else 
-      (inlet.XBA*(inlet.w+wzero)+outlet1.XAB*outlet1.w)/(inlet.w+wzero+outlet1.w);
-    inlet.XAB= if outlet1.w<0 then outlet2.XAB else if outlet2.w<0 then outlet1.XAB else 
-      (outlet1.XAB*(outlet1.w+wzero)+outlet2.XAB*outlet2.w)/(outlet1.w+wzero+outlet2.w);
+    outlet1.XBA= if (inlet.w<0 and rev_inlet) then outlet2.XAB else if (outlet2.w<0 or not rev_outlet2) then inlet.XBA else 
+      (inlet.XBA*(inlet.w+wzero)+outlet2.XAB*(outlet2.w+wzero))/(inlet.w+2*wzero+outlet2.w);
+    outlet2.XBA= if (inlet.w<0 and rev_inlet) then outlet1.XAB else if (outlet1.w<0 or not rev_outlet1) then inlet.XBA else 
+      (inlet.XBA*(inlet.w+wzero)+outlet1.XAB*(outlet1.w+wzero))/(inlet.w+2*wzero+outlet1.w);
+    inlet.XAB= if (outlet1.w<0 or not rev_outlet1) then outlet2.XAB else if (outlet2.w<0 or not rev_outlet2) then outlet1.XAB else 
+      (outlet1.XAB*(outlet1.w+wzero)+outlet2.XAB*(outlet2.w+wzero))/(outlet1.w+2*wzero+outlet2.w);
+    
+    //Check flow direction
+    assert( not checkFlowDirection or ((rev_inlet or inlet.w >= 0) and 
+                                       (rev_outlet1 or outlet1.w <= 0) and 
+                                       (rev_outlet2 or outlet2.w <= 0)),
+                                      "Flow reversal not supported");
     
   end FlowSplit;
   
