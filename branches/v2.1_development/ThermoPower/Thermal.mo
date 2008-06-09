@@ -335,10 +335,16 @@ This model computes the thermal and mechanical properties of a generic material.
   connector HT = Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a 
     "Thermal port for lumped parameter heat transfer";
   connector HThtc 
-    "Thermal port for lumped parameter heat transfer with heat transfer coefficient" 
+    "Thermal port for lumped parameter heat transfer with outgoing heat transfer coefficient" 
     extends HT;
-    ThermalConductance G "Thermal conductance";
+    output ThermalConductance G "Thermal conductance";
   end HThtc;
+  
+  connector HThtc_in 
+    "Thermal port for lumped parameter heat transfer with incoming heat transfer coefficient" 
+    extends HT;
+    input ThermalConductance G "Thermal conductance";
+  end HThtc_in;
   
   connector DHT "Distributed Heat Terminal" 
     annotation (Icon(Rectangle(extent=[-100, 100; 100, -100], style(color=45,
@@ -348,10 +354,17 @@ This model computes the thermal and mechanical properties of a generic material.
     flow HeatFlux phi[N] "Heat flux at the nodes";
   end DHT;
   
-  connector DHThtc "Distributed Heat Terminal with heat transfer coefficient" 
+  connector DHThtc 
+    "Distributed Heat Terminal with heat transfer coefficient output" 
     extends DHT;
-    CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
+    output CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
   end DHThtc;
+  
+  connector DHThtc_in 
+    "Distributed Heat Terminal with heat transfer coefficient input" 
+    extends DHT;
+    input CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
+  end DHThtc_in;
   
   model HThtc_HT "HThtc to HT adaptor" 
     annotation (Diagram, Icon(
@@ -379,7 +392,7 @@ This model computes the thermal and mechanical properties of a generic material.
         Line(points=[100,100; -100,-100], style(color=1, rgbcolor={255,0,0}))));
     HT HT_port 
              annotation (extent=[100,-20; 140,20]);
-    HThtc HThtc_port 
+    HThtc_in HThtc_port 
                   annotation (extent=[-140,-20; -100,20]);
   equation 
     HT_port.T = HThtc_port.T;
@@ -390,7 +403,8 @@ This model computes the thermal and mechanical properties of a generic material.
     
     DHT DHT_port(N=N) 
                     annotation (extent=[100,40; 120,-40]);
-    DHThtc DHThtc_port( N=N) 
+    DHThtc_in DHThtc_port(
+                        N=N) 
                          annotation (extent=[-120,40; -100,-40], rotation=90);
     
     parameter Integer N(min=1)=2 "Number of nodes";
@@ -481,7 +495,7 @@ This model computes the thermal and mechanical properties of a generic material.
   model HThtc_DHThtc "HThtc to DHThtc adaptor" 
     parameter Integer N = 1 "Number of nodes on DHT side";
     parameter Area exchangeSurface "Heat exchange surface";
-    HThtc HT_port    annotation (extent=[-140,-20; -100,22]);
+    HThtc_in HT_port annotation (extent=[-140,-20; -100,22]);
     DHThtc DHT_port(final N=1)    annotation (extent=[100,-40; 120,40]);
   equation 
     for i in 1:N loop
@@ -553,7 +567,7 @@ This model computes the thermal and mechanical properties of a generic material.
     "Lumped parameter convective heat transfer between a HT and a HThtc" 
     extends Icons.HeatFlow;
     HT otherside               annotation (extent=[-40,-20; 40,-40]);
-    HThtc fluidside               annotation (extent=[-40,20; 40,40]);
+    HThtc_in fluidside            annotation (extent=[-40,20; 40,40]);
   equation 
     fluidside.Q_flow = fluidside.G*(fluidside.T - otherside.T) 
       "Convective heat transfer";
@@ -839,9 +853,9 @@ This model computes the thermal and mechanical properties of a generic material.
     parameter Temperature TstartO[N] = ThermoPower.Thermal.linspaceExt(TstartO1,TstartON,N) 
       "Start value of temperature vector - other side (initialized by default)"
       annotation(Dialog(tab = "Initialisation"));
-    Thermal.DHT otherside(N=N, T(start=TstartF)) 
+    DHT otherside(        N=N, T(start=TstartF)) 
                                annotation (extent=[-40,-40; 40,-20]);
-    Thermal.DHThtc fluidside(N=N, T(start=TstartO)) 
+    DHThtc_in fluidside(             N=N, T(start=TstartO)) 
                                   annotation (extent=[-40,20; 40,40]);
   equation 
     for j in 1:N loop

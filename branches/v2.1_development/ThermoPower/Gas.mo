@@ -435,7 +435,7 @@ The latter options can be useful when two or more components are connected direc
       annotation (extent=[-120,-20; -80,20]);
     FlangeB outlet(redeclare package Medium = Medium) 
       annotation (extent=[80,-20; 120,20]);
-    Thermal.HT thermalPort 
+    replaceable Thermal.HT thermalPort 
       annotation (extent=[-40,60; 40,80]);
   equation 
     M = gas.d*V "Gas mass";
@@ -539,7 +539,7 @@ The latter options can be useful when two or more components are connected direc
         annotation (extent=[-120,-20; -80,20]);
       FlangeB outlet(redeclare package Medium = Medium) 
         annotation (extent=[80,-20; 120,20]);
-      Thermal.HT thermalPort 
+      replaceable Thermal.HT thermalPort 
         annotation (extent=[-40,60; 40,80]);
     equation 
       M = gas.d*V "Gas mass";
@@ -678,9 +678,10 @@ The latter options can be useful when two or more components are connected direc
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),   Icon);
+</html>"),   Icon,
+      Diagram);
     
-    Thermal.HT thermalPort 
+    replaceable Thermal.HT thermalPort 
       annotation (extent=[-38,60; 42,80]);
   equation 
     M = gas.d*V "Gas mass";
@@ -762,8 +763,7 @@ The latter options can be useful when two or more components are connected direc
     parameter Boolean rev_inlet1 = true "Allow flow reversal at inlet1";
     parameter Boolean rev_inlet2 = true "Allow flow reversal at inlet2";
     parameter Boolean rev_outlet = true "Allow flow reversal at outlet";
-    parameter Boolean checkFlowDirection = false 
-      "Check flow direction: active -true-, deactive -false-" 
+    parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_inlet1 or not rev_inlet2 or not rev_outlet));
     FlangeA inlet1(redeclare package Medium = Medium) 
       annotation (extent=[-80,20; -40,60]);
@@ -802,9 +802,14 @@ The latter options can be useful when two or more components are connected direc
     annotation (Icon,
   Documentation(info="<html>
 <p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p>All the physically meaningful combinations of flow directions are allowed.
+<p><b>Modelling options</b></p>
+<p> If <tt>rev_inlet1</tt>, <tt>rev_inlet2</tt> or <tt>rev_outlet</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
+<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
 </html>", revisions="<html>
 <ul>
+<li><i>23 May 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       Allow flows reversal option added.</li>
 <li><i>20 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to Modelica.Media.</li>
@@ -824,8 +829,7 @@ The latter options can be useful when two or more components are connected direc
     parameter Boolean rev_inlet = true "Allow flow reversal at inlet";
     parameter Boolean rev_outlet1 = true "Allow flow reversal at outlet1";
     parameter Boolean rev_outlet2 = true "Allow flow reversal at outlet2";
-    parameter Boolean checkFlowDirection = false 
-      "Check flow direction: active -true-, deactive -false-" 
+    parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_inlet or not rev_outlet1 or not rev_outlet2));
     FlangeA inlet(redeclare package Medium = Medium) 
       annotation (extent=[-80,-20; -40,20]);
@@ -835,9 +839,14 @@ The latter options can be useful when two or more components are connected direc
       annotation (extent=[40,-60; 80,-20]);
     annotation (Icon, Documentation(info="<html>
 <p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p>All the physically meaningful combinations of flow directions are allowed.
+<p><b>Modelling options</b></p>
+<p> If <tt>rev_inlet</tt>, <tt>rev_outlet1</tt> or <tt>rev_outlet2</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
+<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
 </html>", revisions="<html>
 <ul>
+<li><i>23 May 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       Allow flows reversal option added.</li>
 <li><i>20 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to Modelica.Media.</li>
