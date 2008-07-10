@@ -10987,7 +10987,7 @@ I dati fanno riferimento all'avviamento della GT20.
             fillPattern=1));
         connect(levelHP_SP.y, Level_HP.SP) annotation (points=[-19,54; 20,54],
             style(color=74, rgbcolor={0,0,127}));
-        connect(levelIP_SP.y, Level_IP.SP) annotation (points=[-19,4; 0.5,4;
+        connect(levelIP_SP.y, Level_IP.SP) annotation (points=[-19,4; 0.5,4; 
               0.5,4; 20,4],                                   style(color=74,
               rgbcolor={0,0,127}));
         connect(levelLP_SP.y, Level_LP.SP) annotation (points=[-19,-40; 20,-40],
@@ -33238,7 +33238,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     expandable connector Sensors 
      // Empty connector, defined by expansion 
       
-      annotation (Icon(Polygon(points=[-80,80; 60,80; 100,0; 60,-80; -80,-80; -80, 80],
+      annotation (Icon(Polygon(points=[-100,100; 100,100; 100,0; 100,-100; -100,
+                -100; -100,100],
                           style(
                             color=84,
                             rgbcolor={255,170,213},
@@ -33257,7 +33258,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     
     expandable connector Actuators 
      // Empty connector, defined by expansion
-      annotation (Icon(Polygon(points=[-80,80; 60,80; 100,0; 60,-80; -80,-80; -80, 80], style(
+      annotation (Icon(Polygon(points=[-100,100; 100,100; 100,0; 100,-100; -100,
+                -100; -100,100],                                                        style(
               color=52,
               rgbcolor={213,255,170},
               fillColor=62,
