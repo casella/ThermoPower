@@ -1575,6 +1575,10 @@ Modelica in file \"Modelica/package.mo\".
   protected 
       Modelica.Blocks.Interfaces.BooleanInput closedInternal 
         annotation (extent=[-8,40; 8,58],   rotation=270);
+  public 
+      Modelica.Blocks.Interfaces.RealOutput delta_out 
+        annotation (extent=[-10,-100; 10,-80],
+                                            rotation=270);
     equation 
       // Loaded angle
       der(delta) = omega - omegaRef;
@@ -1591,6 +1595,8 @@ Modelica in file \"Modelica/package.mo\".
         closedInternal = true;
       end if;
       connect(closed, closedInternal);
+      //Output signal
+      delta_out = delta;
     initial equation 
       if initOpt == ThermoPower.Choices.Init.Options.noInit then
         // do nothing
