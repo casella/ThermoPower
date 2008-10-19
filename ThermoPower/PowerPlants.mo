@@ -3,12 +3,10 @@ package PowerPlants
   import ThermoPower.Choices.Init.Options;
 annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")));
   
-  package Gasifier   
-  end Gasifier;
   
   package GasTurbine 
     package Interfaces 
-      partial model GT "Base class for Gas Turbine" 
+      partial model GasTurbine "Base class for Gas Turbine" 
         
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
           Modelica.Media.Interfaces.PartialMedium;
@@ -82,7 +80,66 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
                 rgbfillColor={170,170,255}))));
         Buses.Sensors SensorsBus annotation (extent=[88,-50; 108,-30]);
         Buses.Actuators ActuatorsBus annotation (extent=[108,-82; 88,-62]);
-      end GT;
+      end GasTurbine;
+
+      partial model GasTurbineSimplify 
+        replaceable package FlueGas = 
+            StartingCCPP.CCPP_3L_Definitive.Media.FlueGasSingle extends 
+          Modelica.Media.Interfaces.PartialMedium;
+        ThermoPower.Gas.FlangeB flueGasOut(redeclare package Medium = FlueGas) 
+                                           annotation (extent=[90,70; 110,90]);
+        annotation (Diagram, Icon(
+                            Rectangle(extent=[-100,100; 100,-100], style(
+                color=76,
+                rgbcolor={170,170,255},
+                fillColor=30,
+                rgbfillColor={230,230,230})),
+            Rectangle(extent=[-44,8; 38,-6],    style(
+                color=76,
+                rgbcolor={170,170,255},
+                gradient=2,
+                fillColor=10,
+                rgbfillColor={135,135,135})),
+            Ellipse(extent=[-20,80; 20,40], style(
+                color=9,
+                rgbcolor={175,175,175},
+                gradient=3,
+                fillColor=1,
+                rgbfillColor={255,0,0})),
+            Polygon(points=[-20,18; -24,24; -24,64; -20,64; -20,18], style(
+                color=10,
+                rgbcolor={135,135,135},
+                gradient=3,
+                fillColor=76,
+                rgbfillColor={170,170,255})),
+            Polygon(points=[20,18; 24,24; 24,64; 20,64; 20,18], style(
+                color=10,
+                rgbcolor={135,135,135},
+                gradient=3,
+                fillColor=76,
+                rgbfillColor={170,170,255})),
+            Polygon(points=[80,60; 76,56; 76,82; 100,82; 100,78; 80,78; 80,60], style(
+                color=10,
+                rgbcolor={135,135,135},
+                gradient=3,
+                fillColor=76,
+                rgbfillColor={170,170,255})),
+            Polygon(points=[-80,70; -20,30; -20,-30; -80,-70; -80,70], style(
+                color=10,
+                rgbcolor={135,135,135},
+                gradient=3,
+                fillColor=76,
+                rgbfillColor={170,170,255})),
+            Polygon(points=[80,70; 20,30; 20,-30; 80,-70; 80,-70; 80,70], style(
+                color=10,
+                rgbcolor={135,135,135},
+                gradient=3,
+                fillColor=76,
+                rgbfillColor={170,170,255}))));
+        Modelica.Blocks.Interfaces.RealInput GTLoad "GT unit load in p.u." 
+          annotation (extent=[-112,-12; -88,12],
+                                               rotation=0);
+      end GasTurbineSimplify;
     end Interfaces;
     
     package Components 
@@ -726,7 +783,7 @@ I dati fanno riferimento all'avviamento della GT20.
               -56,51; -48,51],
             style(color=76, rgbcolor={159,159,223}));
         connect(fuelPlenum.outlet, fuelPressDrop.inlet) 
-                                                  annotation (points=[-26,51;
+                                                  annotation (points=[-26,51; 
               -10,51; -10,46; -11,46],
             style(color=76, rgbcolor={159,159,223}));
         connect(exhaust.outlet, OutAtmosphere.flange) 
@@ -747,7 +804,7 @@ I dati fanno riferimento all'avviamento della GT20.
               80], style(color=74, rgbcolor={0,0,127}));
         connect(bladePath.T, bladePath_T) annotation (points=[16,23; 16,30; 106,30],
             style(color=74, rgbcolor={0,0,127}));
-        connect(clutchFrictionScale.y, Clutch.friction)        annotation (points=[-64.8,18;
+        connect(clutchFrictionScale.y, Clutch.friction)        annotation (points=[-64.8,18; 
               -51,18; -51,-2.4],           style(color=74, rgbcolor={0,0,127}));
         connect(clutchFriction, clutchFrictionScale.u) annotation (points=[-110,18;
               -92.4,18], style(color=74, rgbcolor={0,0,127}));
@@ -756,14 +813,14 @@ I dati fanno riferimento all'avviamento della GT20.
         connect(servoValve.y, fuelValve.theta) annotation (points=[-49.16,76; -40,
               76; -40,64; -66,64; -66,57.2],
                                          style(color=74, rgbcolor={0,0,127}));
-        connect(GTunit.FlueGas_out, bladePath.inlet)  annotation (points=[2.4,-2;
+        connect(GTunit.FlueGas_out, bladePath.inlet)  annotation (points=[2.4,-2; 
               14.5,-2; 14.5,10; 26,10],
                                       style(color=76, rgbcolor={159,159,223}));
         connect(GTunit.shaft_b, GTInertia.flange_a) 
           annotation (points=[3.68,-8; 14,-8], style(color=0, rgbcolor={0,0,0}));
-        connect(Clutch.flange_b, GTunit.shaft_b)         annotation (points=[-44,-8;
+        connect(Clutch.flange_b, GTunit.shaft_b)         annotation (points=[-44,-8; 
               -44,-22; 4,-22; 4,-8; 3.68,-8], style(color=0, rgbcolor={0,0,0}));
-        connect(fuelPressDrop.outlet, GTunit.Fuel_in)  annotation (points=[-11,18;
+        connect(fuelPressDrop.outlet, GTunit.Fuel_in)  annotation (points=[-11,18; 
               -12,18; -12,6.4], style(color=76, rgbcolor={159,159,223}));
         connect(InletPressDrop.outlet, GTunit.Air_in) 
                                                    annotation (points=[-44,-54; -42,
@@ -970,7 +1027,7 @@ I dati fanno riferimento all'avviamento della GT20.
               -56,51; -48,51],
             style(color=76, rgbcolor={159,159,223}));
         connect(fuelPlenum.outlet, fuelPressDrop.inlet) 
-                                                  annotation (points=[-26,51;
+                                                  annotation (points=[-26,51; 
               -10,51; -10,46; -11,46],
             style(color=76, rgbcolor={159,159,223}));
         connect(exhaust.outlet, OutAtmosphere.flange) 
@@ -990,7 +1047,7 @@ I dati fanno riferimento all'avviamento della GT20.
               80], style(color=74, rgbcolor={0,0,127}));
         connect(bladePath.T, bladePath_T) annotation (points=[18,23; 18,30; 106,30],
             style(color=74, rgbcolor={0,0,127}));
-        connect(clutchFrictionScale.y, Clutch.friction)        annotation (points=[-64.8,18;
+        connect(clutchFrictionScale.y, Clutch.friction)        annotation (points=[-64.8,18; 
               -51,18; -51,-2.4],           style(color=74, rgbcolor={0,0,127}));
         connect(clutchFriction, clutchFrictionScale.u) annotation (points=[-110,20;
               -100,20; -100,18; -92.4,18],
@@ -1007,7 +1064,7 @@ I dati fanno riferimento all'avviamento della GT20.
                                                style(color=0, rgbcolor={0,0,0}));
         connect(Clutch.flange_b, GTunit.shaft_b)         annotation (points=[-44,-8;
               -44,-22; 4,-22; 4,-6; 5.68,-6], style(color=0, rgbcolor={0,0,0}));
-        connect(fuelPressDrop.outlet, GTunit.Fuel_in)  annotation (points=[-11,18;
+        connect(fuelPressDrop.outlet, GTunit.Fuel_in)  annotation (points=[-11,18; 
               -10,18; -10,8.4], style(color=76, rgbcolor={159,159,223}));
         connect(InletPressDrop.outlet, GTunit.Air_in) 
                                                    annotation (points=[-44,-54; -42,
@@ -1036,7 +1093,7 @@ I dati fanno riferimento all'avviamento della GT20.
       end PlantUNIT__avv;
       
       model GT_2 
-        extends ThermoPower.PowerPlants.GasTurbine.Interfaces.GT;
+        extends ThermoPower.PowerPlants.GasTurbine.Interfaces.GasTurbine;
         parameter SI.MassFraction Xexhaust[GTunit.FlueGasMedium.nX]={0.16342,0.01323,0.03444,0.04988,0.73904} 
           " turbine gas exhaust composition ";
         Gas.PressDrop OutPressDrop(
@@ -1156,8 +1213,8 @@ I dati fanno riferimento all'avviamento della GT20.
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(GTunit.Fuel_in, fuelPressDrop.outlet) annotation (points=[0,
-              -27.6; 0,-8; -1.83691e-015,-8], style(
+        connect(GTunit.Fuel_in, fuelPressDrop.outlet) annotation (points=[0,-27.6; 
+              0,-8; -1.83691e-015,-8],        style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
@@ -1205,8 +1262,8 @@ I dati fanno riferimento all'avviamento della GT20.
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(p_fuelCompr.flange, fuelPressDrop.outlet) annotation (points=[
-              -28,-6; -28,-20; 0,-20; 0,-8; -1.83691e-015,-8], style(
+        connect(p_fuelCompr.flange, fuelPressDrop.outlet) annotation (points=[-28,-6; 
+              -28,-20; 0,-20; 0,-8; -1.83691e-015,-8],         style(
             color=76,
             rgbcolor={170,170,255},
             fillColor=76,
@@ -1265,7 +1322,7 @@ I dati fanno riferimento all'avviamento della GT20.
       end GT_2;
       
       model GT 
-        extends Interfaces.GT;
+        extends ThermoPower.PowerPlants.GasTurbine.Interfaces.GasTurbine;
         parameter SI.Power nominalElectricalPower=50e9;
         parameter SI.Frequency fn=50;
         parameter SI.MassFraction Xexhaust[GTunit.FlueGasMedium.nX]={0.16342,0.01323,0.03444,0.04988,0.73904} 
@@ -1393,7 +1450,7 @@ I dati fanno riferimento all'avviamento della GT20.
         connect(MotorSpeed.y,Motor. w_ref) 
                                        annotation (points=[-79.1,-83; -68.2,-83],
             style(color=74, rgbcolor={0,0,127}));
-        connect(Clutch.flange_b, GTunit.shaft_b) annotation (points=[-24,-83;
+        connect(Clutch.flange_b, GTunit.shaft_b) annotation (points=[-24,-83; 
               14,-83; 14,-40; 9.6,-40], style(
             color=0,
             rgbcolor={0,0,0},
@@ -1416,7 +1473,7 @@ I dati fanno riferimento all'avviamento della GT20.
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(GTInertia.flange_a, GTunit.shaft_b) annotation (points=[26,-40;
+        connect(GTInertia.flange_a, GTunit.shaft_b) annotation (points=[26,-40; 
               9.6,-40], style(
             color=0,
             rgbcolor={0,0,0},
@@ -1486,23 +1543,23 @@ I dati fanno riferimento all'avviamento della GT20.
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(fuelPressDrop.inlet, fuelPlenum.outlet) annotation (points=[-10,
-              6; -10,7.5; -10,7.5; -10,9; -10,16; -10,16], style(
+        connect(fuelPressDrop.inlet, fuelPlenum.outlet) annotation (points=[-10,6; 
+              -10,7.5; -10,7.5; -10,9; -10,16; -10,16],    style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(fuelPressDrop.outlet, GTunit.Fuel_in) annotation (points=[-10,
-              -14; -10,-19.8; -10,-19.8; -10,-25.6], style(
+        connect(fuelPressDrop.outlet, GTunit.Fuel_in) annotation (points=[-10,-14; 
+              -10,-19.8; -10,-19.8; -10,-25.6],      style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(fuelValve.outlet, fuelPlenum.inlet) annotation (points=[-10,48;
+        connect(fuelValve.outlet, fuelPlenum.inlet) annotation (points=[-10,48; 
               -10,44; -10,44; -10,40; -10,36; -10,36], style(
             color=76,
             rgbcolor={159,159,223},
@@ -1510,7 +1567,7 @@ I dati fanno riferimento all'avviamento della GT20.
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(fuelValve.inlet, FuelInlet) annotation (points=[-10,68; -10,76;
+        connect(fuelValve.inlet, FuelInlet) annotation (points=[-10,68; -10,76; 
               0,76; 0,90], style(
             color=76,
             rgbcolor={159,159,223},
@@ -1557,61 +1614,187 @@ I dati fanno riferimento all'avviamento della GT20.
             fillPattern=1));
       end GT;
       
-      model GT_simp 
-        extends Interfaces.GT;
-        annotation (Diagram);
-        Components.GTunit GTunit(
-          eta_mech=0.985,
-          beta(start=3),
-          Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix,
-          HH=37.47e6,
-          pstart=0.9758e5,
-          Tstart=282.15,
-          tableHI=Components.Table_finali.GT20Data.tabHI,
-          tablePR=Components.Table_finali.GT20Data.tabPR,
-          tableW=Components.Table_finali.GT20Data.tabW,
-          tableZLP=Components.Table_finali.GT20Data.tabZLP,
-          tableN=Components.Table_finali.GT20Data.tabN) 
-          annotation (extent=[-20,-20; 20,20]);
+      model GasTurbineSimplify 
+        extends 
+          ThermoPower.PowerPlants.GasTurbine.Interfaces.GasTurbineSimplify;
+        parameter Modelica.SIunits.Power maxPower=235e6;
+        parameter Modelica.SIunits.MassFlowRate flueGasNomFlowRate=614 
+          "Nominal flue gas flow rate";
+        parameter Modelica.SIunits.MassFlowRate flueGasMinFlowRate=454 
+          "Minimum flue gas flow rate";
+        parameter Modelica.SIunits.MassFlowRate flueGasOffFlowRate=
+            flueGasMinFlowRate/100 "Flue gas flow rate with GT switched off";
+        parameter Modelica.SIunits.MassFlowRate fuelNomFlowRate=12.1 
+          "Nominal fuel flow rate";
+        parameter Modelica.SIunits.MassFlowRate fuelIntFlowRate=7.08 
+          "Intermediate fuel flow rate";
+        parameter Modelica.SIunits.MassFlowRate fuelMinFlowRate=4.58 
+          "Minimum fuel flow rate";
+        parameter Modelica.SIunits.MassFlowRate fuelOffFlowRate=0.1 
+          "Flue gas flow rate with GT switched off";
+        parameter Real constTempLoad = 0.60 
+          "Fraction of load from which the temperature is kept constant";
+        parameter Real intLoad = 0.42 
+          "Intermediate load for fuel consumption computations";
+        parameter Modelica.SIunits.Temperature flueGasNomTemp=843 
+          "Maximum flue gas temperature";
+        parameter Modelica.SIunits.Temperature flueGasMinTemp=548 
+          "Minimum flue gas temperature (zero electrical load)";
+        parameter Modelica.SIunits.Temperature flueGasOffTemp=363.15 
+          "Flue gas temperature with GT switched off";
+        parameter Modelica.SIunits.SpecificEnthalpy fuel_LHV=49e6 
+          "Fuel Lower Heating Value";
+        parameter Modelica.SIunits.SpecificEnthalpy fuel_HHV=55e6 
+          "Fuel Higher Heating Value";
+        FlueGas.BaseProperties gas;
+        Modelica.SIunits.MassFlowRate w;
+        Modelica.SIunits.Power P_el=noEvent(if GTLoad > 0 then GTLoad*maxPower else 
+                  0) "Electrical power output";
+        Modelica.SIunits.MassFlowRate fuelFlowRate "Fuel flow rate";
       equation 
-        connect(GTunit.shaft_b, shaft_b) annotation (points=[19.6,0; 100,0],
-            style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(GTunit.FlueGas_out, FlueGasOutlet) annotation (points=[18,6; 62,
-              6; 62,80; 100,80], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(GTunit.Fuel_in, FuelInlet) annotation (points=[0,14.4; 0,14.4;
-              0,90], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(GTunit.Air_in, AirInlet) annotation (points=[-18,6; -60,6; -60,
-              80; -100,80], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end GT_simp;
+        gas.p = flueGasOut.p;
+        gas.Xi = FlueGas.reference_X[1:FlueGas.nXi];
+        gas.T = noEvent(
+          if GTLoad > constTempLoad then flueGasNomTemp else 
+          if GTLoad > 0 then flueGasMinTemp +
+            GTLoad/constTempLoad*(flueGasNomTemp-flueGasMinTemp) else 
+          flueGasMinTemp * (1+GTLoad) - flueGasOffTemp * GTLoad);
+        w = noEvent(
+          if GTLoad > constTempLoad then flueGasMinFlowRate + (GTLoad-constTempLoad)/
+            (1-constTempLoad)*(flueGasNomFlowRate-flueGasMinFlowRate) else 
+          if GTLoad > 0 then flueGasMinFlowRate else 
+          flueGasMinFlowRate * (1+GTLoad) - flueGasOffFlowRate * GTLoad);
+        fuelFlowRate = noEvent(
+          if GTLoad > intLoad then fuelIntFlowRate + (GTLoad-intLoad)/
+            (1-intLoad)*(fuelNomFlowRate-fuelIntFlowRate) else 
+          if GTLoad > 0 then fuelMinFlowRate + GTLoad/intLoad *
+            (fuelIntFlowRate-fuelMinFlowRate) else 
+          fuelMinFlowRate * (1+GTLoad) - fuelOffFlowRate * GTLoad);
+        
+        flueGasOut.w = -w;
+        flueGasOut.hBA = gas.h;
+        flueGasOut.XBA = gas.Xi;
+      end GasTurbineSimplify;
     end Examples;
     
+    package Control 
+      block Selector 
+        Modelica.Blocks.Interfaces.RealInput u[2] annotation (extent=[-114,50; -94,70]);
+        Modelica.Blocks.Interfaces.RealOutput y annotation (extent=[92,10; 112,30]);
+        annotation (Diagram, Icon(
+                            Rectangle(extent=[-100,100; 100,-100], style(color=3,
+                  rgbcolor={0,0,255})), Text(
+              extent=[-52,36; 46,-46],
+              style(color=3, rgbcolor={0,0,255}),
+              string="SEL")));
+        Modelica.Blocks.Interfaces.IntegerInput select 
+          annotation (extent=[-114,-50; -94,-30]);
+      equation 
+        assert(select>0 and select <= size(u,1), "Selection out of range");
+        y = u[select];
+      end Selector;
+      
+      model ToScale 
+                    extends Modelica.Blocks.Interfaces.SISO;
+        parameter Real uLow = 0;
+        parameter Real uHigh = 1;
+        parameter Real yLow = 0;
+        parameter Real yHigh = 1;
+      equation 
+        y = (u - uLow)/(uHigh-uLow)*(yHigh-yLow) + yLow;
+        annotation (Icon(
+            Polygon(points=[-52,88; -60,66; -44,66; -52,88],
+                                                          style(color=8,
+                  fillColor=8)),
+            Line(points=[-52,-2; -24,-2], style(color=9, rgbcolor={175,175,175})),
+            Polygon(points=[96,-66; 74,-58; 74,-74; 96,-66],
+                                                          style(color=8,
+                  fillColor=8)),
+            Line(points=[-84,-66; 74,-66],
+                                         style(color=8)),
+            Line(points=[-52,-80; -52,68],
+                                         style(color=8)),
+            Line(points=[-24,-2; 54,24],    style(color=0)),
+            Rectangle(extent=[-54,-62; -50,-68],
+                                             style(
+                color=0,
+                fillColor=0,
+                fillPattern=1)),
+            Line(points=[-24,-2; -24,-66], style(color=9, rgbcolor={175,175,175})),
+            Line(points=[54,24; 54,-66], style(color=9, rgbcolor={175,175,175})),
+            Line(points=[54,24; -52,24], style(color=9, rgbcolor={175,175,175}))));
+      end ToScale;
+      
+      block ServoActuator 
+        parameter Time Tt "Total travel time";
+        parameter Time T "Small-signal time constant";
+        parameter Real yLow = 0 "Lower limit of actuator action";
+        parameter Real yHigh = 1 "Upper limit of actuator action";
+        parameter Boolean steadyStateInit = false "Steady-state initialisation";
+        Modelica.Blocks.Interfaces.RealInput u annotation (extent=[-108,-14; -82,14]);
+        Modelica.Blocks.Interfaces.RealOutput y annotation (extent=[100,-12; 124,12]);
+        Modelica.Blocks.Interfaces.BooleanOutput satHigh 
+          "Actuator saturated in the high position" 
+          annotation (extent=[100,48; 124,72]);
+        Modelica.Blocks.Interfaces.BooleanOutput satLow 
+          "Actuator saturated in the low" annotation (extent=[100,-72; 124,-48]);
+      protected 
+        output Integer state(start=0) "0: running, +1 sat High, -1 sat Low";
+        output Real der_y;
+        output Real der_y_vlim;
+      equation 
+        der_y = 1/T*(u-y) "Required der(y) without limitation";
+        der_y_vlim = smooth(0, if der_y < -(yHigh-yLow)/Tt then -(yHigh-yLow)/Tt else 
+                               if der_y > (yHigh-yLow)/Tt then (yHigh-yLow)/Tt else der_y) 
+          "der(y) after velocity limitation";
+        der(y) = if state == 0 then der_y_vlim else 0 
+          "der(y) accounting for saturation";
+        satHigh = (state == +1);
+        satLow = (state == -1);
+      algorithm 
+        when pre(state) == 0 and y > yHigh and der_y > 0 then
+          state := +1;
+        elsewhen pre(state) == 0 and y < yLow and der_y < 0 then
+          state := -1;
+        elsewhen pre(state) == +1 and der_y < 0 then
+          state :=0;
+        elsewhen pre(state) == -1 and der_y > 0 then
+          state :=0;
+        end when;
+        annotation (Icon(Rectangle(extent=[-100,100; 100,-100], style(color=3,
+                  rgbcolor={0,0,255})),
+                         Text(
+              extent=[-42,46; 44,-38],
+              style(color=3, rgbcolor={0,0,255}),
+              string="A")), Diagram,
+          Documentation(info="<html>
+This model describes a typical servo-actuator dynamics. For small variations of the input, the system responds as a first-order linear system with a time constant of <tt>T</tt>. For larger variations of the input, the system is subject to two constraints:
+<ul>
+<li>the rate of change of the output <tt>y</tt> cannot exceed plus or minus <tt>(yHigh-yLow)/Tt</tt>;
+<li>the output y cannot get greater than <tt>yHigh</tt> or less than <tt>yLow</tt>.
+</ul>
+When the actuator is stuck at the <tt>yHigh</tt> (resp. <tt>yLow</tt>) value, the boolean output <tt>satHigh</tt> (resp. <tt>satLow</tt>) becomes true.
+<p>
+If <tt>steadyStateInit = true</tt>, steady-state initial conditions are enforced.
+</html>",     revisions="<html>
+<ul>
+<li><i>1 Jun 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+      initial equation 
+        if steadyStateInit then
+          der(y) = 0;
+          state = 0;
+        end if;
+      end ServoActuator;
+    end Control;
+
     package Tests 
       model TestServoActuator 
-        GTStartup_finale.Control.ServoActuator Servo(
+        
+        ThermoPower.PowerPlants.GasTurbine.Control.ServoActuator Servo(
           T=1,
           yLow=-1,
           yHigh=1,
@@ -1743,7 +1926,7 @@ test per valutare quale sarebbe la temperatura in ingresso alla turbina non cons
         
         constant Modelica.SIunits.Temperature Tiso=288.15;
         constant Modelica.SIunits.AbsolutePressure piso=1.01325e5;
-        GTStartup_finale.Components.PlantUNIT__finale plant(
+        ThermoPower.PowerPlants.GasTurbine.Examples.PlantUNIT__finale plant(
             nominalElectricalPower =                                               50e9) 
                     annotation (extent=[50,-42; 92,0]);
         Modelica.Blocks.Sources.Ramp valvolaAvviamento(
@@ -1835,8 +2018,9 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
         connect(PresaGiri.y, valvolaPrincipale.u2)            annotation (points=[
               -58.9,-9; -58,-9; -58,30; -54,30],
                                                style(color=74, rgbcolor={0,0,127}));
-        connect(clutchFriction.y, plant.clutchFriction) annotation (points=[-3,-16;
-              0,-16; 0,-16.8; 47.9,-16.8], style(color=74, rgbcolor={0,0,127}));
+        connect(clutchFriction.y, plant.clutchFriction) annotation (points=[-3,-16; 
+              0,-16; 0,-17.22; 47.9,-17.22],
+                                           style(color=74, rgbcolor={0,0,127}));
         connect(Connessione.y, valvolaPrincipale.u1)        annotation (points=[-61,
               38; -54,38; -54,42],     style(color=74, rgbcolor={0,0,127}));
         connect(DistaccoMotore.y, Connessione.u2)        annotation (points=[-98.9,
@@ -1844,7 +2028,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
                                                   style(color=74, rgbcolor={0,0,127}));
         connect(MotoreConnesso.y, Connessione.u1)        annotation (points=[-98.9,
               39; -84.45,39; -84.45,44; -84,44], style(color=74, rgbcolor={0,0,127}));
-        connect(GTHeatRate.y, plant.GTHeatRate) annotation (points=[1,70; 22,70;
+        connect(GTHeatRate.y, plant.GTHeatRate) annotation (points=[1,70; 22,70; 
               22,-5.04; 47.48,-5.04],
                             style(color=74, rgbcolor={0,0,127}));
       end TestPlantUNIT5__finale;
@@ -1856,7 +2040,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
         constant Modelica.SIunits.Temperature Tiso=288.15;
         constant Modelica.SIunits.AbsolutePressure piso=1.01325e5;
         constant Real density=0.82;
-        GTStartup_finale.Components.PlantUNIT__finale plant(
+        ThermoPower.PowerPlants.GasTurbine.Examples.PlantUNIT__finale plant(
             nominalElectricalPower =                                               50e9) 
                     annotation (extent=[54,-42; 96,0]);
         Modelica.Blocks.Sources.Ramp valvolaAvviamento(
@@ -1949,8 +2133,8 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
         connect(PresaGiri.y, valvolaPrincipale.u2)            annotation (points=[
               -58.9,-9; -58,-9; -58,30; -52,30],
                                                style(color=74, rgbcolor={0,0,127}));
-        connect(clutchFriction.y, plant.clutchFriction) annotation (points=[9,-20;
-              20,-20; 20,-16.8; 51.9,-16.8],
+        connect(clutchFriction.y, plant.clutchFriction) annotation (points=[9,-20; 
+              20,-20; 20,-17.22; 51.9,-17.22],
                                            style(color=74, rgbcolor={0,0,127}));
         connect(MotoreConnesso.y, Connessione.u1)        annotation (points=[-98.9,
               39; -88.45,39; -88.45,44; -84,44], style(color=74, rgbcolor={0,0,127}));
@@ -1978,7 +2162,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
         
         constant Modelica.SIunits.Temperature Tiso=288.15;
         constant Modelica.SIunits.AbsolutePressure piso=1.01325e5;
-        GTStartup_finale.Components.PlantUNIT__avv plant(nominalElectricalPower=50e9) 
+        ThermoPower.PowerPlants.GasTurbine.Examples.PlantUNIT__avv plant(nominalElectricalPower=50e9) 
                     annotation (extent=[50,-42; 92,0]);
         Modelica.Blocks.Sources.Ramp valvolaAvviamento(
           startTime=103,
@@ -2121,7 +2305,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
           annotation (extent=[-66,16; -2,80]);
         annotation (Diagram);
         Gas.SourceP fuelSource(            redeclare package Medium = 
-              FuelMedium, p0=20e5)       annotation (extent=[-58,82; -42,98]);
+              FuelMedium, p0=20e5)       annotation (extent=[-58,84; -42,100]);
         Gas.SourceP InletAtmosphere(
           redeclare package Medium = AirMedium,
           p0=1.01325e5,
@@ -2150,7 +2334,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
           eta=0.98,
           f(start=50),
           shaft(phi(start=0)),
-          J=3500)                                   annotation (extent=[60,38;
+          J=3500)                                   annotation (extent=[58,38; 
               78,58]);
         Electrical.Breaker breaker              annotation (extent=[84,48; 68,
               68],
@@ -2230,8 +2414,8 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(fuelSource.flange, gasTurbine.FuelInlet) annotation (points=[
-              -42,90; -34,90; -34,76.8], style(
+        connect(fuelSource.flange, gasTurbine.FuelInlet) annotation (points=[-42,92; 
+              -34,92; -34,76.8],         style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
@@ -2246,14 +2430,14 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(actuators, gasTurbine.ActuatorsBus) annotation (points=[-10,0;
-              8,0; 8,24.96; -2.64,24.96], style(
+        connect(actuators, gasTurbine.ActuatorsBus) annotation (points=[-10,0; 8,
+              0; 8,24.96; -2.64,24.96],   style(
             color=52,
             rgbcolor={213,255,170},
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(clutchFrictionScale.y,Clutch. friction)        annotation (points=[24.7,-27;
+        connect(clutchFrictionScale.y,Clutch. friction)        annotation (points=[24.7,-27; 
               34,-27; 34,13],              style(color=74, rgbcolor={0,0,127}));
         connect(Motor.flange_b,Clutch. flange_a)  annotation (points=[54,20; 44,
               20],                  style(color=0, rgbcolor={0,0,0}));
@@ -2262,7 +2446,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
               20; 76,20],
             style(color=74, rgbcolor={0,0,127}));
         connect(generator.powerConnection,breaker. connection1) 
-          annotation (points=[76.74,48; 76,48; 76,49.4],
+          annotation (points=[76.6,48; 76,48; 76,49.4],
                                                  style(pattern=0, thickness=2));
         connect(breaker.connection2,Grid. connection) 
           annotation (points=[76,66.6; 76,71; 81.26,71],
@@ -2270,7 +2454,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
         connect(GTInertia.flange_b,Gear. flange_a) 
           annotation (points=[32,48; 38,48], style(color=0, rgbcolor={0,0,0}));
         connect(Gear.flange_b,generator. shaft) 
-          annotation (points=[54,48; 61.26,48], style(color=0, rgbcolor={0,0,0}));
+          annotation (points=[54,48; 59.4,48],  style(color=0, rgbcolor={0,0,0}));
         connect(GTInertia.flange_a, gasTurbine.shaft_b) annotation (points=[18,
               48; -2,48], style(
             color=0,
@@ -2278,7 +2462,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(valveOpeningScale.y,servoValve. u) annotation (points=[-51.2,0;
+        connect(valveOpeningScale.y,servoValve. u) annotation (points=[-51.2,0; 
               -52,0; -52,1.42109e-016; -43.65,1.42109e-016],
                           style(color=74, rgbcolor={0,0,127}));
         connect(servoValve.y, actuators.theta_fuelValve) annotation (points=[
@@ -2302,8 +2486,8 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(clutchFriction.y, clutchFrictionScale.u) annotation (points=[
-              -19.3,-27; 8.6,-27], style(
+        connect(clutchFriction.y, clutchFrictionScale.u) annotation (points=[-19.3,
+              -27; 8.6,-27],       style(
             color=74,
             rgbcolor={0,0,127},
             fillColor=30,
@@ -2330,15 +2514,15 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(PresaGiri.y, valvolaPrincipale.u1) annotation (points=[-8.7,-79;
+        connect(PresaGiri.y, valvolaPrincipale.u1) annotation (points=[-8.7,-79; 
               -14,-79; -14,-82.8; -22.6,-82.8], style(
             color=74,
             rgbcolor={0,0,127},
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Connessione.y, valvolaPrincipale.u2) annotation (points=[25.3,
-              -91; 1.65,-91; 1.65,-91.2; -22.6,-91.2], style(
+        connect(Connessione.y, valvolaPrincipale.u2) annotation (points=[25.3,-91; 
+              1.65,-91; 1.65,-91.2; -22.6,-91.2],      style(
             color=74,
             rgbcolor={0,0,127},
             fillColor=30,
@@ -2474,8 +2658,9 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
                                                   style(color=74, rgbcolor={0,0,127}));
         connect(MotoreConnesso.y, Connessione.u1)        annotation (points=[-98.9,
               39; -84.45,39; -84.45,44; -84,44], style(color=74, rgbcolor={0,0,127}));
-        connect(InletAtmosphere.flange, gasTurbine.AirInlet) annotation (points=[6,29; 8,28;
-              20,28], style(
+        connect(InletAtmosphere.flange, gasTurbine.AirInlet) annotation (points=[6,29; 8,
+              28; 20,28],
+                      style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
@@ -2498,7 +2683,7 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(actuators, gasTurbine.ActuatorsBus) annotation (points=[52,-54;
+        connect(actuators, gasTurbine.ActuatorsBus) annotation (points=[52,-54; 
               90,-54; 90,-17.6; 79.4,-17.6], style(
             color=52,
             rgbcolor={213,255,170},
@@ -2528,542 +2713,10 @@ test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, 
             fillPattern=1));
       end TestGT_identico;
       
-      model TestGT_identico_prova 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package AirMedium = ThermoPower.Media.Air extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FuelMedium = ThermoPower.Media.NaturalGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        constant Modelica.SIunits.Temperature Tiso=288.15;
-        constant Modelica.SIunits.AbsolutePressure piso=1.01325e5;
-        parameter SI.MassFraction Xexhaust[gasTurbine.GTunit.FlueGasMedium.nX]={0.16342,0.01323,0.03444,0.04988,0.73904} 
-          " turbine gas exhaust composition ";
-        Modelica.Blocks.Sources.BooleanStep breakerClosed(               startValue=
-             false, startTime=0) 
-          annotation (extent=[-50,-96; -30,-76]);
-        annotation (Diagram, uses(Modelica(version="2.2")),
-          experiment(StopTime=1000),
-          Documentation(info="<html>
-test per ricostruire l'andamento delle grandezze caratteristiche in avviamento, suddividendo la portata di combustibile in una somma di rampe che schematizzano la portata immessa per accendere la macchina, la portata immmessa dalla valvola di avviamento a cui fa seguito una valvola principale, a sua volta suddivisa in una parte che considera la connessione e il momento del distacco del motore e la finale presa di giri.
-<p>una volta avvenuta la sincronizzazione alla rete, non si ha nessun incremento di combustibile</p>
-<p>il modello di impianto considerato è <tt>GTStartup_finale.Components.PlantUnit__finale</tt>
-</html>"));
-        Modelica.Blocks.Sources.Ramp clutchFriction(
-          offset=1,
-          duration=2,
-          height=0,
-          startTime=0) 
-          annotation (extent=[-50,-64; -30,-44]);
-        Examples.GT gasTurbine annotation (extent=[20,-26; 80,34]);
-        Gas.SourceP fuelSource(            redeclare package Medium = 
-              FuelMedium, p0=20e5)       annotation (extent=[24,52; 40,68]);
-        Gas.SourceP InletAtmosphere(
-          redeclare package Medium = AirMedium,
-          p0=1.01325e5,
-          T=282.15)                      annotation (extent=[-8,22; 6,36]);
-        Gas.SinkP OutAtmosphere(
-          redeclare package Medium = FlueGasMedium,
-          p0=1.01325e5,
-          Xnom=Xexhaust)                 annotation (extent=[86,52; 100,66]);
-      protected 
-        Buses.Actuators actuators annotation (extent=[42,-64; 62,-44]);
-      public 
-        Modelica.Blocks.Sources.Constant com_valveHP 
-          annotation (extent=[-28,-2; -48,-22], rotation=180);
-      initial equation 
-       gasTurbine.generator.shaft.phi=0;
-        
-      // plant.GTInertia.w=omega0_n*plant.omega_sync;
-      // der(plant.motor.omega)=0;
-      // der(plant.GTInertia.w)=0;
-        
-      equation 
-        connect(InletAtmosphere.flange, gasTurbine.AirInlet) annotation (points=
-             [6,29; 8,28; 20,28], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(fuelSource.flange, gasTurbine.FuelInlet) annotation (points=[40,
-              60; 50,60; 50,31], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(OutAtmosphere.flange, gasTurbine.FlueGasOutlet) annotation (
-            points=[86,59; 86,28; 80,28], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(actuators, gasTurbine.ActuatorsBus) annotation (points=[52,-54;
-              90,-54; 90,-17.6; 79.4,-17.6], style(
-            color=52,
-            rgbcolor={213,255,170},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(breakerClosed.y, actuators.breakerClosed) annotation (points=[
-              -29,-86; 14,-86; 14,-54; 52,-54], style(
-            color=5,
-            rgbcolor={255,0,255},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(clutchFriction.y, actuators.clutchFriction) annotation (points=
-              [-29,-54; 52,-54], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_valveHP.y, actuators.GTHeatRate) annotation (points=[-27,
-              -12; 14,-12; 14,-54; 52,-54], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end TestGT_identico_prova;
       
-      model TestGT_simp 
-        
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package AirMedium = ThermoPower.Media.Air extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FuelMedium = ThermoPower.Media.NaturalGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        parameter SI.MassFraction Xexhaust[FlueGasMedium.nX]={0.16342,0.01323,0.03444,0.04988,0.73904} 
-          " turbine gas exhaust composition ";
-        annotation (Diagram);
-        Gas.SourceP fuelSource(            redeclare package Medium = 
-              FuelMedium, p0=20e5)       annotation (extent=[-28,52; -12,68]);
-        Gas.SourceP InletAtmosphere(
-          redeclare package Medium = AirMedium,
-          p0=1.01325e5,
-          T=282.15)                      annotation (extent=[-66,10; -46,30]);
-        Gas.SinkP OutAtmosphere(
-          redeclare package Medium = FlueGasMedium,
-          p0=1.01325e5,
-          Xnom=Xexhaust)                 annotation (extent=[40,10; 60,30]);
-        Examples.GT_simp gT_simp(GTunit(HH=4.72e7)) 
-          annotation (extent=[-20,-60; 20,-20]);
-        Modelica.Blocks.Sources.Ramp ramp(
-          height=314.16/2,
-          duration=200,
-          offset=0,
-          startTime=0) annotation (extent=[6,-90; 26,-70]);
-        Modelica.Mechanics.Rotational.Speed speed 
-          annotation (extent=[52,-90; 72,-70]);
-      equation 
-        connect(gT_simp.FlueGasOutlet, OutAtmosphere.flange) annotation (points=
-             [20,-24; 30,-24; 30,20; 40,20], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(gT_simp.AirInlet, InletAtmosphere.flange) annotation (points=[
-              -20,-24; -34,-24; -34,20; -46,20], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(gT_simp.FuelInlet, fuelSource.flange) annotation (points=[0,-22;
-              0,60; -12,60], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(speed.w_ref, ramp.y) annotation (points=[50,-80; 27,-80], style(
-            color=74,
-            rgbcolor={0,0,127},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(speed.flange_b, gT_simp.shaft_b) annotation (points=[72,-80; 90,
-              -80; 90,-40; 20,-40], style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end TestGT_simp;
     end Tests;
     
-    package Control 
-      block Selector 
-        Modelica.Blocks.Interfaces.RealInput u[2] annotation (extent=[-114,50; -94,70]);
-        Modelica.Blocks.Interfaces.RealOutput y annotation (extent=[92,10; 112,30]);
-        annotation (Diagram, Icon(
-                            Rectangle(extent=[-100,100; 100,-100], style(color=3,
-                  rgbcolor={0,0,255})), Text(
-              extent=[-52,36; 46,-46],
-              style(color=3, rgbcolor={0,0,255}),
-              string="SEL")));
-        Modelica.Blocks.Interfaces.IntegerInput select 
-          annotation (extent=[-114,-50; -94,-30]);
-      equation 
-        assert(select>0 and select <= size(u,1), "Selection out of range");
-        y = u[select];
-      end Selector;
-      
-      model ToScale 
-                    extends Modelica.Blocks.Interfaces.SISO;
-        parameter Real uLow = 0;
-        parameter Real uHigh = 1;
-        parameter Real yLow = 0;
-        parameter Real yHigh = 1;
-      equation 
-        y = (u - uLow)/(uHigh-uLow)*(yHigh-yLow) + yLow;
-        annotation (Icon(
-            Polygon(points=[-52,88; -60,66; -44,66; -52,88],
-                                                          style(color=8,
-                  fillColor=8)),
-            Line(points=[-52,-2; -24,-2], style(color=9, rgbcolor={175,175,175})),
-            Polygon(points=[96,-66; 74,-58; 74,-74; 96,-66],
-                                                          style(color=8,
-                  fillColor=8)),
-            Line(points=[-84,-66; 74,-66],
-                                         style(color=8)),
-            Line(points=[-52,-80; -52,68],
-                                         style(color=8)),
-            Line(points=[-24,-2; 54,24],    style(color=0)),
-            Rectangle(extent=[-54,-62; -50,-68],
-                                             style(
-                color=0,
-                fillColor=0,
-                fillPattern=1)),
-            Line(points=[-24,-2; -24,-66], style(color=9, rgbcolor={175,175,175})),
-            Line(points=[54,24; 54,-66], style(color=9, rgbcolor={175,175,175})),
-            Line(points=[54,24; -52,24], style(color=9, rgbcolor={175,175,175}))));
-      end ToScale;
-      
-      block ServoActuator 
-        parameter Time Tt "Total travel time";
-        parameter Time T "Small-signal time constant";
-        parameter Real yLow = 0 "Lower limit of actuator action";
-        parameter Real yHigh = 1 "Upper limit of actuator action";
-        parameter Boolean steadyStateInit = false "Steady-state initialisation";
-        Modelica.Blocks.Interfaces.RealInput u annotation (extent=[-108,-14; -82,14]);
-        Modelica.Blocks.Interfaces.RealOutput y annotation (extent=[100,-12; 124,12]);
-        Modelica.Blocks.Interfaces.BooleanOutput satHigh 
-          "Actuator saturated in the high position" 
-          annotation (extent=[100,48; 124,72]);
-        Modelica.Blocks.Interfaces.BooleanOutput satLow 
-          "Actuator saturated in the low" annotation (extent=[100,-72; 124,-48]);
-      protected 
-        output Integer state(start=0) "0: running, +1 sat High, -1 sat Low";
-        output Real der_y;
-        output Real der_y_vlim;
-      equation 
-        der_y = 1/T*(u-y) "Required der(y) without limitation";
-        der_y_vlim = smooth(0, if der_y < -(yHigh-yLow)/Tt then -(yHigh-yLow)/Tt else 
-                               if der_y > (yHigh-yLow)/Tt then (yHigh-yLow)/Tt else der_y) 
-          "der(y) after velocity limitation";
-        der(y) = if state == 0 then der_y_vlim else 0 
-          "der(y) accounting for saturation";
-        satHigh = (state == +1);
-        satLow = (state == -1);
-      algorithm 
-        when pre(state) == 0 and y > yHigh and der_y > 0 then
-          state := +1;
-        elsewhen pre(state) == 0 and y < yLow and der_y < 0 then
-          state := -1;
-        elsewhen pre(state) == +1 and der_y < 0 then
-          state :=0;
-        elsewhen pre(state) == -1 and der_y > 0 then
-          state :=0;
-        end when;
-        annotation (Icon(Rectangle(extent=[-100,100; 100,-100], style(color=3,
-                  rgbcolor={0,0,255})),
-                         Text(
-              extent=[-42,46; 44,-38],
-              style(color=3, rgbcolor={0,0,255}),
-              string="A")), Diagram,
-          Documentation(info="<html>
-This model describes a typical servo-actuator dynamics. For small variations of the input, the system responds as a first-order linear system with a time constant of <tt>T</tt>. For larger variations of the input, the system is subject to two constraints:
-<ul>
-<li>the rate of change of the output <tt>y</tt> cannot exceed plus or minus <tt>(yHigh-yLow)/Tt</tt>;
-<li>the output y cannot get greater than <tt>yHigh</tt> or less than <tt>yLow</tt>.
-</ul>
-When the actuator is stuck at the <tt>yHigh</tt> (resp. <tt>yLow</tt>) value, the boolean output <tt>satHigh</tt> (resp. <tt>satLow</tt>) becomes true.
-<p>
-If <tt>steadyStateInit = true</tt>, steady-state initial conditions are enforced.
-</html>",     revisions="<html>
-<ul>
-<li><i>1 Jun 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      initial equation 
-        if steadyStateInit then
-          der(y) = 0;
-          state = 0;
-        end if;
-      end ServoActuator;
-    end Control;
     
-    package copie 
-      model PlantUNIT__finale 
-      // dati relativi all'avviamento
-      // le tabelle sono Table_finali
-        annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram,
-          Icon(Rectangle(extent=[-100,100; 100,-100], style(color=3, rgbcolor={0,0,255})), Text(
-              extent=[-70,52; 62,-48],
-              style(color=3, rgbcolor={0,0,255}),
-              string="GT")),
-          Documentation(info="<html>
-I dati fanno riferimento all'avviamento della GT20.
-<p>Le tabelle di interpolazione usate per definire le prestazioni della macchina sono <tt>GTStartup_finale.Data.Table_finali</tt>, considerando come portata di aria transitante la portata passante dalle valvole di Bleed.
-</html>"));
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package AirMedium = ThermoPower.Media.Air extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FuelMedium = ThermoPower.Media.NaturalGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        
-        parameter SI.Power nominalElectricalPower=50e9;
-        parameter SI.Frequency fn=50;
-        parameter SI.MassFraction Xexhaust[GTunit.Exhaust.nX]={0.16342,0.01323,0.03444,0.04988,0.73904} 
-          " turbine gas exhaust composition ";
-        parameter SI.AngularVelocity omega_sync=
-            Modelica.SIunits.Conversions.from_rpm(4949);
-        ThermoPower.Gas.SourceP InletAtmosphere(
-          redeclare package Medium = AirMedium,
-          p0=1.01325e5,
-          T=282.15)                      annotation (extent=[-106,-68; -78,-40]);
-        ThermoPower.Gas.PressDrop OutPressDrop(
-          redeclare package Medium = FlueGasMedium,
-          Xstart=Xexhaust,
-          FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
-          Tstart=495,
-          wnom=168.9,
-          pstart=1.025e5,
-          dpnom=1175,
-          Kf=0.0288,
-          rhonom=0.7)                        annotation (extent=[16,28; 38,52],
-            rotation=90);
-        ThermoPower.Gas.PressDrop InletPressDrop(
-          redeclare package Medium = AirMedium,
-          pstart=1.01325e5,
-          FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
-          rhonom=1.2,
-          Tstart=282.15,
-          wnom=165.3,
-          Kf=0.116,
-          dpnom=3738)                        annotation (extent=[-70,-66; -44,-42]);
-        ThermoPower.Gas.Valve fuelValve(redeclare package Medium = 
-              FuelMedium,
-          wnom=3.6,
-          CvData=ThermoPower.Choices.Valve.CvTypes.Av,
-          pnom=20e5,
-          Av=0.0022,
-          dpnom=7.5e5)               annotation (extent=[-74,40; -58,60]);
-        ThermoPower.Gas.SourceP fuelSource(redeclare package Medium = 
-              FuelMedium, p0=20e5)       annotation (extent=[-102,38; -80,60]);
-        Modelica.Mechanics.Rotational.Inertia GTInertia(             w(start=
-                Modelica.SIunits.Conversions.from_rpm(360)), J=7000) 
-          annotation (extent=[14,-18; 28,2]);
-        
-        ThermoPower.Gas.SensT exhaust(redeclare package Medium = 
-              FlueGasMedium)         annotation (extent=[54,50; 74,70]);
-        ThermoPower.Electrical.Generator generator(
-          eta=0.98,
-          f(start=50),
-          shaft(phi(start=0)),
-          J=3500)                                   annotation (extent=[56,-18; 74,
-              2]);
-        ThermoPower.Electrical.Breaker breaker  annotation (extent=[80,-8; 64,12],
-            rotation=90);
-        ThermoPower.Electrical.Grid Grid(
-          Pn=nominalElectricalPower,
-          fn=fn,
-          droop=0.05)                     annotation (extent=[94,6; 76,24],
-            rotation=180);
-        ThermoPower.Gas.Plenum fuelPlenum(redeclare package Medium = 
-              FuelMedium,
-          pstart=12.5e5,
-          initOpt=ThermoPower.Choices.Init.Options.steadyState,
-          V=0.5)                            annotation (extent=[-48,40; -26,62]);
-        ThermoPower.Gas.PressDrop fuelPressDrop(redeclare package Medium = 
-              FuelMedium,
-          wnom=3.6,
-          pstart=12.5e5,
-          FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
-          rhonom=8.18,
-          Kf=213336,
-          dpnom=3.45e5) 
-          annotation (extent=[-22,18; 0,46],   rotation=270);
-        ThermoPower.Gas.SinkP OutAtmosphere(
-          redeclare package Medium = FlueGasMedium,
-          Xnom=Xexhaust,
-          p0=1.01325e5)                  annotation (extent=[76,44; 102,72]);
-        Components.HydraulicClutch Clutch 
-                                   annotation (extent=[-58,-16; -44,0]);
-        Modelica.Blocks.Interfaces.RealInput GTHeatRate "Per Unit" 
-          annotation (extent=[-122,66; -102,86]);
-        Modelica.Blocks.Interfaces.RealInput clutchFriction "Per Unit" 
-          annotation (extent=[-120,8; -100,28]);
-        Modelica.Blocks.Interfaces.BooleanInput breakerClosed 
-          annotation (extent=[-114,-92; -94,-72]);
-        Control.ToScale valveOpeningScale(yHigh=0.7) 
-                                  annotation (extent=[-94,64; -70,88]);
-        Control.ToScale clutchFrictionScale(yHigh=34.937) 
-                                   annotation (extent=[-90,6; -66,30]);
-        ThermoPower.Gas.SensT bladePath(redeclare package Medium = 
-              FlueGasMedium)         annotation (extent=[12,6; 32,26], rotation=90);
-        Modelica.Blocks.Interfaces.RealOutput exhaust_T 
-          annotation (extent=[96,70; 116,90]);
-        Modelica.Blocks.Interfaces.RealOutput bladePath_T 
-          annotation (extent=[96,20; 116,40]);
-        Modelica.Blocks.Interfaces.RealOutput frequency "Per Unit" 
-          annotation (extent=[96,-90; 116,-70]);
-        Modelica.Blocks.Interfaces.RealOutput electricalPower "Per Unit" 
-          annotation (extent=[94,-56; 116,-32]);
-        Control.ServoActuator servoValve(
-          Tt=20,
-          T=2,
-          yLow=0.1,
-          steadyStateInit=true)              annotation (extent=[-64,68; -50,84]);
-        Components.GTunit GTunit(
-          eta_mech=0.985,
-          beta(start=3),
-          Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix,
-          HH=37.47e6,
-          pstart=0.9758e5,
-          Tstart=282.15,
-          tableHI=GTStartup_finale.Data.Table_finali.GT20Data.tabHI,
-          tablePR=GTStartup_finale.Data.Table_finali.GT20Data.tabPR,
-          tableW=GTStartup_finale.Data.Table_finali.GT20Data.tabW,
-          tableZLP=GTStartup_finale.Data.Table_finali.GT20Data.tabZLP,
-          tableN=GTStartup_finale.Data.Table_finali.GT20Data.tabN) 
-          annotation (extent=[-28,-28; 4,12]);
-        Modelica.Mechanics.Rotational.IdealGear Gear(ratio=(4949/60)/(25)) 
-          annotation (extent=[34,-16; 50,0]);
-        ThermoPower.Gas.Header Silencer(
-          redeclare package Medium = FlueGasMedium,
-          Xstart=Xexhaust,
-          initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP,
-          Tmstart=300,
-          gamma=4500*4000,
-          Cm=20e6,
-          V=0.0875,
-          S=0.0098) 
-          annotation (extent=[36,50; 52,66]);
-        ThermoPower.Gas.SensP ComprPressure(redeclare package Medium = 
-              FuelMedium)                   annotation (extent=[-52,-2; -18,28]);
-        Modelica.Mechanics.Rotational.Speed Motor 
-          annotation (extent=[-84,-18; -62,4]);
-        Modelica.Blocks.Sources.Ramp MotorSpeed(
-          duration=1,
-          startTime=65,
-          height=395 - 110,
-          offset=110) annotation (extent=[-118,-18; -98,2]);
-        Modelica.Blocks.Interfaces.RealOutput comprPressure 
-          annotation (extent=[94,-20; 114,0]);
-      equation 
-        electricalPower = generator.powerConnection.W/nominalElectricalPower;
-        frequency = generator.powerConnection.f/fn;
-        connect(InletAtmosphere.flange, InletPressDrop.inlet) 
-                                                   annotation (points=[-78,-54; -70,
-              -54],   style(color=76, rgbcolor={159,159,223}));
-        connect(fuelSource.flange, fuelValve.inlet) 
-                                               annotation (points=[-80,49; -78,49;
-              -78,50; -74,50],
-            style(color=76, rgbcolor={159,159,223}));
-        connect(generator.powerConnection, breaker.connection1) 
-          annotation (points=[72.74,-8; 72,-8; 72,-6.6],
-                                                 style(pattern=0, thickness=2));
-        connect(breaker.connection2, Grid.connection) 
-          annotation (points=[72,10.6; 72,15; 77.26,15],
-                                                   style(pattern=0, thickness=2));
-        connect(fuelValve.outlet, fuelPlenum.inlet) 
-                                              annotation (points=[-58,50; -56,50;
-              -56,51; -48,51],
-            style(color=76, rgbcolor={159,159,223}));
-        connect(fuelPlenum.outlet, fuelPressDrop.inlet) 
-                                                  annotation (points=[-26,51;
-              -10,51; -10,46; -11,46],
-            style(color=76, rgbcolor={159,159,223}));
-        connect(exhaust.outlet, OutAtmosphere.flange) 
-                                              annotation (points=[70,56; 74,56; 74,
-              58; 76,58],
-            style(color=76, rgbcolor={159,159,223}));
-        connect(GTHeatRate, valveOpeningScale.u) annotation (points=[-112,76; -96.4,
-              76], style(color=74, rgbcolor={0,0,127}));
-        connect(breakerClosed, breaker.closed) annotation (points=[-104,-82; 80,
-              -82; 80,2; 78.4,2],
-                             style(color=5, rgbcolor={255,0,255}));
-        connect(bladePath.outlet, OutPressDrop.inlet) 
-                                                    annotation (points=[26,22; 26,
-              28; 27,28],
-                   style(color=76, rgbcolor={159,159,223}));
-        connect(exhaust.T, exhaust_T) annotation (points=[71,66; 78,66; 78,80; 106,
-              80], style(color=74, rgbcolor={0,0,127}));
-        connect(bladePath.T, bladePath_T) annotation (points=[16,23; 16,30; 106,30],
-            style(color=74, rgbcolor={0,0,127}));
-        connect(clutchFrictionScale.y, Clutch.friction)        annotation (points=[-64.8,18;
-              -51,18; -51,-2.4],           style(color=74, rgbcolor={0,0,127}));
-        connect(clutchFriction, clutchFrictionScale.u) annotation (points=[-110,18;
-              -92.4,18], style(color=74, rgbcolor={0,0,127}));
-        connect(valveOpeningScale.y, servoValve.u) annotation (points=[-68.8,76;
-              -63.65,76], style(color=74, rgbcolor={0,0,127}));
-        connect(servoValve.y, fuelValve.theta) annotation (points=[-49.16,76; -40,
-              76; -40,64; -66,64; -66,57.2],
-                                         style(color=74, rgbcolor={0,0,127}));
-        connect(GTunit.FlueGas_out, bladePath.inlet)  annotation (points=[2.4,-2;
-              14.5,-2; 14.5,10; 26,10],
-                                      style(color=76, rgbcolor={159,159,223}));
-        connect(GTunit.shaft_b, GTInertia.flange_a) 
-          annotation (points=[3.68,-8; 14,-8], style(color=0, rgbcolor={0,0,0}));
-        connect(Clutch.flange_b, GTunit.shaft_b)         annotation (points=[-44,-8;
-              -44,-22; 4,-22; 4,-8; 3.68,-8], style(color=0, rgbcolor={0,0,0}));
-        connect(fuelPressDrop.outlet, GTunit.Fuel_in)  annotation (points=[-11,18;
-              -12,18; -12,6.4], style(color=76, rgbcolor={159,159,223}));
-        connect(InletPressDrop.outlet, GTunit.Air_in) 
-                                                   annotation (points=[-44,-54; -42,
-              -54; -42,-2; -26.4,-2], style(color=76, rgbcolor={159,159,223}));
-        connect(GTInertia.flange_b, Gear.flange_a) 
-          annotation (points=[28,-8; 34,-8], style(color=0, rgbcolor={0,0,0}));
-        connect(Gear.flange_b, generator.shaft) 
-          annotation (points=[50,-8; 57.26,-8], style(color=0, rgbcolor={0,0,0}));
-        connect(Silencer.outlet, exhaust.inlet) 
-                                               annotation (points=[52,58; 56,58; 56,
-              56; 58,56],
-                      style(color=76, rgbcolor={159,159,223}));
-        connect(OutPressDrop.outlet, Silencer.inlet) 
-                                                  annotation (points=[27,52; 27,58;
-              36,58], style(color=76, rgbcolor={159,159,223}));
-        connect(ComprPressure.flange, GTunit.Fuel_in)  annotation (points=[-35,7;
-              -35,6.4; -12,6.4],           style(color=3, rgbcolor={0,0,255}));
-        connect(Motor.flange_b, Clutch.flange_a)  annotation (points=[-62,-7; -60,
-              -7; -60,-8; -58,-8],  style(color=0, rgbcolor={0,0,0}));
-        connect(MotorSpeed.y, Motor.w_ref) 
-                                       annotation (points=[-97,-8; -90,-8; -90,-7;
-              -86.2,-7],
-            style(color=74, rgbcolor={0,0,127}));
-        connect(ComprPressure.p, comprPressure) annotation (points=[-25.82,22; 80,
-              22; 80,-10; 104,-10], style(color=74, rgbcolor={0,0,127}));
-      end PlantUNIT__finale;
-    end copie;
   end GasTurbine;
   
   package HRSG 
@@ -3146,7 +2799,8 @@ I dati fanno riferimento all'avviamento della GT20.
         parameter SI.Pressure pstartout_F=fluidNomPressure 
           "Outlet fluid pressure start value"                annotation(Dialog(tab = "Initialization"));
         
-        annotation (Diagram, Icon(Rectangle(extent=[-80,80; 80,-80],  style(
+        annotation (Diagram, Icon(Rectangle(extent=[-100,100; 100,-100],
+                                                                      style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=30,
@@ -3161,13 +2815,13 @@ I dati fanno riferimento all'avviamento della GT20.
               string="%name",
               style(color=71, rgbcolor={85,170,255}))));
         Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) 
-                            annotation (extent=[-100,-20; -60,20]);
+                            annotation (extent=[-120,-20; -80,20]);
         Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) 
-                            annotation (extent=[60,-20; 100,20]);
+                            annotation (extent=[80,-20; 120,20]);
         Water.FlangeA waterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-20,60; 20,100]);
+          annotation (extent=[-20,80; 20,120]);
         Water.FlangeB waterOut(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-20,-100; 20,-60]);
+          annotation (extent=[-20,-120; 20,-80]);
         
       end HeatExchanger;
       
@@ -3175,13 +2829,14 @@ I dati fanno riferimento all'avviamento della GT20.
         "Base class for Parallel Heat Exchanger (two fluid with one gas)" 
         
         annotation (Diagram, Icon(
-            Rectangle(extent=[-80,80; 80,-80], style(
+            Rectangle(extent=[-100,100; 100,-100],
+                                               style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Line(points=[-40,80; -40,60; -10,60; -10,42; -42,20; 20,-20; -10,-40; -10,
-                  -60; -40,-60; -40,-80],           style(
+            Line(points=[-40,80; -40,60; -10,60; -10,42; -42,20; 20,-20; -10,
+                  -40; -10,-60; -40,-60; -40,-80],  style(
                 color=3,
                 rgbcolor={0,0,255},
                 thickness=2,
@@ -3197,21 +2852,21 @@ I dati fanno riferimento all'avviamento della GT20.
               string="%name",
               style(color=71, rgbcolor={85,170,255}))));
         ThermoPower.Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium)
-                            annotation (extent=[-100,-20; -60,20]);
+                            annotation (extent=[-120,-20; -80,20]);
         ThermoPower.Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium)
-                            annotation (extent=[60,-20; 100,20]);
+                            annotation (extent=[80,-20; 120,20]);
         ThermoPower.Water.FlangeA waterInA(redeclare package Medium = 
               FluidMedium) "water/steam first inlet" 
-          annotation (extent=[-60,60; -20,100]);
+          annotation (extent=[-60,80; -20,120]);
         ThermoPower.Water.FlangeB waterOutA(redeclare package Medium = 
               FluidMedium) "water/steam first outlet" 
-          annotation (extent=[-60,-100; -20,-60]);
+          annotation (extent=[-60,-120; -20,-80]);
         ThermoPower.Water.FlangeA waterInB(redeclare package Medium = 
               FluidMedium) "water/steam second inlet" 
-          annotation (extent=[20,60; 60,100]);
+          annotation (extent=[20,80; 60,120]);
         ThermoPower.Water.FlangeB waterOutB(redeclare package Medium = 
               FluidMedium) "water/steam second outlet" 
-          annotation (extent=[20,-100; 60,-60]);
+          annotation (extent=[20,-120; 60,-80]);
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
           Modelica.Media.Interfaces.PartialMedium;
         replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
@@ -3399,7 +3054,8 @@ I dati fanno riferimento all'avviamento della GT20.
         "Base class for parallel Heat Exchanger (two fluid with one gas) with attemperation" 
         
         annotation (Diagram, Icon(
-            Rectangle(extent=[-80,80; 80,-80], style(
+            Rectangle(extent=[-100,100; 100,-100],
+                                               style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=30,
@@ -3427,7 +3083,7 @@ I dati fanno riferimento all'avviamento della GT20.
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255})),
-            Line(points=[-40,-34; -48,-42; -78,-42],
+            Line(points=[-40,-34; -48,-42; -100,-42],
                                                style(
                 color=3,
                 rgbcolor={0,0,255},
@@ -3438,34 +3094,34 @@ I dati fanno riferimento all'avviamento della GT20.
                 rgbcolor={0,0,255},
                 fillPattern=1))));
         ThermoPower.Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium)
-                            annotation (extent=[-100,-20; -60,20]);
+                            annotation (extent=[-120,-20; -80,20]);
         ThermoPower.Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium)
-                            annotation (extent=[60,-20; 100,20]);
+                            annotation (extent=[80,-20; 120,20]);
         ThermoPower.Water.FlangeA waterInA(redeclare package Medium = 
               FluidMedium) "water/steam first inlet" 
-          annotation (extent=[-60,60; -20,100]);
+          annotation (extent=[-60,80; -20,120]);
         ThermoPower.Water.FlangeB waterOutA(redeclare package Medium = 
               FluidMedium) "water/steam first outlet" 
-          annotation (extent=[-60,-100; -20,-60]);
+          annotation (extent=[-60,-120; -20,-80]);
         ThermoPower.Water.FlangeA waterInB(redeclare package Medium = 
               FluidMedium) "water/steam second inlet " 
-          annotation (extent=[20,60; 60,100]);
+          annotation (extent=[20,80; 60,120]);
         ThermoPower.Water.FlangeB waterOutB(redeclare package Medium = 
               FluidMedium) "water/steam second outlet" 
-          annotation (extent=[20,-100; 60,-60]);
+          annotation (extent=[20,-120; 60,-80]);
         ThermoPower.Water.FlangeA LiquidWaterIn(redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-90,-52; -70,-32]);
+          annotation (extent=[-110,-52; -90,-32]);
         Modelica.Blocks.Interfaces.RealOutput T_intermedA 
           "Intermediate temperature of the HE_A" 
-          annotation (extent=[76,52; 90,66]);
+          annotation (extent=[94,52; 108,66]);
         Modelica.Blocks.Interfaces.RealOutput T_intermedB 
           "Intermediate temperature of the HE_B" 
-          annotation (extent=[76,32; 90,46]);
+          annotation (extent=[94,32; 108,46]);
         Modelica.Blocks.Interfaces.RealInput theta_valveA 
-          annotation (extent=[88,-50; 74,-34]);
+          annotation (extent=[108,-50; 94,-34]);
         Modelica.Blocks.Interfaces.RealInput theta_valveB 
-          annotation (extent=[88,-70; 74,-56]);
+          annotation (extent=[108,-70; 94,-56]);
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
           Modelica.Media.Interfaces.PartialMedium;
         replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
@@ -15046,36 +14702,36 @@ I dati fanno riferimento all'avviamento della GT20.
         extends Interfaces.HRSG_3LRh;
         
         annotation (Diagram);
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wa cylindersBodies(
-          HPd_rint=1.067,
-          HPd_rext=1.167,
-          HPd_L=11.920,
-          HPd_Cm=0,
-          IPd_rint=0.915,
-          IPd_rext=1.015,
-          IPd_L=7,
-          IPd_Cm=0,
-          LPd_rint=1.143,
-          LPd_rext=1.243,
-          LPd_L=11.503,
-          LPd_Cm=0,
-          RiserHPFlowRate=175.5,
-          RiserIPFlowRate=67.5,
-          RiserLPFlowRate=41.5,
-          redeclare package FluidMedium = FluidMedium,
-          SSInit=false,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
-          n0_TFP=1500,
-          inletTFPNomPressure=5398.2,
-          TFPNomFlowRate=89.8,
-          hstart_TFP=1.43495e5,
+        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wa drums(
+          HPd_rint=1.067, 
+          HPd_rext=1.167, 
+          HPd_L=11.920, 
+          HPd_Cm=0, 
+          IPd_rint=0.915, 
+          IPd_rext=1.015, 
+          IPd_L=7, 
+          IPd_Cm=0, 
+          LPd_rint=1.143, 
+          LPd_rext=1.243, 
+          LPd_L=11.503, 
+          LPd_Cm=0, 
+          RiserHPFlowRate=175.5, 
+          RiserIPFlowRate=67.5, 
+          RiserLPFlowRate=41.5, 
+          redeclare package FluidMedium = FluidMedium, 
+          SSInit=false, 
+          fluidLPNomPressure=7.19048e5, 
+          LPd_hvstart=2.76051e6, 
+          LPd_hlstart=6.68356e5, 
+          fluidHPNomPressure=1.626e7, 
+          fluidIPNomPressure=3.3816e6, 
+          HPd_hvstart=2.53239e6, 
+          HPd_hlstart=1.5879e6, 
+          IPd_hvstart=2.794e6, 
+          n0_TFP=1500, 
+          inletTFPNomPressure=5398.2, 
+          TFPNomFlowRate=89.8, 
+          hstart_TFP=1.43495e5, 
           IPd_hlstart=1.0265e6) annotation (extent=[-58,24; 18,100]);
         ThermoPower.PowerPlants.HRSG.Examples.HEG_3LRh_wa HeatExchangersGroup(
           gasNomFlowRate=585.5,
@@ -15372,31 +15028,31 @@ I dati fanno riferimento all'avviamento della GT20.
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateShLP_in.inlet,cylindersBodies. Steam_LP_Out) annotation (
+        connect(stateShLP_in.inlet, drums.Steam_LP_Out)           annotation (
             points=[27,34; 27,58.96; 18,58.96],   style(
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateEvLP_out.outlet,cylindersBodies. FromRiser_LP) annotation (
+        connect(stateEvLP_out.outlet, drums.FromRiser_LP)           annotation (
            points=[33,28; 33,65.04; 18,65.04],   style(
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateEvLP_in.inlet,cylindersBodies. ToRiser_LP) annotation (
+        connect(stateEvLP_in.inlet, drums.ToRiser_LP)           annotation (
             points=[39,22; 39,71.12; 18,71.12],   style(
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateEcLP_out.outlet,cylindersBodies. Feed_LP) annotation (
+        connect(stateEcLP_out.outlet, drums.Feed_LP)           annotation (
             points=[45,16; 45,77.2; 18,77.2],   style(
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateEcLP_in.inlet,cylindersBodies. WaterForLP) annotation (
+        connect(stateEcLP_in.inlet, drums.WaterForLP)           annotation (
             points=[51,6; 51,83.28; 18,83.28],   style(
             thickness=2,
             fillColor=76,
@@ -15408,11 +15064,11 @@ I dati fanno riferimento all'avviamento della GT20.
               -50,-84; -34,-84; -34,-80; -35.2,-74],style(thickness=2));
         connect(Rh_IP_Out, HeatExchangersGroup.Rh_IP_Out) 
           annotation (points=[-20,-100; -20,-74],          style(thickness=2));
-        connect(Sh_IP_Out, HeatExchangersGroup.Sh_IP_Out) annotation (points=[10,-100;
+        connect(Sh_IP_Out, HeatExchangersGroup.Sh_IP_Out) annotation (points=[10,-100; 
               10,-84; -4,-84; -4,-74; -4.8,-74],          style(thickness=2));
-        connect(Sh_LP_Out, HeatExchangersGroup.Sh_LP_Out) annotation (points=[40,-100;
+        connect(Sh_LP_Out, HeatExchangersGroup.Sh_LP_Out) annotation (points=[40,-100; 
               40,-80; 10,-80; 10,-74; 10.4,-74],          style(thickness=2));
-        connect(GasOut, HeatExchangersGroup.GasOut) annotation (points=[100,-10;
+        connect(GasOut, HeatExchangersGroup.GasOut) annotation (points=[100,-10; 
               62,-10; 62,-35.62; 18.38,-35.62],style(
             color=76,
             rgbcolor={159,159,223},
@@ -15423,43 +15079,43 @@ I dati fanno riferimento all'avviamento della GT20.
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(ActuatorsBus, cylindersBodies.ActuatorsBus) annotation (points=[98,36;
+        connect(ActuatorsBus, drums.ActuatorsBus)           annotation (points=[98,36; 
               58,36; 58,34.64; 17.24,34.64],        style(color=52, rgbcolor={
                 213,255,170}));
-        connect(cylindersBodies.SensorsBus, SensorsBus) annotation (points=[17.24,
+        connect(drums.SensorsBus, SensorsBus)           annotation (points=[17.24,
               46.8; 53.65,46.8; 53.65,68; 98,68],      style(color=84, rgbcolor=
                {255,170,213}));
         connect(stateEvLP_out.inlet, HeatExchangersGroup.Ev_LP_Out) 
           annotation (points=[33,22; 33,-9.4; 18,-9.4], style(thickness=2));
         connect(HeatExchangersGroup.Ec_IP_In, stateEcIP_in.outlet) 
           annotation (points=[6.6,2; 7,2; 7,10], style(thickness=2));
-        connect(stateEcIP_in.inlet, cylindersBodies.WaterForIP) annotation (
+        connect(stateEcIP_in.inlet, drums.WaterForIP)           annotation (
             points=[7,16; 7,20.5; 6.6,20.5; 6.6,24], style(thickness=2));
         connect(HeatExchangersGroup.Ec_IP_Out, stateEcIP_out.inlet) 
           annotation (points=[0.52,2; 1,2; 1,10], style(thickness=2));
-        connect(stateEcIP_out.outlet, cylindersBodies.Feed_IP) annotation (
+        connect(stateEcIP_out.outlet, drums.Feed_IP)           annotation (
             points=[1,16; 1,20.5; 0.52,20.5; 0.52,24], style(thickness=2));
         connect(HeatExchangersGroup.Ev_IP_In, stateEvIP_in.outlet) 
           annotation (points=[-5.56,2; -5,2; -5,10], style(thickness=2));
-        connect(stateEvIP_in.inlet, cylindersBodies.ToRiser_IP) annotation (
+        connect(stateEvIP_in.inlet, drums.ToRiser_IP)           annotation (
             points=[-5,16; -5,20.5; -5.56,20.5; -5.56,24], style(thickness=2));
         connect(HeatExchangersGroup.Ev_IP_Out, stateEvIP_out.inlet) 
           annotation (points=[-11.64,2; -11,2; -11,10], style(thickness=2));
-        connect(stateEvIP_out.outlet, cylindersBodies.FromRiser_IP) annotation (
+        connect(stateEvIP_out.outlet, drums.FromRiser_IP)           annotation (
            points=[-11,16; -11,20.5; -11.64,20.5; -11.64,24], style(thickness=2));
         connect(HeatExchangersGroup.Sh_IP_In, stateShIP_in.outlet) 
           annotation (points=[-17.72,2; -17,2; -17,10], style(thickness=2));
-        connect(stateShIP_in.inlet, cylindersBodies.Steam_IP_Out) annotation (
+        connect(stateShIP_in.inlet, drums.Steam_IP_Out)           annotation (
             points=[-17,16; -17,20.5; -17.72,20.5; -17.72,24], style(thickness=
                 2));
         connect(HeatExchangersGroup.Ec_HP_In, stateEcHP_in.outlet) 
           annotation (points=[-29.12,2; -29,2; -29,10], style(thickness=2));
-        connect(stateEcHP_in.inlet, cylindersBodies.WaterForHP) annotation (
+        connect(stateEcHP_in.inlet, drums.WaterForHP)           annotation (
             points=[-29,16; -29,19.5; -29.12,19.5; -29.12,24], style(thickness=
                 2));
         connect(HeatExchangersGroup.Ec_HP_Out, stateEcHP_out.inlet) annotation (
            points=[-35.2,2; -35.2,5; -35,5; -35,10], style(thickness=2));
-        connect(stateEcHP_out.outlet, cylindersBodies.Feed_HP) annotation (
+        connect(stateEcHP_out.outlet, drums.Feed_HP)           annotation (
             points=[-35,16; -35,20.5; -35.2,20.5; -35.2,24], style(thickness=2));
         connect(HeatExchangersGroup.Ev_HP_In, stateEvHP_in.outlet) annotation (
             points=[-41.28,2; -41.28,6; -41,6; -41,10], style(thickness=2));
@@ -15467,15 +15123,15 @@ I dati fanno riferimento all'avviamento della GT20.
            points=[-47.36,2; -47.36,5; -47,5; -47,10], style(thickness=2));
         connect(HeatExchangersGroup.Sh_HP_In, stateShHP_in.outlet) 
           annotation (points=[-53.44,2; -53,2; -53,10], style(thickness=2));
-        connect(stateShHP_in.inlet, cylindersBodies.Steam_HP_Out) annotation (
+        connect(stateShHP_in.inlet, drums.Steam_HP_Out)           annotation (
             points=[-53,16; -53,20.5; -53.44,20.5; -53.44,24], style(thickness=
                 2));
-        connect(stateEvHP_out.outlet, cylindersBodies.FromRiser_HP) annotation (
+        connect(stateEvHP_out.outlet, drums.FromRiser_HP)           annotation (
            points=[-47,16; -47,19.5; -47.36,19.5; -47.36,24], style(thickness=2));
-        connect(stateEvHP_in.inlet, cylindersBodies.ToRiser_HP) annotation (
+        connect(stateEvHP_in.inlet, drums.ToRiser_HP)           annotation (
             points=[-41,16; -41,20.5; -41.28,20.5; -41.28,24], style(thickness=
                 2));
-        connect(WaterIn, cylindersBodies.WaterIn) annotation (points=[80,-100;
+        connect(WaterIn, drums.WaterIn)           annotation (points=[80,-100;
               80,89.36; 18,89.36], style(thickness=2));
       end HRSG_3LRh_wa;
       
@@ -15484,32 +15140,32 @@ I dati fanno riferimento all'avviamento della GT20.
         extends Interfaces.HRSG_3LRh;
         
         annotation (Diagram);
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wafp cylindersBodies(
-          HPd_rint=1.067,
-          HPd_rext=1.167,
-          HPd_L=11.920,
-          HPd_Cm=0,
-          IPd_rint=0.915,
-          IPd_rext=1.015,
-          IPd_L=7,
-          IPd_Cm=0,
-          LPd_rint=1.143,
-          LPd_rext=1.243,
-          LPd_L=11.503,
-          LPd_Cm=0,
-          RiserHPFlowRate=175.5,
-          RiserIPFlowRate=67.5,
-          RiserLPFlowRate=41.5,
-          redeclare package FluidMedium = FluidMedium,
-          SSInit=false,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
+        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wafp drums(
+          HPd_rint=1.067, 
+          HPd_rext=1.167, 
+          HPd_L=11.920, 
+          HPd_Cm=0, 
+          IPd_rint=0.915, 
+          IPd_rext=1.015, 
+          IPd_L=7, 
+          IPd_Cm=0, 
+          LPd_rint=1.143, 
+          LPd_rext=1.243, 
+          LPd_L=11.503, 
+          LPd_Cm=0, 
+          RiserHPFlowRate=175.5, 
+          RiserIPFlowRate=67.5, 
+          RiserLPFlowRate=41.5, 
+          redeclare package FluidMedium = FluidMedium, 
+          SSInit=false, 
+          fluidLPNomPressure=7.19048e5, 
+          LPd_hvstart=2.76051e6, 
+          LPd_hlstart=6.68356e5, 
+          fluidHPNomPressure=1.626e7, 
+          fluidIPNomPressure=3.3816e6, 
+          HPd_hvstart=2.53239e6, 
+          HPd_hlstart=1.5879e6, 
+          IPd_hvstart=2.794e6, 
           IPd_hlstart=1.0265e6) annotation (extent=[-58,24; 18,100]);
         ThermoPower.PowerPlants.HRSG.Examples.HEG_3LRh_wa HeatExchangersGroup(
           gasNomFlowRate=585.5,
@@ -15806,31 +15462,31 @@ I dati fanno riferimento all'avviamento della GT20.
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateShLP_in.inlet,cylindersBodies. Steam_LP_Out) annotation (
+        connect(stateShLP_in.inlet, drums.Steam_LP_Out)           annotation (
             points=[27,34; 27,58.96; 18,58.96],   style(
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateEvLP_out.outlet,cylindersBodies. FromRiser_LP) annotation (
+        connect(stateEvLP_out.outlet, drums.FromRiser_LP)           annotation (
            points=[33,28; 33,65.04; 18,65.04],   style(
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateEvLP_in.inlet,cylindersBodies. ToRiser_LP) annotation (
+        connect(stateEvLP_in.inlet, drums.ToRiser_LP)           annotation (
             points=[39,22; 39,71.12; 18,71.12],   style(
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateEcLP_out.outlet,cylindersBodies. Feed_LP) annotation (
+        connect(stateEcLP_out.outlet, drums.Feed_LP)           annotation (
             points=[45,16; 45,77.2; 18,77.2],   style(
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateEcLP_in.inlet,cylindersBodies. WaterForLP) annotation (
+        connect(stateEcLP_in.inlet, drums.WaterForLP)           annotation (
             points=[51,6; 51,83.28; 18,83.28],   style(
             thickness=2,
             fillColor=76,
@@ -15842,11 +15498,11 @@ I dati fanno riferimento all'avviamento della GT20.
               -50,-90; -35.2,-90; -35.2,-74],       style(thickness=2));
         connect(Rh_IP_Out, HeatExchangersGroup.Rh_IP_Out) 
           annotation (points=[-20,-100; -20,-74],          style(thickness=2));
-        connect(Sh_IP_Out, HeatExchangersGroup.Sh_IP_Out) annotation (points=[10,-100;
+        connect(Sh_IP_Out, HeatExchangersGroup.Sh_IP_Out) annotation (points=[10,-100; 
               10,-90; -4,-90; -4,-74; -4.8,-74],          style(thickness=2));
-        connect(Sh_LP_Out, HeatExchangersGroup.Sh_LP_Out) annotation (points=[40,-100;
+        connect(Sh_LP_Out, HeatExchangersGroup.Sh_LP_Out) annotation (points=[40,-100; 
               40,-86; 10,-86; 10,-74; 10.4,-74],          style(thickness=2));
-        connect(GasOut, HeatExchangersGroup.GasOut) annotation (points=[100,-10;
+        connect(GasOut, HeatExchangersGroup.GasOut) annotation (points=[100,-10; 
               62,-10; 62,-35.62; 18.38,-35.62],style(
             color=76,
             rgbcolor={159,159,223},
@@ -15857,43 +15513,43 @@ I dati fanno riferimento all'avviamento della GT20.
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(ActuatorsBus, cylindersBodies.ActuatorsBus) annotation (points=[98,36;
+        connect(ActuatorsBus, drums.ActuatorsBus)           annotation (points=[98,36; 
               58,36; 58,34.64; 17.24,34.64],        style(color=52, rgbcolor={
                 213,255,170}));
-        connect(cylindersBodies.SensorsBus, SensorsBus) annotation (points=[17.24,
+        connect(drums.SensorsBus, SensorsBus)           annotation (points=[17.24,
               46.8; 53.65,46.8; 53.65,68; 98,68],      style(color=84, rgbcolor=
                {255,170,213}));
         connect(stateEvLP_out.inlet, HeatExchangersGroup.Ev_LP_Out) 
           annotation (points=[33,22; 33,-9.4; 18,-9.4], style(thickness=2));
         connect(HeatExchangersGroup.Ec_IP_In, stateEcIP_in.outlet) 
           annotation (points=[6.6,2; 7,2; 7,10], style(thickness=2));
-        connect(stateEcIP_in.inlet, cylindersBodies.WaterForIP) annotation (
+        connect(stateEcIP_in.inlet, drums.WaterForIP)           annotation (
             points=[7,16; 7,20.5; 6.6,20.5; 6.6,24], style(thickness=2));
         connect(HeatExchangersGroup.Ec_IP_Out, stateEcIP_out.inlet) 
           annotation (points=[0.52,2; 1,2; 1,10], style(thickness=2));
-        connect(stateEcIP_out.outlet, cylindersBodies.Feed_IP) annotation (
+        connect(stateEcIP_out.outlet, drums.Feed_IP)           annotation (
             points=[1,16; 1,20.5; 0.52,20.5; 0.52,24], style(thickness=2));
         connect(HeatExchangersGroup.Ev_IP_In, stateEvIP_in.outlet) 
           annotation (points=[-5.56,2; -5,2; -5,10], style(thickness=2));
-        connect(stateEvIP_in.inlet, cylindersBodies.ToRiser_IP) annotation (
+        connect(stateEvIP_in.inlet, drums.ToRiser_IP)           annotation (
             points=[-5,16; -5,20.5; -5.56,20.5; -5.56,24], style(thickness=2));
         connect(HeatExchangersGroup.Ev_IP_Out, stateEvIP_out.inlet) 
           annotation (points=[-11.64,2; -11,2; -11,10], style(thickness=2));
-        connect(stateEvIP_out.outlet, cylindersBodies.FromRiser_IP) annotation (
+        connect(stateEvIP_out.outlet, drums.FromRiser_IP)           annotation (
            points=[-11,16; -11,20.5; -11.64,20.5; -11.64,24], style(thickness=2));
         connect(HeatExchangersGroup.Sh_IP_In, stateShIP_in.outlet) 
           annotation (points=[-17.72,2; -17,2; -17,10], style(thickness=2));
-        connect(stateShIP_in.inlet, cylindersBodies.Steam_IP_Out) annotation (
+        connect(stateShIP_in.inlet, drums.Steam_IP_Out)           annotation (
             points=[-17,16; -17,20.5; -17.72,20.5; -17.72,24], style(thickness=
                 2));
         connect(HeatExchangersGroup.Ec_HP_In, stateEcHP_in.outlet) 
           annotation (points=[-29.12,2; -29,2; -29,10], style(thickness=2));
-        connect(stateEcHP_in.inlet, cylindersBodies.WaterForHP) annotation (
+        connect(stateEcHP_in.inlet, drums.WaterForHP)           annotation (
             points=[-29,16; -29,19.5; -29.12,19.5; -29.12,24], style(thickness=
                 2));
         connect(HeatExchangersGroup.Ec_HP_Out, stateEcHP_out.inlet) annotation (
            points=[-35.2,2; -35.2,5; -35,5; -35,10], style(thickness=2));
-        connect(stateEcHP_out.outlet, cylindersBodies.Feed_HP) annotation (
+        connect(stateEcHP_out.outlet, drums.Feed_HP)           annotation (
             points=[-35,16; -35,20.5; -35.2,20.5; -35.2,24], style(thickness=2));
         connect(HeatExchangersGroup.Ev_HP_In, stateEvHP_in.outlet) annotation (
             points=[-41.28,2; -41.28,6; -41,6; -41,10], style(thickness=2));
@@ -15901,15 +15557,15 @@ I dati fanno riferimento all'avviamento della GT20.
            points=[-47.36,2; -47.36,5; -47,5; -47,10], style(thickness=2));
         connect(HeatExchangersGroup.Sh_HP_In, stateShHP_in.outlet) 
           annotation (points=[-53.44,2; -53,2; -53,10], style(thickness=2));
-        connect(stateShHP_in.inlet, cylindersBodies.Steam_HP_Out) annotation (
+        connect(stateShHP_in.inlet, drums.Steam_HP_Out)           annotation (
             points=[-53,16; -53,20.5; -53.44,20.5; -53.44,24], style(thickness=
                 2));
-        connect(stateEvHP_out.outlet, cylindersBodies.FromRiser_HP) annotation (
+        connect(stateEvHP_out.outlet, drums.FromRiser_HP)           annotation (
            points=[-47,16; -47,19.5; -47.36,19.5; -47.36,24], style(thickness=2));
-        connect(stateEvHP_in.inlet, cylindersBodies.ToRiser_HP) annotation (
+        connect(stateEvHP_in.inlet, drums.ToRiser_HP)           annotation (
             points=[-41,16; -41,20.5; -41.28,20.5; -41.28,24], style(thickness=
                 2));
-        connect(WaterIn, cylindersBodies.WaterIn) annotation (points=[80,-100;
+        connect(WaterIn, drums.WaterIn)           annotation (points=[80,-100;
               80,89.36; 18,89.36], style(thickness=2));
       end HRSG_3LRh_wafp;
       
@@ -15918,38 +15574,38 @@ I dati fanno riferimento all'avviamento della GT20.
         extends Interfaces.HRSG_3LRh_tap;
         
         annotation (Diagram);
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_tap_CC_wa cylindersBodies(
-          HPd_rint=1.067,
-          HPd_rext=1.167,
-          HPd_L=11.920,
-          HPd_Cm=0,
-          IPd_rint=0.915,
-          IPd_rext=1.015,
-          IPd_L=7,
-          IPd_Cm=0,
-          LPd_rint=1.143,
-          LPd_rext=1.243,
-          LPd_L=11.503,
-          LPd_Cm=0,
-          RiserHPFlowRate=175.5,
-          RiserIPFlowRate=67.5,
-          RiserLPFlowRate=41.5,
-          redeclare package FluidMedium = FluidMedium,
-          SSInit=false,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
-          n0_TFP=1500,
-          inletTFPNomPressure=5398.2,
-          TFPNomFlowRate=89.8,
-          hstart_TFP=1.43495e5,
-          mixHP_V=5,
-          mixIP_V=5,
+        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_tap_CC_wa drums(
+          HPd_rint=1.067, 
+          HPd_rext=1.167, 
+          HPd_L=11.920, 
+          HPd_Cm=0, 
+          IPd_rint=0.915, 
+          IPd_rext=1.015, 
+          IPd_L=7, 
+          IPd_Cm=0, 
+          LPd_rint=1.143, 
+          LPd_rext=1.243, 
+          LPd_L=11.503, 
+          LPd_Cm=0, 
+          RiserHPFlowRate=175.5, 
+          RiserIPFlowRate=67.5, 
+          RiserLPFlowRate=41.5, 
+          redeclare package FluidMedium = FluidMedium, 
+          SSInit=false, 
+          fluidLPNomPressure=7.19048e5, 
+          LPd_hvstart=2.76051e6, 
+          LPd_hlstart=6.68356e5, 
+          fluidHPNomPressure=1.626e7, 
+          fluidIPNomPressure=3.3816e6, 
+          HPd_hvstart=2.53239e6, 
+          HPd_hlstart=1.5879e6, 
+          IPd_hvstart=2.794e6, 
+          n0_TFP=1500, 
+          inletTFPNomPressure=5398.2, 
+          TFPNomFlowRate=89.8, 
+          hstart_TFP=1.43495e5, 
+          mixHP_V=5, 
+          mixIP_V=5, 
           IPd_hlstart=1.0265e6) annotation (extent=[-40,8; 20,68]);
         ThermoPower.PowerPlants.HRSG.Examples.HEG_3LRh_wa HeatExchangersGroup(
           gasNomFlowRate=585.5,
@@ -16227,21 +15883,21 @@ I dati fanno riferimento all'avviamento della GT20.
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(ActuatorsBus, cylindersBodies.ActuatorsBus) annotation (points=[98,36;
+        connect(ActuatorsBus, drums.ActuatorsBus)           annotation (points=[98,36; 
               58,36; 58,16.4; 19.4,16.4],           style(color=52, rgbcolor={
                 213,255,170}));
-        connect(cylindersBodies.SensorsBus, SensorsBus) annotation (points=[19.4,26;
+        connect(drums.SensorsBus, SensorsBus)           annotation (points=[19.4,26;
               53.65,26; 53.65,68; 98,68],              style(color=84, rgbcolor=
                {255,170,213}));
-        connect(cylindersBodies.tapLPwater, LPwater_Out) annotation (points=[
+        connect(drums.tapLPwater, LPwater_Out)           annotation (points=[
               -8.2,68; -8,68; -8,76; 80,76; 80,100], style(thickness=2));
-        connect(cylindersBodies.tapIPwater, IPwater_Out) annotation (points=[
+        connect(drums.tapIPwater, IPwater_Out)           annotation (points=[
               -14.2,68; -14.2,82; 40,82; 40,100], style(thickness=2));
-        connect(cylindersBodies.tapHPwater, HPwater_Out) annotation (points=[
+        connect(drums.tapHPwater, HPwater_Out)           annotation (points=[
               -20.2,68; -20.2,84; -40,84; -40,100], style(thickness=2));
-        connect(cylindersBodies.IPsteamFromExUse, IPsteam_In) annotation (
+        connect(drums.IPsteamFromExUse, IPsteam_In)           annotation (
             points=[-29.2,68; -29.2,88; 0,88; 0,100], style(thickness=2));
-        connect(cylindersBodies.HPsteamFromExUse, HPsteam_In) annotation (
+        connect(drums.HPsteamFromExUse, HPsteam_In)           annotation (
             points=[-35.2,68; -35.2,80; -80,80; -80,100], style(thickness=2));
         connect(Rh_IP_In, HeatExchangersGroup.Rh_IP_In) annotation (points=[-50,
               -100; -50,-80; -22,-80; -22,-70], style(thickness=2));
@@ -16255,15 +15911,15 @@ I dati fanno riferimento all'avviamento della GT20.
               40,-100; 40,-80; 14,-80; 14,-70], style(thickness=2));
         connect(HeatExchangersGroup.Sh_HP_In, stateShHP_in.outlet) annotation (
             points=[-36.4,-10; -36.4,-7; -36,-7; -36,-4.4], style(thickness=2));
-        connect(stateShHP_in.inlet, cylindersBodies.Steam_HP_Out) 
+        connect(stateShHP_in.inlet, drums.Steam_HP_Out) 
           annotation (points=[-36,0.4; -36,8; -36.4,8], style(thickness=2));
-        connect(stateEvHP_out.outlet, cylindersBodies.FromRiser_HP) 
+        connect(stateEvHP_out.outlet, drums.FromRiser_HP) 
           annotation (points=[-32,0.4; -32,8; -31.6,8], style(thickness=2));
-        connect(stateEvHP_in.inlet, cylindersBodies.ToRiser_HP) 
+        connect(stateEvHP_in.inlet, drums.ToRiser_HP) 
           annotation (points=[-28,0.4; -28,8; -26.8,8], style(thickness=2));
-        connect(stateEcHP_out.outlet, cylindersBodies.Feed_HP) 
+        connect(stateEcHP_out.outlet, drums.Feed_HP) 
           annotation (points=[-22,0.4; -22,8], style(thickness=2));
-        connect(stateEcHP_in.inlet, cylindersBodies.WaterForHP) 
+        connect(stateEcHP_in.inlet, drums.WaterForHP) 
           annotation (points=[-16,0.4; -16,8; -17.2,8], style(thickness=2));
         connect(HeatExchangersGroup.Ec_HP_In, stateEcHP_in.outlet) annotation (
             points=[-17.2,-10; -16,-10; -16,-4.4], style(thickness=2));
@@ -16275,29 +15931,29 @@ I dati fanno riferimento all'avviamento della GT20.
            points=[-31.6,-10; -32,-10; -32,-4.4], style(thickness=2));
         connect(HeatExchangersGroup.Sh_IP_In, stateShIP_in.outlet) 
           annotation (points=[-8.2,-10; -8,-10; -8,-4.4], style(thickness=2));
-        connect(stateShIP_in.inlet, cylindersBodies.Steam_IP_Out) 
+        connect(stateShIP_in.inlet, drums.Steam_IP_Out) 
           annotation (points=[-8,0.4; -8,8; -8.2,8], style(thickness=2));
         connect(HeatExchangersGroup.Ev_IP_Out, stateEvIP_out.inlet) 
           annotation (points=[-3.4,-10; -4,-10; -4,-4.4], style(thickness=2));
-        connect(stateEvIP_out.outlet, cylindersBodies.FromRiser_IP) annotation (
+        connect(stateEvIP_out.outlet, drums.FromRiser_IP)           annotation (
            points=[-4,0.4; -4,3.8; -3.4,3.8; -3.4,8], style(thickness=2));
         connect(HeatExchangersGroup.Ev_IP_In, stateEvIP_in.outlet) 
           annotation (points=[1.4,-10; 2,-10; 2,-4.4], style(thickness=2));
-        connect(stateEvIP_in.inlet, cylindersBodies.ToRiser_IP) annotation (
+        connect(stateEvIP_in.inlet, drums.ToRiser_IP)           annotation (
             points=[2,0.4; 2,3.8; 1.4,3.8; 1.4,8], style(thickness=2));
         connect(HeatExchangersGroup.Ec_IP_Out, stateEcIP_out.inlet) annotation (
            points=[6.2,-10; 6.2,-7; 6,-7; 6,-4.4], style(thickness=2));
-        connect(stateEcIP_out.outlet, cylindersBodies.Feed_IP) 
+        connect(stateEcIP_out.outlet, drums.Feed_IP) 
           annotation (points=[6,0.4; 6,8; 6.2,8], style(thickness=2));
         connect(HeatExchangersGroup.Ec_IP_In, stateEcIP_in.outlet) 
           annotation (points=[11,-10; 10,-10; 10,-4.4], style(thickness=2));
-        connect(stateEcIP_in.inlet, cylindersBodies.WaterForIP) 
+        connect(stateEcIP_in.inlet, drums.WaterForIP) 
           annotation (points=[10,0.4; 11,0.4; 11,8], style(thickness=2));
-        connect(stateShLP_in.inlet, cylindersBodies.Steam_LP_Out) annotation (
+        connect(stateShLP_in.inlet, drums.Steam_LP_Out)           annotation (
             points=[27,30; 28,30; 28,35.6; 20,35.6], style(thickness=2));
         connect(stateShLP_in.outlet, HeatExchangersGroup.Sh_LP_In) annotation (
             points=[27,24; 28,24; 28,-14.2; 20,-14.2], style(thickness=2));
-        connect(stateEvLP_out.outlet, cylindersBodies.FromRiser_LP) annotation (
+        connect(stateEvLP_out.outlet, drums.FromRiser_LP)           annotation (
            points=[33,24; 32,24; 32,40.4; 20,40.4], style(thickness=2));
         connect(stateEvLP_out.inlet, HeatExchangersGroup.Ev_LP_Out) annotation (
            points=[33,18; 32,18; 32,-19; 20,-19], style(thickness=2));
@@ -16307,18 +15963,18 @@ I dati fanno riferimento all'avviamento della GT20.
            points=[45,6; 44,6; 44,-28.6; 20,-28.6], style(thickness=2));
         connect(HeatExchangersGroup.Ec_LP_In, stateEcLP_in.outlet) 
           annotation (points=[20,-33.4; 51,-33.4; 51,-4], style(thickness=2));
-        connect(stateEvLP_in.inlet, cylindersBodies.ToRiser_LP) annotation (
+        connect(stateEvLP_in.inlet, drums.ToRiser_LP)           annotation (
             points=[39,18; 38,18; 38,45.2; 20,45.2], style(thickness=2));
-        connect(stateEcLP_out.outlet, cylindersBodies.Fedd_LP) 
+        connect(stateEcLP_out.outlet, drums.Fedd_LP) 
           annotation (points=[45,12; 44,12; 44,50; 20,50], style(thickness=2));
-        connect(stateEcLP_in.inlet, cylindersBodies.WaterForLP) annotation (
+        connect(stateEcLP_in.inlet, drums.WaterForLP)           annotation (
             points=[51,2; 50,2; 50,54.8; 20,54.8], style(thickness=2));
-        connect(GasOut, HeatExchangersGroup.GasOut) annotation (points=[100,-10;
+        connect(GasOut, HeatExchangersGroup.GasOut) annotation (points=[100,-10; 
               58,-10; 58,-39.7; 20.3,-39.7], style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(WaterIn, cylindersBodies.WaterIn) 
+        connect(WaterIn, drums.WaterIn) 
           annotation (points=[80,-100; 80,59.6; 20,59.6], style(thickness=2));
       end HRSG_tap_wa;
       
@@ -16408,7 +16064,7 @@ I dati fanno riferimento all'avviamento della GT20.
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
           annotation (extent=[20,-6; 40,14]);
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -16418,24 +16074,24 @@ I dati fanno riferimento all'avviamento della GT20.
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (points=[-54,0;
+        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (points=[-54,0; 
               -61,0; -61,1.77636e-015; -68,1.77636e-015], style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[-10,-78;
+        connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[-10,-78; 
               -10,-68; -10,-68; -10,-58],      style(thickness=2));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (points=[-10,-46; -10,-16], style(thickness=2));
-        connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[-10,48;
+          annotation (points=[-10,-46; -10,-20], style(thickness=2));
+        connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[-10,48; 
               -10,54; -10,60; -10,60],     style(thickness=2));
         connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (points=[-10,36; -10,16], style(thickness=2));
+          annotation (points=[-10,36; -10,20], style(thickness=2));
       end TestHE_simp;
       
       model TestEcLP 
@@ -16515,16 +16171,16 @@ I dati fanno riferimento all'avviamento della GT20.
           gasNomPressure=5e5) 
           annotation (extent=[-30,-30; 30,30]);
       equation 
-        connect(hE.waterIn, sourseW_water.flange) annotation (points=[0,24; 0,
+        connect(hE.waterIn, sourseW_water.flange) annotation (points=[0,30; 0,
               50; -1.83691e-015,50], style(thickness=2));
-        connect(hE.waterOut, sinkP_water.flange) annotation (points=[0,-24; 0,
+        connect(hE.waterOut, sinkP_water.flange) annotation (points=[0,-30; 0,
               -50; 1.83691e-015,-50], style(thickness=2));
-        connect(hE.gasIn, sourceW_gas.flange) annotation (points=[-24,0; -50,0],
+        connect(hE.gasIn, sourceW_gas.flange) annotation (points=[-30,0; -50,0],
             style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(hE.gasOut, sinkP_gas.flange) annotation (points=[24,0; 50,0],
+        connect(hE.gasOut, sinkP_gas.flange) annotation (points=[30,0; 50,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -18279,11 +17935,11 @@ I dati fanno riferimento all'avviamento della GT20.
           annotation (points=[26,69.6; 26,76], style(thickness=2));
         connect(stateEcIP_out.outlet, sinkEcIP.flange) 
           annotation (points=[18,69.6; 18,88], style(thickness=2));
-        connect(stateEvIP_in.inlet, sourceEvIP.flange) annotation (points=[10,69.6;
+        connect(stateEvIP_in.inlet, sourceEvIP.flange) annotation (points=[10,69.6; 
               10,72.8; 10,76; 10,76],       style(thickness=2));
         connect(stateEvIP_out.outlet, sinkEvIP.flange) 
           annotation (points=[2,69.6; 2,78.8; 2,88; 2,88], style(thickness=2));
-        connect(stateShIP.inlet, sourceShIP.flange) annotation (points=[-6,69.6;
+        connect(stateShIP.inlet, sourceShIP.flange) annotation (points=[-6,69.6; 
               -6,72.8; -6,76; -6,76], style(thickness=2));
         connect(stateShHP_out.outlet, valveLinHP.inlet) annotation (points=[-50,
               -68.8; -50,-84; -62,-84], style(thickness=2));
@@ -18307,12 +17963,12 @@ I dati fanno riferimento all'avviamento della GT20.
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateGas_out.inlet, hEG_3LRh_simp.GasOut) annotation (points=[60,-2;
+        connect(stateGas_out.inlet, hEG_3LRh_simp.GasOut) annotation (points=[60,-2; 
               60,2.5; 40.5,2.5],        style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(stateGas_in.outlet, hEG_3LRh_simp.GasIn) annotation (points=[-76,-2;
+        connect(stateGas_in.outlet, hEG_3LRh_simp.GasIn) annotation (points=[-76,-2; 
               -76,2.5; -60.5,2.5],         style(
             color=76,
             rgbcolor={159,159,223},
@@ -18536,7 +18192,7 @@ I dati fanno riferimento all'avviamento della GT20.
         connect(valveLP.cmd, com_valve.y) annotation (points=[48,19.6; 48,14;
               18,14; 18,-92; 23.4,-92],
                                     style(color=74, rgbcolor={0,0,127}));
-        connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-8,-58;
+        connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-8,-58; 
               -8,-47.8; -8,-47.8; -8,-37.6],      style(
             thickness=2,
             fillColor=3,
@@ -18943,7 +18599,7 @@ I dati fanno riferimento all'avviamento della GT20.
               -96; 18,-96; 18,-90; 33.4,-90], style(color=74, rgbcolor={0,0,127}));
         connect(valveLP.cmd, com_valve.y) annotation (points=[48,19.6; 48,4; 18,
               4; 18,-90; 33.4,-90], style(color=74, rgbcolor={0,0,127}));
-        connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-8,-58;
+        connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-8,-58; 
               -8,-47.8; -8,-47.8; -8,-37.6],      style(
             thickness=2,
             fillColor=3,
@@ -19629,7 +19285,7 @@ I dati fanno riferimento all'avviamento della GT20.
         connect(com_pumpFeedHP.y, actuators.flowRate_feedHP) 
                                                      annotation (points=[85.3,23;
               80,23; 80,40],        style(color=74, rgbcolor={0,0,127}));
-        connect(actuators, Drums.ActuatorsBus)           annotation (points=[80,40;
+        connect(actuators, Drums.ActuatorsBus)           annotation (points=[80,40; 
               20,40; 20,39.52; 9.3,39.52],     style(color=52, rgbcolor={213,
                 255,170}));
         connect(outHP.flange,valveLinHP. outlet) 
@@ -20492,7 +20148,7 @@ I dati fanno riferimento all'avviamento della GT20.
           connect(valveLP.cmd, com_valve.y) annotation (points=[48,19.6; 48,14;
                 18,14; 18,-92; 23.4,-92],
                                       style(color=74, rgbcolor={0,0,127}));
-          connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-8,-58;
+          connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-8,-58; 
                 -8,-47.8; -8,-47.8; -8,-37.6],      style(
               thickness=2,
               fillColor=3,
@@ -20889,7 +20545,7 @@ I dati fanno riferimento all'avviamento della GT20.
           connect(valveLP.cmd, com_valve.y) annotation (points=[48,19.6; 48,14;
                 18,14; 18,-84; 33.4,-84],
                                       style(color=74, rgbcolor={0,0,127}));
-          connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-8,-58;
+          connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-8,-58; 
                 -8,-47.8; -8,-47.8; -8,-37.6],      style(
               thickness=2,
               fillColor=3,
@@ -21297,7 +20953,7 @@ I dati fanno riferimento all'avviamento della GT20.
             annotation (points=[-28,-38; -28,-28.8], style(thickness=2));
           connect(turbineIP.inlet, stateRhIP_out.outlet) annotation (points=[-7.5,
                 -74.1; -16,-74.1; -16,-28.8],      style(thickness=2));
-          connect(stateShIP_out.outlet, mixIP.in2) annotation (points=[-4,-28.8;
+          connect(stateShIP_out.outlet, mixIP.in2) annotation (points=[-4,-28.8; 
                 -4,-60; -24.4,-60; -24.4,-48.74], style(thickness=2));
         end TestHRSG_wa;
         
@@ -21474,7 +21130,7 @@ I dati fanno riferimento all'avviamento della GT20.
             annotation (points=[-28,-38; -28,-28.8], style(thickness=2));
           connect(turbineIP.inlet, stateRhIP_out.outlet) annotation (points=[-7.5,
                 -74.1; -16,-74.1; -16,-28.8],      style(thickness=2));
-          connect(stateShIP_out.outlet, mixIP.in2) annotation (points=[-4,-28.8;
+          connect(stateShIP_out.outlet, mixIP.in2) annotation (points=[-4,-28.8; 
                 -4,-60; -24.4,-60; -24.4,-48.74], style(thickness=2));
           connect(levelsControlSimplified.SensorsBus, hRSG.SensorsBus) 
             annotation (points=[60.2,74; 46,74; 46,61.2; 31.2,61.2], style(
@@ -22866,23 +22522,23 @@ I dati fanno riferimento all'avviamento della GT20.
           "Outlet cooling fluid pressure start value"        annotation(Dialog(tab = "Initialization"));
         
         ThermoPower.Water.FlangeB waterOut(redeclare package Medium = 
-              FluidMedium)                annotation (extent=[-40,-100; 0,-60]);
+              FluidMedium)                annotation (extent=[-30,-120; 10,-80]);
         ThermoPower.Water.FlangeA coolingIn(redeclare package Medium = 
-              FluidMedium)                 annotation (extent=[60,-48; 100,-8]);
+              FluidMedium)                 annotation (extent=[80,-60; 120,-20]);
         ThermoPower.Water.FlangeB coolingOut(redeclare package Medium = 
-              FluidMedium)                 annotation (extent=[60,30; 100,70]);
+              FluidMedium)                 annotation (extent=[80,40; 120,80]);
         annotation (Diagram, Icon(
-            Rectangle(extent=[-90,80; 50,-50],  style(
+            Rectangle(extent=[-100,100; 80,-60], style(
+                color=3, 
+                rgbcolor={0,0,255}, 
+                fillColor=30, 
+                rgbfillColor={230,230,230})),
+            Rectangle(extent=[-90,-60; 70,-100],style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Rectangle(extent=[-80,-50; 40,-80], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Line(points=[68,-30; -58,-30; 10,10; -58,50; 70,50],   style(
+            Line(points=[100,-40; -60,-40; 10,10; -60,60; 100,60], style(
                 color=3,
                 rgbcolor={0,0,255},
                 thickness=2)),
@@ -22891,7 +22547,7 @@ I dati fanno riferimento all'avviamento della GT20.
               string="%name",
               style(color=71, rgbcolor={85,170,255}))));
         ThermoPower.Water.FlangeA steamIn(redeclare package Medium = 
-              FluidMedium)                 annotation (extent=[-40,60; 0,100]);
+              FluidMedium)                 annotation (extent=[-30,80; 10,120]);
         
       end Condenser;
       
@@ -23987,28 +23643,28 @@ I dati fanno riferimento all'avviamento della GT20.
           Vlstart=Vlstart_cond,
           initOpt=if SSInit then Options.steadyState else Options.noInit) 
           annotation (extent=[-66,-6; -34,26]);
-        annotation (Diagram);
+        annotation (Diagram, Icon);
         Modelica.Blocks.Interfaces.RealOutput ratio_VvonVtot 
-          annotation (extent=[-100,0; -80,20], rotation=180);
+          annotation (extent=[-110,0; -90,20], rotation=180);
       equation 
         connect(flowCooling.infl, coolingIn) 
-          annotation (points=[20,-2; 20,-28; 80,-28],
+          annotation (points=[20,-2; 20,-40; 100,-40],
                                                   style(thickness=2));
         connect(flowCooling.outfl, coolingOut) 
-          annotation (points=[20,22; 20,50; 80,50], style(thickness=2));
+          annotation (points=[20,22; 20,60; 100,60],style(thickness=2));
         connect(convHT.side2,flowCooling. wall) annotation (points=[-18.9,10;
               15,10],
                    style(color=45, rgbcolor={255,127,0}));
         connect(condenserShell.steam, steamIn) 
-          annotation (points=[-50,26; -50,80; -20,80],
+          annotation (points=[-50,26; -50,100; -10,100],
                                                      style(thickness=2));
         connect(condenserShell.condensate, waterOut) 
-          annotation (points=[-50,-6; -50,-80; -20,-80],
+          annotation (points=[-50,-6; -50,-100; -10,-100],
                                                       style(thickness=2));
         connect(condenserShell.coolingFluid,convHT. side1) annotation (points=[-50,10;
               -25,10],       style(color=45, rgbcolor={255,127,0}));
-        connect(condenserShell.ratio_VvVtot, ratio_VvonVtot) annotation (points=
-             [-61.2,10; -90,10], style(
+        connect(condenserShell.ratio_VvVtot, ratio_VvonVtot) annotation (points=[-61.2,10; 
+              -100,10],          style(
             color=74,
             rgbcolor={0,0,127},
             fillColor=30,
@@ -24040,26 +23696,26 @@ I dati fanno riferimento all'avviamento della GT20.
         
         //Connectors
         Water.FlangeA steamIn( redeclare package Medium = Medium) 
-                       annotation (extent=[-20,60; 20,100]);
-        Water.FlangeB waterOut( redeclare package Medium = Medium) annotation (extent=[-20,-100;
-              20,-60]);
-        Modelica.Blocks.Interfaces.RealOutput Qcond annotation (extent=[-80,30;
-              -60,50], rotation=180);
+                       annotation (extent=[-20,80; 20,120]);
+        Water.FlangeB waterOut( redeclare package Medium = Medium) annotation (extent=[-20,-120; 
+              20,-80]);
+        Modelica.Blocks.Interfaces.RealOutput Qcond annotation (extent=[-110,30; 
+              -90,50], rotation=180);
         Modelica.Blocks.Interfaces.RealOutput ratio_Vv_Vtot 
-          annotation (extent=[-80,-30; -60,-10], rotation=180);
+          annotation (extent=[-110,-30; -90,-10],rotation=180);
         annotation (
           Icon(
-            Rectangle(extent=[-70,80; 70,-50],  style(
+            Rectangle(extent=[-90,100; 90,-60], style(
+                color=3, 
+                rgbcolor={0,0,255}, 
+                fillColor=30, 
+                rgbfillColor={230,230,230})),
+            Rectangle(extent=[-80,-60; 80,-100],style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Rectangle(extent=[-60,-50; 60,-80], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Line(points=[42,-30; -38,-30; 30,10; -38,50; 42,50],   style(
+            Line(points=[60,-40; -60,-40; 30,10; -60,60; 60,60],   style(
                 color=3,
                 rgbcolor={0,0,255},
                 thickness=2))),
@@ -24114,28 +23770,28 @@ I dati fanno riferimento all'avviamento della GT20.
         SI.Power Q "Thermal power";
         
         Water.FlangeA steamIn( redeclare package Medium = Medium) 
-                       annotation (extent=[-20,60; 20,100]);
-        Water.FlangeB waterOut( redeclare package Medium = Medium) annotation (extent=[-20,-100;
-              20,-60]);
-        Modelica.Blocks.Interfaces.RealOutput Qcond annotation (extent=[-80,30;
-              -60,50], rotation=180);
+                       annotation (extent=[-20,80; 20,120]);
+        Water.FlangeB waterOut( redeclare package Medium = Medium) annotation (extent=[-20,-120; 
+              20,-80]);
+        Modelica.Blocks.Interfaces.RealOutput Qcond annotation (extent=[-110,30; 
+              -90,50], rotation=180);
         Modelica.Blocks.Interfaces.RealOutput ratio_Vv_Vtot 
-          annotation (extent=[-80,-30; -60,-10], rotation=180);
+          annotation (extent=[-110,-30; -90,-10],rotation=180);
         Water.FlangeA tapWater(redeclare package Medium = Medium) 
-                       annotation (extent=[-70,-70; -50,-50]);
+                       annotation (extent=[-90,-90; -70,-70]);
         annotation (
           Icon(
-            Rectangle(extent=[-70,80; 70,-50],  style(
+            Rectangle(extent=[-90,100; 90,-60], style(
+                color=3, 
+                rgbcolor={0,0,255}, 
+                fillColor=30, 
+                rgbfillColor={230,230,230})),
+            Rectangle(extent=[-80,-60; 80,-100],style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Rectangle(extent=[-60,-50; 60,-80], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Line(points=[42,-30; -38,-30; 30,10; -38,50; 42,50],   style(
+            Line(points=[60,-40; -60,-40; 30,10; -60,60; 60,60],   style(
                 color=3,
                 rgbcolor={0,0,255},
                 thickness=2))),
@@ -24351,38 +24007,38 @@ I dati fanno riferimento all'avviamento della GT20.
             annotation (Dialog(tab= "Initialization"));
         
         annotation (Diagram, Icon(
-            Polygon(points=[-26,74; -26,26; -20,26; -20,80; -58,80; -58,74; -26,
-                  74],          style(
+            Polygon(points=[-26,76; -26,28; -20,28; -20,82; -58,82; -58,76; -26,
+                  76],          style(
                 color=0,
                 fillColor=3,
                 thickness=2)),
-            Polygon(points=[28,54; 34,54; 34,74; 62,74; 62,80; 28,80; 28,54],
+            Polygon(points=[28,56; 34,56; 34,76; 62,76; 62,82; 28,82; 28,56],
                         style(
                 color=0,
                 fillColor=3,
                 thickness=2)),
-            Rectangle(extent=[-58,6; 62,-10],  style(
+            Rectangle(extent=[-58,8; 62,-8],   style(
                 color=76,
                 gradient=3,
                 fillColor=9)),
-            Polygon(points=[-26,26; -26,-28; 34,-62; 34,58; -26,26],      style(
+            Polygon(points=[-26,28; -26,-26; 34,-60; 34,60; -26,28],      style(
                 color=0,
                 fillColor=3,
                 thickness=2,
                 fillPattern=1)),
-               Text(extent=[-126,134; 132,94],    string="%name"),
-            Polygon(points=[2,-80; 4,-80; 4,-44; 2,-44; 2,-80], style(
+               Text(extent=[-126,136; 132,96],    string="%name"),
+            Polygon(points=[2,-78; 4,-78; 4,-42; 2,-42; 2,-78], style(
                 color=0,
                 rgbcolor={0,0,0},
                 fillPattern=1))));
         Modelica.Blocks.Interfaces.RealInput partialArc 
-          annotation (extent=[-68,-50; -48,-30]);
+          annotation (extent=[-68,-48; -48,-28]);
         Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
-          annotation (extent=[-74,-12; -54,8]);
+          annotation (extent=[-74,-10; -54,10]);
         Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
-          annotation (extent=[56,-12; 76,8]);
+          annotation (extent=[56,-10; 76,10]);
         Water.FlangeB tap1(redeclare package Medium = FluidMedium) 
-                                         annotation (extent=[-6,-90; 12,-72]);
+                                         annotation (extent=[-6,-88; 12,-70]);
         Water.SteamTurbineStodola ST_firstStages(
           redeclare package Medium = FluidMedium,
           pstart_in=pstart_in,
@@ -24391,7 +24047,7 @@ I dati fanno riferimento all'avviamento della GT20.
           hstartin=hstartin,
           hstartout=hstarttap,
           wnom=wn,
-          Kt=Kt)    annotation (extent=[-44,-20; -8,16]);
+          Kt=Kt)    annotation (extent=[-44,-18; -8,18]);
         Water.SteamTurbineStodola ST_secondStages(
           redeclare package Medium = FluidMedium,
           pstart_in=pstart_tap,
@@ -24400,12 +24056,12 @@ I dati fanno riferimento all'avviamento della GT20.
           hstartin=hstarttap,
           hstartout=hstartout,
           wnom=wn,
-          Kt=Kt)    annotation (extent=[18,-20; 56,16]);
+          Kt=Kt)    annotation (extent=[18,-18; 56,18]);
         Water.FlowSplit flowSplit annotation (extent=[-8,36; 6,50]);
         Water.FlangeA flangeA(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-90,60; -56,94]);
+          annotation (extent=[-90,62; -56,96]);
         Water.FlangeB flangeB(redeclare package Medium = FluidMedium) 
-          annotation (extent=[58,60; 92,94]);
+          annotation (extent=[62,62; 96,96]);
         
       equation 
         connect(Shaft_a, Shaft_a) annotation (points=[-50,0; -50,0; -50,0],
@@ -24419,37 +24075,36 @@ I dati fanno riferimento all'avviamento della GT20.
             rgbcolor={0,0,0},
             thickness=2,
             fillPattern=1));
-        connect(shaft_b, ST_secondStages.shaft_b) annotation (points=[66,-2;
-              49.16,-2],style(
+        connect(shaft_b, ST_secondStages.shaft_b) annotation (points=[66,0; 
+              49.16,0], style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
         connect(ST_secondStages.shaft_a, ST_firstStages.shaft_b) annotation (
-            points=[24.46,-2; -14.48,-2],
-                                        style(
+            points=[24.46,0; -14.48,0], style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_firstStages.shaft_a, shaft_a) annotation (points=[-37.88,-2;
-              -64,-2], style(
+        connect(ST_firstStages.shaft_a, shaft_a) annotation (points=[-37.88,0; 
+              -64,0],  style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
         connect(flowSplit.out1, ST_secondStages.inlet) annotation (points=[3.2,
-              45.94; 12,45.94; 12,46; 22.75,46; 22.75,12.22],
+              45.94; 12,45.94; 12,46; 22.75,46; 22.75,14.22],
                                                        style(thickness=2));
         connect(flowSplit.out2, tap1) 
-          annotation (points=[3.2,40.2; 3.2,-81; 3,-81], style(thickness=2));
+          annotation (points=[3.2,40.2; 3.2,-79; 3,-79], style(thickness=2));
         connect(flangeA, ST_firstStages.inlet) 
-          annotation (points=[-73,77; -39.5,77; -39.5,12.22],
+          annotation (points=[-73,79; -39.5,79; -39.5,14.22],
                                                          style(thickness=2));
         connect(flangeB, ST_secondStages.outlet) 
-          annotation (points=[75,77; 51.63,77; 51.63,12.4],
+          annotation (points=[79,79; 51.63,79; 51.63,14.4],
                                                         style(thickness=2));
-        connect(flowSplit.in1, ST_firstStages.outlet) annotation (points=[-5.2,43;
-              -12.14,43; -12.14,12.4], style(thickness=2));
-        connect(partialArc, ST_firstStages.partialArc) annotation (points=[-58,
-              -40; -36,-40; -36,-26; -52,-26; -52,-9.2; -35,-9.2], style(color=
+        connect(flowSplit.in1, ST_firstStages.outlet) annotation (points=[-5.2,43; 
+              -12.14,43; -12.14,14.4], style(thickness=2));
+        connect(partialArc, ST_firstStages.partialArc) annotation (points=[-58,-38; 
+              -36,-38; -36,-26; -52,-26; -52,-7.2; -35,-7.2],      style(color=
                 74, rgbcolor={0,0,127}));
       end SteamTurbine_1tapping;
       
@@ -26500,7 +26155,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Tstart_cool_out=Tstart_cool_out,
           hstart_cool_in=hstart_cool_in,
           hstart_cool_out=hstart_cool_out) 
-                                       annotation (extent=[-16,-22; 24,18]);
+                                       annotation (extent=[-18,-22; 22,18]);
         annotation (Diagram);
         Water.SourceW coolingIn(redeclare package Medium = FluidMedium,
           p0=coolNomPressure,
@@ -26518,17 +26173,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[-116,-10; -96,10], rotation=180);
       equation 
         connect(condenser.steamIn, SteamIn) 
-          annotation (points=[0,14; 0,100], style(thickness=2));
+          annotation (points=[0,18; 0,100], style(thickness=2));
         connect(condenser.waterOut, WaterOut) 
-          annotation (points=[0,-18; 0,-100], style(thickness=2));
+          annotation (points=[0,-22; 0,-100], style(thickness=2));
         connect(stateCoolingOut.outlet, coolingOut.flange) annotation (points=[
               56,40; 70,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateCoolingOut.inlet, condenser.coolingOut) annotation (points=
-             [44,40; 34,40; 34,8; 20,8], style(
+        connect(stateCoolingOut.inlet, condenser.coolingOut) annotation (points=[44,40; 
+              34,40; 34,10; 22,10],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -26539,14 +26194,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateCoolingIn.outlet, condenser.coolingIn) annotation (points=[44,-14;
-              34,-14; 34,-7.6; 20,-7.6],          style(
+        connect(stateCoolingIn.outlet, condenser.coolingIn) annotation (points=[44,-14; 
+              34,-14; 34,-10; 22,-10],            style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(condenser.ratio_VvonVtot, ratio_VvonVtot) annotation (points=[
-              -14,0; -106,0], style(
+        connect(condenser.ratio_VvonVtot, ratio_VvonVtot) annotation (points=[-18,0; 
+              -106,0],        style(
             color=74,
             rgbcolor={0,0,127},
             fillColor=30,
@@ -26554,34 +26209,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillPattern=1));
       end CondPlant;
       
-      model CondPlantHU "Condensation Plant with coupling Heat Usage" 
-        extends Interfaces.CondPlantHU;
-        parameter SI.Volume mixCondenser_V "Internal volume of the mixer";
-        parameter SI.Enthalpy mixCondenser_hstart=1e5 "Enthalpy start value" 
-          annotation (Dialog(tab="Initialization"));
-        parameter SI.Pressure mixCondenser_pstart=1e5 "Pressure start value" 
-          annotation (Dialog(tab="Initialization"));
-        
-        annotation (Diagram);
-        Water.Mixer mixCondenser(
-          initOpt=if SSInit then Options.steadyState else Options.noInit,
-          redeclare package Medium = FluidMedium,
-          V=mixCondenser_V,
-          pstart=mixCondenser_pstart,
-          hstart=mixCondenser_hstart) 
-                          annotation (extent=[-54,-36; -34,-16], rotation=270);
-        
-      equation 
-        connect(mixCondenser.in2, SteamToHU) 
-                                      annotation (points=[-50,-18.1; -50,100],
-            style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(WaterOut, mixCondenser.out) annotation (points=[0,-100; 0,-60;
-              -44,-60; -44,-36], style(thickness=2));
-      end CondPlantHU;
       
       model CondPlant_cc 
         "Condensation plant with condenser ratio control (type ImpPressureCondenser_tap)" 
@@ -26591,7 +26218,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         Components.StateReader stateTapping(redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-40,-36; -8,-4],  rotation=0);
+          annotation (extent=[-46,-36; -14,-4], rotation=0);
         Control.PID pID(
           PVmax=1,
           PVmin=0.1,
@@ -26606,7 +26233,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             Medium = FluidMedium,
           p=p,
           Vtot=Vtot,
-          Vlstart=Vlstart)                  annotation (extent=[0,-36; 80,44]);
+          Vlstart=Vlstart)                  annotation (extent=[0,-34; 80,46]);
         Water.SourceW sourceTap(
           redeclare package Medium = FluidMedium,
           p0=p)       annotation (extent=[-96,-36; -60,-4]);
@@ -26622,26 +26249,27 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(pID.CS,sourceTap. in_w0) annotation (points=[-68.78,43; -85.2,
               43; -85.2,-10.4],                         style(color=74,
               rgbcolor={0,0,127}));
-        connect(pID.PV,condenserIdeal_tap. ratio_Vv_Vtot) annotation (points=[-42,37.8;
-              -28,37.8; -28,-4; 12,-4],                        style(color=74,
+        connect(pID.PV,condenserIdeal_tap. ratio_Vv_Vtot) annotation (points=[-42,37.8; 
+              -28,37.8; -28,-2; 0,-2],                         style(color=74,
               rgbcolor={0,0,127}));
         connect(condenserIdeal_tap.steamIn, SteamIn) 
-          annotation (points=[40,36; 40,64; 0,64; 0,100], style(thickness=2));
-        connect(condenserIdeal_tap.waterOut, WaterOut) annotation (points=[40,-28;
+          annotation (points=[40,46; 40,64; 0,64; 0,100], style(thickness=2));
+        connect(condenserIdeal_tap.waterOut, WaterOut) annotation (points=[40,-34; 
               40,-52; 0,-52; 0,-100],     style(thickness=2));
         connect(BubbleEnthalpy.h, sourceTap.in_h)                  annotation (
             points=[-64.2,2; -70.8,2; -70.8,-10.4],           style(color=74,
               rgbcolor={0,0,127}));
         connect(SensorsBus.Cond_ratio, condenserIdeal_tap.ratio_Vv_Vtot) 
-          annotation (points=[98,-40; -4,-40; -4,-4; 12,-4], style(color=84,
+          annotation (points=[98,-40; -8,-40; -8,-2; 0,-2],  style(color=84,
               rgbcolor={255,170,213}));
-        connect(SensorsBus.Cond_Q, condenserIdeal_tap.Qcond) annotation (points=
-             [98,-40; -4,-40; -4,20; 12,20], style(color=84, rgbcolor={255,170,
+        connect(SensorsBus.Cond_Q, condenserIdeal_tap.Qcond) annotation (points=[98,-40; 
+              -8,-40; -8,22; 0,22],          style(color=84, rgbcolor={255,170,
                 213}));
         connect(stateTapping.outlet, condenserIdeal_tap.tapWater) 
-          annotation (points=[-14.4,-20; 16,-20], style(thickness=2));
+          annotation (points=[-20.4,-20; 0,-20; 0,-26; 8,-26],
+                                                  style(thickness=2));
         connect(stateTapping.inlet, sourceTap.flange) 
-          annotation (points=[-33.6,-20; -60,-20], style(thickness=2));
+          annotation (points=[-39.6,-20; -60,-20], style(thickness=2));
       end CondPlant_cc;
       
       model CondPlantHU_cc 
@@ -26663,7 +26291,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       equation 
         connect(condPlant_cc.SteamIn, SteamIn) 
           annotation (points=[50,60; 50,100], style(thickness=2));
-        connect(WaterOut, mixCondenser.out) annotation (points=[0,-100; 0,-60;
+        connect(WaterOut, mixCondenser.out) annotation (points=[0,-100; 0,-60; 
               -1.83691e-015,-60], style(thickness=2));
         connect(mixCondenser.in1, condPlant_cc.WaterOut) 
           annotation (points=[6,-42; 6,-20; 50,-20; 50,0], style(thickness=2));
@@ -26672,7 +26300,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(SensorsBus, condPlant_cc.SensorsBus) annotation (points=[98,-40;
               80,-40; 80,-20; 96,-20; 96,18; 79.4,18], style(color=84, rgbcolor=
                {255,170,213}));
-        connect(ActuatorsBus, condPlant_cc.ActuatorsBus) annotation (points=[98,-72;
+        connect(ActuatorsBus, condPlant_cc.ActuatorsBus) annotation (points=[98,-72; 
               72,-72; 72,-12; 88,-12; 88,8.4; 79.4,8.4],      style(color=52,
               rgbcolor={213,255,170}));
       end CondPlantHU_cc;
@@ -26738,14 +26366,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(stateLPTout.inlet, steamTurbines.LPT_Out) 
           annotation (points=[24,-62; 24,-40], style(thickness=2));
         connect(condenserIdeal.steamIn, stateLPTout.outlet) 
-          annotation (points=[42,-80; 24,-80; 24,-74], style(thickness=2));
+          annotation (points=[40,-80; 24,-80; 24,-74], style(thickness=2));
         connect(condenserIdeal.waterOut, WaterOut) 
-          annotation (points=[58,-80; 80,-80; 80,100], style(thickness=2));
+          annotation (points=[60,-80; 80,-80; 80,100], style(thickness=2));
         connect(SensorsBus.ratioVvVtot, condenserIdeal.ratio_Vv_Vtot) 
-          annotation (points=[98,-40; 72,-40; 72,-94; 52,-94; 52,-87], style(
+          annotation (points=[98,-40; 72,-40; 72,-94; 52,-94; 52,-90], style(
               color=84, rgbcolor={255,170,213}));
         connect(SensorsBus.Qout_condenser, condenserIdeal.Qcond) annotation (
-            points=[98,-40; 72,-40; 72,-94; 46,-94; 46,-87], style(color=84,
+            points=[98,-40; 72,-40; 72,-94; 46,-94; 46,-90], style(color=84,
               rgbcolor={255,170,213}));
       end STG_3LRh;
       
@@ -26821,15 +26449,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               60,-72; 60,-36; 35,-36],         style(color=52, rgbcolor={213,
                 255,170}));
         connect(condenserIdeal.waterOut, WaterOut) 
-          annotation (points=[57.6,-84; 80,-84; 80,100], style(thickness=2));
+          annotation (points=[60,-84; 80,-84; 80,100],   style(thickness=2));
         connect(SensorsBus.ratioVvVtot, condenserIdeal.ratio_Vv_Vtot) annotation (
-            points=[98,-40; 66,-40; 66,-98; 50.4,-98; 50.4,-92.4],   style(
+            points=[98,-40; 66,-40; 66,-98; 50.4,-98; 50.4,-96],     style(
               color=84, rgbcolor={255,170,213}));
         connect(SensorsBus.Qout_condenser, condenserIdeal.Qcond) annotation (
-            points=[98,-40; 66,-40; 66,-98; 43.2,-98; 43.2,-92.4],   style(
+            points=[98,-40; 66,-40; 66,-98; 43.2,-98; 43.2,-96],     style(
               color=84, rgbcolor={255,170,213}));
         connect(condenserIdeal.steamIn, stateLPTout.outlet) 
-          annotation (points=[38.4,-84; 26,-84; 26,-74], style(thickness=2));
+          annotation (points=[36,-84; 26,-84; 26,-74],   style(thickness=2));
       end STG_3LRh_valve;
       
       model STG_3LRh_cc 
@@ -26977,7 +26605,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[40,-84; 24,-84; 24,-74], style(thickness=2));
         connect(controlledCondeser.WaterOut, WaterOut) 
           annotation (points=[60,-84; 80,-84; 80,100], style(thickness=2));
-        connect(ActuatorsBus, steamTurbines.ActuatorsBus) annotation (points=[98,-72;
+        connect(ActuatorsBus, steamTurbines.ActuatorsBus) annotation (points=[98,-72; 
               64,-72; 64,-28.8; 31.2,-28.8],      style(color=52, rgbcolor={213,
                 255,170}));
       end STG_3LRh_valve_cc;
@@ -27065,10 +26693,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus, controlledCondeser.ActuatorsBus) annotation (
             points=[98,-72; 48,-72; 48,54.4; 60.4,54.4], style(color=52,
               rgbcolor={213,255,170}));
-        connect(ActuatorsBus, steamTurbines.ActuatorsBus) annotation (points=[98,-72;
+        connect(ActuatorsBus, steamTurbines.ActuatorsBus) annotation (points=[98,-72; 
               48,-72; 48,-28.8; 5.2,-28.8],         style(color=52, rgbcolor={
                 213,255,170}));
-        connect(SensorsBus, steamTurbines.SensorsBus) annotation (points=[98,-40;
+        connect(SensorsBus, steamTurbines.SensorsBus) annotation (points=[98,-40; 
               52,-40; 52,-16; 5.2,-16],      style(color=84, rgbcolor={255,170,
                 213}));
         connect(SensorsBus, controlledCondeser.SensorsBus) annotation (points=[
@@ -28329,20 +27957,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(pump.outlet, stateWater_outPump.inlet) 
           annotation (points=[52,-10; 90,-10; 90,-22],
                                                      style(thickness=2));
-        connect(pID.CS, pump.pumpSpeed_rpm)                annotation (points=[0.6,-40;
+        connect(pID.CS, pump.pumpSpeed_rpm)                annotation (points=[0.6,-40; 
               20,-40; 20,-16; 31.2,-16],          style(color=74, rgbcolor={0,0,
                 127}));
         connect(stateCondIn.inlet, sourceW.flange) 
           annotation (points=[-44,60; -56,60], style(thickness=2));
         connect(stateCondIn.outlet, condenserIdeal.steamIn) 
-          annotation (points=[-32,60; -20,60; -20,32], style(thickness=2));
+          annotation (points=[-32,60; -20,60; -20,36], style(thickness=2));
         connect(stateCondOut.inlet, condenserIdeal.waterOut) 
-          annotation (points=[-2,-10; -20,-10; -20,0],
+          annotation (points=[-2,-10; -20,-10; -20,-4],
                                                      style(thickness=2));
         connect(stateCondOut.outlet, pump.inlet) 
           annotation (points=[10,-10; 21,-10; 21,-10; 32,-10],
                                                            style(thickness=2));
-        connect(condenserIdeal.ratio_Vv_Vtot, pID.PV) annotation (points=[-34,12;
+        connect(condenserIdeal.ratio_Vv_Vtot, pID.PV) annotation (points=[-40,12; 
               -87,12; -87,-44; -20,-44],     style(color=74, rgbcolor={0,0,127}));
         connect(const.y, pID.SP) annotation (points=[-47.4,-26; -34,-26; -34,
               -36; -20,-36], style(color=74, rgbcolor={0,0,127}));
@@ -29584,2245 +29212,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
       end SwingEquation;
       
-      connector SwingEqConnection 
-        flow SI.Power W "Active power";
-        SI.AngularVelocity omega;
-        annotation (Icon(Rectangle(extent=[-100,100; 100,-100], style(
-                color=46,
-                rgbcolor={127,127,0},
-                thickness=1,
-                fillColor=46,
-                rgbfillColor={127,127,0}))));
-      end SwingEqConnection;
       
-      connector ConnectorSE 
-        flow SI.Power W "Active power";
-        SI.Angle delta;
-        annotation (Icon(Rectangle(extent=[-100,100; 100,-100], style(
-                color=46,
-                rgbcolor={127,127,0},
-                thickness=1,
-                fillColor=46,
-                rgbfillColor={127,127,0}))));
-      end ConnectorSE;
       
-      package prove 
-        
-        model Generator_SE_om 
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax;
-          parameter Real J;
-          parameter Real D;
-          parameter SI.Angle delta_start;
-          
-          SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start);
-          SI.AngularVelocity d_delta;
-          SI.AngularVelocity d_thetaGrid;
-          SI.Power Pe;
-          SI.Power Pm;
-          
-          Electrical.PowerConnection powerConnection 
-                                            annotation (extent=[58,-14; 86,14]);
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,40; 60,-40],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G")), Diagram);
-                 annotation (Diagram);
-        equation 
-          omega=der(shaft.phi) "Mechanical boundary condition";
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          d_delta = omega*Np - d_thetaGrid;
-          d_thetaGrid = 2*Modelica.Constants.pi*powerConnection.f;
-          der(delta) = d_delta;
-          
-          J/4*omega*Np*der(d_delta) + D*(omega*Np)^2/4= Pm - Pe;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          powerConnection.W = - Pe;
-          
-        end Generator_SE_om;
-        
-        model Generator_SE_usatneiTest 
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax=30e6;
-          parameter Real J;
-          parameter Real D;
-          parameter SI.Angle delta_start;
-          parameter SI.AngularVelocity omegaGen_nom;
-          
-          SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start);
-          SI.AngularVelocity d_delta;
-          SI.AngularVelocity d_thetaGrid;
-          SI.Power Pe;
-          SI.Power Pm;
-          Real M;
-          Real R;
-          
-          Electrical.PowerConnection powerConnection 
-                                            annotation (extent=[58,-14; 86,14]);
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,40; 60,-40],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G")), Diagram);
-                 annotation (Diagram);
-        equation 
-          M=J/4*omega*Np;
-          R=D/4*omega*Np;
-          omega=der(shaft.phi) "Mechanical boundary condition";
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          d_delta = omega*Np - d_thetaGrid;
-          d_thetaGrid = 2*Modelica.Constants.pi*powerConnection.f;
-          der(delta) = d_delta;
-          
-          M*der(d_delta) + R*d_delta = Pm - Pe - R*d_thetaGrid;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          powerConnection.W = - Pe;
-          
-        end Generator_SE_usatneiTest;
-        
-        model Grid_om "Ideal grid with finite droop" 
-          parameter Frequency fn=50 "Nominal frequency";
-          parameter Power Pn "Nominal power installed on the network";
-          parameter Real droop(unit="pu")=0.05 "Network droop";
-          
-          Electrical.PowerConnection connection 
-                                     annotation (extent=[-100,-14; -72,14]);
-          annotation (Diagram, Icon(
-              Line(points=[18,-16; 2,-38], style(color=0, rgbcolor={0,0,0})),
-              Line(points=[-72,0; -40,0], style(color=0, rgbcolor={0,0,0})),
-              Ellipse(extent=[100,-68; -40,68], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2)),
-              Line(points=[-40,0; -6,0; 24,36; 54,50], style(color=0, rgbcolor={0,0,
-                      0})),
-              Line(points=[24,36; 36,-6], style(color=0, rgbcolor={0,0,0})),
-              Line(points=[-6,0; 16,-14; 40,-52], style(color=0, rgbcolor={0,0,0})),
-              Line(points=[18,-14; 34,-6; 70,-22], style(color=0, rgbcolor={0,0,0})),
-              Line(points=[68,18; 36,-4; 36,-4], style(color=0, rgbcolor={0,0,0})),
-              Ellipse(extent=[-8,2; -2,-4], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255})),
-              Ellipse(extent=[20,38; 26,32], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255})),
-              Ellipse(extent=[52,54; 58,48], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255})),
-              Ellipse(extent=[14,-12; 20,-18], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255})),
-              Ellipse(extent=[66,22; 72,16], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255})),
-              Ellipse(extent=[32,-2; 38,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255})),
-              Ellipse(extent=[38,-50; 44,-56], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255})),
-              Ellipse(extent=[66,-18; 72,-24], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255})),
-              Ellipse(extent=[0,-34; 6,-40], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255}))));
-        equation 
-          connection.f = fn + droop*fn*connection.W/Pn;
-        end Grid_om;
-        
-        model SwingEquation_omega 
-          
-          parameter SI.Power Pmax;
-          parameter SI.MomentOfInertia J;
-          parameter Real D;
-          parameter SI.Angle delta_start;
-          
-          SI.Angle delta(start=delta_start);
-          SI.AngularVelocity d_delta;
-          SI.AngularVelocity d_thetaGen;
-          SI.AngularVelocity d_thetaGrid;
-          SI.Power Pe;
-          
-          ThermoPower.Electrical.PowerConnection powerConnection_a 
-            annotation (extent=[-94,-14; -66,14]);
-          ThermoPower.Electrical.PowerConnection powerConnection_b 
-                                            annotation (extent=[66,-14; 94,14]);
-          Modelica.Blocks.Interfaces.RealOutput delta_out 
-            annotation (extent=[-10,56; 10,76], rotation=90);
-          annotation (Diagram, Icon(Rectangle(extent=[-80,60; 80,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=30,
-                  rgbfillColor={230,230,230})), Text(
-                extent=[-80,40; 86,-40],
-                style(color=0, rgbcolor={0,0,0}),
-                string="S.E.")));
-          
-        equation 
-          d_thetaGen = 2*Modelica.Constants.pi*powerConnection_a.f;
-          d_thetaGrid = 2*Modelica.Constants.pi*powerConnection_b.f;
-          d_delta = d_thetaGen - d_thetaGrid;
-          der(delta) = d_delta;
-          J*d_thetaGen/4*der(d_delta)+ D*d_thetaGen^2/4 + Pe = powerConnection_a.W;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          powerConnection_b.W = - Pe;
-          
-          delta_out = delta;
-          
-        end SwingEquation_omega;
-        
-        model SwingEquation_omega_approx 
-          
-          parameter SI.Power Pmax;
-          parameter SI.MomentOfInertia M=6e6;
-          parameter Real R=6e5;
-          parameter SI.Angle delta_start;
-          
-          SI.Angle delta(start=delta_start);
-          SI.AngularVelocity d_delta;
-          SI.AngularVelocity d_thetaGen;
-          SI.AngularVelocity d_thetaGrid;
-          SI.Power Pe;
-          
-          ThermoPower.Electrical.PowerConnection powerConnection_a 
-            annotation (extent=[-94,-14; -66,14]);
-          ThermoPower.Electrical.PowerConnection powerConnection_b 
-                                            annotation (extent=[66,-14; 94,14]);
-          Modelica.Blocks.Interfaces.RealOutput delta_out 
-            annotation (extent=[-10,56; 10,76], rotation=90);
-          annotation (Diagram, Icon(Rectangle(extent=[-80,60; 80,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=30,
-                  rgbfillColor={230,230,230})), Text(
-                extent=[-80,40; 86,-40],
-                style(color=0, rgbcolor={0,0,0}),
-                string="S.E.")));
-          
-        equation 
-          d_thetaGen = 2*Modelica.Constants.pi*powerConnection_a.f;
-          d_thetaGrid = 2*Modelica.Constants.pi*powerConnection_b.f;
-          d_delta = d_thetaGen - d_thetaGrid;
-          der(delta) = d_delta;
-          M*der(d_delta) + R = powerConnection_a.W - Pe;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          powerConnection_b.W = - Pe;
-          
-          delta_out = delta;
-          
-        end SwingEquation_omega_approx;
-        
-        model test_GenGridBreaker 
-          annotation (Diagram);
-          Water.SteamTurbineStodola steamTurbineStodola(
-            pstart_in=1.28e7,
-            pstart_out=2.98e6,
-            wstart=67.6,
-            hstartin=3.47e6,
-            hstartout=3.1076e6,
-            wnom=67.6,
-            eta_iso_nom=0.833,
-            Kt=0.0032078) 
-                        annotation (extent=[-72,-34; -12,26]);
-          Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-            annotation (extent=[-8,74; 12,94]);
-          Water.ValveVap valveHP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=67.6,
-            hstart=3.47e6,
-            pnom=1.296e7,
-            dpnom=1.6e5,
-            Cv=1165)             annotation (extent=[-54,74; -74,54],rotation=90);
-          Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-94,74; -74,94]);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveHP(
-            height=-0.5,
-            offset=1,
-            startTime=500,
-            duration=3) 
-            annotation (extent=[-24,54; -44,74]);
-          Modelica.Mechanics.Rotational.Inertia inertia(w_start=314.16/2, J=
-                7000) 
-            annotation (extent=[-6,-14; 14,6]);
-          Modelica.Mechanics.Rotational.Damper damper(d=25) 
-            annotation (extent=[20,-72; 40,-52],   rotation=0);
-          Modelica.Mechanics.Rotational.Fixed fixed 
-            annotation (extent=[62,-84; 82,-64]);
-          Modelica.Blocks.Sources.BooleanStep booleanStep(startTime=
-                400000000000, startValue=true) 
-            annotation (extent=[26,28; 46,48]);
-          Generatorjj generator annotation (extent=[26,-14; 46,6]);
-          Electrical.Breaker breaker annotation (extent=[52,-14; 72,6]);
-          Electrical.Grid grid(Pn=50e8) annotation (extent=[82,-14; 102,6]);
-        equation 
-          connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-8,84;
-                -18.9,84; -18.9,20],             style(thickness=2));
-          connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-64,54;
-                -64,19.7; -64.5,19.7],         style(thickness=2));
-          connect(sourceP.flange,valveHP. inlet) 
-            annotation (points=[-74,84; -64,84; -64,74], style(thickness=2));
-          connect(com_valveHP.y,valveHP. theta) annotation (points=[-45,64; -56,
-                64],
-              style(
-              color=74,
-              rgbcolor={0,0,127},
-              fillColor=30,
-              rgbfillColor={230,230,230},
-              fillPattern=1));
-          connect(damper.flange_b,fixed. flange_b) annotation (points=[40,-62;
-                72,-62; 72,-74],   style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2,
-              fillColor=7,
-              rgbfillColor={255,255,255},
-              fillPattern=1));
-          connect(inertia.flange_a, steamTurbineStodola.shaft_b) annotation (
-              points=[-6,-4; -22.8,-4], style(color=0, rgbcolor={0,0,0}));
-          connect(damper.flange_a, steamTurbineStodola.shaft_b) annotation (
-              points=[20,-62; -14,-62; -14,-4; -22.8,-4], style(color=0,
-                rgbcolor={0,0,0}));
-          connect(generator.shaft, inertia.flange_b) annotation (points=[27.4,
-                -4; 14,-4], style(color=0, rgbcolor={0,0,0}));
-          connect(breaker.connection1, generator.powerConnection) annotation (
-              points=[53.4,-4; 44.6,-4], style(pattern=0, thickness=2));
-          connect(breaker.closed, booleanStep.y) annotation (points=[62,4; 56,4;
-                56,38; 47,38], style(color=5, rgbcolor={255,0,255}));
-          connect(grid.connection, breaker.connection2) annotation (points=[
-                83.4,-4; 70.6,-4], style(pattern=0, thickness=2));
-        end test_GenGridBreaker;
-        
-        model test_GenSE_om 
-          annotation (Diagram);
-          Water.SteamTurbineStodola steamTurbineStodola(
-            pstart_in=1.28e7,
-            pstart_out=2.98e6,
-            wstart=67.6,
-            hstartin=3.47e6,
-            hstartout=3.1076e6,
-            wnom=67.6,
-            eta_iso_nom=0.833,
-            Kt=0.0032078) 
-                        annotation (extent=[-72,-34; -12,26]);
-          Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-            annotation (extent=[-8,74; 12,94]);
-          Water.ValveVap valveHP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=67.6,
-            hstart=3.47e6,
-            pnom=1.296e7,
-            dpnom=1.6e5,
-            Cv=1165)             annotation (extent=[-54,74; -74,54],rotation=90);
-          Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-94,74; -74,94]);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveHP(
-            offset=0.2,
-            startTime=2000,
-            duration=20,
-            height=0.8) 
-            annotation (extent=[-24,54; -44,74]);
-          Grid_om grid(                                                     Pn=
-                50e8, droop=0)       annotation (extent=[48,-14; 68,6]);
-          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.prove.Generator_SE_usatneiTest
-            generator_SE_om_approx(
-            J=7000,
-            D=25,
-            delta_start=0.4,
-            omegaGen_nom=314.16) annotation (extent=[2,-14; 22,6]);
-        equation 
-          connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-8,84;
-                -18.9,84; -18.9,20],             style(thickness=2));
-          connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-64,54;
-                -64,19.7; -64.5,19.7],         style(thickness=2));
-          connect(sourceP.flange,valveHP. inlet) 
-            annotation (points=[-74,84; -64,84; -64,74], style(thickness=2));
-          connect(com_valveHP.y,valveHP. theta) annotation (points=[-45,64; -56,
-                64],
-              style(
-              color=74,
-              rgbcolor={0,0,127},
-              fillColor=30,
-              rgbfillColor={230,230,230},
-              fillPattern=1));
-          connect(generator_SE_om_approx.shaft, steamTurbineStodola.shaft_b) 
-            annotation (points=[3,-4; -22.8,-4], style(color=0, rgbcolor={0,0,0}));
-          connect(generator_SE_om_approx.powerConnection, grid.connection) 
-            annotation (points=[19.2,-4; 49.4,-4], style(pattern=0, thickness=2));
-        end test_GenSE_om;
-        
-        model testST_ok 
-          replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-            Modelica.Media.Interfaces.PartialPureSubstance;
-          
-          annotation (Diagram, experiment(StopTime=15000, NumberOfIntervals=
-                  1000));
-          SteamTurbineGroup.Examples.ST3LRh_valve steamTurbines(
-            redeclare package FluidMedium = FluidMedium,
-            steamHPNomFlowRate=67.6,
-            steamHPNomPressure=1.28e7,
-            steamIPNomFlowRate=81.10 - 67.5,
-            steamIPNomPressure=2.68e6,
-            steamLPNomPressure=6e5,
-            pcond=5.3982e3,
-            steamLPNomFlowRate=89.82 - 81.10,
-            HPT_hstart_in=3.47e6,
-            HPT_hstart_out=3.1076e6,
-            IPT_hstart_in=3.554e6,
-            IPT_hstart_out=3.12810e6,
-            LPT_hstart_in=3.109e6,
-            LPT_hstart_out=2.3854e6,
-            valveHP_dpnom=1.6e5,
-            valveIP_dpnom=5e4,
-            mixLP_hstart=3.109e6,
-            mixIP_hstart=3.1076e6,
-            HPT_eta_iso_nom=0.833,
-            IPT_eta_iso_nom=0.903,
-            LPT_eta_iso_nom=0.876,
-            mixLP_V=20,
-            mixIP_V=20,
-            valveHP_Cv=1165,
-            valveIP_Cv=5625,
-            valveLP_Cv=14733,
-            valveLP_dpnom=2.964e4,
-            HPT_Kt=0.0032078,
-            IPT_Kt=0.018883,
-            LPT_Kt=0.078004) 
-                         annotation (extent=[-88,-42; -8,38]);
-          Water.SinkP sinkLPT_p(
-            redeclare package Medium = FluidMedium,
-            p0=5.3982e3,
-            h=2.3854e6)      annotation (extent=[-34,-66; -46,-54],
-                                                                  rotation=0);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveHP(
-            height=0.8,
-            offset=0.2,
-            startTime=10000,
-            duration=5) 
-            annotation (extent=[84,-12; 64,8]);
-          Water.SourceP sourceHPT_p(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-82,52; -70,64], rotation=270);
-          Water.SourceP sourceLPT(h=3.109e6, p0=6.296e5) 
-            annotation (extent=[-34,52; -22,64], rotation=270);
-          Modelica.Blocks.Sources.Ramp com_valveIP(
-            offset=1,
-            startTime=12000,
-            height=-0.9,
-            duration=5)   annotation (extent=[84,-52; 64,-32]);
-          Water.SourceP sourceToMix(p0=2.98e6, h=3.1076e6) 
-            annotation (extent=[-46,66; -34,78], rotation=270);
-          SteamTurbineGroup.Components.EffectHE Rh(
-                                 dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.73e6) 
-            annotation (extent=[-52,74; -64,86], rotation=180);
-          HRSG.Components.StateReader_water stateHPTout 
-            annotation (extent=[-74,52; -54,72], rotation=90);
-          HRSG.Components.StateReader_water stateIPTin 
-            annotation (extent=[-62,72; -42,52], rotation=90);
-        protected 
-          Buses.Actuators actuators annotation (extent=[24,-62; 34,-22], rotation=
-               180);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveLP(
-            height=0,
-            offset=1,
-            startTime=0,
-            duration=10)  annotation (extent=[84,-90; 64,-70]);
-          Grid_om grid(                                                     Pn=
-                50e8, droop=0)       annotation (extent=[60,30; 80,50]);
-          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.prove.Generator_SE_usatneiTest
-            generator_SE_om_approx(
-            Pmax=130e6,
-            D=25,
-            omegaGen_nom=314.16,
-            J=30000,
-            delta_start=1.03682) annotation (extent=[18,30; 38,50]);
-        equation 
-          connect(actuators,steamTurbines. ActuatorsBus)   annotation (points=[29,-42;
-                2,-42; 2,-30.8; -8.8,-30.8],        style(color=52, rgbcolor={213,
-                  255,170}));
-          connect(sinkLPT_p.flange,steamTurbines. LPT_Out) 
-            annotation (points=[-34,-60; -16,-60; -16,-42],
-                                                          style(thickness=2));
-          connect(steamTurbines.LPT_In,sourceLPT. flange) 
-            annotation (points=[-28,38; -28,52], style(thickness=2));
-          connect(steamTurbines.HPT_In,sourceHPT_p. flange) 
-            annotation (points=[-76,38; -76,52], style(thickness=2));
-          connect(com_valveHP.y,actuators. Opening_valveHP) annotation (points=[63,-2;
-                46,-2; 46,-42; 29,-42],              style(color=74, rgbcolor={0,
-                  0,127}));
-          connect(com_valveIP.y,actuators. Opening_valveIP) annotation (points=[63,-42;
-                29,-42],         style(color=74, rgbcolor={0,0,127}));
-          connect(sourceToMix.flange,steamTurbines. SteamToMix) 
-            annotation (points=[-40,66; -40,38], style(thickness=2));
-          connect(stateIPTin.outlet,steamTurbines. IPT_In) 
-            annotation (points=[-52,56; -52,38], style(thickness=2));
-          connect(stateHPTout.inlet,steamTurbines. HPT_Out) 
-            annotation (points=[-64,56; -64,38], style(thickness=2));
-          connect(stateHPTout.outlet,Rh. in1) annotation (points=[-64,68; -64,
-                80; -64.06,80],     style(thickness=2));
-          connect(stateIPTin.inlet,Rh. out1) 
-            annotation (points=[-52,68; -52,80], style(thickness=2));
-          connect(com_valveLP.y, actuators.Opening_valveLP) annotation (points=
-                [63,-80; 46,-80; 46,-42; 29,-42], style(color=74, rgbcolor={0,0,
-                  127}));
-          connect(generator_SE_om_approx.powerConnection, grid.connection) 
-            annotation (points=[35.2,40; 61.4,40], style(pattern=0, thickness=2));
-          connect(generator_SE_om_approx.shaft, steamTurbines.Shaft_b) 
-            annotation (points=[19,40; 4,40; 4,-2; -8,-2], style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2));
-        end testST_ok;
-        
-        model test_SE_breaker_f 
-          annotation (Diagram);
-          Water.SteamTurbineStodola steamTurbineStodola(
-            pstart_in=1.28e7,
-            pstart_out=2.98e6,
-            wstart=67.6,
-            hstartin=3.47e6,
-            hstartout=3.1076e6,
-            wnom=67.6,
-            eta_iso_nom=0.833,
-            Kt=0.0032078) 
-                        annotation (extent=[-72,-34; -12,26]);
-          Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-            annotation (extent=[-8,74; 12,94]);
-          Water.ValveVap valveHP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=67.6,
-            hstart=3.47e6,
-            pnom=1.296e7,
-            dpnom=1.6e5,
-            Cv=1165)             annotation (extent=[-54,74; -74,54],rotation=90);
-          Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-94,74; -74,94]);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveHP(
-            duration=10,
-            startTime=500,
-            height=+0.8,
-            offset=0.2) 
-            annotation (extent=[-24,54; -44,74]);
-        public 
-          Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=false) 
-            annotation (extent=[16,36; 36,56]);
-          SwingEquation_omega swingEquation_omega(
-            Pmax=30e5,
-            J=7000,
-            D=25,
-            delta_start=0.5) annotation (extent=[22,-14; 42,6]);
-          Electrical.Generator generator annotation (extent=[-6,-14; 14,6]);
-          Electrical.Breaker breaker annotation (extent=[48,-14; 68,6]);
-          Electrical.Grid grid(Pn=50e8) annotation (extent=[80,-14; 100,6]);
-        equation 
-          connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-8,84;
-                -18.9,84; -18.9,20],             style(thickness=2));
-          connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-64,54;
-                -64,19.7; -64.5,19.7],         style(thickness=2));
-          connect(sourceP.flange,valveHP. inlet) 
-            annotation (points=[-74,84; -64,84; -64,74], style(thickness=2));
-          connect(com_valveHP.y,valveHP. theta) annotation (points=[-45,64; -56,
-                64],
-              style(
-              color=74,
-              rgbcolor={0,0,127},
-              fillColor=30,
-              rgbfillColor={230,230,230},
-              fillPattern=1));
-          connect(generator.powerConnection, swingEquation_omega.powerConnection_a) 
-            annotation (points=[12.6,-4; 24,-4], style(pattern=0, thickness=2));
-          connect(generator.shaft, steamTurbineStodola.shaft_b) annotation (
-              points=[-4.6,-4; -22.8,-4], style(color=0, rgbcolor={0,0,0}));
-          connect(breaker.connection1, swingEquation_omega.powerConnection_b) 
-            annotation (points=[49.4,-4; 40,-4], style(pattern=0, thickness=2));
-          connect(grid.connection, breaker.connection2) annotation (points=[
-                81.4,-4; 66.6,-4], style(pattern=0, thickness=2));
-          connect(breaker.closed, booleanConstant.y) annotation (points=[58,4;
-                58,46; 37,46], style(color=5, rgbcolor={255,0,255}));
-        end test_SE_breaker_f;
-        
-        model testSTgrid2 
-          replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-            Modelica.Media.Interfaces.PartialPureSubstance;
-          
-          annotation (Diagram, experiment(StopTime=15000, NumberOfIntervals=
-                  1000));
-          SteamTurbineGroup.Examples.ST3LRh_valve steamTurbines(
-            redeclare package FluidMedium = FluidMedium,
-            steamHPNomFlowRate=67.6,
-            steamHPNomPressure=1.28e7,
-            steamIPNomFlowRate=81.10 - 67.5,
-            steamIPNomPressure=2.68e6,
-            steamLPNomPressure=6e5,
-            pcond=5.3982e3,
-            steamLPNomFlowRate=89.82 - 81.10,
-            HPT_hstart_in=3.47e6,
-            HPT_hstart_out=3.1076e6,
-            IPT_hstart_in=3.554e6,
-            IPT_hstart_out=3.12810e6,
-            LPT_hstart_in=3.109e6,
-            LPT_hstart_out=2.3854e6,
-            valveHP_dpnom=1.6e5,
-            valveIP_dpnom=5e4,
-            mixLP_hstart=3.109e6,
-            mixIP_hstart=3.1076e6,
-            HPT_eta_iso_nom=0.833,
-            IPT_eta_iso_nom=0.903,
-            LPT_eta_iso_nom=0.876,
-            mixLP_V=20,
-            mixIP_V=20,
-            valveHP_Cv=1165,
-            valveIP_Cv=5625,
-            valveLP_Cv=14733,
-            valveLP_dpnom=2.964e4,
-            HPT_Kt=0.0032078,
-            IPT_Kt=0.018883,
-            LPT_Kt=0.078004) 
-                         annotation (extent=[-88,-42; -8,38]);
-          Water.SinkP sinkLPT_p(
-            redeclare package Medium = FluidMedium,
-            p0=5.3982e3,
-            h=2.3854e6)      annotation (extent=[-34,-66; -46,-54],
-                                                                  rotation=0);
-        public 
-          Modelica.Blocks.Sources.Constant com_valveHP 
-            annotation (extent=[84,-12; 64,8]);
-          Water.SourceP sourceHPT_p(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-82,52; -70,64], rotation=270);
-          Water.SourceP sourceLPT(h=3.109e6, p0=6.296e5) 
-            annotation (extent=[-34,52; -22,64], rotation=270);
-          Modelica.Blocks.Sources.Ramp com_valveIP(
-            offset=0.3,
-            height=0.7,
-            duration=20,
-            startTime=222222222222) 
-                          annotation (extent=[84,-52; 64,-32]);
-          Water.SourceP sourceToMix(p0=2.98e6, h=3.1076e6) 
-            annotation (extent=[-46,66; -34,78], rotation=270);
-          SteamTurbineGroup.Components.EffectHE Rh(
-                                 dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.73e6) 
-            annotation (extent=[-52,74; -64,86], rotation=180);
-          HRSG.Components.StateReader_water stateHPTout 
-            annotation (extent=[-74,52; -54,72], rotation=90);
-          HRSG.Components.StateReader_water stateIPTin 
-            annotation (extent=[-62,72; -42,52], rotation=90);
-        protected 
-          Buses.Actuators actuators annotation (extent=[24,-62; 34,-22], rotation=
-               180);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveLP(
-            height=-0.7,
-            offset=1,
-            duration=40,
-            startTime=22210000) 
-                          annotation (extent=[84,-90; 64,-70]);
-          SwingEquation_omega swingEquation_omega(
-            Pmax=130e6,
-            J=25000,
-            D=25,
-            delta_start=1) annotation (extent=[36,36; 56,56]);
-          Electrical.Generator generator annotation (extent=[4,36; 24,56]);
-          Electrical.Grid grid(Pn=50e8) annotation (extent=[80,36; 100,56]);
-        equation 
-          connect(actuators,steamTurbines. ActuatorsBus)   annotation (points=[29,-42;
-                2,-42; 2,-30.8; -8.8,-30.8],        style(color=52, rgbcolor={213,
-                  255,170}));
-          connect(sinkLPT_p.flange,steamTurbines. LPT_Out) 
-            annotation (points=[-34,-60; -16,-60; -16,-42],
-                                                          style(thickness=2));
-          connect(steamTurbines.LPT_In,sourceLPT. flange) 
-            annotation (points=[-28,38; -28,52], style(thickness=2));
-          connect(steamTurbines.HPT_In,sourceHPT_p. flange) 
-            annotation (points=[-76,38; -76,52], style(thickness=2));
-          connect(com_valveHP.y,actuators. Opening_valveHP) annotation (points=[63,-2;
-                46,-2; 46,-42; 29,-42],              style(color=74, rgbcolor={0,
-                  0,127}));
-          connect(com_valveIP.y,actuators. Opening_valveIP) annotation (points=[63,-42;
-                29,-42],         style(color=74, rgbcolor={0,0,127}));
-          connect(sourceToMix.flange,steamTurbines. SteamToMix) 
-            annotation (points=[-40,66; -40,38], style(thickness=2));
-          connect(stateIPTin.outlet,steamTurbines. IPT_In) 
-            annotation (points=[-52,56; -52,38], style(thickness=2));
-          connect(stateHPTout.inlet,steamTurbines. HPT_Out) 
-            annotation (points=[-64,56; -64,38], style(thickness=2));
-          connect(stateHPTout.outlet,Rh. in1) annotation (points=[-64,68; -64,
-                80; -64.06,80],     style(thickness=2));
-          connect(stateIPTin.inlet,Rh. out1) 
-            annotation (points=[-52,68; -52,80], style(thickness=2));
-          connect(com_valveLP.y, actuators.Opening_valveLP) annotation (points=
-                [63,-80; 46,-80; 46,-42; 29,-42], style(color=74, rgbcolor={0,0,
-                  127}));
-          connect(generator.shaft, steamTurbines.Shaft_b) annotation (points=[5.4,46;
-                2,46; 2,-2; -8,-2],         style(color=0, rgbcolor={0,0,0}));
-          connect(swingEquation_omega.electricConnect_b, grid.connection) 
-            annotation (points=[54,46; 81.4,46], style(pattern=0, thickness=2));
-          connect(swingEquation_omega.electricConnect_a, generator.powerConnection) 
-            annotation (points=[38,46; 22.6,46], style(pattern=0, thickness=2));
-        end testSTgrid2;
-        
-        model test_SwingEquation_om 
-          annotation (Diagram);
-          Water.SteamTurbineStodola steamTurbineStodola(
-            pstart_in=1.28e7,
-            pstart_out=2.98e6,
-            wstart=67.6,
-            hstartin=3.47e6,
-            hstartout=3.1076e6,
-            wnom=67.6,
-            eta_iso_nom=0.833,
-            Kt=0.0032078) 
-                        annotation (extent=[-72,-34; -12,26]);
-          Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-            annotation (extent=[-8,74; 12,94]);
-          Water.ValveVap valveHP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=67.6,
-            hstart=3.47e6,
-            pnom=1.296e7,
-            dpnom=1.6e5,
-            Cv=1165)             annotation (extent=[-54,74; -74,54],rotation=90);
-          Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-94,74; -74,94]);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveHP(
-            height=+0.8,
-            offset=0.2,
-            duration=30,
-            startTime=2000) 
-            annotation (extent=[-24,54; -44,74]);
-          Electrical.Generator generator 
-                              annotation (extent=[-8,-24; 32,16]);
-          SwingEquation_omega_approx swingEquation_theta(
-            delta_start=0.5, Pmax=30e6) 
-                  annotation (extent=[48,-14; 68,6]);
-          Grid_om grid(
-                    Pn=50e8, droop=0) annotation (extent=[76,-14; 96,6]);
-        equation 
-          connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-8,84;
-                -18.9,84; -18.9,20],             style(thickness=2));
-          connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-64,54;
-                -64,19.7; -64.5,19.7],         style(thickness=2));
-          connect(sourceP.flange,valveHP. inlet) 
-            annotation (points=[-74,84; -64,84; -64,74], style(thickness=2));
-          connect(com_valveHP.y,valveHP. theta) annotation (points=[-45,64; -56,
-                64],
-              style(
-              color=74,
-              rgbcolor={0,0,127},
-              fillColor=30,
-              rgbfillColor={230,230,230},
-              fillPattern=1));
-          connect(generator.shaft, steamTurbineStodola.shaft_b) annotation (
-              points=[-5.2,-4; -14,-4; -14,-4; -22.8,-4],
-                                        style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2));
-          connect(swingEquation_theta.powerConnection_a, generator.powerConnection) 
-            annotation (points=[50,-4; 39.6,-4; 39.6,-4; 29.2,-4], style(
-                pattern=0, thickness=2));
-          connect(swingEquation_theta.powerConnection_b, grid.connection) 
-            annotation (points=[66,-4; 77.4,-4], style(pattern=0, thickness=2));
-        end test_SwingEquation_om;
-        
-        model Generatorjj "Active power generator" 
-          import Modelica.SIunits.Conversions.NonSIunits.*;
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Boolean hasInertia = false 
-            "Model accounts for rotational inertia";
-          parameter MomentOfInertia J=0 "Moment of inertia";
-          parameter Integer Np=2 "Number of electrical poles";
-          Energy E "Rotational kinetic energy";
-          AngularVelocity omega "Shaft angular velocity";
-          AngularVelocity_rpm n "Rotational speed";
-          Frequency f "Electrical frequency";
-          Real Pm;
-          Electrical.PowerConnection powerConnection 
-                                          annotation (extent=[72,-14; 100,14]);
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-14; -72,14]);
-        equation 
-          omega=der(shaft.phi) "Mechanical boundary condition";
-          f=Np*omega/(2*Modelica.Constants.pi) "Electrical frequency";
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          Pm=omega*shaft.tau;
-          powerConnection.f=f "Electrical boundary condition";
-          if hasInertia then
-            E=1/2*J*omega^2 "Kinetic energy";
-            der(E)=omega*shaft.tau-powerConnection.W/eta "Energy balance";
-          else
-            E=0 "Kinetic energy";
-            0=omega*shaft.tau+powerConnection.W/eta "Energy balance";
-          end if annotation (Diagram);
-          annotation (Icon(
-              Rectangle(extent=[-72,6; -48,-8],  style(
-                  color=76,
-                  gradient=2,
-                  fillColor=9)),
-              Ellipse(extent=[50,-50; -50,50], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=7,
-                  rgbfillColor={255,255,255},
-                  fillPattern=1)),
-              Line(points=[50,0; 72,0], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255},
-                  fillPattern=1)),
-              Text(
-                extent=[-26,24; 28,-28],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=7,
-                  rgbfillColor={255,255,255},
-                  fillPattern=1),
-                string="G")));
-        end Generatorjj;
-        
-        model Prova 
-          annotation (Diagram);
-          Water.SteamTurbineStodola steamTurbineStodola(
-            pstart_in=1.28e7,
-            pstart_out=2.98e6,
-            wstart=67.6,
-            hstartin=3.47e6,
-            hstartout=3.1076e6,
-            wnom=67.6,
-            eta_iso_nom=0.833,
-            Kt=0.0032078) 
-                        annotation (extent=[-72,-34; -12,26]);
-          Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-            annotation (extent=[-8,74; 12,94]);
-          Water.ValveVap valveHP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=67.6,
-            hstart=3.47e6,
-            pnom=1.296e7,
-            dpnom=1.6e5,
-            Cv=1165)             annotation (extent=[-54,74; -74,54],rotation=90);
-          Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-94,74; -74,94]);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveHP(
-            height=0.7,
-            duration=5,
-            offset=0.3,
-            startTime=1000) 
-            annotation (extent=[-24,54; -44,74]);
-          Modelica.Mechanics.Rotational.Inertia inertia(w_start=314.16/2, J=
-                7000) 
-            annotation (extent=[-6,-14; 14,6]);
-          Modelica.Mechanics.Rotational.Damper damper(d=25) 
-            annotation (extent=[20,-72; 40,-52],   rotation=0);
-          Modelica.Mechanics.Rotational.Fixed fixed 
-            annotation (extent=[62,-84; 82,-64]);
-          Modelica.Blocks.Sources.BooleanStep booleanStep(startTime=
-                400000000000, startValue=true) 
-            annotation (extent=[26,28; 46,48]);
-          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.prove.Generator_SE_usatneiTest
-            generator(
-            J=25000,
-            D=25,
-            delta_start=0.5,
-            omegaGen_nom=314.16) annotation (extent=[26,-14; 46,6]);
-          Electrical.Breaker breaker annotation (extent=[52,-14; 72,6]);
-          Electrical.Grid grid(Pn=50e8) annotation (extent=[82,-14; 102,6]);
-        equation 
-          connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-8,84;
-                -18.9,84; -18.9,20],             style(thickness=2));
-          connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-64,54;
-                -64,19.7; -64.5,19.7],         style(thickness=2));
-          connect(sourceP.flange,valveHP. inlet) 
-            annotation (points=[-74,84; -64,84; -64,74], style(thickness=2));
-          connect(com_valveHP.y,valveHP. theta) annotation (points=[-45,64; -56,
-                64],
-              style(
-              color=74,
-              rgbcolor={0,0,127},
-              fillColor=30,
-              rgbfillColor={230,230,230},
-              fillPattern=1));
-          connect(damper.flange_b,fixed. flange_b) annotation (points=[40,-62;
-                72,-62; 72,-74],   style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2,
-              fillColor=7,
-              rgbfillColor={255,255,255},
-              fillPattern=1));
-          connect(inertia.flange_a, steamTurbineStodola.shaft_b) annotation (
-              points=[-6,-4; -22.8,-4], style(color=0, rgbcolor={0,0,0}));
-          connect(damper.flange_a, steamTurbineStodola.shaft_b) annotation (
-              points=[20,-62; -14,-62; -14,-4; -22.8,-4], style(color=0,
-                rgbcolor={0,0,0}));
-          connect(generator.shaft, inertia.flange_b) annotation (points=[27,-4;
-                14,-4], style(color=0, rgbcolor={0,0,0}));
-          connect(breaker.connection1, generator.powerConnection) annotation (
-              points=[53.4,-4; 43.2,-4], style(pattern=0, thickness=2));
-          connect(breaker.closed, booleanStep.y) annotation (points=[62,4; 56,4;
-                56,38; 47,38], style(color=5, rgbcolor={255,0,255}));
-          connect(grid.connection, breaker.connection2) annotation (points=[
-                83.4,-4; 70.6,-4], style(pattern=0, thickness=2));
-        end Prova;
-        
-        model Generator_SE_provaBreaker 
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax;
-          parameter Real J;
-          parameter Real D;
-          parameter SI.Angle delta_start;
-          parameter SI.AngularVelocity omegaGen_nom;
-          parameter SI.AngularVelocity omega_start;
-          
-          SI.AngularVelocity omega( start=omega_start) "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start);
-          SI.AngularVelocity d_delta;
-          SI.AngularVelocity d_thetaGrid;
-          SI.Power Pe;
-          SI.Power Pm;
-          Real M;
-          Real R;
-          
-          Electrical.PowerConnection powerConnection 
-                                            annotation (extent=[58,-14; 86,14]);
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,40; 60,-40],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G")), Diagram);
-                 annotation (Diagram);
-          Modelica.Blocks.Interfaces.BooleanInput closed 
-            annotation (extent=[-10,60; 10,80],  rotation=-90);
-        equation 
-          M=J/4*omegaGen_nom;
-          R=D/4*omegaGen_nom;
-          omega=der(shaft.phi) "Mechanical boundary condition";
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          d_delta = omega*Np - d_thetaGrid;
-          d_thetaGrid = 2*Modelica.Constants.pi*powerConnection.f;
-          powerConnection.W = - Pe;
-          der(delta) = d_delta;
-          
-          if closed then
-            Pe = Pmax*Modelica.Math.sin(delta);
-            M*der(d_delta) + R*d_delta = Pm - Pe - R*d_thetaGrid;
-            
-          else
-            J*omega*der(omega) + D*omega^2 = Pm;
-            Pe = 0;
-            
-          end if;
-          
-        end Generator_SE_provaBreaker;
-        
-        model testST_proveBreaker 
-          replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-            Modelica.Media.Interfaces.PartialPureSubstance;
-          
-          annotation (Diagram, experiment(StopTime=15000, NumberOfIntervals=
-                  50000));
-          SteamTurbineGroup.Examples.ST3LRh_valve steamTurbines(
-            redeclare package FluidMedium = FluidMedium,
-            steamHPNomFlowRate=67.6,
-            steamHPNomPressure=1.28e7,
-            steamIPNomFlowRate=81.10 - 67.5,
-            steamIPNomPressure=2.68e6,
-            steamLPNomPressure=6e5,
-            pcond=5.3982e3,
-            steamLPNomFlowRate=89.82 - 81.10,
-            HPT_hstart_in=3.47e6,
-            HPT_hstart_out=3.1076e6,
-            IPT_hstart_in=3.554e6,
-            IPT_hstart_out=3.12810e6,
-            LPT_hstart_in=3.109e6,
-            LPT_hstart_out=2.3854e6,
-            valveHP_dpnom=1.6e5,
-            valveIP_dpnom=5e4,
-            mixLP_hstart=3.109e6,
-            mixIP_hstart=3.1076e6,
-            HPT_eta_iso_nom=0.833,
-            IPT_eta_iso_nom=0.903,
-            LPT_eta_iso_nom=0.876,
-            mixLP_V=20,
-            mixIP_V=20,
-            valveHP_Cv=1165,
-            valveIP_Cv=5625,
-            valveLP_Cv=14733,
-            valveLP_dpnom=2.964e4,
-            HPT_Kt=0.0032078,
-            IPT_Kt=0.018883,
-            LPT_Kt=0.078004) 
-                         annotation (extent=[-88,-42; -8,38]);
-          Water.SinkP sinkLPT_p(
-            redeclare package Medium = FluidMedium,
-            p0=5.3982e3,
-            h=2.3854e6)      annotation (extent=[-34,-66; -46,-54],
-                                                                  rotation=0);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveHP(
-            height=0.8,
-            offset=0.2,
-            startTime=10000,
-            duration=10) 
-            annotation (extent=[84,-12; 64,8]);
-          Water.SourceP sourceHPT_p(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-82,52; -70,64], rotation=270);
-          Water.SourceP sourceLPT(h=3.109e6, p0=6.296e5) 
-            annotation (extent=[-34,52; -22,64], rotation=270);
-          Modelica.Blocks.Sources.Ramp com_valveIP(
-            offset=1,
-            startTime=12000,
-            height=-0.9,
-            duration=10)  annotation (extent=[84,-52; 64,-32]);
-          Water.SourceP sourceToMix(p0=2.98e6, h=3.1076e6) 
-            annotation (extent=[-46,66; -34,78], rotation=270);
-          SteamTurbineGroup.Components.EffectHE Rh(
-                                 dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.73e6) 
-            annotation (extent=[-52,74; -64,86], rotation=180);
-          HRSG.Components.StateReader_water stateHPTout 
-            annotation (extent=[-74,52; -54,72], rotation=90);
-          HRSG.Components.StateReader_water stateIPTin 
-            annotation (extent=[-62,72; -42,52], rotation=90);
-        protected 
-          Buses.Actuators actuators annotation (extent=[24,-62; 34,-22], rotation=
-               180);
-        public 
-          Modelica.Blocks.Sources.Ramp com_valveLP(
-            height=0,
-            offset=1,
-            startTime=0,
-            duration=10)  annotation (extent=[84,-90; 64,-70]);
-          Grid_om grid(                                                     Pn=
-                50e8, droop=0)       annotation (extent=[60,30; 80,50]);
-          Generator_SE_provaBreaker generator_SE_om_approx(
-            Pmax=130e6,
-            D=25,
-            J=30000,
-            delta_start=1.03682,
-            omegaGen_nom=314.16,
-            omega_start=314.16/2) 
-                            annotation (extent=[18,30; 38,50]);
-        public 
-          Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
-            annotation (extent=[-12,60; 8,80]);
-        equation 
-          connect(actuators,steamTurbines. ActuatorsBus)   annotation (points=[29,-42;
-                2,-42; 2,-30.8; -8.8,-30.8],        style(color=52, rgbcolor={213,
-                  255,170}));
-          connect(sinkLPT_p.flange,steamTurbines. LPT_Out) 
-            annotation (points=[-34,-60; -16,-60; -16,-42],
-                                                          style(thickness=2));
-          connect(steamTurbines.LPT_In,sourceLPT. flange) 
-            annotation (points=[-28,38; -28,52], style(thickness=2));
-          connect(steamTurbines.HPT_In,sourceHPT_p. flange) 
-            annotation (points=[-76,38; -76,52], style(thickness=2));
-          connect(com_valveHP.y,actuators. Opening_valveHP) annotation (points=[63,-2;
-                46,-2; 46,-42; 29,-42],              style(color=74, rgbcolor={0,
-                  0,127}));
-          connect(com_valveIP.y,actuators. Opening_valveIP) annotation (points=[63,-42;
-                29,-42],         style(color=74, rgbcolor={0,0,127}));
-          connect(sourceToMix.flange,steamTurbines. SteamToMix) 
-            annotation (points=[-40,66; -40,38], style(thickness=2));
-          connect(stateIPTin.outlet,steamTurbines. IPT_In) 
-            annotation (points=[-52,56; -52,38], style(thickness=2));
-          connect(stateHPTout.inlet,steamTurbines. HPT_Out) 
-            annotation (points=[-64,56; -64,38], style(thickness=2));
-          connect(stateHPTout.outlet,Rh. in1) annotation (points=[-64,68; -64,
-                80; -64.06,80],     style(thickness=2));
-          connect(stateIPTin.inlet,Rh. out1) 
-            annotation (points=[-52,68; -52,80], style(thickness=2));
-          connect(com_valveLP.y, actuators.Opening_valveLP) annotation (points=
-                [63,-80; 46,-80; 46,-42; 29,-42], style(color=74, rgbcolor={0,0,
-                  127}));
-          connect(generator_SE_om_approx.powerConnection, grid.connection) 
-            annotation (points=[35.2,40; 61.4,40], style(pattern=0, thickness=2));
-          connect(generator_SE_om_approx.shaft, steamTurbines.Shaft_b) 
-            annotation (points=[19,40; 4,40; 4,-2; -8,-2], style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2));
-          connect(booleanConstant.y, generator_SE_om_approx.closed) annotation (
-             points=[9,70; 28,70; 28,47], style(color=5, rgbcolor={255,0,255}));
-        end testST_proveBreaker;
-        
-        model Generator_SE_ngen 
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax;
-          parameter Real J;
-          parameter Real D;
-          parameter SI.Angle delta_start;
-          parameter SI.AngularVelocity omegaRef "System reference frequency";
-          parameter SI.AngularVelocity omegaGen_nom;
-          
-          SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start);
-          SI.AngularVelocity d_delta;
-          SI.Angle delta_ext;
-          SI.Angle delta_int;
-          SI.Power Pe;
-          SI.Power Pm;
-          Real M;
-          Real R;
-          
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,40; 60,-40],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G")), Diagram);
-                 annotation (Diagram);
-          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.SwingEqConnection
-            SEconnection annotation (extent=[60,-16; 92,16]);
-        equation 
-          M=J/4*omegaGen_nom;
-          R=D/4*omegaGen_nom;
-          omega=der(shaft.phi) "Mechanical boundary condition";
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          der(delta) = d_delta;
-          d_delta = omega*Np - omegaRef;
-          M*der(d_delta) + R*d_delta = Pm - Pe - R*omegaRef;
-          SEconnection.W = - Pe;
-          Pe=Pmax*sin(delta_int - delta_ext);
-          delta_int = SEconnection.delta_int;
-          delta_ext = SEconnection.delta_ext;
-        end Generator_SE_ngen;
-        
-        model SE_2Gen 
-          
-          SwingEqConnection SEconnection_a annotation (extent=[-96,-16; -64,16]);
-          SwingEqConnection SEconnection_b annotation (extent=[64,-16; 96,16]);
-          annotation (Diagram);
-          
-        equation 
-          SEconnection_a.W + SEconnection_b.W = 0;
-          SEconnection_a.delta_int = SEconnection_b.delta_ext;
-          SEconnection_b.delta_int = SEconnection_a.delta_ext;
-        end SE_2Gen;
-        
-        model test_SE2Gen 
-          annotation (Diagram);
-          Water.SteamTurbineStodola steamTurbineStodola(
-            pstart_in=1.28e7,
-            pstart_out=2.98e6,
-            wstart=67.6,
-            hstartin=3.47e6,
-            hstartout=3.1076e6,
-            wnom=67.6,
-            eta_iso_nom=0.833,
-            Kt=0.0032078) 
-                        annotation (extent=[-60,8; -20,48]);
-          Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-            annotation (extent=[-8,70; 12,90]);
-          Water.ValveVap valveHP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=67.6,
-            hstart=3.47e6,
-            pnom=1.296e7,
-            dpnom=1.6e5,
-            Cv=1165)             annotation (extent=[-60,74; -80,54],rotation=90);
-          Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-100,74; -80,94]);
-          Water.SteamTurbineStodola steamTurbineStodola1(
-            pstart_in=2.68e6,
-            pstart_out=6e5,
-            wstart=81.10,
-            hstartin=3.554e6,
-            hstartout=3.1281e6,
-            wnom=81.10,
-            eta_iso_nom=0.903,
-            Kt=0.018883)     annotation (extent=[-60,-100; -20,-60]);
-          Water.SinkP sinkP1(
-                            p0=6e5, h=3.1281e6) 
-            annotation (extent=[-12,-50; 8,-30]);
-          Water.ValveVap valveIP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=81.1,
-            hstart=3.554e6,
-            dpnom=5e4,
-            pnom=2.73e6,
-            Cv=5625)             annotation (extent=[-62,-32; -82,-52],
-                                                                     rotation=90);
-          Water.SourceP sourceP1(           h=3.554e6, p0=2.73e6) 
-            annotation (extent=[-100,-30; -80,-10]);
-        public 
-          Modelica.Blocks.Sources.Constant com_valveHP1 
-            annotation (extent=[-32,-52; -52,-32]);
-        public 
-          Modelica.Blocks.Sources.Constant com_valveHP2 
-            annotation (extent=[-30,54; -50,74]);
-          Generator_SE_ngen_2 generator_SE_ngen_2_1 
-            annotation (extent=[4,18; 24,38]);
-          Generator_SE_ngen_2 generator_SE_ngen_2_2 
-            annotation (extent=[4,-90; 24,-70]);
-          SE_2Gen_2 sE_2Gen_2_1(
-            Ja=7000,
-            Jb=7000,
-            Da=25,
-            Db=25,
-            omegaGen_nom=314.16,
-            omegaRef=314.16,
-            Pmax=4e6) annotation (extent=[52,-28; 72,-8]);
-        equation 
-          connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-8,80;
-                -24.6,80; -24.6,44],             style(thickness=2));
-          connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-70,54;
-                -70,43.8; -55,43.8],           style(thickness=2));
-          connect(sourceP.flange,valveHP. inlet) 
-            annotation (points=[-80,84; -70,84; -70,74], style(thickness=2));
-          connect(sinkP1.flange, steamTurbineStodola1.outlet) 
-                                                            annotation (points=[-12,-40;
-                -24.6,-40; -24.6,-64],           style(thickness=2));
-          connect(valveIP.outlet, steamTurbineStodola1.inlet) 
-                                                             annotation (points=[-72,-52;
-                -72,-64.2; -55,-64.2],         style(thickness=2));
-          connect(sourceP1.flange, valveIP.inlet) 
-            annotation (points=[-80,-20; -72,-20; -72,-32],
-                                                         style(thickness=2));
-          connect(com_valveHP1.y, valveIP.theta) 
-                                             annotation (points=[-53,-42; -64,
-                -42],
-              style(color=74, rgbcolor={0,0,127}));
-          connect(com_valveHP2.y, valveHP.theta) annotation (points=[-51,64;
-                -62,64], style(
-              color=74,
-              rgbcolor={0,0,127},
-              fillColor=46,
-              rgbfillColor={127,127,0},
-              fillPattern=1));
-          connect(generator_SE_ngen_2_1.shaft, steamTurbineStodola.shaft_b) 
-            annotation (points=[5,28; -27.2,28], style(
-              color=0,
-              rgbcolor={0,0,0},
-              fillColor=46,
-              rgbfillColor={127,127,0},
-              fillPattern=1));
-          connect(generator_SE_ngen_2_2.shaft, steamTurbineStodola1.shaft_b) 
-            annotation (points=[5,-80; -27.2,-80], style(
-              color=0,
-              rgbcolor={0,0,0},
-              fillColor=46,
-              rgbfillColor={127,127,0},
-              fillPattern=1));
-          connect(sE_2Gen_2_1.SEconnection_a, generator_SE_ngen_2_1.SEconnection) 
-            annotation (points=[54,-18; 40,-18; 40,28; 21.6,28], style(
-              color=46,
-              rgbcolor={127,127,0},
-              thickness=1,
-              fillColor=46,
-              rgbfillColor={127,127,0},
-              fillPattern=1));
-          connect(sE_2Gen_2_1.SEconnection_b, generator_SE_ngen_2_2.SEconnection) 
-            annotation (points=[70,-18; 90,-18; 90,-80; 21.6,-80], style(
-              color=46,
-              rgbcolor={127,127,0},
-              thickness=1,
-              fillColor=46,
-              rgbfillColor={127,127,0},
-              fillPattern=1));
-        end test_SE2Gen;
-        
-        model Generator_SE_ngen_2 
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          
-          SI.AngularVelocity omegaGen;
-          SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Power Pm;
-          
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,40; 60,-40],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G")), Diagram);
-                 annotation (Diagram);
-          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.SwingEqConnection
-            SEconnection annotation (extent=[60,-16; 92,16]);
-        equation 
-          
-          omega=der(shaft.phi) "Mechanical boundary condition";
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          omegaGen=omega*Np;
-          SEconnection.W = - Pm;
-          SEconnection.omega = omegaGen;
-          
-        end Generator_SE_ngen_2;
-        
-        model SE_2Gen_2 
-          parameter SI.Power Pmax;
-          parameter Real Ja;
-          parameter Real Jb;
-          parameter Real Da;
-          parameter Real Db;
-          parameter Real omegaGen_nom;
-          parameter Real omegaRef;
-          
-          SI.Angle delta_a;
-          SI.Angle delta_b;
-          SI.AngularVelocity d_delta_a;
-          SI.AngularVelocity d_delta_b;
-          SI.AngularVelocity omega_a;
-          SI.AngularVelocity omega_b;
-          SI.Power Pma;
-          SI.Power Pmb;
-          SI.Power Pa;
-          SI.Power Pb;
-          Real Ma;
-          Real Mb;
-          Real Ra;
-          Real Rb;
-          
-          SwingEqConnection SEconnection_a annotation (extent=[-96,-16; -64,16]);
-          SwingEqConnection SEconnection_b annotation (extent=[64,-16; 96,16]);
-          annotation (Diagram);
-          
-        equation 
-          Ma=Ja/4*omegaGen_nom;
-          Ra=Da/4*omegaGen_nom;
-          Mb=Jb/4*omegaGen_nom;
-          Rb=Db/4*omegaGen_nom;
-          
-          Pma=SEconnection_a.W;
-          Pmb=SEconnection_b.W;
-          omega_a=SEconnection_a.omega;
-          omega_b=SEconnection_b.omega;
-          d_delta_a=omega_a-omegaRef;
-          d_delta_b=omega_b-omegaRef;
-          d_delta_a=der(delta_a);
-          d_delta_b=der(delta_b);
-          
-          Ma*der(d_delta_a) + Ra*d_delta_a = Pma - Pa - Ra*omegaRef;
-          Mb*der(d_delta_b) + Rb*d_delta_b = Pmb - Pb - Rb*omegaRef;
-          Pa=Pmax*sin(delta_a - delta_b);
-          Pb=Pmax*sin(delta_b - delta_a);
-          
-        end SE_2Gen_2;
-      end prove;
       
-      package copie 
-        model Generator_SE_com 
-          "Electric generator inclusive of complex swing equation" 
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax "Output maximum power";
-          parameter Real J "Moment of inertia of the system-shaft";
-          parameter Real D "Damping constant of shaft";
-          parameter SI.Angle delta_start "Start value of loaded angle";
-          
-          SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start) "Loaded angle";
-          SI.AngularVelocity d_delta "Variation of loaded angle";
-          SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
-          SI.Power Pe "Outlet electric power";
-          SI.Power Pm "Inlet mechanical power";
-          Real M "Auxiliary variable";
-          Real R "Auxiliary variable";
-          
-          Electrical.PowerConnection powerConnection 
-                                            annotation (extent=[58,-14; 86,14]);
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,60; 60,-20],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G"),
-              Text(
-                extent=[-60,-10; 60,-50],
-                string="SE",
-                style(color=58, rgbcolor={0,127,0}))),
-                              Diagram);
-          
-        equation 
-          M=J/4*157.08*Np;
-          R=D/4*157.08*Np;
-          omega=der(shaft.phi);
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          omegaGrid = 2*Modelica.Constants.pi*powerConnection.f;
-          powerConnection.W = - Pe;
-          
-          //Definition of loaded angle  
-          d_delta = omega*Np - omegaGrid;
-          der(delta) = d_delta;
-          
-          //Swing Equation    
-          M*der(d_delta) + R*d_delta = Pm - Pe - R*omegaGrid;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          
-        end Generator_SE_com;
-        
-        model Generator_SE_Breaker 
-          "Electic generator inclusive of approximate swing equation and breaker for connection grid" 
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax "Maximum power of generator";
-          parameter Real J "Moment of inertia of the system-shaft";
-          parameter Real D "Damping constant of shaft";
-          parameter SI.Angle delta_start "Loaded angle start value";
-          parameter SI.AngularVelocity omega_nom 
-            "Nominal angulary velocity of shaft";
-          parameter SI.AngularVelocity omega_start 
-            "Angulaty velocity of shaft start value";
-          
-          SI.AngularVelocity omega( start=omega_start) "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start) "Loaded angle";
-          SI.AngularVelocity d_delta "Variation of loaded angle";
-          SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
-          SI.Power Pe "Outlet electric power";
-          SI.Power Pm "Inlet mechanical power";
-          Real M "Auxiliary variable";
-          Real R "Auxiliary variable";
-          
-          Electrical.PowerConnection powerConnection 
-                                            annotation (extent=[58,-14; 86,14]);
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,60; 60,-20],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G"),
-              Text(
-                extent=[-60,-10; 60,-50],
-                string="SE",
-                style(color=58, rgbcolor={0,127,0}))),
-                              Diagram);
-                 annotation (Diagram);
-          Modelica.Blocks.Interfaces.BooleanInput closed 
-            annotation (extent=[-10,58; 10,78],  rotation=-90);
-          Modelica.Blocks.Interfaces.RealOutput delta_out 
-            annotation (extent=[-10,-78; 10,-58],
-                                                rotation=270);
-        equation 
-          M=J/4*omega_nom*Np;
-          R=D/4*omega_nom*Np;
-          omega=der(shaft.phi);
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          omegaGrid = 2*Modelica.Constants.pi*powerConnection.f;
-          powerConnection.W = - Pe;
-          
-          //Definition loaded angle
-          d_delta = omega*Np - omegaGrid;
-          der(delta) = d_delta;
-          
-          if closed then
-            //swing equation
-            Pe = Pmax*Modelica.Math.sin(delta);
-            M*der(d_delta) + R*d_delta = Pm - Pe - R*omegaGrid;
-          else
-            //Free turbine and not connection a grid
-            J*omega*der(omega) + D*omega^2 = Pm;
-            Pe = 0;
-          end if;
-          
-          //Output signal
-          delta_out = delta - integer(delta/(2*Modelica.Constants.pi))*2*Modelica.Constants.pi;
-          
-        end Generator_SE_Breaker;
-        
-        model SwingEquation 
-          
-          parameter SI.Power Pmax "Output maximum power";
-          parameter Real J "Moment of inertia of the system-shaft";
-          parameter Real D "Damping constant of shaft";
-          parameter SI.Angle delta_start "Start value of loaded angle";
-          
-          SI.Angle delta(start=delta_start) "Loaded angle";
-          SI.AngularVelocity d_delta "Variation of loaded angle";
-          SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
-          SI.AngularVelocity omegaGen "Angulary velocity of the generator";
-          SI.Power Pe "Outlet electric power";
-          SI.Power Pm "Inlet mechanical power";
-          Real M "Auxiliary variable";
-          Real R "Auxiliary variable";
-          
-          ThermoPower.Electrical.PowerConnection powerConnection_a 
-            annotation (extent=[-94,-14; -66,14]);
-          ThermoPower.Electrical.PowerConnection powerConnection_b 
-                                            annotation (extent=[66,-14; 94,14]);
-          Modelica.Blocks.Interfaces.RealOutput delta_out 
-            annotation (extent=[-10,56; 10,76], rotation=90);
-          annotation (Diagram, Icon(Rectangle(extent=[-80,60; 80,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=30,
-                  rgbfillColor={230,230,230})), Text(
-                extent=[-80,40; 86,-40],
-                style(color=0, rgbcolor={0,0,0}),
-                string="S.E.")));
-          
-        equation 
-          M=J/4*omegaGen;
-          R=D/4*omegaGen;
-          Pm=powerConnection_a.W;
-          omegaGrid = 2*Modelica.Constants.pi*powerConnection_b.f;
-          omegaGen = 2*Modelica.Constants.pi*powerConnection_a.f;
-          powerConnection_b.W = - Pe;
-          
-          //Definition of loaded angle  
-          d_delta = omega*Np - omegaGrid;
-          der(delta) = d_delta;
-          
-          //Swing Equation    
-          M*der(d_delta) + R*d_delta = Pm - Pe - R*omegaGrid;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          
-          //Output signal
-          delta_out = delta - integer(delta/(2*Modelica.Constants.pi))*2*Modelica.Constants.pi;
-          
-        end SwingEquation;
-      end copie;
       
-      package prove2 
-        model Generator_SE 
-          "Electric generator inclusive of approximate swing equation" 
-          //Parameter
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax "Output maximum power";
-          parameter Real J "Moment of inertia of the system-shaft";
-          parameter Real r=0.3 "Damping of the system";
-          parameter SI.AngularVelocity omega_nom 
-            "Nominal angulary velocity of shaft";
-          parameter SI.Angle delta_start "Loaded angle start value";
-          
-          //Variable  
-          SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start) "Loaded angle";
-          SI.AngularVelocity d_delta "Variation of loaded angle";
-          SI.Power P "Outlet electric power";
-          SI.Power Pm "Inlet mechanical power";
-          Real M "Auxiliary variable";
-          Real D "Auxiliary variable";
-          
-          //Connector
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,60; 60,-20],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G"),
-              Text(
-                extent=[-60,-10; 60,-50],
-                style(color=58, rgbcolor={0,127,0}),
-                string="SE")),Diagram);
-          ConnectorSE connectorSE annotation (extent=[70,-10; 90,10]);
-          
-        equation 
-          M=J/(Np^2)*omega_nom*Np;
-          D=2*r*sqrt(Pmax*J*omega_nom*Np/(Np^2));
-          omega=der(shaft.phi);
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          delta = connectorSE.delta;
-          connectorSE.W = - P;
-          d_delta = der(delta);
-          
-          //Swing Equation  
-          P = Pm - M*der(d_delta) - D*d_delta;
-          
-        end Generator_SE;
-        
-        model Generator_SE_prov 
-          "Electric generator inclusive of approximate swing equation" 
-          //Parameter
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax "Output maximum power";
-          parameter Real J "Moment of inertia of the system-shaft";
-          parameter Real r=0.3 "Damping of the system";
-          parameter SI.AngularVelocity f "Grid frequnacy";
-          parameter SI.AngularVelocity omega_nom 
-            "Nominal angulary velocity of shaft";
-          parameter SI.Angle delta_start "Loaded angle start value";
-          
-          //Variable  
-          SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start) "Loaded angle";
-          SI.AngularVelocity d_delta "Variation of loaded angle";
-          SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
-          SI.Power Pe "Outlet electric power";
-          SI.Power Pm "Inlet mechanical power";
-          SI.Power Pext;
-          Real M "Auxiliary variable";
-          Real D "Auxiliary variable";
-          
-          //Connector
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,60; 60,-20],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G"),
-              Text(
-                extent=[-60,-10; 60,-50],
-                style(color=58, rgbcolor={0,127,0}),
-                string="SE")),Diagram);
-          
-          ConnectorSE connectorSE annotation (extent=[50,-10; 70,10]);
-        equation 
-          M=J/(Np^2)*omega_nom*Np;
-          D=2*r*sqrt(Pmax*J*omega_nom*Np/(Np^2));
-          omega=der(shaft.phi);
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          omegaGrid = 2*Modelica.Constants.pi*f;
-          connectorSE.delta = delta;
-          Pext = connectorSE.W;
-          
-          //Definition of loaded angle
-          d_delta = omega*Np - omegaGrid;
-          der(delta) = d_delta;
-          
-          //Swing Equation  
-          M*der(d_delta) + D*d_delta = Pm - Pe/eta - Pext;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          
-        end Generator_SE_prov;
-        
-        model Generator_SE_close 
-          "Electric generator inclusive of approximate swing equation" 
-          //Parameter
-          parameter Real eta=1 "Conversion efficiency";
-          parameter Integer Np=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax "Output maximum power";
-          parameter Real J "Moment of inertia of the system-shaft";
-          parameter Real r=0.3 "Damping of the system";
-          parameter SI.AngularVelocity f "Grid frequnacy";
-          parameter SI.AngularVelocity omega_nom 
-            "Nominal angulary velocity of shaft";
-          parameter SI.Angle delta_start "Loaded angle start value";
-          
-          //Variable  
-          SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
-          SI.Angle delta(start=delta_start) "Loaded angle";
-          SI.AngularVelocity d_delta "Variation of loaded angle";
-          SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
-          SI.Power Pe "Outlet electric power";
-          SI.Power Pm "Inlet mechanical power";
-          Real M "Auxiliary variable";
-          Real D "Auxiliary variable";
-          
-          //Connector
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-            annotation (extent=[-100,-10; -80,10]);
-          annotation (Icon(
-              Rectangle(extent=[-60,8; -90,-8], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  gradient=2,
-                  fillColor=9,
-                  rgbfillColor={175,175,175})),
-              Ellipse(extent=[-60,60; 60,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230})),
-              Text(
-                extent=[-60,60; 60,-20],
-                style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  thickness=2,
-                  fillColor=30,
-                  rgbfillColor={230,230,230},
-                  fillPattern=1),
-                string="G"),
-              Text(
-                extent=[-60,-10; 60,-50],
-                style(color=58, rgbcolor={0,127,0}),
-                string="SE")),Diagram);
-          
-        equation 
-          M=J/(Np^2)*omega_nom*Np;
-          D=2*r*sqrt(Pmax*J*omega_nom*Np/(Np^2));
-          omega=der(shaft.phi);
-          Pm=omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega) 
-            "Rotational speed in rpm";
-          omegaGrid = 2*Modelica.Constants.pi*f;
-          
-          //Definition of loaded angle
-          d_delta = omega*Np - omegaGrid;
-          der(delta) = d_delta;
-          
-          //Swing Equation  
-          M*der(d_delta) + D*d_delta = Pm - Pe/eta;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          
-        end Generator_SE_close;
-        
-        model SE 
-          parameter SI.Power Pmax_a;
-          parameter SI.Power Pmax_b;
-          
-          SI.Power Pext_a;
-          SI.Power Pext_b;
-          
-          ConnectorSE connectorSE_a annotation (extent=[-90,-10; -70,10]);
-          ConnectorSE connectorSE_b annotation (extent=[70,-10; 90,10]);
-          
-        equation 
-          Pext_a = Pmax_a*Modelica.Math.sin(connectorSE_a.delta - connectorSE_b.delta);
-          connectorSE_a.W = Pext_a;
-          Pext_b = -Pext_a;
-          connectorSE_b.W = Pext_b;
-        end SE;
-        
-        model test_SE2Gen 
-          annotation (Diagram);
-          Water.SteamTurbineStodola steamTurbineStodola(
-            pstart_in=1.28e7,
-            pstart_out=2.98e6,
-            wstart=67.6,
-            hstartin=3.47e6,
-            hstartout=3.1076e6,
-            wnom=67.6,
-            eta_iso_nom=0.833,
-            Kt=0.0032078) 
-                        annotation (extent=[-60,8; -20,48]);
-          Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-            annotation (extent=[-8,70; 12,90]);
-          Water.ValveVap valveHP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=67.6,
-            hstart=3.47e6,
-            pnom=1.296e7,
-            dpnom=1.6e5,
-            Cv=1165)             annotation (extent=[-60,74; -80,54],rotation=90);
-          Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-100,74; -80,94]);
-          Water.SteamTurbineStodola steamTurbineStodola1(
-            pstart_in=2.68e6,
-            pstart_out=6e5,
-            wstart=81.10,
-            hstartin=3.554e6,
-            hstartout=3.1281e6,
-            wnom=81.10,
-            eta_iso_nom=0.903,
-            Kt=0.018883)     annotation (extent=[-60,-100; -20,-60]);
-          Water.SinkP sinkP1(
-                            p0=6e5, h=3.1281e6) 
-            annotation (extent=[-12,-50; 8,-30]);
-          Water.ValveVap valveIP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=81.1,
-            hstart=3.554e6,
-            dpnom=5e4,
-            pnom=2.73e6,
-            Cv=5625)             annotation (extent=[-62,-32; -82,-52],
-                                                                     rotation=90);
-          Water.SourceP sourceP1(           h=3.554e6, p0=2.73e6) 
-            annotation (extent=[-100,-30; -80,-10]);
-        public 
-          Modelica.Blocks.Sources.Constant com_valveHP1 
-            annotation (extent=[-32,-52; -52,-32]);
-        public 
-          Modelica.Blocks.Sources.Constant com_valveHP2 
-            annotation (extent=[-30,54; -50,74]);
-          Generator_SE_prov generator_SE_a(
-            Pmax=30e6,
-            eta=0.96,
-            r=0.2,
-            J=15000,
-            omega_nom=157.08,
-            f=314.16,
-            delta_start=0.876683) 
-                       annotation (extent=[0,8; 40,48]);
-          Generator_SE_prov generator_SE_b(
-            eta=0.96,
-            r=0.2,
-            J=15000,
-            omega_nom=157.08,
-            f=314.16,
-            Pmax=38e6,
-            delta_start=0.948846) 
-                       annotation (extent=[0,-100; 40,-60]);
-          SE sE(Pmax_a=400e6, Pmax_b=400e6) annotation (extent=[60,-20; 80,0]);
-        equation 
-          connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-8,80;
-                -24.6,80; -24.6,44],             style(thickness=2));
-          connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-70,54;
-                -70,43.8; -55,43.8],           style(thickness=2));
-          connect(sourceP.flange,valveHP. inlet) 
-            annotation (points=[-80,84; -70,84; -70,74], style(thickness=2));
-          connect(sinkP1.flange, steamTurbineStodola1.outlet) 
-                                                            annotation (points=[-12,-40;
-                -24.6,-40; -24.6,-64],           style(thickness=2));
-          connect(valveIP.outlet, steamTurbineStodola1.inlet) 
-                                                             annotation (points=[-72,-52;
-                -72,-64.2; -55,-64.2],         style(thickness=2));
-          connect(sourceP1.flange, valveIP.inlet) 
-            annotation (points=[-80,-20; -72,-20; -72,-32],
-                                                         style(thickness=2));
-          connect(com_valveHP1.y, valveIP.theta) 
-                                             annotation (points=[-53,-42; -64,
-                -42],
-              style(color=74, rgbcolor={0,0,127}));
-          connect(com_valveHP2.y, valveHP.theta) annotation (points=[-51,64;
-                -62,64], style(
-              color=74,
-              rgbcolor={0,0,127},
-              fillColor=46,
-              rgbfillColor={127,127,0},
-              fillPattern=1));
-          connect(generator_SE_a.shaft, steamTurbineStodola.shaft_b) 
-            annotation (points=[2,28; -27.2,28], style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2));
-          connect(generator_SE_b.shaft, steamTurbineStodola1.shaft_b) 
-            annotation (points=[2,-80; -27.2,-80], style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2));
-          connect(sE.connectorSE_a, generator_SE_a.connectorSE) annotation (
-              points=[62,-10; 48,-10; 48,28; 32,28], style(
-              color=46,
-              rgbcolor={127,127,0},
-              thickness=1));
-          connect(sE.connectorSE_b, generator_SE_b.connectorSE) annotation (
-              points=[78,-10; 90,-10; 90,-80; 32,-80], style(
-              color=46,
-              rgbcolor={127,127,0},
-              thickness=1));
-        end test_SE2Gen;
-        
-        model SE_2 
-          
-          parameter SI.AngularVelocity f "Grid frequnacy";
-          
-          parameter Real eta_a=1 "Conversion efficiency";
-          parameter Integer Np_a=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax_a "Output maximum power";
-          parameter Real J_a "Moment of inertia of the system-shaft";
-          parameter Real r_a=0.3 "Damping of the system";
-          parameter SI.AngularVelocity omega_nom_a 
-            "Nominal angulary velocity of shaft";
-          parameter SI.Angle delta_a_start "Loaded angle start value";
-          
-          parameter Real eta_b=1 "Conversion efficiency";
-          parameter Integer Np_b=2 "Number of couple of electrical poles";
-          parameter SI.Power Pmax_b "Output maximum power";
-          parameter Real J_b "Moment of inertia of the system-shaft";
-          parameter Real r_b=0.3 "Damping of the system";
-          parameter SI.AngularVelocity omega_nom_b 
-            "Nominal angulary velocity of shaft";
-          parameter SI.Angle delta_b_start "Loaded angle start value";
-          
-          SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
-          
-          SI.AngularVelocity omega_a "Shaft angular velocity";
-          SI.Angle delta_a( start=delta_a_start) "Loaded angle";
-          SI.AngularVelocity d_delta_a "Variation of loaded angle";
-          SI.Power Pe_a "Outlet electric power";
-          SI.Power Pm_a "Inlet mechanical power";
-          SI.Power Pext_a;
-          Real M_a "Auxiliary variable";
-          Real D_a "Auxiliary variable";
-          
-          SI.AngularVelocity omega_b "Shaft angular velocity";
-          SI.Angle delta_b( start=delta_b_start) "Loaded angle";
-          SI.AngularVelocity d_delta_b "Variation of loaded angle";
-          SI.Power Pe_b "Outlet electric power";
-          SI.Power Pm_b "Inlet mechanical power";
-          SI.Power Pext_b;
-          Real M_b "Auxiliary variable";
-          Real D_b "Auxiliary variable";
-          
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
-            annotation (extent=[-90,-10; -70,10]);
-          Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_b 
-            annotation (extent=[70,-10; 90,10]);
-        equation 
-          omegaGrid = 2*Modelica.Constants.pi*f;
-          
-          M_a=J_a/(Np_a^2)*omega_nom_a*Np_a;
-          D_a=2*r_a*sqrt(Pmax_a*J_a*omega_nom_a*Np_a/(Np_a^2));
-          omega_a=der(shaft_a.phi);
-          Pm_a=omega_a*shaft_a.tau;
-          
-          //Definition of loaded angle
-          d_delta_a = omega_a*Np_a - omegaGrid;
-          der(delta_a) = d_delta_a;
-          
-          //Swing Equation  
-          M_a*der(d_delta_a) + D_a*d_delta_a = Pm_a - Pe_a/eta_a - Pext_a;
-          Pe_a = Pmax_a*Modelica.Math.sin(delta_a);
-          Pext_a = Pmax_a*Modelica.Math.sin(delta_a - delta_b);
-          
-          M_b=J_b/(Np_b^2)*omega_nom_b*Np_b;
-          D_b=2*r_b*sqrt(Pmax_b*J_b*omega_nom_b*Np_b/(Np_b^2));
-          omega_b=der(shaft_b.phi);
-          Pm_b=omega_b*shaft_b.tau;
-          
-          //Definition of loaded angle
-          d_delta_b = omega_b*Np_a - omegaGrid;
-          der(delta_b) = d_delta_b;
-          
-          //Swing Equation  
-          M_b*der(d_delta_b) + D_b*d_delta_b = Pm_b - Pe_b/eta_b - Pext_b;
-          Pe_b = Pmax_b*Modelica.Math.sin(delta_b);
-          Pext_b = -Pext_a;
-          annotation (Diagram);
-        end SE_2;
-        
-        model test_SE2Gen_2 
-          annotation (Diagram);
-          Water.SteamTurbineStodola steamTurbineStodola(
-            pstart_in=1.28e7,
-            pstart_out=2.98e6,
-            wstart=67.6,
-            hstartin=3.47e6,
-            hstartout=3.1076e6,
-            wnom=67.6,
-            eta_iso_nom=0.833,
-            Kt=0.0032078) 
-                        annotation (extent=[-60,8; -20,48]);
-          Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-            annotation (extent=[-8,70; 12,90]);
-          Water.ValveVap valveHP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=67.6,
-            hstart=3.47e6,
-            pnom=1.296e7,
-            dpnom=1.6e5,
-            Cv=1165)             annotation (extent=[-60,74; -80,54],rotation=90);
-          Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-            annotation (extent=[-100,74; -80,94]);
-          Water.SteamTurbineStodola steamTurbineStodola1(
-            pstart_in=2.68e6,
-            pstart_out=6e5,
-            wstart=81.10,
-            hstartin=3.554e6,
-            hstartout=3.1281e6,
-            wnom=81.10,
-            eta_iso_nom=0.903,
-            Kt=0.018883)     annotation (extent=[-60,-100; -20,-60]);
-          Water.SinkP sinkP1(
-                            p0=6e5, h=3.1281e6) 
-            annotation (extent=[-12,-50; 8,-30]);
-          Water.ValveVap valveIP(
-            CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-            CheckValve=true,
-            wnom=81.1,
-            hstart=3.554e6,
-            dpnom=5e4,
-            pnom=2.73e6,
-            Cv=5625)             annotation (extent=[-62,-32; -82,-52],
-                                                                     rotation=90);
-          Water.SourceP sourceP1(           h=3.554e6, p0=2.73e6) 
-            annotation (extent=[-100,-30; -80,-10]);
-        public 
-          Modelica.Blocks.Sources.Constant com_valveHP1 
-            annotation (extent=[-32,-52; -52,-32]);
-        public 
-          Modelica.Blocks.Sources.Constant com_valveHP2 
-            annotation (extent=[-30,54; -50,74]);
-          SE_2 generator_SE_a(
-            Pmax_a=30e6,
-            J_a=1500,
-            r_a=0.2,
-            omega_nom_a=157.08,
-            delta_a_start=0.876683,
-            Pmax_b=40e6,
-            J_b=15000,
-            r_b=0.2,
-            omega_nom_b=157.08,
-            delta_b_start=0.948846,
-            f=50)      annotation (extent=[20,0; 60,40]);
-        equation 
-          connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-8,80;
-                -24.6,80; -24.6,44],             style(thickness=2));
-          connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-70,54;
-                -70,43.8; -55,43.8],           style(thickness=2));
-          connect(sourceP.flange,valveHP. inlet) 
-            annotation (points=[-80,84; -70,84; -70,74], style(thickness=2));
-          connect(sinkP1.flange, steamTurbineStodola1.outlet) 
-                                                            annotation (points=[-12,-40;
-                -24.6,-40; -24.6,-64],           style(thickness=2));
-          connect(valveIP.outlet, steamTurbineStodola1.inlet) 
-                                                             annotation (points=[-72,-52;
-                -72,-64.2; -55,-64.2],         style(thickness=2));
-          connect(sourceP1.flange, valveIP.inlet) 
-            annotation (points=[-80,-20; -72,-20; -72,-32],
-                                                         style(thickness=2));
-          connect(com_valveHP1.y, valveIP.theta) 
-                                             annotation (points=[-53,-42; -64,
-                -42],
-              style(color=74, rgbcolor={0,0,127}));
-          connect(com_valveHP2.y, valveHP.theta) annotation (points=[-51,64;
-                -62,64], style(
-              color=74,
-              rgbcolor={0,0,127},
-              fillColor=46,
-              rgbfillColor={127,127,0},
-              fillPattern=1));
-          connect(generator_SE_a.shaft_a, steamTurbineStodola.shaft_b) 
-            annotation (points=[24,20; -2,20; -2,28; -27.2,28], style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2));
-          connect(generator_SE_a.shaft_b, steamTurbineStodola1.shaft_b) 
-            annotation (points=[56,20; 70,20; 70,-80; -27.2,-80], style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2));
-        end test_SE2Gen_2;
-      end prove2;
     end Components;
     
     package Examples 
@@ -31871,7 +29264,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(inertia.flange_b, generator.shaft) annotation (points=[-58,0;
+        connect(inertia.flange_b, generator.shaft) annotation (points=[-58,0; 
               -50.6,0; -50.6,3.55271e-016; -41.2,3.55271e-016], style(
             color=0,
             rgbcolor={0,0,0},
@@ -31893,7 +29286,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(powerSensor.port_b, breaker.connection1) annotation (points=[28,-0.16;
+        connect(powerSensor.port_b, breaker.connection1) annotation (points=[28,-0.16; 
               34,-0.16; 34,-1.77636e-016; 41.4,-1.77636e-016],      style(
             pattern=0,
             thickness=2,
@@ -32328,7 +29721,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             points=[98,-40; 38,-40; 38,86; 28.16,86], style(color=84, rgbcolor=
                 {255,170,213}));
         connect(grid_3in.connection_B, breaker_B.connection2) annotation (
-            points=[77.4,1.77636e-016; 67.7,1.77636e-016; 67.7,1.77636e-016;
+            points=[77.4,1.77636e-016; 67.7,1.77636e-016; 67.7,1.77636e-016; 
               58.6,1.77636e-016], style(pattern=0, thickness=2));
         connect(grid_3in.connection_C, breaker_C.connection2) annotation (
             points=[77.4,-8; 70,-8; 70,-64; 58.6,-64], style(pattern=0,
@@ -32369,7 +29762,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(generator_SE.powerConnection, powerSensor.port_a) annotation (
             points=[-27.6,3.55271e-016; -8.8,3.55271e-016; -8.8,0; 12,0], style(
               pattern=0, thickness=2));
-        connect(powerSensor.port_b, grid.connection) annotation (points=[28,-0.16;
+        connect(powerSensor.port_b, grid.connection) annotation (points=[28,-0.16; 
               48,-0.16; 48,1.77636e-016; 49.4,1.77636e-016],        style(
               pattern=0, thickness=2));
         connect(frequencySensor.port, generator_SE.powerConnection) annotation (
@@ -32618,9 +30011,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Electrical.Grid grid(Pn=50e8, droop=0) 
           annotation (extent=[66,-18; 86,2]);
       equation 
-        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40;
+        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40; 
               -51.68,40; -51.68,4.8],          style(thickness=2));
-        connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18;
+        connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18; 
               -76,4.64],                     style(thickness=2));
         connect(sourceP.flange,valveHP. inlet) 
           annotation (points=[-84,40; -76,40; -76,30], style(thickness=2));
@@ -32691,9 +30084,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Electrical.Grid grid(Pn=50e8, droop=0) 
           annotation (extent=[66,-18; 86,2]);
       equation 
-        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40;
+        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40; 
               -51.68,40; -51.68,4.8],          style(thickness=2));
-        connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18;
+        connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18; 
               -76,4.64],                     style(thickness=2));
         connect(sourceP.flange,valveHP. inlet) 
           annotation (points=[-84,40; -76,40; -76,30], style(thickness=2));
@@ -32770,9 +30163,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=false) 
           annotation (extent=[38,46; 58,66]);
       equation 
-        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40;
+        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40; 
               -51.68,40; -51.68,4.8],          style(thickness=2));
-        connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18;
+        connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18; 
               -76,4.64],                     style(thickness=2));
         connect(sourceP.flange,valveHP. inlet) 
           annotation (points=[-84,40; -76,40; -76,30], style(thickness=2));
@@ -32793,81 +30186,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(grid.connection, generator_SE.powerConnection) annotation (
             points=[67.4,-8; 53.1,-8; 53.1,-8; 38.8,-8],
                                          style(pattern=0, thickness=2));
-        connect(booleanConstant.y, generator_SE.closed) annotation (points=[59,56;
+        connect(booleanConstant.y, generator_SE.closed) annotation (points=[59,56; 
               78,56; 78,30; 10,30; 10,19.2],     style(color=5, rgbcolor={255,0,
                 255}));
       end Test_Generator_SE_breaker;
       
-      model Test_Generator_SE_close 
-        annotation (Diagram, experiment(StopTime=32, NumberOfIntervals=50000));
-        Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=1.28e7,
-          pstart_out=2.98e6,
-          wstart=67.6,
-          hstartin=3.47e6,
-          hstartout=3.1076e6,
-          wnom=67.6,
-          eta_iso_nom=0.833,
-          Kt=0.0032078) 
-                      annotation (extent=[-80,-24; -48,8]);
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-          annotation (extent=[-44,34; -32,46]);
-        Water.ValveVap valveHP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          CheckValve=true,
-          wnom=67.6,
-          hstart=3.47e6,
-          pnom=1.296e7,
-          dpnom=1.6e5,
-          Cv=1165)             annotation (extent=[-70,30; -82,18],rotation=90);
-        Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-          annotation (extent=[-96,34; -84,46]);
-      public 
-        Modelica.Blocks.Sources.Ramp com_valveHP_a(
-          offset=0.2,
-          startTime=5,
-          height=+0.7,
-          duration=3) 
-          annotation (extent=[0,76; -12,88]);
-      public 
-        Modelica.Blocks.Sources.Ramp com_valveHP_b(
-          offset=0,
-          duration=5,
-          height=-0.8,
-          startTime=15) 
-          annotation (extent=[0,54; -12,66]);
-        Modelica.Blocks.Math.Add add 
-          annotation (extent=[-56,62; -42,76], rotation=180);
-        Components.prove2.Generator_SE_close generator_SE(
-          Pmax=30e6,
-          eta=0.96,
-          r=0.2,
-          J=15000,
-          delta_start=0.5073,
-          omega_nom=157.08,
-          f=314.16)  annotation (extent=[-30,-48; 50,32]);
-      equation 
-        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40;
-              -51.68,40; -51.68,4.8],          style(thickness=2));
-        connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18;
-              -76,4.64],                     style(thickness=2));
-        connect(sourceP.flange,valveHP. inlet) 
-          annotation (points=[-84,40; -76,40; -76,30], style(thickness=2));
-        connect(add.y, valveHP.theta) annotation (points=[-56.7,69; -62,69; -62,
-              24; -71.2,24],                                                 style(
-              color=74, rgbcolor={0,0,127}));
-        connect(com_valveHP_b.y, add.u1) annotation (points=[-12.6,60; -30,60;
-              -30,64; -40,64; -40.6,64.8],
-                           style(color=74, rgbcolor={0,0,127}));
-        connect(com_valveHP_a.y, add.u2) annotation (points=[-12.6,82; -30,82;
-              -30,74; -40.6,74; -40.6,73.2],
-                                     style(color=74, rgbcolor={0,0,127}));
-        connect(generator_SE.shaft, steamTurbineStodola.shaft_b) annotation (
-            points=[-26,-8; -53.76,-8],style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
-      end Test_Generator_SE_close;
       
       model TestSingleShaft 
         ThermoPower.PowerPlants.ElectricGeneratorGroup.Examples.SingleShaft_static
@@ -32988,7 +30311,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(actuators, doubleShaft.ActuatorsBus) annotation (points=[74,-30;
+        connect(actuators, doubleShaft.ActuatorsBus) annotation (points=[74,-30; 
               92,-30; 92,-11.6; 79.4,-11.6], style(color=52, rgbcolor={213,255,
                 170}));
         connect(booleanConstant.y, actuators.breakerClosed_shaftA) annotation (
@@ -33423,7 +30746,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             -23.9,17.6; -23.9,30], style(thickness=2));
       connect(sourceWater.flange, hRSG.WaterIn) 
         annotation (points=[22,14; -2.2,14; -2.2,30], style(thickness=2));
-      connect(actuators, hRSG.ActuatorsBus) annotation (points=[80,42; 68,42;
+      connect(actuators, hRSG.ActuatorsBus) annotation (points=[80,42; 68,42; 
             68,72.16; 3.38,72.16], style(color=52, rgbcolor={213,255,170}));
     end Test_ST_HRSG;
     
@@ -33581,17 +30904,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             -23.9,21.6; -23.9,30], style(thickness=2));
       connect(sourceWater.flange, hRSG.WaterIn) 
         annotation (points=[22,14; -2.2,14; -2.2,30], style(thickness=2));
-      connect(actuators, hRSG.ActuatorsBus) annotation (points=[80,72; 68,72;
+      connect(actuators, hRSG.ActuatorsBus) annotation (points=[80,72; 68,72; 
             68,72.16; 3.38,72.16], style(color=52, rgbcolor={213,255,170}));
       connect(stateLPTout.inlet, steamTurbines.LPT_Out) 
         annotation (points=[-6,-64; -6,-60; -6,-60; -6,-56],
                                                style(thickness=2));
       connect(condenserIdeal.waterOut, stateCondOut1.inlet) 
-        annotation (points=[32,-92; 66,-92; 66,-76]);
+        annotation (points=[32,-94; 66,-94; 66,-76]);
       connect(sinkW.flange, stateCondOut1.outlet) 
         annotation (points=[78,-46; 66,-46; 66,-64]);
       connect(condenserIdeal.steamIn, stateLPTout.outlet) 
-        annotation (points=[32,-76; -6,-76; -6,-76]);
+        annotation (points=[32,-74; -6,-74; -6,-76]);
     end Test_STG_HRSG_open;
     
     model Test_STG_HRSG 
@@ -33758,18 +31081,18 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         annotation (points=[-14,21.6; -14,30; -14.6,30], style(thickness=2));
       connect(stateShIP_out.inlet, hRSG.Sh_IP_Out) annotation (points=[-24,21.6;
             -23.9,21.6; -23.9,30], style(thickness=2));
-      connect(actuators, hRSG.ActuatorsBus) annotation (points=[80,72; 68,72;
+      connect(actuators, hRSG.ActuatorsBus) annotation (points=[80,72; 68,72; 
             68,72.16; 3.38,72.16], style(color=52, rgbcolor={213,255,170}));
       connect(stateLPTout.inlet, steamTurbines.LPT_Out) 
         annotation (points=[-6,-62.4; -6,-59.2; -6,-59.2; -6,-56],
                                                style(thickness=2));
       connect(condenserIdeal.waterOut, stateCondOut.inlet) 
-        annotation (points=[-6,-92; -6,-98; 47,-98; 47,-75.2],
+        annotation (points=[-6,-94; -6,-98; 47,-98; 47,-75.2],
                                                      style(thickness=2));
       connect(stateInletHRSG.outlet, hRSG.WaterIn) 
         annotation (points=[26.8,9; -2.2,9; -2.2,30], style(thickness=2));
       connect(condenserIdeal.steamIn, stateLPTout.outlet) 
-        annotation (points=[-6,-76; -6,-72.8; -6,-69.6; -6,-69.6],
+        annotation (points=[-6,-74; -6,-74; -6,-69.6; -6,-69.6],
                                                     style(thickness=2));
       connect(n_pump.y,prescribedSpeedPump. pumpSpeed_rpm) annotation (points=[67.5,-15;
             48,-15; 48,-53.2; 59.36,-53.2],  style(color=74, rgbcolor={0,0,
@@ -33782,13 +31105,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     end Test_STG_HRSG;
     
     model TestSteamPlant 
-      "Test total plant with parameter initial resetting and without control" 
+      "Test total plant with parameters initial resetting and without control" 
       replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
         Modelica.Media.Interfaces.PartialMedium;
       replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
         Modelica.Media.Interfaces.PartialPureSubstance;
       ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
-                                   cylindersBodies(
+                                   drums(
           fluidHPNomPressure=1.22116e7,
           fluidIPNomPressure=2.63694e6,
           fluidLPNomPressure=6.047e5,
@@ -33956,9 +31279,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       Buses.Actuators actuators1 
         annotation (extent=[64,-18; 76,-6],   rotation=0);
     equation 
-      connect(actuators, hRSG.ActuatorsBus) annotation (points=[52,49; 28.6,49;
+      connect(actuators, hRSG.ActuatorsBus) annotation (points=[52,49; 28.6,49; 
             28.6,48.8; 3.4,48.8], style(color=52, rgbcolor={213,255,170}));
-      connect(sTG_3LRh.WaterOut, stateCondOut.inlet) annotation (points=[-2,-26;
+      connect(sTG_3LRh.WaterOut, stateCondOut.inlet) annotation (points=[-2,-26; 
             -2,-20.4; -2,-14.8; -2,-14.8], style(thickness=2));
       connect(stateCondOut.outlet, hRSG.WaterIn) 
         annotation (points=[-2,-5.2; -2,1.4; -2,1.4; -2,8],
@@ -34030,13 +31353,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     end TestSteamPlant;
     
     model TestSteamPlant_valve 
-      "Test total plant with parameter initial resetting, level control and inlet valve on the steam turbine group" 
+      "Test total plant with parameters initial resetting, level control and inlet valve on the steam turbine group" 
       replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
         Modelica.Media.Interfaces.PartialMedium;
       replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
         Modelica.Media.Interfaces.PartialPureSubstance;
       ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
-                                   cylindersBodies(
+                                   drums(
           fluidHPNomPressure=1.22116e7,
           fluidIPNomPressure=2.63694e6,
           fluidLPNomPressure=6.047e5,
@@ -34211,11 +31534,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         annotation (extent=[-96,-86; -84,-74]);
     equation 
       connect(steamTurbineGroup.WaterOut, stateCondOut.inlet) 
-                                                     annotation (points=[-2,-26;
+                                                     annotation (points=[-2,-26; 
             -2,-21.4; -2,-16.8; -2,-16.8], style(thickness=2));
       connect(stateCondOut.outlet, hRSG.WaterIn) 
-        annotation (points=[-2,-7.2; -2,-1.6; -2,-1.6; -2,4],
-                                            style(thickness=2));
+        annotation (points=[-2,-7.2; -2,4], style(thickness=2));
       connect(steamTurbineGroup.From_SH_LP, stateLPT_in.outlet) 
         annotation (points=[-14,-26; -14,-16.8], style(thickness=2));
       connect(stateLPT_in.inlet, hRSG.Sh_LP_Out) 
@@ -34282,7 +31604,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       connect(hRSG.ActuatorsBus, levelsControlSimplified.ActuatorsBus) 
         annotation (points=[3.4,44.8; 82,44.8; 82,70; 60,70], style(color=52,
             rgbcolor={213,255,170}));
-      connect(actuators, steamTurbineGroup.ActuatorsBus) annotation (points=[-14,-94;
+      connect(actuators, steamTurbineGroup.ActuatorsBus) annotation (points=[-14,-94; 
             14,-94; 14,-77.6; 3.4,-77.6],          style(color=52, rgbcolor={
               213,255,170}));
       connect(actuators.Opening_valveHP, valveHP_com.y) annotation (points=[-14,
@@ -34400,7 +31722,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             gamma_F_A=4000,
             gamma_F_B=4000,
             gamma_G_A=70,
-            gamma_G_B=70)),            cylindersBodies(
+            gamma_G_B=70)),            drums(
           fluidHPNomPressure=1.22116e7,
           fluidIPNomPressure=2.63694e6,
           fluidLPNomPressure=6.047e5,
@@ -34487,12 +31809,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         offset=585.5,
         startTime=5000) annotation (extent=[-98,60; -78,80]);
     equation 
-      connect(sTG_3LRh.WaterOut, stateCondOut.inlet) annotation (points=[-2,-26;
-            -2,-24; -4.44089e-016,-24; -4.44089e-016,-22; -2,-22; -2,-16.8],
-                                           style(thickness=2));
+      connect(sTG_3LRh.WaterOut, stateCondOut.inlet) annotation (points=[-2,-26; 
+            -2,-21.4; -2,-16.8; -2,-16.8], style(thickness=2));
       connect(stateCondOut.outlet, hRSG.WaterIn) 
-        annotation (points=[-2,-7.2; -2,-1.6; -2,-1.6; -2,4],
-                                            style(thickness=2));
+        annotation (points=[-2,-7.2; -2,4], style(thickness=2));
       connect(sTG_3LRh.From_SH_LP, stateLPT_in.outlet) 
         annotation (points=[-14,-26; -14,-16.8], style(thickness=2));
       connect(stateLPT_in.inlet, hRSG.Sh_LP_Out) 
@@ -34551,16 +31871,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           color=76,
           rgbcolor={159,159,223},
           thickness=2));
-      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (points=[40.2,70;
+      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (points=[40.2,70; 
             20,70; 20,54.4; 3.4,54.4], style(color=84, rgbcolor={255,170,213}));
-      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[60,70;
+      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[60,70; 
             82,70; 82,44.8; 3.4,44.8],        style(color=52, rgbcolor={213,255,
               170}));
       connect(ramp.y, sourceGas.in_w0) annotation (points=[-77,70; -72,70; -72,
             44; -95.2,44; -95.2,34.5], style(color=74, rgbcolor={0,0,127}));
     end TestSteamPlant_controls;
     
-    model TestSteamPlant_Sim1 
+    
+  end Tests;
+  
+  package Simulations 
+    model SteamPlant_Sim1 
       "Test total plant with levels control and ratio control on the condenser, inlet valves" 
       replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
         Modelica.Media.Interfaces.PartialMedium;
@@ -34664,7 +31988,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             gamma_F_A=4000,
             gamma_F_B=4000,
             gamma_G_A=70,
-            gamma_G_B=70)),            cylindersBodies(
+            gamma_G_B=70)),            drums(
           fluidHPNomPressure=1.22116e7,
           fluidIPNomPressure=2.63694e6,
           fluidLPNomPressure=6.047e5,
@@ -34769,7 +32093,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       Buses.Actuators actuators1 
         annotation (extent=[70,-18; 82,-6],   rotation=0);
     equation 
-      connect(sTG_3LRh.WaterOut, stateCondOut.inlet) annotation (points=[-2,-26;
+      connect(sTG_3LRh.WaterOut, stateCondOut.inlet) annotation (points=[-2,-26; 
             -2,-21.4; -2,-16.8; -2,-16.8], style(thickness=2));
       connect(stateCondOut.outlet, hRSG.WaterIn) 
         annotation (points=[-2,-7.2; -2,-1.6; -2,-1.6; -2,4],
@@ -34814,9 +32138,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           color=76,
           rgbcolor={159,159,223},
           thickness=2));
-      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (points=[40.2,70;
+      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (points=[40.2,70; 
             20,70; 20,54.4; 3.4,54.4], style(color=84, rgbcolor={255,170,213}));
-      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[60,70;
+      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[60,70; 
             82,70; 82,44.8; 3.4,44.8],        style(color=52, rgbcolor={213,255,
               170}));
       connect(actuators.Opening_valveHP,valveHP_com. y) annotation (points=[-70,-92;
@@ -34848,9 +32172,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           color=0,
           rgbcolor={0,0,0},
           thickness=2));
-    end TestSteamPlant_Sim1;
-    
-    model TestSteamPlant_Sim2 
+    end SteamPlant_Sim1;
+
+    model SteamPlant_Sim2 
       "Test total plant with levels control and ratio control on the condenser, inlet valves" 
       replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
         Modelica.Media.Interfaces.PartialMedium;
@@ -34954,7 +32278,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             gamma_F_A=4000,
             gamma_F_B=4000,
             gamma_G_A=70,
-            gamma_G_B=70)),            cylindersBodies(
+            gamma_G_B=70)),            drums(
           fluidHPNomPressure=1.22116e7,
           fluidIPNomPressure=2.63694e6,
           fluidLPNomPressure=6.047e5,
@@ -35062,7 +32386,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       Buses.Actuators actuators1 
         annotation (extent=[70,-18; 82,-6],   rotation=0);
     equation 
-      connect(sTG_3LRh.WaterOut, stateCondOut.inlet) annotation (points=[-2,-26;
+      connect(sTG_3LRh.WaterOut, stateCondOut.inlet) annotation (points=[-2,-26; 
             -2,-21.4; -2,-16.8; -2,-16.8], style(thickness=2));
       connect(stateCondOut.outlet, hRSG.WaterIn) 
         annotation (points=[-2,-7.2; -2,-1.6; -2,-1.6; -2,4],
@@ -35107,9 +32431,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           color=76,
           rgbcolor={159,159,223},
           thickness=2));
-      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (points=[40.2,70;
+      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (points=[40.2,70; 
             20,70; 20,54.4; 3.4,54.4], style(color=84, rgbcolor={255,170,213}));
-      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[60,70;
+      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[60,70; 
             82,70; 82,44.8; 3.4,44.8],        style(color=52, rgbcolor={213,255,
               170}));
       connect(actuators.Opening_valveHP,valveHP_com. y) annotation (points=[-70,-92;
@@ -35140,7 +32464,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           color=0,
           rgbcolor={0,0,0},
           thickness=2));
-    end TestSteamPlant_Sim2;
-  end Tests;
-  
+    end SteamPlant_Sim2;
+  end Simulations;
 end PowerPlants;
