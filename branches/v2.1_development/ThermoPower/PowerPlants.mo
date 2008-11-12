@@ -159,15 +159,9 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
     
     package Components 
       
-      
-      
-      
     end Components;
     
     package Examples 
-      
-      
-      
       
       model GasTurbineSimplified 
         extends 
@@ -231,8 +225,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         flueGasOut.XBA = gas.Xi;
       end GasTurbineSimplified;
     end Examples;
-    
-    
     
     package Tests 
       model TestGasTurbine 
@@ -23648,50 +23640,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         rhol=FluidMedium.bubbleDensity(sat);
       end computation_states;
       
-      model TestPump 
-        
-      public 
-        Components.PrescribedSpeedPump prescribedSpeedPump(
-          rho_nom=1000,
-          n0=1500,
-          nominalCondensationPressure=5.3982e3,
-          nominalSteamFlow=89.8,
-          nominalSteamPressure=7.19e5,
-          redeclare package WaterMedium = Water.StandardWater,
-          dh=2.44e5 - 1.43495e5,
-          q_nom={0.0898,0,0.1},
-          head_nom={72.74,130,0},
-          hstart=1.43495e5)     annotation (extent=[12,10; -8,-10],  rotation=
-              180);
-      public 
-        Modelica.Blocks.Sources.Constant n_pump(k=1500) 
-          annotation (extent=[10,30; 0,40]);
-        Water.SourceP sourceHPT(p0=5398.2, h=1.43495e5) 
-          annotation (extent=[-58,-6; -46,6],  rotation=0);
-        Water.SinkP sinkLPT(p0=719e3, h=2.44e5) 
-                           annotation (extent=[48,-6; 60,6],    rotation=0);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Components.StateReader 
-          stateRedearIn 
-          annotation (extent=[-36,-10; -16,10]);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Components.StateReader 
-          stateRedearOut 
-          annotation (extent=[22,-10; 42,10]);
-        annotation (Diagram);
-      equation 
-        connect(n_pump.y,prescribedSpeedPump. pumpSpeed_rpm) annotation (points=[-0.5,35;
-              -20,35; -20,6; -8.8,6],          style(color=74, rgbcolor={0,0,
-                127}));
-        connect(stateRedearOut.outlet, sinkLPT.flange) 
-          annotation (points=[38,0; 48,0], style(thickness=2));
-        connect(stateRedearOut.inlet, prescribedSpeedPump.outlet) 
-          annotation (points=[26,0; 19,0; 19,-1.22461e-015; 12,-1.22461e-015],
-            style(thickness=2));
-        connect(prescribedSpeedPump.inlet, stateRedearIn.outlet) annotation (
-            points=[-8,1.22461e-015; -20,1.22461e-015; -20,0], style(thickness=
-                2));
-        connect(stateRedearIn.inlet, sourceHPT.flange) 
-          annotation (points=[-32,0; -46,0], style(thickness=2));
-      end TestPump;
       
       model TestSettingTurbineHP 
         Water.SteamTurbineStodola steamTurbineStodola(
