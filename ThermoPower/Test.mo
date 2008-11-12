@@ -4824,7 +4824,7 @@ Algorithm Tolerance = 1e-4
       startTime=10) annotation (extent=[-110,14; -90,34]);
     Modelica.Blocks.Sources.Step Step2(
       height=-0.2,
-      offset=1, 
+      offset=1,
       startTime=40) 
       annotation (extent=[8,46; 28,66]);
   equation 
@@ -4873,9 +4873,9 @@ Algorithm Tolerance = 1e-6
     parameter Real deltaX[2]={.05,-.05} "height of composition step";
     
     annotation (
-      experiment(StopTime=50), 
-      experimentSetupOutput, 
-      Diagram, 
+      experiment(StopTime=50),
+      experimentSetupOutput,
+      Diagram,
       Documentation(info="<html>
 Same as <tt>TestGasFlow1DA</tt>, but with mixture fluid (CombustionAir) and UniformComposition = true. The inlet composition is changed stepwise at time t = 30;
 </html>"));
@@ -4885,10 +4885,9 @@ Same as <tt>TestGasFlow1DA</tt>, but with mixture fluid (CombustionAir) and Unif
       offset=Medium.reference_X) 
                     annotation (extent=[-98,58; -78,78]);
   equation 
-    connect(Step3.y, SourceW1.in_X) annotation (points=[-77,68; -64,68; -64,9], 
+    connect(Step3.y, SourceW1.in_X) annotation (points=[-77,68; -64,68; -64,9],
         style(color=74, rgbcolor={0,0,127}));
   end TestGasFlow1DB;
-  
   
   model TestGasFlow1DC 
     extends TestGasFlow1DB(hex(UniformComposition=false));
@@ -4896,14 +4895,14 @@ Same as <tt>TestGasFlow1DA</tt>, but with mixture fluid (CombustionAir) and Unif
 Same as <tt>TestGasFlow1DB</tt>, but with UniformComposition = false. The outlet composition transient is computed with greater accuracy.
 </html>"));
   end TestGasFlow1DC;
-
+  
   model TestGasFlow1DD 
     extends TestGasFlow1DB(hex(QuasiStatic=true));
     annotation (Documentation(info="<html>
 Same as <tt>TestGasFlow1DB</tt>, but with QuasiStatic = true; the model is purely algebraic (no mass and energy storage).
 </html>"));
   end TestGasFlow1DD;
-
+  
   model TestGasPlenum 
     package Medium=Modelica.Media.IdealGases.MixtureGases.CombustionAir;
     annotation (Diagram, Documentation(info="<html>
@@ -6427,4 +6426,329 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     connect(Step1.y, Clutch1.f_normalized) annotation (points=[-9,64; 40,64; 40,
           5], style(color=74, rgbcolor={0,0,127}));
   end TestFanMech;
+
+  model TestNetworkGridGenerator_Pmax 
+    Electrical.Generator gen(J=10000) 
+                     annotation (extent=[-30,0; -10,20]);
+    ThermoPower.Electrical.NetworkGrid_Pmax network(
+      J=10000,
+      Pmax=20e6,
+      hasBreaker=true, 
+      deltaStart=0.488) 
+      annotation (extent=[20,0; 40,20]);
+    annotation (Diagram, experiment(StopTime=100, NumberOfIntervals=5000));
+    Modelica.Mechanics.Rotational.TorqueStep constantTorque(
+      offsetTorque=1e7/157.08,
+      stepTorque=1e7/157.08*0.8,
+      startTime=50) 
+                 annotation (extent=[-98,0; -78,20]);
+    Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
+      annotation (extent=[-8,30; 12,50]);
+    Modelica.Mechanics.Rotational.Damper damper(d=25) 
+      annotation (extent=[-30,-30; -10,-10]);
+    Modelica.Mechanics.Rotational.Fixed fixed 
+      annotation (extent=[0,-40; 20,-20]);
+    Modelica.Mechanics.Rotational.Inertia inertia(J=1, w_start=157.08) 
+      annotation (extent=[-68,0; -48,20]);
+  equation 
+    connect(fixed.flange_b,damper. flange_b) annotation (points=[10,-30; 10,
+          -20; -10,-20],style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(inertia.flange_a, constantTorque.flange) annotation (points=[-68,10;
+          -78,10],     style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(gen.shaft, inertia.flange_b) annotation (points=[-28.6,10; -48,10],
+        style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(damper.flange_a, inertia.flange_b) annotation (points=[-30,-20;
+          -42,-20; -42,10; -48,10], style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(network.powerConnection, gen.powerConnection) 
+      annotation (points=[20,10; -11.4,10], style(pattern=0, thickness=2));
+    connect(network.closed, booleanConstant.y) annotation (points=[30,19.7; 30,
+          40; 13,40], style(color=5, rgbcolor={255,0,255}));
+  end TestNetworkGridGenerator_Pmax;
+
+  model TestNetworkTwoGenerators_Pmax 
+    ThermoPower.Electrical.NetworkTwoGenerators_Pmax network(
+      J_a=10000,
+      J_b=10000,
+      r_b=0.3,
+      Pmax=40e6,
+      hasBreaker=true, 
+      deltaStart_ab=0.0375) 
+                          annotation (extent=[-10,-10; 10,10]);
+    Electrical.Generator gen_a(J=10000) 
+                     annotation (extent=[-44,-10; -24,10]);
+    Electrical.Generator gen_b(J=10000) 
+                     annotation (extent=[24,-10; 44,10],
+                                                       rotation=180);
+    ThermoPower.Electrical.Load load_a(
+                           Wn=10e6) 
+                                  annotation (extent=[-26,-38; -6,-18]);
+    ThermoPower.Electrical.Load load_b(
+                           Wn=10e6) 
+                                  annotation (extent=[8,-38; 28,-18]);
+    annotation (Diagram, experiment(
+        StopTime=100,
+        NumberOfIntervals=5000,
+        Tolerance=1e-006));
+    Modelica.Mechanics.Rotational.Torque torque_a 
+      annotation (extent=[-72,-10; -52,10]);
+    Modelica.Mechanics.Rotational.Torque torque_b 
+      annotation (extent=[74,-10; 54,10], rotation=0);
+    Modelica.Blocks.Sources.Step NomTorque_a(height=0, offset=1e7/157) 
+      annotation (extent=[-96,-6; -84,6]);
+    Modelica.Blocks.Sources.Step NomTorque_b(height=0, offset=1e7/157) 
+      annotation (extent=[98,-6; 86,6]);
+    Modelica.Blocks.Sources.Step step_a(
+      startTime=50,
+      offset=7e6,
+      height=8e6) annotation (extent=[-46,-34; -34,-22]);
+    Modelica.Blocks.Sources.BooleanStep booleanConstant(
+        startValue=false, startTime=0) 
+      annotation (extent=[-40,40; -20,60]);
+  equation 
+    connect(gen_b.powerConnection, network.powerConnection_b) 
+      annotation (points=[25.4,8.75526e-016; 18,8.75526e-016; 18,1.77636e-016; 
+          10,1.77636e-016],                 style(pattern=0, thickness=2));
+    connect(network.powerConnection_a, gen_a.powerConnection) 
+                                                             annotation (
+        points=[-10,1.77636e-016; -14,1.77636e-016; -14,0; -18,0; -18,
+          1.77636e-016; -25.4,1.77636e-016],
+                                     style(pattern=0, thickness=2));
+    connect(load_a.connection, gen_a.powerConnection) 
+                                                  annotation (points=[-16.1,
+          -19.3; -16,-10; -16,0; -20,0; -20,1.77636e-016; -25.4,1.77636e-016],
+                                           style(pattern=0, thickness=2));
+    connect(load_b.connection, gen_b.powerConnection) 
+                                                    annotation (points=[17.9,
+          -19.3; 17.9,8.75526e-016; 25.4,8.75526e-016],
+                                                   style(pattern=0, thickness=
+           2));
+    connect(step_a.y, load_a.powerConsumption) 
+                                             annotation (points=[-33.4,-28;
+          -19.3,-28], style(color=74, rgbcolor={0,0,127}));
+    connect(NomTorque_b.y, torque_b.tau) annotation (points=[85.4,0; 76,0],
+        style(color=74, rgbcolor={0,0,127}));
+    connect(NomTorque_a.y, torque_a.tau) annotation (points=[-83.4,0; -74,0],
+        style(color=74, rgbcolor={0,0,127}));
+    connect(torque_b.flange_b, gen_b.shaft) annotation (points=[54,0; 48,0; 48,
+          -1.2308e-015; 42.6,-1.2308e-015], style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(torque_a.flange_b, gen_a.shaft) annotation (points=[-52,0; -47.3,0; 
+          -47.3,1.77636e-016; -42.6,1.77636e-016], style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(booleanConstant.y, network.closed) annotation (points=[-19,50; 0,50; 
+          0,9.7], style(
+        color=5,
+        rgbcolor={255,0,255},
+        fillColor=7,
+        rgbfillColor={255,255,255},
+        fillPattern=1));
+  end TestNetworkTwoGenerators_Pmax;
+
+  model TestNetworkGridTwoGenerators 
+    ThermoPower.Electrical.NetworkGridTwoGenerators network(
+      J_a=10000,
+      J_b=10000,
+      r_b=0.3,
+      v=15000,
+      Xline=1.625,
+      e_a=15000,
+      e_b=15000,
+      X_a=4,
+      X_b=4,
+      hasBreaker=false)   annotation (extent=[-10,-10; 10,10]);
+    Electrical.Generator gen_a(J=10000) 
+                     annotation (extent=[-40,-10; -20,10]);
+    Electrical.Generator gen_b(J=10000) 
+                     annotation (extent=[20,-10; 40,10],
+                                                       rotation=180);
+    annotation (Diagram, experiment(
+        StopTime=100,
+        NumberOfIntervals=5000,
+        Tolerance=1e-006));
+    Modelica.Mechanics.Rotational.Torque torque_a 
+      annotation (extent=[-70,-10; -50,10]);
+    Modelica.Mechanics.Rotational.Torque torque_b 
+      annotation (extent=[70,-10; 50,10], rotation=0);
+    Modelica.Blocks.Sources.Step NomTorque_a(          offset=1e7/157,
+      height=1e7/157*0.8,
+      startTime=50) 
+      annotation (extent=[-96,-6; -84,6]);
+    Modelica.Blocks.Sources.Step NomTorque_b(height=0, offset=1e7/157) 
+      annotation (extent=[96,-6; 84,6]);
+  equation 
+    connect(gen_b.powerConnection, network.powerConnection_b) 
+      annotation (points=[21.4,8.75526e-016; 18,8.75526e-016; 18,1.77636e-016; 
+          10,1.77636e-016],                 style(pattern=0, thickness=2));
+    connect(network.powerConnection_a, gen_a.powerConnection) 
+                                                             annotation (
+        points=[-10,1.77636e-016; -8,1.77636e-016; -14,0; -18,0; -18,
+          1.77636e-016; -21.4,1.77636e-016],
+                                     style(pattern=0, thickness=2));
+    connect(NomTorque_b.y, torque_b.tau) annotation (points=[83.4,0; 72,0],
+        style(color=74, rgbcolor={0,0,127}));
+    connect(NomTorque_a.y, torque_a.tau) annotation (points=[-83.4,0; -72,0],
+        style(color=74, rgbcolor={0,0,127}));
+    connect(torque_b.flange_b, gen_b.shaft) annotation (points=[50,0; 48,0; 48,
+          -1.2308e-015; 38.6,-1.2308e-015], style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(torque_a.flange_b, gen_a.shaft) annotation (points=[-50,0; -47.3,0; 
+          -47.3,1.77636e-016; -38.6,1.77636e-016], style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+  end TestNetworkGridTwoGenerators;
+
+  model ControlDroop_TestN2GControl 
+    parameter Real droop "Droop";
+    parameter Real PVnom=157.08 "Nominal value of process variable";
+    parameter Real CVnom "Nominal value of control variable";
+    Real e "error";
+    Real deltaCV;
+    Modelica.Blocks.Interfaces.RealInput PV 
+      annotation (extent=[-120,-20; -80,20]);
+    Modelica.Blocks.Interfaces.RealOutput CV 
+      annotation (extent=[80,-10; 100,10]);
+    annotation (Diagram, Icon(Rectangle(extent=[-80,80; 80,-80], style(
+            color=3,
+            rgbcolor={0,0,255},
+            fillColor=7,
+            rgbfillColor={255,255,255})), Text(
+          extent=[-60,60; 60,-60],
+          style(color=0, rgbcolor={0,0,0}),
+          string="C")));
+    Modelica.Blocks.Interfaces.RealInput SP 
+      annotation (extent=[-20,80; 20,120], rotation=270);
+  equation 
+    e=(SP-PVnom)/PVnom-(PV-PVnom)/PVnom;
+    deltaCV = 1/droop*e*CVnom;
+    CV = deltaCV + CVnom;
+  end ControlDroop_TestN2GControl;
+
+  model TestN2GControl "Test network with two generators, frequency controlled" 
+    ThermoPower.Electrical.NetworkTwoGenerators_Pmax network(
+      J_a=10000,
+      J_b=10000,
+      r_b=0.3,
+      Pmax=20e6,
+      deltaStart_ab=0.05) annotation (extent=[-10,-70; 10,-50]);
+    Electrical.Generator gen_a(J=10000) 
+                     annotation (extent=[-50,-70; -30,-50]);
+    Electrical.Generator gen_b(J=10000) 
+                     annotation (extent=[30,-70; 50,-50],
+                                                       rotation=180);
+    ThermoPower.Electrical.Load load_a(
+                           Wn=10e6) 
+                                  annotation (extent=[-30,-90; -10,-70]);
+    ThermoPower.Electrical.Load load_b(
+                           Wn=10e6) 
+                                  annotation (extent=[10,-90; 30,-70]);
+    annotation (Diagram, experiment(
+        StopTime=100,
+        NumberOfIntervals=5000,
+        Tolerance=1e-006));
+    Modelica.Mechanics.Rotational.Sensors.SpeedSensor omegaSensor_a 
+      annotation (extent=[-36,-8; -20,8]);
+    Modelica.Mechanics.Rotational.Sensors.SpeedSensor omegaSensor_b 
+      annotation (extent=[20,8; 36,-8],  rotation=180);
+    Modelica.Mechanics.Rotational.Torque torque_a 
+      annotation (extent=[-80,-70; -60,-50]);
+    Modelica.Mechanics.Rotational.Torque torque_b 
+      annotation (extent=[86,-70; 66,-50],rotation=0);
+    ControlDroop_TestN2GControl controller_A(
+                                 droop=0.05, CVnom=1e7/157.08) 
+      annotation (extent=[-40,20; -60,40]);
+    ControlDroop_TestN2GControl controller_b(
+                                 droop=0.05, CVnom=1e7/157.08) 
+      annotation (extent=[40,20; 60,40]);
+    Modelica.Blocks.Sources.Step step_a(
+      startTime=50,
+      offset=8e6,
+      height=5e6) annotation (extent=[-56,-86; -44,-74]);
+    Modelica.Blocks.Sources.Constant SP_omega(k=157.08) 
+      annotation (extent=[-36,74; -24,86],
+                                        rotation=0);
+    Modelica.Blocks.Continuous.FirstOrder firstOrder_a(T=1, y_start=1e7/157.08) 
+      annotation (extent=[-72,22; -88,38]);
+    Modelica.Blocks.Continuous.FirstOrder firstOrder_b(y_start=1e7/157.08) 
+      annotation (extent=[72,22; 88,38]);
+  equation 
+    connect(gen_b.powerConnection, network.powerConnection_b) 
+      annotation (points=[31.4,-60; 10,-60],style(pattern=0, thickness=2));
+    connect(network.powerConnection_a, gen_a.powerConnection) 
+                                                             annotation (
+        points=[-10,-60; -31.4,-60], style(pattern=0, thickness=2));
+    connect(load_a.connection, gen_a.powerConnection) 
+                                                  annotation (points=[-20.1,
+          -71.3; -20,-70; -20,-60; -31.4,-60],
+                                           style(pattern=0, thickness=2));
+    connect(load_b.connection, gen_b.powerConnection) 
+                                                    annotation (points=[19.9,
+          -71.3; 19.9,-60; 31.4,-60],              style(pattern=0, thickness=
+           2));
+    connect(omegaSensor_a.flange_a,torque_a. flange_b) 
+                                                   annotation (points=[-36,0;
+          -54,0; -54,-60; -60,-60],
+                                 style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(torque_b.flange_b,omegaSensor_b. flange_a) 
+                                                    annotation (points=[66,-60; 
+          58,-60; 58,9.79685e-016; 36,9.79685e-016],
+                               style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(controller_A.PV,omegaSensor_a. w) 
+                                         annotation (points=[-40,30; -10,30;
+          -10,0; -19.2,0],  style(color=74, rgbcolor={0,0,127}));
+    connect(omegaSensor_b.w,controller_b. PV) 
+                                         annotation (points=[19.2,-1.07765e-015; 
+          10,-1.07765e-015; 10,30; 40,30],
+                      style(color=74, rgbcolor={0,0,127}));
+    connect(step_a.y, load_a.powerConsumption) 
+                                             annotation (points=[-43.4,-80; 
+          -23.3,-80], style(color=74, rgbcolor={0,0,127}));
+    connect(SP_omega.y, controller_b.SP) annotation (points=[-23.4,80; 0,80; 0,
+          60; 50,60; 50,40],
+                  style(color=74, rgbcolor={0,0,127}));
+    connect(controller_A.SP, SP_omega.y) annotation (points=[-50,40; -50,60; 0,
+          60; 0,80; -23.4,80],    style(color=74, rgbcolor={0,0,127}));
+    connect(controller_A.CV, firstOrder_a.u) annotation (points=[-59,30; -70.4,
+          30],       style(color=74, rgbcolor={0,0,127}));
+    connect(firstOrder_a.y, torque_a.tau) annotation (points=[-88.8,30; -96,30;
+          -96,-60; -82,-60],     style(color=74, rgbcolor={0,0,127}));
+    connect(firstOrder_b.u, controller_b.CV) annotation (points=[70.4,30; 59,30],
+               style(color=74, rgbcolor={0,0,127}));
+    connect(torque_b.tau, firstOrder_b.y) annotation (points=[88,-60; 96,-60;
+          96,30; 88.8,30], style(color=74, rgbcolor={0,0,127}));
+    connect(gen_a.shaft, torque_a.flange_b) annotation (points=[-48.6,-60; -60,
+          -60], style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+    connect(gen_b.shaft, torque_b.flange_b) annotation (points=[48.6,-60; 66,
+          -60], style(
+        color=0,
+        rgbcolor={0,0,0},
+        thickness=2));
+  end TestN2GControl;
 end Test;

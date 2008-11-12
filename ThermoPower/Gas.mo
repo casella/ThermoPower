@@ -435,7 +435,7 @@ The latter options can be useful when two or more components are connected direc
       annotation (extent=[-120,-20; -80,20]);
     FlangeB outlet(redeclare package Medium = Medium) 
       annotation (extent=[80,-20; 120,20]);
-    Thermal.HT thermalPort 
+    replaceable Thermal.HT thermalPort 
       annotation (extent=[-40,60; 40,80]);
   equation 
     M = gas.d*V "Gas mass";
@@ -539,7 +539,7 @@ The latter options can be useful when two or more components are connected direc
         annotation (extent=[-120,-20; -80,20]);
       FlangeB outlet(redeclare package Medium = Medium) 
         annotation (extent=[80,-20; 120,20]);
-      Thermal.HT thermalPort 
+      replaceable Thermal.HT thermalPort 
         annotation (extent=[-40,60; 40,80]);
     equation 
       M = gas.d*V "Gas mass";
@@ -678,9 +678,10 @@ The latter options can be useful when two or more components are connected direc
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),   Icon);
+</html>"),   Icon,
+      Diagram);
     
-    Thermal.HT thermalPort 
+    replaceable Thermal.HT thermalPort 
       annotation (extent=[-38,60; 42,80]);
   equation 
     M = gas.d*V "Gas mass";
@@ -759,6 +760,11 @@ The latter options can be useful when two or more components are connected direc
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     constant MassFlowRate wzero=1e-9 
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
+    parameter Boolean rev_inlet1 = true "Allow flow reversal at inlet1";
+    parameter Boolean rev_inlet2 = true "Allow flow reversal at inlet2";
+    parameter Boolean rev_outlet = true "Allow flow reversal at outlet";
+    parameter Boolean checkFlowDirection = false "Check flow direction" 
+                                                 annotation (Dialog(enable = not rev_inlet1 or not rev_inlet2 or not rev_outlet));
     FlangeA inlet1(redeclare package Medium = Medium) 
       annotation (extent=[-80,20; -40,60]);
     FlangeA inlet2(redeclare package Medium = Medium) 
@@ -773,26 +779,37 @@ The latter options can be useful when two or more components are connected direc
     inlet2.p = outlet.p;
     
     // Energy balance
-    outlet.hBA = if inlet2.w < 0 then inlet1.hBA else if inlet1.w < 0 then inlet2.hBA else (
-      inlet1.hBA*(inlet1.w + wzero) + inlet2.hBA*inlet2.w)/(inlet1.w + wzero + inlet2.w);
-    inlet1.hAB = if inlet2.w < 0 then outlet.hAB else if outlet.w < 0 then inlet2.hBA else (
-      outlet.hAB*(outlet.w + wzero) + inlet2.hBA*inlet2.w)/(outlet.w + wzero + inlet2.w);
-    inlet2.hAB = if inlet1.w < 0 then outlet.hAB else if outlet.w < 0 then inlet1.hBA else (
-      outlet.hAB*(outlet.w + wzero) + inlet1.hBA*inlet1.w)/(outlet.w + wzero + inlet1.w);
+    outlet.hBA = if (inlet2.w < 0 and rev_inlet2) then inlet1.hBA else if (inlet1.w < 0 and rev_inlet1) then inlet2.hBA else (
+      inlet1.hBA*(inlet1.w + wzero) + inlet2.hBA*(inlet2.w + wzero))/(inlet1.w + 2*wzero + inlet2.w);
+    inlet1.hAB = if (inlet2.w < 0 and rev_inlet2) then outlet.hAB else if (outlet.w < 0 or not rev_outlet) then inlet2.hBA else (
+      outlet.hAB*(outlet.w + wzero) + inlet2.hBA*(inlet2.w + wzero))/(outlet.w + 2*wzero + inlet2.w);
+    inlet2.hAB = if (inlet1.w < 0 and rev_inlet1) then outlet.hAB else if (outlet.w < 0 or not rev_outlet) then inlet1.hBA else (
+      outlet.hAB*(outlet.w + wzero) + inlet1.hBA*(inlet1.w + wzero))/(outlet.w + 2*wzero + inlet1.w);
     
     // Independent component mass balances
-    outlet.XBA = if inlet2.w < 0 then inlet1.XBA else if inlet1.w < 0 then inlet2.XBA else (
-      inlet1.XBA*(inlet1.w + wzero) + inlet2.XBA*inlet2.w)/(inlet1.w + wzero + inlet2.w);
-    inlet1.XAB = if inlet2.w < 0 then outlet.XAB else if outlet.w < 0 then inlet2.XBA else (
-      outlet.XAB*(outlet.w + wzero) + inlet2.XBA*inlet2.w)/(outlet.w + wzero + inlet2.w);
-    inlet2.XAB = if inlet1.w < 0 then outlet.XAB else if outlet.w < 0 then inlet1.XBA else (
-      outlet.XAB*(outlet.w + wzero) + inlet1.XBA*inlet1.w)/(outlet.w + wzero + inlet1.w);
+    outlet.XBA = if (inlet2.w < 0 and rev_inlet2) then inlet1.XBA else if (inlet1.w < 0 and rev_inlet1) then inlet2.XBA else (
+      inlet1.XBA*(inlet1.w + wzero) + inlet2.XBA*(inlet2.w + wzero))/(inlet1.w + 2*wzero + inlet2.w);
+    inlet1.XAB = if (inlet2.w < 0 and rev_inlet2) then outlet.XAB else if (outlet.w < 0 or not rev_outlet) then inlet2.XBA else (
+      outlet.XAB*(outlet.w + wzero) + inlet2.XBA*(inlet2.w + wzero))/(outlet.w + 2*wzero + inlet2.w);
+    inlet2.XAB = if (inlet1.w < 0 and rev_inlet1) then outlet.XAB else if (outlet.w < 0 or not rev_outlet) then inlet1.XBA else (
+      outlet.XAB*(outlet.w + wzero) + inlet1.XBA*(inlet1.w + wzero))/(outlet.w + 2*wzero + inlet1.w);
+    
+    //Check flow direction
+    assert( not checkFlowDirection or ((rev_inlet1 or inlet1.w >= 0) and 
+                                       (rev_inlet2 or inlet2.w >= 0) and 
+                                       (rev_outlet or outlet.w <= 0)),
+                                      "Flow reversal not supported");
     annotation (Icon,
   Documentation(info="<html>
 <p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p>All the physically meaningful combinations of flow directions are allowed.
+<p><b>Modelling options</b></p>
+<p> If <tt>rev_inlet1</tt>, <tt>rev_inlet2</tt> or <tt>rev_outlet</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
+<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
 </html>", revisions="<html>
 <ul>
+<li><i>23 May 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       Allow flows reversal option added.</li>
 <li><i>20 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to Modelica.Media.</li>
@@ -809,6 +826,11 @@ The latter options can be useful when two or more components are connected direc
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     constant MassFlowRate wzero=1e-9 
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
+    parameter Boolean rev_inlet = true "Allow flow reversal at inlet";
+    parameter Boolean rev_outlet1 = true "Allow flow reversal at outlet1";
+    parameter Boolean rev_outlet2 = true "Allow flow reversal at outlet2";
+    parameter Boolean checkFlowDirection = false "Check flow direction" 
+                                                 annotation (Dialog(enable = not rev_inlet or not rev_outlet1 or not rev_outlet2));
     FlangeA inlet(redeclare package Medium = Medium) 
       annotation (extent=[-80,-20; -40,20]);
     FlangeB outlet1(redeclare package Medium = Medium) 
@@ -817,9 +839,14 @@ The latter options can be useful when two or more components are connected direc
       annotation (extent=[40,-60; 80,-20]);
     annotation (Icon, Documentation(info="<html>
 <p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p>All the physically meaningful combinations of flow directions are allowed.
+<p><b>Modelling options</b></p>
+<p> If <tt>rev_inlet</tt>, <tt>rev_outlet1</tt> or <tt>rev_outlet2</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
+<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
 </html>", revisions="<html>
 <ul>
+<li><i>23 May 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       Allow flows reversal option added.</li>
 <li><i>20 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to Modelica.Media.</li>
@@ -836,20 +863,26 @@ The latter options can be useful when two or more components are connected direc
     outlet2.p=inlet.p;
     
     // Energy balance
-    outlet1.hBA= if inlet.w<0 then outlet2.hAB else if outlet2.w<0 then inlet.hBA else 
-      (inlet.hBA*(inlet.w+wzero)+outlet2.hAB*outlet2.w)/(inlet.w+wzero+outlet2.w);
-    outlet2.hBA= if inlet.w<0 then outlet1.hAB else if outlet1.w<0 then inlet.hBA else 
-      (inlet.hBA*(inlet.w+wzero)+outlet1.hAB*outlet1.w)/(inlet.w+wzero+outlet1.w);
-    inlet.hAB= if outlet1.w<0 then outlet2.hAB else if outlet2.w<0 then outlet1.hAB else 
-      (outlet1.hAB*(outlet1.w+wzero)+outlet2.hAB*outlet2.w)/(outlet1.w+wzero+outlet2.w);
+    outlet1.hBA= if (inlet.w<0 and rev_inlet) then outlet2.hAB else if (outlet2.w<0 or not rev_outlet2) then inlet.hBA else 
+      (inlet.hBA*(inlet.w+wzero)+outlet2.hAB*(outlet2.w+wzero))/(inlet.w+2*wzero+outlet2.w);
+    outlet2.hBA= if (inlet.w<0 and rev_inlet) then outlet1.hAB else if (outlet1.w<0 or not rev_outlet1) then inlet.hBA else 
+      (inlet.hBA*(inlet.w+wzero)+outlet1.hAB*(outlet1.w+wzero))/(inlet.w+2*wzero+outlet1.w);
+    inlet.hAB= if (outlet1.w<0 or not rev_outlet1) then outlet2.hAB else if (outlet2.w<0 or not rev_outlet2) then outlet1.hAB else 
+      (outlet1.hAB*(outlet1.w+wzero)+outlet2.hAB*(outlet2.w+wzero))/(outlet1.w+2*wzero+outlet2.w);
     
     // Independent component mass balances
-    outlet1.XBA= if inlet.w<0 then outlet2.XAB else if outlet2.w<0 then inlet.XBA else 
-      (inlet.XBA*(inlet.w+wzero)+outlet2.XAB*outlet2.w)/(inlet.w+wzero+outlet2.w);
-    outlet2.XBA= if inlet.w<0 then outlet1.XAB else if outlet1.w<0 then inlet.XBA else 
-      (inlet.XBA*(inlet.w+wzero)+outlet1.XAB*outlet1.w)/(inlet.w+wzero+outlet1.w);
-    inlet.XAB= if outlet1.w<0 then outlet2.XAB else if outlet2.w<0 then outlet1.XAB else 
-      (outlet1.XAB*(outlet1.w+wzero)+outlet2.XAB*outlet2.w)/(outlet1.w+wzero+outlet2.w);
+    outlet1.XBA= if (inlet.w<0 and rev_inlet) then outlet2.XAB else if (outlet2.w<0 or not rev_outlet2) then inlet.XBA else 
+      (inlet.XBA*(inlet.w+wzero)+outlet2.XAB*(outlet2.w+wzero))/(inlet.w+2*wzero+outlet2.w);
+    outlet2.XBA= if (inlet.w<0 and rev_inlet) then outlet1.XAB else if (outlet1.w<0 or not rev_outlet1) then inlet.XBA else 
+      (inlet.XBA*(inlet.w+wzero)+outlet1.XAB*(outlet1.w+wzero))/(inlet.w+2*wzero+outlet1.w);
+    inlet.XAB= if (outlet1.w<0 or not rev_outlet1) then outlet2.XAB else if (outlet2.w<0 or not rev_outlet2) then outlet1.XAB else 
+      (outlet1.XAB*(outlet1.w+wzero)+outlet2.XAB*(outlet2.w+wzero))/(outlet1.w+2*wzero+outlet2.w);
+    
+    //Check flow direction
+    assert( not checkFlowDirection or ((rev_inlet or inlet.w >= 0) and 
+                                       (rev_outlet1 or outlet1.w <= 0) and 
+                                       (rev_outlet2 or outlet2.w <= 0)),
+                                      "Flow reversal not supported");
     
   end FlowSplit;
   
@@ -1357,6 +1390,9 @@ The latter options can be useful when two or more components are connected direc
     parameter AbsoluteTemperature Tstartout=300 
       "Outlet temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tstart[N]=linspace(Tstartin,Tstartout,N) 
+      "Start value of temperature vector (initialized by default)" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pstart=101325 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Real wnf=0.01 
@@ -1381,7 +1417,7 @@ The latter options can be useful when two or more components are connected direc
   public 
     Medium.BaseProperties gas[N](
       p(start=ones(N)*pstart),
-      T(start=linspace(Tstartin,Tstartout,N)),
+      T(start=Tstart),
       state(p(start=ones(N)*pstart),
       T(start=ones(N)*Tstartin+(0:(N-1))/(N-1)*(Tstartout-Tstartin)))) 
       "Gas nodal properties";

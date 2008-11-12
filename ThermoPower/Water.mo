@@ -617,9 +617,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
     Mass M "Fluid mass";
     Energy E "Fluid energy";
+    HeatFlowRate Q "Heat flow rate exchanged with the outside";
     Medium.Temperature T "Fluid temperature";
     AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
     Time Tr "Residence time";
+    replaceable Thermal.HT thermalPort "Internal surface of metal wall" 
+      annotation (extent=[-24,66; 24,80]);
   equation 
     // Set fluid properties
     fluid.p=p;
@@ -629,7 +632,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     M=fluid.d*V "Fluid mass";
     E=M*fluid.u "Fluid energy";
     der(M) = in1.w + in2.w + out.w "Fluid mass balance";
-    der(E) = in1.w*hi1 + in2.w*hi2 + out.w*ho - gamma*S*(T - Tm) 
+    der(E) = in1.w*hi1 + in2.w*hi2 + out.w*ho - gamma*S*(T - Tm) + Q 
       "Fluid energy balance";
     if Cm > 0 and gamma >0 then
       Cm*der(Tm) = gamma*S*(T - Tm) "Metal wall energy balance";
@@ -647,6 +650,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     in1.p = p;
     in2.p = p;
     out.p = p;
+    thermalPort.Q_flow = Q;
+    thermalPort.T = T;
     
     Tr=noEvent(M/max(-out.w,Modelica.Constants.eps)) "Residence time";
     
@@ -675,6 +680,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </HTML>",
         revisions="<html>
 <ul>
+<li><i>23 May 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       Thermal port added.</li>
 <li><i>30 May 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Initialisation support added.</li>
@@ -688,7 +696,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+      Icon,
+      Diagram);
   end Mixer;
   
   model Tank "Open tank with free surface" 
@@ -859,8 +869,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     extends Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
     Medium.BaseProperties fluid[N](each p(start=pstartin),
-      h(start=linspace(hstartin, hstartout, N))) 
-      "Properties of the fluid at the nodes";
+      h(start=hstart)) "Properties of the fluid at the nodes";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction (total)";
     Pressure Dpfric1 
@@ -1146,8 +1155,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SpecificEnthalpy hzero=1e-3 "Small value for deltah";
     SmoothMedium.BaseProperties fluid[N](each p(start=pstartin),
-      h(start=linspace(hstartin, hstartout, N))) 
-      "Properties of the fluid at the nodes";
+      h(start=hstart)) "Properties of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction";
@@ -1807,8 +1815,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     import Modelica.Math.*;
     import ThermoPower.Choices.Flow1D.FFtypes;
     Medium.BaseProperties fluid[N](each p(start=pstartin),
-      h(start=linspace(hstartin, hstartout, N))) 
-      "Properties of the fluid at the nodes";
+      h(start=hstart)) "Properties of the fluid at the nodes";
     parameter Real alpha(
       min=0,
       max=1) = 1 "Numerical stabilization coefficient";
@@ -2865,6 +2872,11 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
     parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter Boolean rev_in1 = true "Allow flow reversal at in1";
+    parameter Boolean rev_in2 = true "Allow flow reversal at in2";
+    parameter Boolean rev_out = true "Allow flow reversal at out";
+    parameter Boolean checkFlowDirection = false "Check flow direction" 
+                                                 annotation (Dialog(enable = not rev_in1 or not rev_in2 or not rev_out));
     FlangeB out(p(start=pstart), redeclare package Medium = Medium) 
                 annotation (extent=[40, -20; 80, 20]);
     FlangeA in1(p(start=pstart), redeclare package Medium = Medium) 
@@ -2876,17 +2888,27 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     in1.p = out.p;
     in2.p = out.p;
     // Energy balance
-    out.hBA = if in2.w < 0 then in1.hBA else if in1.w < 0 then in2.hBA else (
-      in1.hBA*(in1.w + wzero) + in2.hBA*in2.w)/(in1.w + wzero + in2.w);
-    in1.hAB = if in2.w < 0 then out.hAB else if out.w < 0 then in2.hBA else (
-      out.hAB*(out.w + wzero) + in2.hBA*in2.w)/(out.w + wzero + in2.w);
-    in2.hAB = if in1.w < 0 then out.hAB else if out.w < 0 then in1.hBA else (
-      out.hAB*(out.w + wzero) + in1.hBA*in1.w)/(out.w + wzero + in1.w);
+    out.hBA = if (in2.w < 0 and rev_in2) then in1.hBA else if (in1.w < 0 and rev_in1) then in2.hBA else (
+      in1.hBA*(in1.w + wzero) + in2.hBA*(in2.w + wzero))/(in1.w + 2*wzero + in2.w);
+    in1.hAB = if (in2.w < 0 and rev_in2) then out.hAB else if (out.w < 0 or not rev_out) then in2.hBA else (
+      out.hAB*(out.w + wzero) + in2.hBA*(in2.w + wzero))/(out.w + 2*wzero + in2.w);
+    in2.hAB = if (in1.w < 0 and rev_in1) then out.hAB else if (out.w < 0 or not rev_out) then in1.hBA else (
+      out.hAB*(out.w + wzero) + in1.hBA*(in1.w + wzero))/(out.w + 2*wzero + in1.w);
+    //Check flow direction
+    assert( not checkFlowDirection or ((rev_in1 or in1.w >= 0) and 
+                                       (rev_in2 or in2.w >= 0) and 
+                                       (rev_out or out.w <= 0)),
+                                      "Flow reversal not supported");
     annotation (Icon, Documentation(info="<HTML>
 <p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p>All the physically meaningful combinations of flow directions are allowed.
+<p><b>Modelling options</b></p>
+<p> If <tt>rev_in1</tt>, <tt>rev_in2</tt> or <tt>rev_out</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
+<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
 </HTML>",   revisions="<html>
 <ul>
+<li><i>23 May 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       Allow flows reversal option added.</li>
 <li><i>16 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Standard medium definition added.</li>
@@ -2906,6 +2928,11 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
     parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter Boolean rev_in1 = true "Allow flow reversal at in1";
+    parameter Boolean rev_out1 = true "Allow flow reversal at out1";
+    parameter Boolean rev_out2 = true "Allow flow reversal at out2";
+    parameter Boolean checkFlowDirection = false "Check flow direction" 
+                                                 annotation (Dialog(enable = not rev_in1 or not rev_out1 or not rev_out2));
     FlangeA in1(p(start=pstart), redeclare package Medium = Medium) 
                                   annotation (extent=[-80, -20; -40, 20]);
     FlangeB out1(p(start=pstart), redeclare package Medium = Medium) 
@@ -2917,20 +2944,27 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     out1.p = in1.p;
     out2.p = in1.p;
     // Energy balance
-    out1.hBA = if in1.w < 0 then out2.hAB else if out2.w < 0 then in1.hBA else 
-            (in1.hBA*(in1.w + wzero) + out2.hAB*out2.w)/(in1.w + wzero + out2.
-       w);
-    out2.hBA = if in1.w < 0 then out1.hAB else if out1.w < 0 then in1.hBA else 
-            (in1.hBA*(in1.w + wzero) + out1.hAB*out1.w)/(in1.w + wzero + out1.
-       w);
-    in1.hAB = if out1.w < 0 then out2.hAB else if out2.w < 0 then out1.hAB else 
-            (out1.hAB*(out1.w + wzero) + out2.hAB*out2.w)/(out1.w + wzero +
-      out2.w);
+    out1.hBA = if (in1.w < 0 and rev_in1) then out2.hAB else if (out2.w < 0 or not rev_out2) then in1.hBA else 
+            (in1.hBA*(in1.w + wzero) + out2.hAB*(out2.w + wzero))/(in1.w + 2*wzero + out2.w);
+    out2.hBA = if (in1.w < 0 and rev_in1) then out1.hAB else if (out1.w < 0 or not rev_out1) then in1.hBA else 
+            (in1.hBA*(in1.w + wzero) + out1.hAB*(out1.w + wzero))/(in1.w + 2*wzero + out1.w);
+    in1.hAB = if (out1.w < 0 or not rev_out1) then out2.hAB else if (out2.w < 0 or not rev_out2) then out1.hAB else 
+            (out1.hAB*(out1.w + wzero) + out2.hAB*(out2.w + wzero))/(out1.w + 2*wzero + out2.w);
+    //Check flow direction
+    assert( not checkFlowDirection or ((rev_in1 or in1.w >= 0) and 
+                                       (rev_out1 or out1.w <= 0) and 
+                                       (rev_out2 or out2.w <= 0)),
+                                      "Flow reversal not supported");
     annotation (Icon, Documentation(info="<HTML>
 <p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p>All the physically meaningful combinations of flow directions are allowed.
+<p><b>Modelling options</b></p>
+<p> If <tt>rev_in1</tt>, <tt>rev_out1</tt> or <tt>rev_out2</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
+<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
 </HTML>",   revisions="<html>
 <ul>
+<li><i>23 May 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       Allow flows reversal option added.</li>
 <li><i>16 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Standard medium definition added.</li>
@@ -4176,7 +4210,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </html>"));
   end PumpNPSH;
-
+  
   model PumpMech "Centrifugal pump with mechanical connector for the shaft" 
     extends PumpBase;
     extends Icons.Water.PumpMech;
