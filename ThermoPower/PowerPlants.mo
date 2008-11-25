@@ -99,10 +99,10 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end GasTurbine;
       
       partial model GasTurbineSimplified 
-        replaceable package FlueGas = ThermoPower.Media.FlueGas 
+        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas 
           extends Modelica.Media.Interfaces.PartialMedium;
-        ThermoPower.Gas.FlangeB flueGasOut(redeclare package Medium = FlueGas) 
-                                           annotation (extent=[90,70; 110,90]);
+        ThermoPower.Gas.FlangeB flueGasOut(redeclare package Medium = 
+              FlueGasMedium)               annotation (extent=[90,70; 110,90]);
         annotation (Diagram, Icon(
                             Rectangle(extent=[-100,100; 100,-100], style(
                 color=76,
@@ -195,14 +195,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
           "Fuel Lower Heating Value";
         parameter Modelica.SIunits.SpecificEnthalpy fuel_HHV=55e6 
           "Fuel Higher Heating Value";
-        FlueGas.BaseProperties gas;
+        FlueGasMedium.BaseProperties gas;
         Modelica.SIunits.MassFlowRate w;
         Modelica.SIunits.Power P_el=noEvent(if GTLoad > 0 then GTLoad*maxPower else 
                   0) "Electrical power output";
         Modelica.SIunits.MassFlowRate fuelFlowRate "Fuel flow rate";
       equation 
         gas.p = flueGasOut.p;
-        gas.Xi = FlueGas.reference_X[1:FlueGas.nXi];
+        gas.Xi = FlueGasMedium.reference_X[1:FlueGasMedium.nXi];
         gas.T = noEvent(
           if GTLoad > constTempLoad then flueGasNomTemp else 
           if GTLoad > 0 then flueGasMinTemp +
@@ -232,13 +232,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         Examples.GasTurbineSimplified gasTurbine 
           annotation (extent=[-40,-40; 0,0]);
         ThermoPower.Gas.SinkP sinkP(redeclare package Medium = 
-              Media.FlueGasSingle) 
+              ThermoPower.Media.FlueGas) 
           annotation (extent=[62,-14; 82,6]);
         annotation (Diagram);
         Modelica.Blocks.Sources.Constant const 
           annotation (extent=[-90,-30; -70,-10]);
         ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateReader_gas(
-            redeclare package Medium = Media.FlueGasSingle) 
+            redeclare package Medium = ThermoPower.Media.FlueGas) 
           annotation (extent=[20,-14; 40,6]);
       equation 
         connect(const.y, gasTurbine.GTLoad) annotation (points=[-69,-20; -40,-20],
@@ -20996,7 +20996,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[-13.2,0;
+        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[-13.2,0; 
               -117.2,0],
                   style(
             color=0,
@@ -21149,7 +21149,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[-13.2,0;
+        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[-13.2,0; 
               -121.2,0],
                   style(
             color=0,
@@ -21347,14 +21347,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,24],
                                         style(color=52, rgbcolor={213,255,170}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8; 
               -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
         connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-113.2,0; -200,0],
             style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8; 
               118.5,15.8; 118.5,16; 110,16], style(thickness=2));
         connect(Shaft_b,ST_LP. shaft_b) annotation (points=[200,0; 152.8,0],
             style(
@@ -21574,14 +21574,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,24],
                                         style(color=52, rgbcolor={213,255,170}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8; 
               -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
         connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-113.2,0; -200,0],
             style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8; 
               118.5,15.8; 118.5,16; 110,16], style(thickness=2));
         connect(Shaft_b,ST_LP. shaft_b) annotation (points=[200,0; 152.8,0],
             style(
@@ -21935,7 +21935,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8; 
               -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
         connect(valveHP.inlet,flowHPSplit. out2) 
           annotation (points=[-150,16; -164,16; -164,40], style(thickness=2));
@@ -21958,7 +21958,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[35.4,16; 48,16; 48,40], style(thickness=2));
         connect(flowIPJoin.in1,byPassIP. outlet) 
           annotation (points=[40,40; 10,40], style(thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8; 
               118.5,15.8; 118.5,16; 110,16], style(thickness=2));
         connect(valveLP.inlet,flowLPSplit. out2) 
           annotation (points=[90,16; 70,16; 70,40], style(thickness=2));
@@ -22372,7 +22372,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=3,
             rgbcolor={0,0,255},
             thickness=2));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8; 
               -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
         connect(valveHP.inlet,flowHPSplit. out2) 
           annotation (points=[-150,16; -164,16; -164,40], style(thickness=2));
@@ -22397,7 +22397,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[35.4,16; 48,16; 48,40], style(thickness=2));
         connect(flowIPJoin.in1,byPassIP. outlet) 
           annotation (points=[40,40; 10,40], style(thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8; 
               118.5,15.8; 118.5,16; 110,16], style(thickness=2));
         connect(valveLP.inlet,flowLPSplit. out2) 
           annotation (points=[90,16; 70,16; 70,40], style(thickness=2));
@@ -22595,7 +22595,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[16.8,-14;
+        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[16.8,-14; 
               -39.2,-14], style(
             color=0,
             rgbcolor={0,0,0},
@@ -22606,11 +22606,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               72.4; -52.4,66; -66,66; -66,40], style(thickness=2));
         connect(valveHP.outlet, ST_HP.inlet) 
           annotation (points=[-66,20; -66,1.8; -67,1.8], style(thickness=2));
-        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-11.6,21.6;
+        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-11.6,21.6; 
               -12,22; -12,32; -36,32; -36,38], style(thickness=2));
         connect(mixLP.out, SteamForHU) 
           annotation (points=[-42,-62; -60,-62; -60,-200], style(thickness=2));
-        connect(valveHU.inlet, flowHUSplit.out2) annotation (points=[-17,-28;
+        connect(valveHU.inlet, flowHUSplit.out2) annotation (points=[-17,-28; 
               -16.4,-28; -16.4,-3.6], style(thickness=2));
         connect(LPT_In, mixLP.in1) annotation (points=[0,200; 0,80; 72,80; 72,
               -66; -27.6,-66; -27.6,-66.8], style(thickness=2));
@@ -22628,7 +22628,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               28,86; -4,86; -4,-10; -11.48,-10; -11.48,-3.6], style(thickness=2));
         connect(flowHUSplit.in1, flowHPJoin.out) 
           annotation (points=[-14,3.6; -14,14.4], style(thickness=2));
-        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58;
+        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58; 
               -36,66; -47.48,66; -47.48,72.4], style(thickness=2));
         connect(flowLPJoin.out, LPT_Out) annotation (points=[63.6,30; 80,30; 80,
               -80; 60,-80; 60,-200], style(thickness=2));
@@ -22769,7 +22769,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[18.8,-20;
+        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[18.8,-20; 
               -39.2,-20],
             style(
             color=0,
@@ -22783,7 +22783,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                                          style(thickness=2));
         connect(valveHP.outlet, ST_HP.inlet) 
           annotation (points=[-66,20; -66,-4.2; -67,-4.2],  style(thickness=2));
-        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-13.6,19.6;
+        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-13.6,19.6; 
               -14,20; -14,30; -36,30; -36,38],
                                            style(thickness=2));
         connect(LPT_In, mixLP.in1) annotation (points=[80,200; 80,80; 74,80; 74,
@@ -22818,16 +22818,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_byPassLP, byPassLP.theta) annotation (
             points=[98,-72; 0,-72; 0,48; 38,48], style(color=52, rgbcolor={213,
                 255,170}));
-        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58;
+        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58; 
               -36,66; -58,66; -58,74.4; -57.48,74.4], style(thickness=2));
-        connect(mixLP.in2, flowHPJoin.out) annotation (points=[-25.26,-42.4;
+        connect(mixLP.in2, flowHPJoin.out) annotation (points=[-25.26,-42.4; 
               -16,-42.4; -16,12.4],
                                 style(thickness=2));
         connect(SteamForHU, flowHUSplit.out2) annotation (points=[-40,-200; -40,
               -65.6; -50.4,-65.6], style(thickness=2));
         connect(flowHUSplit.in1, mixLP.out) annotation (points=[-48,-58.4; -48,
               -46; -36,-46], style(thickness=2));
-        connect(flowHUSplit.out1, HPT_Out) annotation (points=[-45.48,-65.6;
+        connect(flowHUSplit.out1, HPT_Out) annotation (points=[-45.48,-65.6; 
               -45.48,-80; -6,-80; -6,60; -100,60; -100,200],
                                                            style(thickness=2));
       end ST_2LRhHU;
@@ -23019,7 +23019,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       equation 
         connect(condPlant_cc.SteamIn, SteamIn) 
           annotation (points=[50,60; 50,100], style(thickness=2));
-        connect(WaterOut, mixCondenser.out) annotation (points=[0,-100; 0,-60;
+        connect(WaterOut, mixCondenser.out) annotation (points=[0,-100; 0,-60; 
               -1.83691e-015,-60], style(thickness=2));
         connect(mixCondenser.in1, condPlant_cc.WaterOut) 
           annotation (points=[6,-42; 6,-20; 50,-20; 50,0], style(thickness=2));
@@ -23028,7 +23028,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(SensorsBus, condPlant_cc.SensorsBus) annotation (points=[98,-40;
               80,-40; 80,-20; 96,-20; 96,18; 79.4,18], style(color=84, rgbcolor=
                {255,170,213}));
-        connect(ActuatorsBus, condPlant_cc.ActuatorsBus) annotation (points=[98,-72;
+        connect(ActuatorsBus, condPlant_cc.ActuatorsBus) annotation (points=[98,-72; 
               72,-72; 72,-12; 88,-12; 88,8.4; 79.4,8.4],      style(color=52,
               rgbcolor={213,255,170}));
       end CondPlantHU_cc;
@@ -23640,7 +23640,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         rhol=FluidMedium.bubbleDensity(sat);
       end computation_states;
       
-      
       model TestSettingTurbineHP 
         Water.SteamTurbineStodola steamTurbineStodola(
           pstart_in=1.28e7,
@@ -24187,7 +24186,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           bypassLP_Cv=7540,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
-          LPT_Kt=0.078004) 
+          LPT_Kt=0.078004, 
+          valveDrumIP_Cv=810, 
+          valveDrumLP_Cv=1670) 
                        annotation (extent=[-94,-40; -14,40]);
         annotation (Diagram);
         Modelica.Mechanics.Rotational.ConstantSpeed constantSpeed(w_fixed=
@@ -24243,10 +24244,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(com_valveLP.y, actuators.Opening_valveLP) 
                                                       annotation (points=[75,-40;
               66,-40; 66,-74],              style(color=74, rgbcolor={0,0,127}));
-        connect(actuators,steamTurbines. ActuatorsBus) annotation (points=[66,-74;
+        connect(actuators,steamTurbines. ActuatorsBus) annotation (points=[66,-74; 
               18,-74; 18,-28; -14,-28],   style(color=52, rgbcolor={213,255,170}));
-        connect(steamTurbines.Shaft_b, constantSpeed.flange) annotation (points=
-             [-14,0; 0,0], style(
+        connect(steamTurbines.Shaft_b, constantSpeed.flange) annotation (points=[-14,0; 0,
+              0],          style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
@@ -24284,7 +24285,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(steamTurbines.IPT_In, Rh.out1) 
           annotation (points=[-62,40; -62,60], style(thickness=2));
         connect(steamTurbines.HPT_Out, Rh.in1) annotation (points=[-74,40; -74,
-              50; -74,60; -74.06,60], style(thickness=2));
+              60; -74.06,60],         style(thickness=2));
       end TestST3LRh_bypass;
       
       model TestST3LRh_condenser 
@@ -24298,15 +24299,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Modelica.Mechanics.Rotational.ConstantSpeed constantSpeed(w_fixed=
               314.16/2) 
           annotation (extent=[30,0; 10,20]);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Components.StateReader 
-          stateCondOut(                     redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[24,-56; 44,-36], rotation=90);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Components.StateReader 
-          stateLPTout(                     redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-34,-58; -14,-38],
-                                               rotation=270);
         ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_base 
           steamTurbines(
           redeclare package FluidMedium = FluidMedium,
@@ -24381,24 +24373,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(stateLPTout.inlet, steamTurbines.LPT_Out) 
-          annotation (points=[-24,-42; -24,-30], style(thickness=2));
-        connect(condenserPlant.WaterOut,stateCondOut. inlet) 
-          annotation (points=[24,-72; 34,-72; 34,-52], style(thickness=2));
-        connect(condenserPlant.SteamIn, stateLPTout.outlet) 
-          annotation (points=[-16,-72; -24,-72; -24,-54], style(thickness=2));
         connect(steamTurbines.LPT_In,sourceLPT. flange) 
           annotation (points=[-36,50; -36,62], style(thickness=2));
         connect(steamTurbines.HPT_In,sourceHPT. flange) 
           annotation (points=[-84,50; -84,76], style(thickness=2));
         connect(sourceToMix.flange, steamTurbines.SteamToMix) 
           annotation (points=[-48,76; -48,50], style(thickness=2));
-        connect(sinkW.flange, stateCondOut.outlet) 
-          annotation (points=[56,-20; 34,-20; 34,-40], style(thickness=2));
         connect(steamTurbines.IPT_In, Rh.out1) 
           annotation (points=[-60,50; -60,68], style(thickness=2));
         connect(steamTurbines.HPT_Out, Rh.in1) annotation (points=[-72,50; -72,59;
               -72,68; -72.06,68], style(thickness=2));
+        connect(condenserPlant.SteamIn, steamTurbines.LPT_Out)
+          annotation (points=[-16,-72; -24,-72; -24,-30], style(thickness=2));
+        connect(condenserPlant.WaterOut, sinkW.flange) annotation (points=[24,
+              -72; 34,-72; 34,-20; 56,-20], style(thickness=2));
       end TestST3LRh_condenser;
       
       model TestCondenserControl 
@@ -24465,7 +24453,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                                            style(thickness=2));
         connect(sourceTap.flange, stateTapping.inlet) 
           annotation (points=[-40,8; -26,8], style(thickness=2));
-        connect(pID.CS, sourceTap.in_w0) annotation (points=[0.6,-70; 20,-70;
+        connect(pID.CS, sourceTap.in_w0) annotation (points=[0.6,-70; 20,-70; 
               20,-20; -70,-20; -70,20; -54,20; -54,14], style(color=74,
               rgbcolor={0,0,127}));
         connect(pID.PV, condenserIdeal_tap.ratio_Vv_Vtot) annotation (points=[-20,-74;
