@@ -1081,7 +1081,7 @@ The latter options can be useful when two or more components are connected direc
 
 </HTML>"));
   model HeatSource1Dhtc "Distributed Heat Flow Source" 
-    extends HeatSource1D(redeclare Thermal.DHThtc wall);
+    extends HeatSource1D(redeclare Thermal.DHThtc_in wall);
   end HeatSource1Dhtc;
   
   model MetalTube "Cylindrical metal tube - 1 radial node and N axial nodes" 
