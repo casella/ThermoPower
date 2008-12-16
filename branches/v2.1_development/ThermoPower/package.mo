@@ -820,9 +820,11 @@ This package contains general-purpose functions and models
         "Volume flow rate for N operating points (single pump)";
         input Modelica.SIunits.Height head_nom[:] 
         "Pump head for N operating points";
+        constant VolumeFlowRate q_eps = 1e-6 
+        "Small coefficient to avoid numerical singularities";
     protected 
         Integer N = size(q_nom,1) "Number of nominal operating points";
-        Real q_nom_pow[N,N] = {{q_nom[j]^(i-1) for j in 1:N} for i in 1:N} 
+        Real q_nom_pow[N,N] = {{q_nom[i]^(j-1) for j in 1:N} for i in 1:N} 
         "Rows: different operating points; columns: increasing powers";
         /* Linear system to determine the coefficients (example N=3):
   head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
@@ -834,7 +836,7 @@ This package contains general-purpose functions and models
       algorithm 
         // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
         // Note: the implementation is numerically efficient only for low values of N
-        head := sum(q_flow^(i-1)*c[i] for i in 1:N);
+        head := sum((q_flow + q_eps)^(i-1)*c[i] for i in 1:N);
       end polynomialFlow;
     
       function constantPower "Constant power consumption characteristic" 
@@ -1049,6 +1051,13 @@ This characteristic is such that the relative change of the flow coefficient is 
       algorithm 
         eta := eta_nom;
       end constantEfficiency;
+    
+      function constantPower "Constant power consumption characteristic" 
+          extends FanCharacteristics.basePower;
+        input Modelica.SIunits.Power power = 0 "Constant power consumption";
+      algorithm 
+        consumption := power;
+      end constantPower;
     
       function quadraticPower 
       "Quadratic power consumption characteristic, fixed blades" 
@@ -1285,6 +1294,8 @@ Modelica in file \"Modelica/package.mo\".
       parameter Integer Np=2 "Number of electrical poles";
       parameter Modelica.SIunits.Frequency fstart=50 
       "Start value of the electrical frequency"   annotation (Dialog(tab="Initialization"));
+      parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
+      "Initialization option"   annotation(Dialog(tab = "Initialization"));
       Modelica.SIunits.Power Pm "Mechanical power";
       Modelica.SIunits.Power Pe "Electrical Power";
       Modelica.SIunits.Power Ploss "Inertial power Loss";
@@ -1298,23 +1309,6 @@ Modelica in file \"Modelica/package.mo\".
       PowerConnection powerConnection annotation (extent=[72,-14; 100,14]);
       Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
         annotation (extent=[-100,-14; -72,14]);
-    equation 
-      omega_m = der(shaft.phi) "Mechanical boundary condition";
-      omega_e = omega_m*Np;
-      f = omega_e/(2*Modelica.Constants.pi) "Electrical frequency";
-      n = Modelica.SIunits.Conversions.to_rpm(omega_m) 
-      "Rotational speed in rpm";
-      Pm = omega_m*tau;
-      if J>0 then
-        Ploss = J*der(omega_m)*omega_m;
-      else
-        Ploss = 0;
-      end if annotation (Diagram);
-      Pm = Pe/eta + Ploss "Energy balance";
-      // Boundary conditions
-      f = powerConnection.f;
-      Pe = -powerConnection.W;
-      tau = shaft.tau;
       annotation (Icon(
           Rectangle(extent=[-72,6; -48,-8],  style(
               color=76,
@@ -1346,6 +1340,31 @@ Modelica in file \"Modelica/package.mo\".
 <p>This model symply describes the conversion between mechanical energy and electrical energy. Then, in the electrical connector, the frequency is that of the e.m.f. of generator (voltage in vain).
 <p>It is possible to consider the inertial loss, setting the parameter <tt>J</tt>. 
 </html>"));
+    equation 
+      omega_m = der(shaft.phi) "Mechanical boundary condition";
+      omega_e = omega_m*Np;
+      f = omega_e/(2*Modelica.Constants.pi) "Electrical frequency";
+      n = Modelica.SIunits.Conversions.to_rpm(omega_m) 
+      "Rotational speed in rpm";
+      Pm = omega_m*tau;
+      if J>0 then
+        Ploss = J*der(omega_m)*omega_m;
+      else
+        Ploss = 0;
+      end if annotation (Diagram);
+      Pm = Pe/eta + Ploss "Energy balance";
+      // Boundary conditions
+      f = powerConnection.f;
+      Pe = -powerConnection.W;
+      tau = shaft.tau;
+    initial equation 
+      if initOpt == ThermoPower.Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
+        der(omega_m) = 0;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
     end Generator;
   
     model Breaker "Circuit breaker" 
@@ -1405,7 +1424,7 @@ Modelica in file \"Modelica/package.mo\".
       parameter Frequency fn=50 "Nominal frequency";
       replaceable function powerCurve = Functions.one 
       "Normalised power consumption vs. frequency curve";
-      PowerConnection connection annotation (extent=[-14,74; 12,100]);
+      PowerConnection connection annotation (extent=[-14,72; 14,100]);
       Power W "Actual power consumption";
       Frequency f "Frequency";
       annotation (
@@ -1451,7 +1470,8 @@ Modelica in file \"Modelica/package.mo\".
               rgbcolor={0,0,0},
               fillColor=7,
               rgbfillColor={255,255,255},
-              fillPattern=1))));
+              fillPattern=1))),
+      Diagram);
       Modelica.Blocks.Interfaces.RealInput powerConsumption 
         annotation (extent=[-20,12; -46,-12], rotation=-180);
     equation 
@@ -1540,10 +1560,10 @@ Modelica in file \"Modelica/package.mo\".
   
     partial model Network1portBase "Base class for network one port" 
       parameter Boolean hasBreaker = false;
-      parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
-      "Initialisation option"   annotation(Dialog(tab = "Initialization"));
       parameter Modelica.SIunits.Angle deltaStart=0 
       "Start value of the loaded angle"                                             annotation(Dialog(tab="Initialization"));
+      parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
+      "Initialization option"   annotation(Dialog(tab = "Initialization"));
       Modelica.SIunits.Power Pe "Clean electrical power";
       Modelica.SIunits.Power Ploss "Electrical power loss";
       Modelica.SIunits.AngularVelocity omega "Angular velocity";
@@ -1569,6 +1589,13 @@ Modelica in file \"Modelica/package.mo\".
 <p>where <tt>omega</tt> is the angular velocity of electrical greatness of the port and <tt>omegaRef</tt> is the angular velocity of reference.
 <p>The electrical power losses are described by the variables <tt>Ploss</tt>, to define in the extension.
 <p><tt>hasBreaker</tt> is true, the model provide an interrupter, commanded from external boolean signal, to described the connection/disconnection the electrical port from the grid; otherwise it is assumed that the electrical port is always connected to the grid. 
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
 </html>"));
       Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker 
         annotation (extent=[-16,82; 16,112], rotation=270);
@@ -1653,8 +1680,16 @@ Modelica in file \"Modelica/package.mo\".
               fillColor=7,
               rgbfillColor={255,255,255},
               fillPattern=1))), Documentation(info="<html>
-<p>In this model the coefficient <tt>C</tt> is defined in base to parameters <tt>e</tt>, <tt>v</tt>, <tt>X</tt> and <tt>Xline</tt>.
+<p>This model extends <tt>Network1portBase</tt> partial model, defining the coefficient of the exchanged clean electrical power and the damping power losses.
+<p>The coefficient <tt>C</tt> is defined in base to parameters <tt>e</tt>, <tt>v</tt>, <tt>X</tt> and <tt>Xline</tt>.
 <p>The power losses are dissipative type. It is possible to directly set the damping of respective generator/shaft system (parameter <tt>r</tt>). If <tt>J</tt> is zero, the respective damping is not considered.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
 </html>"));
     end NetworkGrid_eX;
   
@@ -1701,14 +1736,22 @@ Modelica in file \"Modelica/package.mo\".
               color=0,
               rgbcolor={0,0,0},
               thickness=2))), Documentation(info="<html>
-<p>In this model the coefficient <tt>C</tt> is directly defined by maximum power transmissible between th electrical port and the grid.
+<p>This model extends <tt>Network1portBase</tt> partial model, defining the coefficient of the exchanged clean electrical power and the damping power losses.
+<p>The coefficient <tt>C</tt> is directly defined by maximum power transmissible between the electrical port and the grid.
 <p>The power losses are dissipative type. It is possible to directly set the damping of respective generator/shaft system (parameter <tt>r</tt>). If <tt>J</tt> is zero, the respective damping is not considered.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
 </html>"));
     end NetworkGrid_Pmax;
   
     partial model Network2portBase "Base class for network with two port" 
       parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
-      "Initialisation option"   annotation(Dialog(tab = "Initialization"));
+      "Initialization option"   annotation(Dialog(tab = "Initialization"));
       Modelica.SIunits.Power Pe_ab "Exchanged electrical power from A to B";
       Modelica.SIunits.Power Pe_a "Clean electrical power side A";
       Modelica.SIunits.Power Pe_b "Clean electrical power side B";
@@ -1740,6 +1783,13 @@ Modelica in file \"Modelica/package.mo\".
 <p>where <ul><tt>delta_ab = delta_a - delta_b</tt></ul>
 <p>The coefficient <tt>C</tt> is an opportune variable to define in the extension. <tt>delta_a</tt> and <tt>delta_b</tt> are the phases of electrical greatness in the respective port.
 <p>The electrical power loss in the respective side are described by the variables <tt>Ploss_a</tt> and <tt>Ploss_b</tt>, to define in the extension.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
 </html>"));
       PowerConnection powerConnection_b "B" 
                                         annotation (extent=[86,-14; 114,14]);
@@ -1767,7 +1817,8 @@ Modelica in file \"Modelica/package.mo\".
   
     model NetworkTwoGenerators_eX 
     "Connection: generator(a) - generator(b); Parameters: voltages and reactances" 
-      extends ThermoPower.Electrical.Network2portBase( deltaStart=deltaStart_ab);
+      extends ThermoPower.Electrical.Network2portBase( deltaStart=deltaStart_ab,
+                                                      final initOpt = ThermoPower.Choices.Init.Options.noInit);
       parameter Boolean hasBreaker = false;
       parameter Modelica.SIunits.Voltage e_a "e.m.f rotating frame" 
                                                        annotation(Dialog(group="Generator side A"));
@@ -1837,6 +1888,13 @@ Modelica in file \"Modelica/package.mo\".
 <p>The coefficient of exchanged electrical power depends by parameters <tt>e_a</tt>, <tt>e_b</tt>, <tt>X_a</tt>, <tt>X_b</tt> and <tt>Xline</tt>.
 <p>The clean electrical powers of two port coincide with the power <tt>P_ab</tt> (opportune signs).
 <p>The power losses are dissipative type. It is possible to directly set the damping of respective generator/shaft system. If <tt>J_a</tt> or <tt>J_b</tt> are zero, the respective damping is not considered.  
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
 </html>"),   Icon(
           Line(points=[-54,0; -94,0], style(
               color=0,
@@ -1869,7 +1927,8 @@ Modelica in file \"Modelica/package.mo\".
   
     model NetworkTwoGenerators_Pmax 
     "Connection: generator(a) - generator(b); Parameters: maximum power" 
-      extends ThermoPower.Electrical.Network2portBase( deltaStart=deltaStart_ab);
+      extends ThermoPower.Electrical.Network2portBase( deltaStart=deltaStart_ab,
+                                                      final initOpt = ThermoPower.Choices.Init.Options.noInit);
       parameter Boolean hasBreaker = false;
       parameter Modelica.SIunits.Power Pmax "Output maximum power";
       parameter Modelica.SIunits.MomentOfInertia J_a=0 
@@ -1930,6 +1989,13 @@ Modelica in file \"Modelica/package.mo\".
 <p>The coefficient of exchanged electrical power directly depends by parameter <tt>Pmax</tt>.
 <p>The clean electrical powers of two port coincide with the power <tt>P_ab</tt> (opportune signs).
 <p>The power losses are dissipative type. It is possible to directly set the damping of respective generator/shaft system. If <tt>J_a</tt> or <tt>J_b</tt> are zero, the respective damping is not considered.  
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
 </html>"),   Icon(
           Line(points=[-54,0; -94,0], style(
               color=0,
@@ -2002,6 +2068,7 @@ Modelica in file \"Modelica/package.mo\".
       "Loaded angle between generator side A and grid";
       Modelica.SIunits.Angle delta_bg 
       "Loaded angle between generator side B and grid";
+      Modelica.SIunits.Angle delta_g "Grid phase";
       Modelica.Blocks.Interfaces.BooleanInput closed_gen_a if 
                                                         hasBreaker 
         annotation (extent=[-84,44; -52,74], rotation=270);
@@ -2021,8 +2088,9 @@ Modelica in file \"Modelica/package.mo\".
     equation 
       // Loaded angles
       omegaRef = 2*Modelica.Constants.pi*fnom;
-      der(delta_ag) = omega_a - omegaRef;
-      der(delta_bg) = omega_b - omegaRef;
+      der(delta_g) = omegaRef;
+      delta_ag = delta_a - delta_g;
+      delta_bg = delta_b - delta_g;
       // Breakers and their connections
       if not hasBreaker then
         closedInternal_gen_a = true;
@@ -2063,7 +2131,7 @@ Modelica in file \"Modelica/package.mo\".
       Pe_bg = C_bg*Modelica.Math.sin(delta_bg);
       Pe_a = Pe_ab + Pe_ag;
       Pe_b = -Pe_ab + Pe_bg;
-      Pe_g = -Pe_ag - Pe_bg;
+      Pe_g = -(-Pe_ag - Pe_bg);
       // Damping power losses
       if J_a>0 then
         D_a = 2*r_a*sqrt(C_ab*J_a*(2*Modelica.Constants.pi*fnom*Np_a)/(Np_a^2));
@@ -2149,6 +2217,13 @@ Modelica in file \"Modelica/package.mo\".
 <p>This model adds to <tt>Netowrk2portBase</tt> partial model, in more in comparison to the concepts expressed by the <tt>NetowrkTwoGenerators_eX</tt> model, two further electrical flows: from port_a to grid and from port_b to grid, so that to describe the interactions between two ports and the grid.
 <p>The clean electrical powers of two ports are defined by opportune combinations of the power flows introduced.
 <p>The power losses are dissipative type. It is possible to directly set the damping of respective generator/shaft system. If <tt>J_a</tt> or <tt>J_b</tt> are zero, the respective damping is not considered.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
 </html>"));
     end NetworkGridTwoGenerators;
   end Electrical;

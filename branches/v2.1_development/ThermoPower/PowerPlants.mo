@@ -1,9 +1,11 @@
 package PowerPlants "Models of thermoelectrical power plants components" 
   import SI = Modelica.SIunits;
   import ThermoPower.Choices.Init.Options;
-annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")));
+annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
+      Documentation(revisions="<html>
+</html>"));
   
-  package GasTurbine 
+  package GasTurbine "Models and tests of gas turbine and its main components" 
     package Interfaces 
       
       partial model GasTurbine "Base class for Gas Turbine" 
@@ -157,10 +159,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end GasTurbineSimplified;
     end Interfaces;
     
-    package Components 
-      
-    end Components;
-    
     package Examples 
       
       model GasTurbineSimplified 
@@ -260,9 +258,16 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             thickness=2));
       end TestGasTurbine;
     end Tests;
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end GasTurbine;
   
-  package HRSG 
+  package HRSG "Models and tests of HRSG and its main components" 
     package Interfaces 
       partial model HeatExchanger "Base class for heat exchanger fluid - gas" 
         
@@ -14050,8 +14055,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
     
     package Tests 
       model computation_states 
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         parameter SI.SpecificEnthalpy h=2.39102e6 "value of specific enthalpy";
         parameter SI.Pressure p=5389.2 "value of pressure";
         parameter SI.Temperature T=288 "value of temperature";
@@ -14079,10 +14083,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end computation_states;
       
       model TestHE_simp 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
               w0=70.59,
@@ -14163,10 +14165,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestHE_simp;
       
       model TestEcLP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
@@ -14256,10 +14256,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestEcLP;
       
       model TestEvLP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
@@ -14364,16 +14362,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(T_waterOut.inlet, hE.waterOut) 
           annotation (points=[-10,-46; -10,-20], style(thickness=2));
         connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[-10,48;
-              -10,60],                     style(thickness=2));
+              -10,54; -10,60; -10,60],     style(thickness=2));
         connect(T_waterIn.outlet, hE.waterIn) 
           annotation (points=[-10,36; -10,20], style(thickness=2));
       end TestEvLP;
       
       model TestShLP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
@@ -14453,7 +14449,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
           annotation (extent=[20,-6; 40,14]);
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14463,7 +14459,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14476,18 +14472,16 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[-10,-78;
               -10,-68; -10,-68; -10,-58],      style(thickness=2));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (points=[-10,-46; -10,-16], style(thickness=2));
+          annotation (points=[-10,-46; -10,-20], style(thickness=2));
         connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[-10,48;
               -10,54; -10,60; -10,60],     style(thickness=2));
         connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (points=[-10,36; -10,16], style(thickness=2));
+          annotation (points=[-10,36; -10,20], style(thickness=2));
       end TestShLP;
       
       model TestEc1HP_EcIP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 
@@ -14626,7 +14620,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
           annotation (extent=[20,-6; 40,14]);
         
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14636,7 +14630,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14651,13 +14645,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(sinkP_water_B.flange, T_waterOut_B.outlet) annotation (points=[8,-76; 8,
               -69; 8,-69; 8,-62; 8,-48; 8,-48],              style(thickness=2));
         connect(T_waterOut_B.inlet, hE.waterOutB) annotation (points=[8,-36; 8,
-              -26; -2,-26; -2,-16], style(thickness=2));
+              -26; -2,-26; -2,-20], style(thickness=2));
         connect(T_waterOut_A.inlet, hE.waterOutA) annotation (points=[-28,-36;
-              -28,-28; -18,-28; -18,-16], style(thickness=2));
-        connect(hE.waterInA, T_waterIn_A.outlet) annotation (points=[-18,16;
+              -28,-28; -18,-28; -18,-20], style(thickness=2));
+        connect(hE.waterInA, T_waterIn_A.outlet) annotation (points=[-18,20;
               -18,24; -28,24; -28,32], style(thickness=2));
         connect(hE.waterInB, T_waterIn_B.outlet) 
-          annotation (points=[-2,16; -2,24; 6,24; 6,32], style(thickness=2));
+          annotation (points=[-2,20; -2,24; 6,24; 6,32], style(thickness=2));
         connect(T_waterIn_B.inlet, sourseW_water_B.flange) 
           annotation (points=[6,44; 6,49; 6,49; 6,54; 6,64; 6,64],
                                                        style(thickness=2));
@@ -14666,10 +14660,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestEc1HP_EcIP;
       
       model TestEvIP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
@@ -14749,7 +14741,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
           annotation (extent=[20,-6; 40,14]);
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14759,7 +14751,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14772,18 +14764,16 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[-10,-78;
               -10,-68; -10,-68; -10,-58],      style(thickness=2));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (points=[-10,-46; -10,-16], style(thickness=2));
+          annotation (points=[-10,-46; -10,-20], style(thickness=2));
         connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[-10,48;
               -10,54; -10,60; -10,60],     style(thickness=2));
         connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (points=[-10,36; -10,16], style(thickness=2));
+          annotation (points=[-10,36; -10,20], style(thickness=2));
       end TestEvIP;
       
       model TestShIP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
@@ -14868,7 +14858,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         Modelica.Blocks.Sources.Constant const 
           annotation (extent=[-86,-50; -76,-40]);
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14878,7 +14868,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14889,11 +14879,11 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             rgbcolor={159,159,223},
             thickness=2));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (points=[-10,-46; -10,-16], style(thickness=2));
+          annotation (points=[-10,-46; -10,-20], style(thickness=2));
         connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[-10,48;
               -10,54; -10,60; -10,60],     style(thickness=2));
         connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (points=[-10,36; -10,16], style(thickness=2));
+          annotation (points=[-10,36; -10,20], style(thickness=2));
         connect(valveLinIP.outlet,OutIP. flange) 
           annotation (points=[-32,-82; -42,-82],
                                                style(thickness=2));
@@ -14904,10 +14894,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestShIP;
       
       model TestEc2HP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
@@ -14987,7 +14975,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
           annotation (extent=[20,-6; 40,14]);
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -14997,7 +14985,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -15010,18 +14998,16 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[-10,-78;
               -10,-68; -10,-68; -10,-58],      style(thickness=2));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (points=[-10,-46; -10,-16], style(thickness=2));
+          annotation (points=[-10,-46; -10,-20], style(thickness=2));
         connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[-10,48;
               -10,54; -10,60; -10,60],     style(thickness=2));
         connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (points=[-10,36; -10,16], style(thickness=2));
+          annotation (points=[-10,36; -10,20], style(thickness=2));
       end TestEc2HP;
       
       model TestEvHP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
@@ -15101,7 +15087,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
           annotation (extent=[20,-6; 40,14]);
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -15111,7 +15097,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -15124,18 +15110,16 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[-10,-78;
               -10,-68; -10,-68; -10,-58],      style(thickness=2));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (points=[-10,-46; -10,-16], style(thickness=2));
+          annotation (points=[-10,-46; -10,-20], style(thickness=2));
         connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[-10,48;
               -10,54; -10,60; -10,60],     style(thickness=2));
         connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (points=[-10,36; -10,16], style(thickness=2));
+          annotation (points=[-10,36; -10,20], style(thickness=2));
       end TestEvHP;
       
       model TestSh1HP_Rh1IP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 
@@ -15274,7 +15258,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
           annotation (extent=[20,-6; 40,14]);
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -15284,7 +15268,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -15299,13 +15283,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(sinkP_water_B.flange, T_waterOut_B.outlet) annotation (points=[8,-76; 8,
               -69; 8,-69; 8,-62; 8,-48; 8,-48],              style(thickness=2));
         connect(T_waterOut_B.inlet, hE.waterOutB) annotation (points=[8,-36; 8,
-              -26; -2,-26; -2,-16], style(thickness=2));
+              -26; -2,-26; -2,-20], style(thickness=2));
         connect(T_waterOut_A.inlet, hE.waterOutA) annotation (points=[-28,-36;
-              -28,-28; -18,-28; -18,-16], style(thickness=2));
-        connect(hE.waterInA, T_waterIn_A.outlet) annotation (points=[-18,16;
+              -28,-28; -18,-28; -18,-20], style(thickness=2));
+        connect(hE.waterInA, T_waterIn_A.outlet) annotation (points=[-18,20;
               -18,24; -28,24; -28,32], style(thickness=2));
         connect(hE.waterInB, T_waterIn_B.outlet) 
-          annotation (points=[-2,16; -2,24; 6,24; 6,32], style(thickness=2));
+          annotation (points=[-2,20; -2,24; 6,24; 6,32], style(thickness=2));
         connect(T_waterIn_B.inlet, sourseW_water_B.flange) 
           annotation (points=[6,44; 6,49; 6,49; 6,54; 6,64; 6,64],
                                                        style(thickness=2));
@@ -15314,10 +15298,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestSh1HP_Rh1IP;
       
       model TestSh2HP_Rh2IP 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 
@@ -15457,7 +15439,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
           annotation (extent=[20,-6; 40,14]);
         
       equation 
-        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 6,0],
+        connect(T_gasOut.inlet, hE.gasOut) annotation (points=[24,0; 10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -15467,7 +15449,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -26,0],
+        connect(T_gasIn.outlet, hE.gasIn) annotation (points=[-42,0; -30,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -15482,13 +15464,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(sinkP_water_B.flange, T_waterOut_B.outlet) annotation (points=[8,-76; 8,
               -69; 8,-69; 8,-62; 8,-48; 8,-48],              style(thickness=2));
         connect(T_waterOut_B.inlet, hE.waterOutB) annotation (points=[8,-36; 8,
-              -26; -2,-26; -2,-16], style(thickness=2));
+              -26; -2,-26; -2,-20], style(thickness=2));
         connect(T_waterOut_A.inlet, hE.waterOutA) annotation (points=[-28,-36;
-              -28,-28; -18,-28; -18,-16], style(thickness=2));
-        connect(hE.waterInA, T_waterIn_A.outlet) annotation (points=[-18,16;
+              -28,-28; -18,-28; -18,-20], style(thickness=2));
+        connect(hE.waterInA, T_waterIn_A.outlet) annotation (points=[-18,20;
               -18,24; -28,24; -28,32], style(thickness=2));
         connect(hE.waterInB, T_waterIn_B.outlet) 
-          annotation (points=[-2,16; -2,24; 6,24; 6,32], style(thickness=2));
+          annotation (points=[-2,20; -2,24; 6,24; 6,32], style(thickness=2));
         connect(T_waterIn_B.inlet, sourseW_water_B.flange) 
           annotation (points=[6,44; 6,49; 6,49; 6,54; 6,64; 6,64],
                                                        style(thickness=2));
@@ -15497,10 +15479,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestSh2HP_Rh2IP;
       
       model TestHEG_3LRh_wa 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         //HP
         parameter SI.MassFlowRate fluidHPNomFlowRate_Sh=67.6 
           "Nominal mass flowrate";
@@ -15979,8 +15959,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ev_IP_In, sourceEvIP.flange) annotation (points=[
-              0,20; 0,39; 0,58; -1.10215e-015,58], style(
+        connect(hEG_3LRh_simp.Ev_IP_In, sourceEvIP.flange) annotation (points=[0,20; 0,
+              39; 0,58; -1.10215e-015,58],         style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -15997,14 +15977,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ec_IP_In, sourceEcIP.flange) annotation (points=[
-              12,20; 12,40; 16,40; 16,58], style(
+        connect(hEG_3LRh_simp.Ec_IP_In, sourceEcIP.flange) annotation (points=[12,20;
+              12,40; 16,40; 16,58],        style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Sh_IP_In, sourceShIP.flange) annotation (points=[
-              -12,20; -12,40; -16,40; -16,58], style(
+        connect(hEG_3LRh_simp.Sh_IP_In, sourceShIP.flange) annotation (points=[-12,20;
+              -12,40; -16,40; -16,58],         style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -16072,8 +16052,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestHEG_3LRh_wa;
       
       model TestDG_3LCC_wa 
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wa Drums(
           HPd_rint=1.067,
@@ -16372,20 +16351,20 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateToEcLP.inlet, Drums.WaterForLP) annotation (points=[-30,
-              -0.4; -30,22; -30.6667,22], style(
+        connect(stateToEcLP.inlet, Drums.WaterForLP) annotation (points=[-30,-0.4;
+              -30,22; -30.6667,22],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateReturnEcLP.outlet, Drums.Feed_LP) annotation (points=[-38,
-              -0.4; -38,22; -38.6667,22], style(
+        connect(stateReturnEcLP.outlet, Drums.Feed_LP) annotation (points=[-38,-0.4;
+              -38,22; -38.6667,22],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateToRiserLP.inlet, Drums.ToRiser_LP) annotation (points=[-46,
-              -0.4; -46.6667,-0.4; -46.6667,22], style(
+        connect(stateToRiserLP.inlet, Drums.ToRiser_LP) annotation (points=[-46,-0.4;
+              -46.6667,-0.4; -46.6667,22],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -16396,8 +16375,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateToShLP.inlet, Drums.Steam_LP_Out) annotation (points=[-62,
-              -0.4; -62,22; -62.6667,22], style(
+        connect(stateToShLP.inlet, Drums.Steam_LP_Out) annotation (points=[-62,-0.4;
+              -62,22; -62.6667,22],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -16533,8 +16512,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestDG_3LCC_wa;
       
       model TestDG_3LCC_wafp 
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wafp Drums(
           HPd_rint=1.067,
@@ -16732,8 +16710,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             fillColor=74,
             rgbfillColor={0,0,127},
             fillPattern=1));
-        connect(stateToRiserHP.inlet, Drums.ToRiser_HP) annotation (points=[
-              -154,-108.4; -154,20; -153.333,20], style(
+        connect(stateToRiserHP.inlet, Drums.ToRiser_HP) annotation (points=[-154,
+              -108.4; -154,20; -153.333,20],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -16834,20 +16812,20 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateToEcLP.inlet, Drums.WaterForLP) annotation (points=[-30,
-              -0.4; -30,20; -30.6667,20], style(
+        connect(stateToEcLP.inlet, Drums.WaterForLP) annotation (points=[-30,-0.4;
+              -30,20; -30.6667,20],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateReturnEcLP.outlet, Drums.Feed_LP) annotation (points=[-38,
-              -0.4; -38,-0.4; -38,20; -38.6667,20], style(
+        connect(stateReturnEcLP.outlet, Drums.Feed_LP) annotation (points=[-38,-0.4;
+              -38,-0.4; -38,20; -38.6667,20],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateToRiserLP.inlet, Drums.ToRiser_LP) annotation (points=[-46,
-              -0.4; -46.6667,-0.4; -46.6667,20], style(
+        connect(stateToRiserLP.inlet, Drums.ToRiser_LP) annotation (points=[-46,-0.4;
+              -46.6667,-0.4; -46.6667,20],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -16858,8 +16836,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateToShLP.inlet, Drums.Steam_LP_Out) annotation (points=[-62,
-              -0.4; -62,-0.4; -62,20; -62.6667,20], style(
+        connect(stateToShLP.inlet, Drums.Steam_LP_Out) annotation (points=[-62,-0.4;
+              -62,-0.4; -62,20; -62.6667,20],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -16988,10 +16966,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestDG_3LCC_wafp;
       
       model TestHRSG_wa 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
       protected 
         Buses.Actuators actuators annotation (extent=[84,44; 72,54]);
@@ -17173,10 +17149,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestHRSG_wa;
       
       model TestHRSG_wafp 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
       protected 
         Buses.Actuators actuators annotation (extent=[84,46; 72,56]);
@@ -17354,8 +17328,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
     package TestsControl 
       model TestPumpControl 
         import ThermoPower;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         Water.SinkP sinkToEcLP_p(           h=2.440e5, p0=7.19e5) 
           annotation (extent=[60,-20; 80,0]);
@@ -17439,10 +17412,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestPumpControl;
       
       model TestHRSG_wac 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         annotation (Diagram);
         Gas.SourceW sourceGas(
@@ -17611,7 +17582,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
         connect(stateShIP_out.outlet, mixIP.in2) annotation (points=[-4,-28.8;
               -4,-60; -24.4,-60; -24.4,-48.74], style(thickness=2));
         connect(levelsControlSimplified.SensorsBus, hRSG.SensorsBus) 
-          annotation (points=[60.2,70; 46,70; 46,66; 32,66],       style(
+          annotation (points=[60,70; 46,70; 46,66; 32,66],         style(
               color=84, rgbcolor={255,170,213}));
         connect(levelsControlSimplified.ActuatorsBus, hRSG.ActuatorsBus) 
           annotation (points=[80,70; 92,70; 92,54; 32,54],       style(color=
@@ -17619,9 +17590,17 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")))
       end TestHRSG_wac;
       
     end TestsControl;
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end HRSG;
   
   package SteamTurbineGroup 
+    "Models and tests of steam turbine group and its main components" 
     package Interfaces 
       partial model ST_2L 
         "Base class for Steam Turbine with two pressure levels" 
@@ -20996,7 +20975,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[-13.2,0; 
+        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[-13.2,0;
               -117.2,0],
                   style(
             color=0,
@@ -21149,7 +21128,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[-13.2,0; 
+        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[-13.2,0;
               -121.2,0],
                   style(
             color=0,
@@ -21347,14 +21326,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,24],
                                         style(color=52, rgbcolor={213,255,170}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8; 
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
               -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
         connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-113.2,0; -200,0],
             style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8; 
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
               118.5,15.8; 118.5,16; 110,16], style(thickness=2));
         connect(Shaft_b,ST_LP. shaft_b) annotation (points=[200,0; 152.8,0],
             style(
@@ -21574,14 +21553,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,24],
                                         style(color=52, rgbcolor={213,255,170}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8; 
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
               -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
         connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-113.2,0; -200,0],
             style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8; 
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
               118.5,15.8; 118.5,16; 110,16], style(thickness=2));
         connect(Shaft_b,ST_LP. shaft_b) annotation (points=[200,0; 152.8,0],
             style(
@@ -21935,7 +21914,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8; 
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
               -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
         connect(valveHP.inlet,flowHPSplit. out2) 
           annotation (points=[-150,16; -164,16; -164,40], style(thickness=2));
@@ -21958,7 +21937,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[35.4,16; 48,16; 48,40], style(thickness=2));
         connect(flowIPJoin.in1,byPassIP. outlet) 
           annotation (points=[40,40; 10,40], style(thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8; 
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
               118.5,15.8; 118.5,16; 110,16], style(thickness=2));
         connect(valveLP.inlet,flowLPSplit. out2) 
           annotation (points=[90,16; 70,16; 70,40], style(thickness=2));
@@ -22372,7 +22351,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=3,
             rgbcolor={0,0,255},
             thickness=2));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8; 
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
               -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
         connect(valveHP.inlet,flowHPSplit. out2) 
           annotation (points=[-150,16; -164,16; -164,40], style(thickness=2));
@@ -22397,7 +22376,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[35.4,16; 48,16; 48,40], style(thickness=2));
         connect(flowIPJoin.in1,byPassIP. outlet) 
           annotation (points=[40,40; 10,40], style(thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8; 
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
               118.5,15.8; 118.5,16; 110,16], style(thickness=2));
         connect(valveLP.inlet,flowLPSplit. out2) 
           annotation (points=[90,16; 70,16; 70,40], style(thickness=2));
@@ -22595,7 +22574,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[16.8,-14; 
+        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[16.8,-14;
               -39.2,-14], style(
             color=0,
             rgbcolor={0,0,0},
@@ -22606,11 +22585,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               72.4; -52.4,66; -66,66; -66,40], style(thickness=2));
         connect(valveHP.outlet, ST_HP.inlet) 
           annotation (points=[-66,20; -66,1.8; -67,1.8], style(thickness=2));
-        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-11.6,21.6; 
+        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-11.6,21.6;
               -12,22; -12,32; -36,32; -36,38], style(thickness=2));
         connect(mixLP.out, SteamForHU) 
           annotation (points=[-42,-62; -60,-62; -60,-200], style(thickness=2));
-        connect(valveHU.inlet, flowHUSplit.out2) annotation (points=[-17,-28; 
+        connect(valveHU.inlet, flowHUSplit.out2) annotation (points=[-17,-28;
               -16.4,-28; -16.4,-3.6], style(thickness=2));
         connect(LPT_In, mixLP.in1) annotation (points=[0,200; 0,80; 72,80; 72,
               -66; -27.6,-66; -27.6,-66.8], style(thickness=2));
@@ -22628,7 +22607,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               28,86; -4,86; -4,-10; -11.48,-10; -11.48,-3.6], style(thickness=2));
         connect(flowHUSplit.in1, flowHPJoin.out) 
           annotation (points=[-14,3.6; -14,14.4], style(thickness=2));
-        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58; 
+        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58;
               -36,66; -47.48,66; -47.48,72.4], style(thickness=2));
         connect(flowLPJoin.out, LPT_Out) annotation (points=[63.6,30; 80,30; 80,
               -80; 60,-80; 60,-200], style(thickness=2));
@@ -22769,7 +22748,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[18.8,-20; 
+        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[18.8,-20;
               -39.2,-20],
             style(
             color=0,
@@ -22783,7 +22762,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                                          style(thickness=2));
         connect(valveHP.outlet, ST_HP.inlet) 
           annotation (points=[-66,20; -66,-4.2; -67,-4.2],  style(thickness=2));
-        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-13.6,19.6; 
+        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-13.6,19.6;
               -14,20; -14,30; -36,30; -36,38],
                                            style(thickness=2));
         connect(LPT_In, mixLP.in1) annotation (points=[80,200; 80,80; 74,80; 74,
@@ -22818,16 +22797,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_byPassLP, byPassLP.theta) annotation (
             points=[98,-72; 0,-72; 0,48; 38,48], style(color=52, rgbcolor={213,
                 255,170}));
-        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58; 
+        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58;
               -36,66; -58,66; -58,74.4; -57.48,74.4], style(thickness=2));
-        connect(mixLP.in2, flowHPJoin.out) annotation (points=[-25.26,-42.4; 
+        connect(mixLP.in2, flowHPJoin.out) annotation (points=[-25.26,-42.4;
               -16,-42.4; -16,12.4],
                                 style(thickness=2));
         connect(SteamForHU, flowHUSplit.out2) annotation (points=[-40,-200; -40,
               -65.6; -50.4,-65.6], style(thickness=2));
         connect(flowHUSplit.in1, mixLP.out) annotation (points=[-48,-58.4; -48,
               -46; -36,-46], style(thickness=2));
-        connect(flowHUSplit.out1, HPT_Out) annotation (points=[-45.48,-65.6; 
+        connect(flowHUSplit.out1, HPT_Out) annotation (points=[-45.48,-65.6;
               -45.48,-80; -6,-80; -6,60; -100,60; -100,200],
                                                            style(thickness=2));
       end ST_2LRhHU;
@@ -23019,7 +22998,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       equation 
         connect(condPlant_cc.SteamIn, SteamIn) 
           annotation (points=[50,60; 50,100], style(thickness=2));
-        connect(WaterOut, mixCondenser.out) annotation (points=[0,-100; 0,-60; 
+        connect(WaterOut, mixCondenser.out) annotation (points=[0,-100; 0,-60;
               -1.83691e-015,-60], style(thickness=2));
         connect(mixCondenser.in1, condPlant_cc.WaterOut) 
           annotation (points=[6,-42; 6,-20; 50,-20; 50,0], style(thickness=2));
@@ -23028,7 +23007,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(SensorsBus, condPlant_cc.SensorsBus) annotation (points=[98,-40;
               80,-40; 80,-20; 96,-20; 96,18; 79.4,18], style(color=84, rgbcolor=
                {255,170,213}));
-        connect(ActuatorsBus, condPlant_cc.ActuatorsBus) annotation (points=[98,-72; 
+        connect(ActuatorsBus, condPlant_cc.ActuatorsBus) annotation (points=[98,-72;
               72,-72; 72,-12; 88,-12; 88,8.4; 79.4,8.4],      style(color=52,
               rgbcolor={213,255,170}));
       end CondPlantHU_cc;
@@ -23612,8 +23591,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     
     package Tests 
       model computation_states 
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         parameter SI.SpecificEnthalpy h=2.39102e6 "value of specific enthalpy";
         parameter SI.Pressure p=2e5 "value of pressure";
         parameter SI.Temperature T=288 "value of temperature";
@@ -23979,9 +23957,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestTurbineHPefficiency;
       
       model TestST3LRh_base 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_base 
           steamTurbines(
@@ -24048,9 +24024,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestST3LRh_base;
       
       model TestST3LRh_valve 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_valve 
           steamTurbines(
@@ -24149,9 +24123,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestST3LRh_valve;
       
       model TestST3LRh_bypass 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         Examples.ST3LRh_bypass steamTurbines(
           redeclare package FluidMedium = FluidMedium,
@@ -24186,8 +24158,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           bypassLP_Cv=7540,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
-          LPT_Kt=0.078004, 
-          valveDrumIP_Cv=810, 
+          LPT_Kt=0.078004,
+          valveDrumIP_Cv=810,
           valveDrumLP_Cv=1670) 
                        annotation (extent=[-94,-40; -14,40]);
         annotation (Diagram);
@@ -24244,7 +24216,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(com_valveLP.y, actuators.Opening_valveLP) 
                                                       annotation (points=[75,-40;
               66,-40; 66,-74],              style(color=74, rgbcolor={0,0,127}));
-        connect(actuators,steamTurbines. ActuatorsBus) annotation (points=[66,-74; 
+        connect(actuators,steamTurbines. ActuatorsBus) annotation (points=[66,-74;
               18,-74; 18,-28; -14,-28],   style(color=52, rgbcolor={213,255,170}));
         connect(steamTurbines.Shaft_b, constantSpeed.flange) annotation (points=[-14,0; 0,
               0],          style(
@@ -24289,9 +24261,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestST3LRh_bypass;
       
       model TestST3LRh_condenser 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         //other data
         constant Real pi=Modelica.Constants.pi;
         
@@ -24383,16 +24353,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[-60,50; -60,68], style(thickness=2));
         connect(steamTurbines.HPT_Out, Rh.in1) annotation (points=[-72,50; -72,59;
               -72,68; -72.06,68], style(thickness=2));
-        connect(condenserPlant.SteamIn, steamTurbines.LPT_Out)
+        connect(condenserPlant.SteamIn, steamTurbines.LPT_Out) 
           annotation (points=[-16,-72; -24,-72; -24,-30], style(thickness=2));
         connect(condenserPlant.WaterOut, sinkW.flange) annotation (points=[24,
               -72; 34,-72; 34,-20; 56,-20], style(thickness=2));
       end TestST3LRh_condenser;
       
       model TestCondenserControl 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         annotation (Diagram);
         Components.StateReader_water stateTapping(
@@ -24453,7 +24421,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                                            style(thickness=2));
         connect(sourceTap.flange, stateTapping.inlet) 
           annotation (points=[-40,8; -26,8], style(thickness=2));
-        connect(pID.CS, sourceTap.in_w0) annotation (points=[0.6,-70; 20,-70; 
+        connect(pID.CS, sourceTap.in_w0) annotation (points=[0.6,-70; 20,-70;
               20,-20; -70,-20; -70,20; -54,20; -54,14], style(color=74,
               rgbcolor={0,0,127}));
         connect(pID.PV, condenserIdeal_tap.ratio_Vv_Vtot) annotation (points=[-20,-74;
@@ -24462,9 +24430,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestCondenserControl;
       
       model TestSTG_cc "Test of STG with condenser control" 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
+        package FluidMedium = ThermoPower.Water.StandardWater;
         
         annotation (Diagram, experiment(StopTime=20000, NumberOfIntervals=10000));
         Modelica.Mechanics.Rotational.ConstantSpeed constantSpeed(w_fixed=
@@ -24593,9 +24559,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end curveEfficiency;
       
     end Functions;
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end SteamTurbineGroup;
   
   package ElectricGeneratorGroup 
+    "Models and tests of electrical group (generator and network) and its main components" 
     package Interfaces 
       partial model SingleShaft 
         "Base Class for alternator group, configuration single-shaft (one generator)" 
@@ -27168,9 +27142,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=2));
       end TestTripleShaft;
     end Tests;
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end ElectricGeneratorGroup;
   
-  package Control 
+  package Control "Models of common control elements" 
     model PID "ISA PID controller with anti-windup" 
       parameter Real Kp "Proportional gain (normalised units)";
       parameter Time Ti "Integral time";
@@ -27291,6 +27272,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             string="SetPoint")));
     end LevelSetPoint;
     
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end Control;
   
   package Buses 
@@ -27334,16 +27322,21 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                           fillPattern=1),
                          string="A")));
     end Actuators;
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end Buses;
   
-  package Tests 
+  package Tests "Tests for complessive steam power plants" 
     
     model TestSteamPlant 
       "Test total plant with parameters initial resetting and without control" 
-      replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-        Modelica.Media.Interfaces.PartialMedium;
-      replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-        Modelica.Media.Interfaces.PartialPureSubstance;
+      package FlueGasMedium = ThermoPower.Media.FlueGas;
+      package FluidMedium = ThermoPower.Water.StandardWater;
       ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
                                    drums(
           fluidHPNomPressure=1.22116e7,
@@ -27457,7 +27450,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamIPNomFlowRate=14.5,
           steamLPNomFlowRate=10.9)) 
         annotation (extent=[-100,-140; 0,-40]);
-      annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1));
+      annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1),
+        Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
       Gas.SourceW sourceGas(
         redeclare package Medium = FlueGasMedium,
         w0=585.5,
@@ -27614,10 +27614,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     
     model TestSteamPlant_valve 
       "Test total plant with parameters initial resetting, level control and inlet valve on the steam turbine group" 
-      replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-        Modelica.Media.Interfaces.PartialMedium;
-      replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-        Modelica.Media.Interfaces.PartialPureSubstance;
+      package FlueGasMedium = ThermoPower.Media.FlueGas;
+      package FluidMedium = ThermoPower.Water.StandardWater;
       ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
                                    drums(
           fluidHPNomPressure=1.22116e7,
@@ -27735,7 +27733,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamIPNomFlowRate=14.5,
           steamLPNomFlowRate=10.9)) 
         annotation (extent=[-100,-180; 0,-80]);
-      annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1));
+      annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1),
+        Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
       Gas.SourceW sourceGas(
         redeclare package Medium = FlueGasMedium,
         w0=585.5,
@@ -27933,10 +27938,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     
     model TestSteamPlant_controls 
       "Test total plant with levels control and ratio control on the condenser " 
-      replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-        Modelica.Media.Interfaces.PartialMedium;
-      replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-        Modelica.Media.Interfaces.PartialPureSubstance;
+      package FlueGasMedium = ThermoPower.Media.FlueGas;
+      package FluidMedium = ThermoPower.Water.StandardWater;
       ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
                                   HeatExchangersGroup(
           fluidHPNomPressure_Sh=1.22116e7,
@@ -28070,7 +28073,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           StopTime=20000,
           NumberOfIntervals=10000,
           Tolerance=1e-006),
-        Coordsys(extent=[-200,-200; 200,200], scale=0.1));
+        Coordsys(extent=[-200,-200; 200,200], scale=0.1),
+        Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
       Gas.SourceW sourceGas(
         redeclare package Medium = FlueGasMedium,
         w0=585.5,
@@ -28229,15 +28239,21 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fillPattern=1));
     end TestSteamPlant_controls;
     
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end Tests;
   
   package Simulators 
+    "Simulators for steam power plants and simple combined cycles" 
     model SteamPlant_Sim1 
       "Test total plant with levels control and ratio control on the condenser, inlet valves" 
-      replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-        Modelica.Media.Interfaces.PartialMedium;
-      replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-        Modelica.Media.Interfaces.PartialPureSubstance;
+      package FlueGasMedium = ThermoPower.Media.FlueGas;
+      package FluidMedium = ThermoPower.Water.StandardWater;
       ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
                                   HeatExchangersGroup(
           fluidHPNomPressure_Sh=1.22116e7,
@@ -28369,7 +28385,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           StopTime=15000,
           NumberOfIntervals=10000,
           Tolerance=1e-006),
-        Coordsys(extent=[-200,-200; 200,200], scale=0.1));
+        Coordsys(extent=[-200,-200; 200,200], scale=0.1),
+        Documentation(info="<html>
+<p>Characteristic simulations: variation of the gas flow rate.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
     public 
       HRSG.Control.levelsControl levelsControl(
         CSmin_levelHP=30,
@@ -28569,10 +28594,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     
     model SteamPlant_Sim2 
       "Test total plant with levels control and ratio control on the condenser, inlet valves" 
-      replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-        Modelica.Media.Interfaces.PartialMedium;
-      replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-        Modelica.Media.Interfaces.PartialPureSubstance;
+      package FlueGasMedium = ThermoPower.Media.FlueGas;
+      package FluidMedium = ThermoPower.Water.StandardWater;
       ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
                                   HeatExchangersGroup(
           fluidHPNomPressure_Sh=1.22116e7,
@@ -28704,7 +28727,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           StopTime=15000,
           NumberOfIntervals=10000,
           Tolerance=1e-006),
-        Coordsys(extent=[-200,-200; 200,200], scale=0.1));
+        Coordsys(extent=[-200,-200; 200,200], scale=0.1),
+        Documentation(info="<html>
+<p>Characteristic simulations: variation of the HP valve opening.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
     public 
       HRSG.Control.levelsControl levelsControl(
         CSmin_levelHP=30,
@@ -28907,10 +28939,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     
     model CCPP_Sim3 
       "Test total plant with levels control and ratio control on the condenser, inlet valves" 
-      replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-        Modelica.Media.Interfaces.PartialMedium;
-      replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-        Modelica.Media.Interfaces.PartialPureSubstance;
+      package FlueGasMedium = ThermoPower.Media.FlueGas;
+      package FluidMedium = ThermoPower.Water.StandardWater;
       ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
                                   HeatExchangersGroup(
           fluidHPNomPressure_Sh=1.22116e7,
@@ -29045,7 +29075,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           StopTime=15000,
           NumberOfIntervals=10000,
           Tolerance=1e-006),
-        Coordsys(extent=[-200,-200; 200,200], scale=0.1));
+        Coordsys(extent=[-200,-200; 200,200], scale=0.1),
+        Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
     public 
       HRSG.Control.levelsControl levelsControl(
         CSmin_levelHP=30,
@@ -29088,7 +29125,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       Buses.Actuators actuators annotation (extent=[-60,100; -80,120]);
     public 
       ThermoPower.PowerPlants.GasTurbine.Examples.GasTurbineSimplified 
-        gasTurbine(redeclare package FlueGas = FlueGasMedium) 
+        gasTurbine(redeclare package FlueGasMedium = FlueGasMedium) 
         annotation (extent=[-140,-60; -60,20]);
     equation 
       connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (points=[100,-120;
@@ -29208,5 +29245,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           points=[180,-152; 190,-152; 190,-172; 72,-172; 72,-148; 60,-148],
           style(color=52, rgbcolor={213,255,170}));
     end CCPP_Sim3;
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end Simulators;
 end PowerPlants;

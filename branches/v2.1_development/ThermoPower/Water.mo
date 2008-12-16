@@ -1073,13 +1073,19 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     end if;
     infl.hAB = htilde[1];
     outfl.hBA = htilde[N - 1];
-    if w >= 0 then
-      h[1] = infl.hBA;
-      h[2:N] = htilde;
-    else
-      h[N] = outfl.hAB;
-      h[1:N - 1] = htilde;
-    end if;
+    
+    h[1] = infl.hBA;
+    h[2:N] = htilde;
+  /*
+  if w >= 0 then
+    h[1] = infl.hBA;
+    h[2:N] = htilde;
+  else
+    h[N] = outfl.hAB;
+    h[1:N - 1] = htilde;
+  end if;
+*/
+    
     T = wall.T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
     
@@ -3994,8 +4000,6 @@ li><i>1 Jul 2004</i>
        annotation(Dialog(group="Characteristics"));
     parameter Volume V=0 "Pump Internal Volume" annotation(Evaluate=true);
     parameter Boolean CheckValve=false "Reverse flow stopped";
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option" annotation(Dialog(tab="Initialisation"));
     parameter Pressure pin_start "Inlet Pressure Start Value" 
       annotation(Dialog(tab="Initialisation"));
     parameter Pressure pout_start "Outlet Pressure Start Value" 
@@ -4004,6 +4008,8 @@ li><i>1 Jul 2004</i>
       annotation(Dialog(tab="Initialisation"));
     parameter SpecificEnthalpy hstart=1e5 "Fluid Specific Enthalpy Start Value"
       annotation(Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+      "Initialisation option" annotation(Dialog(tab="Initialisation"));
     constant Acceleration g=Modelica.Constants.g_n;
     MassFlowRate w_single(start = wstart/Np0) "Mass flow rate (single pump)";
     MassFlowRate w = Np*w_single "Mass flow rate (total)";
@@ -4028,10 +4034,10 @@ li><i>1 Jul 2004</i>
     Real s "Auxiliary Variable";
     FlangeA infl(p(start=pin_start),hAB(start=hstart),
       redeclare package Medium = Medium) 
-      annotation (extent=[-100, 2; -60, 42]);
+      annotation (extent=[-100,0; -60,40]);
     FlangeB outfl(p(start=pout_start),hBA(start=hstart),
       redeclare package Medium = Medium) 
-      annotation (extent=[40,52; 80,92]);
+      annotation (extent=[40,50; 80,90]);
     Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps" 
       annotation (extent=[18, 70; 38, 90], rotation=-90);
   equation 
@@ -4217,7 +4223,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     Angle phi "Shaft angle";
     AngularVelocity omega "Shaft angular velocity";
     Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort 
-      annotation (extent=[80,4; 110,32]);
+      annotation (extent=[76,6; 106,36]);
   equation 
     // Mechanical boundary condition
     phi = MechPort.phi;
@@ -4463,11 +4469,11 @@ Input variables changed. This function now computes the heat transfer coefficien
     ThermoPower.Water.FlangeA inlet(
       redeclare package Medium = Medium,
       p(start=pstart_in)) 
-      annotation (extent=[-92,62; -58,96]);
+      annotation (extent=[-100,60; -60,100]);
     ThermoPower.Water.FlangeB outlet(
       redeclare package Medium = Medium,
       p(start=pstart_out)) 
-      annotation (extent=[60,64; 94,96]);
+      annotation (extent=[60,60; 100,100]);
     
   equation 
     PR=inlet.p/outlet.p "Pressure ratio";
@@ -4556,7 +4562,7 @@ Input variables changed. This function now computes the heat transfer coefficien
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstartout "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
-    Medium.BaseProperties fluid_in(p(start=pstart_in),h(start=hstartin));
+    Medium.BaseProperties fluid_in(p(start=pstartin),h(start=hstartin));
     FlangeA inlet(redeclare package Medium = Medium) 
                   annotation (extent=[-120,50; -80,90]);
     FlangeB outlet(redeclare package Medium = Medium) 

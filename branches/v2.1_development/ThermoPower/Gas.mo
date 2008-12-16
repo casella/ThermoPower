@@ -1248,7 +1248,8 @@ The latter options can be useful when two or more components are connected direc
     parameter AbsoluteTemperature Tstart=300 "Start temperature" 
       annotation(Dialog(tab="Initialisation"));
     parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
-      "Start gas composition";
+      "Start gas composition" 
+      annotation(Dialog(tab="Initialisation"));
     MassFlowRate w "Mass Flow Rate";
     Pressure dp "Pressure drop";
     Real Fxt;
@@ -1921,9 +1922,9 @@ This model extends the CombustionChamber Base model, with the definition of the 
     ThermoPower.Gas.FlangeB outlet(redeclare package Medium = Medium) 
       annotation (extent=[60,60; 100,100]);
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
-      annotation (extent=[-76,-12; -54,10]);
+      annotation (extent=[-72,-12; -48,12]);
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
-      annotation (extent=[54,-12; 74,10]);
+      annotation (extent=[48,-12; 72,12]);
     
   equation 
     w = inlet.w;
@@ -2129,9 +2130,9 @@ This model adds the performance characteristics to the Compressor_Base model, by
     Real eta "isoentropic efficiency";
     
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
-    annotation (extent=[-88,-14; -58,14]);
+    annotation (extent=[-72,-12; -48,12]);
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
-    annotation (extent=[58,-14; 88,14]);
+    annotation (extent=[48,-12; 72,12]);
     ThermoPower.Gas.FlangeA inlet(redeclare package Medium = Medium) 
                        annotation (extent=[-100,60; -60,100]);
     ThermoPower.Gas.FlangeB outlet(redeclare package Medium = Medium) 
@@ -2210,7 +2211,8 @@ This model adds the performance characteristics to the Compressor_Base model, by
 </html>"), Icon(Text(
           extent=[-128,-60; 128,-100],
           style(color=3, rgbcolor={0,0,255}),
-          string="%name")));
+          string="%name")), 
+      Diagram);
   end TurbineBase;
   
   model Turbine "Gas Turbine" 
@@ -2674,7 +2676,8 @@ The packages Medium are redeclared and a mass balance determines the composition
       "Use powerCharacteristic (vs. efficiencyCharacteristic)" 
        annotation(Dialog(group="Characteristics"));
     replaceable function powerCharacteristic = 
-      Functions.FanCharacteristics.basePower 
+      Functions.FanCharacteristics.constantPower 
+      extends Functions.FanCharacteristics.basePower 
       "Power consumption vs. q_flow at nominal speed and density" 
       annotation(Dialog(group="Characteristics", enable = usePowerCharacteristic),
                  choicesAllMatching=true);
@@ -2692,8 +2695,6 @@ The packages Medium are redeclared and a mass balance determines the composition
        annotation(Dialog(group="Characteristics"));
     parameter Volume V=0 "Fan Internal Volume"  annotation(Evaluate=true);
     parameter Boolean CheckValve=false "Reverse flow stopped";
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
-      "Initialisation option" annotation(Dialog(tab="Initialisation"));
     parameter Pressure pin_start "Inlet Pressure Start Value" 
       annotation(Dialog(tab="Initialisation"));
     parameter Pressure pout_start "Outlet Pressure Start Value" 
@@ -2705,6 +2706,8 @@ The packages Medium are redeclared and a mass balance determines the composition
       annotation(Dialog(tab="Initialisation"));
     parameter Density rho_start=rho0 "Inlet Density start value" 
       annotation(Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+      "Initialisation option" annotation(Dialog(tab="Initialisation"));
     MassFlowRate w_single(start=q_single_start*rho_start) 
       "Mass flow rate (single fan)";
     MassFlowRate w = Np*w_single "Mass flow rate (total)";
@@ -2850,7 +2853,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     Angle phi "Shaft angle";
     AngularVelocity omega "Shaft angular velocity";
     Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort 
-      annotation (extent=[80,6; 110,34]);
+      annotation (extent=[78,6; 108,36]);
   equation 
     n = Modelica.SIunits.Conversions.to_rpm(omega) "Rotational speed";
     
