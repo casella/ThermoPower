@@ -1076,15 +1076,6 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     
     h[1] = infl.hBA;
     h[2:N] = htilde;
-  /*
-  if w >= 0 then
-    h[1] = infl.hBA;
-    h[2:N] = htilde;
-  else
-    h[N] = outfl.hAB;
-    h[1:N - 1] = htilde;
-  end if;
-*/
     
     T = wall.T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
@@ -1459,8 +1450,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     // Boundary conditions
     infl.hAB = htilde[1];
     outfl.hBA = htilde[N - 1];
-      h[1] = infl.hBA;
-      h[2:N] = htilde;
+    h[1] = infl.hBA;
+    h[2:N] = htilde;
     T = wall.T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
     
@@ -1999,7 +1990,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     T = wall.T;
     phi = wall.phi;
     
-    //Boundary Values
+    //Boundary Values of outflowing fluid enthalpies
     h[1] = infl.hAB;
     h[N] = outfl.hBA;
     

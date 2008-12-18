@@ -370,13 +370,13 @@ Casella</a>:<br>
        First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput);
+        experimentSetupOutput(equdistant=false));
       ThermoPower.Water.Tank Tank2(
         A=0.1,
         pext=1e5,
         redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph) 
         annotation (extent=[20, -4; 40, 16]);
-      ThermoPower.Water.Flow1D Pipe(
+      Water.Flow1Dfem Pipe(
         N=5,
         L=1,
         omega=0.314,
@@ -389,8 +389,8 @@ Casella</a>:<br>
         Cfnom=0.005,
         DynamicMomentum=true,
         redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom) 
-                              annotation (extent=[-20, -10; 0, 10]);
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        alpha=1)              annotation (extent=[-20, -10; 0, 10]);
       ThermoPower.Water.Tank Tank1(
         A=0.1,
         pext=1e5,
@@ -1978,7 +1978,7 @@ Algorithm Tolerance = 1e-4
     end TestST2;
   end WaterElements;
   
-  package ThermalElements 
+  package ThermoHydraulicElements 
     "Test for Thermal package elements and Flow1D models of Water and Gas packages" 
     
     model TestConvHT2N 
@@ -4085,6 +4085,7 @@ Algorithm Tolerance = 1e-9
       Merr = Mhex-Mbal;
     initial equation 
       Mbal = Mhex;
+      
     equation 
       connect(hIn.y, Source.in_h) annotation (points=[-59,0; -46,0; -46,-14],
           style(color=74, rgbcolor={0,0,127}));
@@ -4234,7 +4235,7 @@ Algorithm Tolerance = 1e-9
       package Medium=Modelica.Media.Water.WaterIF97_ph;
       import Modelica.Constants.*;
       // number of Nodes
-      parameter Integer Nnodes=10;
+      parameter Integer Nnodes=20;
       // total length
       parameter Length Lhex=10;
       // internal diameter
@@ -4330,9 +4331,9 @@ Algorithm Tolerance = 1e-9
            0.4) 
         annotation (extent=[-60,-30; -40,-10]);
       Modelica.Blocks.Sources.Ramp extPower2(
-        duration=10,
         startTime=150,
-        height=-6e5)  annotation (extent=[-80,58; -60,78]);
+        height=-12e5,
+        duration=50)  annotation (extent=[-80,60; -60,80]);
       Modelica.Blocks.Math.Add Add1 annotation (extent=[-40,40; -20,60]);
     equation 
       connect(heatSource.wall, hex.wall) 
@@ -4347,6 +4348,7 @@ Algorithm Tolerance = 1e-9
       Merr = Mhex-Mbal;
     initial equation 
       Mbal = Mhex;
+      
     equation 
       connect(hex.outfl, Sink.flange) annotation (points=[10,-20; 60,-20], style(
           color=3,
@@ -4354,7 +4356,7 @@ Algorithm Tolerance = 1e-9
           thickness=2));
       connect(extPower.y, Add1.u2) annotation (points=[-59,36; -42,44], style(
             color=74, rgbcolor={0,0,127}));
-      connect(extPower2.y, Add1.u1) annotation (points=[-59,68; -42,56], style(
+      connect(extPower2.y, Add1.u1) annotation (points=[-59,70; -42,56], style(
             color=74, rgbcolor={0,0,127}));
       connect(Add1.y, heatSource.power) annotation (points=[-19,50; 0,50; 0,14],
           style(color=74, rgbcolor={0,0,127}));
@@ -5040,7 +5042,7 @@ Algorithm Tolerance = 1e-7
           width=0.59,
           height=0.55),
         Diagram,
-        experiment(StopTime=250, Tolerance=1e-008),
+        experiment(StopTime=1000, Tolerance=1e-008),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2phDB</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow, computation of the heat transfer coefficient).<br>
 This model represent the fluid side of a once-through boiler with an applied external linear temperature profile. The operating fluid is water.<br> 
@@ -5491,75 +5493,6 @@ Casella</a>:<br>
 </html>"));
     end Flow1D_check;
     
-    model TestEvaporatorTemp 
-      extends Water.EvaporatorBase(
-        redeclare package Medium=Modelica.Media.Water.StandardWater,
-        L=30,
-        A=1e-4,
-        omega=1e-2,
-        Dhyd=1e-3,
-        wnom=0.1,
-        FFtype=0,
-        pstartin=10e5,
-        hstartin=8e5,
-        hstartout=2.9e6,
-        csilstart=0.2*L,
-        csivstart=0.8*L) 
-                  annotation (extent=[-60,-20; 60,40]);
-      annotation (experiment(
-          StopTime=600,
-          NumberOfIntervals=1000,
-          Tolerance=1e-008),
-          experimentSetupOutput);
-      Temperature Text "External temperature";
-      parameter Real K( fixed=false, start=1.2e3);
-    equation 
-      Text=700 - 2*min(max(time-1,0),70)+ 2*min(max(time-300,0),70);
-      Ql=K*(Text-fluid_in.T)*csil/L * (1-min(max(time-100,0),160)/200+min(max(time-400,0),200)/200);
-      Qb=K*(Text-sat.Tsat)*(csiv-csil)/L * (1-min(max(time-100,0),160)/200+min(max(time-400,0),200)/200);
-      Qv=K*(Text-fluid_out.T)*(L-csiv)/L * (1-min(max(time-100,0),160)/200+min(max(time-400,0),200)/200);
-      hin=8e5;
-      win=0.1;
-      wout=0.1/60e5*p;
-    initial equation 
-      der(csil)=0;
-      der(csiv)=0;
-      der(hout)=0;
-      hout=2.9e6;
-      der(p)=0;
-    end TestEvaporatorTemp;
-    
-    model TestEvaporatorFlux 
-      extends Water.EvaporatorBase(
-        redeclare package Medium=Modelica.Media.Water.StandardWater,
-        L=30,
-        A=1e-4,
-        omega=1e-2,
-        Dhyd=1e-3,
-        wnom=0.1,
-        FFtype=0,
-        pstartin=10e5,
-        hstartin=4e5,
-        hstartout=4e5,
-        csilstart=0,
-        csivstart=0) 
-                  annotation (extent=[-60,-20; 60,40]);
-      annotation (experiment(StopTime=30, Tolerance=1e-008),
-          experimentSetupOutput);
-    equation 
-      Ql=2.5e5*csil/L *min(max(time-10,0),100);
-      Qb=2.5e5*(csiv-csil)/L * min(max(time-10,0),100);
-      Qv=2.5e5*(L-csiv)/L * min(max(time-10,0),100);
-      hin=4e5;
-      win=0.1;
-      wout=0.1/10e5*p;
-    initial equation 
-      csil=L;
-      csiv=L;
-      hout=4e5;
-      der(p)=0;
-    end TestEvaporatorFlux;
-    
     model TestGasFlow1DA 
       replaceable package Medium = 
           Modelica.Media.IdealGases.SingleGases.N2 
@@ -5688,8 +5621,8 @@ Algorithm Tolerance = 1e-6
     end TestGasFlow1DA;
     
     model TestGasFlow1DB 
-      extends ThermoPower.Test.ThermalElements.TestGasFlow1DA(
-        redeclare package Medium = 
+      extends ThermoPower.Test.ThermoHydraulicElements.TestGasFlow1DA(
+          redeclare package Medium = 
             Modelica.Media.IdealGases.MixtureGases.CombustionAir);
       parameter Real deltaX[2]={.05,-.05} "height of composition step";
       
@@ -5711,21 +5644,96 @@ Same as <tt>TestGasFlow1DA</tt>, but with mixture fluid (CombustionAir) and Unif
     end TestGasFlow1DB;
     
     model TestGasFlow1DC 
-      extends ThermoPower.Test.ThermalElements.TestGasFlow1DB(
-                             hex(UniformComposition=false));
+      extends ThermoPower.Test.ThermoHydraulicElements.TestGasFlow1DB(hex(
+            UniformComposition=false));
       annotation (Documentation(info="<html>
 Same as <tt>TestGasFlow1DB</tt>, but with UniformComposition = false. The outlet composition transient is computed with greater accuracy.
 </html>"));
     end TestGasFlow1DC;
     
     model TestGasFlow1DD 
-      extends ThermoPower.Test.ThermalElements.TestGasFlow1DB(
-                             hex(QuasiStatic=true));
+      extends ThermoPower.Test.ThermoHydraulicElements.TestGasFlow1DB(hex(
+            QuasiStatic=true));
       annotation (Documentation(info="<html>
 Same as <tt>TestGasFlow1DB</tt>, but with QuasiStatic = true; the model is purely algebraic (no mass and energy storage).
 </html>"));
     end TestGasFlow1DD;
-  end ThermalElements;
+    
+    model TestEvaporatorTemp 
+      extends Water.EvaporatorBase(
+        redeclare package Medium=Modelica.Media.Water.StandardWater,
+        L=30,
+        A=1e-4,
+        omega=1e-2,
+        Dhyd=1e-3,
+        wnom=0.1,
+        FFtype=0,
+        pstartin=10e5,
+        hstartin=8e5,
+        hstartout=2.9e6,
+        csilstart=0.2*L,
+        csivstart=0.8*L) 
+                  annotation (extent=[-60,-20; 60,40]);
+      annotation (experiment(
+          StopTime=600,
+          NumberOfIntervals=1000,
+          Tolerance=1e-008),
+          experimentSetupOutput,
+        Documentation(info="<html>
+The moving boundary evaporator model is still incomplete, and it fails at t = 245.
+</html>"));
+      Temperature Text "External temperature";
+      parameter Real K( fixed=false, start=1.2e3);
+    equation 
+      Text=700 - 2*min(max(time-1,0),70)+ 2*min(max(time-300,0),70);
+      Ql=K*(Text-fluid_in.T)*csil/L * (1-min(max(time-100,0),160)/200+min(max(time-400,0),200)/200);
+      Qb=K*(Text-sat.Tsat)*(csiv-csil)/L * (1-min(max(time-100,0),160)/200+min(max(time-400,0),200)/200);
+      Qv=K*(Text-fluid_out.T)*(L-csiv)/L * (1-min(max(time-100,0),160)/200+min(max(time-400,0),200)/200);
+      hin=8e5;
+      win=0.1;
+      wout=0.1/60e5*p;
+    initial equation 
+      der(csil)=0;
+      der(csiv)=0;
+      der(hout)=0;
+      hout=2.9e6;
+      der(p)=0;
+    end TestEvaporatorTemp;
+    
+    model TestEvaporatorFlux 
+      extends Water.EvaporatorBase(
+        redeclare package Medium=Modelica.Media.Water.StandardWater,
+        L=30,
+        A=1e-4,
+        omega=1e-2,
+        Dhyd=1e-3,
+        wnom=0.1,
+        FFtype=0,
+        pstartin=10e5,
+        hstartin=4e5,
+        hstartout=4e5,
+        csilstart=0,
+        csivstart=0) 
+                  annotation (extent=[-60,-20; 60,40]);
+      annotation (experiment(StopTime=30, Tolerance=1e-008),
+          experimentSetupOutput,
+        Documentation(info="<html>
+The moving boundary evaporator model is still incomplete, and it fails at t = 12.
+</html>"));
+    equation 
+      Ql=2.5e5*csil/L *min(max(time-10,0),100);
+      Qb=2.5e5*(csiv-csil)/L * min(max(time-10,0),100);
+      Qv=2.5e5*(L-csiv)/L * min(max(time-10,0),100);
+      hin=4e5;
+      win=0.1;
+      wout=0.1/10e5*p;
+    initial equation 
+      csil=L;
+      csiv=L;
+      hout=4e5;
+      der(p)=0;
+    end TestEvaporatorFlux;
+  end ThermoHydraulicElements;
   
   package GasElements "Test for Gas package elements except Flow1D models" 
     
@@ -7557,7 +7565,7 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.BooleanStep BreakerCommand(startTime=3,
           startValue=true)   annotation (extent=[20,20; 40,40]);
     equation 
-      connect(turboGenInertia.flange_b, generator.shaft) annotation (points=[0,0; 4,0; 
+      connect(turboGenInertia.flange_b, generator.shaft) annotation (points=[0,0; 4,0;
             4,1.77636e-016; 11.4,1.77636e-016], style(
           color=0,
           rgbcolor={0,0,0},
@@ -7568,7 +7576,7 @@ Algorithm Tolerance = 1e-6
           rgbcolor={0,0,0},
           thickness=2));
       connect(Breaker1.connection2, grid.connection) annotation (points=[68.6,
-            1.77636e-016; 70.8,1.77636e-016; 70.8,1.77636e-016; 73,1.77636e-016; 
+            1.77636e-016; 70.8,1.77636e-016; 70.8,1.77636e-016; 73,1.77636e-016;
             73,1.77636e-016; 77.4,1.77636e-016],
                                         style(pattern=0, thickness=2));
     initial equation 
@@ -7580,7 +7588,7 @@ Algorithm Tolerance = 1e-6
       connect(generator.powerConnection, Breaker1.connection1) annotation (points=[28.6,
             1.77636e-016; 40,-3.1606e-022; 38,0; 51.4,1.77636e-016],      style(
             pattern=0, thickness=2));
-      connect(load.connection, generator.powerConnection) annotation (points=[40,-21.4; 
+      connect(load.connection, generator.powerConnection) annotation (points=[40,-21.4;
             40,1.77636e-016; 28.6,1.77636e-016],        style(pattern=0,
             thickness=2));
       connect(LocalLoad.y, load.powerConsumption) annotation (points=[21,-30;
@@ -7590,17 +7598,18 @@ Algorithm Tolerance = 1e-6
     end TestElectrical2;
     
     model TestNetworkGridGenerator_Pmax 
-      
-      Electrical.Generator gen(J=10000, initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+      parameter Boolean SSInit = true "Steady-state initialization";
+      Electrical.Generator gen(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState else 
+                  Choices.Init.Options.noInit) 
                        annotation (extent=[-10,-10; 10,10]);
       ThermoPower.Electrical.NetworkGrid_Pmax network(
         J=10000,
         Pmax=20e6,
         hasBreaker=true,
         deltaStart=0.488,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+        initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit) 
         annotation (extent=[40,-10; 60,10]);
-      annotation (Diagram, experiment(StopTime=40, Tolerance=1e-006), 
+      annotation (Diagram, experiment(StopTime=40, Tolerance=1e-006),
         Documentation(info="<html>
 <p>The model is designed to test the <tt>NetworkGrid</tt> model.
 <p>The model starts at steady state.
@@ -7611,10 +7620,11 @@ Algorithm Tolerance = 1e-6
     by <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+        experimentSetupOutput(equdistant=false));
       Modelica.Mechanics.Rotational.TorqueStep constantTorque(
-        offsetTorque=1e7/157.08, 
-        stepTorque=1e7/157.08*0.2, 
+        offsetTorque=1e7/157.08,
+        stepTorque=1e7/157.08*0.2,
         startTime=20) 
                    annotation (extent=[-78,-10; -58,10]);
       Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
@@ -7654,102 +7664,8 @@ Algorithm Tolerance = 1e-6
             30; 33,30], style(color=5, rgbcolor={255,0,255}));
     end TestNetworkGridGenerator_Pmax;
     
-    model TestNetworkTwoGenerators_Pmax 
-      
-      ThermoPower.Electrical.NetworkTwoGenerators_Pmax network(
-        J_a=10000,
-        J_b=10000,
-        r_b=0.3,
-        Pmax=40e6,
-        hasBreaker=true,
-        deltaStart_ab=0.0375) 
-                            annotation (extent=[-10,-10; 10,10]);
-      Electrical.Generator gen_a(J=10000) 
-                       annotation (extent=[-44,-10; -24,10]);
-      Electrical.Generator gen_b(J=10000) 
-                       annotation (extent=[24,-10; 44,10],
-                                                         rotation=180);
-      ThermoPower.Electrical.Load load_a(
-                             Wn=10e6) 
-                                    annotation (extent=[-26,-38; -6,-18]);
-      ThermoPower.Electrical.Load load_b(
-                             Wn=10e6) 
-                                    annotation (extent=[8,-38; 28,-18]);
-      annotation (Diagram, experiment(StopTime=100, Tolerance=1e-006), 
-        Documentation(info="<html>
-<p>The model is designed to test the <tt>NetworkTwoGenerators</tt> model.
-<p>At 20s, step variation of the load of a generator. Observe the electric power oscillations.
-</html>", revisions="<html>
-<ul>
-<li><i>15 Jul 2008</i>
-    by <a> Luca Savoldelli </a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      Modelica.Mechanics.Rotational.Torque torque_a 
-        annotation (extent=[-72,-10; -52,10]);
-      Modelica.Mechanics.Rotational.Torque torque_b 
-        annotation (extent=[74,-10; 54,10], rotation=0);
-      Modelica.Blocks.Sources.Step NomTorque_a(height=0, offset=1e7/157) 
-        annotation (extent=[-96,-6; -84,6]);
-      Modelica.Blocks.Sources.Step NomTorque_b(height=0, offset=1e7/157) 
-        annotation (extent=[98,-6; 86,6]);
-      Modelica.Blocks.Sources.Step step_a(
-        offset=7e6,
-        height=8e6, 
-        startTime=20) 
-                    annotation (extent=[-46,-34; -34,-22]);
-      Modelica.Blocks.Sources.BooleanStep booleanConstant(
-          startValue=false, startTime=0) 
-        annotation (extent=[-40,40; -20,60]);
-    equation 
-      connect(gen_b.powerConnection, network.powerConnection_b) 
-        annotation (points=[25.4,8.75526e-016; 18,8.75526e-016; 18,1.77636e-016; 
-            10,1.77636e-016],                 style(pattern=0, thickness=2));
-      connect(network.powerConnection_a, gen_a.powerConnection) 
-                                                               annotation (
-          points=[-10,1.77636e-016; -14,1.77636e-016; -14,0; -18,0; -18,
-            1.77636e-016; -25.4,1.77636e-016],
-                                       style(pattern=0, thickness=2));
-      connect(load_a.connection, gen_a.powerConnection) 
-                                                    annotation (points=[-16,
-            -19.4; -16,-19.4; -16,0; -20,0; -20,1.77636e-016; -25.4,
-            1.77636e-016],                   style(pattern=0, thickness=2));
-      connect(load_b.connection, gen_b.powerConnection) 
-                                                      annotation (points=[18,-19.4; 
-            18,8.75526e-016; 25.4,8.75526e-016],     style(pattern=0, thickness=
-             2));
-      connect(step_a.y, load_a.powerConsumption) 
-                                               annotation (points=[-33.4,-28;
-            -19.3,-28], style(color=74, rgbcolor={0,0,127}));
-      connect(NomTorque_b.y, torque_b.tau) annotation (points=[85.4,0; 76,0],
-          style(color=74, rgbcolor={0,0,127}));
-      connect(NomTorque_a.y, torque_a.tau) annotation (points=[-83.4,0; -74,0],
-          style(color=74, rgbcolor={0,0,127}));
-      connect(torque_b.flange_b, gen_b.shaft) annotation (points=[54,0; 48,0; 
-            48,-1.2308e-015; 42.6,-1.2308e-015],
-                                              style(
-          color=0,
-          rgbcolor={0,0,0},
-          thickness=2));
-      connect(torque_a.flange_b, gen_a.shaft) annotation (points=[-52,0; -47.3,
-            0; -47.3,1.77636e-016; -42.6,1.77636e-016],
-                                                     style(
-          color=0,
-          rgbcolor={0,0,0},
-          thickness=2));
-      connect(booleanConstant.y, network.closed) annotation (points=[-19,50; 0,
-            50; 0,9.7],
-                    style(
-          color=5,
-          rgbcolor={255,0,255},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-    end TestNetworkTwoGenerators_Pmax;
-    
     model TestNetworkGridTwoGenerators 
-      
+      parameter Boolean SSInit = true "Steady-state initialization";
       ThermoPower.Electrical.NetworkGridTwoGenerators network(
         J_a=10000,
         J_b=10000,
@@ -7761,14 +7677,16 @@ Algorithm Tolerance = 1e-6
         X_a=4,
         X_b=4,
         hasBreaker=false,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+        initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit) 
                             annotation (extent=[-10,-10; 10,10]);
-      Electrical.Generator gen_a(J=10000, initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+      Electrical.Generator gen_a(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState else 
+                  Choices.Init.Options.noInit) 
                        annotation (extent=[-40,-10; -20,10]);
-      Electrical.Generator gen_b(J=10000, initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+      Electrical.Generator gen_b(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState else 
+                  Choices.Init.Options.noInit) 
                        annotation (extent=[20,-10; 40,10],
                                                          rotation=180);
-      annotation (Diagram, experiment(StopTime=40, Tolerance=1e-006), 
+      annotation (Diagram, experiment(StopTime=40, Tolerance=1e-006),
         Documentation(info="<html>
 <p>The model is designed to test the <tt>NetworkGridtwoGenerators</tt> model.
 <p>The model starts at steady state.
@@ -7779,20 +7697,21 @@ Algorithm Tolerance = 1e-6
     by <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+        experimentSetupOutput(equdistant=false));
       Modelica.Mechanics.Rotational.Torque torque_a 
         annotation (extent=[-70,-10; -50,10]);
       Modelica.Mechanics.Rotational.Torque torque_b 
         annotation (extent=[70,-10; 50,10], rotation=0);
-      Modelica.Blocks.Sources.Step NomTorque_a(          offset=1e7/157, 
-        startTime=20, 
+      Modelica.Blocks.Sources.Step NomTorque_a(          offset=1e7/157,
+        startTime=20,
         height=1e7/157*0.2) 
         annotation (extent=[-96,-6; -84,6]);
       Modelica.Blocks.Sources.Step NomTorque_b(height=0, offset=1e7/157) 
         annotation (extent=[96,-6; 84,6]);
     equation 
       connect(gen_b.powerConnection, network.powerConnection_b) 
-        annotation (points=[21.4,8.75526e-016; 18,8.75526e-016; 18,1.77636e-016; 
+        annotation (points=[21.4,8.75526e-016; 18,8.75526e-016; 18,1.77636e-016;
             10,1.77636e-016],                 style(pattern=0, thickness=2));
       connect(network.powerConnection_a, gen_a.powerConnection) 
                                                                annotation (
@@ -7803,7 +7722,7 @@ Algorithm Tolerance = 1e-6
           style(color=74, rgbcolor={0,0,127}));
       connect(NomTorque_a.y, torque_a.tau) annotation (points=[-83.4,0; -72,0],
           style(color=74, rgbcolor={0,0,127}));
-      connect(torque_b.flange_b, gen_b.shaft) annotation (points=[50,0; 48,0; 
+      connect(torque_b.flange_b, gen_b.shaft) annotation (points=[50,0; 48,0;
             48,-1.2308e-015; 38.6,-1.2308e-015],
                                               style(
           color=0,
@@ -7826,15 +7745,16 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Interfaces.RealInput PV 
         annotation (extent=[-120,-20; -80,20]);
       Modelica.Blocks.Interfaces.RealOutput CV 
-        annotation (extent=[80,-10; 100,10]);
-      annotation (Diagram, Icon(Rectangle(extent=[-80,80; 80,-80], style(
+        annotation (extent=[100,-10; 120,10]);
+      annotation (Diagram, Icon(Rectangle(extent=[-100,100; 100,-100],
+                                                                   style(
               color=3,
               rgbcolor={0,0,255},
               fillColor=7,
               rgbfillColor={255,255,255})), Text(
             extent=[-60,60; 60,-60],
             style(color=0, rgbcolor={0,0,0}),
-            string="C")), 
+            string="C")),
         Documentation(info="<html>
 <p>Controller for static control of the frequency.
 </html>", revisions="<html>
@@ -7854,16 +7774,20 @@ Algorithm Tolerance = 1e-6
     
     model TestN2GControl 
       "Test network with two generators, frequency controlled" 
-      
+      parameter Boolean SSInit = true "Steady-state initialization";
       ThermoPower.Electrical.NetworkTwoGenerators_Pmax network(
         J_a=10000,
         J_b=10000,
         r_b=0.3,
         Pmax=20e6,
-        deltaStart_ab=0.05) annotation (extent=[-10,-70; 10,-50]);
-      Electrical.Generator gen_a(J=10000) 
+        deltaStart_ab=0.05,
+        initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit) 
+                            annotation (extent=[-10,-70; 10,-50]);
+      Electrical.Generator generator_a(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState else 
+                  Choices.Init.Options.noInit) 
                        annotation (extent=[-50,-70; -30,-50]);
-      Electrical.Generator gen_b(J=10000) 
+      Electrical.Generator generator_b(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState else 
+                  Choices.Init.Options.noInit) 
                        annotation (extent=[30,-70; 50,-50],
                                                          rotation=180);
       ThermoPower.Electrical.Load load_a(
@@ -7872,7 +7796,7 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Electrical.Load load_b(
                              Wn=10e6) 
                                     annotation (extent=[10,-90; 30,-70]);
-      annotation (Diagram, experiment(StopTime=100, Tolerance=1e-006), 
+      annotation (Diagram, experiment(StopTime=100, Tolerance=1e-006),
         Documentation(info="<html>
 <p>At 20s, step variation of the load of a generator. Observe the electric power oscillations and the controlled angular velocity.
 </html>", revisions="<html>
@@ -7881,7 +7805,9 @@ Algorithm Tolerance = 1e-6
     by <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+        experimentSetupOutput(equdistant=false),
+        Coordsys(extent=[-100,-100; 100,100], scale=0.1));
       Modelica.Mechanics.Rotational.Sensors.SpeedSensor omegaSensor_a 
         annotation (extent=[-36,-8; -20,8]);
       Modelica.Mechanics.Rotational.Sensors.SpeedSensor omegaSensor_b 
@@ -7901,22 +7827,28 @@ Algorithm Tolerance = 1e-6
         offset=8e6,
         height=5e6) annotation (extent=[-56,-86; -44,-74]);
       Modelica.Blocks.Sources.Constant SP_omega(k=157.08) 
-        annotation (extent=[-36,74; -24,86],
+        annotation (extent=[-40,70; -20,90],
                                           rotation=0);
-      Modelica.Blocks.Continuous.FirstOrder firstOrder_a(T=1, y_start=1e7/157.08) 
-        annotation (extent=[-72,22; -88,38]);
-      Modelica.Blocks.Continuous.FirstOrder firstOrder_b(y_start=1e7/157.08) 
-        annotation (extent=[72,22; 88,38]);
+      Modelica.Blocks.Continuous.FirstOrder filter_a(
+        T=1,
+        y_start=1e7/157.08,
+        initType=if SSInit then Modelica.Blocks.Types.Init.SteadyState else 
+            Modelica.Blocks.Types.Init.NoInit) 
+        annotation (extent=[-70,20; -90,40]);
+      Modelica.Blocks.Continuous.FirstOrder filter_b(y_start=1e7/157.08,
+          initType=if SSInit then Modelica.Blocks.Types.Init.SteadyState else 
+            Modelica.Blocks.Types.Init.NoInit) 
+        annotation (extent=[70,20; 90,40]);
     equation 
-      connect(gen_b.powerConnection, network.powerConnection_b) 
+      connect(generator_b.powerConnection, network.powerConnection_b) 
         annotation (points=[31.4,-60; 10,-60],style(pattern=0, thickness=2));
-      connect(network.powerConnection_a, gen_a.powerConnection) 
+      connect(network.powerConnection_a, generator_a.powerConnection) 
                                                                annotation (
           points=[-10,-60; -31.4,-60], style(pattern=0, thickness=2));
-      connect(load_a.connection, gen_a.powerConnection) 
-                                                    annotation (points=[-20,-71.4;
-            -20,-71.4; -20,-60; -31.4,-60],  style(pattern=0, thickness=2));
-      connect(load_b.connection, gen_b.powerConnection) 
+      connect(load_a.connection, generator_a.powerConnection) 
+                                                    annotation (points=[-20,
+            -71.4; -20,-60; -31.4,-60],      style(pattern=0, thickness=2));
+      connect(load_b.connection, generator_b.powerConnection) 
                                                       annotation (points=[20,-71.4;
             20,-60; 31.4,-60],                       style(pattern=0, thickness=
              2));
@@ -7928,7 +7860,7 @@ Algorithm Tolerance = 1e-6
           rgbcolor={0,0,0},
           thickness=2));
       connect(torque_b.flange_b,omegaSensor_b. flange_a) 
-                                                      annotation (points=[66,-60; 
+                                                      annotation (points=[66,-60;
             58,-60; 58,9.79685e-016; 36,9.79685e-016],
                                  style(
           color=0,
@@ -7944,25 +7876,27 @@ Algorithm Tolerance = 1e-6
       connect(step_a.y, load_a.powerConsumption) 
                                                annotation (points=[-43.4,-80;
             -23.3,-80], style(color=74, rgbcolor={0,0,127}));
-      connect(SP_omega.y, controller_b.SP) annotation (points=[-23.4,80; 0,80; 0,
+      connect(SP_omega.y, controller_b.SP) annotation (points=[-19,80; 0,80; 0,
             60; 50,60; 50,40],
                     style(color=74, rgbcolor={0,0,127}));
-      connect(controller_A.SP, SP_omega.y) annotation (points=[-50,40; -50,60; 0,
-            60; 0,80; -23.4,80],    style(color=74, rgbcolor={0,0,127}));
-      connect(controller_A.CV, firstOrder_a.u) annotation (points=[-59,30; -70.4,
+      connect(controller_A.SP, SP_omega.y) annotation (points=[-50,40; -50,60;
+            0,60; 0,80; -19,80],    style(color=74, rgbcolor={0,0,127}));
+      connect(controller_A.CV, filter_a.u)     annotation (points=[-61,30; -68,
             30],       style(color=74, rgbcolor={0,0,127}));
-      connect(firstOrder_a.y, torque_a.tau) annotation (points=[-88.8,30; -96,30;
+      connect(filter_a.y, torque_a.tau)     annotation (points=[-91,30; -96,30;
             -96,-60; -82,-60],     style(color=74, rgbcolor={0,0,127}));
-      connect(firstOrder_b.u, controller_b.CV) annotation (points=[70.4,30; 59,30],
+      connect(filter_b.u, controller_b.CV)     annotation (points=[68,30; 61,30],
                  style(color=74, rgbcolor={0,0,127}));
-      connect(torque_b.tau, firstOrder_b.y) annotation (points=[88,-60; 96,-60;
-            96,30; 88.8,30], style(color=74, rgbcolor={0,0,127}));
-      connect(gen_a.shaft, torque_a.flange_b) annotation (points=[-48.6,-60; -60,
+      connect(torque_b.tau, filter_b.y)     annotation (points=[88,-60; 96,-60;
+            96,30; 91,30],   style(color=74, rgbcolor={0,0,127}));
+      connect(generator_a.shaft, torque_a.flange_b) 
+                                              annotation (points=[-48.6,-60; -60,
             -60], style(
           color=0,
           rgbcolor={0,0,0},
           thickness=2));
-      connect(gen_b.shaft, torque_b.flange_b) annotation (points=[48.6,-60; 66,
+      connect(generator_b.shaft, torque_b.flange_b) 
+                                              annotation (points=[48.6,-60; 66,
             -60], style(
           color=0,
           rgbcolor={0,0,0},
