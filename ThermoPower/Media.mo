@@ -25,7 +25,7 @@ package Media "Medium models for the ThermoPower library"
         Modelica.Media.Water.IF97_Utilities.cp_pT(p0, T0);
     constant ThermoPower.Density rho0=
         Modelica.Media.Water.IF97_Utilities.rho_pT(p0, T0);
-    constant RelativePressureCoefficient beta_r=Modelica.Media.Water.IF97_Utilities.beta_pT(p0,T0);
+    constant RelativePressureCoefficient beta0=Modelica.Media.Water.IF97_Utilities.beta_pT(p0,T0);
     constant Modelica.SIunits.SpecificEnthalpy h0=
         Modelica.Media.Water.IF97_Utilities.h_pT(p0, T0);
     constant Modelica.SIunits.DynamicViscosity eta0=
@@ -41,7 +41,7 @@ package Media "Medium models for the ThermoPower library"
     equation 
       // h = cp0*(T-T0)+h0;
       T = T0 + (h-h0)/cp0;
-      d = rho0*(1-beta_r*(T-T0));
+      d = rho0*(1-beta0*(T-T0));
       u = h;
       R=1;
       MM=0.018;
@@ -63,7 +63,7 @@ package Media "Medium models for the ThermoPower library"
     redeclare function extends density_derh_p 
       "density derivative by specific enthalpy at const pressure" 
     algorithm 
-      ddhp:=-rho0*beta_r/cp0;
+      ddhp:=-rho0*beta0/cp0;
     end density_derh_p;
     
     redeclare function extends density_derp_h 
