@@ -5,7 +5,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       Documentation(revisions="<html>
 </html>"));
   
-  package GasTurbine "Models and tests of gas turbine and its main components" 
+  package GasTurbine 
+    "Models and tests of the gas turbine and its main components" 
     package Interfaces 
       
       partial model GasTurbine "Base class for Gas Turbine" 
@@ -267,7 +268,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
 </html>"));
   end GasTurbine;
   
-  package HRSG "Models and tests of HRSG and its main components" 
+  package HRSG "Models and tests of the HRSG and its main components" 
     package Interfaces 
       partial model HeatExchanger "Base class for heat exchanger fluid - gas" 
         
@@ -17600,7 +17601,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
   end HRSG;
   
   package SteamTurbineGroup 
-    "Models and tests of steam turbine group and its main components" 
+    "Models and tests of the steam turbine group and its main components" 
     package Interfaces 
       partial model ST_2L 
         "Base class for Steam Turbine with two pressure levels" 
@@ -24569,7 +24570,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
   end SteamTurbineGroup;
   
   package ElectricGeneratorGroup 
-    "Models and tests of electrical group (generator and network) and its main components" 
+    "Models and tests of the electrical group (generator and network) and its main components" 
     package Interfaces 
       partial model SingleShaft 
         "Base Class for alternator group, configuration single-shaft (one generator)" 
@@ -27151,7 +27152,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 </html>"));
   end ElectricGeneratorGroup;
   
-  package Control "Models of common control elements" 
+  package Control "Models of the common control elements" 
     model PID "ISA PID controller with anti-windup" 
       parameter Real Kp "Proportional gain (normalised units)";
       parameter Time Ti "Integral time";
