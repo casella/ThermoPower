@@ -24,7 +24,7 @@ package ThermoPower "Open library for thermal power plant simulation"
   type GasDensity = Density (start=5) "start value for gases/vapours";
 
 
-  type AbsoluteTemperature = Temperature (start=300) "generic temperature";
+  type AbsoluteTemperature = Temperature (start=300, nominal = 500) "generic temperature";
 
 
   type AbsolutePressure = Pressure (start=1e5) "generic pressure";
