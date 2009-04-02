@@ -3715,7 +3715,7 @@ The latter options can be useful when two or more components are connected direc
     FlangeB outlet(w(start=-wnom),p(start=pout_start),redeclare package Medium 
         =                                                                        Medium) 
                    annotation (extent=[80, -20; 120, 20]);
-    Modelica.Blocks.Interfaces.RealInput theta 
+    Modelica.Blocks.Interfaces.RealInput theta "Valve opening in per unit" 
       annotation (extent=[-20, 60; 20, 100], rotation=-90);
     annotation (
       Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
