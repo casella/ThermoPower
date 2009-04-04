@@ -24,7 +24,8 @@ package ThermoPower "Open library for thermal power plant simulation"
   type GasDensity = Density (start=5) "start value for gases/vapours";
 
 
-  type AbsoluteTemperature = Temperature (start=300, nominal = 500) "generic temperature";
+  type AbsoluteTemperature = Temperature (start=300, nominal = 500) 
+  "generic temperature";
 
 
   type AbsolutePressure = Pressure (start=1e5) "generic pressure";
@@ -1337,9 +1338,9 @@ Modelica in file \"Modelica/package.mo\".
               fillPattern=1),
             string="G")), Diagram,
         Documentation(info="<html>
-<p>This model symply describes the conversion between mechanical energy and electrical energy. 
+<p>This model describes the conversion between mechanical power and electrical power in an ideal synchronous generator. 
 The frequency in the electrical connector is the e.m.f. of generator.
-<p>It is possible to consider the generator inertial effects, setting the parameter <tt>J > 0</tt>. 
+<p>It is possible to consider the generator inertia in the model, by setting the parameter <tt>J > 0</tt>. 
 </html>"));
     equation 
       omega_m = der(shaft.phi) "Mechanical boundary condition";
@@ -1408,7 +1409,10 @@ The frequency in the electrical connector is the e.m.f. of generator.
               rgbcolor={255,85,255},
               fillColor=83,
               rgbfillColor={255,85,255},
-              fillPattern=1))));
+              fillPattern=1))),
+      Documentation(info="<html>
+Ideal breaker model. Can only be used to connect a generator to a grid with finite droop. Otherwise, please consider the other models in this package.
+</html>"));
       Modelica.Blocks.Interfaces.BooleanInput closed 
         annotation (extent=[-20,60; 20,100], rotation=-90);
     equation 
@@ -1559,14 +1563,14 @@ The frequency in the electrical connector is the e.m.f. of generator.
       f = port.f;
     end FrequencySensor;
   
-    partial model Network1portBase "Base class for network one port" 
-      parameter Boolean hasBreaker = false;
+    partial model Network1portBase "Base class for one-port network" 
+      parameter Boolean hasBreaker = false 
+      "Model includes a breaker controlled by external input";
       parameter Modelica.SIunits.Angle deltaStart=0 
-      "Start value of the loaded angle"                                             annotation(Dialog(tab="Initialization"));
+      "Start value of the load angle"                                               annotation(Dialog(tab="Initialization"));
       parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
       "Initialization option"   annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Power C 
-      "Coefficient of Pe (max. power transfer)";
+      parameter Modelica.SIunits.Power C "Max. power transfer";
       Modelica.SIunits.Power Pe "Net electrical power";
       Modelica.SIunits.Power Ploss "Electrical power loss";
       Modelica.SIunits.AngularVelocity omega "Angular velocity";
@@ -1582,15 +1586,15 @@ The frequency in the electrical connector is the e.m.f. of generator.
               fillColor=7,
               rgbfillColor={255,255,255}))),
         Documentation(info="<html>
-<p>Basic interface of the Network models with one electrical port and connection with the grid, containing the common parameters, variables and connectors.</p>
+<p>Basic interface of the Network models with one electrical port for the connection to the generator, containing the common parameters, variables and connectors.</p>
 <p><b>Modelling options</b>
 <p>The net electrical power is defined by the following relationship:
 <ul><tt>Pe = C*sin(delta)</tt></ul> 
-<p><tt>delta</tt> is the load angle is express through his derivative, which is defined by the following relationship:
+<p><tt>delta</tt> is the load angle, defined by the following relationship:
 <ul><tt>der(delta) = omega - omegaRef</tt></ul>
-<p>where <tt>omega</tt> is related to the frequency on the power connector, and <tt>omegaRef</tt> is the reference angular velocity.
+<p>where <tt>omega</tt> is related to the frequency on the power connector (generator frequency), and <tt>omegaRef</tt> is the reference angular velocity of the network embedded in the model.
 <p>The electrical power losses are described by the variable <tt>Ploss</tt>.
-<p>If <tt>hasBreaker</tt> is true, the model provide a circuit breaker, controlled by the boolean input signal, to describe the connection/disconnection of the electrical port from the grid; otherwise it is assumed that the electrical port is always connected to the grid. 
+<p>If <tt>hasBreaker</tt> is true, the model provides a circuit breaker, controlled by the boolean input signal, to describe the connection/disconnection of the electrical port from the grid; otherwise it is assumed that the electrical port is always connected to the grid. 
 </html>", revisions="<html>
 <ul>
 <li><i>15 Jul 2008</i>
@@ -1647,7 +1651,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       parameter Modelica.SIunits.MomentOfInertia J=0 
       "Moment of inertia of the generator/shaft system (for damping term calculation only)"
            annotation(Dialog(group="Generator"));
-      parameter Real r=0.2 "Electrical damping of generator/shaft system" 
+      parameter Real r=0.2 "Damping coefficient of the swing equation" 
                              annotation(dialog(enable=if J>0 then true else false, group="Generator"));
       parameter Integer Np=2 "Number of electrical poles" 
                                annotation(dialog(enable=if J>0 then true else false, group="Generator"));
@@ -1681,8 +1685,8 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
               rgbfillColor={255,255,255},
               fillPattern=1))), Documentation(info="<html>
 <p>This model extends <tt>Network1portBase</tt> partial model, by defining the power coefficient <tt>C</tt> in terms of <tt>e</tt>, <tt>v</tt>, <tt>X</tt>, and <tt>Xline</tt>.
-<p>The power losses are dissipative type. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
-If <tt>J</tt> is zero, zero damping is assumed.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J</tt> is zero, zero damping is assumed by default. Note that <tt>J</tt> is only used to compute the dissipative term and should refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
 </html>", revisions="<html>
 <ul>
 <li><i>15 Jul 2008</i>
@@ -1695,7 +1699,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
   
     model NetworkGrid_Pmax 
       extends ThermoPower.Electrical.Network1portBase( final C = Pmax);
-      parameter Modelica.SIunits.Power Pmax "Output maximum power";
+      parameter Modelica.SIunits.Power Pmax "Maximum power transfer";
       parameter Modelica.SIunits.Frequency fnom=50 
       "Nominal frequency of network";
       parameter Modelica.SIunits.MomentOfInertia J=0 
@@ -1735,8 +1739,8 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
               rgbcolor={0,0,0},
               thickness=2))), Documentation(info="<html>
 <p>This model extends <tt>Network1portBase</tt> partial model, by directly defining the maximum power that can be transferred between the electrical port and the grid <tt>Pmax</tt>.
-<p>The power losses are dissipative type. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
-If <tt>J</tt> is zero, zero damping is assumed.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J</tt> is zero, zero damping is assumed. Note that <tt>J</tt> is only used to compute the dissipative term and should refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
 </html>", revisions="<html>
 <ul>
 <li><i>15 Jul 2008</i>
@@ -1829,7 +1833,8 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
     "Connection: generator(a) - generator(b); Parameters: voltages and reactances" 
       extends ThermoPower.Electrical.Network2portBase( deltaStart=deltaStart_ab,
                                                       final C_ab = e_a*e_b/(X_a+X_b+Xline));
-      parameter Boolean hasBreaker = false;
+      parameter Boolean hasBreaker = false 
+      "Model includes a breaker controlled by external input";
       parameter Modelica.SIunits.Voltage e_a "e.m.f voltage (generator A)" 
                                                        annotation(Dialog(group="Generator side A"));
       parameter Modelica.SIunits.Voltage e_b "e.m.f voltage (generator B)" 
@@ -1896,8 +1901,8 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       annotation (Documentation(info="<html>
 <p>Simplified model of connection between two generators based on the swing equation. It completes <tt>Netowrk2portBase</tt> partial model, by defining the power coefficient <tt>C</tt> in terms of the parameters <tt>e_a</tt>, <tt>e_b</tt>, <tt>X_a</tt>, <tt>X_b</tt> and <tt>Xline</tt>.
 <p>The net electrical powers of two port coincides with the power <tt>P_ab</tt>.
-<p>The power losses are dissipative type. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
-If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed. Note that <tt>J_a</tt> and <tt>J_b</tt> are only used to compute the dissipative term and should each refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
 </html>", revisions="<html>
 <ul>
 <li><i>15 Jul 2008</i>
@@ -1940,7 +1945,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       extends ThermoPower.Electrical.Network2portBase( deltaStart=deltaStart_ab,
                                                       final C_ab = Pmax);
       parameter Boolean hasBreaker = false;
-      parameter Modelica.SIunits.Power Pmax "Output maximum power";
+      parameter Modelica.SIunits.Power Pmax "Maximum power transfer";
       parameter Modelica.SIunits.MomentOfInertia J_a=0 
       "Moment of inertia of the generator/shaft system A (for damping term calculation only)"
                                                                                                           annotation(Dialog(group="Generator side A"));
@@ -1999,8 +2004,8 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
 <p>Simplified model of connection between two generators based on swing equation. It completes <tt>Netowrk2portBase</tt> partial model, defining the coefficient of the exchanged clean electrical power and the damping power losses.
 <p>The power coefficient is given by directly defining the maximum power that can be transferred between the electrical port and the grid <tt>Pmax</tt>.
 <p>The net electrical powers of two port coincide with the power <tt>P_ab</tt>.
-<p>The power losses are dissipative type. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
-If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed. Note that <tt>J_a</tt> and <tt>J_b</tt> are only used to compute the dissipative term and should each refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
 </html>", revisions="<html>
 <ul>
 <li><i>15 Jul 2008</i>
@@ -2040,7 +2045,8 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
   
     model NetworkGridTwoGenerators "Base class for network with two port" 
       extends ThermoPower.Electrical.Network2portBase( final C_ab = e_a*e_b/(X_a+X_b));
-      parameter Boolean hasBreaker = false;
+      parameter Boolean hasBreaker = false 
+      "Model includes a breaker controlled by external input";
       parameter Modelica.SIunits.Voltage v "Network connection frame";
       parameter Modelica.SIunits.Voltage e_a "e.m.f voltage (generator A)" 
                                                        annotation(Dialog(group="Generator side A"));
@@ -2221,8 +2227,8 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
 <p>Simplified model of connection between two generators and the grid.
 <p>This model adds to <tt>Netowrk2portBase</tt> partial model, in more in comparison to the concepts expressed by the <tt>NetowrkTwoGenerators_eX</tt> model, two further electrical flows: from port_a to grid and from port_b to grid, so that to describe the interactions between two ports and the grid.
 <p>The clean electrical powers of two ports are defined by opportune combinations of the power flows introduced.
-<p>The power losses are dissipative type. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
-If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed. Note that <tt>J_a</tt> and <tt>J_b</tt> are only used to compute the dissipative term and should each refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
 </html>", revisions="<html>
 <ul>
 <li><i>15 Jul 2008</i>
@@ -2232,5 +2238,9 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
 </ul>
 </html>"));
     end NetworkGridTwoGenerators;
+  annotation (Documentation(info="<html>
+<p>This package allows to describe the flow of active power between a synchronous generator and a grid, through simplified power transmission line models, assuming ideal voltage control. </p>
+<p>These models are meant to be used as simplified boundary conditions for a thermal power plant model, rather than for fully modular description of three-phase networks. Specialized libraries should be used for this purpose; bear in mind, however, that full three-phase models of electrical machinery and power lines could make the power plant simulation substantially heavier, if special numeric integration strategies are not adopted.
+</html>"));
   end Electrical;
 end ThermoPower;

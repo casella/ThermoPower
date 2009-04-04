@@ -7,7 +7,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
   
   package GasTurbine 
     "Models and tests of the gas turbine and its main components" 
-    package Interfaces 
+    package Interfaces "Interface definitions" 
       
       partial model GasTurbine "Base class for Gas Turbine" 
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
@@ -160,7 +160,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       end GasTurbineSimplified;
     end Interfaces;
     
-    package Examples 
+    package Examples "Example implementations" 
       
       model GasTurbineSimplified 
         extends 
@@ -225,7 +225,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       end GasTurbineSimplified;
     end Examples;
     
-    package Tests 
+    package Tests "Test cases" 
       model TestGasTurbine 
         
         Examples.GasTurbineSimplified gasTurbine 
@@ -269,7 +269,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
   end GasTurbine;
   
   package HRSG "Models and tests of the HRSG and its main components" 
-    package Interfaces 
+    package Interfaces "Interface definitions" 
       partial model HeatExchanger "Base class for heat exchanger fluid - gas" 
         
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
@@ -5345,7 +5345,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       
     end Interfaces;
     
-    package Components 
+    package Components "HRSG component models" 
       
       model HE "Heat Exchanger fluid - gas" 
         extends Interfaces.HeatExchanger(pstartout_F=fluidNomPressure-dpnom);
@@ -7470,7 +7470,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillPattern=1));
         connect(levelHP_SP.y, Level_HP.SP) annotation (points=[-19,54; 20,54],
             style(color=74, rgbcolor={0,0,127}));
-        connect(levelIP_SP.y, Level_IP.SP) annotation (points=[-19,4; 0.5,4;
+        connect(levelIP_SP.y, Level_IP.SP) annotation (points=[-19,4; 0.5,4; 
               0.5,4; 20,4],                                   style(color=74,
               rgbcolor={0,0,127}));
         connect(levelLP_SP.y, Level_LP.SP) annotation (points=[-19,-40; 20,-40],
@@ -7481,7 +7481,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       
     end Control;
     
-    package Examples 
+    package Examples "Example implementations" 
       
       model HEG_2L "Heat Exchangers Group with two pressure level" 
         extends Interfaces.HEG_2L;
@@ -14054,7 +14054,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       
     end Examples;
     
-    package Tests 
+    package Tests "Test cases" 
       model computation_states 
         package FluidMedium = ThermoPower.Water.StandardWater;
         parameter SI.SpecificEnthalpy h=2.39102e6 "value of specific enthalpy";
@@ -17326,7 +17326,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       
     end Tests;
     
-    package TestsControl 
+    package TestsControl "Closed-loop test cases" 
       model TestPumpControl 
         import ThermoPower;
         package FluidMedium = ThermoPower.Water.StandardWater;
@@ -17380,13 +17380,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={240,240,240},
             fillPattern=1));
-        connect(feed_w.inlet, pump.outlet)          annotation (points=[20,-10;
+        connect(feed_w.inlet, pump.outlet)          annotation (points=[20,-10; 
               10,-10; 10,-10; 0,-10],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={240,240,240},
             fillPattern=1));
-        connect(sourceShLP.flange, pump.inlet)          annotation (points=[-60,-10;
+        connect(sourceShLP.flange, pump.inlet)          annotation (points=[-60,-10; 
               -50,-10; -50,-10; -40,-10; -40,-10; -20,-10],          style(
             thickness=2,
             fillColor=30,
@@ -17398,7 +17398,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={240,240,240},
             fillPattern=1));
-        connect(pIDController.PV, feed_w.w) annotation (points=[32,32; 40,32;
+        connect(pIDController.PV, feed_w.w) annotation (points=[32,32; 40,32; 
               40,-8.88178e-016; 34,-8.88178e-016],       style(
             color=74,
             rgbcolor={0,0,127},
@@ -17407,7 +17407,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillPattern=1));
         connect(pIDController.CS, firstOrder.u) annotation (points=[11.4,36; -2,
               36],    style(color=74, rgbcolor={0,0,127}));
-        connect(firstOrder.y, pump.pumpSpeed_rpm)          annotation (points=[-25,36;
+        connect(firstOrder.y, pump.pumpSpeed_rpm)          annotation (points=[-25,36; 
               -40,36; -40,-4; -20.8,-4],         style(color=74, rgbcolor={0,
                 0,127}));
       end TestPumpControl;
@@ -17555,32 +17555,32 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(OutLP.flange, turbineLP.outlet) annotation (points=[64,-74;
-              51.7,-74],                 style(thickness=2));
+        connect(OutLP.flange, turbineLP.outlet) annotation (points=[64,-74; 52,
+              -74],                      style(thickness=2));
         connect(turbineHP.shaft_b, turbineIP.shaft_a) annotation (points=[-33.6,
               -82; -6.6,-82],       style(color=0, rgbcolor={0,0,0}));
         connect(turbineIP.shaft_b, turbineLP.shaft_a) annotation (points=[6.4,-82;
               37.4,-82],           style(color=0, rgbcolor={0,0,0}));
         connect(mixLP.in2, turbineIP.outlet) 
-          annotation (points=[19.05,-74; 7.7,-74],  style(thickness=2));
+          annotation (points=[19.05,-74; 8,-74],    style(thickness=2));
         connect(constantSpeed.flange, turbineLP.shaft_b) annotation (points=[88,-83;
               88,-82; 50.4,-82],         style(color=0, rgbcolor={0,0,0}));
-        connect(turbineLP.inlet, mixLP.out) annotation (points=[36.5,-74.1;
-              36.5,-71; 28,-71], style(thickness=2));
+        connect(turbineLP.inlet, mixLP.out) annotation (points=[36,-74; 36,-71; 
+              28,-71],           style(thickness=2));
         connect(sourceShLP.flange, stateFromCondenser.inlet) 
           annotation (points=[40,-40; 24,-40; 24,-28.8], style(thickness=2));
         connect(mixLP.in1, stateShLP_out.outlet) 
           annotation (points=[19,-68; 8,-68; 8,-28.8], style(thickness=2));
-        connect(turbineHP.inlet, stateShHP_out.outlet) annotation (points=[-47.5,
-              -74.1; -47.5,-52.05; -40,-52.05; -40,-28.8],       style(
+        connect(turbineHP.inlet, stateShHP_out.outlet) annotation (points=[-48,-74; 
+              -48,-52.05; -40,-52.05; -40,-28.8],                style(
               thickness=2));
-        connect(turbineHP.outlet, mixIP.in1) annotation (points=[-32.3,-74;
-              -31.6,-74; -31.6,-48.8], style(thickness=2));
+        connect(turbineHP.outlet, mixIP.in1) annotation (points=[-32,-74; -31.6,
+              -74; -31.6,-48.8],       style(thickness=2));
         connect(mixIP.out, stateRhIP_in.inlet) 
           annotation (points=[-28,-38; -28,-28.8], style(thickness=2));
-        connect(turbineIP.inlet, stateRhIP_out.outlet) annotation (points=[-7.5,
-              -74.1; -16,-74.1; -16,-28.8],      style(thickness=2));
-        connect(stateShIP_out.outlet, mixIP.in2) annotation (points=[-4,-28.8;
+        connect(turbineIP.inlet, stateRhIP_out.outlet) annotation (points=[-8,-74; 
+              -16,-74; -16,-28.8],               style(thickness=2));
+        connect(stateShIP_out.outlet, mixIP.in2) annotation (points=[-4,-28.8; 
               -4,-60; -24.4,-60; -24.4,-48.74], style(thickness=2));
         connect(levelsControlSimplified.SensorsBus, hRSG.SensorsBus) 
           annotation (points=[60,70; 46,70; 46,66; 32,66],         style(
@@ -17602,7 +17602,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
   
   package SteamTurbineGroup 
     "Models and tests of the steam turbine group and its main components" 
-    package Interfaces 
+    package Interfaces "Interface definitions" 
       partial model ST_2L 
         "Base class for Steam Turbine with two pressure levels" 
         
@@ -20217,7 +20217,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       end STGroup2LRhHU;
     end Interfaces;
     
-    package Components 
+    package Components "Component definitions" 
       
       model Condenser "Condenser" 
         extends Interfaces.Condenser(pstartout_cool=coolNomPressure-dpnom_cool);
@@ -20876,7 +20876,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end StateReader_water;
     end Components;
     
-    package Examples 
+    package Examples "Example implementations" 
       
       model ST2LRh_base "Steam turbine with two pressure levels and reheat" 
         extends Interfaces.ST_2LRh;
@@ -23590,7 +23590,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end STG_3LRh_bypass_cc;
     end Examples;
     
-    package Tests 
+    package Tests "Test cases" 
       model computation_states 
         package FluidMedium = ThermoPower.Water.StandardWater;
         parameter SI.SpecificEnthalpy h=2.39102e6 "value of specific enthalpy";
@@ -24545,7 +24545,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       
     end Tests;
     
-    package Functions 
+    package Functions "Function definitions" 
       
       function curveEfficiency "curve for efficiency calculation" 
         input Real eta_nom "Nominal efficiency (maximum)";
@@ -24571,7 +24571,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
   
   package ElectricGeneratorGroup 
     "Models and tests of the electrical group (generator and network) and its main components" 
-    package Interfaces 
+    package Interfaces "Interface definitions" 
       partial model SingleShaft 
         "Base Class for alternator group, configuration single-shaft (one generator)" 
         parameter SI.Frequency fn=50 "Nominal frequency of the grid";
@@ -25254,7 +25254,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TripleShaft;
     end Interfaces;
     
-    package Components 
+    package Components "Xomponent definitions" 
       model PowerSensor "Measures power flow through the component" 
         Electrical.PowerConnection port_a 
                                annotation (extent=[-110,-10; -90,10]);
@@ -25777,7 +25777,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end OldElementsSwingEquation;
     end Components;
     
-    package Examples 
+    package Examples "Example implementations" 
       model SingleShaft_static 
         "Alternator group in configuration single-shaft (one generator)" 
         extends 
@@ -25838,7 +25838,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(powerSensor.port_b, breaker.connection1) annotation (points=[28,-0.16;
+        connect(powerSensor.port_b, breaker.connection1) annotation (points=[28,-0.16; 
               34,-0.16; 34,-3.55271e-016; 50.8,-3.55271e-016],      style(
             pattern=0,
             thickness=2,
@@ -25846,7 +25846,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(breaker.connection2, grid.connection) annotation (points=[85.2,
-              -3.55271e-016; 86,-3.1606e-022; 86,0; 94,0; 94,3.55271e-016;
+              -3.55271e-016; 86,-3.1606e-022; 86,0; 94,0; 94,3.55271e-016; 
               102.8,3.55271e-016],
                              style(
             pattern=0,
@@ -26667,7 +26667,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end GeneratorGroup;
     end Examples;
     
-    package Tests 
+    package Tests "Test cases" 
       
       model Test_Generator_SE 
         annotation (Diagram, experiment(StopTime=32, NumberOfIntervals=50000));
@@ -27282,7 +27282,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 </html>"));
   end Control;
   
-  package Buses 
+  package Buses "Expandable signal buses definitions" 
     
     expandable connector Sensors 
      // Empty connector, defined by expansion 
