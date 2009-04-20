@@ -4579,7 +4579,7 @@ Input variables changed. This function now computes the heat transfer coefficien
     if cardinality(partialArc)==0 then
       partialArc =1 "Default value if not connected";
     end if;
-    wnom=Kv*partialArc*pnom "Definition of Kv coefficient";
+    Kv = wnom/pnom "Definition of Kv coefficient";
     w=Kv*inlet.p "Flow characteristics";
     hiso=Medium.isentropicEnthalpy(outlet.p, fluid_in.state) 
       "Isentropic enthalpy";
