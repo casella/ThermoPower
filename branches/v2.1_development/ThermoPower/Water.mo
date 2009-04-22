@@ -3353,8 +3353,8 @@ The latter options can be useful when two or more components are connected direc
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(M) = 0;
-      der(E) = 0;
+      der(p) = 0;
+      der(Vld) = 0;
     else
       assert(false, "Unsupported initialisation option");
     end if;

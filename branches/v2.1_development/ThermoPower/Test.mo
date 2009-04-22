@@ -2302,115 +2302,6 @@ Algorithm Tolerance = 1e-6
           style(color=74, rgbcolor={0,0,127}));
     end TestFlow1Db;
     
-    model TestFlow1Dc "Test case for Flow1D" 
-      package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
-      // number of Nodes
-      parameter Integer Nnodes=20;
-      // total length
-      parameter Modelica.SIunits.Length Lhex=200;
-      // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
-      // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
-      // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
-      // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
-      // friction coefficient
-      parameter Real Cfhex=0.005;
-      // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.31;
-      // initial pressure
-      parameter Modelica.SIunits.Pressure phex=1e5;
-      // initial specific enthalpy 
-      parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
-      ThermoPower.Water.Flow1D hex(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex,
-        Dhyd=Dihex,
-        A=Ahex,
-        wnom=whex,
-        Cfnom=Cfhex,
-        HydraulicCapacitance=2,
-        hstartin=hs,
-        hstartout=hs,
-        DynamicMomentum=false,
-        pstartin=2*phex,
-        pstartout=2*phex,
-      redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
-                       annotation (extent=[-20,-10; 0,10]);
-      annotation (
-        Diagram,
-        experiment(StopTime=1000, Tolerance=1e-006),
-        Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes). <br>
-This model is designed to simulate the flow reversal througth the heat exchanger. The operating fluid is liquid water; the heat flux entering the heat exchanger is set to zero. <br>
-During the simulation, flow reversal is achieved:
-<ul>
-        <li>t=500 s, Negative ramp variation (duration = 20 s) of the mass flow rate trough the heat exchanger. The final mass flow rate has the same magnitude and opposite direction with respect to the initial one.</li>
-</ul>
-</p>
-<p>
-Simulation Interval = [0...1000] sec <br> 
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
-</p>
-</HTML>",   revisions="<html>
-<ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
-    First release.</li>
-</ul>
-</html>"));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=2*whex/phex) 
-        annotation (extent=[40,-10; 60,10]);
-      ThermoPower.Water.SinkP SinkP1(h=hs, p0=4*phex) 
-        annotation (extent=[70,-10; 90,10]);
-      ThermoPower.Water.SourceW SourceW1(
-        w0=whex,
-        G=0,
-        p0=2*phex,
-        h=2*hs) annotation (extent=[-80,-10; -60,10]);
-      Modelica.Blocks.Sources.Ramp Ramp1(
-        duration=20,
-        height=-2*whex,
-        offset=whex,
-        startTime=500)   annotation (extent=[-100,28; -80,48]);
-      Modelica.Blocks.Sources.Constant Constant1 
-        annotation (extent=[10,50; 30,70]);
-      ThermoPower.Thermal.HeatSource1D HeatSource1D1(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (extent=[-20,20; 0,40]);
-      Modelica.Blocks.Sources.Constant Constant2(k=0) 
-        annotation (extent=[-50,50; -30,70]);
-      ThermoPower.Water.SensT T_in(redeclare package Medium = 
-            Medium)                annotation (extent=[-50,-6; -30,14]);
-      ThermoPower.Water.SensT T_out(redeclare package Medium = 
-            Medium)                 annotation (extent=[10,-6; 30,14]);
-    equation 
-      connect(ValveLin1.outlet, SinkP1.flange) 
-        annotation (points=[60,0; 70,0], style(thickness=2));
-      connect(HeatSource1D1.wall, hex.wall) 
-        annotation (points=[-10,27; -10,5],    style(color=45));
-      connect(SourceW1.flange, T_in.inlet) 
-        annotation (points=[-60,0; -46,0], style(thickness=2));
-      connect(T_in.outlet, hex.infl) annotation (points=[-34,0; -20,0], style(
-            thickness=2));
-      connect(T_out.outlet, ValveLin1.inlet) 
-        annotation (points=[26,0; 40,0], style(thickness=2));
-      connect(hex.outfl, T_out.inlet) annotation (points=[0,0; 14,0], style(
-            thickness=2));
-      connect(Ramp1.y, SourceW1.in_w0) annotation (points=[-79,38; -74,38; -74,6],
-          style(color=74, rgbcolor={0,0,127}));
-      connect(Constant2.y, HeatSource1D1.power) annotation (points=[-29,60; -10,
-            60; -10,34], style(color=74, rgbcolor={0,0,127}));
-      connect(Constant1.y, ValveLin1.cmd) annotation (points=[31,60; 50,60; 50,8],
-          style(color=74, rgbcolor={0,0,127}));
-    end TestFlow1Dc;
-    
     model TestFlow1Dd "Test case for Flow1D" 
       package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
@@ -3954,6 +3845,7 @@ Casella</a>:<br>
       connect(Constant1.y, ValveLin2.cmd) annotation (points=[-49,80; -40,80; -40,
             58], style(color=74, rgbcolor={0,0,127}));
     end TestFlow1DfemF;
+    
     
     model TestFlow1D2phA "Test case for Flow1D2ph" 
       package Medium=Modelica.Media.Water.WaterIF97_ph;
@@ -6875,7 +6767,6 @@ This is the full model of a turbojet-type engine at 11.000m [1].
         T=300)   annotation (extent=[-20,34; 0,54]);
       Modelica.Mechanics.Rotational.Inertia Inertia1(J=50) 
         annotation (extent=[6,-24; 26,-4]);
-      
       Gas.PressDrop PressDrop1(
         redeclare package Medium = Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
@@ -6894,7 +6785,6 @@ This is the full model of a turbojet-type engine at 11.000m [1].
         pstart=8.29e5,
         dpnom=0.18e5,
         rhonom=4.7) annotation (extent=[-20,0; 0,20]);
-      
       Gas.PressDrop PressDrop3(
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
@@ -6905,7 +6795,6 @@ This is the full model of a turbojet-type engine at 11.000m [1].
         dpnom=170,
         rhonom=0.48) 
                     annotation (extent=[-72,-16; -52,4]);
-      
       Modelica.Blocks.Sources.Step Step1(
         height=-0.2,
         offset=2.02,
@@ -6916,13 +6805,13 @@ This is the full model of a turbojet-type engine at 11.000m [1].
           color=76,
           rgbcolor={159,159,223},
           thickness=2));
-      connect(Compressor1.shaft_b, Inertia1.flange_a)    annotation (points=[-29.6,
-            -14.1; -30,-14.1; -30,-14; 6,-14], style(
+      connect(Compressor1.shaft_b, Inertia1.flange_a)    annotation (points=[-30,-14;
+            6,-14],                            style(
           color=0,
           rgbcolor={0,0,0},
           thickness=2));
       connect(Inertia1.flange_b, Turbine1.shaft_a)    annotation (points=[26,-14;
-            60.7,-14], style(
+            62,-14],   style(
           color=0,
           rgbcolor={0,0,0},
           thickness=2));
@@ -7358,8 +7247,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         pin_start=1e5,
         bladePos0=0.8,
         pout_start=1e5 + 5000,
-        q_single_start=0,
-        redeclare function flowCharacteristic = flowChar) 
+        redeclare function flowCharacteristic = flowChar,
+        q_single_start=144) 
                           annotation (extent=[-70,-24; -30,16]);
       Gas.SinkP SinkP1(redeclare package Medium = Modelica.Media.Air.SimpleAir)
         annotation (extent=[0,20; 20,40]);
