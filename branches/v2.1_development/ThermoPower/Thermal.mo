@@ -1148,6 +1148,7 @@ The latter options can be useful when two or more components are connected direc
 </html>
 "),   Diagram);
   equation 
+    assert(rext > rint, "External radius must be greater than internal radius");
     Am = (rext^2 - rint^2)*pi "Area of the metal cross section";
     rhomcm*Am*der(T) = rint*2*pi*int.phi + rext*2*pi*ext.phi "Energy balance";
     if WallRes then
