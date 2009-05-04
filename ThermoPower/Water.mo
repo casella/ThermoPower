@@ -4548,11 +4548,13 @@ Input variables changed. This function now computes the heat transfer coefficien
     parameter Time T_HP "Time constant of HP mechanical power response";
     parameter Time T_LP "Time constant of LP mechanical power response";
     parameter Pressure pstartin = pnom "Inlet start pressure" 
-      annotation(Dialog(tab = "Initialisation"));
+      annotation(Dialog(tab = "Initialization"));
     parameter SpecificEnthalpy hstartin "Inlet enthalpy start value" 
-      annotation(Dialog(tab = "Initialisation"));
+      annotation(Dialog(tab = "Initialization"));
     parameter SpecificEnthalpy hstartout "Outlet enthalpy start value" 
-      annotation(Dialog(tab = "Initialisation"));
+      annotation(Dialog(tab = "Initialization"));
+    parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.steadyState 
+      "Initialization option" annotation(Dialog(tab = "Initialization"));
     Medium.BaseProperties fluid_in(p(start=pstartin),h(start=hstartin));
     FlangeA inlet(redeclare package Medium = Medium) 
                   annotation (extent=[-120,50; -80,90]);
@@ -4607,6 +4609,15 @@ Input variables changed. This function now computes the heat transfer coefficien
     
     // The next equation is provided to close the balance but never actually used
     inlet.hAB = outlet.hBA;
+  initial equation 
+    if initOpt == ThermoPower.Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
+      der(P_HP) = 0;
+      der(P_LP) = 0;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
     
     annotation (
       Icon(Text(extent=[-108,-80; 108,-110],  string="%name"),
