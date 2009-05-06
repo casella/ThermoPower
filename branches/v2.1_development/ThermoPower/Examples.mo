@@ -2414,10 +2414,10 @@ Casella</a>:<br>
             100; 0,100], style(thickness=2));
       connect(water.steam, waterOut) annotation (points=[13.6,60.4; 48,60.4; 48,
             -68; 0,-68; 0,-100], style(thickness=2));
-      connect(adapter.HT_port, water.heat) annotation (points=[0.4,12; 
+      connect(adapter.HT_port, water.heat) annotation (points=[0.4,12;
             7.10543e-016,12; 7.10543e-016,28], style(color=3, rgbcolor={0,0,255}));
       connect(gasFlow.wall, heatTransfer_ext.side1) annotation (points=[
-            6.12303e-016,-45; 6.12303e-016,-38.5; -3.67382e-016,-38.5; 
+            6.12303e-016,-45; 6.12303e-016,-38.5; -3.67382e-016,-38.5;
             -3.67382e-016,-31], style(color=45, rgbcolor={255,127,0}));
       connect(gasFlow.infl, gasIn) annotation (points=[-10,-50; -60,-50; -60,0;
             -100,0], style(
@@ -2610,540 +2610,9 @@ Casella</a>:<br>
       
     end PrescribedPressureCondenser;
     
-    model SettingStodolaTurbine 
-      
-      package FluidMedium = ThermoPower.Water.StandardWater;
-      //fluid
-      parameter Modelica.SIunits.MassFlowRate fluidNomFlowRate=55 
-        "Nominal flow rate through the fluid side";
-      parameter Modelica.SIunits.Pressure fluidNomPressure=30e5 
-        "Nominal pressure in the fluid side inlet";
-      parameter Modelica.SIunits.Temperature Tstart_M_In=Tstart_F_In 
-        "Inlet metal wall temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_M_Out=Tstart_F_Out 
-        "Outlet metal wall temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_F_In=719 
-        "Inlet fluid temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_F_Out=
-          FluidMedium.temperature_ph(fluidNomPressure, hstart_F_Out) 
-        "Outlet fluid temperature start value";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart_F_In=
-          FluidMedium.specificEnthalpy_pT(fluidNomPressure, Tstart_F_In) 
-        "Nominal specific enthalpy";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart_F_Out=2.67e6 
-        "Nominal specific enthalpy";
-      Modelica.Mechanics.Rotational.ConstantSpeed constantSpeed(w_fixed=
-            314.16/2) 
-                    annotation (extent=[70,-20; 50,0]);
-      annotation (Diagram, Documentation(revisions="<html>
-<ul>
-<li><i>10 Dec 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      Water.SteamTurbineStodola steamTurbineStodola(
-        pstart_in=30e5,
-        pstart_out=0.5e5,
-        wstart=55,
-        wnom=55,
-        hstartin=3.33e6,
-        hstartout=2.67e6,
-        Kt=0.0104) 
-        annotation (extent=[-40,-40; 20,20], style(thickness=2));
-      Water.SourceP sourseW_water(redeclare package Medium = FluidMedium,
-        h=hstart_F_In,
-        p0=30e5)            annotation (extent=[-80,60; -60,80],rotation=0);
-      Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-        h=hstart_F_Out,
-        p0=5390)        annotation (extent=[40,60; 60,80],    rotation=0);
-    equation 
-      connect(constantSpeed.flange, steamTurbineStodola.shaft_b) annotation (
-          points=[50,-10; 9.2,-10], style(
-          color=0,
-          rgbcolor={0,0,0},
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sinkP_water.flange, steamTurbineStodola.outlet) annotation (
-          points=[40,70; 14,70; 14,14], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineStodola.inlet, sourseW_water.flange) annotation (
-          points=[-34,14; -34,70; -60,70], style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-    end SettingStodolaTurbine;
     
-    model SettingEc 
-      package FlueGasMedium = ThermoPower.Media.FlueGas;
-      package FluidMedium = ThermoPower.Water.StandardWater;
-      
-      //gas
-      parameter Modelica.SIunits.MassFlowRate gasNomFlowRate=500 
-        "Nominal mass flowrate";
-      parameter Modelica.SIunits.Temperature Tstart_G_In=500 
-        "Inlet gas temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_G_Out=372.35 
-        "Outlet gas temperature start value";
-      
-      //fluid
-      parameter Modelica.SIunits.MassFlowRate fluidNomFlowRate=55 
-        "Nominal flow rate through the fluid side";
-      parameter Modelica.SIunits.Pressure fluidNomPressure=30e5 
-        "Nominal pressure in the fluid side inlet";
-      parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_G=30 
-        "Constant heat transfer coefficient in the gas side";
-      parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_F=3000 
-        "Constant heat transfer coefficient in the fluid side";
-      parameter Modelica.SIunits.Temperature Tstart_M_In=Tstart_F_In 
-        "Inlet metal wall temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_M_Out=428.09 
-        "Outlet metal wall temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_F_In=FluidMedium.temperature_ph(fluidNomPressure, hstart_F_In) 
-        "Inlet fluid temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_F_Out=428.09 
-        "Outlet fluid temperature start value";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart_F_In=1.48e5 
-        "Nominal specific enthalpy";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart_F_Out=
-          FluidMedium.specificEnthalpy_pT(fluidNomPressure, Tstart_F_Out) 
-        "Nominal specific enthalpy";
-      parameter Boolean SSInit = true "Steady-state initialization";
-      
-      Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-        w0=fluidNomFlowRate,
-        p0=fluidNomPressure,
-        h=hstart_F_In)      annotation (extent=[-10,60; 10,80], rotation=270);
-      Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-        p0=fluidNomPressure,
-        h=hstart_F_Out) annotation (extent=[-10,-80; 10,-60], rotation=270);
-      Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                       annotation (extent=[60,-10; 80,10]);
-      Gas.SourceW sourceW_gas(
-        redeclare package Medium = FlueGasMedium,
-        w0=gasNomFlowRate,
-        T=Tstart_G_In)     annotation (extent=[-80,-10; -60,10]);
-      annotation (Diagram, experiment(StopTime=1000),
-        Documentation(revisions="<html>
-<ul>
-<li><i>10 Dec 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      PowerPlants.HRSG.Components.HE economizer(
-        redeclare package FluidMedium = FluidMedium,
-        redeclare package FlueGasMedium = FlueGasMedium,
-        N_G=3,
-        N_F=6,
-        exchSurface_G=40095.9,
-        exchSurface_F=3439.389,
-        extSurfaceTub=3888.449,
-        gasVol=10,
-        fluidVol=28.977,
-        metalVol=8.061,
-        rhomcm=7900*578.05,
-        lambda=20,
-        fluidNomFlowRate=fluidNomFlowRate,
-        fluidNomPressure=fluidNomPressure,
-        Tstart_G_In=Tstart_G_In,
-        Tstart_G_Out=Tstart_G_Out,
-        Tstart_M_In=Tstart_M_In,
-        Tstart_M_Out=Tstart_M_Out,
-        Tstart_F_In=Tstart_F_In,
-        Tstart_F_Out=Tstart_F_Out,
-        gamma_G=gamma_G,
-        gamma_F=gamma_F,
-        SSInit=SSInit,
-        fluidFlow(FFtype=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom=150),
-        gasNomFlowRate=500,
-        gasNomPressure=101325) 
-        annotation (extent=[-20,-20; 20,20]);
-      PowerPlants.HRSG.Components.StateReader_water T_waterIn(
-                            redeclare package Medium = FluidMedium) 
-        annotation (extent=[-10,30; 10,50],rotation=270);
-      PowerPlants.HRSG.Components.StateReader_water T_waterOut(
-                             redeclare package Medium = FluidMedium) 
-        annotation (extent=[-10,-50; 10,-30],rotation=270);
-      PowerPlants.HRSG.Components.StateReader_gas T_gasIn(
-                        redeclare package Medium = FlueGasMedium) 
-        annotation (extent=[-50,-10; -30,10]);
-      PowerPlants.HRSG.Components.StateReader_gas T_gasOut(
-                         redeclare package Medium = FlueGasMedium) 
-        annotation (extent=[30,-10; 50,10]);
-    equation 
-      connect(T_waterOut.inlet, economizer.waterOut) 
-                                             annotation (points=[1.10215e-015,
-            -34; 0,-34; 0,-20], style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(economizer.waterIn, T_waterIn.outlet) 
-                                            annotation (points=[0,20; 0,34;
-            -1.10215e-015,34], style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[
-            1.10215e-015,46; -1.83691e-015,46; -1.83691e-015,60], style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[
-            1.83691e-015,-60; -1.10215e-015,-60; -1.10215e-015,-46], style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(T_gasOut.inlet, economizer.gasOut) 
-                                         annotation (points=[34,0; 20,0], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(sinkP_gas.flange, T_gasOut.outlet) annotation (points=[60,0; 46,0],
-          style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(economizer.gasIn, T_gasIn.outlet) 
-                                        annotation (points=[-20,0; -34,0],
-          style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(T_gasIn.inlet, sourceW_gas.flange) annotation (points=[-46,0; -60,
-            0], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-    end SettingEc;
     
-    model SettingSh 
-      package FlueGasMedium = ThermoPower.Media.FlueGas;
-      package FluidMedium = ThermoPower.Water.StandardWater;
-      
-      //gas
-      parameter Modelica.SIunits.MassFlowRate gasNomFlowRate=500 
-        "Nominal mass flowrate";
-      parameter Modelica.SIunits.Temperature Tstart_G_In=785 
-        "Inlet gas temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_G_Out=700 
-        "Outlet gas temperature start value";
-      
-      //fluid
-      parameter Modelica.SIunits.MassFlowRate fluidNomFlowRate=55 
-        "Nominal flow rate through the fluid side";
-      parameter Modelica.SIunits.Pressure fluidNomPressure=30e5 
-        "Nominal pressure in the fluid side inlet";
-      parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_G=80 
-        "Constant heat transfer coefficient in the gas side";
-      parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_F=5000 
-        "Constant heat transfer coefficient in the fluid side";
-      parameter Modelica.SIunits.Temperature Tstart_M_In=Tstart_F_In 
-        "Inlet metal wall temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_M_Out=Tstart_F_Out 
-        "Outlet metal wall temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_F_In=513 
-        "Inlet fluid temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_F_Out=700 
-        "Outlet fluid temperature start value";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart_F_In=
-          FluidMedium.specificEnthalpy_pT(fluidNomPressure, Tstart_F_In) 
-        "Nominal specific enthalpy";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart_F_Out=
-          FluidMedium.specificEnthalpy_pT(fluidNomPressure, Tstart_F_Out) 
-        "Nominal specific enthalpy";
-      
-      Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-        w0=fluidNomFlowRate,
-        p0=fluidNomPressure,
-        h=hstart_F_In)      annotation (extent=[-10,60; 10,80], rotation=270);
-      Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-        h=hstart_F_Out,
-        p0=fluidNomPressure - 0.4e5) 
-                        annotation (extent=[-10,-80; 10,-60], rotation=270);
-      Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                       annotation (extent=[60,-10; 80,10]);
-      Gas.SourceW sourceW_gas(
-        redeclare package Medium = FlueGasMedium,
-        w0=gasNomFlowRate,
-        T=Tstart_G_In)     annotation (extent=[-80,-10; -60,10]);
-      annotation (Diagram, Documentation(revisions="<html>
-<ul>
-<li><i>10 Dec 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      PowerPlants.HRSG.Components.StateReader_water T_waterOut(
-                             redeclare package Medium = FluidMedium) 
-        annotation (extent=[-10,-50; 10,-30],rotation=270);
-      PowerPlants.HRSG.Components.StateReader_gas T_gasIn(
-                        redeclare package Medium = FlueGasMedium) 
-        annotation (extent=[-50,-10; -30,10]);
-      PowerPlants.HRSG.Components.StateReader_gas T_gasOut(
-                         redeclare package Medium = FlueGasMedium) 
-        annotation (extent=[30,-10; 50,10]);
-      PowerPlants.HRSG.Components.HE superheater(
-        redeclare package FluidMedium = FluidMedium,
-        redeclare package FlueGasMedium = FlueGasMedium,
-        N_G=3,
-        N_F=7,
-        exchSurface_G=2314.8,
-        exchSurface_F=450.218,
-        extSurfaceTub=504.652,
-        gasVol=10,
-        fluidVol=4.468,
-        metalVol=1.146,
-        rhomcm=7900*578.05,
-        lambda=20,
-        gasNomFlowRate=585.5,
-        fluidNomFlowRate=fluidNomFlowRate,
-        fluidNomPressure=fluidNomPressure,
-        Tstart_G_In=Tstart_G_In,
-        Tstart_G_Out=Tstart_G_Out,
-        Tstart_M_In=Tstart_M_In,
-        Tstart_M_Out=Tstart_M_Out,
-        Tstart_F_In=Tstart_F_In,
-        Tstart_F_Out=Tstart_F_Out,
-        gamma_G=gamma_G,
-        gamma_F=gamma_F,
-        SSInit=true,
-        dpnom=1e5,
-        gasNomPressure=101325,
-        fluidFlow(FFtype=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom=150)) 
-        annotation (extent=[-20,-20; 20,20]);
-      PowerPlants.HRSG.Components.StateReader_water T_waterIn(
-                            redeclare package Medium = FluidMedium) 
-        annotation (extent=[-10,30; 10,50],rotation=270);
-    equation 
-      connect(sinkP_gas.flange, T_gasOut.outlet) annotation (points=[60,0; 46,0],
-          style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(T_gasIn.inlet, sourceW_gas.flange) annotation (points=[-46,0; -60,
-            0], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[
-            1.83691e-015,-60; -1.10215e-015,-60; -1.10215e-015,-46],
-                                                               style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(superheater.gasIn, T_gasIn.outlet) 
-                                        annotation (points=[-20,0; -34,0],
-          style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(superheater.gasOut, T_gasOut.inlet) 
-                                         annotation (points=[20,0; 34,0], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(superheater.waterOut, T_waterOut.inlet) 
-                                             annotation (points=[0,-20; 0,-34;
-            1.10215e-015,-34],      style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[
-            1.10215e-015,46; 0,54; -7.3476e-016,56; -1.83691e-015,56;
-            -1.83691e-015,60],           style(thickness=2));
-      connect(superheater.waterIn, T_waterIn.outlet) 
-                                            annotation (points=[0,20; 0,34;
-            -1.10215e-015,34],
-                             style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-    end SettingSh;
     
-    model SettingEv 
-      package FlueGasMedium = ThermoPower.Media.FlueGas;
-      package FluidMedium = ThermoPower.Water.StandardWater;
-      
-      //gas
-      parameter Modelica.SIunits.MassFlowRate gasNomFlowRate=500 
-        "Nominal mass flowrate";
-      parameter Modelica.SIunits.Temperature Tstart_G_In=700 
-        "Inlet gas temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_G_Out=500 
-        "Outlet gas temperature start value";
-      
-      //fluid
-      parameter Modelica.SIunits.MassFlowRate fluidNomFlowRate=55 
-        "Nominal flow rate through the fluid side";
-      parameter Modelica.SIunits.Pressure fluidNomPressure=30e5 
-        "Nominal pressure in the fluid side inlet";
-      parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_G=85 
-        "Constant heat transfer coefficient in the gas side";
-      parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_F=20000 
-        "Constant heat transfer coefficient in the fluid side";
-      parameter Modelica.SIunits.Temperature Tstart_M_In=Tstart_F_In 
-        "Inlet metal wall temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_M_Out=Tstart_F_Out 
-        "Outlet metal wall temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_F_In=FluidMedium.temperature_ph(
-           fluidNomPressure, hstart_F_In) "Inlet fluid temperature start value";
-      parameter Modelica.SIunits.Temperature Tstart_F_Out=
-          FluidMedium.temperature_ph(fluidNomPressure, hstart_F_Out) 
-        "Outlet fluid temperature start value";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart_F_In=9.2e5 
-        "Nominal specific enthalpy";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart_F_Out=2.8e6 
-        "Nominal specific enthalpy";
-      
-      Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-        w0=fluidNomFlowRate,
-        p0=fluidNomPressure,
-        h=hstart_F_In)      annotation (extent=[-10,60; 10,80], rotation=270);
-      Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-        h=hstart_F_Out,
-        p0=fluidNomPressure - 0.5e5) 
-                        annotation (extent=[-10,-80; 10,-60], rotation=270);
-      Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                       annotation (extent=[60,-10; 80,10]);
-      Gas.SourceW sourceW_gas(
-        redeclare package Medium = FlueGasMedium,
-        w0=gasNomFlowRate,
-        T=Tstart_G_In)     annotation (extent=[-80,-10; -60,10]);
-      annotation (Diagram, Documentation(revisions="<html>
-<ul>
-<li><i>10 Dec 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      PowerPlants.HRSG.Components.StateReader_water T_waterIn(
-                            redeclare package Medium = FluidMedium) 
-        annotation (extent=[-10,30; 10,50],rotation=270);
-      PowerPlants.HRSG.Components.StateReader_water T_waterOut(
-                             redeclare package Medium = FluidMedium) 
-        annotation (extent=[-10,-50; 10,-30],rotation=270);
-      PowerPlants.HRSG.Components.StateReader_gas T_gasIn(
-                        redeclare package Medium = FlueGasMedium) 
-        annotation (extent=[-50,-10; -30,10]);
-      PowerPlants.HRSG.Components.StateReader_gas T_gasOut(
-                         redeclare package Medium = FlueGasMedium) 
-        annotation (extent=[30,-10; 50,10]);
-      PowerPlants.HRSG.Components.HE2ph evaporator(
-        redeclare package FluidMedium = FluidMedium,
-        redeclare package FlueGasMedium = FlueGasMedium,
-        N_G=4,
-        N_F=4,
-        exchSurface_G=24402,
-        exchSurface_F=1837.063,
-        extSurfaceTub=2163.652,
-        gasVol=10,
-        fluidVol=12.400,
-        metalVol=4.801,
-        rhomcm=7900*578.05,
-        lambda=20,
-        gasNomFlowRate=585.5,
-        gasNomPressure=0,
-        fluidNomFlowRate=fluidNomFlowRate,
-        fluidNomPressure=fluidNomPressure,
-        Tstart_G_In=Tstart_G_In,
-        Tstart_G_Out=Tstart_G_Out,
-        Tstart_M_In=Tstart_M_In,
-        Tstart_M_Out=Tstart_M_Out,
-        Tstart_F_In=Tstart_F_In,
-        Tstart_F_Out=Tstart_F_Out,
-        gamma_G=gamma_G,
-        gamma_F=gamma_F,
-        SSInit=true,
-        fluidFlow(FFtype=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom=150)) 
-        annotation (extent=[-20,-20; 20,20]);
-    equation 
-      connect(T_gasOut.outlet, sinkP_gas.flange) annotation (points=[46,0; 60,0],
-                style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(T_gasIn.inlet, sourceW_gas.flange) annotation (points=[-46,0; -60,
-            0],                                         style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(sinkP_water.flange, T_waterOut.outlet) annotation (points=[
-            1.83691e-015,-60; -1.10215e-015,-60; -1.10215e-015,-46],
-                                             style(thickness=2));
-      connect(T_waterIn.inlet, sourseW_water.flange) annotation (points=[
-            1.10215e-015,46; 1.10215e-015,54; -1.83691e-015,54; -1.83691e-015,
-            60],                         style(thickness=2));
-      connect(T_gasOut.inlet, evaporator.gasOut) 
-                                         annotation (points=[34,0; 20,0], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(evaporator.waterIn, T_waterIn.outlet) 
-                                            annotation (points=[0,20; 0,28;
-            -1.10215e-015,28; -1.10215e-015,34],
-                             style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(evaporator.gasIn, T_gasIn.outlet) 
-                                        annotation (points=[-20,0; -34,0],
-          style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(evaporator.waterOut, T_waterOut.inlet) 
-                                             annotation (points=[0,-20; 0,-34;
-            1.10215e-015,-34],      style(
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-    end SettingEv;
     
     model Plant 
       import ThermoPower;
@@ -3627,7 +3096,7 @@ Casella</a>:<br>
         ThermoPower.Examples.RankineCycle.Plant plant(
                          SSInit=true,
           redeclare package FlueGas = FlueGas,
-          redeclare package Water = Water, 
+          redeclare package Water = Water,
           evaporator(water(initOpt=ThermoPower.Choices.Init.Options.noInit))) 
                                  annotation (extent=[20,-10; 80,30]);
         Modelica.Blocks.Sources.Ramp nPump(
@@ -3660,8 +3129,8 @@ Casella</a>:<br>
         package Water = ThermoPower.Water.StandardWater "Fluid model";
         annotation (Coordsys(extent=[-100,-100; 100,100], scale=0.1), Diagram,
           experiment(
-            StopTime=10000, 
-            NumberOfIntervals=5000, 
+            StopTime=10000,
+            NumberOfIntervals=5000,
             Tolerance=1e-006),
           Icon,
           Documentation(revisions="<html>
@@ -3680,8 +3149,8 @@ Casella</a>:<br>
             = FlueGas, redeclare package Water = Water,
           SSInit=true)           annotation (extent=[20,-10; 80,30]);
         Modelica.Blocks.Sources.Step voidFractionSetPoint(
-          offset=0.2, 
-          height=0, 
+          offset=0.2,
+          height=0,
           startTime=0) 
           annotation (extent=[-80,-40; -60,-20]);
         PID voidFractionController(
@@ -3697,7 +3166,7 @@ Casella</a>:<br>
         Modelica.Blocks.Sources.Ramp powerSetPoint(
           offset=56.8e6,
           height=-56.8e6*0.35,
-          duration=450, 
+          duration=450,
           startTime=500) 
                        annotation (extent=[-80,40; -60,60]);
         PID powerController(
@@ -3996,7 +3465,7 @@ Casella</a>:<br>
           color=76,
           rgbcolor={159,159,223},
           thickness=2));
-      connect(stateOutletCC.outlet,PressDrop1. inlet) annotation (points=[-8,40;
+      connect(stateOutletCC.outlet,PressDrop1. inlet) annotation (points=[-8,40; 
             1.83691e-015,40; 1.83691e-015,18],
                            style(
           color=76,
@@ -4061,7 +3530,7 @@ Casella</a>:<br>
         steadyStateInit=true,
         Kp=0.25) annotation (extent=[-32,-10; -12,10]);
     equation 
-      connect(plant.combustibleFlowRate, pID.CS) annotation (points=[20,0;
+      connect(plant.combustibleFlowRate, pID.CS) annotation (points=[20,0; 
             -11.4,0], style(color=74, rgbcolor={0,0,127}));
       connect(pID.SP, powerSetPoint.y) annotation (points=[-32,4; -59,4], style(
             color=74, rgbcolor={0,0,127}));
