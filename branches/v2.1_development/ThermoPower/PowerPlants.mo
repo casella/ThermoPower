@@ -599,8 +599,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
       end ParallelHE;
       
-      partial model ParallelHE_Att 
-        "Base class for parallel Heat Exchanger (two fluid with one gas) with attemperation" 
+      partial model ParallelHE_Des 
+        "Base class for parallel Heat Exchanger (two fluid with one gas) with desuperheater" 
         
         annotation (Diagram, Icon(
             Rectangle(extent=[-100,100; 100,-100],
@@ -625,22 +625,31 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
               extent=[-100,-115; 100,-145],
               string="%name",
               style(color=71, rgbcolor={85,170,255})),
-            Polygon(points=[-34,-38; -44,-30; -22,-24; -32,-16; -34,-38],
+            Polygon(points=[-58,-40; -68,-32; -46,-26; -56,-18; -58,-40],
                                                                    style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255})),
-            Line(points=[-40,-34; -48,-42; -100,-42],
-                                               style(
+            Polygon(points=[-42,-54; -52,-46; -30,-40; -40,-32; -42,-54],
+                                                                   style(
+                color=0,
+                rgbcolor={0,0,0},
+                thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255})),
+            Line(points=[-48,-50; -68,-70; -96,-70; -98,-70], style(
                 color=3,
                 rgbcolor={0,0,255},
+                fillColor=30,
+                rgbfillColor={230,230,230},
                 fillPattern=1)),
-            Line(points=[-4,2; -26,-20],
-                                       style(
+            Line(points=[-62,-36; -68,-42; -100,-42; -102,-42], style(
                 color=3,
                 rgbcolor={0,0,255},
+                fillColor=30,
+                rgbfillColor={230,230,230},
                 fillPattern=1))));
         ThermoPower.Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium)
                             annotation (extent=[-120,-20; -80,20]);
@@ -658,7 +667,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         ThermoPower.Water.FlangeB waterOutB(redeclare package Medium = 
               FluidMedium) "water/steam second outlet" 
           annotation (extent=[20,-120; 60,-80]);
-        ThermoPower.Water.FlangeA LiquidWaterIn(redeclare package Medium = 
+        ThermoPower.Water.FlangeA LiquidWaterIn_A(redeclare package Medium = 
               FluidMedium) 
           annotation (extent=[-110,-52; -90,-32]);
         Modelica.Blocks.Interfaces.RealOutput T_intermedA 
@@ -1041,61 +1050,189 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             annotation(Dialog(tab = "Initialization (pHE-2)",
                               group = "side B"));
         
-      end ParallelHE_Att;
+        ThermoPower.Water.FlangeA LiquidWaterIn_B(redeclare package Medium = 
+              FluidMedium) 
+          annotation (extent=[-110,-80; -90,-60]);
+      end ParallelHE_Des;
       
       partial model HEG_2L 
-        "Base class for Heat Exchangers Group with two pressure levels" 
+        "Base class for Heat Exchangers Group with two pressure levels and desuperheater" 
         
-        Water.FlangeA LiquidWaterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-210,50; -190,70]);
-        Water.FlangeA Sh_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-170,90; -150,110]);
-        Water.FlangeB Ev_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-140,90; -120,110]);
-        Water.FlangeA Ev_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-110,90; -90,110]);
-        Water.FlangeB Ec_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-80,90; -60,110]);
-        Water.FlangeA Ec_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-50,90; -30,110]);
-        Water.FlangeA Sh_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[30,90; 50,110]);
-        Water.FlangeB Ev_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[58,90; 78,110]);
-        Water.FlangeA Ev_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[90,90; 110,110]);
-        Water.FlangeB Ec_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[120,90; 140,110]);
-        Water.FlangeA Ec_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[150,90; 170,110]);
-        Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-110,-110; -90,-90]);
-        Water.FlangeB Sh_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[90,-110; 110,-90]);
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) 
-                          annotation (extent=[-214,-14; -186,14]);
-        Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium) 
-                           annotation (extent=[186,-14; 214,14]);
-        Buses.Sensors SensorsBus annotation (extent=[190,-50; 210,-30]);
-        Buses.Actuators ActuatorsBus annotation (extent=[210,-80; 190,-60]);
         annotation (Icon(
-            Rectangle(extent=[-200,100; 200,-100], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Rectangle(extent=[-400,200; 400,-200], style(
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Line(points=[-100,60; -100,40; -60,30; -140,0; -60,-30; -100,-40;
-                  -100,-60], style(
+            Line(points=[-120,200; -120,-100], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[100,60; 100,40; 140,30; 60,0; 140,-30; 100,-40; 100,
-                  -60], style(
+                fillPattern=1)),
+            Line(points=[-160,-100; -156,-110; -144,-120; -136,-120; -124,-110;
+                  -120,-100], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2))),
+                fillPattern=1)),
+            Line(points=[-160,200; -160,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-200,200; -200,-102], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-240,-100; -236,-110; -224,-120; -216,-120; -204,-110;
+                  -200,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-240,200; -240,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-200,-200; -200,-140; -280,-140; -280,204; -278,200],
+                style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-400,80; 400,80], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,60; 400,60], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,40; 400,40], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,100; 400,100], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,0; 400,0], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-20; 400,-20], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-40; 400,-40], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,20; 400,20], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-80; 400,-80], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-100; 400,-100], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-60; 400,-60], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[140,-200; 140,-140; 60,-140; 60,204; 62,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[100,-100; 104,-110; 116,-120; 124,-120; 136,-110; 140,
+                  -100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[100,200; 100,-102], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[140,200; 140,-102], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[180,200; 180,-102], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[220,200; 220,-102], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[180,-100; 184,-110; 196,-120; 204,-120; 216,-110; 220,
+                  -100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-126,138; -114,138; -120,122; -126,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-166,144; -154,144; -160,160; -166,144],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-246,144; -234,144; -240,160; -246,144],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-206,138; -194,138; -200,122; -206,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[94,144; 106,144; 100,160; 94,144],      style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[134,138; 146,138; 140,122; 134,138],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[174,144; 186,144; 180,160; 174,144],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[214,138; 226,138; 220,122; 214,138],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[54,138; 66,138; 60,122; 54,138],         style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-286,138; -274,138; -280,122; -286,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1))),
                              Diagram,
-          Coordsys(extent=[-200,-100; 200,100], scale=0.1));
+          Coordsys(extent=[-400,-200; 400,200], scale=0.1));
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
           Modelica.Media.Interfaces.PartialMedium;
         replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
@@ -1411,33 +1548,246 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
                                                                   tab = "Initialization (LP)", group = "Ec"));
         
+        Water.FlangeA Sh_HP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-294,186; -266,214]);
+        Water.FlangeB Ev_HP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-254,186; -226,214]);
+        Water.FlangeA Ev_HP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-214,186; -186,214]);
+        Water.FlangeB Ec_HP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-174,186; -146,214]);
+        Water.FlangeA Ec_HP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-134,186; -106,214]);
+        Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-214,-214; -186,-186]);
+        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) 
+                          annotation (extent=[-414,-14; -386,14]);
+        Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium) 
+                           annotation (extent=[386,-14; 414,14]);
+        Water.FlangeA Sh_LP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[46,186; 74,214]);
+        Water.FlangeB Ev_LP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[86,186; 114,214]);
+        Water.FlangeA Ev_LP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[126,186; 154,214]);
+        Water.FlangeB Ec_LP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[166,186; 194,214]);
+        Water.FlangeA Ec_LP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[206,186; 234,214]);
+        Water.FlangeB Sh_LP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[126,-214; 154,-186]);
+        Buses.Sensors SensorsBus 
+                              annotation (extent=[380,120; 420,160]);
+        Buses.Actuators ActuatorsBus 
+                                  annotation (extent=[420,60; 380,100]);
       end HEG_2L;
       
       partial model HEG_2LRh 
-        "Base class for Heat Exchangers Group with two pressure levels and reheat" 
+        "Base class for Heat Exchangers Group with two pressure levels" 
         
         annotation (Icon(
-            Rectangle(extent=[-200,100; 200,-100], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Rectangle(extent=[-400,200; 400,-200], style(
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Line(points=[-100,60; -100,40; -60,30; -140,0; -60,-30; -100,-40;
-                  -100,-60], style(
+            Line(points=[-120,200; -120,-100], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[100,60; 100,40; 140,30; 60,0; 140,-30; 100,-40; 100,
-                  -60], style(
+                fillPattern=1)),
+            Line(points=[-160,-100; -156,-110; -144,-120; -136,-120; -124,-110;
+                  -120,-100], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2))),
-                             Diagram,
-          Coordsys(extent=[-200,-100; 200,100], scale=0.1));
-        Water.FlangeA Rh_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-60,-110; -40,-90]);
-        Water.FlangeB Rh_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-10,-110; 10,-90]);
+                fillPattern=1)),
+            Line(points=[-160,200; -160,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-200,200; -200,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-240,-100; -236,-110; -224,-120; -216,-120; -204,-110;
+                  -200,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-240,200; -240,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-200,-200; -200,-140; -280,-140; -280,204; -278,200],
+                style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-400,80; 400,80], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,60; 400,60], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,40; 400,40], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,100; 400,100], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,0; 400,0], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-20; 400,-20], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-40; 400,-40], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,20; 400,20], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-80; 400,-80], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-100; 400,-100], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-400,-60; 400,-60], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-60,100; -50,114; -34,120; -26,120; -10,114; 0,100],
+                style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-60,100; -60,-198], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[0,100; 0,-198], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[140,-200; 140,-140; 60,-140; 60,204; 62,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[100,-100; 104,-110; 116,-120; 124,-120; 136,-110; 140,
+                  -100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[100,200; 100,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[140,200; 140,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[180,202; 180,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[220,202; 220,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[180,-100; 184,-110; 196,-120; 204,-120; 216,-110; 220,
+                  -100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-286,138; -274,138; -280,122; -286,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-246,144; -234,144; -240,160; -246,144],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-206,138; -194,138; -200,122; -206,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-166,144; -154,144; -160,160; -166,144],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-126,138; -114,138; -120,122; -126,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[54,138; 66,138; 60,122; 54,138],         style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[94,144; 106,144; 100,160; 94,144],      style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[134,138; 146,138; 140,122; 134,138],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[174,144; 186,144; 180,160; 174,144],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[214,138; 226,138; 220,122; 214,138],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-66,-142; -54,-142; -60,-158; -66,-142], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-6,-136; 6,-136; 0,-120; -6,-136],      style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Text(
+              extent=[-78,-132; 22,-152],
+              style(
+                color=3,
+                rgbcolor={0,0,255},
+                thickness=2,
+                fillPattern=1),
+              string="Rh")), Diagram,
+          Coordsys(extent=[-400,-200; 400,200], scale=0.1));
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
           Modelica.Media.Interfaces.PartialMedium;
         replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
@@ -1451,26 +1801,23 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         //Nominal parameter
         parameter SI.MassFlowRate fluidHPNomFlowRate_Sh "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "HP", group = "Sh"));
-        parameter SI.Pressure fluidHPNomPressure_Sh "Nominal pressure" annotation (Dialog(tab= "HP", group = "Sh"));
+                                                                                annotation (Dialog(tab= "HP", group= "Sh"));
+        parameter SI.Pressure fluidHPNomPressure_Sh "Nominal pressure" annotation (Dialog(tab = "HP", group= "Sh"));
         parameter SI.MassFlowRate fluidHPNomFlowRate_Ev "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "HP", group = "Ev"));
-        parameter SI.Pressure fluidHPNomPressure_Ev "Nominal pressure" annotation (Dialog(tab= "HP", group = "Ev"));
+                                                                                annotation (Dialog(tab= "HP", group= "Ev"));
+        parameter SI.Pressure fluidHPNomPressure_Ev "Nominal pressure" annotation (Dialog(tab = "HP", group= "Ev"));
         parameter SI.MassFlowRate fluidHPNomFlowRate_Ec "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "HP", group = "Ec"));
-        parameter SI.Pressure fluidHPNomPressure_Ec "Nominal pressure" annotation (Dialog(tab= "HP", group = "Ec"));
-        parameter SI.MassFlowRate fluidIPNomFlowRate_Rh "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "IP", group = "Rh"));
-        parameter SI.Pressure fluidIPNomPressure_Rh "Nominal pressure" annotation (Dialog(tab= "IP", group = "Rh"));
+                                                                                annotation (Dialog(tab= "HP", group= "Ec"));
+        parameter SI.Pressure fluidHPNomPressure_Ec "Nominal pressure" annotation (Dialog(tab = "HP", group= "Ec"));
         parameter SI.MassFlowRate fluidLPNomFlowRate_Sh "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "LP", group = "Sh"));
-        parameter SI.Pressure fluidLPNomPressure_Sh "Nominal pressure" annotation (Dialog(tab= "LP", group = "Sh"));
+                                                                                annotation (Dialog(tab = "LP", group= "Sh"));
+        parameter SI.Pressure fluidLPNomPressure_Sh "Nominal pressure" annotation (Dialog(tab = "LP", group= "Sh"));
         parameter SI.MassFlowRate fluidLPNomFlowRate_Ev "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "LP", group = "Ev"));
-        parameter SI.Pressure fluidLPNomPressure_Ev "Nominal pressure" annotation (Dialog(tab= "LP", group = "Ev"));
+                                                                                annotation (Dialog(tab = "LP", group= "Ev"));
+        parameter SI.Pressure fluidLPNomPressure_Ev "Nominal pressure" annotation (Dialog(tab = "LP", group = "Ev"));
         parameter SI.MassFlowRate fluidLPNomFlowRate_Ec "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "LP", group = "Ec"));
-        parameter SI.Pressure fluidLPNomPressure_Ec "Nominal pressure" annotation (Dialog(tab= "LP", group = "Ec"));
+                                                                                annotation (Dialog(tab = "LP", group = "Ec"));
+        parameter SI.Pressure fluidLPNomPressure_Ec "Nominal pressure" annotation (Dialog(tab = "LP", group = "Ec"));
         
         //Physical Parameter
         //Sh2_HP
@@ -1724,16 +2071,16 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         parameter SI.Temperature Rh2_IP_Tstart_M_Out 
           "Outlet metal wall temperature start value of Rh2" 
             annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh2_IP_hstart_F_In) 
+        parameter SI.Temperature Rh2_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Rh2_IP_hstart_F_In) 
           "Inlet fluid temperature start value of Rh2" annotation(Dialog(enable = use_T_Sh,
                                                                   tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh2_IP_hstart_F_Out) 
+        parameter SI.Temperature Rh2_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Rh2_IP_hstart_F_Out) 
           "Outlet fluid temperature start value of Rh2" annotation(Dialog(enable = use_T_Sh,
                                                                    tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh2_IP_Tstart_F_In) 
+        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Rh2_IP_Tstart_F_In) 
           "Inlet fluid specific enthalpy start value of Rh2" annotation(Dialog(enable = not use_T_Sh,
                                                                         tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh2_IP_Tstart_F_Out) 
+        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Rh2_IP_Tstart_F_Out) 
           "Outlet fluid specific enthalpy start value of Rh2" annotation(Dialog(enable = not use_T_Sh,
                                                                          tab = "Initialization (IP)", group = "Rh"));
         //Rh1_HP
@@ -1747,16 +2094,16 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         parameter SI.Temperature Rh1_IP_Tstart_M_Out 
           "Outlet metal wall temperature start value of Rh1" 
             annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh1_IP_hstart_F_In) 
+        parameter SI.Temperature Rh1_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Rh1_IP_hstart_F_In) 
           "Inlet fluid temperature start value of Rh1" annotation(Dialog(enable = use_T_Sh,
                                                                   tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh1_IP_hstart_F_Out) 
+        parameter SI.Temperature Rh1_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Rh1_IP_hstart_F_Out) 
           "Outlet fluid temperature start value of Rh1" annotation(Dialog(enable = use_T_Sh,
                                                                    tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh1_IP_Tstart_F_In) 
+        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Rh1_IP_Tstart_F_In) 
           "Inlet fluid specific enthalpy start value of Rh1" annotation(Dialog(enable = not use_T_Sh,
                                                                         tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh1_IP_Tstart_F_Out) 
+        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Rh1_IP_Tstart_F_Out) 
           "Outlet fluid specific enthalpy start value of Rh1" annotation(Dialog(enable = not use_T_Sh,
                                                                          tab = "Initialization (IP)", group = "Rh"));
         
@@ -1829,151 +2176,366 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         parameter SI.SpecificEnthalpy Ec_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_Out) 
           "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
                                                                   tab = "Initialization (LP)", group = "Ec"));
-        Water.FlangeA LiquidWaterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-210,50; -190,70]);
+        
         Water.FlangeA Sh_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-170,90; -150,110]);
+          annotation (extent=[-294,186; -266,214]);
         Water.FlangeB Ev_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-140,90; -120,110]);
+          annotation (extent=[-254,186; -226,214]);
         Water.FlangeA Ev_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-110,90; -90,110]);
+          annotation (extent=[-214,186; -186,214]);
         Water.FlangeB Ec_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-80,90; -60,110]);
+          annotation (extent=[-174,186; -146,214]);
         Water.FlangeA Ec_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-50,90; -30,110]);
-        Water.FlangeA Sh_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[30,90; 50,110]);
-        Water.FlangeB Ev_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[58,90; 78,110]);
-        Water.FlangeA Ev_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[90,90; 110,110]);
-        Water.FlangeB Ec_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[120,90; 140,110]);
-        Water.FlangeA Ec_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[150,90; 170,110]);
+          annotation (extent=[-134,186; -106,214]);
         Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-110,-110; -90,-90]);
-        Water.FlangeB Sh_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[90,-110; 110,-90]);
+          annotation (extent=[-214,-214; -186,-186]);
         Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) 
-                          annotation (extent=[-214,-14; -186,14]);
+                          annotation (extent=[-414,-14; -386,14]);
         Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium) 
-                           annotation (extent=[186,-14; 214,14]);
-        Buses.Sensors SensorsBus annotation (extent=[190,-50; 210,-30]);
-        Buses.Actuators ActuatorsBus annotation (extent=[210,-80; 190,-60]);
+                           annotation (extent=[386,-14; 414,14]);
+        Water.FlangeA Sh_LP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[46,186; 74,214]);
+        Water.FlangeB Ev_LP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[86,186; 114,214]);
+        Water.FlangeA Ev_LP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[126,186; 154,214]);
+        Water.FlangeB Ec_LP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[166,186; 194,214]);
+        Water.FlangeA Ec_LP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[206,186; 234,214]);
+        Water.FlangeA Rh_IP_In(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-14,-214; 14,-186]);
+        Water.FlangeB Rh_IP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-74,-214; -46,-186]);
+        Water.FlangeB Sh_LP_Out(redeclare package Medium = FluidMedium) 
+          annotation (extent=[126,-214; 154,-186]);
+        Buses.Sensors SensorsBus 
+                              annotation (extent=[380,120; 420,160]);
+        Buses.Actuators ActuatorsBus 
+                                  annotation (extent=[420,60; 380,100]);
       end HEG_2LRh;
       
       partial model HEG_3LRh 
         "Base class for Heat Exchangers Group with three pressure levels and reheat" 
         
-        Water.FlangeA LiquidWaterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-310,80; -290,100]);
         Water.FlangeA Sh_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-270,140; -250,160]);
+          annotation (extent=[-394,186; -366,214]);
         Water.FlangeB Ev_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-240,140; -220,160]);
+          annotation (extent=[-354,186; -326,214]);
         Water.FlangeA Ev_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-150,140; -130,160]);
+          annotation (extent=[-314,186; -286,214]);
         Water.FlangeB Ec_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-180,140; -160,160]);
+          annotation (extent=[-274,186; -246,214]);
         Water.FlangeA Ec_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-210,140; -190,160]);
+          annotation (extent=[-234,186; -206,214]);
         Water.FlangeA Sh_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-70,140; -50,160]);
+          annotation (extent=[-94,186; -66,214]);
         Water.FlangeB Ev_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-40,140; -20,160]);
+          annotation (extent=[-54,186; -26,214]);
         Water.FlangeA Ev_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-10,140; 10,160]);
+          annotation (extent=[-14,186; 14,214]);
         Water.FlangeB Ec_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[20,140; 40,160]);
+          annotation (extent=[26,186; 54,214]);
         Water.FlangeA Ec_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[50,140; 70,160]);
+          annotation (extent=[66,186; 94,214]);
         Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-210,-160; -190,-140]);
-        Water.FlangeB Sh_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-10,-160; 10,-140]);
+          annotation (extent=[-314,-214; -286,-186]);
         Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) 
-                          annotation (extent=[-314,-14; -286,14]);
+                          annotation (extent=[-514,-14; -486,14]);
         Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium) 
-                           annotation (extent=[286,-14; 314,14]);
+                           annotation (extent=[486,-14; 514,14]);
         annotation (Icon(
-            Rectangle(extent=[-300,150; 300,-150], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Rectangle(extent=[-500,200; 500,-200], style(
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Line(points=[0,100; 0,60; 40,40; -40,0; 40,-40; 0,-60; 0,-100],
-                              style(
+            Text(
+              extent=[-210,-140; -110,-160],
+              style(
                 color=3,
                 rgbcolor={0,0,255},
+                thickness=2,
+                fillPattern=1),
+              string="Rh"),
+            Line(points=[380,202; 380,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[340,-100; 344,-110; 356,-120; 364,-120; 376,-110; 380,
+                  -100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[340,202; 340,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[300,202; 300,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[260,-100; 264,-110; 276,-120; 284,-120; 296,-110; 300,
+                  -100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[260,202; 260,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[80,200; 80,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[40,-100; 44,-110; 56,-120; 64,-120; 76,-110; 80,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[40,202; 40,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[0,200; 0,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-40,-100; -36,-110; -24,-120; -16,-120; -4,-110; 0,
+                  -100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-40,200; -40,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-220,200; -220,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-260,-100; -256,-110; -244,-120; -236,-120; -224,-110;
+                  -220,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-260,200; -260,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-300,202; -300,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-340,-100; -336,-110; -324,-120; -316,-120; -304,-110;
+                  -300,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-340,200; -340,-100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-300,-200; -300,-140; -380,-140; -380,204; -378,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-130,-140; -80,-140; -80,-140; -80,204; -78,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[300,-200; 300,-140; 220,-140; 220,204; 222,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-192,100; -180,114; -164,120; -156,120; -140,114; -130,
+                  100], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-130,100; -130,-198], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-190,100; -190,-198], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-500,80; 500,80], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
                 thickness=2,
                 fillPattern=1)),
-            Line(points=[-200,100; -200,60; -160,40; -240,0; -160,-40; -200,-60;
-                  -200,-100], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Line(points=[-500,60; 500,60], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
                 thickness=2,
                 fillPattern=1)),
-            Line(points=[200,100; 200,60; 240,40; 160,0; 240,-40; 200,-60; 200,
-                  -100],      style(
-                color=3,
-                rgbcolor={0,0,255},
+            Line(points=[-500,40; 500,40], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
                 thickness=2,
                 fillPattern=1)),
-            Text(
-              extent=[-250,130; -150,110],
-              style(
+            Line(points=[-500,100; 500,100], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-500,0; 500,0], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-500,-20; 500,-20], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-500,-40; 500,-40], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-500,20; 500,20], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-500,-80; 500,-80], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-500,-100; 500,-100], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Line(points=[-500,-60; 500,-60], style(
+                color=76,
+                rgbcolor={170,170,255},
+                pattern=2,
+                thickness=2,
+                fillPattern=1)),
+            Polygon(points=[-386,138; -374,138; -380,122; -386,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-346,144; -334,144; -340,160; -346,144],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-306,138; -294,138; -300,122; -306,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-266,144; -254,144; -260,160; -266,144],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-226,138; -214,138; -220,122; -226,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-86,138; -74,138; -80,122; -86,138],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,144; -34,144; -40,160; -46,144],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-6,138; 6,138; 0,122; -6,138],           style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[34,144; 46,144; 40,160; 34,144],        style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,138; 86,138; 80,122; 74,138],         style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[214,138; 226,138; 220,122; 214,138],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[254,144; 266,144; 260,160; 254,144],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[294,138; 306,138; 300,122; 294,138],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[334,144; 346,144; 340,160; 334,144],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[374,138; 386,138; 380,122; 374,138],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-196,-144; -184,-144; -190,-160; -196,-144],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-136,-170; -124,-170; -130,-154; -136,-170],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-136,-124; -124,-124; -130,-108; -136,-124],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-98,-146; -98,-134; -114,-140; -98,-146],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[-134,-136; -126,-144],
+                                           style(
                 color=3,
                 rgbcolor={0,0,255},
                 thickness=2,
-                fillPattern=1),
-              string="HP"),
-            Text(
-              extent=[-50,130; 50,110],
-              style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1),
-              string="IP"),
-            Text(
-              extent=[150,130; 250,110],
-              style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1),
-              string="LP"),
-            Text(
-              extent=[-150,-110; -50,-130],
-              style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1),
-              string="Rh")),
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1))),
             Diagram,
-          Coordsys(extent=[-300,-150; 300,150], scale=0.1));
+          Coordsys(extent=[-500,-200; 500,200], scale=0.1));
         Water.FlangeA Sh_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[130,140; 150,160]);
+          annotation (extent=[206,186; 234,214]);
         Water.FlangeB Ev_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[160,140; 180,160]);
+          annotation (extent=[246,186; 274,214]);
         Water.FlangeA Ev_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[190,140; 210,160]);
+          annotation (extent=[286,186; 314,214]);
         Water.FlangeB Ec_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[220,140; 240,160]);
+          annotation (extent=[326,186; 354,214]);
         Water.FlangeA Ec_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[250,140; 270,160]);
+          annotation (extent=[366,186; 394,214]);
         Water.FlangeA Rh_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-140,-160; -120,-140]);
+          annotation (extent=[-144,-214; -116,-186]);
         Water.FlangeB Rh_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-80,-160; -60,-140]);
+          annotation (extent=[-204,-214; -176,-186]);
         Water.FlangeB Sh_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[190,-160; 210,-140]);
+          annotation (extent=[286,-212; 314,-184]);
         Buses.Sensors SensorsBus 
-                              annotation (extent=[286,-76; 318,-44]);
+                              annotation (extent=[480,120; 520,160]);
         Buses.Actuators ActuatorsBus 
-                                  annotation (extent=[318,-116; 286,-84]);
+                                  annotation (extent=[520,60; 480,100]);
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
           Modelica.Media.Interfaces.PartialMedium;
         replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
@@ -2532,669 +3094,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
       end HEG_3LRh;
       
-      partial model HEG_3LRh_wa 
-        "Base class for Heat Exchangers Group with three pressure levels and reheat, without attemperation" 
-        
-        annotation (Icon(
-            Rectangle(extent=[-300,150; 300,-150], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Line(points=[0,100; 0,60; 40,40; -40,0; 40,-40; 0,-60; 0,-100],
-                              style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[-200,100; -200,60; -160,40; -240,0; -160,-40; -200,-60;
-                  -200,-100], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[200,100; 200,60; 240,40; 160,0; 240,-40; 200,-60; 200,
-                  -100],      style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Text(
-              extent=[-250,130; -150,110],
-              style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1),
-              string="HP"),
-            Text(
-              extent=[-50,130; 50,110],
-              style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1),
-              string="IP"),
-            Text(
-              extent=[150,130; 250,110],
-              style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1),
-              string="LP"),
-            Text(
-              extent=[-150,-110; -50,-130],
-              style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1),
-              string="Rh")),
-            Diagram,
-          Coordsys(extent=[-300,-150; 300,150], scale=0.1));
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
-        
-        //Common Parameter
-        parameter SI.MassFlowRate gasNomFlowRate 
-          "Nominal flow rate through the gas side";
-        parameter SI.Pressure gasNomPressure 
-          "Nominal pressure in the gas side inlet";
-        
-        //Nominal parameter
-        parameter SI.MassFlowRate fluidHPNomFlowRate_Sh "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "HP", group = "Sh"));
-        parameter SI.Pressure fluidHPNomPressure_Sh "Nominal pressure" annotation (Dialog(tab= "HP", group = "Sh"));
-        parameter SI.MassFlowRate fluidHPNomFlowRate_Ev "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "HP", group = "Ev"));
-        parameter SI.Pressure fluidHPNomPressure_Ev "Nominal pressure" annotation (Dialog(tab= "HP", group = "Ev"));
-        parameter SI.MassFlowRate fluidHPNomFlowRate_Ec "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "HP", group = "Ec"));
-        parameter SI.Pressure fluidHPNomPressure_Ec "Nominal pressure" annotation (Dialog(tab= "HP", group = "Ec"));
-        parameter SI.MassFlowRate fluidIPNomFlowRate_Rh "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "IP", group = "Rh"));
-        parameter SI.Pressure fluidIPNomPressure_Rh "Nominal pressure" annotation (Dialog(tab= "IP", group = "Rh"));
-        parameter SI.MassFlowRate fluidIPNomFlowRate_Sh "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "IP", group = "Sh"));
-        parameter SI.Pressure fluidIPNomPressure_Sh "Nominal pressure" annotation (Dialog(tab= "IP", group = "Sh"));
-        parameter SI.MassFlowRate fluidIPNomFlowRate_Ev "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "IP", group = "Ev"));
-        parameter SI.Pressure fluidIPNomPressure_Ev "Nominal pressure" annotation (Dialog(tab= "IP", group = "Ev"));
-        parameter SI.MassFlowRate fluidIPNomFlowRate_Ec "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "IP", group = "Ec"));
-        parameter SI.Pressure fluidIPNomPressure_Ec "Nominal pressure" annotation (Dialog(tab= "IP", group = "Ec"));
-        parameter SI.MassFlowRate fluidLPNomFlowRate_Sh "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "LP", group = "Sh"));
-        parameter SI.Pressure fluidLPNomPressure_Sh "Nominal pressure" annotation (Dialog(tab= "LP", group = "Sh"));
-        parameter SI.MassFlowRate fluidLPNomFlowRate_Ev "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "LP", group = "Ev"));
-        parameter SI.Pressure fluidLPNomPressure_Ev "Nominal pressure" annotation (Dialog(tab= "LP", group = "Ev"));
-        parameter SI.MassFlowRate fluidLPNomFlowRate_Ec "Nominal mass flowrate"
-                                                                                annotation (Dialog(tab= "LP", group = "Ec"));
-        parameter SI.Pressure fluidLPNomPressure_Ec "Nominal pressure" annotation (Dialog(tab= "LP", group = "Ec"));
-        
-        //Physical Parameter
-        //Sh2_HP
-        parameter Integer Sh2_HP_N_G=2 "Number of node of the gas side, Sh2" 
-            annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter Integer Sh2_HP_N_F=2 "Number of node of the fluid side, Sh2" 
-            annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Area Sh2_HP_exchSurface_G 
-          "Exchange surface between gas - metal tube, Sh2" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Area Sh2_HP_exchSurface_F 
-          "Exchange surface between metal tube - fluid, Sh2" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Area Sh2_HP_extSurfaceTub 
-          "Total external surface of the tubes, Sh2" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Volume Sh2_HP_gasVol "Gas volume, Sh2" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Volume Sh2_HP_fluidVol "Fluid volume, Sh2" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Volume Sh2_HP_metalVol 
-          "Volume of the metal part in the tube, Sh2" annotation (Dialog(tab= "HP", group= "Sh"));
-        //Sh1_HP
-        parameter Integer Sh1_HP_N_G=2 "Number of node of the gas side, Sh1" 
-            annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter Integer Sh1_HP_N_F=2 "Number of node of the fluid side, Sh1" 
-            annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Area Sh1_HP_exchSurface_G 
-          "Exchange surface between gas - metal tube, Sh1" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Area Sh1_HP_exchSurface_F 
-          "Exchange surface between metal tube - fluid, Sh1" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Area Sh1_HP_extSurfaceTub 
-          "Total external surface of the tubes, Sh1" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Volume Sh1_HP_gasVol "Gas volume, Sh1" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Volume Sh1_HP_fluidVol "Fluid volume, Sh1" annotation (Dialog(tab= "HP", group= "Sh"));
-        parameter SI.Volume Sh1_HP_metalVol 
-          "Volume of the metal part in the tube, Sh1" annotation (Dialog(tab= "HP", group= "Sh"));
-        //Ev_HP
-        parameter Integer Ev_HP_N_G=2 "Number of node of the gas side" 
-            annotation (Dialog(tab = "HP",group = "Ev"));
-        parameter Integer Ev_HP_N_F=2 "Number of node of the fluid side" 
-            annotation (Dialog(tab= "HP", group= "Ev"));
-        parameter SI.Area Ev_HP_exchSurface_G 
-          "Exchange surface between gas - metal tube" annotation (Dialog(tab= "HP", group= "Ev"));
-        parameter SI.Area Ev_HP_exchSurface_F 
-          "Exchange surface between metal tube - fluid" annotation (Dialog(tab= "HP", group= "Ev"));
-        parameter SI.Area Ev_HP_extSurfaceTub 
-          "Total external surface of the tubes" annotation (Dialog(tab= "HP", group= "Ev"));
-        parameter SI.Volume Ev_HP_gasVol "Gas volume" annotation (Dialog(tab = "HP", group= "Ev"));
-        parameter SI.Volume Ev_HP_fluidVol "Fluid volume" annotation (Dialog(tab = "HP", group= "Ev"));
-        parameter SI.Volume Ev_HP_metalVol 
-          "Volume of the metal part in the tube" annotation (Dialog(tab= "HP", group= "Ev"));
-        //Ec2_HP
-        parameter Integer Ec2_HP_N_G=2 "Number of node of the gas side, Ec2" 
-            annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter Integer Ec2_HP_N_F=2 "Number of node of the fluid side, Ec2" 
-            annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Area Ec2_HP_exchSurface_G 
-          "Exchange surface between gas - metal tube, Ec2" annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Area Ec2_HP_exchSurface_F 
-          "Exchange surface between metal tube - fluid, Ec2" annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Area Ec2_HP_extSurfaceTub 
-          "Total external surface of the tubes, Ec2" 
-                                                annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Volume Ec2_HP_gasVol "Gas volume, Ec2" annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Volume Ec2_HP_fluidVol "Fluid volume, Ec2" annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Volume Ec2_HP_metalVol 
-          "Volume of the metal part in the tube, Ec2" 
-                                                 annotation (Dialog(tab = "HP", group = "Ec"));
-        //Ec1_HP
-        parameter Integer Ec1_HP_N_G=2 "Number of node of the gas side, Ec1" 
-            annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter Integer Ec1_HP_N_F=2 "Number of node of the fluid side, Ec1" 
-            annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Area Ec1_HP_exchSurface_G 
-          "Exchange surface between gas - metal tube, Ec1" annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Area Ec1_HP_exchSurface_F 
-          "Exchange surface between metal tube - fluid, Ec1" annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Area Ec1_HP_extSurfaceTub 
-          "Total external surface of the tubes, Ec1" 
-                                                annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Volume Ec1_HP_gasVol "Gas volume, Ec1" annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Volume Ec1_HP_fluidVol "Fluid volume, Ec1" annotation (Dialog(tab = "HP", group = "Ec"));
-        parameter SI.Volume Ec1_HP_metalVol 
-          "Volume of the metal part in the tube, Ec1" 
-                                                 annotation (Dialog(tab = "HP", group = "Ec"));
-        //Rh2_IP
-        parameter Integer Rh2_IP_N_G=2 "Number of node of the gas side, Rh2" 
-            annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter Integer Rh2_IP_N_F=2 "Number of node of the fluid side, Rh2" 
-            annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Area Rh2_IP_exchSurface_G 
-          "Exchange surface between gas - metal tube, Rh2" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Area Rh2_IP_exchSurface_F 
-          "Exchange surface between metal tube - fluid, Rh2" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Area Rh2_IP_extSurfaceTub 
-          "Total external surface of the tubes, Rh2" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Volume Rh2_IP_gasVol "Gas volume, Rh2" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Volume Rh2_IP_fluidVol "Fluid volume, Rh2" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Volume Rh2_IP_metalVol 
-          "Volume of the metal part in the tube, Rh2" annotation (Dialog(tab = "IP", group = "Rh"));
-        //Rh1_IP
-        parameter Integer Rh1_IP_N_G=2 "Number of node of the gas side, Rh1"  annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter Integer Rh1_IP_N_F=2 "Number of node of the fluid side, Rh1"  annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Area Rh1_IP_exchSurface_G 
-          "Exchange surface between gas - metal tube, Rh1" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Area Rh1_IP_exchSurface_F 
-          "Exchange surface between metal tube - fluid, Rh1" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Area Rh1_IP_extSurfaceTub 
-          "Total external surface of the tubes, Rh1"                                      annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Volume Rh1_IP_gasVol "Gas volume, Rh1" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Volume Rh1_IP_fluidVol "Fluid volume, Rh1" annotation (Dialog(tab = "IP", group = "Rh"));
-        parameter SI.Volume Rh1_IP_metalVol 
-          "Volume of the metal part in the tube, Rh1" annotation (Dialog(tab = "IP", group = "Rh"));
-        //Sh_IP
-        parameter Integer Sh_IP_N_G=2 "Number of node of the gas side" 
-            annotation (Dialog(tab = "IP", group = "Sh"));
-        parameter Integer Sh_IP_N_F=2 "Number of node of the fluid side" 
-            annotation (Dialog(tab = "IP", group = "Sh"));
-        parameter SI.Area Sh_IP_exchSurface_G 
-          "Exchange surface between gas - metal tube" annotation (Dialog(tab = "IP", group = "Sh"));
-        parameter SI.Area Sh_IP_exchSurface_F 
-          "Exchange surface between metal tube - fluid" annotation (Dialog(tab = "IP", group = "Sh"));
-        parameter SI.Area Sh_IP_extSurfaceTub 
-          "Total external surface of the tube" annotation (Dialog(tab = "IP", group = "Sh"));
-        parameter SI.Volume Sh_IP_gasVol "Gas volume" annotation (Dialog(tab = "IP", group = "Sh"));
-        parameter SI.Volume Sh_IP_fluidVol "Fluid volume" annotation (Dialog(tab = "IP", group = "Sh"));
-        parameter SI.Volume Sh_IP_metalVol 
-          "Volume of the metal part in the tube" annotation (Dialog(tab = "IP", group = "Sh"));
-        //Ev_IP
-        parameter Integer Ev_IP_N_G=2 "Number of node of the gas side" 
-            annotation (Dialog(tab = "IP", group = "Ev"));
-        parameter Integer Ev_IP_N_F=2 "Number of node of the fluid side" 
-            annotation (Dialog(tab = "IP", group = "Ev"));
-        parameter SI.Area Ev_IP_exchSurface_G 
-          "Exchange surface between gas - metal tube" annotation (Dialog(tab = "IP", group = "Ev"));
-        parameter SI.Area Ev_IP_exchSurface_F 
-          "Exchange surface between metal tube - fluid" annotation (Dialog(tab = "IP", group = "Ev"));
-        parameter SI.Area Ev_IP_extSurfaceTub 
-          "Total external surface of the tubes" annotation (Dialog(tab = "IP", group = "Ev"));
-        parameter SI.Volume Ev_IP_gasVol "Gas volume" annotation (Dialog(tab = "IP", group = "Ev"));
-        parameter SI.Volume Ev_IP_fluidVol "Fluid volume" annotation (Dialog(tab = "IP", group = "Ev"));
-        parameter SI.Volume Ev_IP_metalVol 
-          "Volume of the metal part in the tube" annotation (Dialog(tab = "IP", group = "Ev"));
-        //Ec_IP
-        parameter Integer Ec_IP_N_G=2 "Number of node of the gas side" 
-            annotation (Dialog(tab = "IP", group = "Ec"));
-        parameter Integer Ec_IP_N_F=2 "Number of node of the fluid side" 
-            annotation (Dialog(tab = "IP", group = "Ec"));
-        parameter SI.Area Ec_IP_exchSurface_G 
-          "Exchange surface between gas - metal tube" annotation (Dialog(tab = "IP", group = "Ec"));
-        parameter SI.Area Ec_IP_exchSurface_F 
-          "Exchange surface between metal tube - fluid" annotation (Dialog(tab = "IP", group = "Ec"));
-        parameter SI.Area Ec_IP_extSurfaceTub 
-          "Total external surface of the tube" annotation (Dialog(tab = "IP", group = "Ec"));
-        parameter SI.Volume Ec_IP_gasVol "Gas volume" annotation (Dialog(tab = "IP", group = "Ec"));
-        parameter SI.Volume Ec_IP_fluidVol "Fluid volume" annotation (Dialog(tab = "IP", group = "Ec"));
-        parameter SI.Volume Ec_IP_metalVol 
-          "Volume of the metal part in the tube" annotation (Dialog(tab = "IP", group = "Ec"));
-        //Sh_LP
-        parameter Integer Sh_LP_N_G=2 "Number of node of the gas side" 
-            annotation (Dialog(tab = "LP", group = "Sh"));
-        parameter Integer Sh_LP_N_F=2 "Number of node of the fluid side" 
-            annotation (Dialog(tab = "LP", group = "Sh"));
-        parameter SI.Area Sh_LP_exchSurface_G 
-          "Exchange surface between gas - metal tube" annotation (Dialog(tab = "LP", group = "Sh"));
-        parameter SI.Area Sh_LP_exchSurface_F 
-          "Exchange surface between metal tube - fluid" annotation (Dialog(tab = "LP", group = "Sh"));
-        parameter SI.Area Sh_LP_extSurfaceTub 
-          "Total external surface of the tubes" annotation (Dialog(tab = "LP", group = "Sh"));
-        parameter SI.Volume Sh_LP_gasVol "Gas volume" annotation (Dialog(tab = "LP", group = "Sh"));
-        parameter SI.Volume Sh_LP_fluidVol "Fluid volume" annotation (Dialog(tab = "LP", group = "Sh"));
-        parameter SI.Volume Sh_LP_metalVol 
-          "Volume of the metal part in the tube" annotation (Dialog(tab = "LP", group = "Sh"));
-        //Ev_LP
-        parameter Integer Ev_LP_N_G=2 "Number of node of the gas side" 
-            annotation (Dialog(tab = "LP", group = "Ev"));
-        parameter Integer Ev_LP_N_F=2 "Number of node of the fluid side" 
-            annotation (Dialog(tab = "LP", group = "Ev"));
-        parameter SI.Area Ev_LP_exchSurface_G 
-          "Exchange surface between gas - metal tube" annotation (Dialog(tab = "LP", group = "Ev"));
-        parameter SI.Area Ev_LP_exchSurface_F 
-          "Exchange surface between metal tube - fluid" annotation (Dialog(tab = "LP", group = "Ev"));
-        parameter SI.Area Ev_LP_extSurfaceTub 
-          "Total external surface of the tubes" annotation (Dialog(tab = "LP", group = "Ev"));
-        parameter SI.Volume Ev_LP_gasVol "Gas volume" annotation (Dialog(tab = "LP", group = "Ev"));
-        parameter SI.Volume Ev_LP_fluidVol "Fluid volume" annotation (Dialog(tab = "LP", group = "Ev"));
-        parameter SI.Volume Ev_LP_metalVol 
-          "Volume of the metal part in the tube" annotation (Dialog(tab = "LP", group = "Ev"));
-        //Ec_LP
-        parameter Integer Ec_LP_N_G=2 "Number of node of the gas side" 
-            annotation (Dialog(tab = "LP", group = "Ec"));
-        parameter Integer Ec_LP_N_F=2 "Number of node of the fluid side" 
-            annotation (Dialog(tab = "LP", group = "Ec"));
-        parameter SI.Area Ec_LP_exchSurface_G 
-          "Exchange surface between gas - metal tube" annotation (Dialog(tab = "LP", group = "Ec"));
-        parameter SI.Area Ec_LP_exchSurface_F 
-          "Exchange surface between metal tube - fluid" annotation (Dialog(tab = "LP", group = "Ec"));
-        parameter SI.Area Ec_LP_extSurfaceTub 
-          "Total external surface of the tubes" annotation (Dialog(tab = "LP", group = "Ec"));
-        parameter SI.Volume Ec_LP_gasVol "Gas volume" annotation (Dialog(tab = "LP", group = "Ec"));
-        parameter SI.Volume Ec_LP_fluidVol "Fluid volume" annotation (Dialog(tab = "LP", group = "Ec"));
-        parameter SI.Volume Ec_LP_metalVol 
-          "Volume of the metal part in the tube" annotation (Dialog(tab = "LP", group = "Ec"));
-        
-        //Initialization conditions
-        parameter Boolean use_T_Sh = true 
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Superheaters (Reheater)"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean use_T_Ev = true 
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Evaporators"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean use_T_Ec = true 
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Economizers"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
-        
-        //Start values
-        //Sh2_HP
-        parameter SI.Temperature Sh2_HP_Tstart_G_In 
-          "Intlet gas temperature start value of Sh2" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_G_Out 
-          "Outlet gas temperature start value of Sh2" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_M_In 
-          "Inlet metal wall temperature start value of Sh2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_M_Out 
-          "Outlet metal wall temperature start value of Sh2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh2_HP_hstart_F_In) 
-          "Inlet fluid temperature start value of Sh2" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh2_HP_hstart_F_Out) 
-          "Outlet fluid temperature start value of Sh2" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh2_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh2_HP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value of Sh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh2_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh2_HP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value of Sh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (HP)", group = "Sh"));
-        //Sh1_HP
-        parameter SI.Temperature Sh1_HP_Tstart_G_In 
-          "Intlet gas temperature start value of Sh1" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_G_Out 
-          "Outlet gas temperature start value of Sh1" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_M_In 
-          "Inlet metal wall temperature start value of Sh1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_M_Out 
-          "Outlet metal wall temperature start value of Sh1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh1_HP_hstart_F_In) 
-          "Inlet fluid temperature start value of Sh1" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh1_HP_hstart_F_Out) 
-          "Outlet fluid temperature start value of Sh1" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh1_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh1_HP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value of Sh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh1_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh1_HP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value of Sh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (HP)", group = "Sh"));
-        //Ev_HP
-        parameter SI.Temperature Ev_HP_Tstart_G_In 
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_G_Out 
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_M_In 
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_M_Out 
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,Ev_HP_hstart_F_In) 
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                           tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,Ev_HP_hstart_F_Out) 
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                            tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ev,Ev_HP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ev,Ev_HP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (HP)", group = "Ev"));
-        //Ec2_HP
-        parameter SI.Temperature Ec2_HP_Tstart_G_In 
-          "Intlet gas temperature start value of Ec2" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_G_Out 
-          "Outlet gas temperature start value of Ec2" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_M_In 
-          "Inlet metal wall temperature start value of Ec2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_M_Out 
-          "Outlet metal wall temperature start value of Ec2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec2_HP_hstart_F_In) 
-          "Inlet fluid temperature start value of Ec2" annotation(Dialog(enable = use_T_Ec,
-                                                                  tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec2_HP_hstart_F_Out) 
-          "Outlet fluid temperature start value of Ec2" annotation(Dialog(enable = use_T_Ec,
-                                                                   tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec2_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec2_HP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value of Ec2" annotation(Dialog(enable = not use_T_Ec,
-                                                                        tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec2_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec2_HP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value of Ec2" annotation(Dialog(enable = not use_T_Ec,
-                                                                         tab = "Initialization (HP)", group = "Ec"));
-        //Ec1_HP
-        parameter SI.Temperature Ec1_HP_Tstart_G_In 
-          "Intlet gas temperature start value of Ec1" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_G_Out 
-          "Outlet gas temperature start value of Ec1" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_M_In 
-          "Inlet metal wall temperature start value of Ec1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_M_Out 
-          "Outlet metal wall temperature start value of Ec1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec1_HP_hstart_F_In) 
-          "Inlet fluid temperature start value of Ec1" annotation(Dialog(enable = use_T_Ec,
-                                                                  tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec1_HP_hstart_F_Out) 
-          "Outlet fluid temperature start value of Ec1" annotation(Dialog(enable = use_T_Ec,
-                                                                   tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec1_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec1_HP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value of Ec1" annotation(Dialog(enable = not use_T_Ec,
-                                                                        tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec1_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec1_HP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value of Ec1" annotation(Dialog(enable = not use_T_Ec,
-                                                                         tab = "Initialization (HP)", group = "Ec"));
-        //Rh2_IP
-        parameter SI.Temperature Rh2_IP_Tstart_G_In 
-          "Intlet gas temperature start value of Rh2" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_G_Out 
-          "Outlet gas temperature start value of Rh2" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_M_In 
-          "Inlet metal wall temperature start value of Rh2" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_M_Out 
-          "Outlet metal wall temperature start value of Rh2" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh2_IP_hstart_F_In) 
-          "Inlet fluid temperature start value of Rh2" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh2_IP_hstart_F_Out) 
-          "Outlet fluid temperature start value of Rh2" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh2_IP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value of Rh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh2_IP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value of Rh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (IP)", group = "Rh"));
-        //Rh1_HP
-        parameter SI.Temperature Rh1_IP_Tstart_G_In 
-          "Intlet gas temperature start value of Rh1" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_G_Out 
-          "Outlet gas temperature start value of Rh1" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_M_In 
-          "Inlet metal wall temperature start value of Rh1" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_M_Out 
-          "Outlet metal wall temperature start value of Rh1" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh1_IP_hstart_F_In) 
-          "Inlet fluid temperature start value of Rh1" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh1_IP_hstart_F_Out) 
-          "Outlet fluid temperature start value of Rh1" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh1_IP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value of Rh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh1_IP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value of Rh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (IP)", group = "Rh"));
-        //Sh_IP
-        parameter SI.Temperature Sh_IP_Tstart_G_In 
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_G_Out 
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_M_In 
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_M_Out 
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Sh,Sh_IP_hstart_F_In) 
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                           tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Sh,Sh_IP_hstart_F_Out) 
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                            tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Sh,Sh_IP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                 tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Sh,Sh_IP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                  tab = "Initialization (IP)", group = "Sh"));
-        //Ev_IP
-        parameter SI.Temperature Ev_IP_Tstart_G_In 
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_G_Out 
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_M_In 
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_M_Out 
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Ev,Ev_IP_hstart_F_In) 
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                                 tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Ev,Ev_IP_hstart_F_Out) 
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                                  tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Ev,Ev_IP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Ev,Ev_IP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (IP)", group = "Ev"));
-        //Ec_IP
-        parameter SI.Temperature Ec_IP_Tstart_G_In 
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_G_Out 
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_M_In 
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_M_Out 
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Ec,Ec_IP_hstart_F_In) 
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                           tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Ec,Ec_IP_hstart_F_Out) 
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                            tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Ec,Ec_IP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                 tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Ec,Ec_IP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                  tab = "Initialization (IP)", group = "Ec"));
-        
-        //Sh_LP
-        parameter SI.Temperature Sh_LP_Tstart_G_In 
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_G_Out 
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_M_In 
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_M_Out 
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Sh,Sh_LP_hstart_F_In) 
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                           tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Sh,Sh_LP_hstart_F_Out) 
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                            tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Sh,Sh_LP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                 tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Sh,Sh_LP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                  tab = "Initialization (LP)", group = "Sh"));
-        //Ev_LP
-        parameter SI.Temperature Ev_LP_Tstart_G_In 
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_G_Out 
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_M_In 
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_M_Out 
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,Ev_LP_hstart_F_In) 
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                                 tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,Ev_LP_hstart_F_Out) 
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                            tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ev,Ev_LP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ev,Ev_LP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (LP)", group = "Ev"));
-        //Ec_LP
-        parameter SI.Temperature Ec_LP_Tstart_G_In 
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_G_Out 
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_M_In 
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_M_Out 
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ec,Ec_LP_hstart_F_In) 
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                           tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ec,Ec_LP_hstart_F_Out) 
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                            tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_In) 
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                 tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_Out) 
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                  tab = "Initialization (LP)", group = "Ec"));
-        
-        Water.FlangeA Sh_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-270,140; -250,160]);
-        Water.FlangeB Ev_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-240,140; -220,160]);
-        Water.FlangeA Ev_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-150,140; -130,160]);
-        Water.FlangeB Ec_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-180,140; -160,160]);
-        Water.FlangeA Ec_HP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-210,140; -190,160]);
-        Water.FlangeA Sh_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-70,140; -50,160]);
-        Water.FlangeB Ev_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-40,140; -20,160]);
-        Water.FlangeA Ev_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-10,140; 10,160]);
-        Water.FlangeB Ec_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[20,140; 40,160]);
-        Water.FlangeA Ec_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[50,140; 70,160]);
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) 
-                          annotation (extent=[-314,-14; -286,14]);
-        Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium) 
-                           annotation (extent=[286,-14; 314,14]);
-        Water.FlangeA Sh_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[130,140; 150,160]);
-        Water.FlangeB Ev_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[160,140; 180,160]);
-        Water.FlangeA Ev_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[190,140; 210,160]);
-        Water.FlangeB Ec_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[220,140; 240,160]);
-        Water.FlangeA Ec_LP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[250,140; 270,160]);
-        Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-210,-160; -190,-140]);
-        Water.FlangeB Sh_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-10,-160; 10,-140]);
-        Water.FlangeA Rh_IP_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-140,-160; -120,-140]);
-        Water.FlangeB Rh_IP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-80,-160; -60,-140]);
-        Water.FlangeB Sh_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[190,-160; 210,-140]);
-      end HEG_3LRh_wa;
-      
       partial model DG_2L "Base class for Drums Group with two pressure levels" 
         
         replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
@@ -3246,541 +3145,181 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         constant Real g=Modelica.Constants.g_n;
         constant Real pi=Modelica.Constants.pi;
         
-        Water.FlangeB LiquidWaterOut(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-210,110; -190,130]);
-        Water.FlangeB Steam_HP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-170,-210; -150,-190]);
-        Water.FlangeA FromRiser_HP(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-140,-210; -120,-190]);
-        Water.FlangeB ToRiser_HP(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-110,-210; -90,-190]);
-        Water.FlangeA Feed_HP(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-80,-210; -60,-190]);
-        Water.FlangeB WaterForHP(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-50,-210; -30,-190]);
-        Water.FlangeB Steam_LP_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[30,-210; 50,-190]);
-        Water.FlangeA FromRiser_LP(redeclare package Medium = FluidMedium) 
-          annotation (extent=[60,-210; 80,-190]);
-        Water.FlangeB ToRiser_LP(redeclare package Medium = FluidMedium) 
-          annotation (extent=[90,-210; 110,-190]);
-        Water.FlangeA Feed_LP(redeclare package Medium = FluidMedium) 
-          annotation (extent=[120,-210; 140,-190]);
-        Water.FlangeB WaterForLP(redeclare package Medium = FluidMedium) 
-          annotation (extent=[150,-210; 170,-190]);
-        Water.FlangeA WaterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[190,110; 210,130]);
-        Buses.Sensors SensorsBus 
-                              annotation (extent=[184,44; 216,76]);
-        Buses.Actuators ActuatorsBus 
-                                  annotation (extent=[216,4; 184,36]);
         annotation (Icon(
-            Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Rectangle(extent=[-400,300; 400,-300], style(
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Ellipse(extent=[-160,-20; -80,-100],  style(
+            Line(points=[140,10; -120,10; -120,-300], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[80,80; 180,-20],    style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=3,
                 rgbfillColor={0,0,255})),
-            Ellipse(extent=[-56,36; -24,4],    style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-40,36; -40,4; -52,30; -40,4; -28,30],        style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-130,-200; -130,-90], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[-100,-200; -100,-84], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[-70,-200; -70,-80; -120,-60], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[-160,-198; -160,-120; -180,-120; -180,-20; -160,-20;
-                  -120,-60], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Polygon(points=[-160,-60; -80,-60; -80,-54; -82,-44; -88,-34; -94,
-                  -28; -100,-24; -106,-22; -114,-20; -120,-20; -126,-20; -134,
-                  -22; -140,-24; -146,-28; -152,-34; -158,-44; -160,-54; -160,
-                  -60; -160,-60],        style(
+            Line(points=[180,-300; 180,-20; 140,30], style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[-40,-198; -40,4], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[40,-20; 120,-100],    style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Ellipse(extent=[144,36; 176,4],    style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[160,36; 160,4; 148,30; 160,4; 172,30],        style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[70,-200; 70,-90], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[100,-200; 100,-84], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[130,-200; 130,-80; 80,-60], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[40,-198; 40,-120; 20,-120; 20,-20; 40,-20; 80,-60],
-                style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Polygon(points=[40,-60; 120,-60; 120,-54; 118,-44; 112,-34; 106,-28;
-                  100,-24; 94,-22; 86,-20; 80,-20; 74,-20; 66,-22; 60,-24; 54,
-                  -28; 48,-34; 42,-44; 40,-54; 40,-60; 40,-60],
-                                         style(
+            Line(points=[140,-300; 140,72], style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[160,-198; 160,4], style(
+            Line(points=[100,-296; 100,-6], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillColor=68,
+                rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[-40,36; -40,120; 198,120], style(
+            Line(points=[60,-296; 60,-50; 60,-10; 60,80; 80,80; 130,30; 130,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillColor=68,
+                rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[160,36; 160,120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[-140,152; -100,112],  style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-140,132; -100,132; -100,136; -102,142; -106,146;
-                  -110,150; -116,152; -118,152; -120,152; -122,152; -124,152;
-                  -130,150; -134,146; -138,142; -140,136; -140,132; -140,132],
+            Polygon(points=[80,30; 180,30; 180,38; 178,48; 172,58; 166,66; 158,
+                  72; 148,78; 138,80; 130,80; 122,80; 112,78; 102,72; 94,66; 88,
+                  58; 82,48; 80,38; 80,38; 80,30],
                 style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[-132,120; -200,120], style(
+            Ellipse(extent=[-260,80; -160,-20], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255})),
+            Line(points=[-160,-290; -160,-20; -200,30], style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-200,-300; -200,-2], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-240,-298; -240,-6], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-280,-298; -280,-50; -280,-10; -280,80; -260,80; -210,
+                  30; -210,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Polygon(points=[-260,30; -160,30; -160,38; -162,48; -168,58; -174,
+                  66; -182,72; -192,78; -202,80; -210,80; -218,80; -228,78;
+                  -238,72; -246,66; -252,58; -258,48; -260,38; -260,38; -260,30],
+                style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Ellipse(extent=[-60,30; -20,-10],
+                                           style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Line(points=[-20,10; -60,10; -30,28; -60,10; -32,-8],
+                                                             style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Polygon(points=[-286,-204; -274,-204; -280,-220; -286,-204],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-246,-198; -234,-198; -240,-182; -246,-198],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-206,-204; -194,-204; -200,-220; -206,-204],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-166,-198; -154,-198; -160,-182; -166,-198],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-126,-204; -114,-204; -120,-220; -126,-204],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[54,-204; 66,-204; 60,-220; 54,-204],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[94,-198; 106,-198; 100,-182; 94,-198],  style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[134,-204; 146,-204; 140,-220; 134,-204], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[174,-198; 186,-198; 180,-182; 174,-198],style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillPattern=1))),
                              Diagram,
-          Coordsys(extent=[-200,-200; 200,200], scale=0.1));
+          Coordsys(extent=[-400,-300; 400,300], scale=0.1));
+        Water.FlangeB Steam_HP_Out(            redeclare package Medium = 
+              FluidMedium) 
+          annotation (extent=[-294,-314; -266,-286]);
+        Water.FlangeA Riser_HP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-254,-314; -226,-286]);
+        Water.FlangeB Downcomer_HP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-214,-314; -186,-286]);
+        Water.FlangeA Feed_HP(            redeclare package Medium = 
+              FluidMedium) 
+          annotation (extent=[-174,-314; -146,-286]);
+        Water.FlangeB WaterForHP(            redeclare package Medium = 
+              FluidMedium) 
+          annotation (extent=[-134,-314; -106,-286]);
+        Water.FlangeB Steam_LP_Out(            redeclare package Medium = 
+              FluidMedium) 
+          annotation (extent=[46,-314; 74,-286]);
+        Water.FlangeA Riser_LP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[86,-314; 114,-286]);
+        Water.FlangeB Downcomer_LP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[126,-314; 154,-286]);
+        Water.FlangeA Feed_LP(            redeclare package Medium = 
+              FluidMedium) 
+          annotation (extent=[166,-314; 194,-286]);
+        Buses.Sensors SensorsBus 
+                              annotation (extent=[380,60; 420,100]);
+        Buses.Actuators ActuatorsBus 
+                                  annotation (extent=[420,0; 380,40]);
       end DG_2L;
       
-      partial model DG_3L 
-        "Base class for Drums Group with three pressure levels" 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
-        
-        //Charateristics 
-        //HP drum 
-        parameter SI.Pressure fluidHPNomPressure "Nominal internal pressure" 
-                                                     annotation (Dialog(group = "HP drum"));
-        parameter SI.Length HPd_rint "Internal radius"                annotation (Dialog(group = "HP drum"));
-        parameter SI.Length HPd_rext "External radius"                annotation (Dialog(group = "HP drum"));
-        parameter SI.Length HPd_L "Length"                annotation (Dialog(group = "HP drum"));
-        parameter SI.HeatCapacity HPd_Cm 
-          "Total Heat Capacity of the metal wall"          annotation (Dialog(group = "HP drum"));
-        //IP drum 
-        parameter SI.Pressure fluidIPNomPressure "Nominal internal pressure" 
-                                                     annotation (Dialog(group = "IP drum"));
-        parameter SI.Length IPd_rint "Internal radius"                annotation (Dialog(group = "IP drum"));
-        parameter SI.Length IPd_rext "External radius"                annotation (Dialog(group = "IP drum"));
-        parameter SI.Length IPd_L "Length"                annotation (Dialog(group = "IP drum"));
-        parameter SI.HeatCapacity IPd_Cm 
-          "Total Heat Capacity of the metal wall"          annotation (Dialog(group = "IP drum"));
-        //LP drum 
-        parameter SI.Pressure fluidLPNomPressure "Nominal internal pressure" 
-                                                     annotation (Dialog(group = "LP drum"));
-        parameter SI.Length LPd_rint "Internal radius"                annotation (Dialog(group = "LP drum"));
-        parameter SI.Length LPd_rext "External radius"                annotation (Dialog(group = "LP drum"));
-        parameter SI.Length LPd_L "Length"                annotation (Dialog(group = "LP drum"));
-        parameter SI.HeatCapacity LPd_Cm 
-          "Total Heat Capacity of the metal wall"          annotation (Dialog(group = "LP drum"));
-        
-        //Initialization 
-        parameter Boolean SSInit = false "Steady-state initialisation" annotation(Dialog(tab = "Initialisation"));
-        //HP drum
-        parameter SI.Pressure HPd_pstart=fluidHPNomPressure 
-          "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.SpecificEnthalpy HPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.SpecificEnthalpy HPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.Temperature HPd_Tmstart=300 
-          "Metal wall temperature start value" 
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        //IP drum
-        parameter SI.Pressure IPd_pstart=fluidIPNomPressure 
-          "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter SI.SpecificEnthalpy IPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter SI.SpecificEnthalpy IPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter SI.Temperature IPd_Tmstart=300 
-          "Metal wall temperature start value" 
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        //LP drum
-        parameter SI.Pressure LPd_pstart=fluidLPNomPressure 
-          "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.SpecificEnthalpy LPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.SpecificEnthalpy LPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.Temperature LPd_Tmstart=300 
-          "Metal wall temperature start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        
-        constant Real g=Modelica.Constants.g_n;
-        constant Real pi=Modelica.Constants.pi;
-        
-        Water.FlangeB LiquidWaterOut(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-310,170; -290,190]);
-        Water.FlangeA WaterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[290,230; 310,250]);
-        annotation (Icon(
-            Rectangle(extent=[-300,300; 300,-300], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Ellipse(extent=[-270,-70; -170,-170], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[-170,-302; -170,-160; -210,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-200,-300; -200,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-230,-302; -230,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-260,-304; -260,-200; -280,-200; -280,-70; -260,-70;
-                  -220,-120; -220,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[-270,-120; -170,-120; -170,-112; -172,-102; -178,
-                  -92; -184,-84; -192,-78; -202,-72; -212,-70; -220,-70; -228,
-                  -70; -238,-72; -248,-78; -256,-84; -262,-92; -268,-102; -270,
-                  -112; -270,-112; -270,-120],
-                                         style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[240,60; 280,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[260,60; 260,20; 242,50; 260,20; 278,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[260,20; 260,-302], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[40,60; 80,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,60; 60,20; 42,50; 60,20; 78,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,20; 60,-300], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[-160,60; -120,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-140,60; -140,20; -158,50; -140,20; -124,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-140,18; -140,-302], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,60; 60,240], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[-70,-70; 30,-170], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[30,-302; 30,-160; -10,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[0,-300; 0,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-30,-302; -30,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-60,-304; -60,-200; -80,-200; -80,-70; -60,-70; -20,
-                  -120; -20,-120],
-                             style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[-70,-120; 30,-120; 30,-112; 28,-102; 22,-92; 16,-84;
-                  8,-78; -2,-72; -12,-70; -20,-70; -28,-70; -38,-72; -48,-78;
-                  -56,-84; -62,-92; -68,-102; -70,-112; -70,-112; -70,-120],
-                                                                         style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[130,-70; 230,-170], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[230,-302; 230,-160; 190,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[200,-300; 200,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[170,-302; 170,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[140,-304; 140,-200; 120,-200; 120,-70; 140,-70; 180,
-                  -120; 180,-120],
-                             style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[130,-120; 230,-120; 230,-112; 228,-102; 222,-92;
-                  216,-84; 208,-78; 198,-72; 188,-70; 180,-70; 172,-70; 162,-72;
-                  152,-78; 144,-84; 138,-92; 132,-102; 130,-112; 130,-112; 130,
-                  -120],
-                style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-140,60; -140,240; 260,240],style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[260,60; 260,240; 298,240],style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[-220,210; -180,170],  style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-220,190; -180,190; -180,194; -182,200; -186,204;
-                  -190,208; -196,210; -198,210; -200,210; -202,210; -204,210;
-                  -210,208; -214,204; -218,200; -220,194; -220,190; -220,190],
-                style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-210,180; -300,180], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1))),
-                             Diagram,
-          Coordsys(extent=[-300,-300; 300,300], scale=0.1));
-        Water.FlangeB Steam_HP_Out(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-270,-310; -250,-290]);
-        Water.FlangeA FromRiser_HP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-240,-310; -220,-290]);
-        Water.FlangeB ToRiser_HP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-210,-310; -190,-290]);
-        Water.FlangeA Feed_HP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-180,-310; -160,-290]);
-        Water.FlangeB WaterForHP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-150,-310; -130,-290]);
-        Water.FlangeB Steam_IP_Out(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-70,-310; -50,-290]);
-        Water.FlangeA FromRiser_IP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-40,-310; -20,-290]);
-        Water.FlangeB ToRiser_IP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-10,-310; 10,-290]);
-        Water.FlangeA Feed_IP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[20,-310; 40,-290]);
-        Water.FlangeB WaterForIP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[50,-310; 70,-290]);
-        Water.FlangeB Steam_LP_Out(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[130,-310; 150,-290]);
-        Water.FlangeA FromRiser_LP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[160,-310; 180,-290]);
-        Water.FlangeB ToRiser_LP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[190,-310; 210,-290]);
-        Water.FlangeA Feed_LP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[220,-310; 240,-290]);
-        Water.FlangeB WaterForLP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[250,-310; 270,-290]);
-        Buses.Sensors SensorsBus 
-                              annotation (extent=[280,140; 320,180]);
-        Buses.Actuators ActuatorsBus 
-                                  annotation (extent=[320,80; 280,120]);
-      end DG_3L;
-      
-      partial model DG_3L_wa 
-        "Base class for Drums Group with three pressure levels, without attemperation" 
+      partial model DG_3L_s 
+        "Base class for Drums Group with three pressure levels, series feedwater pumps" 
         
         replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
           Modelica.Media.Interfaces.PartialPureSubstance;
@@ -3851,620 +3390,283 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         constant Real pi=Modelica.Constants.pi;
         
         annotation (Icon(
-            Rectangle(extent=[-300,300; 300,-300], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Rectangle(extent=[-500,300; 500,-300], style(
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Ellipse(extent=[-270,-70; -170,-170], style(
+            Ellipse(extent=[240,80; 340,-20],   style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=3,
                 rgbfillColor={0,0,255})),
-            Line(points=[-170,-302; -170,-160; -210,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-200,-300; -200,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-230,-302; -230,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-260,-304; -260,-200; -280,-200; -280,-70; -260,-70;
-                  -220,-120; -220,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[-270,-120; -170,-120; -170,-112; -172,-102; -178,
-                  -92; -184,-84; -192,-78; -202,-72; -212,-70; -220,-70; -228,
-                  -70; -238,-72; -248,-78; -256,-84; -262,-92; -268,-102; -270,
-                  -112; -270,-112; -270,-120],
-                                         style(
+            Line(points=[340,-302; 340,-20; 300,30], style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Ellipse(extent=[240,60; 280,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[260,60; 260,20; 242,50; 260,20; 278,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[260,20; 260,-302], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[40,60; 80,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,60; 60,20; 42,50; 60,20; 78,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,20; 60,-300], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[-160,60; -120,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-140,60; -140,20; -158,50; -140,20; -124,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-140,18; -140,-302], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,60; 60,240], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[-70,-70; 30,-170], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[30,-302; 30,-160; -10,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[0,-300; 0,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-30,-302; -30,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-60,-304; -60,-200; -80,-200; -80,-70; -60,-70; -20,
-                  -120; -20,-120],
-                             style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[-70,-120; 30,-120; 30,-112; 28,-102; 22,-92; 16,-84;
-                  8,-78; -2,-72; -12,-70; -20,-70; -28,-70; -38,-72; -48,-78;
-                  -56,-84; -62,-92; -68,-102; -70,-112; -70,-112; -70,-120],
-                                                                         style(
+            Line(points=[300,-300; 300,-2], style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Ellipse(extent=[130,-70; 230,-170], style(
+            Line(points=[260,-300; 260,-6], style(
                 color=3,
                 rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[230,-302; 230,-160; 190,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[200,-300; 200,-160], style(
+            Line(points=[220,-300; 220,-50; 220,-10; 220,80; 240,80; 290,30;
+                  290,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[170,-302; 170,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[140,-304; 140,-200; 120,-200; 120,-70; 140,-70; 180,
-                  -120; 180,-120],
-                             style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[130,-120; 230,-120; 230,-112; 228,-102; 222,-92;
-                  216,-84; 208,-78; 198,-72; 188,-70; 180,-70; 172,-70; 162,-72;
-                  152,-78; 144,-84; 138,-92; 132,-102; 130,-112; 130,-112; 130,
-                  -120],
+            Polygon(points=[240,30; 340,30; 340,38; 338,48; 332,58; 326,66; 318,
+                  72; 308,78; 298,80; 290,80; 282,80; 272,78; 262,72; 254,66;
+                  248,58; 242,48; 240,38; 240,38; 240,30],
                 style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[-140,60; -140,240; 260,240],style(
+            Line(points=[300,8; 80,8; 80,-300], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillPattern=1)),
-            Line(points=[260,60; 260,240; 298,240],style(
+            Line(points=[80,-120; -220,-120; -220,-302], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[-60,80; 40,-20],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255})),
+            Line(points=[40,-300; 40,-20; 0,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[0,-300; 0,72], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-40,-296; -40,-6], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-80,-296; -80,-50; -80,-10; -80,80; -60,80; -10,30;
+                  -10,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Polygon(points=[-60,30; 40,30; 40,38; 38,48; 32,58; 26,66; 18,72; 8,
+                  78; -2,80; -10,80; -18,80; -28,78; -38,72; -46,66; -52,58;
+                  -58,48; -60,38; -60,38; -60,30],
+                style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Ellipse(extent=[-360,80; -260,-20], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255})),
+            Line(points=[-260,-290; -260,-20; -300,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-300,-300; -300,-2], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-340,-298; -340,-6], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-380,-298; -380,-50; -380,-10; -380,80; -360,80; -310,
+                  30; -310,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Polygon(points=[-360,30; -260,30; -260,38; -262,48; -268,58; -274,
+                  66; -282,72; -292,78; -302,80; -310,80; -318,80; -328,78;
+                  -338,72; -346,66; -352,58; -358,48; -360,38; -360,38; -360,30],
+                style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Ellipse(extent=[132,28; 172,-12],
+                                           style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Line(points=[172,8; 132,8; 162,26; 132,8; 160,-10],
+                                                             style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Ellipse(extent=[-180,-100; -140,-140],
+                                           style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Line(points=[-140,-120; -180,-120; -150,-102; -180,-120; -152,-138],
+                                                             style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Polygon(points=[-386,-234; -374,-234; -380,-250; -386,-234],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-346,-228; -334,-228; -340,-212; -346,-228],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-306,-234; -294,-234; -300,-250; -306,-234],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-266,-228; -254,-228; -260,-212; -266,-228],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-226,-234; -214,-234; -220,-250; -226,-234],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-86,-234; -74,-234; -80,-250; -86,-234], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,-228; -34,-228; -40,-212; -46,-228],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-6,-234; 6,-234; 0,-250; -6,-234],       style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[34,-228; 46,-228; 40,-212; 34,-228],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,-234; 86,-234; 80,-250; 74,-234],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[214,-234; 226,-234; 220,-250; 214,-234], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[254,-228; 266,-228; 260,-212; 254,-228],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[294,-234; 306,-234; 300,-250; 294,-234], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[334,-228; 346,-228; 340,-212; 334,-228],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[76,-116; 84,-124],
+                                           style(
                 color=3,
                 rgbcolor={0,0,255},
                 thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,-60; 86,-60; 80,-76; 74,-60],         style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillPattern=1))),
                              Diagram,
-          Coordsys(extent=[-300,-300; 300,300], scale=0.1));
-        Water.FlangeA WaterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[290,230; 310,250]);
+          Coordsys(extent=[-500,-300; 500,300], scale=0.1));
         Water.FlangeB Steam_HP_Out(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-270,-310; -250,-290]);
-        Water.FlangeA FromRiser_HP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-240,-310; -220,-290]);
-        Water.FlangeB ToRiser_HP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-210,-310; -190,-290]);
+          annotation (extent=[-394,-314; -366,-286]);
+        Water.FlangeA Riser_HP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-354,-314; -326,-286]);
+        Water.FlangeB Downcomer_HP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-314,-314; -286,-286]);
         Water.FlangeA Feed_HP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-180,-310; -160,-290]);
+          annotation (extent=[-274,-314; -246,-286]);
         Water.FlangeB WaterForHP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-150,-310; -130,-290]);
+          annotation (extent=[-234,-314; -206,-286]);
         Water.FlangeB Steam_IP_Out(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-70,-310; -50,-290]);
-        Water.FlangeA FromRiser_IP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-40,-310; -20,-290]);
-        Water.FlangeB ToRiser_IP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-10,-310; 10,-290]);
+          annotation (extent=[-94,-314; -66,-286]);
+        Water.FlangeA Riser_IP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-54,-314; -26,-286]);
+        Water.FlangeB Downcomer_IP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-14,-314; 14,-286]);
         Water.FlangeA Feed_IP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[20,-310; 40,-290]);
+          annotation (extent=[26,-314; 54,-286]);
         Water.FlangeB WaterForIP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[50,-310; 70,-290]);
+          annotation (extent=[66,-314; 94,-286]);
         Water.FlangeB Steam_LP_Out(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[130,-310; 150,-290]);
-        Water.FlangeA FromRiser_LP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[160,-310; 180,-290]);
-        Water.FlangeB ToRiser_LP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[190,-310; 210,-290]);
+          annotation (extent=[206,-314; 234,-286]);
+        Water.FlangeA Riser_LP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[246,-314; 274,-286]);
+        Water.FlangeB Downcomer_LP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[286,-314; 314,-286]);
         Water.FlangeA Feed_LP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[220,-310; 240,-290]);
-        Water.FlangeB WaterForLP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[250,-310; 270,-290]);
+          annotation (extent=[326,-314; 354,-286]);
         Buses.Sensors SensorsBus 
-                              annotation (extent=[280,140; 320,180]);
+                              annotation (extent=[480,60; 520,100]);
         Buses.Actuators ActuatorsBus 
-                                  annotation (extent=[320,80; 280,120]);
-      end DG_3L_wa;
+                                  annotation (extent=[520,0; 480,40]);
+      end DG_3L_s;
       
-      partial model DG_3L_is 
-        "Base class for Drums Group with three pressure levels, without attemperation and ideal sourge of water included" 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
-        
-        //Charateristics 
-        //HP drum 
-        parameter Modelica.SIunits.Pressure fluidHPNomPressure 
-          "Nominal internal pressure"                annotation (Dialog(group = "HP drum"));
-        parameter Modelica.SIunits.Length HPd_rint "Internal radius"  annotation (Dialog(group = "HP drum"));
-        parameter Modelica.SIunits.Length HPd_rext "External radius"  annotation (Dialog(group = "HP drum"));
-        parameter Modelica.SIunits.Length HPd_L "Length"  annotation (Dialog(group = "HP drum"));
-        parameter Modelica.SIunits.HeatCapacity HPd_Cm 
-          "Total Heat Capacity of the metal wall"          annotation (Dialog(group = "HP drum"));
-        //IP drum 
-        parameter Modelica.SIunits.Pressure fluidIPNomPressure 
-          "Nominal internal pressure"                annotation (Dialog(group = "IP drum"));
-        parameter Modelica.SIunits.Length IPd_rint "Internal radius"  annotation (Dialog(group = "IP drum"));
-        parameter Modelica.SIunits.Length IPd_rext "External radius"  annotation (Dialog(group = "IP drum"));
-        parameter Modelica.SIunits.Length IPd_L "Length"  annotation (Dialog(group = "IP drum"));
-        parameter Modelica.SIunits.HeatCapacity IPd_Cm 
-          "Total Heat Capacity of the metal wall"          annotation (Dialog(group = "IP drum"));
-        //LP drum 
-        parameter Modelica.SIunits.Pressure fluidLPNomPressure 
-          "Nominal internal pressure"                annotation (Dialog(group = "LP drum"));
-        parameter Modelica.SIunits.Length LPd_rint "Internal radius"  annotation (Dialog(group = "LP drum"));
-        parameter Modelica.SIunits.Length LPd_rext "External radius"  annotation (Dialog(group = "LP drum"));
-        parameter Modelica.SIunits.Length LPd_L "Length"  annotation (Dialog(group = "LP drum"));
-        parameter Modelica.SIunits.HeatCapacity LPd_Cm 
-          "Total Heat Capacity of the metal wall"          annotation (Dialog(group = "LP drum"));
-        
-        //Initialization 
-        parameter Boolean SSInit = false "Steady-state initialisation" annotation(Dialog(tab = "Initialisation"));
-        //HP drum
-        parameter Modelica.SIunits.Pressure HPd_pstart=fluidHPNomPressure 
-          "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter Modelica.SIunits.SpecificEnthalpy HPd_hvstart 
-          "Vapour enthalpy start value" 
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter Modelica.SIunits.SpecificEnthalpy HPd_hlstart 
-          "Liquid enthalpy start value" 
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter Modelica.SIunits.Temperature HPd_Tmstart=300 
-          "Metal wall temperature start value" 
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        //IP drum
-        parameter Modelica.SIunits.Pressure IPd_pstart=fluidIPNomPressure 
-          "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter Modelica.SIunits.SpecificEnthalpy IPd_hvstart 
-          "Vapour enthalpy start value" 
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter Modelica.SIunits.SpecificEnthalpy IPd_hlstart 
-          "Liquid enthalpy start value" 
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter Modelica.SIunits.Temperature IPd_Tmstart=300 
-          "Metal wall temperature start value" 
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        //LP drum
-        parameter Modelica.SIunits.Pressure LPd_pstart=fluidLPNomPressure 
-          "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter Modelica.SIunits.SpecificEnthalpy LPd_hvstart 
-          "Vapour enthalpy start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter Modelica.SIunits.SpecificEnthalpy LPd_hlstart 
-          "Liquid enthalpy start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter Modelica.SIunits.Temperature LPd_Tmstart=300 
-          "Metal wall temperature start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        
-        constant Real g=Modelica.Constants.g_n;
-        constant Real pi=Modelica.Constants.pi;
-        
-        ThermoPower.Water.FlangeB Steam_HP_Out(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-270,-310; -250,-290]);
-        ThermoPower.Water.FlangeA FromRiser_HP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-240,-310; -220,-290]);
-        ThermoPower.Water.FlangeB ToRiser_HP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-210,-310; -190,-290]);
-        ThermoPower.Water.FlangeA Feed_HP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-180,-310; -160,-290]);
-        ThermoPower.Water.FlangeB WaterForHP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-150,-310; -130,-290]);
-        ThermoPower.Water.FlangeB Steam_IP_Out(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-70,-310; -50,-290]);
-        ThermoPower.Water.FlangeA FromRiser_IP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-40,-310; -20,-290]);
-        ThermoPower.Water.FlangeB ToRiser_IP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-10,-310; 10,-290]);
-        ThermoPower.Water.FlangeA Feed_IP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[20,-310; 40,-290]);
-        ThermoPower.Water.FlangeB WaterForIP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[50,-310; 70,-290]);
-        ThermoPower.Water.FlangeB Steam_LP_Out(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[130,-310; 150,-290]);
-        ThermoPower.Water.FlangeA FromRiser_LP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[160,-310; 180,-290]);
-        ThermoPower.Water.FlangeB ToRiser_LP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[190,-310; 210,-290]);
-        ThermoPower.Water.FlangeA Feed_LP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[220,-310; 240,-290]);
-        ThermoPower.Water.FlangeB WaterForLP(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[250,-310; 270,-290]);
-        ThermoPower.PowerPlants.Buses.Sensors SensorsBus 
-                              annotation (extent=[280,140; 320,180]);
-        ThermoPower.PowerPlants.Buses.Actuators ActuatorsBus 
-                                  annotation (extent=[320,80; 280,120]);
-        annotation (Icon(
-            Rectangle(extent=[-300,300; 300,-300], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Ellipse(extent=[-270,-70; -170,-170], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[-170,-302; -170,-160; -210,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-200,-300; -200,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-230,-302; -230,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-260,-304; -260,-200; -280,-200; -280,-70; -260,-70;
-                  -220,-120; -220,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[-270,-120; -170,-120; -170,-112; -172,-102; -178,-92;
-                  -184,-84; -192,-78; -202,-72; -212,-70; -220,-70; -228,-70;
-                  -238,-72; -248,-78; -256,-84; -262,-92; -268,-102; -270,-112;
-                  -270,-112; -270,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[240,60; 280,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[260,60; 260,20; 242,50; 260,20; 278,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[260,20; 260,-302], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[40,60; 80,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,60; 60,20; 42,50; 60,20; 78,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,20; 60,-300], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[-160,60; -120,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-140,60; -140,20; -158,50; -140,20; -124,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-140,18; -140,-302], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,60; 60,180], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[-70,-70; 30,-170], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[30,-302; 30,-160; -10,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[0,-300; 0,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-30,-302; -30,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-60,-304; -60,-200; -80,-200; -80,-70; -60,-70; -20,-120;
-                  -20,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[-70,-120; 30,-120; 30,-112; 28,-102; 22,-92; 16,-84;
-                  8,-78; -2,-72; -12,-70; -20,-70; -28,-70; -38,-72; -48,-78; -56,
-                  -84; -62,-92; -68,-102; -70,-112; -70,-112; -70,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[130,-70; 230,-170], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[230,-302; 230,-160; 190,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[200,-300; 200,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[170,-302; 170,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[140,-304; 140,-200; 120,-200; 120,-70; 140,-70; 180,-120;
-                  180,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[130,-120; 230,-120; 230,-112; 228,-102; 222,-92; 216,
-                  -84; 208,-78; 198,-72; 188,-70; 180,-70; 172,-70; 162,-72; 152,
-                  -78; 144,-84; 138,-92; 132,-102; 130,-112; 130,-112; 130,-120],
-                style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[36,224; 86,176], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillPattern=1)),
-            Line(points=[-140,60; -140,120; 60,202], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[260,60; 260,120; 60,202], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1))),
-                             Diagram,
-          Coordsys(
-            extent=[-300,-300; 300,300],
-            scale=0.1,
-            grid=[2,2]));
-      end DG_3L_is;
-      
-      partial model DG_3L_tap_wa 
-        "Base class for Drums Group with three pressure levels and tappings of saturated water for external heater, without attemperation" 
+      partial model DG_3L_p 
+        "Base class for Drums Group with three pressure levels, parallel feedwater pumps" 
         
         replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
           Modelica.Media.Interfaces.PartialPureSubstance;
@@ -4534,297 +3736,278 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         constant Real g=Modelica.Constants.g_n;
         constant Real pi=Modelica.Constants.pi;
         
-        Water.FlangeA HPsteamFromExUse(redeclare package Medium = FluidMedium) 
-          "HP steam from external use" 
-          annotation (extent=[-250,290; -230,310]);
-        Water.FlangeB tapHPwater(redeclare package Medium = FluidMedium) 
-          "tapping HP Water for external use" 
-          annotation (extent=[-150,290; -130,310]);
-        Water.FlangeA IPsteamFromExUse(redeclare package Medium = FluidMedium) 
-          "IP steam from external use" 
-          annotation (extent=[-210,290; -190,310]);
-        Water.FlangeB tapIPwater(redeclare package Medium = FluidMedium) 
-          "tapping IP Water for external use" 
-          annotation (extent=[-110,290; -90,310]);
-        Water.FlangeB tapLPwater(redeclare package Medium = FluidMedium) 
-          "tapping LP Water for external use" 
-          annotation (extent=[-72,290; -52,310]);
         annotation (Icon(
-            Rectangle(extent=[-300,300; 300,-300], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Rectangle(extent=[-500,300; 500,-300], style(
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Ellipse(extent=[-270,-70; -170,-170], style(
+            Ellipse(extent=[240,80; 340,-20],   style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=3,
                 rgbfillColor={0,0,255})),
-            Line(points=[-170,-302; -170,-160; -210,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-200,-300; -200,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-230,-302; -230,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-260,-304; -260,-200; -280,-200; -280,-70; -260,-70;
-                  -220,-120; -220,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[-270,-120; -170,-120; -170,-112; -172,-102; -178,
-                  -92; -184,-84; -192,-78; -202,-72; -212,-70; -220,-70; -228,
-                  -70; -238,-72; -248,-78; -256,-84; -262,-92; -268,-102; -270,
-                  -112; -270,-112; -270,-120],
-                                         style(
+            Line(points=[340,-302; 340,-20; 300,30], style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Ellipse(extent=[240,60; 280,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[260,60; 260,20; 242,50; 260,20; 278,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[260,20; 260,-302], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[40,60; 80,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,60; 60,20; 42,50; 60,20; 78,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,20; 60,-300], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[-160,60; -120,20], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-140,60; -140,20; -158,50; -140,20; -124,50], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-140,18; -140,-302], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[60,60; 60,240], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Ellipse(extent=[-70,-70; 30,-170], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[30,-302; 30,-160; -10,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[0,-300; 0,-160], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-30,-302; -30,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[-60,-304; -60,-200; -80,-200; -80,-70; -60,-70; -20,
-                  -120; -20,-120],
-                             style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[-70,-120; 30,-120; 30,-112; 28,-102; 22,-92; 16,-84;
-                  8,-78; -2,-72; -12,-70; -20,-70; -28,-70; -38,-72; -48,-78;
-                  -56,-84; -62,-92; -68,-102; -70,-112; -70,-112; -70,-120],
-                                                                         style(
+            Line(points=[300,-300; 300,-2], style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Ellipse(extent=[130,-70; 230,-170], style(
+            Line(points=[260,-300; 260,-6], style(
                 color=3,
                 rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[230,-302; 230,-160; 190,-120], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[200,-300; 200,-160], style(
+            Line(points=[220,-300; 220,-50; 220,-10; 220,80; 240,80; 290,30;
+                  290,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[170,-302; 170,-168], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[140,-304; 140,-200; 120,-200; 120,-70; 140,-70; 180,
-                  -120; 180,-120],
-                             style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Polygon(points=[130,-120; 230,-120; 230,-112; 228,-102; 222,-92;
-                  216,-84; 208,-78; 198,-72; 188,-70; 180,-70; 172,-70; 162,-72;
-                  152,-78; 144,-84; 138,-92; 132,-102; 130,-112; 130,-112; 130,
-                  -120],
+            Polygon(points=[240,30; 340,30; 340,38; 338,48; 332,58; 326,66; 318,
+                  72; 308,78; 298,80; 290,80; 282,80; 272,78; 262,72; 254,66;
+                  248,58; 242,48; 240,38; 240,38; 240,30],
                 style(
                 color=3,
                 rgbcolor={0,0,255},
                 fillColor=68,
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
-            Line(points=[-140,60; -140,240; 260,240],style(
+            Ellipse(extent=[-60,80; 40,-20],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255})),
+            Line(points=[40,-300; 40,-20; 0,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[0,-300; 0,72], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-40,-296; -40,-6], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-80,-296; -80,-50; -80,-10; -80,80; -60,80; -10,30;
+                  -10,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Polygon(points=[-60,30; 40,30; 40,38; 38,48; 32,58; 26,66; 18,72; 8,
+                  78; -2,80; -10,80; -18,80; -28,78; -38,72; -46,66; -52,58;
+                  -58,48; -60,38; -60,38; -60,30],
+                style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Ellipse(extent=[-360,80; -260,-20], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255})),
+            Line(points=[-260,-290; -260,-20; -300,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-300,-300; -300,-2], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-340,-298; -340,-6], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[-380,-298; -380,-50; -380,-10; -380,80; -360,80; -310,
+                  30; -310,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Polygon(points=[-360,30; -260,30; -260,38; -262,48; -268,58; -274,
+                  66; -282,72; -292,78; -302,80; -310,80; -318,80; -328,78;
+                  -338,72; -346,66; -352,58; -358,48; -360,38; -360,38; -360,30],
+                style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=68,
+                rgbfillColor={170,213,255},
+                fillPattern=1)),
+            Line(points=[300,8; 80,8; 80,-300], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[80,-120; -220,-120; -220,-302], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[78,-118; 82,-122], style(
                 color=3,
                 rgbcolor={0,0,255},
                 thickness=2,
                 fillPattern=1)),
-            Line(points=[260,60; 260,240; 298,240],style(
+            Ellipse(extent=[-240,-160; -200,-200],
+                                           style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillColor=7,
+                rgbfillColor={255,255,255},
                 fillPattern=1)),
-            Text(
-              extent=[-260,280; -40,260],
-              style(
+            Line(points=[-220,-160; -220,-200; -238,-172; -220,-200; -202,-172],
+                                                             style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1),
-              string="tappings")),
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Ellipse(extent=[60,-160; 100,-200],
+                                           style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Line(points=[80,-160; 80,-200; 62,-172; 80,-200; 98,-172],
+                                                             style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Polygon(points=[-386,-234; -374,-234; -380,-250; -386,-234],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-346,-228; -334,-228; -340,-212; -346,-228],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-306,-234; -294,-234; -300,-250; -306,-234],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-266,-228; -254,-228; -260,-212; -266,-228],
+                                                                    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-226,-234; -214,-234; -220,-250; -226,-234],
+                                                                     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-86,-234; -74,-234; -80,-250; -86,-234], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,-228; -34,-228; -40,-212; -46,-228],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-6,-234; 6,-234; 0,-250; -6,-234],       style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[34,-228; 46,-228; 40,-212; 34,-228],    style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,-234; 86,-234; 80,-250; 74,-234],     style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[214,-234; 226,-234; 220,-250; 214,-234], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[254,-228; 266,-228; 260,-212; 254,-228],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[294,-234; 306,-234; 300,-250; 294,-234], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[334,-228; 346,-228; 340,-212; 334,-228],style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,-52; 86,-52; 80,-68; 74,-52],         style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1))),
                              Diagram,
-          Coordsys(extent=[-300,-300; 300,300], scale=0.1));
-        
-        Water.FlangeA WaterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[290,230; 310,250]);
+          Coordsys(extent=[-500,-300; 500,300], scale=0.1));
         Water.FlangeB Steam_HP_Out(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-270,-310; -250,-290]);
-        Water.FlangeA FromRiser_HP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-240,-310; -220,-290]);
-        Water.FlangeB ToRiser_HP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-210,-310; -190,-290]);
+          annotation (extent=[-394,-314; -366,-286]);
+        Water.FlangeA Riser_HP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-354,-314; -326,-286]);
+        Water.FlangeB Downcomer_HP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-314,-314; -286,-286]);
         Water.FlangeA Feed_HP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-180,-310; -160,-290]);
+          annotation (extent=[-274,-314; -246,-286]);
         Water.FlangeB WaterForHP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-150,-310; -130,-290]);
+          annotation (extent=[-234,-314; -206,-286]);
         Water.FlangeB Steam_IP_Out(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-70,-310; -50,-290]);
-        Water.FlangeA FromRiser_IP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-40,-310; -20,-290]);
-        Water.FlangeB ToRiser_IP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-10,-310; 10,-290]);
+          annotation (extent=[-94,-314; -66,-286]);
+        Water.FlangeA Riser_IP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-54,-314; -26,-286]);
+        Water.FlangeB Downcomer_IP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-14,-314; 14,-286]);
         Water.FlangeA Feed_IP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[20,-310; 40,-290]);
+          annotation (extent=[26,-314; 54,-286]);
         Water.FlangeB WaterForIP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[50,-310; 70,-290]);
+          annotation (extent=[66,-314; 94,-286]);
         Water.FlangeB Steam_LP_Out(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[130,-310; 150,-290]);
-        Water.FlangeA FromRiser_LP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[160,-310; 180,-290]);
-        Water.FlangeB ToRiser_LP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[190,-310; 210,-290]);
+          annotation (extent=[206,-314; 234,-286]);
+        Water.FlangeA Riser_LP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[246,-314; 274,-286]);
+        Water.FlangeB Downcomer_LP(redeclare package Medium = FluidMedium) 
+          annotation (extent=[286,-314; 314,-286]);
         Water.FlangeA Feed_LP(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[220,-310; 240,-290]);
-        Water.FlangeB WaterForLP(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[250,-310; 270,-290]);
+          annotation (extent=[326,-314; 354,-286]);
         Buses.Sensors SensorsBus 
-                              annotation (extent=[280,140; 320,180]);
+                              annotation (extent=[480,60; 520,100]);
         Buses.Actuators ActuatorsBus 
-                                  annotation (extent=[320,80; 280,120]);
-      end DG_3L_tap_wa;
+                                  annotation (extent=[520,0; 480,40]);
+      end DG_3L_p;
       
       partial model HRSG_2L 
         "Base class for Heat Recovery Steam Generator with two pressure levels" 
@@ -4837,8 +4020,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           annotation (extent=[140,-220; 180,-180]);
         annotation (Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Ellipse(extent=[-130,160; -70,100], style(
@@ -4870,8 +4053,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
             Rectangle(extent=[-200,60; 200,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={215,215,215})),
             Line(points=[-100,60; -100,20; -60,0; -140,-40; -60,-80; -100,-100;
@@ -4919,8 +4102,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           annotation (extent=[140,-220; 180,-180]);
         annotation (Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Ellipse(extent=[-130,160; -70,100], style(
@@ -4952,8 +4135,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
             Rectangle(extent=[-200,60; 200,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={215,215,215})),
             Line(points=[-100,60; -100,20; -60,0; -140,-40; -60,-80; -100,-100;
@@ -5007,8 +4190,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           annotation (extent=[140,-220; 180,-180]);
         annotation (Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Ellipse(extent=[-140,160; -80,100], style(
@@ -5053,8 +4236,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 rgbfillColor={170,213,255},
                 fillPattern=1)),
             Rectangle(extent=[-200,60; 200,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={215,215,215})),
             Line(points=[-110,60; -110,20; -70,0; -150,-40; -70,-80; -110,-100;
@@ -5087,9 +4270,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         Water.FlangeB Sh_HP_Out(            redeclare package Medium = 
               FluidMedium) 
           annotation (extent=[-180,-220; -140,-180]);
-        Water.FlangeB Sh_IP_Out(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[0,-220; 40,-180]);
         Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) 
                           annotation (extent=[-220,-60; -180,-20]);
         Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium) 
@@ -5109,246 +4289,12 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                                   annotation (extent=[220,80; 180,120]);
       end HRSG_3LRh;
       
-      partial model HRSG_3LRh_is 
-        "Base class for Heat Recovery Steam Generator with three pressure levels and reheat, ideal sourge of water included" 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
-        
-        ThermoPower.Water.FlangeB Sh_HP_Out(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-180,-220; -140,-180]);
-        ThermoPower.Water.FlangeB Sh_IP_Out(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[0,-220; 40,-180]);
-        ThermoPower.Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium)
-                          annotation (extent=[-220,-60; -180,-20]);
-        ThermoPower.Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium)
-                           annotation (extent=[180,-60; 220,-20]);
-        ThermoPower.Water.FlangeA Rh_IP_In(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-120,-220; -80,-180]);
-        ThermoPower.Water.FlangeB Rh_IP_Out(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-60,-220; -20,-180]);
-        ThermoPower.Water.FlangeB Sh_LP_Out(redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[60,-220; 100,-180]);
-        ThermoPower.PowerPlants.Buses.Sensors SensorsBus 
-                              annotation (extent=[180,140; 220,180]);
-        ThermoPower.PowerPlants.Buses.Actuators ActuatorsBus 
-                                  annotation (extent=[220,80; 180,120]);
-        annotation (Icon(
-            Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Ellipse(extent=[-140,160; -80,100], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-140,130; -80,130; -80,134; -80,134; -82,142; -84,
-                  146; -88,152; -94,156; -98,158; -106,160; -110,160; -114,160;
-                  -122,158; -126,156; -132,152; -136,146; -138,142; -140,134;
-                  -140,130],
-                style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[-30,160; 30,100], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-30,130; 30,130; 30,134; 30,134; 28,142; 26,146; 22,
-                  152; 16,156; 12,158; 4,160; 0,160; -4,160; -12,158; -16,156;
-                  -22,152; -26,146; -28,142; -30,134; -30,130], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[80,160; 140,100], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[80,130; 140,130; 140,134; 140,134; 138,142; 136,146;
-                  132,152; 126,156; 122,158; 114,160; 110,160; 106,160; 98,158;
-                  94,156; 88,152; 84,146; 82,142; 80,134; 80,130], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Rectangle(extent=[-200,60; 200,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={215,215,215})),
-            Line(points=[-110,60; -110,20; -70,0; -150,-40; -70,-80; -110,-100;
-                  -110,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[0,60; 0,20; 40,0; -40,-40; 40,-80; 0,-100; 0,-140],
-                style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[110,60; 110,20; 150,0; 70,-40; 150,-80; 110,-100; 110,
-                  -140], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1))),
-            Diagram,
-          Coordsys(extent=[-200,-200; 200,200], scale=0.1));
-        
-      end HRSG_3LRh_is;
-      
-      partial model HRSG_3LRh_tap "Base class for Heat Recovery Steam Generator with three pressure levels,
-  reheat and tappings of saturated water for external heater " 
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas extends 
-          Modelica.Media.Interfaces.PartialMedium;
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
-        
-        Water.FlangeA HPsteam_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-170,190; -150,210]);
-        Water.FlangeB HPwater_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-110,190; -90,210]);
-        Water.FlangeA IPsteam_In(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-50,190; -30,210]);
-        Water.FlangeB IPwater_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[12,190; 32,210]);
-        Water.FlangeB LPwater_Out(redeclare package Medium = FluidMedium) 
-          annotation (extent=[70,190; 90,210]);
-        annotation (Icon(
-            Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Ellipse(extent=[-140,160; -80,100], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-140,130; -80,130; -80,134; -80,134; -82,142; -84,
-                  146; -88,152; -94,156; -98,158; -106,160; -110,160; -114,160;
-                  -122,158; -126,156; -132,152; -136,146; -138,142; -140,134;
-                  -140,130],
-                style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[-30,160; 30,100], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-30,130; 30,130; 30,134; 30,134; 28,142; 26,146; 22,
-                  152; 16,156; 12,158; 4,160; 0,160; -4,160; -12,158; -16,156;
-                  -22,152; -26,146; -28,142; -30,134; -30,130], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Ellipse(extent=[80,160; 140,100], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[80,130; 140,130; 140,134; 140,134; 138,142; 136,146;
-                  132,152; 126,156; 122,158; 114,160; 110,160; 106,160; 98,158;
-                  94,156; 88,152; 84,146; 82,142; 80,134; 80,130], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Rectangle(extent=[-200,60; 200,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={215,215,215})),
-            Line(points=[-110,60; -110,20; -70,0; -150,-40; -70,-80; -110,-100;
-                  -110,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[0,60; 0,20; 40,0; -40,-40; 40,-80; 0,-100; 0,-140],
-                style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1)),
-            Line(points=[110,60; 110,20; 150,0; 70,-40; 150,-80; 110,-100; 110,
-                  -140], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=68,
-                rgbfillColor={170,213,255},
-                fillPattern=1))),
-            Diagram,
-          Coordsys(extent=[-200,-200; 200,200], scale=0.1));
-        
-        Water.FlangeA WaterIn(redeclare package Medium = FluidMedium) 
-          annotation (extent=[140,-220; 180,-180]);
-        Water.FlangeB Sh_HP_Out(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-180,-220; -140,-180]);
-        Water.FlangeB Sh_IP_Out(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[0,-220; 40,-180]);
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) 
-                          annotation (extent=[-220,-60; -180,-20]);
-        Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium) 
-                           annotation (extent=[180,-60; 220,-20]);
-        Water.FlangeA Rh_IP_In(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-120,-220; -80,-180]);
-        Water.FlangeB Rh_IP_Out(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-60,-220; -20,-180]);
-        Water.FlangeB Sh_LP_Out(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[60,-220; 100,-180]);
-        Buses.Sensors SensorsBus 
-                              annotation (extent=[180,140; 220,180]);
-        Buses.Actuators ActuatorsBus 
-                                  annotation (extent=[220,80; 180,120]);
-      end HRSG_3LRh_tap;
-      
     end Interfaces;
     
     package Components "HRSG component models" 
       
       model HE "Heat Exchanger fluid - gas" 
-        extends Interfaces.HeatExchanger(pstartout_F=fluidNomPressure-dpnom);
+        extends Interfaces.HeatExchanger(pstartout_F=fluidNomPressure-dpnom_F);
         
         parameter SI.CoefficientOfHeatTransfer gamma_G 
           "Constant heat transfer coefficient in the gas side";
@@ -5356,12 +4302,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Constant heat transfer coefficient in the fluid side";
         parameter Choices.Flow1D.FFtypes.Temp FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
           "Friction Factor Type, fluid side";
+        parameter Real Kfnom_F=0 "Nominal hydraulic resistance coefficient";
+        parameter SI.Pressure dpnom_F=0 
+          "Nominal pressure drop fluid side (friction term only!)";
+        parameter SI.Density rhonom_F=0 "Nominal inlet density fluid side";
+        parameter Real Cfnom_F=0 "Nominal Fanning friction factor";
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
           "Location of the hydraulic capacitance, fluid side";
         parameter Boolean counterCurrent=true "Counter-current flow";
-        parameter SI.Pressure dpnom=0 
-          "Nominal pressure drop fluid side (friction term only!)";
-        parameter SI.Density rhonom=0 "Nominal inlet density fluid side";
         parameter Boolean gasQuasiStatic=false 
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         constant Real pi=Modelica.Constants.pi;
@@ -5379,13 +4327,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           pstartin=pstartin_F,
           pstartout=pstartout_F,
           FFtype=FFtype_F,
-          dpnom=dpnom,
-          rhonom=rhonom,
           HydraulicCapacitance=HCtype_F,
           hstart=hstart_F,
           hstartin=hstart_F_In,
-          hstartout=hstart_F_Out) 
-                                 annotation (extent=[-10,-60; 10,-40]);
+          hstartout=hstart_F_Out,
+          Kfnom=Kfnom_F,
+          dpnom=dpnom_F,
+          rhonom=rhonom_F,
+          Cfnom=Cfnom_F)         annotation (extent=[-10,-60; 10,-40]);
         Thermal.ConvHT convHT(               N=N_F,
           Tstart11=Tstart_M_In,
           Tstart1N=Tstart_M_Out,
@@ -5442,6 +4391,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           gamma=gamma_G,
           Tstart1=Tstart_G,
           Tstart2=Tstart_M)    annotation (extent=[-10,20; 10,40]);
+        
       equation 
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (points=[0,-45; 0,-33.1],
@@ -5481,7 +4431,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       end HE;
       
       model HE2ph "Heat Exchanger fluid - gas (fluid 2-phase)" 
-        extends Interfaces.HeatExchanger(pstartout_F=fluidNomPressure-dpnom);
+        extends Interfaces.HeatExchanger(pstartout_F=fluidNomPressure-dpnom_F);
         
         parameter SI.CoefficientOfHeatTransfer gamma_G 
           "Constant heat transfer coefficient in the gas side";
@@ -5489,12 +4439,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Constant heat transfer coefficient in the fluid side";
         parameter Choices.Flow1D.FFtypes.Temp FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
           "Friction Factor Type, fluid side";
+        parameter Real Kfnom_F=0 "Nominal hydraulic resistance coefficient";
+        parameter SI.Pressure dpnom_F=0 
+          "Nominal pressure drop fluid side (friction term only!)";
+        parameter SI.Density rhonom_F=0 "Nominal inlet density fluid side";
+        parameter Real Cfnom_F=0 "Nominal Fanning friction factor";
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
           "Location of the hydraulic capacitance, fluid side";
         parameter Boolean counterCurrent=true "Counter-current flow";
-        parameter SI.Pressure dpnom=0 
-          "Nominal pressure drop fluid side (friction term only!)";
-        parameter SI.Density rhonom=0 "Nominal inlet density fluid side";
         parameter Boolean gasQuasiStatic=false 
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         constant Real pi=Modelica.Constants.pi;
@@ -5512,13 +4464,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           pstartin=pstartin_F,
           pstartout=pstartout_F,
           FFtype=FFtype_F,
-          dpnom=dpnom,
-          rhonom=rhonom,
           HydraulicCapacitance=HCtype_F,
           hstart=hstart_F,
           hstartin=hstart_F_In,
-          hstartout=hstart_F_Out) 
-                                 annotation (extent=[-10,-58; 10,-38]);
+          hstartout=hstart_F_Out,
+          Kfnom=Kfnom_F,
+          dpnom=dpnom_F,
+          rhonom=rhonom_F,
+          Cfnom=Cfnom_F)         annotation (extent=[-10,-58; 10,-38]);
         Thermal.ConvHT convHT(gamma=gamma_F, N=N_F,
           Tstart11=Tstart_M_In,
           Tstart1N=Tstart_M_Out,
@@ -5574,6 +4527,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           gamma=gamma_G,
           Tstart1=Tstart_G,
           Tstart2=Tstart_M)    annotation (extent=[-10,22; 10,42]);
+        
       equation 
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (points=[0,-43; 0,-33.1],
@@ -5613,8 +4567,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       end HE2ph;
       
       model ParHE "Parallel heat exchangers fluid - gas" 
-        extends Interfaces.ParallelHE(pstartout_F_A=fluidNomPressure_A-dpnom_A,
-                                      pstartout_F_B=fluidNomPressure_B-dpnom_B);
+        extends Interfaces.ParallelHE(pstartout_F_A=fluidNomPressure_A-dpnom_F_A,
+                                      pstartout_F_B=fluidNomPressure_B-dpnom_F_B);
         
         parameter SI.CoefficientOfHeatTransfer gamma_G_A 
           "Constant heat transfer coefficient in the gas side"     annotation (Dialog(group = "side A"));
@@ -5626,20 +4580,29 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Constant heat transfer coefficient in the fluid side"     annotation (Dialog(group = "side B"));
         parameter Choices.Flow1D.FFtypes.Temp FFtype_F_A=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
           "Friction Factor Type, fluid side"     annotation (Dialog(group = "side A"));
+        parameter Real Kfnom_F_A=0 "Nominal hydraulic resistance coefficient" 
+                                                                             annotation (Dialog(group = "side A"));
+        parameter SI.Pressure dpnom_F_A=0 
+          "Nominal pressure drop fluid side (friction term only!)"     annotation (Dialog(group = "side A"));
+        parameter SI.Density rhonom_F_A=0 "Nominal inlet density fluid side"   annotation (Dialog(group = "side A"));
+        parameter Real Cfnom_F_A=0 "Nominal Fanning friction factor" 
+                                                                    annotation (Dialog(group = "side A"));
         parameter Choices.Flow1D.FFtypes.Temp FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
           "Friction Factor Type, fluid side"     annotation (Dialog(group = "side B"));
+        parameter Real Kfnom_F_B=0 "Nominal hydraulic resistance coefficient" 
+                                                                             annotation (Dialog(group = "side B"));
+        parameter SI.Pressure dpnom_F_B=0 
+          "Nominal pressure drop fluid side (friction term only!)"   annotation (Dialog(group = "side B"));
+        parameter SI.Density rhonom_F_B=0 "Nominal inlet density fluid side"   annotation (Dialog(group = "side B"));
+        parameter Real Cfnom_F_B=0 "Nominal Fanning friction factor" 
+                                                                    annotation (Dialog(group = "side B"));
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F_A=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
           "Location of the hydraulic capacitance, fluid side"     annotation (Dialog(group = "side A"));
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F_B=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
           "Location of the hydraulic capacitance, fluid side"     annotation (Dialog(group = "side B"));
         parameter Boolean counterCurrent_A = true "Counter-current flow"     annotation (Dialog(group = "side A"));
         parameter Boolean counterCurrent_B = true "Counter-current flow"     annotation (Dialog(group = "side B"));
-        parameter SI.Pressure dpnom_A=0 
-          "Nominal pressure drop fluid side (friction term only!)"     annotation (Dialog(group = "side A"));
-        parameter SI.Pressure dpnom_B=0 
-          "Nominal pressure drop fluid side (friction term only!)"     annotation (Dialog(group = "side B"));
-        parameter SI.Density rhonom_A=0 "Nominal inlet density fluid side"     annotation (Dialog(group = "side A"));
-        parameter SI.Density rhonom_B=0 "Nominal inlet density fluid side"     annotation (Dialog(group = "side B"));
+        
         parameter Boolean gasQuasiStatic=false 
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         constant Real pi=Modelica.Constants.pi;
@@ -5665,12 +4628,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart=hstart_F_A,
           wnom=fluidNomFlowRate_A,
           FFtype=FFtype_F_A,
-          dpnom=dpnom_A,
-          rhonom=rhonom_A,
           HydraulicCapacitance=HCtype_F_A,
           hstartin=hstart_F_A_In,
-          hstartout=hstart_F_A_Out) 
-                                 annotation (extent=[-38,-56; -18,-36]);
+          hstartout=hstart_F_A_Out,
+          Kfnom=Kfnom_F_A,
+          dpnom=dpnom_F_A,
+          rhonom=rhonom_F_A,
+          Cfnom=Cfnom_F_A)       annotation (extent=[-38,-56; -18,-36]);
         Thermal.ConvHT convHT_A(
           N=N_F_A,
           gamma=gamma_F_A,
@@ -5723,12 +4687,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           pstartout=pstartout_F_B,
           hstart=hstart_F_B,
           FFtype=FFtype_F_B,
-          dpnom=dpnom_B,
-          rhonom=rhonom_B,
           HydraulicCapacitance=HCtype_F_B,
           hstartin=hstart_F_B_In,
-          hstartout=hstart_F_B_Out) 
-                                 annotation (extent=[38,-56; 18,-36]);
+          hstartout=hstart_F_B_Out,
+          Kfnom=Kfnom_F_B,
+          dpnom=dpnom_F_B,
+          rhonom=rhonom_F_B,
+          Cfnom=Cfnom_F_B)       annotation (extent=[38,-56; 18,-36]);
         Thermal.ConvHT convHT_B(
           N=N_F_B,
           gamma=gamma_F_B,
@@ -5786,6 +4751,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           gamma=gamma_G_B,
           Tstart1=Tstart_G,
           Tstart2=Tstart_M_B)    annotation (extent=[18,24; 38,44]);
+        
       equation 
         connect(heatFlowDistribution_A.side2, cC_A.side1) annotation (points=[-28,14.9;
               -28,5],           style(color=45, rgbcolor={255,127,0}));
@@ -5845,9 +4811,9 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
               -1.1], style(color=45, rgbcolor={255,127,0}));
       end ParHE;
       
-      model ParHE_att 
-        "Parallel Heat Exchanger (two fluid with one gas) with attemperation" 
-        extends Interfaces.ParallelHE_Att;
+      model ParHE_Des 
+        "Parallel Heat Exchanger (two fluid with one gas) with Desuperheater" 
+        extends ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE_Des;
         
         parameter SI.CoefficientOfHeatTransfer gamma_G_A_p1 
           "Constant heat transfer coefficient in the gas side"            annotation (Dialog(tab = "pHE-1", group = "side A"));
@@ -5857,10 +4823,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Constant heat transfer coefficient in the fluid side"            annotation (Dialog(tab = "pHE-1", group = "side A"));
         parameter SI.CoefficientOfHeatTransfer gamma_F_B_p1 
           "Constant heat transfer coefficient in the fluid side"            annotation (Dialog(tab = "pHE-1", group = "side B"));
-        parameter Choices.Flow1D.FFtypes.Temp FFtype_F_A_p1=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
-          "Friction Factor Type, fluid side"            annotation (Dialog(tab = "pHE-1", group = "side A"));
-        parameter Choices.Flow1D.FFtypes.Temp FFtype_F_B_p1=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
-          "Friction Factor Type, fluid side"            annotation (Dialog(tab = "pHE-1", group = "side B"));
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F_A_p1=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
           "Location of the hydraulic capacitance, fluid side"            annotation (Dialog(tab = "pHE-1", group = "side A"));
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F_B_p1=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
@@ -5869,14 +4831,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                                             annotation (Dialog(tab = "pHE-1", group = "side A"));
         parameter Boolean counterCurrent_B_p1 = true "Counter-current flow" 
                                             annotation (Dialog(tab = "pHE-1", group = "side B"));
-        parameter SI.Pressure dpnom_A_p1=0 
-          "Nominal pressure drop fluid side(friction term only!)"            annotation (Dialog(tab = "pHE-1", group = "side A"));
-        parameter SI.Pressure dpnom_B_p1=0 
-          "Nominal pressure drop fluid side(friction term only!)"            annotation (Dialog(tab = "pHE-1", group = "side B"));
-        parameter SI.Density rhonom_A_p1=0 "Nominal inlet density fluid side" 
-                                                        annotation (Dialog(tab = "pHE-1", group = "side A"));
-        parameter SI.Density rhonom_B_p1=0 "Nominal inlet density fluid side" 
-                                                        annotation (Dialog(tab = "pHE-1", group = "side B"));
         parameter SI.CoefficientOfHeatTransfer gamma_G_A_p2 
           "Constant heat transfer coefficient in the gas side"            annotation (Dialog(tab = "pHE-2", group = "side A"));
         parameter SI.CoefficientOfHeatTransfer gamma_G_B_p2 
@@ -5885,10 +4839,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Constant heat transfer coefficient in the fluid side"            annotation (Dialog(tab = "pHE-2", group = "side A"));
         parameter SI.CoefficientOfHeatTransfer gamma_F_B_p2 
           "Constant heat transfer coefficient in the fluid side"            annotation (Dialog(tab = "pHE-2", group = "side B"));
-        parameter Choices.Flow1D.FFtypes.Temp FFtype_F_A_p2=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
-          "Friction Factor Type, fluid side"            annotation (Dialog(tab = "pHE-2", group = "side A"));
-        parameter Choices.Flow1D.FFtypes.Temp FFtype_F_B_p2=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
-          "Friction Factor Type, fluid side"            annotation (Dialog(tab = "pHE-2", group = "side B"));
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F_A_p2=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
           "Location of the hydraulic capacitance, fluid side"            annotation (Dialog(tab = "pHE-2", group = "side A"));
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F_B_p2=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
@@ -5897,31 +4847,23 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                                             annotation (Dialog(tab = "pHE-2", group = "side A"));
         parameter Boolean counterCurrent_B_p2 = true "Counter-current flow" 
                                             annotation (Dialog(tab = "pHE-2", group = "side B"));
-        parameter SI.Pressure dpnom_A_p2=0 
-          "Nominal pressure drop fluid side (friction term only!)"            annotation (Dialog(tab = "pHE-2", group = "side A"));
-        parameter SI.Pressure dpnom_B_p2=0 
-          "Nominal pressure drop fluid side (friction term only!)"            annotation (Dialog(tab = "pHE-2", group = "side B"));
-        parameter SI.Density rhonom_A_p2=0 "Nominal inlet density fluid side" 
-                                                        annotation (Dialog(tab = "pHE-2", group = "side A"));
-        parameter SI.Density rhonom_B_p2=0 "Nominal inlet density fluid side" 
-                                                        annotation (Dialog(tab = "pHE-2", group = "side B"));
         parameter Boolean gasQuasiStatic=false 
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         constant Real pi=Modelica.Constants.pi;
         
         //Valves parameters
-        parameter Real Cv_valA "Cv (US) flow coefficient, valve A" annotation (Dialog(group = "Attemperation A"));
-        parameter SI.Pressure pnom_valA "Nominal inlet pressure, valve A" annotation (Dialog(group = "Attemperation A"));
-        parameter SI.Pressure dpnom_valA "Nominal pressure drop, valve A" annotation (Dialog(group = "Attemperation A"));
-        parameter SI.MassFlowRate wnom_valA "Nominal mass flowrate, valve A" annotation (Dialog(group = "Attemperation A"));
+        parameter Real Cv_valA "Cv (US) flow coefficient, valve A" annotation (Dialog(group = "Desuperheater A"));
+        parameter SI.Pressure pnom_valA "Nominal inlet pressure, valve A" annotation (Dialog(group = "Desuperheater A"));
+        parameter SI.Pressure dpnom_valA "Nominal pressure drop, valve A" annotation (Dialog(group = "Desuperheater A"));
+        parameter SI.MassFlowRate wnom_valA "Nominal mass flowrate, valve A" annotation (Dialog(group = "Desuperheater A"));
         parameter SI.SpecificEnthalpy hstart_valA=1e5 
-          "Specific enthalpy start value, valve A" annotation (Dialog(group = "Attemperation A"));
-        parameter Real Cv_valB "Cv (US) flow coefficient, valve B" annotation (Dialog(group = "Attemperation B"));
-        parameter SI.Pressure pnom_valB "Nominal inlet pressure, valve B" annotation (Dialog(group = "Attemperation B"));
-        parameter SI.Pressure dpnom_valB "Nominal pressure drop, valve B" annotation (Dialog(group = "Attemperation B"));
-        parameter SI.MassFlowRate wnom_valB "Nominal mass flowrate, valve B" annotation (Dialog(group = "Attemperation B"));
+          "Specific enthalpy start value, valve A" annotation (Dialog(group = "Desuperheater A"));
+        parameter Real Cv_valB "Cv (US) flow coefficient, valve B" annotation (Dialog(group = "Desuperheater B"));
+        parameter SI.Pressure pnom_valB "Nominal inlet pressure, valve B" annotation (Dialog(group = "Desuperheater B"));
+        parameter SI.Pressure dpnom_valB "Nominal pressure drop, valve B" annotation (Dialog(group = "Desuperheater B"));
+        parameter SI.MassFlowRate wnom_valB "Nominal mass flowrate, valve B" annotation (Dialog(group = "Desuperheater B"));
         parameter SI.SpecificEnthalpy hstart_valB=1e5 
-          "Specific enthalpy start value, valve B" annotation (Dialog(group = "Attemperation B"));
+          "Specific enthalpy start value, valve B" annotation (Dialog(group = "Desuperheater B"));
         
         ParHE pHE1(
           redeclare package FluidMedium = FluidMedium,
@@ -5948,16 +4890,10 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           gamma_G_B=gamma_G_B_p1,
           gamma_F_A=gamma_F_A_p1,
           gamma_F_B=gamma_F_B_p1,
-          FFtype_F_A=FFtype_F_A_p1,
-          FFtype_F_B=FFtype_F_B_p1,
           HCtype_F_A=HCtype_F_A_p1,
           HCtype_F_B=HCtype_F_B_p1,
           counterCurrent_A=counterCurrent_A_p1,
           counterCurrent_B=counterCurrent_B_p1,
-          dpnom_A=dpnom_A_p1,
-          dpnom_B=dpnom_B_p1,
-          rhonom_A=rhonom_A_p1,
-          rhonom_B=rhonom_B_p1,
           gasQuasiStatic=gasQuasiStatic,
           lambda=lambda,
           extSurfaceTub_A=extSurfaceTub_A_p1,
@@ -6011,22 +4947,21 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           dpnom=dpnom_valB,
           wnom=wnom_valB,
           CheckValve=true,
-          hstart=hstart_valB) annotation (extent=[-18,-2; -34,14],
-                                                                 rotation=180);
-        Water.FlowJoin flowJoinA(
+          hstart=hstart_valB) annotation (extent=[-18,2; -34,18],rotation=180);
+        Water.Mixer flowJoinA(
           redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_in2=false,
-          rev_out=false)        annotation (extent=[-10,-18; 10,2],
+          V=3,
+          initOpt=if SSInit then Options.steadyState else Options.noInit,
+          pstart=pstartout_F_A_p1,
+          hstart=hstart_F_A_Out_p1) 
+                                annotation (extent=[-10,-18; 10,2],
                                                                   rotation=0);
-        Water.FlowJoin flowJoinB(redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_in2=false,
-          rev_out=false) 
+        Water.Mixer flowJoinB(   redeclare package Medium = FluidMedium,
+          V=3,
+          initOpt=if SSInit then Options.steadyState else Options.noInit,
+          pstart=pstartout_F_B_p1,
+          hstart=hstart_F_B_Out_p1) 
           annotation (extent=[-10,6; 10,26], rotation=0);
-        Water.FlowSplit flowSplit(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-66,-30; -46,-10],
-                                             rotation=0);
         ParHE pHE2(
           redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -6052,16 +4987,10 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           gamma_G_B=gamma_G_B_p2,
           gamma_F_A=gamma_F_A_p2,
           gamma_F_B=gamma_F_B_p2,
-          FFtype_F_A=FFtype_F_A_p2,
-          FFtype_F_B=FFtype_F_B_p2,
           HCtype_F_A=HCtype_F_A_p2,
           HCtype_F_B=HCtype_F_B_p2,
           counterCurrent_A=counterCurrent_A_p2,
           counterCurrent_B=counterCurrent_B_p2,
-          dpnom_A=dpnom_A_p2,
-          dpnom_B=dpnom_B_p2,
-          rhonom_A=rhonom_A_p2,
-          rhonom_B=rhonom_B_p2,
           gasQuasiStatic=gasQuasiStatic,
           lambda=lambda,
           extSurfaceTub_A=extSurfaceTub_A_p2,
@@ -6122,46 +5051,29 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(flowSplit.out2, valveA.inlet)  annotation (points=[-50,-24; -34,
-              -24],                                                                   style(
-            thickness=2,
-            fillColor=62,
-            rgbfillColor={0,127,127},
-            fillPattern=1));
         connect(valveA.outlet, flowJoinA.in2) annotation (points=[-18,-24; -14,
-              -24; -14,-12; -6,-12],                                               style(
+              -24; -14,-14; -7.9,-14],                                             style(
             thickness=2,
             fillColor=62,
             rgbfillColor={0,127,127},
             fillPattern=1));
         connect(flowJoinA.in1, pHE1.waterOutA) 
-                                              annotation (points=[-6,-4; -14,-4;
+                                              annotation (points=[-8,-2; -14,-2;
               -14,16; -40,16; -40,28],
                        style(
             thickness=2,
             fillColor=62,
             rgbfillColor={0,127,127},
             fillPattern=1));
-        connect(flowJoinB.in1, pHE1.waterOutB) annotation (points=[-6,20; -32,
-              20; -32,28],            style(
+        connect(flowJoinB.in1, pHE1.waterOutB) annotation (points=[-8,22; -32,
+              22; -32,28],            style(
             thickness=2,
             fillColor=62,
             rgbfillColor={0,127,127},
             fillPattern=1));
-        connect(valveB.outlet,flowJoinB. in2) annotation (points=[-18,6; -10,6;
-              -10,12; -6,12],      style(
-            thickness=2,
-            fillColor=62,
-            rgbfillColor={0,127,127},
-            fillPattern=1));
-        connect(valveB.inlet, flowSplit.out1) annotation (points=[-34,6; -42,6;
-              -42,-15.8; -50,-15.8],      style(
-            thickness=2,
-            fillColor=62,
-            rgbfillColor={0,127,127},
-            fillPattern=1));
-        connect(LiquidWaterIn, flowSplit.in1) annotation (points=[-100,-42; -66,
-              -42; -66,-20; -62,-20],                   style(
+        connect(valveB.outlet,flowJoinB. in2) annotation (points=[-18,10; 
+              -12.95,10; -12.95,10; -7.9,10],
+                                   style(
             thickness=2,
             fillColor=62,
             rgbfillColor={0,127,127},
@@ -6169,9 +5081,9 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         connect(intermediate_A.outlet, pHE2.waterInA) 
           annotation (points=[27.2,-7.8; 32,-7.8; 32,-16], style(thickness=2));
         connect(intermediate_A.inlet, flowJoinA.out) 
-          annotation (points=[18.8,-7.8; 18.8,-8; 6,-8], style(thickness=2));
+          annotation (points=[18.8,-7.8; 18.8,-8; 10,-8],style(thickness=2));
         connect(intermediate_B.inlet,flowJoinB. out) annotation (points=[18.8,
-              16.2; 19.4,16.2; 19.4,16; 6,16], style(thickness=2));
+              16.2; 19.4,16.2; 19.4,16; 10,16],style(thickness=2));
         connect(intermediate_B.outlet, pHE2.waterInB) annotation (points=[27.2,
               16.2; 27.2,16; 40,16; 40,-16], style(thickness=2));
         connect(waterOutB, pHE2.waterOutB) 
@@ -6181,14 +5093,26 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         connect(T_intermedB, intermediate_B.T) annotation (points=[101,39; 40,
               39; 40,23.2; 28.6,23.2],
                                    style(color=74, rgbcolor={0,0,127}));
-        connect(intermediate_A.T, T_intermedA) annotation (points=[28.6,-0.8;
+        connect(intermediate_A.T, T_intermedA) annotation (points=[28.6,-0.8; 
               52,-0.8; 52,59; 101,59],style(color=74, rgbcolor={0,0,127}));
         connect(theta_valveA, valveA.theta)  annotation (points=[101,-42; -26,
               -42; -26,-30.4], style(color=74, rgbcolor={0,0,127}));
-        connect(theta_valveB, valveB.theta) annotation (points=[101,-63; 60,-63;
-              60,-46; -36,-46; -36,-10; -26,-10; -26,-0.4], style(color=74,
+        connect(theta_valveB, valveB.theta) annotation (points=[101,-63; 60,-63; 
+              60,-46; -36,-46; -36,-10; -26,-10; -26,3.6],  style(color=74,
               rgbcolor={0,0,127}));
-      end ParHE_att;
+        connect(LiquidWaterIn_A, valveA.inlet) annotation (points=[-100,-42;
+              -60,-42; -60,-24; -34,-24], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(LiquidWaterIn_B, valveB.inlet) annotation (points=[-100,-70; 
+              -70,-70; -70,10; -34,10], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+      end ParHE_Des;
       
       model HE_simp "Simplified Heat Exchanger fluid - gas" 
         extends Interfaces.HeatExchanger(extSurfaceTub = exchSurface_G);
@@ -7440,7 +6364,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={240,240,240},
             fillPattern=1));
-        connect(SensorsBus.y_drumIP, Level_IP.PV) annotation (points=[-98,0;
+        connect(SensorsBus.y_drumIP, Level_IP.PV) annotation (points=[-100,0;
               -60,0; -60,-20; 0,-20; 0,-4; 20,-4], style(
             color=84,
             rgbcolor={255,170,213},
@@ -7470,7 +6394,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillPattern=1));
         connect(levelHP_SP.y, Level_HP.SP) annotation (points=[-19,54; 20,54],
             style(color=74, rgbcolor={0,0,127}));
-        connect(levelIP_SP.y, Level_IP.SP) annotation (points=[-19,4; 0.5,4; 
+        connect(levelIP_SP.y, Level_IP.SP) annotation (points=[-19,4; 0.5,4;
               0.5,4; 20,4],                                   style(color=74,
               rgbcolor={0,0,127}));
         connect(levelLP_SP.y, Level_LP.SP) annotation (points=[-19,-40; 20,-40],
@@ -7484,7 +6408,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
     package Examples "Example implementations" 
       
       model HEG_2L "Heat Exchangers Group with two pressure level" 
-        extends Interfaces.HEG_2L;
+        extends ThermoPower.PowerPlants.HRSG.Interfaces.HEG_2L;
         
         parameter Real rhomcm 
           "Metal heat capacity per unit volume (density by specific heat capacity)[J/m^3.K]";
@@ -7558,7 +6482,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart_F_Out=Sh2_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda) 
-          annotation (extent=[-150,-10; -130,10]);
+          annotation (extent=[-350,-10; -330,10]);
         replaceable Components.HE Sh1_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7613,7 +6537,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm,
           lambda=lambda,
           use_T=use_T_Sh) 
-          annotation (extent=[-110,-10; -90,10]);
+          annotation (extent=[-230,-10; -210,10]);
         replaceable Components.HE2ph Ev_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7668,7 +6592,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm,
           lambda=lambda,
           use_T=use_T_Ev) 
-          annotation (extent=[-70,-10; -50,10]);
+          annotation (extent=[-110,-10; -90,10]);
         replaceable Components.HE Ec_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7723,7 +6647,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm,
           lambda=lambda,
           use_T=use_T_Ec) 
-          annotation (extent=[20,-10; 40,10]);
+          annotation (extent=[30,-10; 50,10]);
         replaceable Components.HE Sh_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7834,7 +6758,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm,
           lambda=lambda,
           use_T=use_T_Ev) 
-                         annotation (extent=[90,-10; 110,10]);
+                         annotation (extent=[130,-10; 150,10]);
         replaceable Components.HE Ec_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7888,14 +6812,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart_F_Out=Ec_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)                annotation (extent=[150,-10; 170,10]);
+          use_T=use_T_Ec)                annotation (extent=[210,-10; 230,10]);
         Water.Mixer mixAtt(
           redeclare package Medium = FluidMedium,
           V=1,
           hstart=Sh1_HP_hstart_F_Out,
           pstart=fluidHPNomPressure_Sh,
           initOpt=if SSInit then Options.steadyState else Options.noInit) 
-          annotation (extent=[-150,42; -130,62], rotation=270);
+          annotation (extent=[-350,82; -330,102],rotation=270);
         Water.ValveLiq valveAttSh(
           redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -7905,155 +6829,141 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           wnom=wnom_attShHP,
           hstart=valShHP_hstart,
           Cv=Cv_attShHP) "valve for attemperation of the Sh" 
-                                annotation (extent=[-178,68; -162,52]);
+                                annotation (extent=[-354,122; -338,138],
+            rotation=270);
         Water.SensT Sh2HPIn_T(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-126,38; -146,18], rotation=90);
+          annotation (extent=[-326,50; -346,30], rotation=90);
         Water.SensT Sh2HPOut_T(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-126,-20; -146,-40],
+          annotation (extent=[-326,-42; -346,-62],
                                                  rotation=90);
         annotation (Diagram);
+        Water.FlowSplit flowSplit2(           redeclare package Medium = 
+              FluidMedium,
+          rev_in1=false,
+          rev_out1=false,
+          rev_out2=false) 
+          annotation (extent=[-130,156; -110,176],
+                                               rotation=270);
       equation 
-        connect(SensorsBus.T_Sh2HP_In, Sh2HPIn_T.T) annotation (points=[200,-40;
-              30,-40; 30,-52; -112,-52; -112,16; -130,16; -130,20],
+        connect(SensorsBus.T_Sh2HP_In, Sh2HPIn_T.T) annotation (points=[400,140;
+              -148,140; -148,-80; -292,-80; -292,16; -330,16; -330,32],
                                                    style(
             color=84,
             rgbcolor={255,170,213},
             thickness=1));
-        connect(SensorsBus.T_Sh2HP_Out, Sh2HPOut_T.T) annotation (points=[200,-40;
-              30,-40; 30,-52; -130,-52; -130,-38],
+        connect(SensorsBus.T_Sh2HP_Out, Sh2HPOut_T.T) annotation (points=[400,140;
+              -148,140; -148,-80; -330,-80; -330,-60],
                                                  style(color=84, rgbcolor={255,
                 170,213}));
         connect(ActuatorsBus.theta_attShHP, valveAttSh.theta) annotation (
-            points=[200,-70; -170,-70; -170,53.6],
+            points=[400,80; -320,80; -320,130; -339.6,130],
                                                  style(
             color=52,
             rgbcolor={213,255,170},
             thickness=1));
-        connect(valveAttSh.inlet, LiquidWaterIn) annotation (points=[-178,60;
-              -200,60], style(
+        connect(mixAtt.in1, Sh1_HP.waterOut) annotation (points=[-334,100; -334,
+              110; -300,110; -300,-40; -220,-40; -220,-10],
+                                                 style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(mixAtt.in2, valveAttSh.outlet) annotation (points=[-146,59.9;
-              -150,59.9; -150,60; -162,60], style(
+        connect(Sh2HPOut_T.inlet, Sh2_HP.waterOut) annotation (points=[-340,-46;
+              -340,-10], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(mixAtt.in1, Sh1_HP.waterOut) annotation (points=[-134,60; -114,
-              60; -114,-40; -100,-40; -100,-10], style(
+        connect(Sh2_HP.waterIn, Sh2HPIn_T.outlet) annotation (points=[-340,10;
+              -340,34], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh2HPOut_T.inlet, Sh2_HP.waterOut) annotation (points=[-140,-24;
-              -140,-10], style(
+        connect(Sh2HPIn_T.inlet, mixAtt.out) annotation (points=[-340,46; -340,
+              82], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh2_HP.waterIn, Sh2HPIn_T.outlet) annotation (points=[-140,10;
-              -140,22], style(
+        connect(Sh1_HP.waterIn, Sh_HP_In) annotation (points=[-220,10; -220,40;
+              -280,40; -280,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh2HPIn_T.inlet, mixAtt.out) annotation (points=[-140,34; -140,
-              42], style(
+        connect(Ev_HP.waterOut, Ev_HP_Out) annotation (points=[-100,-10; -100,
+              -40; -136,-40; -136,60; -240,60; -240,200],
+                                                   style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh1_HP.waterIn, Sh_HP_In) annotation (points=[-100,10; -100,68;
-              -160,68; -160,100], style(
+        connect(Ev_HP.waterIn, Ev_HP_In) annotation (points=[-100,10; -100,70;
+              -200,70; -200,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_HP.waterOut, Ev_HP_Out) annotation (points=[-60,-10; -60,-40;
-              -80,-40; -80,72; -130,72; -130,100], style(
+        connect(Ec_HP.waterOut, Ec_HP_Out) annotation (points=[40,-10; 40,-40;
+              20,-40; 20,100; -160,100; -160,200],
+                                               style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_HP.waterIn, Ev_HP_In) annotation (points=[-60,10; -60,76;
-              -100,76; -100,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec_HP.waterOut, Ec_HP_Out) annotation (points=[30,-10; 30,-40;
-              10,-40; 10,80; -70,80; -70,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP.waterIn, Sh_LP_In) annotation (points=[-20,10; -20,52; 40,
-              52; 40,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec_HP.waterIn, Ec_HP_In) annotation (points=[30,10; 30,84; -40,
-              84; -40,100], style(
+        connect(Sh_LP.waterIn, Sh_LP_In) annotation (points=[-20,10; -20,52; 60,
+              52; 60,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(Sh_LP.waterOut, Sh_LP_Out) annotation (points=[-20,-10; -20,-80;
-              100,-80; 100,-100], style(
+              140,-80; 140,-200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh_HP_Out, Sh2HPOut_T.outlet) annotation (points=[-100,-100;
-              -100,-80; -140,-80; -140,-36; -140,-36], style(
+        connect(Sh_HP_Out, Sh2HPOut_T.outlet) annotation (points=[-200,-200;
+              -200,-140; -340,-140; -340,-58],         style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_LP.waterIn, Ev_LP_In) annotation (points=[100,10; 100,100],
+        connect(Ev_LP.waterIn, Ev_LP_In) annotation (points=[140,10; 140,200],
             style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_LP.waterOut, Ev_LP_Out) annotation (points=[100,-10; 100,-40;
-              68,-40; 68,100], style(
+        connect(Ev_LP.waterOut, Ev_LP_Out) annotation (points=[140,-10; 140,-40;
+              100,-40; 100,200],
+                               style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec_LP.waterOut, Ec_LP_Out) annotation (points=[160,-10; 160,-40;
-              130,-40; 130,100], style(
+        connect(Ec_LP.waterOut, Ec_LP_Out) annotation (points=[220,-10; 220,-40;
+              180,-40; 180,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec_LP.waterIn, Ec_LP_In) annotation (points=[160,10; 160,100;
-              160,100], style(
+        connect(Ec_LP.waterIn, Ec_LP_In) annotation (points=[220,10; 220,200],
+                        style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec_LP.gasOut, GasOut) annotation (points=[170,0; 185,0; 185,
-              1.77636e-015; 200,1.77636e-015], style(
+        connect(Ec_LP.gasOut, GasOut) annotation (points=[230,0; 185,0; 185,
+              1.77636e-015; 400,1.77636e-015], style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec_LP.gasIn, Ev_LP.gasOut) annotation (points=[150,0; 110,0],
-            style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ev_LP.gasIn, Ec_HP.gasOut) annotation (points=[90,0; 40,0],
+        connect(Ec_LP.gasIn, Ev_LP.gasOut) annotation (points=[210,0; 150,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8061,7 +6971,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec_HP.gasIn, Sh_LP.gasOut) annotation (points=[20,0; -10,0],
+        connect(Ev_LP.gasIn, Ec_HP.gasOut) annotation (points=[130,0; 50,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8069,7 +6979,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh_LP.gasIn, Ev_HP.gasOut) annotation (points=[-30,0; -50,0],
+        connect(Ec_HP.gasIn, Sh_LP.gasOut) annotation (points=[30,0; -10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8077,7 +6987,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_HP.gasIn, Sh1_HP.gasOut) annotation (points=[-70,0; -90,0],
+        connect(Sh_LP.gasIn, Ev_HP.gasOut) annotation (points=[-30,0; -90,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8085,7 +6995,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh1_HP.gasIn, Sh2_HP.gasOut) annotation (points=[-110,0; -130,0],
+        connect(Ev_HP.gasIn, Sh1_HP.gasOut) annotation (points=[-110,0; -210,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8093,18 +7003,39 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh2_HP.gasIn, GasIn) annotation (points=[-150,0; -175,0; -175,
-              1.77636e-015; -200,1.77636e-015], style(
+        connect(Sh1_HP.gasIn, Sh2_HP.gasOut) annotation (points=[-230,0; -330,0],
+            style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
+        connect(Sh2_HP.gasIn, GasIn) annotation (points=[-350,0; -355,0; -355,
+              1.77636e-015; -400,1.77636e-015], style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(mixAtt.in2, valveAttSh.outlet) annotation (points=[-346,99.9;
+              -346,122], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(flowSplit2.in1, Ec_HP_In) 
+          annotation (points=[-120,172; -120,200], style(thickness=2));
+        connect(flowSplit2.out2, valveAttSh.inlet) annotation (points=[-124,160;
+              -124,150; -346,150; -346,138], style(thickness=2));
+        connect(flowSplit2.out1, Ec_HP.waterIn) annotation (points=[-115.8,160;
+              -115.8,150; 40,150; 40,10], style(thickness=2));
       end HEG_2L;
       
       model HEG_2LRh "Heat Exchangers Group with two pressure level and reheat" 
-        extends Interfaces.HEG_2LRh(Rh1_IP_Tstart_G_In = Sh1_HP_Tstart_G_In,
+        extends ThermoPower.PowerPlants.HRSG.Interfaces.HEG_2LRh(
+                                    Rh1_IP_Tstart_G_In = Sh1_HP_Tstart_G_In,
                                     Rh1_IP_Tstart_G_Out = Sh1_HP_Tstart_G_Out,
                                     Rh2_IP_Tstart_G_In = Sh2_HP_Tstart_G_In,
                                     Rh2_IP_Tstart_G_Out = Sh2_HP_Tstart_G_Out,
@@ -8141,160 +7072,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         parameter SI.SpecificEnthalpy valRhIP_hstart 
           "Specific enthalpy start value, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
         
-        replaceable Components.ParHE_att ShHP_RhIP(
-          Cv_valA=Cv_attShHP,
-          pnom_valA=pnom_attShHP,
-          dpnom_valA=dpnom_attShHP,
-          wnom_valA=wnom_attShHP,
-          hstart_valA=valShHP_hstart,
-          Cv_valB=Cv_attRhIP,
-          pnom_valB=pnom_attRhIP,
-          dpnom_valB=dpnom_attRhIP,
-          wnom_valB=wnom_attRhIP,
-          hstart_valB=valRhIP_hstart,
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
-          fluidNomPressure_A=fluidHPNomPressure_Sh,
-          fluidNomPressure_B=fluidIPNomPressure_Rh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
-          rhomcm_A_p1=rhomcm,
-          rhomcm_B_p1=rhomcm,
-          rhomcm_A_p2=rhomcm,
-          rhomcm_B_p2=rhomcm,
-          lambda=lambda,
-          N_G_p1=Sh1_HP_N_G,
-          N_F_A_p1=Sh1_HP_N_F,
-          N_F_B_p1=Rh1_IP_N_F,
-          exchSurface_G_A_p1=Sh1_HP_exchSurface_G,
-          exchSurface_G_B_p1=Rh1_IP_exchSurface_G,
-          exchSurface_F_A_p1=Sh1_HP_exchSurface_F,
-          exchSurface_F_B_p1=Rh1_IP_exchSurface_F,
-          extSurfaceTub_A_p1=Sh1_HP_extSurfaceTub,
-          extSurfaceTub_B_p1=Rh1_IP_extSurfaceTub,
-          gasVol_p1=Sh1_HP_gasVol,
-          fluidVol_A_p1=Sh1_HP_fluidVol,
-          fluidVol_B_p1=Rh1_IP_fluidVol,
-          metalVol_A_p1=Sh1_HP_metalVol,
-          metalVol_B_p1=Rh1_IP_metalVol,
-          N_G_p2=Sh2_HP_N_G,
-          N_F_A_p2=Sh2_HP_N_F,
-          N_F_B_p2=Rh2_IP_N_F,
-          exchSurface_G_A_p2=Sh2_HP_exchSurface_G,
-          exchSurface_G_B_p2=Rh2_IP_exchSurface_G,
-          exchSurface_F_A_p2=Sh2_HP_exchSurface_F,
-          exchSurface_F_B_p2=Rh2_IP_exchSurface_F,
-          extSurfaceTub_A_p2=Sh2_HP_extSurfaceTub,
-          extSurfaceTub_B_p2=Rh2_IP_extSurfaceTub,
-          gasVol_p2=Sh2_HP_gasVol,
-          fluidVol_A_p2=Sh2_HP_fluidVol,
-          fluidVol_B_p2=Rh2_IP_fluidVol,
-          metalVol_A_p2=Sh2_HP_metalVol,
-          metalVol_B_p2=Rh2_IP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In_p1=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out_p1=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In_p1=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out_p1=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In_p1=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out_p1=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In_p1=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out_p1=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In_p1=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out_p1=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In_p1=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out_p1=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In_p1=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out_p1=Rh1_IP_hstart_F_Out,
-          Tstart_G_In_p2=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out_p2=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In_p2=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out_p2=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In_p2=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out_p2=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In_p2=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out_p2=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In_p2=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out_p2=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In_p2=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out_p2=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In_p2=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out_p2=Rh2_IP_hstart_F_Out,
-          use_T=use_T_Sh) extends 
-          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE_Att(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
-          fluidNomPressure_A=fluidHPNomPressure_Sh,
-          fluidNomPressure_B=fluidIPNomPressure_Rh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
-          rhomcm_A_p1=rhomcm,
-          rhomcm_B_p1=rhomcm,
-          rhomcm_A_p2=rhomcm,
-          rhomcm_B_p2=rhomcm,
-          lambda=lambda,
-          N_G_p1=Sh1_HP_N_G,
-          N_F_A_p1=Sh1_HP_N_F,
-          N_F_B_p1=Rh1_IP_N_F,
-          exchSurface_G_A_p1=Sh1_HP_exchSurface_G,
-          exchSurface_G_B_p1=Rh1_IP_exchSurface_G,
-          exchSurface_F_A_p1=Sh1_HP_exchSurface_F,
-          exchSurface_F_B_p1=Rh1_IP_exchSurface_F,
-          extSurfaceTub_A_p1=Sh1_HP_extSurfaceTub,
-          extSurfaceTub_B_p1=Rh1_IP_extSurfaceTub,
-          gasVol_p1=Sh1_HP_gasVol,
-          fluidVol_A_p1=Sh1_HP_fluidVol,
-          fluidVol_B_p1=Rh1_IP_fluidVol,
-          metalVol_A_p1=Sh1_HP_metalVol,
-          metalVol_B_p1=Rh1_IP_metalVol,
-          N_G_p2=Sh2_HP_N_G,
-          N_F_A_p2=Sh2_HP_N_F,
-          N_F_B_p2=Rh2_IP_N_F,
-          exchSurface_G_A_p2=Sh2_HP_exchSurface_G,
-          exchSurface_G_B_p2=Rh2_IP_exchSurface_G,
-          exchSurface_F_A_p2=Sh2_HP_exchSurface_F,
-          exchSurface_F_B_p2=Rh2_IP_exchSurface_F,
-          extSurfaceTub_A_p2=Sh2_HP_extSurfaceTub,
-          extSurfaceTub_B_p2=Rh2_IP_extSurfaceTub,
-          gasVol_p2=Sh2_HP_gasVol,
-          fluidVol_A_p2=Sh2_HP_fluidVol,
-          fluidVol_B_p2=Rh2_IP_fluidVol,
-          metalVol_A_p2=Sh2_HP_metalVol,
-          metalVol_B_p2=Rh2_IP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In_p1=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out_p1=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In_p1=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out_p1=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In_p1=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out_p1=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In_p1=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out_p1=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In_p1=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out_p1=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In_p1=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out_p1=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In_p1=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out_p1=Rh1_IP_hstart_F_Out,
-          Tstart_G_In_p2=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out_p2=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In_p2=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out_p2=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In_p2=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out_p2=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In_p2=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out_p2=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In_p2=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out_p2=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In_p2=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out_p2=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In_p2=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out_p2=Rh2_IP_hstart_F_Out,
-          use_T=use_T_Sh)         annotation (extent=[-150,-10; -130,10]);
         replaceable Components.HE2ph Ev_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -8349,7 +7126,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm,
           lambda=lambda,
           use_T=use_T_Ev) 
-          annotation (extent=[-70,-10; -50,10]);
+          annotation (extent=[-210,-10; -190,10]);
         replaceable Components.HE Ec_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -8403,7 +7180,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart_F_Out=Ec_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)          annotation (extent=[38,-10; 58,10]);
+          use_T=use_T_Ec)          annotation (extent=[40,-10; 60,10]);
         replaceable Components.HE Sh_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -8457,7 +7234,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart_F_In=Sh_LP_hstart_F_In,
           hstart_F_Out=Sh_LP_hstart_F_Out,
           rhomcm=rhomcm,
-          lambda=lambda)           annotation (extent=[-6,-10; 14,10]);
+          lambda=lambda)           annotation (extent=[-30,-10; -10,10]);
         replaceable Components.HE2ph Ev_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -8511,7 +7288,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart_F_In=Ev_LP_hstart_F_In,
           hstart_F_Out=Ev_LP_hstart_F_Out,
           rhomcm=rhomcm,
-          lambda=lambda) annotation (extent=[90,-10; 110,10]);
+          lambda=lambda) annotation (extent=[130,-10; 150,10]);
         replaceable Components.HE Ec_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -8565,73 +7342,207 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart_F_Out=Ec_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)                annotation (extent=[150,-10; 170,10]);
-        Water.SensT RhIPOut_T(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-132,-66; -112,-46],
-                                                 style(thickness=2));
-        Water.SensT ShHPOut_T(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-132,-86; -112,-66],
-                                                 rotation=0);
+          use_T=use_T_Ec)                annotation (extent=[210,-10; 230,10]);
         annotation (Diagram, Icon);
+        replaceable Components.ParHE Sh1HP_Rh1IP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          SSInit=SSInit,
+          lambda=lambda,
+          N_G=Sh1_HP_N_G,
+          N_F_A=Sh1_HP_N_F,
+          N_F_B=Rh1_IP_N_F,
+          exchSurface_G_A=Sh1_HP_exchSurface_G,
+          exchSurface_G_B=Rh1_IP_exchSurface_G,
+          exchSurface_F_A=Sh1_HP_exchSurface_F,
+          exchSurface_F_B=Rh1_IP_exchSurface_F,
+          extSurfaceTub_A=Sh1_HP_extSurfaceTub,
+          extSurfaceTub_B=Rh1_IP_extSurfaceTub,
+          gasVol=Sh1_HP_gasVol,
+          fluidVol_A=Sh1_HP_fluidVol,
+          fluidVol_B=Rh1_IP_fluidVol,
+          metalVol_A=Sh1_HP_metalVol,
+          metalVol_B=Rh1_IP_metalVol,
+          use_T=use_T_Sh,
+          Tstart_G_In=Sh1_HP_Tstart_G_In,
+          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
+          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
+          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
+          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
+          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
+          hstart_F_A_In=Sh1_HP_hstart_F_In,
+          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
+          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
+          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
+          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
+          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
+          hstart_F_B_In=Rh1_IP_hstart_F_In,
+          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
+          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
+          fluidNomPressure_A=fluidHPNomPressure_Sh,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm,
+          fluidNomFlowRate_B=fluidHPNomFlowRate_Sh,
+          fluidNomPressure_B=fluidHPNomPressure_Sh) 
+                         extends 
+          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          SSInit=SSInit,
+          lambda=lambda,
+          N_G=Sh1_HP_N_G,
+          N_F_A=Sh1_HP_N_F,
+          N_F_B=Rh1_IP_N_F,
+          exchSurface_G_A=Sh1_HP_exchSurface_G,
+          exchSurface_G_B=Rh1_IP_exchSurface_G,
+          exchSurface_F_A=Sh1_HP_exchSurface_F,
+          exchSurface_F_B=Rh1_IP_exchSurface_F,
+          extSurfaceTub_A=Sh1_HP_extSurfaceTub,
+          extSurfaceTub_B=Rh1_IP_extSurfaceTub,
+          gasVol=Sh1_HP_gasVol,
+          fluidVol_A=Sh1_HP_fluidVol,
+          fluidVol_B=Rh1_IP_fluidVol,
+          metalVol_A=Sh1_HP_metalVol,
+          metalVol_B=Rh1_IP_metalVol,
+          use_T=use_T_Sh,
+          Tstart_G_In=Sh1_HP_Tstart_G_In,
+          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
+          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
+          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
+          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
+          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
+          hstart_F_A_In=Sh1_HP_hstart_F_In,
+          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
+          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
+          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
+          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
+          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
+          hstart_F_B_In=Rh1_IP_hstart_F_In,
+          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
+          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
+          fluidNomPressure_A=fluidHPNomPressure_Sh,
+          fluidNomPressure_B=fluidIPNomPressure_Rh,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm) 
+                         annotation (extent=[-288,-12; -264,12]);
+        replaceable Components.ParHE Sh2HP_Rh2IP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          SSInit=SSInit,
+          lambda=lambda,
+          use_T=use_T_Ec,
+          N_G=Sh2_HP_N_G,
+          N_F_A=Sh2_HP_N_F,
+          N_F_B=Rh2_IP_N_F,
+          exchSurface_G_A=Sh2_HP_exchSurface_G,
+          exchSurface_G_B=Rh2_IP_exchSurface_G,
+          exchSurface_F_A=Sh2_HP_exchSurface_F,
+          exchSurface_F_B=Rh2_IP_exchSurface_F,
+          extSurfaceTub_A=Sh2_HP_extSurfaceTub,
+          extSurfaceTub_B=Rh2_IP_extSurfaceTub,
+          gasVol=Sh2_HP_gasVol,
+          fluidVol_A=Sh2_HP_fluidVol,
+          fluidVol_B=Rh2_IP_fluidVol,
+          metalVol_A=Sh2_HP_metalVol,
+          Tstart_G_In=Sh2_HP_Tstart_G_In,
+          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
+          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
+          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
+          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
+          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
+          hstart_F_A_In=Sh2_HP_hstart_F_In,
+          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
+          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
+          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
+          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
+          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
+          hstart_F_B_In=Rh2_IP_hstart_F_In,
+          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
+          metalVol_B=Rh2_IP_metalVol,
+          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
+          fluidNomPressure_A=fluidHPNomPressure_Sh,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm,
+          fluidNomFlowRate_B=fluidHPNomPressure_Sh,
+          fluidNomPressure_B=fluidHPNomPressure_Sh) 
+                         extends 
+          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          SSInit=SSInit,
+          lambda=lambda,
+          use_T=use_T_Ec,
+          N_G=Sh2_HP_N_G,
+          N_F_A=Sh2_HP_N_F,
+          N_F_B=Rh2_IP_N_F,
+          exchSurface_G_A=Sh2_HP_exchSurface_G,
+          exchSurface_G_B=Rh2_IP_exchSurface_G,
+          exchSurface_F_A=Sh2_HP_exchSurface_F,
+          exchSurface_F_B=Rh2_IP_exchSurface_F,
+          extSurfaceTub_A=Sh2_HP_extSurfaceTub,
+          extSurfaceTub_B=Rh2_IP_extSurfaceTub,
+          gasVol=Sh2_HP_gasVol,
+          fluidVol_A=Sh2_HP_fluidVol,
+          fluidVol_B=Rh2_IP_fluidVol,
+          metalVol_A=Sh2_HP_metalVol,
+          Tstart_G_In=Sh2_HP_Tstart_G_In,
+          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
+          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
+          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
+          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
+          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
+          hstart_F_A_In=Sh2_HP_hstart_F_In,
+          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
+          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
+          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
+          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
+          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
+          hstart_F_B_In=Rh2_IP_hstart_F_In,
+          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
+          metalVol_B=Rh2_IP_metalVol,
+          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
+          fluidNomPressure_A=fluidHPNomPressure_Sh,
+          fluidNomPressure_B=fluidIPNomPressure_Rh,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm) 
+                         annotation (extent=[-360,-12; -336,12]);
       equation 
-        connect(SensorsBus.T_Sh2HP_In, ShHP_RhIP.T_intermedA) annotation (
-            points=[200,-40; -100,-40; -100,6; -106,6; -106,5.9; -129.9,5.9],
-                                                                 style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.T_Rh2IP_In, ShHP_RhIP.T_intermedB) annotation (
-            points=[200,-40; -100,-40; -100,3.9; -129.9,3.9],    style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.T_Rh2IP_Out, RhIPOut_T.T) annotation (points=[200,-40;
-              -100,-40; -100,-50; -114,-50],
-                                          style(color=84, rgbcolor={255,170,213}));
-        connect(ActuatorsBus.theta_attShHP, ShHP_RhIP.theta_valveA) annotation (
-           points=[200,-70; -88,-70; -88,-4.2; -129.9,-4.2],  style(color=52,
-              rgbcolor={213,255,170}));
-        connect(ActuatorsBus.theta_attRhIP, ShHP_RhIP.theta_valveB) annotation (
-           points=[200,-70; -88,-70; -88,-6.3; -129.9,-6.3],  style(color=52,
-              rgbcolor={213,255,170}));
-        connect(SensorsBus.T_Sh2HP_Out, ShHPOut_T.T) annotation (points=[200,-40;
-              -100,-40; -100,-70; -114,-70],       style(color=84, rgbcolor={
-                255,170,213}));
-        connect(RhIPOut_T.inlet, ShHP_RhIP.waterOutB) annotation (points=[-128,-60;
-              -136,-60; -136,-10],          style(thickness=2));
-        connect(ShHPOut_T.inlet, ShHP_RhIP.waterOutA) annotation (points=[-128,
-              -80; -144,-80; -144,-10], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_HP_Out, ShHPOut_T.outlet) annotation (points=[-100,-100;
-              -100,-80; -116,-80], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec_LP.waterIn, Ec_LP_In) annotation (points=[160,10; 160,100],
+        connect(Ec_LP.waterIn, Ec_LP_In) annotation (points=[220,10; 220,200],
             style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec_LP.waterOut, Ec_LP_Out) annotation (points=[160,-10; 160,-32;
-              130,-32; 130,100], style(
+        connect(Ec_LP.waterOut, Ec_LP_Out) annotation (points=[220,-10; 220,-40;
+              180,-40; 180,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_LP.waterOut, Ev_LP_Out) annotation (points=[100,-10; 100,-30;
-              68,-30; 68,100], style(
+        connect(Ev_LP.waterOut, Ev_LP_Out) annotation (points=[140,-10; 140,-40;
+              100,-40; 100,200],
+                               style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_LP.waterIn, Ev_LP_In) annotation (points=[100,10; 100,100],
+        connect(Ev_LP.waterIn, Ev_LP_In) annotation (points=[140,10; 140,200],
             style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec_LP.gasIn, Ev_LP.gasOut) annotation (points=[150,0; 110,0],
+        connect(Ec_LP.gasIn, Ev_LP.gasOut) annotation (points=[210,0; 150,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8639,15 +7550,15 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(GasOut, Ec_LP.gasOut) annotation (points=[200,1.77636e-015; 185,
-              1.77636e-015; 185,0; 170,0], style(
+        connect(GasOut, Ec_LP.gasOut) annotation (points=[400,1.77636e-015; 262,
+              1.77636e-015; 262,0; 230,0], style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_LP.gasIn, Ec_HP.gasOut) annotation (points=[90,0; 58,0],
+        connect(Ev_LP.gasIn, Ec_HP.gasOut) annotation (points=[130,0; 60,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8655,7 +7566,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec_HP.gasIn, Sh_LP.gasOut) annotation (points=[38,0; 14,0],
+        connect(Ec_HP.gasIn, Sh_LP.gasOut) annotation (points=[40,0; -10,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8663,7 +7574,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh_LP.gasIn, Ev_HP.gasOut) annotation (points=[-6,0; -50,0],
+        connect(Sh_LP.gasIn, Ev_HP.gasOut) annotation (points=[-30,0; -190,0],
             style(
             color=76,
             rgbcolor={159,159,223},
@@ -8671,78 +7582,80 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_HP.gasIn, ShHP_RhIP.gasOut) annotation (points=[-70,0; -130,
-              0], style(
+        connect(Ev_HP.waterOut, Ev_HP_Out) annotation (points=[-200,-10; -200,
+              -60; -240,-60; -240,200],            style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Ev_HP.waterIn, Ev_HP_In) annotation (points=[-200,10; -200,200],
+                                            style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Sh_LP.waterIn, Sh_LP_In) annotation (points=[-20,10; -20,80; 60,
+              80; 60,200],
+                       style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Ec_HP.waterIn, Ec_HP_In) annotation (points=[50,10; 50,68; -120,
+              68; -120,200],style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Ec_HP.waterOut, Ec_HP_Out) annotation (points=[50,-10; 50,-40;
+              -160,-40; -160,200],             style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Sh_LP.waterOut, Sh_LP_Out) annotation (points=[-20,-10; -20,-60;
+              140,-60; 140,-200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Sh2HP_Rh2IP.gasIn, GasIn) annotation (points=[-360,0; -384,0;
+              -384,1.77636e-015; -400,1.77636e-015], style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(ShHP_RhIP.gasIn, GasIn) annotation (points=[-150,0; -180,0;
-              -180,1.77636e-015; -200,1.77636e-015], style(
+        connect(Sh1HP_Rh1IP.gasIn,Sh2HP_Rh2IP. gasOut) annotation (points=[-288,0;
+              -336,0],    style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ev_HP.gasIn, Sh1HP_Rh1IP.gasOut) annotation (points=[-210,0;
+              -264,0], style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(ShHP_RhIP.LiquidWaterIn, LiquidWaterIn) annotation (points=[
-              -150,-4.2; -162,-4.2; -162,-4; -172,-4; -172,60; -200,60], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ShHP_RhIP.waterInA, Sh_HP_In) annotation (points=[-144,10; -144,
-              60; -160,60; -160,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ShHP_RhIP.waterInB, Rh_IP_In) annotation (points=[-136,10; -136,
-              40; -94,40; -94,-80; -50,-80; -50,-100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(RhIPOut_T.outlet, Rh_IP_Out) annotation (points=[-116,-60; 0,
-              -60; 0,-100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ev_HP.waterOut, Ev_HP_Out) annotation (points=[-60,-10; -60,-26;
-              -80,-26; -80,48; -130,48; -130,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ev_HP.waterIn, Ev_HP_In) annotation (points=[-60,10; -60,52;
-              -100,52; -100,100; -100,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP.waterIn, Sh_LP_In) annotation (points=[4,10; 4,80; 40,80;
-              40,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec_HP.waterIn, Ec_HP_In) annotation (points=[48,10; 48,68; -40,
-              68; -40,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec_HP.waterOut, Ec_HP_Out) annotation (points=[48,-10; 48,-30;
-              28,-30; 28,60; -70,60; -70,100], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP.waterOut, Sh_LP_Out) annotation (points=[4,-10; 4,-52;
-              100,-52; 100,-100], style(
+        connect(Sh1HP_Rh1IP.waterInB, Rh_IP_In) annotation (points=[-271.2,12;
+              -271.2,44; -252,44; -252,-94; 1.77636e-015,-94; 1.77636e-015,-200],
+                                                              style(thickness=2));
+        connect(Sh1HP_Rh1IP.waterOutB, Sh2HP_Rh2IP.waterInB) annotation (points=
+             [-271.2,-12; -270,-12; -270,-58; -324,-58; -324,28; -343.2,28;
+              -343.2,12], style(thickness=2));
+        connect(Sh1HP_Rh1IP.waterOutA, Sh2HP_Rh2IP.waterInA) annotation (points=
+             [-280.8,-12; -280.8,-40; -312,-40; -312,50; -352.8,50; -352.8,12],
+            style(thickness=2));
+        connect(Sh2HP_Rh2IP.waterOutA, Sh_HP_Out) annotation (points=[-352.8,
+              -12; -352,-12; -352,-148; -200,-148; -200,-200], style(thickness=
+                2));
+        connect(Sh1HP_Rh1IP.waterInA, Sh_HP_In) annotation (points=[-280.8,12;
+              -280.8,103; -280,103; -280,200], style(thickness=2));
+        connect(Rh_IP_Out, Sh2HP_Rh2IP.waterOutB) annotation (points=[-60,-200;
+              -60,-120; -343.2,-120; -343.2,-12], style(
+            color=3,
+            rgbcolor={0,0,255},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -8751,7 +7664,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       
       model HEG_3LRh 
         "Heat Exchangers Group with three pressure level and reheat" 
-        extends Interfaces.HEG_3LRh(Ec1_HP_Tstart_G_In = Ec_IP_Tstart_G_In,
+        extends ThermoPower.PowerPlants.HRSG.Interfaces.HEG_3LRh(
+                                    Ec1_HP_Tstart_G_In = Ec_IP_Tstart_G_In,
                                     Ec1_HP_Tstart_G_Out = Ec_IP_Tstart_G_Out,
                                     Rh1_IP_Tstart_G_In = Sh1_HP_Tstart_G_In,
                                     Rh1_IP_Tstart_G_Out = Sh1_HP_Tstart_G_Out,
@@ -8770,189 +7684,209 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Thermal conductivity of the metal";
         constant Real pi=Modelica.Constants.pi;
         
-        //Valves parameters
-        parameter Real Cv_attShHP 
-          "Cv (US) flow coefficient, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
-        parameter SI.Pressure pnom_attShHP 
-          "Nominal inlet pressure, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
-        parameter SI.Pressure dpnom_attShHP 
-          "Nominal pressure drop, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
-        parameter SI.MassFlowRate wnom_attShHP 
-          "Nominal mass flowrate, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
-        parameter SI.SpecificEnthalpy valShHP_hstart 
-          "Specific enthalpy start value, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
-        parameter Real Cv_attRhIP 
-          "Cv (US) flow coefficient, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
-        parameter SI.Pressure pnom_attRhIP 
-          "Nominal inlet pressure, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
-        parameter SI.Pressure dpnom_attRhIP 
-          "Nominal pressure drop, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
-        parameter SI.MassFlowRate wnom_attRhIP 
-          "Nominal mass flowrate, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
-        parameter SI.SpecificEnthalpy valRhIP_hstart 
-          "Specific enthalpy start value, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
+        parameter SI.Volume mixIP_V=3 "Internal volume of the IP mixer";
         
-        replaceable Components.ParHE_att ShHP_RhIP(
-          Cv_valA=Cv_attShHP,
-          pnom_valA=pnom_attShHP,
-          dpnom_valA=dpnom_attShHP,
-          wnom_valA=wnom_attShHP,
-          hstart_valA=valShHP_hstart,
-          Cv_valB=Cv_attRhIP,
-          pnom_valB=pnom_attRhIP,
-          dpnom_valB=dpnom_attRhIP,
-          wnom_valB=wnom_attRhIP,
-          hstart_valB=valRhIP_hstart,
+        annotation (Diagram, Icon,
+          DymolaStoredErrors);
+        replaceable Components.ParHE Sh1HP_Rh1IP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
           gasNomFlowRate=gasNomFlowRate,
           gasNomPressure=gasNomPressure,
+          SSInit=SSInit,
+          lambda=lambda,
+          N_G=Sh1_HP_N_G,
+          N_F_A=Sh1_HP_N_F,
+          N_F_B=Rh1_IP_N_F,
+          exchSurface_G_A=Sh1_HP_exchSurface_G,
+          exchSurface_G_B=Rh1_IP_exchSurface_G,
+          exchSurface_F_A=Sh1_HP_exchSurface_F,
+          exchSurface_F_B=Rh1_IP_exchSurface_F,
+          extSurfaceTub_A=Sh1_HP_extSurfaceTub,
+          extSurfaceTub_B=Rh1_IP_extSurfaceTub,
+          gasVol=Sh1_HP_gasVol,
+          fluidVol_A=Sh1_HP_fluidVol,
+          fluidVol_B=Rh1_IP_fluidVol,
+          metalVol_A=Sh1_HP_metalVol,
+          metalVol_B=Rh1_IP_metalVol,
+          use_T=use_T_Sh,
+          Tstart_G_In=Sh1_HP_Tstart_G_In,
+          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
+          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
+          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
+          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
+          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
+          hstart_F_A_In=Sh1_HP_hstart_F_In,
+          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
+          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
+          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
+          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
+          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
+          hstart_F_B_In=Rh1_IP_hstart_F_In,
+          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           fluidNomPressure_B=fluidIPNomPressure_Rh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
-          rhomcm_A_p1=rhomcm,
-          rhomcm_B_p1=rhomcm,
-          rhomcm_A_p2=rhomcm,
-          rhomcm_B_p2=rhomcm,
-          lambda=lambda,
-          N_G_p1=Sh1_HP_N_G,
-          N_F_A_p1=Sh1_HP_N_F,
-          N_F_B_p1=Rh1_IP_N_F,
-          exchSurface_G_A_p1=Sh1_HP_exchSurface_G,
-          exchSurface_G_B_p1=Rh1_IP_exchSurface_G,
-          exchSurface_F_A_p1=Sh1_HP_exchSurface_F,
-          exchSurface_F_B_p1=Rh1_IP_exchSurface_F,
-          extSurfaceTub_A_p1=Sh1_HP_extSurfaceTub,
-          extSurfaceTub_B_p1=Rh1_IP_extSurfaceTub,
-          gasVol_p1=Sh1_HP_gasVol,
-          fluidVol_A_p1=Sh1_HP_fluidVol,
-          fluidVol_B_p1=Rh1_IP_fluidVol,
-          metalVol_A_p1=Sh1_HP_metalVol,
-          metalVol_B_p1=Rh1_IP_metalVol,
-          N_G_p2=Sh2_HP_N_G,
-          N_F_A_p2=Sh2_HP_N_F,
-          N_F_B_p2=Rh2_IP_N_F,
-          exchSurface_G_A_p2=Sh2_HP_exchSurface_G,
-          exchSurface_G_B_p2=Rh2_IP_exchSurface_G,
-          exchSurface_F_A_p2=Sh2_HP_exchSurface_F,
-          exchSurface_F_B_p2=Rh2_IP_exchSurface_F,
-          extSurfaceTub_A_p2=Sh2_HP_extSurfaceTub,
-          extSurfaceTub_B_p2=Rh2_IP_extSurfaceTub,
-          gasVol_p2=Sh2_HP_gasVol,
-          fluidVol_A_p2=Sh2_HP_fluidVol,
-          fluidVol_B_p2=Rh2_IP_fluidVol,
-          metalVol_A_p2=Sh2_HP_metalVol,
-          metalVol_B_p2=Rh2_IP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In_p1=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out_p1=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In_p1=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out_p1=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In_p1=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out_p1=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In_p1=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out_p1=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In_p1=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out_p1=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In_p1=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out_p1=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In_p1=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out_p1=Rh1_IP_hstart_F_Out,
-          Tstart_G_In_p2=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out_p2=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In_p2=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out_p2=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In_p2=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out_p2=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In_p2=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out_p2=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In_p2=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out_p2=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In_p2=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out_p2=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In_p2=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out_p2=Rh2_IP_hstart_F_Out,
-          use_T=use_T_Sh) extends 
-          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE_Att(
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm) 
+                         extends 
+          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
           gasNomFlowRate=gasNomFlowRate,
           gasNomPressure=gasNomPressure,
+          SSInit=SSInit,
+          lambda=lambda,
+          N_G=Sh1_HP_N_G,
+          N_F_A=Sh1_HP_N_F,
+          N_F_B=Rh1_IP_N_F,
+          exchSurface_G_A=Sh1_HP_exchSurface_G,
+          exchSurface_G_B=Rh1_IP_exchSurface_G,
+          exchSurface_F_A=Sh1_HP_exchSurface_F,
+          exchSurface_F_B=Rh1_IP_exchSurface_F,
+          extSurfaceTub_A=Sh1_HP_extSurfaceTub,
+          extSurfaceTub_B=Rh1_IP_extSurfaceTub,
+          gasVol=Sh1_HP_gasVol,
+          fluidVol_A=Sh1_HP_fluidVol,
+          fluidVol_B=Rh1_IP_fluidVol,
+          metalVol_A=Sh1_HP_metalVol,
+          metalVol_B=Rh1_IP_metalVol,
+          use_T=use_T_Sh,
+          Tstart_G_In=Sh1_HP_Tstart_G_In,
+          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
+          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
+          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
+          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
+          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
+          hstart_F_A_In=Sh1_HP_hstart_F_In,
+          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
+          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
+          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
+          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
+          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
+          hstart_F_B_In=Rh1_IP_hstart_F_In,
+          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           fluidNomPressure_B=fluidIPNomPressure_Rh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
-          rhomcm_A_p1=rhomcm,
-          rhomcm_B_p1=rhomcm,
-          rhomcm_A_p2=rhomcm,
-          rhomcm_B_p2=rhomcm,
-          lambda=lambda,
-          N_G_p1=Sh1_HP_N_G,
-          N_F_A_p1=Sh1_HP_N_F,
-          N_F_B_p1=Rh1_IP_N_F,
-          exchSurface_G_A_p1=Sh1_HP_exchSurface_G,
-          exchSurface_G_B_p1=Rh1_IP_exchSurface_G,
-          exchSurface_F_A_p1=Sh1_HP_exchSurface_F,
-          exchSurface_F_B_p1=Rh1_IP_exchSurface_F,
-          extSurfaceTub_A_p1=Sh1_HP_extSurfaceTub,
-          extSurfaceTub_B_p1=Rh1_IP_extSurfaceTub,
-          gasVol_p1=Sh1_HP_gasVol,
-          fluidVol_A_p1=Sh1_HP_fluidVol,
-          fluidVol_B_p1=Rh1_IP_fluidVol,
-          metalVol_A_p1=Sh1_HP_metalVol,
-          metalVol_B_p1=Rh1_IP_metalVol,
-          N_G_p2=Sh2_HP_N_G,
-          N_F_A_p2=Sh2_HP_N_F,
-          N_F_B_p2=Rh2_IP_N_F,
-          exchSurface_G_A_p2=Sh2_HP_exchSurface_G,
-          exchSurface_G_B_p2=Rh2_IP_exchSurface_G,
-          exchSurface_F_A_p2=Sh2_HP_exchSurface_F,
-          exchSurface_F_B_p2=Rh2_IP_exchSurface_F,
-          extSurfaceTub_A_p2=Sh2_HP_extSurfaceTub,
-          extSurfaceTub_B_p2=Rh2_IP_extSurfaceTub,
-          gasVol_p2=Sh2_HP_gasVol,
-          fluidVol_A_p2=Sh2_HP_fluidVol,
-          fluidVol_B_p2=Rh2_IP_fluidVol,
-          metalVol_A_p2=Sh2_HP_metalVol,
-          metalVol_B_p2=Rh2_IP_metalVol,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm) 
+                         annotation (extent=[-388,-12; -364,12]);
+        replaceable Components.ParHE Sh2HP_Rh2IP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
           SSInit=SSInit,
-          Tstart_G_In_p1=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out_p1=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In_p1=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out_p1=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In_p1=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out_p1=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In_p1=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out_p1=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In_p1=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out_p1=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In_p1=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out_p1=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In_p1=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out_p1=Rh1_IP_hstart_F_Out,
-          Tstart_G_In_p2=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out_p2=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In_p2=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out_p2=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In_p2=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out_p2=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In_p2=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out_p2=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In_p2=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out_p2=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In_p2=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out_p2=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In_p2=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out_p2=Rh2_IP_hstart_F_Out,
-          use_T=use_T_Sh)         annotation (extent=[-268,-14; -240,14]);
-        annotation (Diagram, Icon);
-        Water.SensT ShHPOut_T(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-238,-116; -258,-136],
-                                                 rotation=180);
-        Water.SensT RhIPOut_T(redeclare package Medium = FluidMedium) 
-          annotation (extent=[-212,-114; -192,-94]);
-        
+          lambda=lambda,
+          use_T=use_T_Ec,
+          N_G=Sh2_HP_N_G,
+          N_F_A=Sh2_HP_N_F,
+          N_F_B=Rh2_IP_N_F,
+          exchSurface_G_A=Sh2_HP_exchSurface_G,
+          exchSurface_G_B=Rh2_IP_exchSurface_G,
+          exchSurface_F_A=Sh2_HP_exchSurface_F,
+          exchSurface_F_B=Rh2_IP_exchSurface_F,
+          extSurfaceTub_A=Sh2_HP_extSurfaceTub,
+          extSurfaceTub_B=Rh2_IP_extSurfaceTub,
+          gasVol=Sh2_HP_gasVol,
+          fluidVol_A=Sh2_HP_fluidVol,
+          fluidVol_B=Rh2_IP_fluidVol,
+          metalVol_A=Sh2_HP_metalVol,
+          Tstart_G_In=Sh2_HP_Tstart_G_In,
+          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
+          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
+          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
+          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
+          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
+          hstart_F_A_In=Sh2_HP_hstart_F_In,
+          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
+          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
+          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
+          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
+          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
+          hstart_F_B_In=Rh2_IP_hstart_F_In,
+          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
+          metalVol_B=Rh2_IP_metalVol,
+          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
+          fluidNomPressure_A=fluidHPNomPressure_Sh,
+          fluidNomPressure_B=fluidIPNomPressure_Rh,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm) 
+                         extends 
+          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          SSInit=SSInit,
+          lambda=lambda,
+          use_T=use_T_Ec,
+          N_G=Sh2_HP_N_G,
+          N_F_A=Sh2_HP_N_F,
+          N_F_B=Rh2_IP_N_F,
+          exchSurface_G_A=Sh2_HP_exchSurface_G,
+          exchSurface_G_B=Rh2_IP_exchSurface_G,
+          exchSurface_F_A=Sh2_HP_exchSurface_F,
+          exchSurface_F_B=Rh2_IP_exchSurface_F,
+          extSurfaceTub_A=Sh2_HP_extSurfaceTub,
+          extSurfaceTub_B=Rh2_IP_extSurfaceTub,
+          gasVol=Sh2_HP_gasVol,
+          fluidVol_A=Sh2_HP_fluidVol,
+          fluidVol_B=Rh2_IP_fluidVol,
+          metalVol_A=Sh2_HP_metalVol,
+          Tstart_G_In=Sh2_HP_Tstart_G_In,
+          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
+          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
+          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
+          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
+          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
+          hstart_F_A_In=Sh2_HP_hstart_F_In,
+          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
+          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
+          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
+          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
+          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
+          hstart_F_B_In=Rh2_IP_hstart_F_In,
+          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
+          metalVol_B=Rh2_IP_metalVol,
+          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
+          fluidNomPressure_A=fluidHPNomPressure_Sh,
+          fluidNomPressure_B=fluidIPNomPressure_Rh,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm) 
+                         annotation (extent=[-460,-12; -436,12]);
+        replaceable Components.BaseReader_water stateRh1IP_out(redeclare 
+            package Medium = FluidMedium) extends Components.BaseReader_water(
+            redeclare package Medium = FluidMedium) 
+                           annotation (extent=[-410,-50; -390,-30],
+                                                                  rotation=180);
+        replaceable Components.BaseReader_water stateSh1HP_out(redeclare 
+            package Medium = FluidMedium) extends Components.BaseReader_water(
+            redeclare package Medium = FluidMedium) 
+                           annotation (extent=[-442,30; -422,50], rotation=180);
+        replaceable Components.BaseReader_water stateSh1HP_in(redeclare package
+            Medium = FluidMedium) extends Components.BaseReader_water(
+            redeclare package Medium = FluidMedium) 
+                           annotation (extent=[-390,58; -370,38], rotation=90);
+        replaceable Components.BaseReader_water stateRh1IP_in(redeclare package
+            Medium = FluidMedium) extends Components.BaseReader_water(
+            redeclare package Medium = FluidMedium) 
+                           annotation (extent=[-380,58; -360,38], rotation=90);
+        replaceable Components.BaseReader_water stateRh2IP_out(redeclare 
+            package Medium = FluidMedium) extends Components.BaseReader_water(
+            redeclare package Medium = FluidMedium) 
+                           annotation (extent=[-454,-42; -434,-62],
+                                                                  rotation=90);
+        replaceable Components.BaseReader_water stateSh2HP_out(redeclare 
+            package Medium = FluidMedium) extends Components.BaseReader_water(
+            redeclare package Medium = FluidMedium) 
+                           annotation (extent=[-464,-42; -444,-62],
+                                                                  rotation=90);
         replaceable Components.HE Ec2_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -9006,7 +7940,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart_F_Out=Ec2_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)          annotation (extent=[-72,-12; -48,12]);
+          use_T=use_T_Ec)          annotation (extent=[-92,12; -68,-12]);
         replaceable Components.ParHE Ec1HP_EcIP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -9091,7 +8025,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           fluidNomPressure_B=fluidIPNomPressure_Ec,
           rhomcm_A=rhomcm,
           rhomcm_B=rhomcm) 
-                         annotation (extent=[128,-12; 152,12]);
+                         annotation (extent=[178,-12; 202,12]);
         replaceable Components.HE Ec_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -9146,7 +8080,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           use_T=use_T_Ec,
           fluidNomFlowRate=fluidLPNomFlowRate_Ec,
           fluidNomPressure=fluidLPNomPressure_Ec) 
-                                         annotation (extent=[248,-12; 272,12]);
+                                         annotation (extent=[368,-12; 392,12]);
         replaceable Components.HE2ph Ev_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -9201,7 +8135,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           use_T=use_T_Ev,
           fluidNomFlowRate=fluidLPNomFlowRate_Ev,
           fluidNomPressure=fluidLPNomPressure_Ev) 
-                         annotation (extent=[188,-12; 212,12]);
+                         annotation (extent=[288,-12; 312,12]);
         replaceable Components.HE2ph Ev_IP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -9311,7 +8245,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           use_T=use_T_Sh,
           fluidNomFlowRate=fluidLPNomFlowRate_Sh,
           fluidNomPressure=fluidLPNomPressure_Sh) 
-                                   annotation (extent=[68,-12; 92,12]);
+                                   annotation (extent=[108,-12; 132,12]);
         replaceable Components.HE2ph Ev_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -9366,7 +8300,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm,
           lambda=lambda,
           use_T=use_T_Ev) 
-          annotation (extent=[-192,-12; -168,12]);
+          annotation (extent=[-312,-12; -288,12]);
         replaceable Components.HE Sh_IP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -9420,56 +8354,21 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart_F_In=Sh_IP_Tstart_F_In,
           Tstart_F_Out=Sh_IP_Tstart_F_Out,
           hstart_F_In=Sh_IP_hstart_F_In,
-          hstart_F_Out=Sh_IP_hstart_F_Out) annotation (extent=[-132,-12; -108,
+          hstart_F_Out=Sh_IP_hstart_F_Out) annotation (extent=[-218,-12; -194,
               12]);
-        replaceable Components.BaseReader_gas stateGas_EvHPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[-160,-10; -140,10]);
-        replaceable Components.BaseReader_gas stateGas_ShIPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[-100,-10; -80,10]);
-        replaceable Components.BaseReader_gas stateGas_Ec2HPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[-40,-10; -20,10]);
-        replaceable Components.BaseReader_gas stateGas_EvIPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[30,-10; 50,10]);
-        replaceable Components.BaseReader_gas stateGas_ShLPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[100,-10; 120,10]);
-        replaceable Components.BaseReader_gas stateGas_EcIPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[160,-10; 180,10]);
-        replaceable Components.BaseReader_gas stateGas_EvLPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[220,-10; 240,10]);
         replaceable Components.BaseReader_water stateEvHP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-190,60; -170,40], rotation=90);
+                           annotation (extent=[-310,60; -290,40], rotation=90);
         replaceable Components.BaseReader_water stateShIP_in(
                                                   redeclare package Medium = 
               FluidMedium) extends Components.BaseReader_water( redeclare 
             package Medium = 
-              FluidMedium) annotation (extent=[-130,60; -110,40], rotation=90);
+              FluidMedium) annotation (extent=[-216,60; -196,40], rotation=90);
         replaceable Components.BaseReader_water stateEc2HP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-70,60; -50,40],   rotation=90);
+                           annotation (extent=[-90,-60; -70,-40], rotation=90);
         replaceable Components.BaseReader_water stateEvIP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
@@ -9477,37 +8376,38 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         replaceable Components.BaseReader_water stateShLP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[70,40; 90,60], rotation=270);
+                           annotation (extent=[110,40; 130,60],
+                                                              rotation=270);
         replaceable Components.BaseReader_water stateEcIP_in(
                                            redeclare package Medium = 
               FluidMedium) extends Components.BaseReader_water( redeclare 
             package Medium = 
-              FluidMedium) annotation (extent=[136,60; 156,40],   rotation=90);
+              FluidMedium) annotation (extent=[186,60; 206,40],   rotation=90);
         replaceable Components.BaseReader_water stateEvLP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[190,40; 210,60],
+                           annotation (extent=[290,40; 310,60],
                                                               rotation=270);
         replaceable Components.BaseReader_water stateEcLP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[250,40; 270,60],
+                           annotation (extent=[370,40; 390,60],
                                                               rotation=270);
         replaceable Components.BaseReader_water stateEvHP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = 
                      FlueGasMedium) 
-                           annotation (extent=[-190,-60; -170,-40],
+                           annotation (extent=[-310,-60; -290,-40],
                                                                   rotation=270);
         replaceable Components.BaseReader_water stateShIP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-130,-40; -110,-60],
+                           annotation (extent=[-216,-40; -196,-60],
                                                                   rotation=90);
         replaceable Components.BaseReader_water stateEc2HP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-70,-60; -50,-40], rotation=270);
+                           annotation (extent=[-90,38; -70,18],   rotation=270);
         replaceable Components.BaseReader_water stateEvIP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
@@ -9515,202 +8415,125 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         replaceable Components.BaseReader_water stateShLP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[70,-40; 90,-60],   rotation=90);
+                           annotation (extent=[110,-40; 130,-60], rotation=90);
         replaceable Components.BaseReader_water stateEcIP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[136,-60; 156,-40], rotation=270);
+                           annotation (extent=[186,-60; 206,-40], rotation=270);
         replaceable Components.BaseReader_water stateEvLP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[210,-40; 190,-60],
+                           annotation (extent=[310,-40; 290,-60],
                                                               rotation=90);
         replaceable Components.BaseReader_water stateEcLP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water(  redeclare package Medium = FluidMedium)
-                           annotation (extent=[270,-40; 250,-60],
+                           annotation (extent=[390,-40; 370,-60],
                                                               rotation=90);
         replaceable Components.BaseReader_water stateEc1HP_in(
                                            redeclare package Medium = 
               FluidMedium) extends Components.BaseReader_water( redeclare 
             package Medium = 
-              FluidMedium) annotation (extent=[124,60; 144,40],   rotation=90);
+              FluidMedium) annotation (extent=[174,60; 194,40],   rotation=90);
         replaceable Components.BaseReader_water stateEc1HP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[124,-60; 144,-40], rotation=270);
-        replaceable Components.BaseReader_gas stateGas_ShHPout(redeclare 
-            package Medium = 
-                     FlueGasMedium) extends Components.BaseReader_gas(redeclare 
-            package Medium = FlueGasMedium) 
-                             annotation (extent=[-220,-10; -200,10]);
-        replaceable Components.BaseReader_water stateSh1HP_in(redeclare package
-            Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-270,58; -250,38], rotation=90);
-        replaceable Components.BaseReader_water stateRh1IP_in(redeclare package
-            Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-258,58; -238,38], rotation=90);
-        replaceable Components.BaseReader_water stateRh2IP_out(redeclare 
-            package Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-258,-40; -238,-60],
-                                                                  rotation=90);
-        replaceable Components.BaseReader_water stateSh2HP_out(redeclare 
-            package Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-270,-40; -250,-60],
-                                                                  rotation=90);
+                           annotation (extent=[174,-60; 194,-40], rotation=270);
+        Water.Mixer mixIP(
+          redeclare package Medium = FluidMedium,
+          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
+                    ThermoPower.Choices.Init.Options.noInit,
+          V=mixIP_V,
+          pstart=fluidIPNomPressure_Rh,
+          hstart=Rh1_IP_hstart_F_In) 
+                          annotation (extent=[-260,-120; -240,-100],
+                                                             rotation=180);
       equation 
-        connect(SensorsBus.T_Sh2HP_In, ShHP_RhIP.T_intermedA) annotation (
-            points=[302,-60; -234,-60; -234,8.26; -239.86,8.26],style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.T_Rh2IP_In, ShHP_RhIP.T_intermedB) annotation (
-            points=[302,-60; -234,-60; -234,5.46; -239.86,5.46],style(
-            color=84,
-            rgbcolor={255,170,213},
-            thickness=1));
-        connect(SensorsBus.T_Sh2HP_Out, ShHPOut_T.T) annotation (points=[302,-60;
-              -234,-60; -234,-120; -240,-120],         style(color=84, rgbcolor=
-               {255,170,213}));
-        connect(SensorsBus.T_Rh2IP_Out, RhIPOut_T.T) annotation (points=[302,-60;
-              -160,-60; -160,-98; -194,-98],  style(color=84, rgbcolor={255,170,
-                213}));
-        connect(ActuatorsBus.theta_attShHP, ShHP_RhIP.theta_valveA) annotation (
-           points=[302,-100; 264,-100; 264,-92; -220,-92; -220,-5.88; -239.86,
-              -5.88],                                          style(color=52,
-              rgbcolor={213,255,170}));
-        connect(ActuatorsBus.theta_attRhIP, ShHP_RhIP.theta_valveB) annotation (
-           points=[302,-100; 264,-100; 264,-92; -220,-92; -220,-8.82; -239.86,
-              -8.82],                                          style(color=52,
-              rgbcolor={213,255,170}));
-        connect(Ev_HP.gasOut,stateGas_EvHPout. inlet) annotation (points=[-168,0;
-              -156,0],                       style(
+        connect(stateRh1IP_out.inlet, Sh1HP_Rh1IP.waterOutB) annotation (points=[-394,-40;
+              -371.2,-40; -371.2,-12],      style(thickness=2));
+        connect(Sh2HP_Rh2IP.waterInA, stateSh1HP_out.outlet) annotation (points=[-452.8,
+              12; -452.8,40; -438,40],      style(thickness=2));
+        connect(Sh2HP_Rh2IP.gasIn, GasIn) annotation (points=[-460,0; -442,0;
+              -442,1.77636e-015; -500,1.77636e-015], style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateGas_EvHPout.outlet,Sh_IP. gasIn) annotation (points=[-144,0;
-              -132,0],                                          style(
+        connect(stateRh2IP_out.inlet, Sh2HP_Rh2IP.waterOutB) annotation (points=[-444,-46;
+              -444,-12; -443.2,-12],           style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateSh2HP_out.inlet, Sh2HP_Rh2IP.waterOutA) annotation (points=[-454,-46;
+              -454,-12; -452.8,-12],           style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateRh1IP_in.outlet, Sh1HP_Rh1IP.waterInB) annotation (points=[-370,42;
+              -370,12; -371.2,12],           style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateSh1HP_in.outlet, Sh1HP_Rh1IP.waterInA) annotation (points=[-380,42;
+              -380,12; -380.8,12],           style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateSh1HP_in.inlet, Sh_HP_In) annotation (points=[-380,54;
+              -380,200],                   style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Sh_HP_Out, stateSh2HP_out.outlet) annotation (points=[-300,-200;
+              -300,-160; -454,-160; -454,-58], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Rh_IP_Out, stateRh2IP_out.outlet) annotation (points=[-190,-200;
+              -190,-140; -444,-140; -444,-58],style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Sh1HP_Rh1IP.waterOutA, stateSh1HP_out.inlet) annotation (points=[-380.8,
+              -12; -380.8,-30; -400,-30; -400,40; -426,40],        style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateRh1IP_out.outlet, Sh2HP_Rh2IP.waterInB) annotation (points=[-406,-40;
+              -420,-40; -420,22; -443.2,22; -443.2,12],           style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Sh1HP_Rh1IP.gasIn, Sh2HP_Rh2IP.gasOut) annotation (points=[-388,0;
+              -436,0],    style(
             color=76,
             rgbcolor={159,159,223},
+            thickness=2));
+        connect(stateEcLP_in.outlet,Ec_LP. waterIn) annotation (points=[380,44;
+              380,12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh_IP.gasOut,stateGas_ShIPout. inlet) annotation (points=[-108,0;
-              -96,0],                                          style(
-            color=76,
-            rgbcolor={159,159,223},
+        connect(stateEvLP_in.outlet,Ev_LP. waterIn) annotation (points=[300,44;
+              300,12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateGas_ShIPout.outlet,Ec2_HP. gasIn) annotation (points=[-84,0;
-              -72,0],                                        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec2_HP.gasOut,stateGas_Ec2HPout. inlet) annotation (points=[-48,0;
-              -36,0],                                        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_Ec2HPout.outlet,Ev_IP. gasIn) annotation (points=[-24,0;
-              -12,0],                                        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ev_IP.gasOut,stateGas_EvIPout. inlet) annotation (points=[12,0; 34,
-              0],                                         style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_EvIPout.outlet,Sh_LP. gasIn) annotation (points=[46,0; 68,
-              0],                                      style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP.gasOut,stateGas_ShLPout. inlet) annotation (points=[92,0;
-              104,0],                                      style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_ShLPout.outlet,Ec1HP_EcIP. gasIn) annotation (points=[116,0;
-              128,0],                                            style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec1HP_EcIP.gasOut,stateGas_EcIPout. inlet) annotation (points=[152,0;
-              164,0],                                            style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_EcIPout.outlet,Ev_LP. gasIn) annotation (points=[176,0;
-              188,0],                                     style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ev_LP.gasOut,stateGas_EvLPout. inlet) annotation (points=[212,0;
-              224,0],                                        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_EvLPout.outlet,Ec_LP. gasIn) annotation (points=[236,0;
-              248,0],                                     style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcLP_in.outlet,Ec_LP. waterIn) annotation (points=[260,44;
-              260,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvLP_in.outlet,Ev_LP. waterIn) annotation (points=[200,44;
-              200,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP.waterIn,stateShLP_in. outlet) annotation (points=[80,12;
-              80,44],     style(
+        connect(Sh_LP.waterIn,stateShLP_in. outlet) annotation (points=[120,12;
+              120,44],    style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -9722,14 +8545,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh_IP.waterIn,stateShIP_in. outlet) annotation (points=[-120,12;
-              -120,44],                   style(
+        connect(Sh_IP.waterIn,stateShIP_in. outlet) annotation (points=[-206,12;
+              -206,44],                   style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_HP.waterIn,stateEvHP_in. outlet) annotation (points=[-180,12;
-              -180,44], style(
+        connect(Ev_HP.waterIn,stateEvHP_in. outlet) annotation (points=[-300,12;
+              -300,44], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -9740,277 +8563,233 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateShLP_out.inlet,Sh_LP. waterOut) annotation (points=[80,-44;
-              80,-12], style(
+        connect(stateShLP_out.inlet,Sh_LP. waterOut) annotation (points=[120,-44;
+              120,-12],style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateShIP_out.inlet,Sh_IP. waterOut) annotation (points=[-120,-44;
-              -120,-12], style(
+        connect(stateShIP_out.inlet,Sh_IP. waterOut) annotation (points=[-206,-44;
+              -206,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEcLP_out.inlet,Ec_LP. waterOut) annotation (points=[260,-44;
-              260,-12], style(
+        connect(stateEcLP_out.inlet,Ec_LP. waterOut) annotation (points=[380,-44;
+              380,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvLP_out.inlet,Ev_LP. waterOut) annotation (points=[200,-44;
-              200,-12],                   style(
+        connect(stateEvLP_out.inlet,Ev_LP. waterOut) annotation (points=[300,-44;
+              300,-12],                   style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvHP_out.inlet,Ev_HP. waterOut) annotation (points=[-180,-44;
-              -180,-12], style(
+        connect(stateEvHP_out.inlet,Ev_HP. waterOut) annotation (points=[-300,-44;
+              -300,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec1HP_EcIP.waterInB,stateEcIP_in. outlet) annotation (points=[144.8,12;
-              146,12; 146,44],           style(
+        connect(Ec1HP_EcIP.waterInB,stateEcIP_in. outlet) annotation (points=[194.8,12;
+              196,12; 196,44],           style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEc2HP_out.inlet,Ec2_HP. waterOut) annotation (points=[-60,-44;
-              -60,-12],      style(
+        connect(stateEc2HP_out.inlet,Ec2_HP. waterOut) annotation (points=[-80,22;
+              -80,12],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec2_HP.waterIn,stateEc2HP_in. outlet) annotation (points=[-60,12;
-              -60,44],     style(
+        connect(Ec2_HP.waterIn,stateEc2HP_in. outlet) annotation (points=[-80,-12;
+              -80,-44],    style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEc2HP_in.inlet,stateEc1HP_out. outlet) annotation (points=[-60,56;
-              -60,80; -40,80; -40,-90; 134,-90; 134,-56],            style(
+        connect(stateEc2HP_in.inlet,stateEc1HP_out. outlet) annotation (points=[-80,-56;
+              -80,-90; 184,-90; 184,-56],                            style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEcIP_out.inlet,Ec1HP_EcIP. waterOutB) annotation (points=[146,-44;
-              146,-12; 144.8,-12],          style(
+        connect(stateEcIP_out.inlet,Ec1HP_EcIP. waterOutB) annotation (points=[196,-44;
+              196,-12; 194.8,-12],          style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEc1HP_out.inlet,Ec1HP_EcIP. waterOutA) annotation (points=[134,-44;
-              134,-12; 135.2,-12],           style(
+        connect(stateEc1HP_out.inlet,Ec1HP_EcIP. waterOutA) annotation (points=[184,-44;
+              184,-12; 185.2,-12],           style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEc1HP_in.outlet,Ec1HP_EcIP. waterInA) annotation (points=[134,44;
-              135.2,44; 135.2,12],         style(
+        connect(stateEc1HP_in.outlet,Ec1HP_EcIP. waterInA) annotation (points=[184,44;
+              185.2,44; 185.2,12],         style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_HP.gasIn, stateGas_ShHPout.outlet) annotation (points=[-192,
-              0; -204,0], style(
-            color=76,
-            rgbcolor={159,159,223},
+        connect(stateEcLP_in.inlet, Ec_LP_In) annotation (points=[380,56; 380,
+              200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateGas_ShHPout.inlet, ShHP_RhIP.gasOut) annotation (points=[-216,0;
-              -234,0; -234,1.77636e-015; -240,1.77636e-015],         style(
-            color=76,
-            rgbcolor={159,159,223},
+        connect(stateEvLP_in.inlet, Ev_LP_In) annotation (points=[300,56; 300,
+              200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateRh2IP_out.inlet, ShHP_RhIP.waterOutB) annotation (points=[
-              -248,-44; -248,-14; -248.4,-14], style(
+        connect(stateShLP_in.inlet, Sh_LP_In) annotation (points=[120,56; 120,
+              130; 220,130; 220,200],
+                                 style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateSh2HP_out.inlet, ShHP_RhIP.waterOutA) annotation (points=[
-              -260,-44; -260,-14; -259.6,-14], style(
+        connect(stateEcIP_in.inlet, Ec_IP_In) annotation (points=[196,56; 196,
+              120; 80,120; 80,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateRh1IP_in.outlet, ShHP_RhIP.waterInB) annotation (points=[-248,42;
-              -248,14; -248.4,14],          style(
+        connect(stateEcIP_out.outlet, Ec_IP_Out) annotation (points=[196,-56;
+              196,-70; 40,-70; 40,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateSh1HP_in.outlet, ShHP_RhIP.waterInA) annotation (points=[-260,42;
-              -260,14; -259.6,14],          style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcLP_in.inlet, Ec_LP_In) annotation (points=[260,56; 260,
-              150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvLP_in.inlet, Ev_LP_In) annotation (points=[200,56; 200,
-              150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateShLP_in.inlet, Sh_LP_In) annotation (points=[80,56; 80,130;
-              140,130; 140,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcIP_in.inlet, Ec_IP_In) annotation (points=[146,56; 146,
-              120; 60,120; 60,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcIP_out.outlet, Ec_IP_Out) annotation (points=[146,-56;
-              146,-70; 30,-70; 30,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEc1HP_in.inlet, Ev_HP_In) annotation (points=[134,56; 134,
-              110; -140,110; -140,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateShIP_in.inlet, Sh_IP_In) annotation (points=[-120,56; -120,
-              90; -60,90; -60,150], style(
+        connect(stateShIP_in.inlet, Sh_IP_In) annotation (points=[-206,56; -206,
+              90; -80,90; -80,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(stateEvIP_in.inlet, Ev_IP_In) annotation (points=[-3.67382e-016,
-              56; 0,56; 0,150], style(
+              56; -3.67382e-016,200; 1.77636e-015,200],
+                                style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(stateEvIP_out.outlet, Ev_IP_Out) annotation (points=[
-              -1.10215e-015,-56; 0,-64; 0,-70; -30,-70; -30,150], style(
+              -1.10215e-015,-56; -1.10215e-015,-64; 0,-70; -40,-70; -40,200],
+                                                                  style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateShLP_out.outlet, Sh_LP_Out) annotation (points=[80,-56; 80,
-              -110; 200,-110; 200,-150], style(
+        connect(stateShLP_out.outlet, Sh_LP_Out) annotation (points=[120,-56;
+              120,-110; 300,-110; 300,-198],
+                                         style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateSh1HP_in.inlet, Sh_HP_In) annotation (points=[-260,54;
-              -260,150], style(
+        connect(stateEvHP_out.outlet, Ev_HP_Out) annotation (points=[-300,-56;
+              -300,-70; -340,-70; -340,200],                     style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvHP_in.inlet, Ec_HP_In) annotation (points=[-180,56; -180,
-              110; -200,110; -200,150], style(
+        connect(stateEvLP_out.outlet, Ev_LP_Out) annotation (points=[300,-56;
+              300,-70; 260,-70; 260,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvHP_out.outlet, Ev_HP_Out) annotation (points=[-180,-56;
-              -180,-70; -210,-70; -210,100; -230,100; -230,150], style(
+        connect(stateEcLP_out.outlet, Ec_LP_Out) annotation (points=[380,-56;
+              380,-70; 340,-70; 340,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateShIP_out.outlet, Sh_IP_Out) annotation (points=[-120,-56;
-              -120,-100; 0,-100; 0,-150], style(
+        connect(stateEc2HP_out.outlet, Ec_HP_Out) annotation (points=[-80,34;
+              -80,60; -260,60; -260,200],                       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Rh_IP_In, stateRh1IP_in.inlet) annotation (points=[-130,-150;
-              -130,-120; -230,-120; -230,70; -248,70; -248,54], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvLP_out.outlet, Ev_LP_Out) annotation (points=[200,-56;
-              200,-70; 170,-70; 170,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcLP_out.outlet, Ec_LP_Out) annotation (points=[260,-56;
-              260,-68; 230,-68; 230,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEc2HP_out.outlet, Ec_HP_Out) annotation (points=[-60,-56;
-              -60,-70; -150,-70; -150,110; -170,110; -170,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ShHPOut_T.inlet, stateSh2HP_out.outlet) annotation (points=[
-              -254,-130; -260,-130; -260,-56], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(RhIPOut_T.inlet, stateRh2IP_out.outlet) annotation (points=[
-              -208,-108; -248,-108; -248,-56], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(RhIPOut_T.outlet, Rh_IP_Out) annotation (points=[-196,-108; -70,
-              -108; -70,-150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ShHPOut_T.outlet, Sh_HP_Out) annotation (points=[-242,-130;
-              -200,-130; -200,-150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ShHP_RhIP.gasIn, GasIn) annotation (points=[-268,1.77636e-015;
-              -280,1.77636e-015; -280,1.77636e-015; -300,1.77636e-015], style(
+        connect(GasOut,Ec_LP. gasOut) annotation (points=[500,1.77636e-015; 426,
+              1.77636e-015; 392,0],        style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(ShHP_RhIP.LiquidWaterIn, LiquidWaterIn) annotation (points=[-268,
-              -5.88; -280,-5.88; -280,90; -300,90],      style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(GasOut, Ec_LP.gasOut) annotation (points=[300,1.77636e-015; 288,
-              -3.1606e-021; 288,0; 272,0], style(
+        connect(Sh_IP.gasIn,Ev_HP. gasOut) annotation (points=[-218,0; -288,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ec2_HP.gasIn,Sh_IP. gasOut) annotation (points=[-92,0; -194,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ev_IP.gasIn,Ec2_HP. gasOut) annotation (points=[-12,0; -68,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Sh_LP.gasIn,Ev_IP. gasOut) annotation (points=[108,0; 12,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ec1HP_EcIP.gasIn,Sh_LP. gasOut) annotation (points=[178,0; 132,
+              0],              style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ev_LP.gasIn,Ec1HP_EcIP. gasOut) annotation (points=[288,0; 202,
+              0], style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ec_LP.gasIn,Ev_LP. gasOut) annotation (points=[368,0; 312,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ev_HP.gasIn, Sh1HP_Rh1IP.gasOut) annotation (points=[-312,0;
+              -364,0], style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
+            fillPattern=1));
+        connect(stateEvHP_in.inlet, Ev_HP_In) annotation (points=[-300,56; -300,
+              200], style(
+            thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
+        connect(Ec_HP_In, stateEc1HP_in.inlet) annotation (points=[-220,200;
+              -220,100; 184,100; 184,56],
+                                        style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(mixIP.in1, Rh_IP_In) annotation (points=[-242,-116; -130,-116;
+              -130,-200], style(thickness=2));
+        connect(mixIP.in2, stateShIP_out.outlet) annotation (points=[-242.1,
+              -104; -206,-104; -206,-56], style(thickness=2));
+        connect(mixIP.out, stateRh1IP_in.inlet) annotation (points=[-260,-110;
+              -350,-110; -350,86; -370,86; -370,54], style(thickness=2));
       end HEG_3LRh;
       
-      model HEG_3LRh_wa 
-        "Heat Exchangers Group with three pressure level and reheat, without attemperation" 
-        extends ThermoPower.PowerPlants.HRSG.Interfaces.HEG_3LRh_wa(
+      model HEG_3LRh_des 
+        "Heat Exchangers Group with three pressure level, reheat and desuperheater" 
+        extends ThermoPower.PowerPlants.HRSG.Interfaces.HEG_3LRh(
                                     Ec1_HP_Tstart_G_In = Ec_IP_Tstart_G_In,
                                     Ec1_HP_Tstart_G_Out = Ec_IP_Tstart_G_Out,
                                     Rh1_IP_Tstart_G_In = Sh1_HP_Tstart_G_In,
@@ -10030,192 +8809,191 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Thermal conductivity of the metal";
         constant Real pi=Modelica.Constants.pi;
         
-        annotation (Diagram, Icon,
-          DymolaStoredErrors);
-        replaceable Components.ParHE Sh1HP_Rh1IP(
+        //Valves parameters
+        parameter Real Cv_attShHP 
+          "Cv (US) flow coefficient, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
+        parameter SI.Pressure pnom_attShHP 
+          "Nominal inlet pressure, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
+        parameter SI.Pressure dpnom_attShHP 
+          "Nominal pressure drop, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
+        parameter SI.MassFlowRate wnom_attShHP 
+          "Nominal mass flowrate, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
+        parameter SI.SpecificEnthalpy valShHP_hstart 
+          "Specific enthalpy start value, valve for Sh_HP attemperation" annotation (dialog(group = "Attemperation Sh"));
+        parameter Real Cv_attRhIP 
+          "Cv (US) flow coefficient, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
+        parameter SI.Pressure pnom_attRhIP 
+          "Nominal inlet pressure, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
+        parameter SI.Pressure dpnom_attRhIP 
+          "Nominal pressure drop, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
+        parameter SI.MassFlowRate wnom_attRhIP 
+          "Nominal mass flowrate, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
+        parameter SI.SpecificEnthalpy valRhIP_hstart 
+          "Specific enthalpy start value, valve for Rh_IP attemperation" annotation (dialog(group = "Attemperation Rh"));
+        
+        parameter SI.Volume mixIP_V=3 "Internal volume of the IP mixer";
+        
+        replaceable ThermoPower.PowerPlants.HRSG.Components.ParHE_Des ShHP_RhIP(
+          Cv_valA=Cv_attShHP,
+          pnom_valA=pnom_attShHP,
+          dpnom_valA=dpnom_attShHP,
+          wnom_valA=wnom_attShHP,
+          hstart_valA=valShHP_hstart,
+          Cv_valB=Cv_attRhIP,
+          pnom_valB=pnom_attRhIP,
+          dpnom_valB=dpnom_attRhIP,
+          wnom_valB=wnom_attRhIP,
+          hstart_valB=valRhIP_hstart,
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
           gasNomFlowRate=gasNomFlowRate,
           gasNomPressure=gasNomPressure,
-          SSInit=SSInit,
-          lambda=lambda,
-          N_G=Sh1_HP_N_G,
-          N_F_A=Sh1_HP_N_F,
-          N_F_B=Rh1_IP_N_F,
-          exchSurface_G_A=Sh1_HP_exchSurface_G,
-          exchSurface_G_B=Rh1_IP_exchSurface_G,
-          exchSurface_F_A=Sh1_HP_exchSurface_F,
-          exchSurface_F_B=Rh1_IP_exchSurface_F,
-          extSurfaceTub_A=Sh1_HP_extSurfaceTub,
-          extSurfaceTub_B=Rh1_IP_extSurfaceTub,
-          gasVol=Sh1_HP_gasVol,
-          fluidVol_A=Sh1_HP_fluidVol,
-          fluidVol_B=Rh1_IP_fluidVol,
-          metalVol_A=Sh1_HP_metalVol,
-          metalVol_B=Rh1_IP_metalVol,
-          use_T=use_T_Sh,
-          Tstart_G_In=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           fluidNomPressure_B=fluidIPNomPressure_Rh,
-          rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
-                         extends 
-          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
+          rhomcm_A_p1=rhomcm,
+          rhomcm_B_p1=rhomcm,
+          rhomcm_A_p2=rhomcm,
+          rhomcm_B_p2=rhomcm,
+          lambda=lambda,
+          N_G_p1=Sh1_HP_N_G,
+          N_F_A_p1=Sh1_HP_N_F,
+          N_F_B_p1=Rh1_IP_N_F,
+          exchSurface_G_A_p1=Sh1_HP_exchSurface_G,
+          exchSurface_G_B_p1=Rh1_IP_exchSurface_G,
+          exchSurface_F_A_p1=Sh1_HP_exchSurface_F,
+          exchSurface_F_B_p1=Rh1_IP_exchSurface_F,
+          extSurfaceTub_A_p1=Sh1_HP_extSurfaceTub,
+          extSurfaceTub_B_p1=Rh1_IP_extSurfaceTub,
+          gasVol_p1=Sh1_HP_gasVol,
+          fluidVol_A_p1=Sh1_HP_fluidVol,
+          fluidVol_B_p1=Rh1_IP_fluidVol,
+          metalVol_A_p1=Sh1_HP_metalVol,
+          metalVol_B_p1=Rh1_IP_metalVol,
+          N_G_p2=Sh2_HP_N_G,
+          N_F_A_p2=Sh2_HP_N_F,
+          N_F_B_p2=Rh2_IP_N_F,
+          exchSurface_G_A_p2=Sh2_HP_exchSurface_G,
+          exchSurface_G_B_p2=Rh2_IP_exchSurface_G,
+          exchSurface_F_A_p2=Sh2_HP_exchSurface_F,
+          exchSurface_F_B_p2=Rh2_IP_exchSurface_F,
+          extSurfaceTub_A_p2=Sh2_HP_extSurfaceTub,
+          extSurfaceTub_B_p2=Rh2_IP_extSurfaceTub,
+          gasVol_p2=Sh2_HP_gasVol,
+          fluidVol_A_p2=Sh2_HP_fluidVol,
+          fluidVol_B_p2=Rh2_IP_fluidVol,
+          metalVol_A_p2=Sh2_HP_metalVol,
+          metalVol_B_p2=Rh2_IP_metalVol,
+          SSInit=SSInit,
+          Tstart_G_In_p1=Sh1_HP_Tstart_G_In,
+          Tstart_G_Out_p1=Sh1_HP_Tstart_G_Out,
+          Tstart_M_A_In_p1=Sh1_HP_Tstart_M_In,
+          Tstart_M_A_Out_p1=Sh1_HP_Tstart_M_Out,
+          Tstart_F_A_In_p1=Sh1_HP_Tstart_F_In,
+          Tstart_F_A_Out_p1=Sh1_HP_Tstart_F_Out,
+          hstart_F_A_In_p1=Sh1_HP_hstart_F_In,
+          hstart_F_A_Out_p1=Sh1_HP_hstart_F_Out,
+          Tstart_M_B_In_p1=Rh1_IP_Tstart_M_In,
+          Tstart_M_B_Out_p1=Rh1_IP_Tstart_M_Out,
+          Tstart_F_B_In_p1=Rh1_IP_Tstart_F_In,
+          Tstart_F_B_Out_p1=Rh1_IP_Tstart_F_Out,
+          hstart_F_B_In_p1=Rh1_IP_hstart_F_In,
+          hstart_F_B_Out_p1=Rh1_IP_hstart_F_Out,
+          Tstart_G_In_p2=Sh2_HP_Tstart_G_In,
+          Tstart_G_Out_p2=Sh2_HP_Tstart_G_Out,
+          Tstart_M_A_In_p2=Sh2_HP_Tstart_M_In,
+          Tstart_M_A_Out_p2=Sh2_HP_Tstart_M_Out,
+          Tstart_F_A_In_p2=Sh2_HP_Tstart_F_In,
+          Tstart_F_A_Out_p2=Sh2_HP_Tstart_F_Out,
+          hstart_F_A_In_p2=Sh2_HP_hstart_F_In,
+          hstart_F_A_Out_p2=Sh2_HP_hstart_F_Out,
+          Tstart_M_B_In_p2=Rh2_IP_Tstart_M_In,
+          Tstart_M_B_Out_p2=Rh2_IP_Tstart_M_Out,
+          Tstart_F_B_In_p2=Rh2_IP_Tstart_F_In,
+          Tstart_F_B_Out_p2=Rh2_IP_Tstart_F_Out,
+          hstart_F_B_In_p2=Rh2_IP_hstart_F_In,
+          hstart_F_B_Out_p2=Rh2_IP_hstart_F_Out,
+          use_T=use_T_Sh) extends 
+          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE_Des(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
           gasNomFlowRate=gasNomFlowRate,
           gasNomPressure=gasNomPressure,
-          SSInit=SSInit,
-          lambda=lambda,
-          N_G=Sh1_HP_N_G,
-          N_F_A=Sh1_HP_N_F,
-          N_F_B=Rh1_IP_N_F,
-          exchSurface_G_A=Sh1_HP_exchSurface_G,
-          exchSurface_G_B=Rh1_IP_exchSurface_G,
-          exchSurface_F_A=Sh1_HP_exchSurface_F,
-          exchSurface_F_B=Rh1_IP_exchSurface_F,
-          extSurfaceTub_A=Sh1_HP_extSurfaceTub,
-          extSurfaceTub_B=Rh1_IP_extSurfaceTub,
-          gasVol=Sh1_HP_gasVol,
-          fluidVol_A=Sh1_HP_fluidVol,
-          fluidVol_B=Rh1_IP_fluidVol,
-          metalVol_A=Sh1_HP_metalVol,
-          metalVol_B=Rh1_IP_metalVol,
-          use_T=use_T_Sh,
-          Tstart_G_In=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           fluidNomPressure_B=fluidIPNomPressure_Rh,
-          rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
-                         annotation (extent=[-228,-12; -204,12]);
-        replaceable Components.ParHE Sh2HP_Rh2IP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          SSInit=SSInit,
-          lambda=lambda,
-          use_T=use_T_Ec,
-          N_G=Sh2_HP_N_G,
-          N_F_A=Sh2_HP_N_F,
-          N_F_B=Rh2_IP_N_F,
-          exchSurface_G_A=Sh2_HP_exchSurface_G,
-          exchSurface_G_B=Rh2_IP_exchSurface_G,
-          exchSurface_F_A=Sh2_HP_exchSurface_F,
-          exchSurface_F_B=Rh2_IP_exchSurface_F,
-          extSurfaceTub_A=Sh2_HP_extSurfaceTub,
-          extSurfaceTub_B=Rh2_IP_extSurfaceTub,
-          gasVol=Sh2_HP_gasVol,
-          fluidVol_A=Sh2_HP_fluidVol,
-          fluidVol_B=Rh2_IP_fluidVol,
-          metalVol_A=Sh2_HP_metalVol,
-          Tstart_G_In=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
-          metalVol_B=Rh2_IP_metalVol,
-          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
           fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
-          fluidNomPressure_A=fluidHPNomPressure_Sh,
-          fluidNomPressure_B=fluidIPNomPressure_Rh,
-          rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
-                         extends 
-          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          SSInit=SSInit,
+          rhomcm_A_p1=rhomcm,
+          rhomcm_B_p1=rhomcm,
+          rhomcm_A_p2=rhomcm,
+          rhomcm_B_p2=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec,
-          N_G=Sh2_HP_N_G,
-          N_F_A=Sh2_HP_N_F,
-          N_F_B=Rh2_IP_N_F,
-          exchSurface_G_A=Sh2_HP_exchSurface_G,
-          exchSurface_G_B=Rh2_IP_exchSurface_G,
-          exchSurface_F_A=Sh2_HP_exchSurface_F,
-          exchSurface_F_B=Rh2_IP_exchSurface_F,
-          extSurfaceTub_A=Sh2_HP_extSurfaceTub,
-          extSurfaceTub_B=Rh2_IP_extSurfaceTub,
-          gasVol=Sh2_HP_gasVol,
-          fluidVol_A=Sh2_HP_fluidVol,
-          fluidVol_B=Rh2_IP_fluidVol,
-          metalVol_A=Sh2_HP_metalVol,
-          Tstart_G_In=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
-          metalVol_B=Rh2_IP_metalVol,
-          fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
-          fluidNomPressure_A=fluidHPNomPressure_Sh,
-          fluidNomPressure_B=fluidIPNomPressure_Rh,
-          rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
-                         annotation (extent=[-280,-12; -256,12]);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_gas 
-          stateGas_Sh2HP_Sh1HP(                         redeclare package 
-            Medium = FlueGasMedium) annotation (extent=[-252,-10; -232,10]);
-        replaceable Components.BaseReader_water stateRh1IP_out(redeclare 
-            package Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-240,-50; -220,-30],
-                                                                  rotation=180);
-        replaceable Components.BaseReader_water stateSh1HP_out(redeclare 
-            package Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-270,30; -250,50], rotation=180);
+          N_G_p1=Sh1_HP_N_G,
+          N_F_A_p1=Sh1_HP_N_F,
+          N_F_B_p1=Rh1_IP_N_F,
+          exchSurface_G_A_p1=Sh1_HP_exchSurface_G,
+          exchSurface_G_B_p1=Rh1_IP_exchSurface_G,
+          exchSurface_F_A_p1=Sh1_HP_exchSurface_F,
+          exchSurface_F_B_p1=Rh1_IP_exchSurface_F,
+          extSurfaceTub_A_p1=Sh1_HP_extSurfaceTub,
+          extSurfaceTub_B_p1=Rh1_IP_extSurfaceTub,
+          gasVol_p1=Sh1_HP_gasVol,
+          fluidVol_A_p1=Sh1_HP_fluidVol,
+          fluidVol_B_p1=Rh1_IP_fluidVol,
+          metalVol_A_p1=Sh1_HP_metalVol,
+          metalVol_B_p1=Rh1_IP_metalVol,
+          N_G_p2=Sh2_HP_N_G,
+          N_F_A_p2=Sh2_HP_N_F,
+          N_F_B_p2=Rh2_IP_N_F,
+          exchSurface_G_A_p2=Sh2_HP_exchSurface_G,
+          exchSurface_G_B_p2=Rh2_IP_exchSurface_G,
+          exchSurface_F_A_p2=Sh2_HP_exchSurface_F,
+          exchSurface_F_B_p2=Rh2_IP_exchSurface_F,
+          extSurfaceTub_A_p2=Sh2_HP_extSurfaceTub,
+          extSurfaceTub_B_p2=Rh2_IP_extSurfaceTub,
+          gasVol_p2=Sh2_HP_gasVol,
+          fluidVol_A_p2=Sh2_HP_fluidVol,
+          fluidVol_B_p2=Rh2_IP_fluidVol,
+          metalVol_A_p2=Sh2_HP_metalVol,
+          metalVol_B_p2=Rh2_IP_metalVol,
+          SSInit=SSInit,
+          Tstart_G_In_p1=Sh1_HP_Tstart_G_In,
+          Tstart_G_Out_p1=Sh1_HP_Tstart_G_Out,
+          Tstart_M_A_In_p1=Sh1_HP_Tstart_M_In,
+          Tstart_M_A_Out_p1=Sh1_HP_Tstart_M_Out,
+          Tstart_F_A_In_p1=Sh1_HP_Tstart_F_In,
+          Tstart_F_A_Out_p1=Sh1_HP_Tstart_F_Out,
+          hstart_F_A_In_p1=Sh1_HP_hstart_F_In,
+          hstart_F_A_Out_p1=Sh1_HP_hstart_F_Out,
+          Tstart_M_B_In_p1=Rh1_IP_Tstart_M_In,
+          Tstart_M_B_Out_p1=Rh1_IP_Tstart_M_Out,
+          Tstart_F_B_In_p1=Rh1_IP_Tstart_F_In,
+          Tstart_F_B_Out_p1=Rh1_IP_Tstart_F_Out,
+          hstart_F_B_In_p1=Rh1_IP_hstart_F_In,
+          hstart_F_B_Out_p1=Rh1_IP_hstart_F_Out,
+          Tstart_G_In_p2=Sh2_HP_Tstart_G_In,
+          Tstart_G_Out_p2=Sh2_HP_Tstart_G_Out,
+          Tstart_M_A_In_p2=Sh2_HP_Tstart_M_In,
+          Tstart_M_A_Out_p2=Sh2_HP_Tstart_M_Out,
+          Tstart_F_A_In_p2=Sh2_HP_Tstart_F_In,
+          Tstart_F_A_Out_p2=Sh2_HP_Tstart_F_Out,
+          hstart_F_A_In_p2=Sh2_HP_hstart_F_In,
+          hstart_F_A_Out_p2=Sh2_HP_hstart_F_Out,
+          Tstart_M_B_In_p2=Rh2_IP_Tstart_M_In,
+          Tstart_M_B_Out_p2=Rh2_IP_Tstart_M_Out,
+          Tstart_F_B_In_p2=Rh2_IP_Tstart_F_In,
+          Tstart_F_B_Out_p2=Rh2_IP_Tstart_F_Out,
+          hstart_F_B_In_p2=Rh2_IP_hstart_F_In,
+          hstart_F_B_Out_p2=Rh2_IP_hstart_F_Out,
+          use_T=use_T_Sh)         annotation (extent=[-454,-24; -406,24]);
+        annotation (Diagram, Icon);
+        Water.SensT ShHPOut_T(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-360,-146; -380,-166],
+                                                 rotation=180);
+        Water.SensT RhIPOut_T(redeclare package Medium = FluidMedium) 
+          annotation (extent=[-380,-140; -360,-120]);
+        
         replaceable Components.HE Ec2_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -10269,7 +9047,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hstart_F_Out=Ec2_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)          annotation (extent=[-52,-12; -28,12]);
+          use_T=use_T_Ec)          annotation (extent=[-92,12; -68,-12]);
         replaceable Components.ParHE Ec1HP_EcIP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -10354,7 +9132,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           fluidNomPressure_B=fluidIPNomPressure_Ec,
           rhomcm_A=rhomcm,
           rhomcm_B=rhomcm) 
-                         annotation (extent=[128,-12; 152,12]);
+                         annotation (extent=[178,-12; 202,12]);
         replaceable Components.HE Ec_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -10409,7 +9187,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           use_T=use_T_Ec,
           fluidNomFlowRate=fluidLPNomFlowRate_Ec,
           fluidNomPressure=fluidLPNomPressure_Ec) 
-                                         annotation (extent=[248,-12; 272,12]);
+                                         annotation (extent=[368,-12; 392,12]);
         replaceable Components.HE2ph Ev_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -10464,7 +9242,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           use_T=use_T_Ev,
           fluidNomFlowRate=fluidLPNomFlowRate_Ev,
           fluidNomPressure=fluidLPNomPressure_Ev) 
-                         annotation (extent=[188,-12; 212,12]);
+                         annotation (extent=[288,-12; 312,12]);
         replaceable Components.HE2ph Ev_IP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -10519,7 +9297,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           use_T=use_T_Ev,
           fluidNomFlowRate=fluidIPNomFlowRate_Ev,
           fluidNomPressure=fluidIPNomPressure_Ev) 
-          annotation (extent=[8,-12; 32,12]);
+          annotation (extent=[-12,-12; 12,12]);
         replaceable Components.HE Sh_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -10574,7 +9352,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           use_T=use_T_Sh,
           fluidNomFlowRate=fluidLPNomFlowRate_Sh,
           fluidNomPressure=fluidLPNomPressure_Sh) 
-                                   annotation (extent=[68,-12; 92,12]);
+                                   annotation (extent=[108,-12; 132,12]);
         replaceable Components.HE2ph Ev_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -10629,7 +9407,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm,
           lambda=lambda,
           use_T=use_T_Ev) 
-          annotation (extent=[-172,-12; -148,12]);
+          annotation (extent=[-312,-12; -288,12]);
         replaceable Components.HE Sh_IP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -10683,585 +9461,479 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart_F_In=Sh_IP_Tstart_F_In,
           Tstart_F_Out=Sh_IP_Tstart_F_Out,
           hstart_F_In=Sh_IP_hstart_F_In,
-          hstart_F_Out=Sh_IP_hstart_F_Out) annotation (extent=[-112,-12; -88,12]);
-        replaceable Components.BaseReader_gas stateGas_EvHPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[-140,-10; -120,10]);
-        replaceable Components.BaseReader_gas stateGas_ShIPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[-80,-10; -60,10]);
-        replaceable Components.BaseReader_gas stateGas_Ec2HPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[-20,-10; 0,10]);
-        replaceable Components.BaseReader_gas stateGas_EvIPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[40,-10; 60,10]);
-        replaceable Components.BaseReader_gas stateGas_ShLPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[100,-10; 120,10]);
-        replaceable Components.BaseReader_gas stateGas_EcIPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[160,-10; 180,10]);
-        replaceable Components.BaseReader_gas stateGas_EvLPout(
-            redeclare package Medium = FlueGasMedium) extends 
-          Components.BaseReader_gas(
-            redeclare package Medium = FlueGasMedium) 
-                             annotation (extent=[220,-10; 240,10]);
+          hstart_F_Out=Sh_IP_hstart_F_Out) annotation (extent=[-218,-12; -194,
+              12]);
         replaceable Components.BaseReader_water stateEvHP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-170,60; -150,40], rotation=90);
+                           annotation (extent=[-310,60; -290,40], rotation=90);
         replaceable Components.BaseReader_water stateShIP_in(
                                                   redeclare package Medium = 
               FluidMedium) extends Components.BaseReader_water( redeclare 
             package Medium = 
-              FluidMedium) annotation (extent=[-110,60; -90,40],  rotation=90);
+              FluidMedium) annotation (extent=[-216,60; -196,40], rotation=90);
         replaceable Components.BaseReader_water stateEc2HP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-50,60; -30,40],   rotation=90);
+                           annotation (extent=[-90,-60; -70,-40], rotation=90);
         replaceable Components.BaseReader_water stateEvIP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[10,60; 30,40],     rotation=90);
+                           annotation (extent=[-10,60; 10,40],    rotation=90);
         replaceable Components.BaseReader_water stateShLP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[70,40; 90,60], rotation=270);
+                           annotation (extent=[110,40; 130,60],
+                                                              rotation=270);
         replaceable Components.BaseReader_water stateEcIP_in(
                                            redeclare package Medium = 
               FluidMedium) extends Components.BaseReader_water( redeclare 
             package Medium = 
-              FluidMedium) annotation (extent=[136,60; 156,40],   rotation=90);
+              FluidMedium) annotation (extent=[186,60; 206,40],   rotation=90);
         replaceable Components.BaseReader_water stateEvLP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[190,40; 210,60],
+                           annotation (extent=[290,40; 310,60],
                                                               rotation=270);
         replaceable Components.BaseReader_water stateEcLP_in(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[250,40; 270,60],
+                           annotation (extent=[370,40; 390,60],
                                                               rotation=270);
         replaceable Components.BaseReader_water stateEvHP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = 
                      FlueGasMedium) 
-                           annotation (extent=[-170,-60; -150,-40],
+                           annotation (extent=[-310,-60; -290,-40],
                                                                   rotation=270);
         replaceable Components.BaseReader_water stateShIP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-110,-40; -90,-60],rotation=90);
+                           annotation (extent=[-216,-40; -196,-60],
+                                                                  rotation=90);
         replaceable Components.BaseReader_water stateEc2HP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-50,-60; -30,-40], rotation=270);
+                           annotation (extent=[-90,38; -70,18],   rotation=270);
         replaceable Components.BaseReader_water stateEvIP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[10,-60; 30,-40],   rotation=270);
+                           annotation (extent=[-10,-60; 10,-40],  rotation=270);
         replaceable Components.BaseReader_water stateShLP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[70,-40; 90,-60],   rotation=90);
+                           annotation (extent=[110,-40; 130,-60], rotation=90);
         replaceable Components.BaseReader_water stateEcIP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[136,-60; 156,-40], rotation=270);
+                           annotation (extent=[186,-60; 206,-40], rotation=270);
         replaceable Components.BaseReader_water stateEvLP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[210,-40; 190,-60],
+                           annotation (extent=[310,-40; 290,-60],
                                                               rotation=90);
         replaceable Components.BaseReader_water stateEcLP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water(  redeclare package Medium = FluidMedium)
-                           annotation (extent=[270,-40; 250,-60],
+                           annotation (extent=[390,-40; 370,-60],
                                                               rotation=90);
         replaceable Components.BaseReader_water stateEc1HP_in(
                                            redeclare package Medium = 
               FluidMedium) extends Components.BaseReader_water( redeclare 
             package Medium = 
-              FluidMedium) annotation (extent=[124,60; 144,40],   rotation=90);
+              FluidMedium) annotation (extent=[174,60; 194,40],   rotation=90);
         replaceable Components.BaseReader_water stateEc1HP_out(
             redeclare package Medium = FluidMedium) extends 
           Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (extent=[124,-60; 144,-40], rotation=270);
-        replaceable Components.BaseReader_gas stateGas_ShHPout(redeclare 
-            package Medium = 
-                     FlueGasMedium) extends Components.BaseReader_gas(redeclare 
-            package Medium = FlueGasMedium) 
-                             annotation (extent=[-200,-10; -180,10]);
+                           annotation (extent=[174,-60; 194,-40], rotation=270);
         replaceable Components.BaseReader_water stateSh1HP_in(redeclare package
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-230,58; -210,38], rotation=90);
+                           annotation (extent=[-450,80; -430,60], rotation=90);
         replaceable Components.BaseReader_water stateRh1IP_in(redeclare package
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-220,58; -200,38], rotation=90);
+                           annotation (extent=[-430,80; -410,60], rotation=90);
         replaceable Components.BaseReader_water stateRh2IP_out(redeclare 
             package Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-272,-42; -252,-62],
+                           annotation (extent=[-430,-60; -410,-80],
                                                                   rotation=90);
         replaceable Components.BaseReader_water stateSh2HP_out(redeclare 
             package Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-282,-42; -262,-62],
+                           annotation (extent=[-450,-60; -430,-80],
                                                                   rotation=90);
+        Water.Mixer mixIP(
+          redeclare package Medium = FluidMedium,
+          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
+                    ThermoPower.Choices.Init.Options.noInit,
+          V=mixIP_V,
+          hstart=Rh1_IP_hstart_F_In,
+          pstart=fluidIPNomPressure_Rh) 
+                          annotation (extent=[-280,-120; -260,-100],
+                                                             rotation=180);
+        Water.FlowSplit flowSplit2(           redeclare package Medium = 
+              FluidMedium,
+          rev_in1=false,
+          rev_out1=false,
+          rev_out2=false) 
+          annotation (extent=[-230,140; -210,160],
+                                               rotation=270);
+        Water.FlowSplit flowSplit1(           redeclare package Medium = 
+              FluidMedium,
+          rev_in1=false,
+          rev_out1=false,
+          rev_out2=false) 
+          annotation (extent=[70,150; 90,170], rotation=270);
       equation 
-        connect(stateGas_Sh2HP_Sh1HP.outlet, Sh1HP_Rh1IP.gasIn) annotation (
-            points=[-236,0; -228,0],     style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2));
-        connect(stateGas_Sh2HP_Sh1HP.inlet, Sh2HP_Rh2IP.gasOut) annotation (
-            points=[-248,0; -256,0],     style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2));
-        connect(stateRh1IP_out.inlet, Sh1HP_Rh1IP.waterOutB) annotation (points=[-224,-40;
-              -211.2,-40; -211.2,-12],      style(thickness=2));
-        connect(Sh2HP_Rh2IP.waterInA, stateSh1HP_out.outlet) annotation (points=[-272.8,
-              12; -272.8,40; -266,40],      style(thickness=2));
-        connect(Ev_HP.gasOut,stateGas_EvHPout. inlet) annotation (points=[-148,0;
-              -136,0],                       style(
-            color=76,
-            rgbcolor={159,159,223},
+        connect(SensorsBus.T_Sh2HP_In, ShHP_RhIP.T_intermedA) annotation (
+            points=[500,140; -360,140; -360,14; -382,14; -405.76,14.16],
+                                                                style(color=84,
+              rgbcolor={255,170,213}));
+        connect(SensorsBus.T_Rh2IP_In, ShHP_RhIP.T_intermedB) annotation (
+            points=[500,140; -360,140; -360,10; -382,10; -405.76,9.36],
+                                                                style(
+            color=84,
+            rgbcolor={255,170,213},
+            thickness=1));
+        connect(SensorsBus.T_Sh2HP_Out, ShHPOut_T.T) annotation (points=[500,140;
+              -250,140; -250,-150; -362,-150],         style(color=84, rgbcolor=
+               {255,170,213}));
+        connect(SensorsBus.T_Rh2IP_Out, RhIPOut_T.T) annotation (points=[500,140;
+              -250,140; -250,-124; -362,-124],style(color=84, rgbcolor={255,170,
+                213}));
+        connect(ActuatorsBus.theta_attShHP, ShHP_RhIP.theta_valveA) annotation (
+           points=[500,80; 440,80; 440,-92; -360,-92; -360,-8; -362,-10;
+              -405.76,-10.08],                                 style(color=52,
+              rgbcolor={213,255,170}));
+        connect(ActuatorsBus.theta_attRhIP, ShHP_RhIP.theta_valveB) annotation (
+           points=[500,80; 440,80; 440,-92; -360,-92; -360,-16; -382,-16;
+              -405.76,-15.12],                                 style(color=52,
+              rgbcolor={213,255,170}));
+        connect(stateEcLP_in.outlet,Ec_LP. waterIn) annotation (points=[380,44;
+              380,12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateGas_EvHPout.outlet,Sh_IP. gasIn) annotation (points=[-124,0;
-              -112,0],                                          style(
-            color=76,
-            rgbcolor={159,159,223},
+        connect(stateEvLP_in.outlet,Ev_LP. waterIn) annotation (points=[300,44;
+              300,12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh_IP.gasOut,stateGas_ShIPout. inlet) annotation (points=[-88,0;
-              -76,0],                                          style(
-            color=76,
-            rgbcolor={159,159,223},
+        connect(Sh_LP.waterIn,stateShLP_in. outlet) annotation (points=[120,12;
+              120,44],    style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateGas_ShIPout.outlet,Ec2_HP. gasIn) annotation (points=[-64,0;
-              -52,0],                                        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec2_HP.gasOut,stateGas_Ec2HPout. inlet) annotation (points=[-28,0;
-              -16,0],                                        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_Ec2HPout.outlet,Ev_IP. gasIn) annotation (points=[-4,0; 8,
-              0],                                            style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ev_IP.gasOut,stateGas_EvIPout. inlet) annotation (points=[32,0; 44,
-              0],                                         style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_EvIPout.outlet,Sh_LP. gasIn) annotation (points=[56,0; 68,
-              0],                                      style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP.gasOut,stateGas_ShLPout. inlet) annotation (points=[92,0;
-              104,0],                                      style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_ShLPout.outlet,Ec1HP_EcIP. gasIn) annotation (points=[116,0;
-              128,0],                                            style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ec1HP_EcIP.gasOut,stateGas_EcIPout. inlet) annotation (points=[152,0;
-              164,0],                                            style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_EcIPout.outlet,Ev_LP. gasIn) annotation (points=[176,0;
-              188,0],                                     style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ev_LP.gasOut,stateGas_EvLPout. inlet) annotation (points=[212,0;
-              224,0],                                        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_EvLPout.outlet,Ec_LP. gasIn) annotation (points=[236,0;
-              248,0],                                     style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcLP_in.outlet,Ec_LP. waterIn) annotation (points=[260,44;
-              260,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvLP_in.outlet,Ev_LP. waterIn) annotation (points=[200,44;
-              200,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP.waterIn,stateShLP_in. outlet) annotation (points=[80,12;
-              80,44],     style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Ev_IP.waterIn,stateEvIP_in. outlet) annotation (points=[20,12;
-              20,44],
+        connect(Ev_IP.waterIn,stateEvIP_in. outlet) annotation (points=[0,12; 0,
+              44; 3.67382e-016,44],
             style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh_IP.waterIn,stateShIP_in. outlet) annotation (points=[-100,12;
-              -100,44],                   style(
+        connect(Sh_IP.waterIn,stateShIP_in. outlet) annotation (points=[-206,12;
+              -206,44],                   style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_HP.waterIn,stateEvHP_in. outlet) annotation (points=[-160,12;
-              -160,44], style(
+        connect(Ev_HP.waterIn,stateEvHP_in. outlet) annotation (points=[-300,12;
+              -300,44], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvIP_out.inlet,Ev_IP. waterOut) annotation (points=[20,-44;
-              20,-12],                                               style(
+        connect(stateEvIP_out.inlet,Ev_IP. waterOut) annotation (points=[
+              1.10215e-015,-44; 1.10215e-015,-36.5; 0,-36.5; 0,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateShLP_out.inlet,Sh_LP. waterOut) annotation (points=[80,-44;
-              80,-12], style(
+        connect(stateShLP_out.inlet,Sh_LP. waterOut) annotation (points=[120,-44;
+              120,-12],style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateShIP_out.inlet,Sh_IP. waterOut) annotation (points=[-100,-44;
-              -100,-12], style(
+        connect(stateShIP_out.inlet,Sh_IP. waterOut) annotation (points=[-206,-44;
+              -206,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEcLP_out.inlet,Ec_LP. waterOut) annotation (points=[260,-44;
-              260,-12], style(
+        connect(stateEcLP_out.inlet,Ec_LP. waterOut) annotation (points=[380,-44;
+              380,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvLP_out.inlet,Ev_LP. waterOut) annotation (points=[200,-44;
-              200,-12],                   style(
+        connect(stateEvLP_out.inlet,Ev_LP. waterOut) annotation (points=[300,-44;
+              300,-12],                   style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvHP_out.inlet,Ev_HP. waterOut) annotation (points=[-160,-44;
-              -160,-12], style(
+        connect(stateEvHP_out.inlet,Ev_HP. waterOut) annotation (points=[-300,-44;
+              -300,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec1HP_EcIP.waterInB,stateEcIP_in. outlet) annotation (points=[144.8,12;
-              146,12; 146,44],           style(
+        connect(Ec1HP_EcIP.waterInB,stateEcIP_in. outlet) annotation (points=[194.8,12;
+              196,12; 196,44],           style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEc2HP_out.inlet,Ec2_HP. waterOut) annotation (points=[-40,-44;
-              -40,-12],      style(
+        connect(stateEc2HP_out.inlet,Ec2_HP. waterOut) annotation (points=[-80,22;
+              -80,12],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ec2_HP.waterIn,stateEc2HP_in. outlet) annotation (points=[-40,12;
-              -40,44],     style(
+        connect(Ec2_HP.waterIn,stateEc2HP_in. outlet) annotation (points=[-80,-12;
+              -80,-44],    style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEc2HP_in.inlet,stateEc1HP_out. outlet) annotation (points=[-40,56;
-              -40,80; 110,80; 110,-66; 134,-66; 134,-56],            style(
+        connect(stateEc2HP_in.inlet,stateEc1HP_out. outlet) annotation (points=[-80,-56;
+              -80,-90; 184,-90; 184,-56],                            style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEcIP_out.inlet,Ec1HP_EcIP. waterOutB) annotation (points=[146,-44;
-              146,-12; 144.8,-12],          style(
+        connect(stateEcIP_out.inlet,Ec1HP_EcIP. waterOutB) annotation (points=[196,-44;
+              196,-12; 194.8,-12],          style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEc1HP_out.inlet,Ec1HP_EcIP. waterOutA) annotation (points=[134,-44;
-              134,-12; 135.2,-12],           style(
+        connect(stateEc1HP_out.inlet,Ec1HP_EcIP. waterOutA) annotation (points=[184,-44;
+              184,-12; 185.2,-12],           style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEc1HP_in.outlet,Ec1HP_EcIP. waterInA) annotation (points=[134,44;
-              135.2,44; 135.2,12],         style(
+        connect(stateEc1HP_in.outlet,Ec1HP_EcIP. waterInA) annotation (points=[184,44;
+              185.2,44; 185.2,12],         style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Ev_HP.gasIn,stateGas_ShHPout. outlet) annotation (points=[-172,
-              0; -184,0], style(
+        connect(stateEcLP_in.inlet, Ec_LP_In) annotation (points=[380,56; 380,
+              200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateEvLP_in.inlet, Ev_LP_In) annotation (points=[300,56; 300,
+              200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateShLP_in.inlet, Sh_LP_In) annotation (points=[120,56; 120,
+              130; 220,130; 220,200],
+                                 style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateEcIP_out.outlet, Ec_IP_Out) annotation (points=[196,-56;
+              196,-70; 40,-70; 40,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateShIP_in.inlet, Sh_IP_In) annotation (points=[-206,56; -206,
+              90; -80,90; -80,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateEvIP_in.inlet, Ev_IP_In) annotation (points=[-3.67382e-016,
+              56; 1.77636e-015,56; 1.77636e-015,200],
+                                style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateEvIP_out.outlet, Ev_IP_Out) annotation (points=[
+              -1.10215e-015,-56; 0,-64; 0,-70; -40,-70; -40,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateShLP_out.outlet, Sh_LP_Out) annotation (points=[120,-56;
+              120,-110; 300,-110; 300,-198],
+                                         style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateSh1HP_in.inlet, Sh_HP_In) annotation (points=[-440,76;
+              -440,140; -380,140; -380,200],
+                         style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateEvHP_out.outlet, Ev_HP_Out) annotation (points=[-300,-56;
+              -300,-70; -340,-70; -340,200],                     style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateEvLP_out.outlet, Ev_LP_Out) annotation (points=[300,-56;
+              300,-70; 260,-70; 260,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateEcLP_out.outlet, Ec_LP_Out) annotation (points=[380,-56;
+              380,-70; 340,-70; 340,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateEc2HP_out.outlet, Ec_HP_Out) annotation (points=[-80,34;
+              -80,60; -260,60; -260,200],                       style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(ShHPOut_T.inlet, stateSh2HP_out.outlet) annotation (points=[-376,
+              -160; -440,-160; -440,-76],      style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(RhIPOut_T.inlet, stateRh2IP_out.outlet) annotation (points=[-376,
+              -134; -420,-134; -420,-76],      style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(RhIPOut_T.outlet, Rh_IP_Out) annotation (points=[-364,-134;
+              -190,-134; -190,-200],
+                               style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(ShHPOut_T.outlet, Sh_HP_Out) annotation (points=[-364,-160;
+              -300,-160; -300,-200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(ShHP_RhIP.gasIn, GasIn) annotation (points=[-454,0; -462,0;
+              -462,1.77636e-015; -500,1.77636e-015],                    style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEcLP_in.inlet, Ec_LP_In) annotation (points=[260,56; 260,
-              150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvLP_in.inlet, Ev_LP_In) annotation (points=[200,56; 200,
-              150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateShLP_in.inlet, Sh_LP_In) annotation (points=[80,56; 80,130;
-              140,130; 140,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcIP_in.inlet, Ec_IP_In) annotation (points=[146,56; 146,
-              120; 60,120; 60,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcIP_out.outlet, Ec_IP_Out) annotation (points=[146,-56;
-              146,-72; 50,-72; 50,100; 30,100; 30,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEc1HP_in.inlet, Ev_HP_In) annotation (points=[134,56; 134,
-              110; -140,110; -140,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateShIP_in.inlet, Sh_IP_In) annotation (points=[-100,56; -100,
-              90; -60,90; -60,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvIP_in.inlet, Ev_IP_In) annotation (points=[20,56; 20,100;
-              0,100; 0,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvIP_out.outlet, Ev_IP_Out) annotation (points=[20,-56; 20,
-              -70; -10,-70; -10,90; -30,90; -30,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvHP_in.inlet, Ec_HP_In) annotation (points=[-160,56; -160,
-              100; -200,100; -200,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvLP_out.outlet, Ev_LP_Out) annotation (points=[200,-56;
-              200,-70; 170,-70; 170,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEcLP_out.outlet, Ec_LP_Out) annotation (points=[260,-56;
-              260,-68; 230,-68; 230,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEc2HP_out.outlet, Ec_HP_Out) annotation (points=[-40,-56;
-              -40,-70; -130,-70; -130,106; -170,106; -170,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(GasOut, Ec_LP.gasOut) annotation (points=[300,1.77636e-015; 300,
-              4; 288,0; 272,0], style(
+        connect(GasOut, Ec_LP.gasOut) annotation (points=[500,1.77636e-015; 426,
+              0; 392,0],                   style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Sh2HP_Rh2IP.gasIn, GasIn) annotation (points=[-280,0; -288,0;
-              -288,1.77636e-015; -300,1.77636e-015], style(
+        connect(Ev_HP.gasIn, ShHP_RhIP.gasOut) annotation (points=[-312,0; -406,
+              0],                                       style(
             color=76,
             rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateGas_ShHPout.inlet, Sh1HP_Rh1IP.gasOut) annotation (points=
-              [-196,0; -204,0], style(
+            thickness=2));
+        connect(Sh_IP.gasIn, Ev_HP.gasOut) annotation (points=[-218,0; -288,0],
+            style(
             color=76,
             rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ec2_HP.gasIn, Sh_IP.gasOut) annotation (points=[-92,0; -194,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ev_IP.gasIn, Ec2_HP.gasOut) annotation (points=[-12,0; -68,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Sh_LP.gasIn, Ev_IP.gasOut) annotation (points=[108,0; 12,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ec1HP_EcIP.gasIn, Sh_LP.gasOut) annotation (points=[178,0; 132,
+              0],              style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ev_LP.gasIn, Ec1HP_EcIP.gasOut) annotation (points=[288,0; 202,
+              0], style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(Ec_LP.gasIn, Ev_LP.gasOut) annotation (points=[368,0; 312,0],
+            style(
+            color=76,
+            rgbcolor={159,159,223},
+            thickness=2));
+        connect(stateRh2IP_out.inlet, ShHP_RhIP.waterOutB) annotation (points=[
+              -420,-64; -420,-24; -420.4,-24], style(thickness=2, fillPattern=1));
+        connect(stateSh2HP_out.inlet, ShHP_RhIP.waterOutA) annotation (points=[
+              -440,-64; -440,-24; -439.6,-24], style(thickness=2, fillPattern=1));
+        connect(stateSh1HP_in.outlet, ShHP_RhIP.waterInA) annotation (points=[
+              -440,64; -440,24; -439.6,24], style(thickness=2, fillPattern=1));
+        connect(ShHP_RhIP.waterInB, stateRh1IP_in.outlet) annotation (points=[
+              -420.4,24; -420.4,44; -420,44; -420,64], style(thickness=2,
+              fillPattern=1));
+        connect(stateEvHP_in.inlet, Ev_HP_In) annotation (points=[-300,56; -300,
+              200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateRh2IP_out.inlet, Sh2HP_Rh2IP.waterOutB) annotation (points=
-             [-262,-46; -262,-12; -263.2,-12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateSh2HP_out.inlet, Sh2HP_Rh2IP.waterOutA) annotation (points=
-             [-272,-46; -272,-12; -272.8,-12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateRh1IP_in.outlet, Sh1HP_Rh1IP.waterInB) annotation (points=
-              [-210,42; -210,12; -211.2,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateSh1HP_in.outlet, Sh1HP_Rh1IP.waterInA) annotation (points=
-              [-220,42; -220,12; -220.8,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateSh1HP_in.inlet, Sh_HP_In) annotation (points=[-220,54;
-              -220,66; -260,66; -260,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateEvHP_out.outlet, Ev_HP_Out) annotation (points=[-160,-56;
-              -160,-70; -180,-70; -180,92; -230,92; -230,150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_HP_Out, stateSh2HP_out.outlet) annotation (points=[-200,-150;
-              -200,-120; -272,-120; -272,-58], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Rh_IP_In, stateRh1IP_in.inlet) annotation (points=[-130,-150;
-              -130,-110; -190,-110; -190,66; -210,66; -210,54], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Rh_IP_Out, stateRh2IP_out.outlet) annotation (points=[-70,-150;
-              -70,-100; -262,-100; -262,-58], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_IP_Out, stateShIP_out.outlet) annotation (points=[0,-150; 0,
-              -88; -100,-88; -100,-56], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateShLP_out.outlet, Sh_LP_Out) annotation (points=[80,-56; 80,
-              -100; 200,-100; 200,-150], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh1HP_Rh1IP.waterOutA, stateSh1HP_out.inlet) annotation (points=
-             [-220.8,-12; -220.8,-30; -236,-30; -236,40; -254,40], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateRh1IP_out.outlet, Sh2HP_Rh2IP.waterInB) annotation (points=
-             [-236,-40; -246,-40; -246,22; -263.2,22; -263.2,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end HEG_3LRh_wa;
+        connect(mixIP.out, stateRh1IP_in.inlet) annotation (points=[-280,-110;
+              -380,-110; -380,100; -420,100; -420,76], style(thickness=2));
+        connect(Rh_IP_In, mixIP.in1) annotation (points=[-130,-200; -130,-116;
+              -262,-116], style(thickness=2));
+        connect(mixIP.in2, stateShIP_out.outlet) annotation (points=[-262.1,
+              -104; -206,-104; -206,-56], style(thickness=2));
+        connect(flowSplit2.in1, Ec_HP_In) 
+          annotation (points=[-220,156; -220,200], style(thickness=2));
+        connect(flowSplit2.out1, stateEc1HP_in.inlet) annotation (points=[
+              -215.8,144; -214,144; -214,110; 184,110; 184,56], style(thickness=
+               2));
+        connect(flowSplit2.out2, ShHP_RhIP.LiquidWaterIn_A) annotation (points=
+              [-224,144; -224,110; -472,110; -472,-10.08; -454,-10.08], style(
+              thickness=2));
+        connect(flowSplit1.in1, Ec_IP_In) 
+          annotation (points=[80,166; 80,200], style(thickness=2));
+        connect(flowSplit1.out1, stateEcIP_in.inlet) annotation (points=[84.2,
+              154; 86,154; 86,120; 196,120; 196,56], style(thickness=2));
+        connect(flowSplit1.out2, ShHP_RhIP.LiquidWaterIn_B) annotation (points=
+              [76,154; 76,120; -480,120; -480,-16.8; -454,-16.8], style(
+              thickness=2));
+      end HEG_3LRh_des;
       
       model DG_2L_NC 
-        "Drums Group with two pressure level, natural circulation and all ideal feed pump" 
+        "Drums Group with two pressure level, natural circulation, all ideal feed pumps and desuperheater" 
         extends ThermoPower.PowerPlants.HRSG.Interfaces.DG_2L;
         annotation (Diagram, Icon);
         Water.SinkW blowDownHP(            redeclare package Medium = 
               FluidMedium, w0=0) 
-          annotation (extent=[-130,-64; -90,-24],
+          annotation (extent=[-246,-100; -206,-60],
                                             rotation=270);
         Components.DrumSensors HPd(
           redeclare package Medium = FluidMedium,
@@ -11275,14 +9947,11 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hvstart=HPd_hvstart,
           Tmstart=HPd_Tmstart,
           Cm=HPd_Cm) "HP drum" 
-                        annotation (extent=[-68,0; -148,80]);
+                        annotation (extent=[-186,-20; -266,60]);
         Water.SensW steamHP_w(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-188,-132; -148,-172],
+          annotation (extent=[-308,-200; -268,-240],
                                                   rotation=90);
-        Water.ThroughW feedPumpLP(            redeclare package Medium = 
-              FluidMedium)        annotation (extent=[140,-100; 180,-60],
-            rotation=270);
         Water.SinkW blowDownLP(            redeclare package Medium = 
               FluidMedium,
             w0=0) 
@@ -11300,146 +9969,117 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hvstart=LPd_hvstart,
           Tmstart=LPd_Tmstart,
           Cm=LPd_Cm) "LP drum" 
-                        annotation (extent=[132,-2; 52,78]);
+                        annotation (extent=[144,0; 64,80]);
         Water.SensW steamLP_w(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[12,-130; 52,-170],
+          annotation (extent=[32,-200; 72,-240],
                                               rotation=90);
         Water.FlowSplit flowSplit1(           redeclare package Medium = 
               FluidMedium,
           rev_in1=false,
           rev_out1=false,
           rev_out2=false) 
-          annotation (extent=[72,-114; 112,-74],
+          annotation (extent=[112,-128; 152,-88],
                                                rotation=270);
-        Water.FlowSplit flowSplit2(
-          redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[-4,-126; 36,-86],rotation=180);
-        Water.ThroughW feedPumpAtt(redeclare package Medium = FluidMedium) 
-          "Feed pump for attemperation" 
-                                annotation (extent=[-120,100; -160,140]);
+        Water.ThroughW IPfeedPump(redeclare package Medium = FluidMedium) 
+                                annotation (extent=[-30,-188; -70,-148],
+            rotation=0);
       equation 
-        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (points=[200,60; 140,
-              60; 140,180; -60,180; -60,70; -93.6,70; -93.6,69.6],
+        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (points=[400,80; 200,
+              80; 200,120; -60,120; -60,50; -211.6,50; -211.6,49.6],
                                                            style(color=84,
               rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (points=[200,60; 140,
-              60; 140,180; -60,180; -60,56; -80.8,56],   style(color=84,
+        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (points=[400,80; 200,
+              80; 200,120; -60,120; -60,36; -198.8,36],  style(color=84,
               rgbcolor={255,170,213}));
-        connect(Steam_HP_Out,steamHP_w. outlet) annotation (points=[-160,-200;
-              -160,-164], style(
+        connect(Steam_HP_Out,steamHP_w. outlet) annotation (points=[-280,-300;
+              -280,-232], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(steamHP_w.inlet,HPd. steam) annotation (points=[-160,-140; -160,
-              80; -132,80; -132,68; -131.2,68], style(
+        connect(steamHP_w.inlet,HPd. steam) annotation (points=[-280,-208; -280,
+              80; -244,80; -244,48; -249.2,48], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(FromRiser_HP,HPd. riser) annotation (points=[-130,-200; -130,
-              -120; -140,-120; -140,17.2; -139.2,17.2],
-                                                  style(
+        connect(Feed_HP,HPd. feedwater) annotation (points=[-160,-300; -160,14;
+              -187.2,14], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Feed_HP,HPd. feedwater) annotation (points=[-70,-200; -70,34;
-              -69.2,34],  style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(blowDownHP.flange,HPd. blowdown) annotation (points=[-110,-24;
-              -110,0.8; -108,0.8],           style(thickness=2));
-        connect(ActuatorsBus.flowRate_feedLP,feedPumpLP. in_w0) 
-          annotation (points=[200,20; 200,-72; 172,-72],            style(color=
-                52, rgbcolor={213,255,170}));
-        connect(feedPumpLP.outlet, WaterForLP) 
-          annotation (points=[160,-100; 160,-200],         style(thickness=2));
-        connect(feedPumpLP.inlet, WaterIn) annotation (points=[160,-60; 160,120;
-              200,120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (points=[200,60; 140,
-              60; 140,68; 106.4,68; 106.4,67.6],      style(color=84, rgbcolor=
+        connect(blowDownHP.flange,HPd. blowdown) annotation (points=[-226,-60;
+              -226,-19.2],                   style(thickness=2));
+        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (points=[400,80; 140,
+              80; 140,68; 118.4,68; 118.4,69.6],      style(color=84, rgbcolor=
                 {255,170,213}));
-        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (points=[200,60; 140,
-              60; 140,54; 119.2,54],              style(color=84, rgbcolor={255,
+        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (points=[400,80; 140,
+              80; 140,56; 131.2,56],              style(color=84, rgbcolor={255,
                 170,213}));
-        connect(steamLP_w.inlet,LPd. steam) annotation (points=[40,-138; 40,78;
-              68.8,78; 68.8,66],   style(
+        connect(steamLP_w.inlet,LPd. steam) annotation (points=[60,-208; 60,78;
+              80.8,78; 80.8,68],   style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(FromRiser_LP,LPd. riser) annotation (points=[70,-200; 70,-80;
-              60.8,-80; 60.8,15.2],    style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_LP,LPd. feedwater) annotation (points=[130,-200; 130,32;
-              130.8,32], style(
+        connect(Feed_LP,LPd. feedwater) annotation (points=[180,-300; 180,34;
+              142.8,34], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(blowDownLP.flange,LPd. blowdown) 
-          annotation (points=[92,-26; 92,-1.2],  style(thickness=2));
-        connect(Steam_LP_Out, steamLP_w.outlet) annotation (points=[40,-200; 40,
-              -162], style(
+          annotation (points=[92,-26; 92,0.8; 104,0.8],
+                                                 style(thickness=2));
+        connect(Steam_LP_Out, steamLP_w.outlet) annotation (points=[60,-300; 60,
+              -232], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(flowSplit1.in1, LPd.downcomer) annotation (points=[92,-82; 120,
-              -82; 120,10], style(
+        connect(flowSplit1.in1, LPd.downcomer) annotation (points=[132,-96; 132,
+              12],          style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(ActuatorsBus.flowRate_attemp,feedPumpAtt. in_w0) annotation (
-            points=[200,20; 220,-32; 222,160; -132,160; -132,132],
-                                     style(color=52, rgbcolor={213,255,170}));
-        connect(flowSplit1.out2, flowSplit2.in1) annotation (points=[84,-106; 28,
-              -106], style(
+        connect(IPfeedPump.inlet, flowSplit1.out2) annotation (points=[-30,-168;
+              124,-168; 124,-120], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(flowSplit2.out2, feedPumpAtt.inlet) annotation (points=[4,-98;
-              -30,-98; -30,120; -120,120], style(
+        connect(ActuatorsBus.flowRate_feedHP, IPfeedPump.in_w0) annotation (
+            points=[400,20; 302,20; 302,-140; -42,-140; -42,-156], style(
+            color=52,
+            rgbcolor={213,255,170},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(WaterForHP, IPfeedPump.outlet) annotation (points=[-120,-300;
+              -120,-168; -70,-168], style(thickness=2));
+        connect(Downcomer_HP, HPd.downcomer) annotation (points=[-200,-300;
+              -200,-8; -198,-8], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(feedPumpAtt.outlet, LiquidWaterOut) annotation (points=[-160,
-              120; -200,120], style(
+        connect(Riser_HP, HPd.riser) annotation (points=[-240,-300; -240,-120;
+              -257.2,-120; -257.2,-2.8], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(flowSplit2.out1, WaterForHP) annotation (points=[4,-114.4; -40,
-              -114.4; -40,-200], style(
+        connect(Downcomer_LP, flowSplit1.out1) annotation (points=[140,-300;
+              140,-120; 140.4,-120], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(flowSplit1.out1, ToRiser_LP) annotation (points=[100.4,-106;
-              100.4,-151; 100,-151; 100,-200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ToRiser_HP, HPd.downcomer) annotation (points=[-100,-200; -100,
-              -120; -80,-120; -80,12], style(
+        connect(Riser_LP, LPd.riser) annotation (points=[100,-300; 100,-82;
+              72.8,-82; 72.8,17.2], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -11447,57 +10087,48 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       end DG_2L_NC;
       
       model DG_3L_CC 
-        "Drums Group with three pressure level, controlled circulation and all ideal feed pump" 
-        extends ThermoPower.PowerPlants.HRSG.Interfaces.DG_3L;
+        "Drums Group with three pressure level, controlled circulation" 
+        extends ThermoPower.PowerPlants.HRSG.Interfaces.DG_3L_p;
         parameter SI.MassFlowRate RiserHPFlowRate=0 
           "Nominal mass flowrate through the riser of HP";
         parameter SI.MassFlowRate RiserIPFlowRate=0 
           "Nominal mass flowrate through the riser of IP";
         parameter SI.MassFlowRate RiserLPFlowRate=0 
           "Nominal mass flowrate through the riser of LP";
+        
         annotation (Diagram);
-        Water.ThroughW feedPumpAtt(redeclare package Medium = FluidMedium) 
-          "Feed pump for attemperation" 
-                                annotation (extent=[-162,160; -202,200]);
-        Water.FlowSplit flowSplit2(
-          redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[100,-160; 140,-120],
-                                               rotation=180);
         Water.FlowSplit flowSplit3(
           redeclare package Medium = FluidMedium,
           rev_in1=false,
           rev_out1=false,
           rev_out2=false) 
-          annotation (extent=[52,-168; 92,-128],
+          annotation (extent=[132,-150; 172,-110],
                                                rotation=180);
         Water.ThroughW feedPumpIP(            redeclare package Medium = 
-              FluidMedium)      annotation (extent=[40,-260; 80,-220],
+              FluidMedium)      annotation (extent=[60,-202; 100,-162],
                                                                      rotation=
               270);
         Water.ThroughW feedPumpHP(            redeclare package Medium = 
-              FluidMedium)      annotation (extent=[-160,-260; -120,-220],
+              FluidMedium)      annotation (extent=[-240,-200; -200,-160],
                                                                        rotation=
              270);
         Water.ThroughW circulationPumpLP(            redeclare package Medium 
             = FluidMedium, w0=RiserLPFlowRate) 
-                                annotation (extent=[180,-200; 220,-240],
+                                annotation (extent=[280,-188; 320,-228],
                                                                    rotation=90);
         Water.SinkW blowDownHP(            redeclare package Medium = 
               FluidMedium, w0=0) 
-          annotation (extent=[-234,-84; -194,-44],
+          annotation (extent=[-348,-78; -308,-38],
                                             rotation=270);
         Water.SinkW blowDownLP(            redeclare package Medium = 
               FluidMedium,
             w0=0) 
-          annotation (extent=[166,-84; 206,-44],
+          annotation (extent=[244,-80; 284,-40],
                                             rotation=270);
         Water.SinkW blowDownIP(            redeclare package Medium = 
               FluidMedium,
             w0=0) 
-          annotation (extent=[-34,-84; 6,-44],
+          annotation (extent=[-48,-84; -8,-44],
                                             rotation=270);
         Components.DrumSensors HPd(
           redeclare package Medium = FluidMedium,
@@ -11511,7 +10142,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hvstart=HPd_hvstart,
           Tmstart=HPd_Tmstart,
           Cm=HPd_Cm) "HP drum" 
-                        annotation (extent=[-174,0; -254,80]);
+                        annotation (extent=[-288,0; -368,80]);
         Components.DrumSensors IPd(
           redeclare package Medium = FluidMedium,
           rint=IPd_rint,
@@ -11524,7 +10155,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hvstart=IPd_hvstart,
           Tmstart=IPd_Tmstart,
           Cm=IPd_Cm) "IP drum" 
-                        annotation (extent=[26,0; -54,80]);
+                        annotation (extent=[10,0; -70,80]);
         Components.DrumSensors LPd(
           redeclare package Medium = FluidMedium,
           rint=LPd_rint,
@@ -11537,7 +10168,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           hvstart=LPd_hvstart,
           Tmstart=LPd_Tmstart,
           Cm=LPd_Cm) "LP drum" 
-                        annotation (extent=[226,0; 146,80]);
+                        annotation (extent=[304,-4; 224,76]);
         Water.ThroughW circulationPumpIP(            redeclare package Medium 
             = FluidMedium, w0=RiserIPFlowRate) 
                                 annotation (extent=[20,-200; -20,-160],
@@ -11545,1252 +10176,217 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
               270);
         Water.ThroughW circulationPumpHP(            redeclare package Medium 
             = FluidMedium, w0=RiserHPFlowRate) 
-                                annotation (extent=[-180,-200; -220,-160],
+                                annotation (extent=[-280,-200; -320,-160],
                                                                        rotation=
              270);
         Water.SensW steamHP_w(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-288,-200; -248,-240],
+          annotation (extent=[-408,-200; -368,-240],
                                                   rotation=90);
         Water.SensW steamIP_w(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[-88,-200; -48,-240],
+          annotation (extent=[-108,-200; -68,-240],
                                                rotation=90);
         Water.SensW steamLP_w(            redeclare package Medium = 
               FluidMedium) 
-          annotation (extent=[112,-200; 152,-240],
+          annotation (extent=[192,-200; 232,-240],
                                               rotation=90);
         Water.FlowSplit flowSplit1(           redeclare package Medium = 
               FluidMedium,
           rev_in1=false,
           rev_out1=false,
           rev_out2=false) 
-          annotation (extent=[172,-142; 212,-102],
+          annotation (extent=[272,-120; 312,-80],
                                                rotation=270);
-        Water.ThroughW feedPumpLP(            redeclare package Medium = 
-              FluidMedium)        annotation (extent=[240,-126; 280,-86],
-            rotation=270);
       equation 
-        connect(feedPumpAtt.outlet, LiquidWaterOut) 
-          annotation (points=[-202,180; -300,180],
-                                                style(thickness=2));
-        connect(ActuatorsBus.flowRate_attemp, feedPumpAtt.in_w0) annotation (
-            points=[300,100; 180,100; 180,220; -174,220; -174,192],
-                                     style(color=52, rgbcolor={213,255,170}));
         connect(ActuatorsBus.flowRate_feedHP,feedPumpHP. in_w0) annotation (
-            points=[300,100; -110,100; -110,-232; -128,-232],
+            points=[500,20; 440,20; 440,-20; -140,-20; -140,-172; -208,-172],
             style(color=52, rgbcolor={213,255,170}));
         connect(ActuatorsBus.flowRate_feedIP,feedPumpIP. in_w0) annotation (
-            points=[300,100; 90,100; 90,-232; 72,-232],          style(color=52,
+            points=[500,20; 440,20; 440,-20; 120,-20; 120,-174; 92,-174],
+                                                                 style(color=52,
               rgbcolor={213,255,170}));
-        connect(ActuatorsBus.flowRate_feedLP,feedPumpLP. in_w0) 
-          annotation (points=[300,100; 300,-98; 272,-98],           style(color=
-                52, rgbcolor={213,255,170}));
-        connect(SensorsBus.w_steamHP,steamHP_w. w) annotation (points=[300,160;
-              240,160; 240,280; -280,280; -280,20; -300,20; -300,-260; -280,
-              -260; -280,-236],
+        connect(SensorsBus.w_steamHP,steamHP_w. w) annotation (points=[500,80;
+              400,80; 400,160; -420,160; -420,-260; -400,-260; -400,-236],
                     style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.w_steamIP,steamIP_w. w) annotation (points=[300,160;
-              240,160; 240,280; -100,280; -100,-260; -80,-260; -80,-236],
+        connect(SensorsBus.w_steamIP,steamIP_w. w) annotation (points=[500,80;
+              400,80; 400,160; -120,160; -120,-260; -100,-260; -100,-236],
                                                                  style(color=84,
               rgbcolor={255,170,213}));
-        connect(SensorsBus.w_steamLP,steamLP_w. w) annotation (points=[300,160;
-              240,160; 240,280; 100,280; 100,-260; 120,-260; 120,-236],
+        connect(SensorsBus.w_steamLP,steamLP_w. w) annotation (points=[500,80;
+              400,80; 400,160; 180,160; 180,-260; 200,-260; 200,-236],
                                                 style(color=84, rgbcolor={255,
                 170,213}));
-        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (points=[300,160;
-              240,160; 240,280; -160,280; -160,68; -199.6,68; -199.6,69.6],
+        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (points=[500,80; 400,
+              80; 400,160; -160,160; -160,68; -313.6,68; -313.6,69.6],
                                                            style(color=84,
               rgbcolor={255,170,213}));
-        connect(SensorsBus.p_drumIP,IPd. p_out) annotation (points=[300,160;
-              240,160; 240,280; 40,280; 40,69.6; 0.4,69.6],
+        connect(SensorsBus.p_drumIP,IPd. p_out) annotation (points=[500,80; 400,
+              80; 400,160; 40,160; 40,69.6; -15.6,69.6],
                                           style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (points=[300,160;
-              240,160; 240,68; 200.4,68; 200.4,69.6], style(color=84, rgbcolor=
+        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (points=[500,80; 400,
+              80; 400,68; 278.4,68; 278.4,65.6],      style(color=84, rgbcolor=
                 {255,170,213}));
-        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (points=[300,160;
-              240,160; 240,280; -160,280; -160,56; -186.8,56],
-                                                         style(color=84,
+        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (points=[500,80; 380,
+              80; 380,160; -160,160; -160,56; -300.8,56],style(color=84,
               rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumIP,IPd. y_out) annotation (points=[300,160;
-              240,160; 240,280; 40,280; 40,56; 13.2,56],
+        connect(SensorsBus.y_drumIP,IPd. y_out) annotation (points=[500,80; 400,
+              80; 400,160; 40,160; 40,56; -2.8,56],
                                       style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (points=[300,160;
-              240,160; 240,56; 213.2,56],         style(color=84, rgbcolor={255,
+        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (points=[500,80; 400,
+              80; 400,52; 291.2,52],              style(color=84, rgbcolor={255,
                 170,213}));
-        connect(Steam_HP_Out,steamHP_w. outlet) annotation (points=[-260,-300;
-              -260,-232], style(
+        connect(Steam_HP_Out,steamHP_w. outlet) annotation (points=[-380,-300;
+              -380,-232], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(steamHP_w.inlet,HPd. steam) annotation (points=[-260,-208; -260,
-              80; -238,80; -238,68; -237.2,68], style(
+        connect(steamHP_w.inlet,HPd. steam) annotation (points=[-380,-208; -380,
+              100; -352,100; -352,68; -351.2,68],
+                                                style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(circulationPumpHP.inlet,HPd. downcomer) annotation (points=[-200,
-              -160; -200,-100; -186,-100; -186,12], style(
+        connect(circulationPumpHP.inlet,HPd. downcomer) annotation (points=[-300,
+              -160; -300,12],                       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(ToRiser_HP,circulationPumpHP. outlet) annotation (points=[-200,
-              -300; -200,-200], style(
+        connect(Feed_HP,HPd. feedwater) annotation (points=[-260,-300; -260,34;
+              -289.2,34], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(FromRiser_HP,HPd. riser) annotation (points=[-230,-300; -230,
-              -100; -248,-100; -248,17.2; -245.2,17.2],
-                                                  style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_HP,HPd. feedwater) annotation (points=[-170,-300; -170,34;
-              -175.2,34], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Steam_IP_Out,steamIP_w. outlet) annotation (points=[-60,-300;
-              -60,-232],
+        connect(Steam_IP_Out,steamIP_w. outlet) annotation (points=[-80,-300;
+              -80,-232],
                      style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_IP,IPd. riser) annotation (points=[-30,-300; -30,-100;
-              -45.2,-100; -45.2,17.2], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(circulationPumpIP.inlet,IPd. downcomer) annotation (points=[
-              -3.67382e-015,-160; 0,-160; 0,-100; 14,-100; 14,12], style(
+              -3.67382e-015,-160; 0,-160; 0,12; -2,12],            style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(circulationPumpIP.outlet, ToRiser_IP) annotation (points=[
-              3.67382e-015,-200; 3.67382e-015,-300; 0,-300],         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamIP_w.inlet,IPd. steam) annotation (points=[-60,-208; -60,
-              80; -38,80; -38,68; -37.2,68],
+        connect(steamIP_w.inlet,IPd. steam) annotation (points=[-80,-208; -80,
+              80; -38,80; -38,68; -53.2,68],
                                          style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Feed_IP,IPd. feedwater) annotation (points=[30,-300; 30,34;
-              24.8,34],
-                   style(
+        connect(Feed_IP,IPd. feedwater) annotation (points=[40,-300; 40,34; 8.8,
+              34], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(steamLP_w.inlet,LPd. steam) annotation (points=[140,-208; 140,
-              80; 162.8,80; 162.8,68],
+        connect(steamLP_w.inlet,LPd. steam) annotation (points=[220,-208; 220,
+              80; 240.8,80; 240.8,64],
                                    style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(FromRiser_LP,LPd. riser) annotation (points=[170,-300; 170,-100;
-              154.8,-100; 154.8,17.2], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Steam_LP_Out,steamLP_w. outlet) annotation (points=[140,-300;
-              140,-232],
+        connect(Steam_LP_Out,steamLP_w. outlet) annotation (points=[220,-300;
+              220,-232],
                      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Feed_LP,LPd. feedwater) annotation (points=[230,-300; 230,34;
-              224.8,34], style(
+        connect(Feed_LP,LPd. feedwater) annotation (points=[340,-300; 340,30;
+              302.8,30], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(circulationPumpLP.inlet,flowSplit1. out1) annotation (points=[200,-200;
-              200,-134; 200.4,-134],           style(thickness=2));
-        connect(ToRiser_LP,circulationPumpLP. outlet) 
-          annotation (points=[200,-300; 200,-240], style(thickness=2));
-        connect(flowSplit1.in1,LPd. downcomer) annotation (points=[192,-110;
-              192,-100; 214,-100; 214,12], style(thickness=2));
-        connect(flowSplit3.out1, feedPumpIP.inlet) 
-                                                  annotation (points=[60,-156.4;
-              60,-188.2; 60,-220; 60,-220],style(thickness=2));
-        connect(flowSplit3.out2, feedPumpHP.inlet) 
-                                                  annotation (points=[60,-140;
-              -140,-140; -140,-220], style(thickness=2));
-        connect(feedPumpIP.outlet, WaterForIP) annotation (points=[60,-260; 60,
-              -280; 60,-280; 60,-300], style(thickness=2));
-        connect(feedPumpHP.outlet, WaterForHP) 
-          annotation (points=[-140,-260; -140,-300], style(thickness=2));
-        connect(feedPumpLP.outlet, WaterForLP) 
-          annotation (points=[260,-126; 260,-300],         style(thickness=2));
-        connect(blowDownHP.flange,HPd. blowdown) annotation (points=[-214,-44;
-              -214,0.8],                     style(thickness=2));
+        connect(circulationPumpLP.inlet,flowSplit1. out1) annotation (points=[300,-188;
+              300,-112; 300.4,-112],           style(thickness=2));
+        connect(flowSplit1.in1,LPd. downcomer) annotation (points=[292,-88; 292,
+              8],                          style(thickness=2));
+        connect(flowSplit3.out1,feedPumpIP. inlet) 
+                                                  annotation (points=[140,
+              -138.4; 140,-140; 80,-140; 80,-162],
+                                           style(thickness=2));
+        connect(flowSplit3.out2,feedPumpHP. inlet) 
+                                                  annotation (points=[140,-122;
+              -220,-122; -220,-160], style(thickness=2));
+        connect(blowDownHP.flange,HPd. blowdown) annotation (points=[-328,-38;
+              -328,0.8],                     style(thickness=2));
         connect(blowDownIP.flange,IPd. blowdown) 
-          annotation (points=[-14,-44; -14,-21.6; -14,0.8; -14,0.8],
-                                                          style(thickness=2));
+          annotation (points=[-28,-44; -28,0.8; -30,0.8], style(thickness=2));
         connect(blowDownLP.flange,LPd. blowdown) 
-          annotation (points=[186,-44; 186,0.8], style(thickness=2));
-        connect(feedPumpLP.inlet, WaterIn) annotation (points=[260,-86; 260,240;
-              300,240], style(
+          annotation (points=[264,-40; 264,-3.2],style(thickness=2));
+        connect(flowSplit1.out2, flowSplit3.in1) annotation (points=[284,-112;
+              284,-130; 164,-130], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(flowSplit1.out2, flowSplit2.in1) annotation (points=[184,-134;
-              184,-140; 132,-140], style(
+        connect(WaterForHP, feedPumpHP.outlet) annotation (points=[-220,-300;
+              -220,-200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(flowSplit2.out1, flowSplit3.in1) annotation (points=[108,-148.4;
-              107,-148.4; 107,-148; 84,-148], style(
+        connect(WaterForIP, feedPumpIP.outlet) annotation (points=[80,-300; 80,
+              -202], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(flowSplit2.out2, feedPumpAtt.inlet) annotation (points=[108,
-              -132; 108,180; -162,180], style(
+        connect(Riser_LP, LPd.riser) annotation (points=[260,-300; 260,-100;
+              232.8,-100; 232.8,13.2], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Downcomer_LP, circulationPumpLP.outlet) annotation (points=[300,
+              -300; 300,-300; 300,-228], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Downcomer_IP, circulationPumpIP.outlet) annotation (points=[
+              1.77636e-015,-300; 1.77636e-015,-252; 3.67382e-015,-252;
+              3.67382e-015,-200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Riser_IP, IPd.riser) annotation (points=[-40,-300; -40,-100;
+              -61.2,-100; -61.2,17.2], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Downcomer_HP, circulationPumpHP.outlet) annotation (points=[
+              -300,-300; -300,-200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(Riser_HP, HPd.riser) annotation (points=[-340,-300; -340,-100;
+              -359.2,-100; -359.2,17.2], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
       end DG_3L_CC;
       
-      model DG_3L_CC_wa 
-        "Drums Group with three pressure level, controlled circulation and without attemperation" 
-        extends ThermoPower.PowerPlants.HRSG.Interfaces.DG_3L_wa;
-        parameter SI.MassFlowRate RiserHPFlowRate=0 
-          "Nominal mass flowrate through the riser of HP";
-        parameter SI.MassFlowRate RiserIPFlowRate=0 
-          "Nominal mass flowrate through the riser of IP";
-        parameter SI.MassFlowRate RiserLPFlowRate=0 
-          "Nominal mass flowrate through the riser of LP";
-        
-        //Total Feed Pump Parameter
-        parameter SI.Conversions.NonSIunits.AngularVelocity_rpm n0_TFP 
-          "Nominal rpm"                                                              annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        parameter SI.Pressure outletTFPNomPressure = fluidLPNomPressure 
-          "Nominal live steam pressure"                                          annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        parameter SI.Pressure inletTFPNomPressure 
-          "Nominal condensation pressure"                                         annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        parameter SI.MassFlowRate TFPNomFlowRate "Nominal steam mass flow rate"
-                                                                                annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        parameter SI.SpecificEnthalpy hstart_TFP 
-          "Fluid Specific Enthalpy Start Value" annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        
-        annotation (Diagram);
-        Components.PrescribedSpeedPump totalFeedPump(
-          redeclare package WaterMedium = FluidMedium,
-          rho_nom=1000,
-          n0=n0_TFP,
-          nominalSteamPressure=outletTFPNomPressure,
-          nominalCondensationPressure=inletTFPNomPressure,
-          nominalSteamFlow=TFPNomFlowRate,
-          hstart=hstart_TFP,
-          q_nom={0.0898,0,0.1},
-          head_nom={72.74,130,0}) annotation (extent=[180,220; 220,180]);
-        Water.FlowSplit flowSplit2(
-          redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[52,-168; 92,-128],
-                                               rotation=180);
-        Water.ThroughW feedPumpIP(            redeclare package Medium = 
-              FluidMedium)      annotation (extent=[40,-260; 80,-220],
-                                                                     rotation=
-              270);
-        Water.ThroughW feedPumpHP(            redeclare package Medium = 
-              FluidMedium)      annotation (extent=[-160,-260; -120,-220],
-                                                                       rotation=
-             270);
-        Water.ThroughW circulationPumpLP(            redeclare package Medium 
-            = FluidMedium, w0=RiserLPFlowRate) 
-                                annotation (extent=[180,-200; 220,-240],
-                                                                   rotation=90);
-        Water.SinkW blowDownHP(            redeclare package Medium = 
-              FluidMedium, w0=0) 
-          annotation (extent=[-234,-84; -194,-44],
-                                            rotation=270);
-        Water.SinkW blowDownLP(            redeclare package Medium = 
-              FluidMedium,
-            w0=0) 
-          annotation (extent=[166,-84; 206,-44],
-                                            rotation=270);
-        Water.SinkW blowDownIP(            redeclare package Medium = 
-              FluidMedium,
-            w0=0) 
-          annotation (extent=[-34,-84; 6,-44],
-                                            rotation=270);
-        Components.DrumSensors HPd(
-          redeclare package Medium = FluidMedium,
-          rint=HPd_rint,
-          rext=HPd_rext,
-          L=HPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=HPd_pstart,
-          hlstart=HPd_hlstart,
-          hvstart=HPd_hvstart,
-          Tmstart=HPd_Tmstart,
-          Cm=HPd_Cm) "HP drum" 
-                        annotation (extent=[-174,0; -254,80]);
-        Components.DrumSensors IPd(
-          redeclare package Medium = FluidMedium,
-          rint=IPd_rint,
-          rext=IPd_rext,
-          L=IPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=IPd_pstart,
-          hlstart=IPd_hlstart,
-          hvstart=IPd_hvstart,
-          Tmstart=IPd_Tmstart,
-          Cm=IPd_Cm) "IP drum" 
-                        annotation (extent=[26,0; -54,80]);
-        Components.DrumSensors LPd(
-          redeclare package Medium = FluidMedium,
-          rint=LPd_rint,
-          rext=LPd_rext,
-          L=LPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=LPd_pstart,
-          hlstart=LPd_hlstart,
-          hvstart=LPd_hvstart,
-          Tmstart=LPd_Tmstart,
-          Cm=LPd_Cm) "LP drum" 
-                        annotation (extent=[226,0; 146,80]);
-        Water.ThroughW circulationPumpIP(            redeclare package Medium 
-            = FluidMedium, w0=RiserIPFlowRate) 
-                                annotation (extent=[20,-200; -20,-160],
-                                                                     rotation=
-              270);
-        Water.ThroughW circulationPumpHP(            redeclare package Medium 
-            = FluidMedium, w0=RiserHPFlowRate) 
-                                annotation (extent=[-180,-200; -220,-160],
-                                                                       rotation=
-             270);
-        Water.SensW steamHP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-288,-200; -248,-240],
-                                                  rotation=90);
-        Water.SensW steamIP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-88,-200; -48,-240],
-                                               rotation=90);
-        Water.SensW steamLP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[112,-200; 152,-240],
-                                              rotation=90);
-        Water.FlowSplit flowSplit1(           redeclare package Medium = 
-              FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[172,-142; 212,-102],
-                                               rotation=270);
-      equation 
-        connect(totalFeedPump.inlet, WaterIn)       annotation (points=[180,200;
-              160,200; 160,240; 300,240],
-                                     style(thickness=2));
-        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
-          annotation (points=[300,100; 160,100; 160,188; 178.4,188],
-            style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.flowRate_feedHP,feedPumpHP. in_w0) annotation (
-            points=[300,100; -110,100; -110,-232; -128,-232],
-            style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.flowRate_feedIP,feedPumpIP. in_w0) annotation (
-            points=[300,100; 90,100; 90,-232; 72,-232],          style(color=52,
-              rgbcolor={213,255,170}));
-        connect(SensorsBus.w_steamHP,steamHP_w. w) annotation (points=[300,160;
-              240,160; 240,280; -280,280; -280,20; -300,20; -300,-260; -280,
-              -260; -280,-236],
-                    style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.w_steamIP,steamIP_w. w) annotation (points=[300,160;
-              240,160; 240,280; -100,280; -100,-260; -80,-260; -80,-236],
-                                                                 style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.w_steamLP,steamLP_w. w) annotation (points=[300,160;
-              240,160; 240,280; 100,280; 100,-260; 120,-260; 120,-236],
-                                                style(color=84, rgbcolor={255,
-                170,213}));
-        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (points=[300,160;
-              240,160; 240,280; -160,280; -160,68; -199.6,68; -199.6,69.6],
-                                                           style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.p_drumIP,IPd. p_out) annotation (points=[300,160;
-              240,160; 240,280; 40,280; 40,69.6; 0.4,69.6],
-                                          style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (points=[300,160;
-              240,160; 240,68; 200.4,68; 200.4,69.6], style(color=84, rgbcolor=
-                {255,170,213}));
-        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (points=[300,160;
-              240,160; 240,280; -160,280; -160,56; -186.8,56],
-                                                         style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumIP,IPd. y_out) annotation (points=[300,160;
-              240,160; 240,280; 40,280; 40,56; 13.2,56],
-                                      style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (points=[300,160;
-              240,160; 240,56; 213.2,56],         style(color=84, rgbcolor={255,
-                170,213}));
-        connect(Steam_HP_Out,steamHP_w. outlet) annotation (points=[-260,-300;
-              -260,-232], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamHP_w.inlet,HPd. steam) annotation (points=[-260,-208; -260,
-              80; -238,80; -238,68; -237.2,68], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpHP.inlet,HPd. downcomer) annotation (points=[-200,
-              -160; -200,-100; -186,-100; -186,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ToRiser_HP,circulationPumpHP. outlet) annotation (points=[-200,
-              -300; -200,-200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_HP,HPd. riser) annotation (points=[-230,-300; -230,
-              -100; -248,-100; -248,17.2; -245.2,17.2],
-                                                  style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_HP,HPd. feedwater) annotation (points=[-170,-300; -170,34;
-              -175.2,34], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Steam_IP_Out,steamIP_w. outlet) annotation (points=[-60,-300;
-              -60,-232],
-                     style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_IP,IPd. riser) annotation (points=[-30,-300; -30,-100;
-              -45.2,-100; -45.2,17.2], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpIP.inlet,IPd. downcomer) annotation (points=[
-              -3.67382e-015,-160; 0,-160; 0,-100; 14,-100; 14,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpIP.outlet, ToRiser_IP) annotation (points=[
-              3.67382e-015,-200; 3.67382e-015,-300; 0,-300],         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamIP_w.inlet,IPd. steam) annotation (points=[-60,-208; -60,
-              80; -38,80; -38,68; -37.2,68],
-                                         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_IP,IPd. feedwater) annotation (points=[30,-300; 30,34;
-              24.8,34],
-                   style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamLP_w.inlet,LPd. steam) annotation (points=[140,-208; 140,
-              80; 162.8,80; 162.8,68],
-                                   style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_LP,LPd. riser) annotation (points=[170,-300; 170,-100;
-              154.8,-100; 154.8,17.2], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Steam_LP_Out,steamLP_w. outlet) annotation (points=[140,-300;
-              140,-232],
-                     style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_LP,LPd. feedwater) annotation (points=[230,-300; 230,34;
-              224.8,34], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpLP.inlet,flowSplit1. out1) annotation (points=[200,-200;
-              200,-134; 200.4,-134],           style(thickness=2));
-        connect(ToRiser_LP,circulationPumpLP. outlet) 
-          annotation (points=[200,-300; 200,-240], style(thickness=2));
-        connect(flowSplit1.in1,LPd. downcomer) annotation (points=[192,-110;
-              192,-100; 214,-100; 214,12], style(thickness=2));
-        connect(flowSplit2.out1,feedPumpIP. inlet) 
-                                                  annotation (points=[60,-156.4;
-              60,-188.2; 60,-220; 60,-220],style(thickness=2));
-        connect(flowSplit2.out2,feedPumpHP. inlet) 
-                                                  annotation (points=[60,-140;
-              -140,-140; -140,-220], style(thickness=2));
-        connect(feedPumpIP.outlet, WaterForIP) annotation (points=[60,-260; 60,
-              -280; 60,-280; 60,-300], style(thickness=2));
-        connect(feedPumpHP.outlet, WaterForHP) 
-          annotation (points=[-140,-260; -140,-300], style(thickness=2));
-        connect(blowDownHP.flange,HPd. blowdown) annotation (points=[-214,-44;
-              -214,0.8],                     style(thickness=2));
-        connect(blowDownIP.flange,IPd. blowdown) 
-          annotation (points=[-14,-44; -14,-21.6; -14,0.8; -14,0.8],
-                                                          style(thickness=2));
-        connect(blowDownLP.flange,LPd. blowdown) 
-          annotation (points=[186,-44; 186,0.8], style(thickness=2));
-        connect(flowSplit1.out2, flowSplit2.in1) annotation (points=[184,-134;
-              184,-148; 84,-148], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(totalFeedPump.outlet, WaterForLP) annotation (points=[220,200;
-              260,200; 260,-300], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end DG_3L_CC_wa;
-      
-      model DG_3L_CC_wafp "Drums Group with three pressure level, controlled circulation, without
-   attemperation and all ideal feed pump" 
-        extends ThermoPower.PowerPlants.HRSG.Interfaces.DG_3L_wa;
-        parameter SI.MassFlowRate RiserHPFlowRate=0 
-          "Nominal mass flowrate through the riser of HP";
-        parameter SI.MassFlowRate RiserIPFlowRate=0 
-          "Nominal mass flowrate through the riser of IP";
-        parameter SI.MassFlowRate RiserLPFlowRate=0 
-          "Nominal mass flowrate through the riser of LP";
-        
-        annotation (Diagram);
-        Water.FlowSplit flowSplit2(
-          redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[52,-168; 92,-128],
-                                               rotation=180);
-        Water.ThroughW feedPumpIP(            redeclare package Medium = 
-              FluidMedium)      annotation (extent=[40,-260; 80,-220],
-                                                                     rotation=
-              270);
-        Water.ThroughW feedPumpHP(            redeclare package Medium = 
-              FluidMedium)      annotation (extent=[-160,-260; -120,-220],
-                                                                       rotation=
-             270);
-        Water.ThroughW circulationPumpLP(            redeclare package Medium 
-            = FluidMedium, w0=RiserLPFlowRate) 
-                                annotation (extent=[180,-200; 220,-240],
-                                                                   rotation=90);
-        Water.SinkW blowDownHP(            redeclare package Medium = 
-              FluidMedium, w0=0) 
-          annotation (extent=[-234,-84; -194,-44],
-                                            rotation=270);
-        Water.SinkW blowDownLP(            redeclare package Medium = 
-              FluidMedium,
-            w0=0) 
-          annotation (extent=[166,-84; 206,-44],
-                                            rotation=270);
-        Water.SinkW blowDownIP(            redeclare package Medium = 
-              FluidMedium,
-            w0=0) 
-          annotation (extent=[-34,-84; 6,-44],
-                                            rotation=270);
-        Components.DrumSensors HPd(
-          redeclare package Medium = FluidMedium,
-          rint=HPd_rint,
-          rext=HPd_rext,
-          L=HPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=HPd_pstart,
-          hlstart=HPd_hlstart,
-          hvstart=HPd_hvstart,
-          Tmstart=HPd_Tmstart,
-          Cm=HPd_Cm) "HP drum" 
-                        annotation (extent=[-174,0; -254,80]);
-        Components.DrumSensors IPd(
-          redeclare package Medium = FluidMedium,
-          rint=IPd_rint,
-          rext=IPd_rext,
-          L=IPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=IPd_pstart,
-          hlstart=IPd_hlstart,
-          hvstart=IPd_hvstart,
-          Tmstart=IPd_Tmstart,
-          Cm=IPd_Cm) "IP drum" 
-                        annotation (extent=[26,0; -54,80]);
-        Components.DrumSensors LPd(
-          redeclare package Medium = FluidMedium,
-          rint=LPd_rint,
-          rext=LPd_rext,
-          L=LPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=LPd_pstart,
-          hlstart=LPd_hlstart,
-          hvstart=LPd_hvstart,
-          Tmstart=LPd_Tmstart,
-          Cm=LPd_Cm) "LP drum" 
-                        annotation (extent=[226,0; 146,80]);
-        Water.ThroughW circulationPumpIP(            redeclare package Medium 
-            = FluidMedium, w0=RiserIPFlowRate) 
-                                annotation (extent=[20,-200; -20,-160],
-                                                                     rotation=
-              270);
-        Water.ThroughW circulationPumpHP(            redeclare package Medium 
-            = FluidMedium, w0=RiserHPFlowRate) 
-                                annotation (extent=[-180,-200; -220,-160],
-                                                                       rotation=
-             270);
-        Water.SensW steamHP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-288,-200; -248,-240],
-                                                  rotation=90);
-        Water.SensW steamIP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-88,-200; -48,-240],
-                                               rotation=90);
-        Water.SensW steamLP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[112,-200; 152,-240],
-                                              rotation=90);
-        Water.FlowSplit flowSplit1(           redeclare package Medium = 
-              FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[172,-142; 212,-102],
-                                               rotation=270);
-        Water.ThroughW feedPumpLP(            redeclare package Medium = 
-              FluidMedium)        annotation (extent=[240,-126; 280,-86],
-            rotation=270);
-      equation 
-        connect(ActuatorsBus.flowRate_feedHP,feedPumpHP. in_w0) annotation (
-            points=[300,100; -110,100; -110,-232; -128,-232],
-            style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.flowRate_feedIP,feedPumpIP. in_w0) annotation (
-            points=[300,100; 90,100; 90,-232; 72,-232],          style(color=52,
-              rgbcolor={213,255,170}));
-        connect(ActuatorsBus.flowRate_feedLP,feedPumpLP. in_w0) 
-          annotation (points=[300,100; 300,-98; 272,-98],           style(color=
-                52, rgbcolor={213,255,170}));
-        connect(SensorsBus.w_steamHP,steamHP_w. w) annotation (points=[300,160;
-              240,160; 240,280; -280,280; -280,20; -300,20; -300,-260; -280,
-              -260; -280,-236],
-                    style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.w_steamIP,steamIP_w. w) annotation (points=[300,160;
-              240,160; 240,280; -100,280; -100,-260; -80,-260; -80,-236],
-                                                                 style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.w_steamLP,steamLP_w. w) annotation (points=[300,160;
-              240,160; 240,280; 100,280; 100,-260; 120,-260; 120,-236],
-                                                style(color=84, rgbcolor={255,
-                170,213}));
-        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (points=[300,160;
-              240,160; 240,280; -160,280; -160,68; -199.6,68; -199.6,69.6],
-                                                           style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.p_drumIP,IPd. p_out) annotation (points=[300,160;
-              240,160; 240,280; 40,280; 40,69.6; 0.4,69.6],
-                                          style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (points=[300,160;
-              240,160; 240,68; 200.4,68; 200.4,69.6], style(color=84, rgbcolor=
-                {255,170,213}));
-        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (points=[300,160;
-              240,160; 240,280; -160,280; -160,56; -186.8,56],
-                                                         style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumIP,IPd. y_out) annotation (points=[300,160;
-              240,160; 240,280; 40,280; 40,56; 13.2,56],
-                                      style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (points=[300,160;
-              240,160; 240,56; 213.2,56],         style(color=84, rgbcolor={255,
-                170,213}));
-        connect(Steam_HP_Out,steamHP_w. outlet) annotation (points=[-260,-300;
-              -260,-232], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamHP_w.inlet,HPd. steam) annotation (points=[-260,-208; -260,
-              80; -238,80; -238,68; -237.2,68], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpHP.inlet,HPd. downcomer) annotation (points=[-200,
-              -160; -200,-100; -186,-100; -186,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ToRiser_HP,circulationPumpHP. outlet) annotation (points=[-200,
-              -300; -200,-200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_HP,HPd. riser) annotation (points=[-230,-300; -230,
-              -100; -248,-100; -248,17.2; -245.2,17.2],
-                                                  style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_HP,HPd. feedwater) annotation (points=[-170,-300; -170,34;
-              -175.2,34], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Steam_IP_Out,steamIP_w. outlet) annotation (points=[-60,-300;
-              -60,-232],
-                     style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_IP,IPd. riser) annotation (points=[-30,-300; -30,-100;
-              -45.2,-100; -45.2,17.2], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpIP.inlet,IPd. downcomer) annotation (points=[
-              -3.67382e-015,-160; 0,-160; 0,-100; 14,-100; 14,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpIP.outlet, ToRiser_IP) annotation (points=[
-              3.67382e-015,-200; 3.67382e-015,-300; 0,-300],         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamIP_w.inlet,IPd. steam) annotation (points=[-60,-208; -60,
-              80; -38,80; -38,68; -37.2,68],
-                                         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_IP,IPd. feedwater) annotation (points=[30,-300; 30,34;
-              24.8,34],
-                   style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamLP_w.inlet,LPd. steam) annotation (points=[140,-208; 140,
-              80; 162.8,80; 162.8,68],
-                                   style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_LP,LPd. riser) annotation (points=[170,-300; 170,-100;
-              154.8,-100; 154.8,17.2], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Steam_LP_Out,steamLP_w. outlet) annotation (points=[140,-300;
-              140,-232],
-                     style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_LP,LPd. feedwater) annotation (points=[230,-300; 230,34;
-              224.8,34], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpLP.inlet,flowSplit1. out1) annotation (points=[200,-200;
-              200,-134; 200.4,-134],           style(thickness=2));
-        connect(ToRiser_LP,circulationPumpLP. outlet) 
-          annotation (points=[200,-300; 200,-240], style(thickness=2));
-        connect(flowSplit1.in1,LPd. downcomer) annotation (points=[192,-110;
-              192,-100; 214,-100; 214,12], style(thickness=2));
-        connect(flowSplit2.out1,feedPumpIP. inlet) 
-                                                  annotation (points=[60,-156.4;
-              60,-188.2; 60,-220; 60,-220],style(thickness=2));
-        connect(flowSplit2.out2,feedPumpHP. inlet) 
-                                                  annotation (points=[60,-140;
-              -140,-140; -140,-220], style(thickness=2));
-        connect(feedPumpLP.outlet, WaterForLP) 
-          annotation (points=[260,-126; 260,-300],         style(thickness=2));
-        connect(blowDownHP.flange,HPd. blowdown) annotation (points=[-214,-44;
-              -214,0.8],                     style(thickness=2));
-        connect(blowDownIP.flange,IPd. blowdown) 
-          annotation (points=[-14,-44; -14,-21.6; -14,0.8; -14,0.8],
-                                                          style(thickness=2));
-        connect(blowDownLP.flange,LPd. blowdown) 
-          annotation (points=[186,-44; 186,0.8], style(thickness=2));
-        connect(feedPumpLP.inlet, WaterIn) annotation (points=[260,-86; 260,240;
-              300,240], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(flowSplit2.in1, flowSplit1.out2) annotation (points=[84,-148;
-              184,-148; 184,-134], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(WaterForIP, feedPumpIP.outlet) annotation (points=[60,-300; 60,
-              -260; 60,-260], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(WaterForHP, feedPumpHP.outlet) annotation (points=[-140,-300;
-              -140,-300; -140,-260], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end DG_3L_CC_wafp;
-      
-      model DG_3L_tap_CC_wa "Drums Group with three pressure level and tappings of saturated water
-   for external heater, controlled circulation and without attemperation" 
-        extends ThermoPower.PowerPlants.HRSG.Interfaces.DG_3L_tap_wa;
-        //Flow Rate of evaporators circulation
-        parameter SI.MassFlowRate RiserHPFlowRate=0 
-          "Nominal mass flowrate through the riser of HP";
-        parameter SI.MassFlowRate RiserIPFlowRate=0 
-          "Nominal mass flowrate through the riser of IP";
-        parameter SI.MassFlowRate RiserLPFlowRate=0 
-          "Nominal mass flowrate through the riser of LP";
-        
-        //Total Feed Pump Parameter
-        parameter SI.Conversions.NonSIunits.AngularVelocity_rpm n0_TFP 
-          "Nominal rpm"                                                              annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        parameter SI.Pressure outletTFPNomPressure = fluidLPNomPressure 
-          "Nominal live steam pressure"                                          annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        parameter SI.Pressure inletTFPNomPressure 
-          "Nominal condensation pressure"                                         annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        parameter SI.MassFlowRate TFPNomFlowRate "Nominal steam mass flow rate"
-                                                                                annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        parameter SI.SpecificEnthalpy hstart_TFP 
-          "Fluid Specific Enthalpy Start Value" annotation (Dialog(group = "Total Feed Pump (TFP)"));
-        
-        //mixer for external tappings 
-        parameter SI.Volume mixHP_V "Internal volume of the HP steam mixer";
-        parameter SI.Volume mixIP_V "Internal volume of the IP steam mixer";
-        
-        Water.FlowSplit flowSplit1(redeclare package Medium = FluidMedium) 
-          annotation (extent=[218,134; 258,174],
-                                               rotation=270);
-        Water.FlowSplit flowSplit3(redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[-186,-140; -146,-100],
-                                               rotation=90);
-        Water.FlowSplit flowSplit6(redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[14,-142; 54,-102],
-                                               rotation=90);
-        Water.Mixer mixHP(redeclare package Medium = FluidMedium,
-          pstart=HPd_pstart,
-          hstart=HPd_hvstart,
-          initOpt=if SSInit then Options.steadyState else Options.noInit,
-          V=mixHP_V)      annotation (extent=[-292,-76; -252,-36],
-                                                                 rotation=270);
-        Water.Mixer mixIP(
-          redeclare package Medium = FluidMedium,
-          initOpt=if SSInit then Options.steadyState else Options.noInit,
-          V=mixIP_V,
-          pstart=IPd_pstart,
-          hstart=IPd_hvstart) 
-                           annotation (extent=[-92,-78; -52,-38],
-                                                                rotation=270);
-        annotation (Diagram);
-        Components.PrescribedSpeedPump prescribedSpeedPump(
-          redeclare package WaterMedium = FluidMedium,
-          rho_nom=1000,
-          n0=n0_TFP,
-          nominalSteamPressure=outletTFPNomPressure,
-          nominalCondensationPressure=inletTFPNomPressure,
-          nominalSteamFlow=TFPNomFlowRate,
-          hstart=hstart_TFP,
-          q_nom={0.0898,0,0.1},
-          head_nom={72.74,130,0}) annotation (extent=[180,220; 220,180]);
-        Water.FlowSplit flowSplit2(
-          redeclare package Medium = FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[52,-174; 92,-134],
-                                               rotation=180);
-        Water.ThroughW feedPumpIP(            redeclare package Medium = 
-              FluidMedium)      annotation (extent=[40,-260; 80,-220],
-                                                                     rotation=
-              270);
-        Water.ThroughW feedPumpHP(            redeclare package Medium = 
-              FluidMedium)      annotation (extent=[-160,-260; -120,-220],
-                                                                       rotation=
-             270);
-        Water.ThroughW circulationPumpLP(            redeclare package Medium 
-            = FluidMedium, w0=RiserLPFlowRate) 
-                                annotation (extent=[180,-200; 220,-240],
-                                                                   rotation=90);
-        Water.SinkW blowDownHP(            redeclare package Medium = 
-              FluidMedium, w0=0) 
-          annotation (extent=[-234,-84; -194,-44],
-                                            rotation=270);
-        Water.SinkW blowDownLP(            redeclare package Medium = 
-              FluidMedium,
-            w0=0) 
-          annotation (extent=[166,-84; 206,-44],
-                                            rotation=270);
-        Water.SinkW blowDownIP(            redeclare package Medium = 
-              FluidMedium,
-            w0=0) 
-          annotation (extent=[-34,-84; 6,-44],
-                                            rotation=270);
-        Components.DrumSensors HPd(
-          redeclare package Medium = FluidMedium,
-          rint=HPd_rint,
-          rext=HPd_rext,
-          L=HPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=HPd_pstart,
-          hlstart=HPd_hlstart,
-          hvstart=HPd_hvstart,
-          Tmstart=HPd_Tmstart,
-          Cm=HPd_Cm) "HP drum" 
-                        annotation (extent=[-174,0; -254,80]);
-        Components.DrumSensors IPd(
-          redeclare package Medium = FluidMedium,
-          rint=IPd_rint,
-          rext=IPd_rext,
-          L=IPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=IPd_pstart,
-          hlstart=IPd_hlstart,
-          hvstart=IPd_hvstart,
-          Tmstart=IPd_Tmstart,
-          Cm=IPd_Cm) "IP drum" 
-                        annotation (extent=[26,0; -54,80]);
-        Components.DrumSensors LPd(
-          redeclare package Medium = FluidMedium,
-          rint=LPd_rint,
-          rext=LPd_rext,
-          L=LPd_L,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          pstart=LPd_pstart,
-          hlstart=LPd_hlstart,
-          hvstart=LPd_hvstart,
-          Tmstart=LPd_Tmstart,
-          Cm=LPd_Cm) "LP drum" 
-                        annotation (extent=[226,0; 146,80]);
-        Water.ThroughW circulationPumpIP(            redeclare package Medium 
-            = FluidMedium, w0=RiserIPFlowRate) 
-                                annotation (extent=[20,-200; -20,-160],
-                                                                     rotation=
-              270);
-        Water.ThroughW circulationPumpHP(            redeclare package Medium 
-            = FluidMedium, w0=RiserHPFlowRate) 
-                                annotation (extent=[-180,-200; -220,-160],
-                                                                       rotation=
-             270);
-        Water.SensW steamHP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-288,-200; -248,-240],
-                                                  rotation=90);
-        Water.SensW steamIP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[-88,-200; -48,-240],
-                                               rotation=90);
-        Water.SensW steamLP_w(            redeclare package Medium = 
-              FluidMedium) 
-          annotation (extent=[112,-200; 152,-240],
-                                              rotation=90);
-        Water.FlowSplit flowSplit4(           redeclare package Medium = 
-              FluidMedium,
-          rev_in1=false,
-          rev_out1=false,
-          rev_out2=false) 
-          annotation (extent=[172,-142; 212,-102],
-                                               rotation=270);
-      equation 
-        connect(HPsteamFromExUse, mixHP.in2) annotation (points=[-240,300; -240,
-              120; -284,120; -284,-40.2],    style(thickness=2));
-        connect(mixIP.in2, IPsteamFromExUse) annotation (points=[-84,-42.2; -84,
-              100; -200,100; -200,300], style(thickness=2));
-        connect(flowSplit3.out2, tapHPwater) annotation (points=[-158,-108;
-              -158,266; -140,266; -140,300],
-                                          style(thickness=2));
-        connect(flowSplit6.out2, tapIPwater) annotation (points=[42,-110; 42,
-              202; -100,202; -100,300],                  style(thickness=2));
-        connect(tapLPwater, flowSplit1.out2) 
-          annotation (points=[-62,300; -62,210; 120,210; 120,120; 230,120; 230,
-              142],                                      style(thickness=2));
-        connect(prescribedSpeedPump.inlet, WaterIn) annotation (points=[180,200;
-              160,200; 160,240; 300,240],
-                                     style(thickness=2));
-        connect(ActuatorsBus.nPump_feedLP,prescribedSpeedPump. pumpSpeed_rpm) 
-          annotation (points=[300,100; 160,100; 160,188; 178.4,188],
-            style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.flowRate_feedHP,feedPumpHP. in_w0) annotation (
-            points=[300,100; -110,100; -110,-232; -128,-232],
-            style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.flowRate_feedIP,feedPumpIP. in_w0) annotation (
-            points=[300,100; 90,100; 90,-232; 72,-232],          style(color=52,
-              rgbcolor={213,255,170}));
-        connect(SensorsBus.w_steamHP,steamHP_w. w) annotation (points=[300,160;
-              240,160; 240,280; -300,280; -300,-260; -280,-260; -280,-236],
-                    style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.w_steamIP,steamIP_w. w) annotation (points=[300,160;
-              240,160; 240,280; -104,280; -104,-260; -80,-260; -80,-236],
-                                                                 style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.w_steamLP,steamLP_w. w) annotation (points=[300,160;
-              240,160; 240,280; 100,280; 100,-260; 120,-260; 120,-236],
-                                                style(color=84, rgbcolor={255,
-                170,213}));
-        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (points=[300,160;
-              240,160; 240,280; -148,280; -148,68; -199.6,68; -199.6,69.6],
-                                                           style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.p_drumIP,IPd. p_out) annotation (points=[300,160;
-              240,160; 240,280; 46,280; 46,70; 24,70; 24,69.6; 0.4,69.6],
-                                          style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (points=[300,160;
-              240,160; 240,68; 200.4,68; 200.4,69.6], style(color=84, rgbcolor=
-                {255,170,213}));
-        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (points=[300,160;
-              240,160; 240,280; -148,280; -148,56; -186.8,56],
-                                                         style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumIP,IPd. y_out) annotation (points=[300,160;
-              240,160; 240,280; 46,280; 46,56; 13.2,56],
-                                      style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (points=[300,160;
-              240,160; 240,56; 213.2,56],         style(color=84, rgbcolor={255,
-                170,213}));
-        connect(Steam_HP_Out,steamHP_w. outlet) annotation (points=[-260,-300;
-              -260,-232], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpHP.inlet,HPd. downcomer) annotation (points=[-200,
-              -160; -200,-100; -186,-100; -186,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(ToRiser_HP,circulationPumpHP. outlet) annotation (points=[-200,
-              -300; -200,-200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_HP,HPd. riser) annotation (points=[-230,-300; -230,
-              -100; -248,-100; -248,17.2; -245.2,17.2],
-                                                  style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Steam_IP_Out,steamIP_w. outlet) annotation (points=[-60,-300;
-              -60,-232],
-                     style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_IP,IPd. riser) annotation (points=[-30,-300; -30,-100;
-              -45.2,-100; -45.2,17.2], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpIP.inlet,IPd. downcomer) annotation (points=[
-              -3.67382e-015,-160; 0,-160; 0,-100; 14,-100; 14,12], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpIP.outlet, ToRiser_IP) annotation (points=[
-              3.67382e-015,-200; 3.67382e-015,-300; 0,-300],         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamLP_w.inlet,LPd. steam) annotation (points=[140,-208; 140,
-              68; 162.8,68],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(FromRiser_LP,LPd. riser) annotation (points=[170,-300; 170,-100;
-              154.8,-100; 154.8,17.2], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Steam_LP_Out,steamLP_w. outlet) annotation (points=[140,-300;
-              140,-232],
-                     style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_LP,LPd. feedwater) annotation (points=[230,-300; 230,34;
-              224.8,34], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(circulationPumpLP.inlet,flowSplit4. out1) annotation (points=[200,-200;
-              200,-134; 200.4,-134],           style(thickness=2));
-        connect(ToRiser_LP,circulationPumpLP. outlet) 
-          annotation (points=[200,-300; 200,-240], style(thickness=2));
-        connect(flowSplit4.in1,LPd. downcomer) annotation (points=[192,-110;
-              192,-100; 214,-100; 214,12], style(thickness=2));
-        connect(flowSplit2.out1,feedPumpIP. inlet) 
-                                                  annotation (points=[60,-162.4;
-              60,-191.2; 60,-220; 60,-220],style(thickness=2));
-        connect(flowSplit2.out2,feedPumpHP. inlet) 
-                                                  annotation (points=[60,-146;
-              -140,-146; -140,-220], style(thickness=2));
-        connect(feedPumpIP.outlet, WaterForIP) annotation (points=[60,-260; 60,
-              -280; 60,-280; 60,-300], style(thickness=2));
-        connect(feedPumpHP.outlet, WaterForHP) 
-          annotation (points=[-140,-260; -140,-300], style(thickness=2));
-        connect(blowDownHP.flange,HPd. blowdown) annotation (points=[-214,-44;
-              -214,0.8],                     style(thickness=2));
-        connect(blowDownIP.flange,IPd. blowdown) 
-          annotation (points=[-14,-44; -14,-21.6; -14,0.8; -14,0.8],
-                                                          style(thickness=2));
-        connect(blowDownLP.flange,LPd. blowdown) 
-          annotation (points=[186,-44; 186,0.8], style(thickness=2));
-        connect(flowSplit4.out2, flowSplit2.in1) annotation (points=[184,-134;
-              184,-154; 84,-154], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamHP_w.inlet, mixHP.out) annotation (points=[-260,-208; -260,
-              -120; -272,-120; -272,-76], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(mixHP.in1, HPd.steam) annotation (points=[-260,-40; -260,68;
-              -237.2,68], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(steamIP_w.inlet, mixIP.out) annotation (points=[-60,-208; -60,
-              -120; -72,-120; -72,-78], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(mixIP.in1, IPd.steam) annotation (points=[-60,-42; -60,68;
-              -37.2,68], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HPd.feedwater, flowSplit3.out1) annotation (points=[-175.2,34;
-              -174.4,34; -174.4,-108], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_HP, flowSplit3.in1) annotation (points=[-170,-300; -170,
-              -160; -166,-160; -166,-132], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(IPd.feedwater, flowSplit6.out1) annotation (points=[24.8,34;
-              25.6,34; 25.6,-110], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Feed_IP, flowSplit6.in1) annotation (points=[30,-300; 30,-160;
-              34,-160; 34,-134], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(flowSplit1.in1, prescribedSpeedPump.outlet) annotation (points=
-              [238,166; 238,200; 220,200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(WaterForLP, flowSplit1.out1) annotation (points=[260,-300; 260,
-              120; 246,120; 246,132; 246.4,142], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end DG_3L_tap_CC_wa;
-      
-      model HRSG_3LRh_wa 
-        "Heat Recovery Steam Generator with three pressure level and reheat, without attemperation" 
+      model HRSG_3LRh 
+        "Heat Recovery Steam Generator with three pressure level and reheat" 
         extends Interfaces.HRSG_3LRh;
         
-        annotation (Diagram, Icon);
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wa drums(
+        annotation (Diagram);
+        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC drums(
           HPd_rint=1.067,
           HPd_rext=1.167,
           HPd_L=11.920,
@@ -12816,12 +10412,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           HPd_hvstart=2.53239e6,
           HPd_hlstart=1.5879e6,
           IPd_hvstart=2.794e6,
-          n0_TFP=1500,
-          inletTFPNomPressure=5398.2,
-          TFPNomFlowRate=89.8,
-          hstart_TFP=1.43495e5,
-          IPd_hlstart=1.0265e6) annotation (extent=[-100,0; 80,180]);
-        HEG_3LRh_wa HeatExchangersGroup(
+          IPd_hlstart=1.0265e6) annotation (extent=[-102,40; 98,160]);
+        ThermoPower.PowerPlants.HRSG.Examples.HEG_3LRh HeatExchangersGroup(
           gasNomFlowRate=585.5,
           fluidHPNomFlowRate_Sh=70.59,
           fluidHPNomPressure_Sh=134.3e5,
@@ -13043,7 +10635,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Ev_IP_Tstart_M_Out=FluidMedium.temperature_ph(37.16e5, 1.37e6),
           Ev_LP_Tstart_M_In=FluidMedium.temperature_ph(15.34e5, 6.625e5),
           Ev_LP_Tstart_M_Out=FluidMedium.temperature_ph(15.34e5, 1.065e6)) 
-                             annotation (extent=[-100,-120; 80,-30]);
+                             annotation (extent=[-102,-80; 98,0]);
         replaceable Components.BaseReader_water stateInletWater(redeclare 
             package Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
@@ -13051,1006 +10643,158 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                                                                   rotation=90);
       equation 
         connect(ActuatorsBus, drums.ActuatorsBus)           annotation (points=[200,100;
-              172,100; 172,120; 80,120],            style(color=52, rgbcolor={
+              158,100; 158,104; 98,104],            style(color=52, rgbcolor={
                 213,255,170}));
-        connect(drums.SensorsBus, SensorsBus)           annotation (points=[80,138;
-              172,138; 172,160; 200,160],              style(color=84, rgbcolor=
+        connect(drums.SensorsBus, SensorsBus)           annotation (points=[98,116;
+              140,116; 140,160; 200,160],              style(color=84, rgbcolor=
                {255,170,213}));
-        connect(Sh_LP_Out, HeatExchangersGroup.Sh_LP_Out) annotation (points=[
-              80,-200; 80,-140; 50,-140; 50,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_IP_Out, HeatExchangersGroup.Sh_IP_Out) annotation (points=[
-              20,-200; 20,-160; -10,-160; -10,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Rh_IP_Out, HeatExchangersGroup.Rh_IP_Out) annotation (points=[
-              -40,-200; -40,-160; -31,-160; -31,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Rh_IP_In, HeatExchangersGroup.Rh_IP_In) annotation (points=[
-              -100,-200; -100,-160; -49,-160; -49,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_HP_Out, HeatExchangersGroup.Sh_HP_Out) annotation (points=[
-              -160,-200; -160,-140; -70,-140; -70,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.GasIn, GasIn) annotation (points=[-100,-75;
-              -144,-75; -144,-40; -200,-40], style(
+        connect(HeatExchangersGroup.GasIn, GasIn) annotation (points=[-102,-40;
+              -200,-40],                     style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(GasOut, HeatExchangersGroup.GasOut) annotation (points=[200,-40;
-              120,-40; 120,-75; 80,-75], style(
+        connect(HeatExchangersGroup.GasOut, GasOut) annotation (points=[98,-40;
+              200,-40],                   style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ec_LP_In, drums.WaterForLP) annotation (
-            points=[68,-30; 68,0], style(
+        connect(Sh_HP_Out, HeatExchangersGroup.Sh_HP_Out) annotation (points=[-160,
+              -200; -160,-106; -62,-106; -62,-80],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ev_LP_In, drums.ToRiser_LP) annotation (
-            points=[50,-30; 50,0], style(
+        connect(Sh_LP_Out, HeatExchangersGroup.Sh_LP_Out) annotation (points=[80,-200;
+              80,-160; 58,-160; 58,-79.6],         style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ev_LP_Out, drums.FromRiser_LP) annotation (
-            points=[41,-30; 42,-16; 41,0], style(
+        connect(Rh_IP_Out, HeatExchangersGroup.Rh_IP_Out) annotation (points=[-40,-200;
+              -40,-80],                                style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Sh_LP_In, drums.Steam_LP_Out) annotation (
-            points=[32,-30; 32,0], style(
+        connect(Rh_IP_In, HeatExchangersGroup.Rh_IP_In) annotation (points=[-100,
+              -200; -100,-120; -28,-120; -28,-80],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ec_IP_In, drums.WaterForIP) annotation (
-            points=[8,-30; 8,0], style(
+        connect(WaterIn, stateInletWater.inlet) 
+          annotation (points=[160,-200; 160,-116], style(thickness=2));
+        connect(stateInletWater.outlet, HeatExchangersGroup.Ec_LP_In) 
+          annotation (points=[160,-104; 160,20; 74,20; 74,0], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ev_IP_In, drums.ToRiser_IP) annotation (
-            points=[-10,-30; -10,0], style(
-            thickness=2,
+        connect(HeatExchangersGroup.SensorsBus, drums.SensorsBus) annotation (
+            points=[98,-12; 140,-12; 140,116; 98,116],   style(
+            color=84,
+            rgbcolor={255,170,213},
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Sh_IP_In, drums.Steam_IP_Out) annotation (
-            points=[-28,-30; -28,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ev_HP_In, drums.WaterForHP) annotation (
-            points=[-52,-30; -52,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ec_HP_In, drums.ToRiser_HP) annotation (
-            points=[-70,-30; -70,0], style(
-            thickness=2,
+        connect(HeatExchangersGroup.ActuatorsBus, drums.ActuatorsBus) 
+          annotation (points=[98,-24; 128,-24; 128,104; 98,104],   style(
+            color=52,
+            rgbcolor={213,255,170},
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(HeatExchangersGroup.Sh_HP_In, drums.Steam_HP_Out) annotation (
-            points=[-88,-30; -88,0], style(
+            points=[-78,0; -78,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ev_IP_Out, drums.FromRiser_IP) annotation (
-            points=[-19,-30; -19,0], style(
+        connect(HeatExchangersGroup.Ev_HP_Out, drums.Riser_HP) annotation (
+            points=[-70,0; -70,0; -70,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ec_IP_Out, drums.Feed_IP) annotation (
-            points=[-1,-30; -1,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ec_LP_Out, drums.Feed_LP) annotation (
-            points=[59,-30; 59,0], style(
+        connect(HeatExchangersGroup.Ev_HP_In, drums.Downcomer_HP) annotation (
+            points=[-62,0; -62,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(HeatExchangersGroup.Ec_HP_Out, drums.Feed_HP) annotation (
-            points=[-61,-30; -61,0], style(
+            points=[-54,0; -54,40; -54,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ev_HP_Out, drums.FromRiser_HP) annotation (
-            points=[-79,-30; -79,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(WaterIn, stateInletWater.inlet) 
-          annotation (points=[160,-200; 160,-116], style(thickness=2));
-        connect(stateInletWater.outlet, drums.WaterIn) 
-          annotation (points=[160,-104; 160,162; 80,162], style(thickness=2));
-      end HRSG_3LRh_wa;
-      
-      model HRSG_3LRh_wafp 
-        "Heat Recovery Steam Generator with three pressure level and reheat, without attemperation and all ideal feed pump" 
-        extends Interfaces.HRSG_3LRh;
-        
-        annotation (Diagram);
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wafp drums(
-          HPd_rint=1.067,
-          HPd_rext=1.167,
-          HPd_L=11.920,
-          HPd_Cm=0,
-          IPd_rint=0.915,
-          IPd_rext=1.015,
-          IPd_L=7,
-          IPd_Cm=0,
-          LPd_rint=1.143,
-          LPd_rext=1.243,
-          LPd_L=11.503,
-          LPd_Cm=0,
-          RiserHPFlowRate=175.5,
-          RiserIPFlowRate=67.5,
-          RiserLPFlowRate=41.5,
-          redeclare package FluidMedium = FluidMedium,
-          SSInit=false,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
-          IPd_hlstart=1.0265e6) annotation (extent=[-100,0; 80,180]);
-        HEG_3LRh_wa HeatExchangersGroup(
-          gasNomFlowRate=585.5,
-          fluidHPNomFlowRate_Sh=70.59,
-          fluidHPNomPressure_Sh=134.3e5,
-          fluidHPNomFlowRate_Ev=175.5,
-          fluidHPNomPressure_Ev=137.1e5,
-          fluidHPNomFlowRate_Ec=70.10,
-          fluidHPNomPressure_Ec=138.9e5,
-          fluidIPNomFlowRate_Rh=81.10,
-          fluidIPNomPressure_Rh=28.4e5,
-          fluidIPNomFlowRate_Sh=13.5,
-          fluidIPNomPressure_Sh=29.5e5,
-          fluidIPNomFlowRate_Ev=67.5,
-          fluidIPNomPressure_Ev=37.16e5,
-          fluidIPNomFlowRate_Ec=21.8,
-          fluidIPNomPressure_Ec=48.6e5,
-          fluidLPNomFlowRate_Sh=6.91,
-          fluidLPNomPressure_Sh=6.6e5,
-          fluidLPNomFlowRate_Ev=41.49,
-          fluidLPNomPressure_Ev=15.34e5,
-          fluidLPNomFlowRate_Ec=122.4,
-          fluidLPNomPressure_Ec=19.8e5,
-          Sh2_HP_N_G=3,
-          Sh2_HP_N_F=5,
-          Sh2_HP_exchSurface_G=3636,
-          Sh2_HP_exchSurface_F=421.844,
-          Sh2_HP_extSurfaceTub=540.913,
-          Sh2_HP_gasVol=10,
-          Sh2_HP_fluidVol=2.615,
-          Sh2_HP_metalVol=1.685,
-          Sh1_HP_N_G=3,
-          Sh1_HP_N_F=7,
-          Sh1_HP_exchSurface_G=8137.2,
-          Sh1_HP_exchSurface_F=612.387,
-          Sh1_HP_extSurfaceTub=721.256,
-          Sh1_HP_gasVol=10,
-          Sh1_HP_fluidVol=4.134,
-          Sh1_HP_metalVol=1.600,
-          Ev_HP_N_G=4,
-          Ev_HP_N_F=4,
-          Ev_HP_exchSurface_G=30501.9,
-          Ev_HP_exchSurface_F=2296.328,
-          Ev_HP_extSurfaceTub=2704.564,
-          Ev_HP_gasVol=10,
-          Ev_HP_fluidVol=15.500,
-          Ev_HP_metalVol=6.001,
-          Ec2_HP_N_G=3,
-          Ec2_HP_N_F=6,
-          Ec2_HP_exchSurface_G=20335,
-          Ec2_HP_exchSurface_F=1451.506,
-          Ec2_HP_extSurfaceTub=1803.043,
-          Ec2_HP_gasVol=10,
-          Ec2_HP_fluidVol=9.290,
-          Ec2_HP_metalVol=5.045,
-          Ec1_HP_N_G=3,
-          Ec1_HP_N_F=5,
-          Ec1_HP_exchSurface_G=12201.2,
-          Ec1_HP_exchSurface_F=870.904,
-          Ec1_HP_extSurfaceTub=1081.826,
-          Ec1_HP_gasVol=10,
-          Ec1_HP_fluidVol=5.574,
-          Ec1_HP_metalVol=3.027,
-          Rh2_IP_N_F=7,
-          Rh2_IP_exchSurface_G=4630.2,
-          Rh2_IP_exchSurface_F=873.079,
-          Rh2_IP_extSurfaceTub=1009.143,
-          Rh2_IP_fluidVol=8.403,
-          Rh2_IP_metalVol=2.823,
-          Rh1_IP_N_F=5,
-          Rh1_IP_exchSurface_G=4630,
-          Rh1_IP_exchSurface_F=900.387,
-          Rh1_IP_extSurfaceTub=1009.250,
-          Rh1_IP_fluidVol=8.936,
-          Rh1_IP_metalVol=2.292,
-          Sh_IP_N_G=3,
-          Sh_IP_N_F=7,
-          Sh_IP_exchSurface_G=2314.8,
-          Sh_IP_exchSurface_F=450.218,
-          Sh_IP_extSurfaceTub=504.652,
-          Sh_IP_gasVol=10,
-          Sh_IP_fluidVol=4.468,
-          Sh_IP_metalVol=1.146,
-          Ev_IP_N_G=4,
-          Ev_IP_N_F=4,
-          Ev_IP_exchSurface_G=24402,
-          Ev_IP_exchSurface_F=1837.063,
-          Ev_IP_extSurfaceTub=2163.652,
-          Ev_IP_gasVol=10,
-          Ev_IP_fluidVol=12.400,
-          Ev_IP_metalVol=4.801,
-          Ec_IP_N_G=3,
-          Ec_IP_N_F=5,
-          Ec_IP_exchSurface_G=4067.2,
-          Ec_IP_exchSurface_F=306.177,
-          Ec_IP_extSurfaceTub=360.609,
-          Ec_IP_gasVol=10,
-          Ec_IP_fluidVol=2.067,
-          Ec_IP_metalVol=0.800,
-          Sh_LP_N_G=3,
-          Sh_LP_N_F=7,
-          Sh_LP_exchSurface_G=1708.2,
-          Sh_LP_exchSurface_F=225.073,
-          Sh_LP_extSurfaceTub=252.286,
-          Sh_LP_gasVol=10,
-          Sh_LP_fluidVol=2.234,
-          Sh_LP_metalVol=0.573,
-          Ev_LP_N_G=4,
-          Ev_LP_N_F=4,
-          Ev_LP_exchSurface_G=24402,
-          Ev_LP_exchSurface_F=2292.926,
-          Ev_LP_extSurfaceTub=2592.300,
-          Ev_LP_gasVol=10,
-          Ev_LP_fluidVol=19.318,
-          Ev_LP_metalVol=5.374,
-          Ec_LP_N_G=3,
-          Ec_LP_N_F=6,
-          Ec_LP_exchSurface_G=40095.9,
-          Ec_LP_exchSurface_F=3439.389,
-          Ec_LP_extSurfaceTub=3888.449,
-          Ec_LP_gasVol=10,
-          Ec_LP_fluidVol=28.977,
-          Ec_LP_metalVol=8.061,
-          use_T_Ev=false,
-          Sh2_HP_Tstart_G_In=884.65,
-          Sh2_HP_Tstart_G_Out=837.31,
-          Sh2_HP_Tstart_M_In=742.65,
-          Sh2_HP_Tstart_M_Out=823.28,
-          Sh2_HP_Tstart_F_In=742.65,
-          Sh2_HP_Tstart_F_Out=823.28,
-          Sh1_HP_Tstart_G_In=837.15,
-          Sh1_HP_Tstart_G_Out=748.60,
-          Sh1_HP_Tstart_M_In=606.59,
-          Sh1_HP_Tstart_M_Out=743.18,
-          Sh1_HP_Tstart_F_In=606.59,
-          Sh1_HP_Tstart_F_Out=743.18,
-          Ev_HP_Tstart_G_In=747.15,
-          Ev_HP_Tstart_G_Out=620.30,
-          Ev_HP_hstart_F_In=1.514e6,
-          Ev_HP_hstart_F_Out=2.002e6,
-          Ec2_HP_Tstart_G_In=614.15,
-          Ec2_HP_Tstart_G_Out=558.98,
-          Ec2_HP_Tstart_M_In=494.67,
-          Ec2_HP_Tstart_M_Out=594.14,
-          Ec2_HP_Tstart_F_In=494.67,
-          Ec2_HP_Tstart_F_Out=594.14,
-          Ec1_HP_Tstart_M_In=431.77,
-          Ec1_HP_Tstart_M_Out=494.67,
-          Ec1_HP_Tstart_F_In=431.77,
-          Ec1_HP_Tstart_F_Out=494.67,
-          Rh2_IP_Tstart_M_In=717.31,
-          Rh2_IP_Tstart_M_Out=813.09,
-          Rh2_IP_Tstart_F_In=717.31,
-          Rh2_IP_Tstart_F_Out=813.09,
-          Rh1_IP_Tstart_M_In=618.31,
-          Rh1_IP_Tstart_M_Out=717.34,
-          Rh1_IP_Tstart_F_In=618.31,
-          Rh1_IP_Tstart_F_Out=717.34,
-          Sh_IP_Tstart_G_In=620.15,
-          Sh_IP_Tstart_G_Out=614.50,
-          Sh_IP_Tstart_M_In=506.08,
-          Sh_IP_Tstart_M_Out=605.11,
-          Sh_IP_Tstart_F_In=506.08,
-          Sh_IP_Tstart_F_Out=605.11,
-          Ev_IP_Tstart_G_In=558.15,
-          Ev_IP_Tstart_G_Out=518.51,
-          Ev_IP_hstart_F_In=9.92e5,
-          Ev_IP_hstart_F_Out=1.37e6,
-          Ec_IP_Tstart_G_In=517.15,
-          Ec_IP_Tstart_G_Out=480.11,
-          Ec_IP_Tstart_M_In=430.24,
-          Ec_IP_Tstart_M_Out=493.16,
-          Ec_IP_Tstart_F_In=430.24,
-          Ec_IP_Tstart_F_Out=493.16,
-          Sh_LP_Tstart_G_In=519.15,
-          Sh_LP_Tstart_G_Out=517.44,
-          Sh_LP_Tstart_M_In=435.75,
-          Sh_LP_Tstart_M_Out=505.04,
-          Sh_LP_Tstart_F_In=435.75,
-          Sh_LP_Tstart_F_Out=505.75,
-          Ev_LP_Tstart_G_In=480.00,
-          Ev_LP_Tstart_G_Out=453.47,
-          Ev_LP_hstart_F_In=6.625e5,
-          Ev_LP_hstart_F_Out=1.065e6,
-          Ec_LP_Tstart_G_In=453.47,
-          Ec_LP_Tstart_G_Out=372.35,
-          Ec_LP_Tstart_M_In=331.05,
-          Ec_LP_Tstart_M_Out=428.09,
-          Ec_LP_Tstart_F_In=331.05,
-          Ec_LP_Tstart_F_Out=428.09,
-          rhomcm=7900*578.05,
-          lambda=20,
-          Ec_LP(gamma_G=46.8, gamma_F=4000),
-          Ev_LP(gamma_G=127, gamma_F=20000),
-          Ec1HP_EcIP(
-            gamma_G_A=42,
-            gamma_G_B=45,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh_LP(gamma_G=16.6, gamma_F=4000),
-          Ev_IP(gamma_G=58.5, gamma_F=20000),
-          Ec2_HP(gamma_G=56, gamma_F=4000),
-          Sh_IP(gamma_G=33, gamma_F=4000),
-          Ev_HP(gamma_G=46.5, gamma_F=20000),
-          gasNomPressure=1e5,
-          Sh1HP_Rh1IP(
-            gamma_G_A=70,
-            gamma_G_B=80,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh2HP_Rh2IP(
-            gamma_G_A=83.97,
-            gamma_G_B=80,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          Ev_HP_Tstart_M_In=FluidMedium.temperature_ph(137.1e5, 1.514e6),
-          Ev_HP_Tstart_M_Out=FluidMedium.temperature_ph(137.1e5, 2.002e6),
-          Ev_IP_Tstart_M_In=FluidMedium.temperature_ph(37.16e5, 9.92e5),
-          Ev_IP_Tstart_M_Out=FluidMedium.temperature_ph(37.16e5, 1.37e6),
-          Ev_LP_Tstart_M_In=FluidMedium.temperature_ph(15.34e5, 6.625e5),
-          Ev_LP_Tstart_M_Out=FluidMedium.temperature_ph(15.34e5, 1.065e6)) 
-                             annotation (extent=[-100,-120; 80,-30]);
-        replaceable Components.BaseReader_water stateInletWater(redeclare 
-            package Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[150,-120; 170,-100],
-                                                                  rotation=90);
-      equation 
-        connect(ActuatorsBus, drums.ActuatorsBus)           annotation (points=[200,100;
-              140,100; 140,120; 80,120],            style(color=52, rgbcolor={
-                213,255,170}));
-        connect(drums.SensorsBus, SensorsBus)           annotation (points=[80,138;
-              140,138; 140,160; 200,160],              style(color=84, rgbcolor=
-               {255,170,213}));
-        connect(HeatExchangersGroup.GasIn, GasIn) annotation (points=[-100,-75;
-              -132,-75; -132,-40; -200,-40], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.GasOut, GasOut) annotation (points=[80,-75;
-              140,-75; 140,-40; 200,-40], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ec_LP_In, drums.WaterForLP) annotation (
-            points=[68,-30; 68,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ev_LP_In, drums.ToRiser_LP) annotation (
-            points=[50,-30; 50,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ev_LP_Out, drums.FromRiser_LP) annotation (
-            points=[41,-30; 42,-14; 41,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Sh_LP_In, drums.Steam_LP_Out) annotation (
-            points=[32,-30; 32,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ec_IP_In, drums.WaterForIP) annotation (
-            points=[8,-30; 8,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ev_IP_In, drums.ToRiser_IP) annotation (
-            points=[-10,-30; -10,0], style(
+        connect(HeatExchangersGroup.Ec_HP_In, drums.WaterForHP) annotation (
+            points=[-46,0; -46,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(HeatExchangersGroup.Sh_IP_In, drums.Steam_IP_Out) annotation (
-            points=[-28,-30; -28,0], style(
+            points=[-18,0; -18,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ev_HP_In, drums.WaterForHP) annotation (
-            points=[-52,-30; -52,0], style(
+        connect(HeatExchangersGroup.Ev_IP_Out, drums.Riser_IP) annotation (
+            points=[-10,0; -10,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(HeatExchangersGroup.Ec_HP_In, drums.ToRiser_HP) annotation (
-            points=[-70,-30; -70,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Sh_HP_In, drums.Steam_HP_Out) annotation (
-            points=[-88,-30; -88,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_HP_Out, HeatExchangersGroup.Sh_HP_Out) annotation (points=[
-              -160,-200; -160,-152; -70,-152; -70,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_IP_Out, HeatExchangersGroup.Sh_IP_Out) annotation (points=[
-              20,-200; 20,-160; -10,-160; -10,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP_Out, HeatExchangersGroup.Sh_LP_Out) annotation (points=[
-              80,-200; 80,-160; 50,-160; 50,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ev_HP_Out, drums.FromRiser_HP) annotation (
-            points=[-79,-30; -79,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ec_HP_Out, drums.Feed_HP) annotation (
-            points=[-61,-30; -61,0], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.Ev_IP_Out, drums.FromRiser_IP) annotation (
-            points=[-19,-30; -19,0], style(
+        connect(HeatExchangersGroup.Ev_IP_In, drums.Downcomer_IP) annotation (
+            points=[-2,0; -2,10.5; -2,10.5; -2,21; -2,40; -2,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(HeatExchangersGroup.Ec_IP_Out, drums.Feed_IP) annotation (
-            points=[-1,-30; -1,0], style(
+            points=[6,0; 6,40; 6,40], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(HeatExchangersGroup.Ec_IP_In, drums.WaterForIP) annotation (
+            points=[14,0; 14,40], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(HeatExchangersGroup.Sh_LP_In, drums.Steam_LP_Out) annotation (
+            points=[42,0; 42,0; 42,40], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(HeatExchangersGroup.Ev_LP_Out, drums.Riser_LP) annotation (
+            points=[50,0; 50,40], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(HeatExchangersGroup.Ev_LP_In, drums.Downcomer_LP) annotation (
+            points=[58,0; 58,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(HeatExchangersGroup.Ec_LP_Out, drums.Feed_LP) annotation (
-            points=[59,-30; 59,0], style(
+            points=[66,0; 66,40], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(Rh_IP_Out, HeatExchangersGroup.Rh_IP_Out) annotation (points=[
-              -40,-200; -40,-160; -31,-160; -31,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Rh_IP_In, HeatExchangersGroup.Rh_IP_In) annotation (points=[
-              -100,-200; -100,-160; -49,-160; -49,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(WaterIn, stateInletWater.inlet) 
-          annotation (points=[160,-200; 160,-116], style(thickness=2));
-        connect(stateInletWater.outlet, drums.WaterIn) 
-          annotation (points=[160,-104; 160,162; 80,162], style(thickness=2));
-      end HRSG_3LRh_wafp;
-      
-      model HRSG_tap_wa "Heat Recovery Steam Generator with three pressure level,
-  reheat and tappings of saturated water for external heater, without attemperation" 
-        extends Interfaces.HRSG_3LRh_tap;
-        
-        annotation (Diagram);
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_tap_CC_wa drums(
-          HPd_rint=1.067,
-          HPd_rext=1.167,
-          HPd_L=11.920,
-          HPd_Cm=0,
-          IPd_rint=0.915,
-          IPd_rext=1.015,
-          IPd_L=7,
-          IPd_Cm=0,
-          LPd_rint=1.143,
-          LPd_rext=1.243,
-          LPd_L=11.503,
-          LPd_Cm=0,
-          RiserHPFlowRate=175.5,
-          RiserIPFlowRate=67.5,
-          RiserLPFlowRate=41.5,
-          redeclare package FluidMedium = FluidMedium,
-          SSInit=false,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
-          n0_TFP=1500,
-          inletTFPNomPressure=5398.2,
-          TFPNomFlowRate=89.8,
-          hstart_TFP=1.43495e5,
-          mixHP_V=5,
-          mixIP_V=5,
-          IPd_hlstart=1.0265e6) annotation (extent=[-100,-20; 80,160]);
-        ThermoPower.PowerPlants.HRSG.Examples.HEG_3LRh_wa HeatExchangersGroup(
-          gasNomFlowRate=585.5,
-          fluidHPNomFlowRate_Sh=70.59,
-          fluidHPNomPressure_Sh=134.3e5,
-          fluidHPNomFlowRate_Ev=175.5,
-          fluidHPNomPressure_Ev=137.1e5,
-          fluidHPNomFlowRate_Ec=70.10,
-          fluidHPNomPressure_Ec=138.9e5,
-          fluidIPNomFlowRate_Rh=81.10,
-          fluidIPNomPressure_Rh=28.4e5,
-          fluidIPNomFlowRate_Sh=13.5,
-          fluidIPNomPressure_Sh=29.5e5,
-          fluidIPNomFlowRate_Ev=67.5,
-          fluidIPNomPressure_Ev=37.16e5,
-          fluidIPNomFlowRate_Ec=21.8,
-          fluidIPNomPressure_Ec=48.6e5,
-          fluidLPNomFlowRate_Sh=6.91,
-          fluidLPNomPressure_Sh=6.6e5,
-          fluidLPNomFlowRate_Ev=41.49,
-          fluidLPNomPressure_Ev=15.34e5,
-          fluidLPNomFlowRate_Ec=122.4,
-          fluidLPNomPressure_Ec=19.8e5,
-          Sh2_HP_N_G=3,
-          Sh2_HP_N_F=5,
-          Sh2_HP_exchSurface_G=3636,
-          Sh2_HP_exchSurface_F=421.844,
-          Sh2_HP_extSurfaceTub=540.913,
-          Sh2_HP_gasVol=10,
-          Sh2_HP_fluidVol=2.615,
-          Sh2_HP_metalVol=1.685,
-          Sh1_HP_N_G=3,
-          Sh1_HP_N_F=7,
-          Sh1_HP_exchSurface_G=8137.2,
-          Sh1_HP_exchSurface_F=612.387,
-          Sh1_HP_extSurfaceTub=721.256,
-          Sh1_HP_gasVol=10,
-          Sh1_HP_fluidVol=4.134,
-          Sh1_HP_metalVol=1.600,
-          Ev_HP_N_G=4,
-          Ev_HP_N_F=4,
-          Ev_HP_exchSurface_G=30501.9,
-          Ev_HP_exchSurface_F=2296.328,
-          Ev_HP_extSurfaceTub=2704.564,
-          Ev_HP_gasVol=10,
-          Ev_HP_fluidVol=15.500,
-          Ev_HP_metalVol=6.001,
-          Ec2_HP_N_G=3,
-          Ec2_HP_N_F=6,
-          Ec2_HP_exchSurface_G=20335,
-          Ec2_HP_exchSurface_F=1451.506,
-          Ec2_HP_extSurfaceTub=1803.043,
-          Ec2_HP_gasVol=10,
-          Ec2_HP_fluidVol=9.290,
-          Ec2_HP_metalVol=5.045,
-          Ec1_HP_N_G=3,
-          Ec1_HP_N_F=5,
-          Ec1_HP_exchSurface_G=12201.2,
-          Ec1_HP_exchSurface_F=870.904,
-          Ec1_HP_extSurfaceTub=1081.826,
-          Ec1_HP_gasVol=10,
-          Ec1_HP_fluidVol=5.574,
-          Ec1_HP_metalVol=3.027,
-          Rh2_IP_N_F=7,
-          Rh2_IP_exchSurface_G=4630.2,
-          Rh2_IP_exchSurface_F=873.079,
-          Rh2_IP_extSurfaceTub=1009.143,
-          Rh2_IP_fluidVol=8.403,
-          Rh2_IP_metalVol=2.823,
-          Rh1_IP_N_F=5,
-          Rh1_IP_exchSurface_G=4630,
-          Rh1_IP_exchSurface_F=900.387,
-          Rh1_IP_extSurfaceTub=1009.250,
-          Rh1_IP_fluidVol=8.936,
-          Rh1_IP_metalVol=2.292,
-          Sh_IP_N_G=3,
-          Sh_IP_N_F=7,
-          Sh_IP_exchSurface_G=2314.8,
-          Sh_IP_exchSurface_F=450.218,
-          Sh_IP_extSurfaceTub=504.652,
-          Sh_IP_gasVol=10,
-          Sh_IP_fluidVol=4.468,
-          Sh_IP_metalVol=1.146,
-          Ev_IP_N_G=4,
-          Ev_IP_N_F=4,
-          Ev_IP_exchSurface_G=24402,
-          Ev_IP_exchSurface_F=1837.063,
-          Ev_IP_extSurfaceTub=2163.652,
-          Ev_IP_gasVol=10,
-          Ev_IP_fluidVol=12.400,
-          Ev_IP_metalVol=4.801,
-          Ec_IP_N_G=3,
-          Ec_IP_N_F=5,
-          Ec_IP_exchSurface_G=4067.2,
-          Ec_IP_exchSurface_F=306.177,
-          Ec_IP_extSurfaceTub=360.609,
-          Ec_IP_gasVol=10,
-          Ec_IP_fluidVol=2.067,
-          Ec_IP_metalVol=0.800,
-          Sh_LP_N_G=3,
-          Sh_LP_N_F=7,
-          Sh_LP_exchSurface_G=1708.2,
-          Sh_LP_exchSurface_F=225.073,
-          Sh_LP_extSurfaceTub=252.286,
-          Sh_LP_gasVol=10,
-          Sh_LP_fluidVol=2.234,
-          Sh_LP_metalVol=0.573,
-          Ev_LP_N_G=4,
-          Ev_LP_N_F=4,
-          Ev_LP_exchSurface_G=24402,
-          Ev_LP_exchSurface_F=2292.926,
-          Ev_LP_extSurfaceTub=2592.300,
-          Ev_LP_gasVol=10,
-          Ev_LP_fluidVol=19.318,
-          Ev_LP_metalVol=5.374,
-          Ec_LP_N_G=3,
-          Ec_LP_N_F=6,
-          Ec_LP_exchSurface_G=40095.9,
-          Ec_LP_exchSurface_F=3439.389,
-          Ec_LP_extSurfaceTub=3888.449,
-          Ec_LP_gasVol=10,
-          Ec_LP_fluidVol=28.977,
-          Ec_LP_metalVol=8.061,
-          use_T_Ev=false,
-          Sh2_HP_Tstart_G_In=884.65,
-          Sh2_HP_Tstart_G_Out=837.31,
-          Sh2_HP_Tstart_M_In=742.65,
-          Sh2_HP_Tstart_M_Out=823.28,
-          Sh2_HP_Tstart_F_In=742.65,
-          Sh2_HP_Tstart_F_Out=823.28,
-          Sh1_HP_Tstart_G_In=837.15,
-          Sh1_HP_Tstart_G_Out=748.60,
-          Sh1_HP_Tstart_M_In=606.59,
-          Sh1_HP_Tstart_M_Out=743.18,
-          Sh1_HP_Tstart_F_In=606.59,
-          Sh1_HP_Tstart_F_Out=743.18,
-          Ev_HP_Tstart_G_In=747.15,
-          Ev_HP_Tstart_G_Out=620.30,
-          Ev_HP_hstart_F_In=1.514e6,
-          Ev_HP_hstart_F_Out=2.002e6,
-          Ec2_HP_Tstart_G_In=614.15,
-          Ec2_HP_Tstart_G_Out=558.98,
-          Ec2_HP_Tstart_M_In=494.67,
-          Ec2_HP_Tstart_M_Out=594.14,
-          Ec2_HP_Tstart_F_In=494.67,
-          Ec2_HP_Tstart_F_Out=594.14,
-          Ec1_HP_Tstart_M_In=431.77,
-          Ec1_HP_Tstart_M_Out=494.67,
-          Ec1_HP_Tstart_F_In=431.77,
-          Ec1_HP_Tstart_F_Out=494.67,
-          Rh2_IP_Tstart_M_In=717.31,
-          Rh2_IP_Tstart_M_Out=813.09,
-          Rh2_IP_Tstart_F_In=717.31,
-          Rh2_IP_Tstart_F_Out=813.09,
-          Rh1_IP_Tstart_M_In=618.31,
-          Rh1_IP_Tstart_M_Out=717.34,
-          Rh1_IP_Tstart_F_In=618.31,
-          Rh1_IP_Tstart_F_Out=717.34,
-          Sh_IP_Tstart_G_In=620.15,
-          Sh_IP_Tstart_G_Out=614.50,
-          Sh_IP_Tstart_M_In=506.08,
-          Sh_IP_Tstart_M_Out=605.11,
-          Sh_IP_Tstart_F_In=506.08,
-          Sh_IP_Tstart_F_Out=605.11,
-          Ev_IP_Tstart_G_In=558.15,
-          Ev_IP_Tstart_G_Out=518.51,
-          Ev_IP_hstart_F_In=9.92e5,
-          Ev_IP_hstart_F_Out=1.37e6,
-          Ec_IP_Tstart_G_In=517.15,
-          Ec_IP_Tstart_G_Out=480.11,
-          Ec_IP_Tstart_M_In=430.24,
-          Ec_IP_Tstart_M_Out=493.16,
-          Ec_IP_Tstart_F_In=430.24,
-          Ec_IP_Tstart_F_Out=493.16,
-          Sh_LP_Tstart_G_In=519.15,
-          Sh_LP_Tstart_G_Out=517.44,
-          Sh_LP_Tstart_M_In=435.75,
-          Sh_LP_Tstart_M_Out=505.04,
-          Sh_LP_Tstart_F_In=435.75,
-          Sh_LP_Tstart_F_Out=505.75,
-          Ev_LP_Tstart_G_In=480.00,
-          Ev_LP_Tstart_G_Out=453.47,
-          Ev_LP_hstart_F_In=6.625e5,
-          Ev_LP_hstart_F_Out=1.065e6,
-          Ec_LP_Tstart_G_In=453.47,
-          Ec_LP_Tstart_G_Out=372.35,
-          Ec_LP_Tstart_M_In=331.05,
-          Ec_LP_Tstart_M_Out=428.09,
-          Ec_LP_Tstart_F_In=331.05,
-          Ec_LP_Tstart_F_Out=428.09,
-          rhomcm=7900*578.05,
-          lambda=20,
-          Ec_LP(gamma_G=46.8, gamma_F=4000),
-          Ev_LP(gamma_G=127, gamma_F=20000),
-          Ec1HP_EcIP(
-            gamma_G_A=42,
-            gamma_G_B=45,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh_LP(gamma_G=16.6, gamma_F=4000),
-          Ev_IP(gamma_G=58.5, gamma_F=20000),
-          Ec2_HP(gamma_G=56, gamma_F=4000),
-          Sh_IP(gamma_G=33, gamma_F=4000),
-          Ev_HP(gamma_G=46.5, gamma_F=20000),
-          gasNomPressure=1e5,
-          Sh1HP_Rh1IP(
-            gamma_G_A=70,
-            gamma_G_B=80,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh2HP_Rh2IP(
-            gamma_G_A=83.97,
-            gamma_G_B=80,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          Ev_HP_Tstart_M_In=FluidMedium.temperature_ph(137.1e5, 1.514e6),
-          Ev_HP_Tstart_M_Out=FluidMedium.temperature_ph(137.1e5, 2.002e6),
-          Ev_IP_Tstart_M_In=FluidMedium.temperature_ph(37.16e5, 9.92e5),
-          Ev_IP_Tstart_M_Out=FluidMedium.temperature_ph(37.16e5, 1.37e6),
-          Ev_LP_Tstart_M_In=FluidMedium.temperature_ph(15.34e5, 6.625e5),
-          Ev_LP_Tstart_M_Out=FluidMedium.temperature_ph(15.34e5, 1.065e6)) 
-                             annotation (extent=[-100,-140; 80,-50]);
-        replaceable Components.BaseReader_water stateInletWater(redeclare 
-            package Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[150,-120; 170,-100],
-                                                                  rotation=90);
-      equation 
-        connect(ActuatorsBus, drums.ActuatorsBus)           annotation (points=[200,100;
-              80,100],                              style(color=52, rgbcolor={
-                213,255,170}));
-        connect(drums.SensorsBus, SensorsBus)           annotation (points=[80,118;
-              132,118; 132,160; 200,160],              style(color=84, rgbcolor=
-               {255,170,213}));
-        connect(drums.tapLPwater, LPwater_Out) annotation (points=[-28.6,160;
-              -28,160; -28,172; 80,172; 80,200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.tapIPwater, IPwater_Out) annotation (points=[-40,160; -40,
-              180; 22,180; 22,200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.tapHPwater, HPwater_Out) annotation (points=[-52,160; -52,
-              180; -100,180; -100,200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.IPsteamFromExUse, IPsteam_In) annotation (points=[-70,160;
-              -70,184; -40,184; -40,200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.HPsteamFromExUse, HPsteam_In) annotation (points=[-82,160;
-              -82,172; -160,172; -160,200], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(GasOut, HeatExchangersGroup.GasOut) annotation (points=[200,-40;
-              130,-40; 130,-95; 80,-95], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HeatExchangersGroup.GasIn, GasIn) annotation (points=[-100,-95;
-              -144,-95; -144,-40; -200,-40], style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_HP_Out, HeatExchangersGroup.Sh_HP_Out) annotation (points=[
-              -160,-200; -160,-150; -70,-150; -70,-140], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Rh_IP_In, HeatExchangersGroup.Rh_IP_In) annotation (points=[
-              -100,-200; -100,-160; -49,-160; -49,-140], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Rh_IP_Out, HeatExchangersGroup.Rh_IP_Out) annotation (points=[
-              -40,-200; -40,-168; -31,-168; -31,-140], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_IP_Out, HeatExchangersGroup.Sh_IP_Out) annotation (points=[
-              20,-200; 22,-200; 22,-164; -10,-164; -10,-140], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(Sh_LP_Out, HeatExchangersGroup.Sh_LP_Out) annotation (points=[
-              80,-200; 80,-162; 50,-162; 50,-140], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.Steam_HP_Out, HeatExchangersGroup.Sh_HP_In) annotation (
-            points=[-88,-20; -88,-50],          style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.FromRiser_HP, HeatExchangersGroup.Ev_HP_Out) annotation (
-            points=[-79,-20; -79,-50],          style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.ToRiser_HP, HeatExchangersGroup.Ec_HP_In) annotation (
-            points=[-70,-20; -70,-50], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.Feed_HP, HeatExchangersGroup.Ec_HP_Out) annotation (
-            points=[-61,-20; -61,-50],                   style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.WaterForHP, HeatExchangersGroup.Ev_HP_In) annotation (
-            points=[-52,-20; -52,-50], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.Steam_IP_Out, HeatExchangersGroup.Sh_IP_In) annotation (
-            points=[-28,-20; -28,-50], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.FromRiser_IP, HeatExchangersGroup.Ev_IP_Out) annotation (
-            points=[-19,-20; -19,-50],                   style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.ToRiser_IP, HeatExchangersGroup.Ev_IP_In) annotation (
-            points=[-10,-20; -10,-50],          style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.Feed_IP, HeatExchangersGroup.Ec_IP_Out) annotation (
-            points=[-1,-20; -1,-50],         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.WaterForIP, HeatExchangersGroup.Ec_IP_In) annotation (
-            points=[8,-20; 8,-50], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.Steam_LP_Out, HeatExchangersGroup.Sh_LP_In) annotation (
-            points=[32,-20; 32,-50], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.FromRiser_LP, HeatExchangersGroup.Ev_LP_Out) annotation (
-            points=[41,-20; 41,-50],         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.ToRiser_LP, HeatExchangersGroup.Ev_LP_In) annotation (
-            points=[50,-20; 50,-50],         style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.Feed_LP, HeatExchangersGroup.Ec_LP_Out) annotation (
-            points=[59,-20; 58,-20; 58,-50; 59,-50], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(drums.WaterForLP, HeatExchangersGroup.Ec_LP_In) annotation (
-            points=[68,-20; 68,-50], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(WaterIn, stateInletWater.inlet) 
-          annotation (points=[160,-200; 160,-116], style(thickness=2));
-        connect(stateInletWater.outlet, drums.WaterIn) 
-          annotation (points=[160,-104; 160,142; 80,142], style(thickness=2));
-      end HRSG_tap_wa;
+      end HRSG_3LRh;
       
     end Examples;
     
@@ -15479,7 +12223,431 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
               -28,54; -28,64; -28,64],         style(thickness=2));
       end TestSh2HP_Rh2IP;
       
-      model TestHEG_3LRh_wa 
+      model TestDG_3LCC 
+        package FluidMedium = ThermoPower.Water.StandardWater;
+        
+        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC Drums(
+          HPd_rint=1.067,
+          HPd_rext=1.167,
+          HPd_L=11.920,
+          HPd_Cm=0,
+          IPd_rint=0.915,
+          IPd_rext=1.015,
+          IPd_L=7,
+          IPd_Cm=0,
+          LPd_rint=1.143,
+          LPd_rext=1.243,
+          LPd_L=11.503,
+          LPd_Cm=0,
+          RiserHPFlowRate=175.5,
+          RiserIPFlowRate=67.5,
+          RiserLPFlowRate=41.5,
+          redeclare package FluidMedium = FluidMedium,
+          fluidLPNomPressure=7.19048e5,
+          LPd_hvstart=2.76051e6,
+          LPd_hlstart=6.68356e5,
+          fluidHPNomPressure=1.626e7,
+          fluidIPNomPressure=3.3816e6,
+          HPd_hvstart=2.53239e6,
+          HPd_hlstart=1.5879e6,
+          IPd_hvstart=2.794e6,
+          IPd_hlstart=1.0265e5,
+          SSInit=false)         annotation (extent=[-180,20; 20,140]);
+        annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1));
+        Water.SourceW sourceFromEcLP_w(
+          h=6.544e5,
+          w0=89.8,
+          p0=7.19048e5) 
+                     annotation (extent=[-6,-30; -18,-18],  rotation=90);
+        Water.SinkP sinkToRiserLP_p(p0=1.534e6, h=1.6325e6) 
+          annotation (extent=[-26,-48; -14,-36], rotation=270);
+        Water.SourceW sourceFromRiserLP_w(
+          w0=41.49,
+          h=1.065e6,
+          p0=7.19046e5) 
+                     annotation (extent=[-22,-30; -34,-18], rotation=90);
+        Water.SinkP sinkToShLP_p(          h=2.760e6,
+          redeclare package Medium = FluidMedium,
+          p0=5.398e3) 
+          annotation (extent=[-2,-66; 10,-54]);
+        Water.SinkP sinkToEcHP_p(p0=1.389e7, h=6.775e5) 
+          annotation (extent=[-130,-162; -118,-150],
+                                                 rotation=270);
+        Water.SourceW sourceFromEcHP_w(
+          w0=69.5,
+          h=1.463e6,
+          p0=1.626e7) 
+                     annotation (extent=[-126,-148; -138,-136],
+                                                            rotation=90);
+        Water.SinkP sinkToRiserHP_p(p0=1.371e7, h=1.6325e6) 
+          annotation (extent=[-146,-162; -134,-150],
+                                                 rotation=270);
+        Water.SourceW sourceFromRiserHP_w(
+          w0=175.5,
+          h=2.002e6,
+          p0=1.626e7) 
+                     annotation (extent=[-142,-148; -154,-136],
+                                                            rotation=90);
+        Water.SinkP sinkToShHP_p(            h=2.657e6,
+          redeclare package Medium = FluidMedium,
+          p0=2.98e6) 
+          annotation (extent=[-126,-178; -114,-166],
+                                                 rotation=0);
+        Water.SinkP sinkToEcIP_p(p0=4.86e6, h=6.654e5) 
+          annotation (extent=[-70,-110; -58,-98],
+                                                rotation=270);
+        Water.SourceW sourceFromEcIP_w(
+          h=9.444e5,
+          w0=12.7,
+          p0=3.3816e6) 
+                     annotation (extent=[-66,-96; -78,-84], rotation=90);
+        Water.SinkP sinkToRiserIP_p(p0=3.716e6, h=1.0223e6) 
+          annotation (extent=[-86,-110; -74,-98],rotation=270);
+        Water.SourceW sourceFromRiserIP_w(
+          w0=67.5,
+          h=1.370e6,
+          p0=3.3816e6) 
+                     annotation (extent=[-82,-96; -94,-84], rotation=90);
+        Water.SinkP sinkToShIP_p(           h=2.802e6,
+          p0=6e5,
+          redeclare package Medium = FluidMedium) 
+          annotation (extent=[-62,-126; -50,-114],
+                                                 rotation=0);
+        Water.ValveLin valveLP(redeclare package Medium = FluidMedium, Kv=6.9/6.738e5) 
+          annotation (extent=[-28,-52; -12,-68]);
+        Water.ValveLin valveIP(redeclare package Medium = FluidMedium, Kv=13.5/
+              2.959e6) annotation (extent=[-88,-112; -72,-128]);
+        Water.ValveLin valveHP(redeclare package Medium = FluidMedium, Kv=70/1.344e7) 
+          annotation (extent=[-152,-164; -136,-180]);
+      public 
+        Modelica.Blocks.Sources.Constant com_valve(k=1) 
+          annotation (extent=[60,-196; 40,-176]);
+      public 
+        Components.StateReader_water stateToEcHP(
+                                           redeclare package Medium = 
+              FluidMedium) annotation (extent=[-130,-106; -118,-118],
+                                                                  rotation=90);
+        Components.StateReader_water stateReturnEcHP(
+                                               redeclare package Medium = 
+              FluidMedium) annotation (extent=[-138,-118; -126,-106],
+                                                                  rotation=90);
+        Components.StateReader_water stateToRiserHP(
+                                              redeclare package Medium = 
+              FluidMedium) annotation (extent=[-146,-106; -134,-118],
+                                                                  rotation=90);
+        Components.StateReader_water stateReturnRiserHP(
+                                                  redeclare package Medium = 
+              FluidMedium) annotation (extent=[-154,-118; -142,-106],
+                                                                  rotation=90);
+        Components.StateReader_water stateToShHP(
+                                           redeclare package Medium = 
+              FluidMedium) annotation (extent=[-162,-106; -150,-118],
+                                                                  rotation=90);
+        Components.StateReader_water stateToEcIP(
+                                           redeclare package Medium = 
+              FluidMedium) annotation (extent=[-70,-50; -58,-62],
+                                                                rotation=90);
+        Components.StateReader_water stateReturnEcIP(
+                                               redeclare package Medium = 
+              FluidMedium) annotation (extent=[-78,-62; -66,-50],rotation=90);
+        Components.StateReader_water stateToRiserIP(
+                                              redeclare package Medium = 
+              FluidMedium) annotation (extent=[-86,-50; -74,-62], rotation=90);
+        Components.StateReader_water stateReturnRiserIP(
+                                                  redeclare package Medium = 
+              FluidMedium) annotation (extent=[-94,-62; -82,-50], rotation=90);
+        Components.StateReader_water stateToShIP(
+                                           redeclare package Medium = 
+              FluidMedium) annotation (extent=[-102,-50; -90,-62],rotation=90);
+        Components.StateReader_water stateReturnEcLP(
+                                               redeclare package Medium = 
+              FluidMedium) annotation (extent=[-18,-10; -6,2],rotation=90);
+        Components.StateReader_water stateToRiserLP(
+                                              redeclare package Medium = 
+              FluidMedium) annotation (extent=[-14,2; -26,-10],
+                                                              rotation=90);
+        Components.StateReader_water stateReturnRiserLP(
+                                                  redeclare package Medium = 
+              FluidMedium) annotation (extent=[-34,-10; -22,2],
+                                                              rotation=90);
+        Components.StateReader_water stateToShLP(
+                                           redeclare package Medium = 
+              FluidMedium) annotation (extent=[-30,2; -42,-10],
+                                                              rotation=90);
+      public 
+        Modelica.Blocks.Sources.Ramp IPpump_com(
+          duration=10,
+          offset=12.7,
+          height=0) 
+          annotation (extent=[160,-114; 140,-94]);
+        Modelica.Blocks.Sources.Ramp HPpump_com(
+          duration=10,
+          startTime=0,
+          offset=69.5,
+          height=0) 
+          annotation (extent=[160,-154; 140,-134]);
+      public 
+        Modelica.Blocks.Sources.Constant LPpump_com(k=89.8) 
+          annotation (extent=[160,-80; 140,-60]);
+      protected 
+        Buses.Actuators actuators annotation (extent=[92,78; 80,90]);
+      public 
+        Modelica.Blocks.Sources.Constant LPpump_com1(k=1500) 
+          annotation (extent=[160,-20; 140,0]);
+      equation 
+        connect(IPpump_com.y,actuators. flowRate_feedIP) 
+                                                     annotation (points=[139,-104;
+              110,-104; 110,84; 86,84],
+                              style(color=74, rgbcolor={0,0,127}));
+        connect(HPpump_com.y,actuators. flowRate_feedHP) 
+                                                     annotation (points=[139,-144;
+              100,-144; 100,84; 86,84],
+                                     style(color=74, rgbcolor={0,0,127}));
+        connect(stateReturnEcHP.outlet, Drums.Feed_HP) annotation (points=[-132,
+              -108.4; -132,20],              style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateToEcHP.inlet, Drums.WaterForHP) annotation (points=[-124,
+              -108.4; -124,20],              style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateToShHP.inlet, Drums.Steam_HP_Out) annotation (points=[-156,
+              -108.4; -156,20],              style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateReturnEcIP.outlet, Drums.Feed_IP) annotation (points=[-72,
+              -52.4; -72,20], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateToEcIP.inlet, Drums.WaterForIP) annotation (points=[-64,
+              -52.4; -64,20], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateToShIP.inlet, Drums.Steam_IP_Out) annotation (points=[-96,
+              -52.4; -96,20],  style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sinkToShLP_p.flange, valveLP.outlet) annotation (points=[-2,-60;
+              -12,-60],      style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(valveLP.inlet, stateToShLP.outlet) annotation (points=[-28,-60;
+              -36,-60; -36,-7.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sinkToRiserLP_p.flange, stateToRiserLP.outlet) annotation (
+            points=[-20,-36; -20,-7.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sourceFromRiserLP_w.flange, stateReturnRiserLP.inlet) 
+          annotation (points=[-28,-18; -28,-7.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sourceFromEcLP_w.flange, stateReturnEcLP.inlet) annotation (
+            points=[-12,-18; -12,-7.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateReturnEcLP.outlet, Drums.Feed_LP) annotation (points=[-12,-0.4;
+              -12,20],                    style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateToShLP.inlet, Drums.Steam_LP_Out) annotation (points=[-36,-0.4;
+              -36,20],                    style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(actuators, Drums.ActuatorsBus) annotation (points=[86,84; 20,84],
+                                            style(
+            color=52,
+            rgbcolor={213,255,170},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[-64,-98;
+              -64,-59.6],          style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sourceFromEcIP_w.flange, stateReturnEcIP.inlet) annotation (
+            points=[-72,-84; -72,-59.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sinkToRiserIP_p.flange, stateToRiserIP.outlet) annotation (
+            points=[-80,-98; -80,-59.6],   style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sourceFromRiserIP_w.flange, stateReturnRiserIP.inlet) 
+          annotation (points=[-88,-84; -88,-59.6],   style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(valveIP.inlet, stateToShIP.outlet) annotation (points=[-88,-120;
+              -96,-120; -96,-59.6],         style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sinkToShIP_p.flange, valveIP.outlet) annotation (points=[-62,-120;
+              -72,-120],       style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sinkToEcHP_p.flange, stateToEcHP.outlet) annotation (points=[-124,
+              -150; -124,-115.6],      style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sourceFromEcHP_w.flange, stateReturnEcHP.inlet) annotation (
+            points=[-132,-136; -132,-115.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sinkToRiserHP_p.flange, stateToRiserHP.outlet) annotation (
+            points=[-140,-150; -140,-115.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(sourceFromRiserHP_w.flange, stateReturnRiserHP.inlet) 
+          annotation (points=[-148,-136; -148,-115.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(valveHP.inlet, stateToShHP.outlet) annotation (points=[-152,
+              -172; -156,-172; -156,-115.6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(valveHP.outlet, sinkToShHP_p.flange) annotation (points=[-136,
+              -172; -126,-172], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(com_valve.y, valveHP.cmd) annotation (points=[39,-186; -144,
+              -186; -144,-178.4], style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(com_valve.y, valveIP.cmd) annotation (points=[39,-186; -80,-186;
+              -80,-126.4],        style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(com_valve.y, valveLP.cmd) annotation (points=[39,-186; -20,-186;
+              -20,-66.4], style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(HPpump_com.y, sourceFromEcHP_w.in_w0) annotation (points=[139,-144;
+              -128.4,-144; -128.4,-144.4],       style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(IPpump_com.y, sourceFromEcIP_w.in_w0) annotation (points=[139,-104;
+              39.5,-104; 39.5,-92.4; -68.4,-92.4],       style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(LPpump_com.y, sourceFromEcLP_w.in_w0) annotation (points=[139,-70;
+              72,-70; 72,-26.4; -8.4,-26.4],       style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(LPpump_com1.y, actuators.nPump_feedLP) annotation (points=[139,-10;
+              110,-10; 110,84; 86,84],        style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateToRiserLP.inlet, Drums.Downcomer_LP) annotation (points=[
+              -20,-0.4; -20,20], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateReturnRiserLP.outlet, Drums.Riser_LP) annotation (points=[
+              -28,-0.4; -28,20; -28,20], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateReturnRiserIP.outlet, Drums.Riser_IP) annotation (points=[
+              -88,-52.4; -88,20; -88,20], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateToRiserIP.inlet, Drums.Downcomer_IP) annotation (points=[
+              -80,-52.4; -80,20; -80,20], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateToRiserHP.inlet, Drums.Downcomer_HP) annotation (points=[
+              -140,-108.4; -140,20], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(stateReturnRiserHP.outlet, Drums.Riser_HP) annotation (points=[
+              -148,-108.4; -148,20], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+      end TestDG_3LCC;
+      
+      model TestHEG_3LRh 
         package FlueGasMedium = ThermoPower.Media.FlueGas;
         package FluidMedium = ThermoPower.Water.StandardWater;
         //HP
@@ -15556,11 +12724,11 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                           annotation (extent=[-88,-90; -100,-78],
                                                               rotation=0);
         Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=375.386) 
-                         annotation (extent=[88,-16; 100,-4]);
+                         annotation (extent=[88,-10; 100,2]);
         Gas.SourceW sourceGas(
           redeclare package Medium = FlueGasMedium,
           w0=585.5,
-          T=884.65)          annotation (extent=[-100,-16; -88,-4]);
+          T=884.65)          annotation (extent=[-100,-10; -88,2]);
         Water.SinkP sinkEvHP(
           redeclare package Medium = FluidMedium,
           p0=fluidHPNomPressure_Ev,
@@ -15569,11 +12737,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         Water.ValveLin valveLinHP(redeclare package Medium = FluidMedium, Kv=
               fluidHPNomFlowRate_Sh/fluidHPNomPressure_Sh) 
                                 annotation (extent=[-68,-78; -80,-90]);
-        Water.SinkP OutIP(redeclare package Medium = FluidMedium, p0=0) 
-                           annotation (extent=[20,-90; 32,-78], rotation=0);
-        Water.ValveLin valveLinIP(redeclare package Medium = FluidMedium, Kv=
-              fluidIPNomFlowRate_Sh/fluidIPNomPressure_Sh) 
-                                 annotation (extent=[4,-78; 16,-90]);
         Water.SinkP OutLP(redeclare package Medium = FluidMedium, p0=0) 
                            annotation (extent=[70,-92; 82,-80], rotation=0);
         Water.ValveLin valveLinLP(redeclare package Medium = FluidMedium, Kv=
@@ -15591,13 +12754,14 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           w0=fluidIPNomFlowRate_Rh,
           p0=fluidIPNomPressure_Rh,
           h=Rh1_IP_hstart_F_In) 
-                              annotation (extent=[-32,-72; -20,-60],
+                              annotation (extent=[-24,-58; -14,-48],
                                                                    rotation=90);
         Water.SinkP sinkRhIP(
           redeclare package Medium = FluidMedium,
           p0=fluidIPNomPressure_Rh,
           h=Rh2_IP_hstart_F_Out) 
-                           annotation (extent=[-16,-60; -4,-72],rotation=90);
+                           annotation (extent=[-32,-64; -20,-76],
+                                                                rotation=90);
         Modelica.Blocks.Sources.Constant commandValve 
           annotation (extent=[-50,-90; -40,-80], rotation=270);
         Water.SinkP sinkEcHP(
@@ -15610,29 +12774,29 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           w0=fluidHPNomFlowRate_Ec,
           p0=fluidHPNomPressure_Ec,
           h=Ec1_HP_hstart_F_In) 
-                              annotation (extent=[-42,58; -30,70], rotation=270);
+                              annotation (extent=[-44,58; -32,70], rotation=270);
         Water.SinkP sinkEvIP(
           redeclare package Medium = FluidMedium,
           p0=fluidIPNomPressure_Ev,
           h=Ev_IP_hstart_F_Out) 
-                           annotation (extent=[-14,70; -2,82],  rotation=90);
+                           annotation (extent=[-16,70; -4,82],  rotation=90);
         Water.SourceW sourceEvIP(
           redeclare package Medium = FluidMedium,
           w0=fluidIPNomFlowRate_Ev,
           p0=fluidIPNomPressure_Ev,
           h=Ev_IP_hstart_F_In) 
-                              annotation (extent=[-6,58; 6,70],    rotation=270);
+                              annotation (extent=[-12,58; 0,70],   rotation=270);
         Water.SinkP sinkEcIP(
           redeclare package Medium = FluidMedium,
           p0=fluidIPNomPressure_Ec,
           h=Ec_IP_hstart_F_Out) 
-                           annotation (extent=[2,70; 14,82],    rotation=90);
+                           annotation (extent=[-2,70; 10,82],   rotation=90);
         Water.SourceW sourceEcIP(
           redeclare package Medium = FluidMedium,
           w0=fluidIPNomFlowRate_Ec,
           p0=fluidIPNomPressure_Ec,
           h=Ec_IP_hstart_F_In) 
-                              annotation (extent=[10,58; 22,70],   rotation=270);
+                              annotation (extent=[4,58; 16,70],    rotation=270);
         Water.SinkP sinkEvLP(
           redeclare package Medium = FluidMedium,
           p0=fluidLPNomPressure_Ev,
@@ -15657,18 +12821,19 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                               annotation (extent=[62,70; 74,58],   rotation=90);
         Water.SourceP sourceShHP(p0=fluidHPNomPressure_Sh, h=Sh1_HP_hstart_F_In) 
           annotation (extent=[-62,58; -74,70], rotation=270);
-        Water.SourceP sourceShIP(p0=fluidIPNomPressure_Sh, h=Sh_IP_hstart_F_In) 
-          annotation (extent=[-10,58; -22,70],
+        Water.SourceW sourceShIP(p0=fluidIPNomPressure_Sh, h=Sh_IP_hstart_F_In,
+          w0=fluidIPNomFlowRate_Sh) 
+          annotation (extent=[-14,58; -26,70],
                                              rotation=270);
         Water.SourceP sourceShLP(p0=fluidLPNomPressure_Sh, h=Sh_LP_hstart_F_In) 
           annotation (extent=[28,70; 40,58], rotation=90);
         ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
                                                redeclare package Medium = 
-              FlueGasMedium) annotation (extent=[-84,-18; -68,-2],rotation=0);
+              FlueGasMedium) annotation (extent=[-84,-12; -68,4], rotation=0);
         ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
                                                 redeclare package Medium = 
-              FlueGasMedium) annotation (extent=[68,-18; 84,-2],rotation=0);
-        ThermoPower.PowerPlants.HRSG.Examples.HEG_3LRh_wa hEG_3LRh_simp(
+              FlueGasMedium) annotation (extent=[64,-12; 80,4], rotation=0);
+        Examples.HEG_3LRh hEG_3LRh_simp(
           gasNomFlowRate=585.5,
           fluidHPNomFlowRate_Sh=70.59,
           fluidHPNomPressure_Sh=134.3e5,
@@ -15890,1439 +13055,158 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             gamma_G_B=80,
             gamma_F_A=4000,
             gamma_F_B=4000),
-          SSInit=false)      annotation (extent=[-60,-40; 60,20]);
+          SSInit=true)       annotation (extent=[-60,-28; 50,20]);
       equation 
         connect(OutHP.flange, valveLinHP.outlet) 
           annotation (points=[-88,-84; -80,-84],style(thickness=2));
         connect(valveLinLP.outlet, OutLP.flange) 
           annotation (points=[62,-86; 70,-86], style(thickness=2));
-        connect(valveLinIP.outlet, OutIP.flange) 
-          annotation (points=[16,-84; 20,-84],  style(thickness=2));
         connect(commandValve.y, valveLinHP.cmd) annotation (points=[-45,-90.5;
               -45,-98; -74,-98; -74,-88.8], style(color=74, rgbcolor={0,0,127}));
-        connect(commandValve.y, valveLinIP.cmd) annotation (points=[-45,-90.5;
-              -45,-98; 10,-98; 10,-88.8], style(color=74, rgbcolor={0,0,127}));
         connect(commandValve.y, valveLinLP.cmd) annotation (points=[-45,-90.5;
               -45,-98; 56,-98; 56,-90.8], style(color=74, rgbcolor={0,0,127}));
-        connect(stateGas_in.inlet, sourceGas.flange) annotation (points=[-80.8,
-              -10; -88,-10],          style(
+        connect(stateGas_in.inlet, sourceGas.flange) annotation (points=[-80.8,-4;
+              -88,-4],                style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(sinkGas.flange, stateGas_out.outlet) annotation (points=[88,-10;
-              80.8,-10],       style(
+        connect(sinkGas.flange, stateGas_out.outlet) annotation (points=[88,-4;
+              76.8,-4],        style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
             fillColor=76,
             rgbfillColor={170,170,255},
             fillPattern=1));
-        connect(stateGas_out.inlet, hEG_3LRh_simp.GasOut) annotation (points=[71.2,-10;
-              60,-10],                  style(
+        connect(stateGas_out.inlet, hEG_3LRh_simp.GasOut) annotation (points=[67.2,-4;
+              50,-4],                   style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(stateGas_in.outlet, hEG_3LRh_simp.GasIn) annotation (points=[-71.2,
-              -10; -60,-10],               style(
+        connect(stateGas_in.outlet, hEG_3LRh_simp.GasIn) annotation (points=[-71.2,-4;
+              -60,-4],                     style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2));
-        connect(sinkRhIP.flange, hEG_3LRh_simp.Rh_IP_Out) annotation (points=[
-              -10,-60; -10,-48; -14,-48; -14,-40], style(
+        connect(sinkRhIP.flange, hEG_3LRh_simp.Rh_IP_Out) annotation (points=[-26,-64;
+              -26,-48; -25.9,-48; -25.9,-28],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(sourceRhIP.flange, hEG_3LRh_simp.Rh_IP_In) annotation (points=[
-              -26,-60; -26,-40], style(
+        connect(sourceRhIP.flange, hEG_3LRh_simp.Rh_IP_In) annotation (points=[-19,-48;
+              -19,-28; -19.3,-28],
+                                 style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(valveLinHP.inlet, hEG_3LRh_simp.Sh_HP_Out) annotation (points=[
-              -68,-84; -58,-84; -58,-54; -40,-54; -40,-40], style(
+        connect(valveLinHP.inlet, hEG_3LRh_simp.Sh_HP_Out) annotation (points=[-68,-84;
+              -58,-84; -58,-54; -38,-54; -38,-28],          style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(valveLinIP.inlet, hEG_3LRh_simp.Sh_IP_Out) annotation (points=[
-              4,-84; 0,-84; 0,-40], style(
+        connect(valveLinLP.inlet, hEG_3LRh_simp.Sh_LP_Out) annotation (points=[50,-86;
+              28,-86; 28,-27.76],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(valveLinLP.inlet, hEG_3LRh_simp.Sh_LP_Out) annotation (points=[
-              50,-86; 40,-86; 40,-40], style(
+        connect(hEG_3LRh_simp.Ev_IP_In, sourceEvIP.flange) annotation (points=[-5,20;
+              -5,58; -6,58],                       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ev_IP_In, sourceEvIP.flange) annotation (points=[0,20; 0,
-              39; 0,58; -1.10215e-015,58],         style(
+        connect(hEG_3LRh_simp.Ec_IP_Out, sinkEcIP.flange) annotation (points=[-0.6,20;
+              -0.6,52; 4,52; 4,70],  style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ec_IP_Out, sinkEcIP.flange) annotation (points=[6,
-              20; 6,52; 8,52; 8,70], style(
+        connect(hEG_3LRh_simp.Ev_IP_Out, sinkEvIP.flange) annotation (points=[-9.4,20;
+              -9.4,52; -10,52; -10,70],    style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ev_IP_Out, sinkEvIP.flange) annotation (points=[
-              -6,20; -6,52; -8,52; -8,70], style(
+        connect(hEG_3LRh_simp.Ec_IP_In, sourceEcIP.flange) annotation (points=[3.8,20;
+              3.8,40; 10,40; 10,58],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ec_IP_In, sourceEcIP.flange) annotation (points=[12,20;
-              12,40; 16,40; 16,58],        style(
+        connect(hEG_3LRh_simp.Sh_IP_In, sourceShIP.flange) annotation (points=[-13.8,20;
+              -13.8,40; -20,40; -20,58],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Sh_IP_In, sourceShIP.flange) annotation (points=[-12,20;
-              -12,40; -16,40; -16,58],         style(
+        connect(hEG_3LRh_simp.Sh_HP_In, sourceShHP.flange) annotation (points=[-46.8,20;
+              -46.8,26; -68,26; -68,58],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Sh_HP_In, sourceShHP.flange) annotation (points=[
-              -52,20; -52,26; -68,26; -68,58], style(
+        connect(hEG_3LRh_simp.Ev_HP_Out, sinkEvHP.flange) annotation (points=[-42.4,20;
+              -42.4,30; -60,30; -60,70],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ev_HP_Out, sinkEvHP.flange) annotation (points=[
-              -46,20; -46,30; -60,30; -60,70], style(
+        connect(hEG_3LRh_simp.Ec_HP_Out, sinkEcHP.flange) annotation (points=[-33.6,20;
+              -33.6,38; -44,38; -44,70],       style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ec_HP_In, sourceEvHP.flange) annotation (points=[
-              -40,20; -40,34; -52,34; -52,58], style(
+        connect(hEG_3LRh_simp.Ec_LP_In, sourceEcLP.flange) annotation (points=[36.8,20;
+              36.8,26; 68,26; 68,58],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ec_HP_Out, sinkEcHP.flange) annotation (points=[
-              -34,20; -34,38; -44,38; -44,70], style(
+        connect(hEG_3LRh_simp.Ec_LP_Out, sinkEcLP.flange) annotation (points=[32.4,20;
+              32.4,30; 60,30; 60,70],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ev_HP_In, sourceEcHP.flange) annotation (points=[
-              -28,20; -28,42; -36,42; -36,58], style(
+        connect(hEG_3LRh_simp.Ev_LP_In, sourceEvLP.flange) annotation (points=[28,20;
+              28,34; 52,34; 52,58],        style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ec_LP_In, sourceEcLP.flange) annotation (points=[
-              52,20; 52,26; 68,26; 68,58], style(
+        connect(hEG_3LRh_simp.Ev_LP_Out, sinkEvLP.flange) annotation (points=[23.6,20;
+              23.6,38; 44,38; 44,70],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ec_LP_Out, sinkEcLP.flange) annotation (points=[
-              46,20; 46,30; 60,30; 60,70], style(
+        connect(hEG_3LRh_simp.Sh_LP_In, sourceShLP.flange) annotation (points=[19.2,20;
+              19.2,42; 34,42; 34,58],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ev_LP_In, sourceEvLP.flange) annotation (points=[
-              40,20; 40,34; 52,34; 52,58], style(
+        connect(hEG_3LRh_simp.Ev_HP_In, sourceEvHP.flange) annotation (points=[-38,20;
+              -38,36; -52,36; -52,58],         style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Ev_LP_Out, sinkEvLP.flange) annotation (points=[
-              34,20; 34,38; 44,38; 44,70], style(
+        connect(hEG_3LRh_simp.Ec_HP_In, sourceEcHP.flange) annotation (points=[-29.2,20;
+              -29.2,44; -38,44; -38,58],           style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(hEG_3LRh_simp.Sh_LP_In, sourceShLP.flange) annotation (points=[
-              28,20; 28,42; 34,42; 34,58], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end TestHEG_3LRh_wa;
-      
-      model TestDG_3LCC_wa 
-        package FluidMedium = ThermoPower.Water.StandardWater;
-        
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wa Drums(
-          HPd_rint=1.067,
-          HPd_rext=1.167,
-          HPd_L=11.920,
-          HPd_Cm=0,
-          IPd_rint=0.915,
-          IPd_rext=1.015,
-          IPd_L=7,
-          IPd_Cm=0,
-          LPd_rint=1.143,
-          LPd_rext=1.243,
-          LPd_L=11.503,
-          LPd_Cm=0,
-          RiserHPFlowRate=175.5,
-          RiserIPFlowRate=67.5,
-          RiserLPFlowRate=41.5,
-          redeclare package FluidMedium = FluidMedium,
-          SSInit=false,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
-          IPd_hlstart=1.0265e5,
-          n0_TFP=1500,
-          inletTFPNomPressure=5398.2,
-          TFPNomFlowRate=89.8,
-          hstart_TFP=1.43495e5) annotation (extent=[-180,22; -20,182]);
-        annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1));
-        Water.SinkP sinkToEcLP_p(           h=2.440e5, p0=7.19e5) 
-          annotation (extent=[-36,-48; -24,-36], rotation=270);
-        Water.SourceW sourceFromEcLP_w(
-          h=6.544e5,
-          w0=89.8,
-          p0=7.19048e5) 
-                     annotation (extent=[-32,-30; -44,-18], rotation=90);
-        Water.SinkP sinkToRiserLP_p(p0=1.534e6, h=1.6325e6) 
-          annotation (extent=[-52,-48; -40,-36], rotation=270);
-        Water.SourceW sourceFromRiserLP_w(
-          w0=41.49,
-          h=1.065e6,
-          p0=7.19046e5) 
-                     annotation (extent=[-48,-30; -60,-18], rotation=90);
-        Water.SinkP sinkToShLP_p(          h=2.760e6,
-          redeclare package Medium = FluidMedium,
-          p0=5.398e3) 
-          annotation (extent=[-28,-66; -16,-54]);
-        Water.SinkP sinkToEcHP_p(p0=1.389e7, h=6.775e5) 
-          annotation (extent=[-144,-162; -132,-150],
-                                                 rotation=270);
-        Water.SourceW sourceFromEcHP_w(
-          w0=69.5,
-          h=1.463e6,
-          p0=1.626e7) 
-                     annotation (extent=[-140,-148; -152,-136],
-                                                            rotation=90);
-        Water.SinkP sinkToRiserHP_p(p0=1.371e7, h=1.6325e6) 
-          annotation (extent=[-160,-162; -148,-150],
-                                                 rotation=270);
-        Water.SourceW sourceFromRiserHP_w(
-          w0=175.5,
-          h=2.002e6,
-          p0=1.626e7) 
-                     annotation (extent=[-156,-148; -168,-136],
-                                                            rotation=90);
-        Water.SinkP sinkToShHP_p(            h=2.657e6,
-          redeclare package Medium = FluidMedium,
-          p0=2.98e6) 
-          annotation (extent=[-140,-178; -128,-166],
-                                                 rotation=0);
-        Water.SinkP sinkToEcIP_p(p0=4.86e6, h=6.654e5) 
-          annotation (extent=[-90,-110; -78,-98],
-                                                rotation=270);
-        Water.SourceW sourceFromEcIP_w(
-          h=9.444e5,
-          w0=12.7,
-          p0=3.3816e6) 
-                     annotation (extent=[-86,-96; -98,-84], rotation=90);
-        Water.SinkP sinkToRiserIP_p(p0=3.716e6, h=1.0223e6) 
-          annotation (extent=[-106,-110; -94,-98],
-                                                 rotation=270);
-        Water.SourceW sourceFromRiserIP_w(
-          w0=67.5,
-          h=1.370e6,
-          p0=3.3816e6) 
-                     annotation (extent=[-102,-96; -114,-84],
-                                                            rotation=90);
-        Water.SinkP sinkToShIP_p(           h=2.802e6,
-          p0=6e5,
-          redeclare package Medium = FluidMedium) 
-          annotation (extent=[-82,-126; -70,-114],
-                                                 rotation=0);
-        Water.ValveLin valveLP(redeclare package Medium = FluidMedium, Kv=6.9/6.738e5) 
-          annotation (extent=[-54,-52; -38,-68]);
-        Water.ValveLin valveIP(redeclare package Medium = FluidMedium, Kv=13.5/
-              2.959e6) annotation (extent=[-108,-112; -92,-128]);
-        Water.ValveLin valveHP(redeclare package Medium = FluidMedium, Kv=70/1.344e7) 
-          annotation (extent=[-166,-164; -150,-180]);
-      public 
-        Modelica.Blocks.Sources.Constant com_valve(k=1) 
-          annotation (extent=[60,-196; 40,-176]);
-      public 
-        Components.StateReader_water stateToEcHP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-144,-106; -132,-118],
-                                                                  rotation=90);
-        Components.StateReader_water stateReturnEcHP(
-                                               redeclare package Medium = 
-              FluidMedium) annotation (extent=[-152,-118; -140,-106],
-                                                                  rotation=90);
-        Components.StateReader_water stateToRiserHP(
-                                              redeclare package Medium = 
-              FluidMedium) annotation (extent=[-160,-106; -148,-118],
-                                                                  rotation=90);
-        Components.StateReader_water stateReturnRiserHP(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (extent=[-168,-118; -156,-106],
-                                                                  rotation=90);
-        Components.StateReader_water stateToShHP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-176,-106; -164,-118],
-                                                                  rotation=90);
-        Components.StateReader_water stateToEcIP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-90,-50; -78,-62],
-                                                                rotation=90);
-        Components.StateReader_water stateReturnEcIP(
-                                               redeclare package Medium = 
-              FluidMedium) annotation (extent=[-98,-62; -86,-50],rotation=90);
-        Components.StateReader_water stateToRiserIP(
-                                              redeclare package Medium = 
-              FluidMedium) annotation (extent=[-106,-50; -94,-62],rotation=90);
-        Components.StateReader_water stateReturnRiserIP(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (extent=[-114,-62; -102,-50],
-                                                                  rotation=90);
-        Components.StateReader_water stateToShIP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-122,-50; -110,-62],
-                                                                  rotation=90);
-        Components.StateReader_water stateToEcLP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-24,2; -36,-10],
-                                                              rotation=90);
-        Components.StateReader_water stateReturnEcLP(
-                                               redeclare package Medium = 
-              FluidMedium) annotation (extent=[-44,-10; -32,2],
-                                                              rotation=90);
-        Components.StateReader_water stateToRiserLP(
-                                              redeclare package Medium = 
-              FluidMedium) annotation (extent=[-40,2; -52,-10],
-                                                              rotation=90);
-        Components.StateReader_water stateReturnRiserLP(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (extent=[-60,-10; -48,2],
-                                                              rotation=90);
-        Components.StateReader_water stateToShLP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-56,2; -68,-10],
-                                                              rotation=90);
-      public 
-        Water.SourceP sourceWater(p0=5398.2, h=1.43495e5) 
-                     annotation (extent=[58,158; 46,170]);
-      public 
-        Modelica.Blocks.Sources.Ramp IPpump_com(
-          duration=10,
-          offset=12.7,
-          height=0) 
-          annotation (extent=[160,-114; 140,-94]);
-        Modelica.Blocks.Sources.Ramp HPpump_com(
-          duration=10,
-          startTime=0,
-          offset=69.5,
-          height=0) 
-          annotation (extent=[160,-154; 140,-134]);
-      public 
-        Modelica.Blocks.Sources.Constant LPpump_com(k=89.8) 
-          annotation (extent=[160,-80; 140,-60]);
-      protected 
-        Buses.Actuators actuators annotation (extent=[32,114; 20,126]);
-      public 
-        Modelica.Blocks.Sources.Constant LPpump_com1(k=1500) 
-          annotation (extent=[160,-20; 140,0]);
-      equation 
-        connect(IPpump_com.y,actuators. flowRate_feedIP) 
-                                                     annotation (points=[139,-104;
-              110,-104; 110,120; 26,120],
-                              style(color=74, rgbcolor={0,0,127}));
-        connect(HPpump_com.y,actuators. flowRate_feedHP) 
-                                                     annotation (points=[139,-144;
-              100,-144; 100,120; 26,120],
-                                     style(color=74, rgbcolor={0,0,127}));
-        connect(stateToRiserHP.inlet, Drums.ToRiser_HP) annotation (points=[-154,
-              -108.4; -154,22; -153.333,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnEcHP.outlet, Drums.Feed_HP) annotation (points=[-146,
-              -108.4; -146,22; -145.333,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToEcHP.inlet, Drums.WaterForHP) annotation (points=[-138,
-              -108.4; -138,22; -137.333,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnRiserHP.outlet, Drums.FromRiser_HP) annotation (
-            points=[-162,-108.4; -162,22; -161.333,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToShHP.inlet, Drums.Steam_HP_Out) annotation (points=[-170,
-              -108.4; -170,22; -169.333,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToRiserIP.inlet, Drums.ToRiser_IP) annotation (points=[
-              -100,-52.4; -100,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnEcIP.outlet, Drums.Feed_IP) annotation (points=[-92,
-              -52.4; -92,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToEcIP.inlet, Drums.WaterForIP) annotation (points=[-84,
-              -52.4; -84,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnRiserIP.outlet, Drums.FromRiser_IP) annotation (
-            points=[-108,-52.4; -108,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToShIP.inlet, Drums.Steam_IP_Out) annotation (points=[-116,
-              -52.4; -116,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceWater.flange, Drums.WaterIn) annotation (points=[46,164;
-              12,164; 12,166; -20,166], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToShLP_p.flange, valveLP.outlet) annotation (points=[-28,
-              -60; -38,-60], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(valveLP.inlet, stateToShLP.outlet) annotation (points=[-54,-60;
-              -62,-60; -62,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToRiserLP_p.flange, stateToRiserLP.outlet) annotation (
-            points=[-46,-36; -46,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromRiserLP_w.flange, stateReturnRiserLP.inlet) 
-          annotation (points=[-54,-18; -54,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromEcLP_w.flange, stateReturnEcLP.inlet) annotation (
-            points=[-38,-18; -38,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToEcLP_p.flange, stateToEcLP.outlet) annotation (points=[
-              -30,-36; -30,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToEcLP.inlet, Drums.WaterForLP) annotation (points=[-30,-0.4;
-              -30,22; -30.6667,22],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnEcLP.outlet, Drums.Feed_LP) annotation (points=[-38,-0.4;
-              -38,22; -38.6667,22],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToRiserLP.inlet, Drums.ToRiser_LP) annotation (points=[-46,-0.4;
-              -46.6667,-0.4; -46.6667,22],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnRiserLP.outlet, Drums.FromRiser_LP) annotation (
-            points=[-54,-0.4; -54,22; -54.6667,22], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToShLP.inlet, Drums.Steam_LP_Out) annotation (points=[-62,-0.4;
-              -62,22; -62.6667,22],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(actuators, Drums.ActuatorsBus) annotation (points=[26,120; 3,
-              120; 3,128.667; -20,128.667], style(
-            color=52,
-            rgbcolor={213,255,170},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[
-              -84,-98; -84,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromEcIP_w.flange, stateReturnEcIP.inlet) annotation (
-            points=[-92,-84; -92,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToRiserIP_p.flange, stateToRiserIP.outlet) annotation (
-            points=[-100,-98; -100,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromRiserIP_w.flange, stateReturnRiserIP.inlet) 
-          annotation (points=[-108,-84; -108,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(valveIP.inlet, stateToShIP.outlet) annotation (points=[-108,
-              -120; -116,-120; -116,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToShIP_p.flange, valveIP.outlet) annotation (points=[-82,
-              -120; -92,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToEcHP_p.flange, stateToEcHP.outlet) annotation (points=[
-              -138,-150; -138,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromEcHP_w.flange, stateReturnEcHP.inlet) annotation (
-            points=[-146,-136; -146,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToRiserHP_p.flange, stateToRiserHP.outlet) annotation (
-            points=[-154,-150; -154,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromRiserHP_w.flange, stateReturnRiserHP.inlet) 
-          annotation (points=[-162,-136; -162,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(valveHP.inlet, stateToShHP.outlet) annotation (points=[-166,
-              -172; -170,-172; -170,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(valveHP.outlet, sinkToShHP_p.flange) annotation (points=[-150,
-              -172; -140,-172], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_valve.y, valveHP.cmd) annotation (points=[39,-186; -158,
-              -186; -158,-178.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_valve.y, valveIP.cmd) annotation (points=[39,-186; -100,
-              -186; -100,-126.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_valve.y, valveLP.cmd) annotation (points=[39,-186; -46,-186;
-              -46,-66.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HPpump_com.y, sourceFromEcHP_w.in_w0) annotation (points=[139,
-              -144; -142.4,-144; -142.4,-144.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(IPpump_com.y, sourceFromEcIP_w.in_w0) annotation (points=[139,
-              -104; 19.5,-104; 19.5,-92.4; -88.4,-92.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(LPpump_com.y, sourceFromEcLP_w.in_w0) annotation (points=[139,
-              -70; 46,-70; 46,-26.4; -34.4,-26.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(LPpump_com1.y, actuators.nPump_feedLP) annotation (points=[139,
-              -10; 110,-10; 110,120; 28,120], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end TestDG_3LCC_wa;
-      
-      model TestDG_3LCC_wafp 
-        package FluidMedium = ThermoPower.Water.StandardWater;
-        
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC_wafp Drums(
-          HPd_rint=1.067,
-          HPd_rext=1.167,
-          HPd_L=11.920,
-          HPd_Cm=0,
-          IPd_rint=0.915,
-          IPd_rext=1.015,
-          IPd_L=7,
-          IPd_Cm=0,
-          LPd_rint=1.143,
-          LPd_rext=1.243,
-          LPd_L=11.503,
-          LPd_Cm=0,
-          RiserHPFlowRate=175.5,
-          RiserIPFlowRate=67.5,
-          RiserLPFlowRate=41.5,
-          redeclare package FluidMedium = FluidMedium,
-          SSInit=false,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
-          IPd_hlstart=1.0265e5) annotation (extent=[-180,20; -20,180]);
-        Water.SinkP sinkToEcLP_p(           h=2.440e5, p0=7.19e5) 
-          annotation (extent=[-36,-48; -24,-36], rotation=270);
-        annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1));
-        Water.SourceW sourceFromEcLP_w(
-          h=6.544e5,
-          w0=89.8,
-          p0=7.19048e5) 
-                     annotation (extent=[-32,-30; -44,-18], rotation=90);
-        Water.SinkP sinkToRiserLP_p(p0=1.534e6, h=1.6325e6) 
-          annotation (extent=[-52,-48; -40,-36], rotation=270);
-        Water.SourceW sourceFromRiserLP_w(
-          w0=41.49,
-          h=1.065e6,
-          p0=7.19046e5) 
-                     annotation (extent=[-48,-30; -60,-18], rotation=90);
-        Water.SinkP sinkToShLP_p(          h=2.760e6,
-          redeclare package Medium = FluidMedium,
-          p0=5.398e3) 
-          annotation (extent=[-28,-66; -16,-54]);
-        Water.SinkP sinkToEcHP_p(p0=1.389e7, h=6.775e5) 
-          annotation (extent=[-144,-162; -132,-150],
-                                                 rotation=270);
-        Water.SourceW sourceFromEcHP_w(
-          w0=69.5,
-          h=1.463e6,
-          p0=1.626e7) 
-                     annotation (extent=[-140,-148; -152,-136],
-                                                            rotation=90);
-        Water.SinkP sinkToRiserHP_p(p0=1.371e7, h=1.6325e6) 
-          annotation (extent=[-160,-162; -148,-150],
-                                                 rotation=270);
-        Water.SourceW sourceFromRiserHP_w(
-          w0=175.5,
-          h=2.002e6,
-          p0=1.626e7) 
-                     annotation (extent=[-156,-148; -168,-136],
-                                                            rotation=90);
-        Water.SinkP sinkToShHP_p(            h=2.657e6,
-          redeclare package Medium = FluidMedium,
-          p0=2.98e6) 
-          annotation (extent=[-140,-178; -128,-166],
-                                                 rotation=0);
-        Water.SinkP sinkToEcIP_p(p0=4.86e6, h=6.654e5) 
-          annotation (extent=[-90,-110; -78,-98],
-                                                rotation=270);
-        Water.SourceW sourceFromEcIP_w(
-          h=9.444e5,
-          w0=12.7,
-          p0=3.3816e6) 
-                     annotation (extent=[-86,-96; -98,-84], rotation=90);
-        Water.SinkP sinkToRiserIP_p(p0=3.716e6, h=1.0223e6) 
-          annotation (extent=[-106,-110; -94,-98],
-                                                 rotation=270);
-        Water.SourceW sourceFromRiserIP_w(
-          w0=67.5,
-          h=1.370e6,
-          p0=3.3816e6) 
-                     annotation (extent=[-102,-96; -114,-84],
-                                                            rotation=90);
-        Water.SinkP sinkToShIP_p(           h=2.802e6,
-          p0=6e5,
-          redeclare package Medium = FluidMedium) 
-          annotation (extent=[-82,-126; -70,-114],
-                                                 rotation=0);
-        Water.ValveLin valveLP(redeclare package Medium = FluidMedium, Kv=6.9/6.738e5) 
-          annotation (extent=[-54,-52; -38,-68]);
-        Water.ValveLin valveIP(redeclare package Medium = FluidMedium, Kv=13.5/
-              2.959e6) annotation (extent=[-108,-112; -92,-128]);
-        Water.ValveLin valveHP(redeclare package Medium = FluidMedium, Kv=70/1.344e7) 
-          annotation (extent=[-166,-164; -150,-180]);
-      public 
-        Modelica.Blocks.Sources.Constant com_valve(k=1) 
-          annotation (extent=[56,-194; 44,-182]);
-      public 
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateToEcHP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-144,-106; -132,-118],
-                                                                  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateReturnEcHP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-152,-118; -140,-106],
-                                                                  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateToRiserHP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-160,-106; -148,-118],
-                                                                  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateReturnRiserHP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-168,-118; -156,-106],
-                                                                  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateToShHP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-176,-106; -164,-118],
-                                                                  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateToEcIP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-90,-50; -78,-62],
-                                                                rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateReturnEcIP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-98,-62; -86,-50],rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateToRiserIP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-106,-50; -94,-62],rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateReturnRiserIP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-114,-62; -102,-50],
-                                                                  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateToShIP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-122,-50; -110,-62],
-                                                                  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateToEcLP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-24,2; -36,-10],
-                                                              rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateReturnEcLP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-44,-10; -32,2],
-                                                              rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateToRiserLP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-40,2; -52,-10],
-                                                              rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateReturnRiserLP(                     redeclare package Medium = 
-              FluidMedium) annotation (extent=[-60,-10; -48,2],
-                                                              rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateToShLP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (extent=[-56,2; -68,-10],
-                                                              rotation=90);
-      public 
-        Water.SourceP sourceWater(p0=5398.2, h=1.43495e5) 
-                     annotation (extent=[58,158; 46,170]);
-      public 
-        Modelica.Blocks.Sources.Ramp IPpump_com(
-          duration=10,
-          offset=12.7,
-          height=0) 
-          annotation (extent=[140,-98; 128,-86]);
-        Modelica.Blocks.Sources.Ramp HPpump_com(
-          duration=10,
-          startTime=0,
-          offset=69.5,
-          height=0) 
-          annotation (extent=[140,-126; 128,-114]);
-      public 
-        Modelica.Blocks.Sources.Constant LPpump_com(k=89.8) 
-          annotation (extent=[140,-78; 128,-66]);
-      protected 
-        Buses.Actuators actuators annotation (extent=[32,120; 20,132]);
-      equation 
-        connect(IPpump_com.y, actuators.flowRate_feedIP) 
-                                                     annotation (points=[127.4,
-              -92; 110,-92; 110,126; 26,126],
-                              style(color=74, rgbcolor={0,0,127}));
-        connect(HPpump_com.y, actuators.flowRate_feedHP) 
-                                                     annotation (points=[127.4,
-              -120; 100,-120; 100,126; 26,126],
-                                     style(color=74, rgbcolor={0,0,127}));
-        connect(LPpump_com.y, actuators.flowRate_feedLP) annotation (points=[127.4,
-              -72; 120,-72; 120,126; 26,126],
-                                        style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=74,
-            rgbfillColor={0,0,127},
-            fillPattern=1));
-        connect(stateToRiserHP.inlet, Drums.ToRiser_HP) annotation (points=[-154,
-              -108.4; -154,20; -153.333,20],      style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnEcHP.outlet, Drums.Feed_HP) annotation (points=[-146,
-              -108.4; -146,20; -145.333,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToEcHP.inlet, Drums.WaterForHP) annotation (points=[-138,
-              -108.4; -138,20; -137.333,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnRiserHP.outlet, Drums.FromRiser_HP) annotation (
-            points=[-162,-108.4; -162,20; -161.333,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToShHP.inlet, Drums.Steam_HP_Out) annotation (points=[-170,
-              -108.4; -170,20; -169.333,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToRiserIP.inlet, Drums.ToRiser_IP) annotation (points=[
-              -100,-52.4; -100,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnEcIP.outlet, Drums.Feed_IP) annotation (points=[-92,
-              -52.4; -92,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToEcIP.inlet, Drums.WaterForIP) annotation (points=[-84,
-              -52.4; -84,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnRiserIP.outlet, Drums.FromRiser_IP) annotation (
-            points=[-108,-52.4; -108,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToShIP.inlet, Drums.Steam_IP_Out) annotation (points=[-116,
-              -52.4; -116,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceWater.flange, Drums.WaterIn) annotation (points=[46,164;
-              -20,164], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToShLP_p.flange, valveLP.outlet) annotation (points=[-28,
-              -60; -38,-60], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(valveLP.inlet, stateToShLP.outlet) annotation (points=[-54,-60;
-              -62,-60; -62,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToRiserLP_p.flange, stateToRiserLP.outlet) annotation (
-            points=[-46,-36; -46,-7.6; -46,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromRiserLP_w.flange, stateReturnRiserLP.inlet) 
-          annotation (points=[-54,-18; -54,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromEcLP_w.flange, stateReturnEcLP.inlet) annotation (
-            points=[-38,-18; -38,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToEcLP_p.flange, stateToEcLP.outlet) annotation (points=[
-              -30,-36; -30,-7.6; -30,-7.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToEcLP.inlet, Drums.WaterForLP) annotation (points=[-30,-0.4;
-              -30,20; -30.6667,20],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnEcLP.outlet, Drums.Feed_LP) annotation (points=[-38,-0.4;
-              -38,-0.4; -38,20; -38.6667,20],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToRiserLP.inlet, Drums.ToRiser_LP) annotation (points=[-46,-0.4;
-              -46.6667,-0.4; -46.6667,20],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateReturnRiserLP.outlet, Drums.FromRiser_LP) annotation (
-            points=[-54,-0.4; -54,-0.4; -54,20; -54.6667,20], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateToShLP.inlet, Drums.Steam_LP_Out) annotation (points=[-62,-0.4;
-              -62,-0.4; -62,20; -62.6667,20],       style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(actuators, Drums.ActuatorsBus) annotation (points=[26,126; 3,
-              126; 3,126.667; -20,126.667], style(
-            color=52,
-            rgbcolor={213,255,170},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (points=[
-              -84,-98; -84,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromEcIP_w.flange, stateReturnEcIP.inlet) annotation (
-            points=[-92,-84; -92,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToRiserIP_p.flange, stateToRiserIP.outlet) annotation (
-            points=[-100,-98; -100,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromRiserIP_w.flange, stateReturnRiserIP.inlet) 
-          annotation (points=[-108,-84; -108,-59.6; -108,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(valveIP.inlet, stateToShIP.outlet) annotation (points=[-108,
-              -120; -116,-120; -116,-59.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToShIP_p.flange, valveIP.outlet) annotation (points=[-82,
-              -120; -92,-120], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToEcHP_p.flange, stateToEcHP.outlet) annotation (points=[
-              -138,-150; -138,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromEcHP_w.flange, stateReturnEcHP.inlet) annotation (
-            points=[-146,-136; -146,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sinkToRiserHP_p.flange, stateToRiserHP.outlet) annotation (
-            points=[-154,-150; -154,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(sourceFromRiserHP_w.flange, stateReturnRiserHP.inlet) 
-          annotation (points=[-162,-136; -162,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(valveHP.inlet, stateToShHP.outlet) annotation (points=[-166,
-              -172; -170,-172; -170,-115.6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(valveHP.outlet, sinkToShHP_p.flange) annotation (points=[-150,
-              -172; -140,-172], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_valve.y, valveHP.cmd) annotation (points=[43.4,-188; -158,
-              -188; -158,-178.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_valve.y, valveIP.cmd) annotation (points=[43.4,-188; -100,
-              -188; -100,-126.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_valve.y, valveLP.cmd) annotation (points=[43.4,-188; -46,
-              -188; -46,-66.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(HPpump_com.y, sourceFromEcHP_w.in_w0) annotation (points=[127.4,
-              -120; -18,-120; -18,-144; -142.4,-144; -142.4,-144.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(IPpump_com.y, sourceFromEcIP_w.in_w0) annotation (points=[127.4,
-              -92; 19.5,-92; 19.5,-92.4; -88.4,-92.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(LPpump_com.y, sourceFromEcLP_w.in_w0) annotation (points=[127.4,
-              -72; 46,-72; 46,-26.4; -34.4,-26.4], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end TestDG_3LCC_wafp;
-      
-      model TestHRSG_wa 
-        package FlueGasMedium = ThermoPower.Media.FlueGas;
-        package FluidMedium = ThermoPower.Water.StandardWater;
-        
-      protected 
-        Buses.Actuators actuators annotation (extent=[84,44; 72,54]);
-        annotation (Diagram, experiment(
-            StopTime=8000,
-            NumberOfIntervals=5000,
-            Tolerance=1e-006));
-      public 
-        Water.SinkP outHP(redeclare package Medium = FluidMedium, p0=0) 
-                          annotation (extent=[-78,-48; -92,-34],
-                                                              rotation=0);
-        Water.SinkP outIP(redeclare package Medium = FluidMedium, p0=0) 
-                           annotation (extent=[-40,-86; -54,-72],
-                                                                rotation=0);
-        Water.SinkP outLP(redeclare package Medium = FluidMedium, p0=0) 
-                           annotation (extent=[40,-86; 54,-72], rotation=0);
-        Water.SourceW sourceRhIP(
-          redeclare package Medium = FluidMedium,
-          h=3.22e6,
-          w0=81.10,
-          p0=28.4e5)          annotation (extent=[-34,-64; -22,-52],
-                                                                   rotation=90);
-        Water.SinkP sinkRhIP(
-          redeclare package Medium = FluidMedium,
-          h=3.548e6,
-          p0=28.4e5)       annotation (extent=[-22,-38; -10,-50],
-                                                                rotation=90);
-        Gas.SourceW sourceGas(
-          redeclare package Medium = FlueGasMedium,
-          w0=585.5,
-          T=884.65)          annotation (extent=[-100,18; -84,34]);
-        Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=379.448) 
-                         annotation (extent=[72,18; 88,34]);
-        Water.ValveLin valveLinHP(redeclare package Medium = FluidMedium, Kv=
-              69.5/134.3e5)     annotation (extent=[-54,-34; -68,-48]);
-        Water.ValveLin valveLinIP(redeclare package Medium = FluidMedium, Kv=
-              12.7/29.6e5)       annotation (extent=[-10,-72; -24,-86],
-            rotation=0);
-        Water.ValveLin valveLinLP(redeclare package Medium = FluidMedium, Kv=
-              6.91/6.6e5)        annotation (extent=[30,-86; 16,-72], rotation=
-              180);
-        Modelica.Blocks.Sources.Constant com_pumpFeedHP(k=64.5) 
-          annotation (extent=[98,64; 86,76]);
-        Modelica.Blocks.Sources.Constant com_pumpFeedIP(k=13.5) 
-          annotation (extent=[58,64; 70,76]);
-        Modelica.Blocks.Sources.Constant commandValve 
-          annotation (extent=[-92,-96; -82,-86], rotation=0);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
-                                               redeclare package Medium = 
-              FlueGasMedium) annotation (extent=[-76,16; -56,36],   rotation=0);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
-                                                redeclare package Medium = 
-              FlueGasMedium) annotation (extent=[42,16; 62,36],   rotation=0);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShHP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-48,-16; -32,-32], rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShIP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-12,-16; 4,-32],   rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShLP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[0,-16; 16,-32],    rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateRhIP_out(
-                                                   redeclare package Medium = 
-              FluidMedium) annotation (extent=[-24,-16; -8,-32],  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateRhIP_in(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (extent=[-36,-16; -20,-32], rotation=270);
-        ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
-                                redeclare package FlueGasMedium = FlueGasMedium, redeclare 
-            package FluidMedium = FluidMedium) 
-          annotation (extent=[-48,-6; 32,74]);
-        Water.SourceP sourceShLP(
-          redeclare package Medium = FluidMedium,
-          p0=5398.2,
-          h=1.43495e5) 
-          annotation (extent=[18,-38; 30,-50],
-                                             rotation=270);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateFromCondenser(                           redeclare package 
-            Medium = 
-              FluidMedium) annotation (extent=[32,-16; 16,-32],
-                                                              rotation=270);
-      public 
-        Modelica.Blocks.Sources.Constant com_n_pump(k=1510) 
-          annotation (extent=[98,84; 86,96]);
-      equation 
-        connect(com_pumpFeedIP.y, actuators.flowRate_feedIP) 
-                                                     annotation (points=[70.6,70;
-              78,70; 78,49], style(color=74, rgbcolor={0,0,127}));
-        connect(com_pumpFeedHP.y, actuators.flowRate_feedHP) 
-                                                     annotation (points=[85.4,70;
-              78,70; 78,49],        style(color=74, rgbcolor={0,0,127}));
-        connect(stateGas_in.inlet, sourceGas.flange) annotation (points=[-72,26;
-              -84,26],       style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=76,
-            rgbfillColor={170,170,255},
-            fillPattern=1));
-        connect(sinkGas.flange, stateGas_out.outlet) annotation (points=[72,26;
-              58,26],  style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=76,
-            rgbfillColor={170,170,255},
-            fillPattern=1));
-        connect(stateGas_in.outlet, hRSG.GasIn) annotation (points=[-60,26; -48,
-              26],         style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2));
-        connect(stateGas_out.inlet, hRSG.GasOut) annotation (points=[46,26; 32,
-              26],        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2));
-        connect(stateShLP_out.inlet, hRSG.Sh_LP_Out) 
-          annotation (points=[8,-19.2; 8,-6], style(thickness=2));
-        connect(stateShIP_out.inlet, hRSG.Sh_IP_Out) 
-          annotation (points=[-4,-19.2; -4,-6], style(thickness=2));
-        connect(stateRhIP_out.inlet, hRSG.Rh_IP_Out) 
-          annotation (points=[-16,-19.2; -16,-6], style(thickness=2));
-        connect(stateRhIP_in.outlet, hRSG.Rh_IP_In) 
-          annotation (points=[-28,-19.2; -28,-6], style(thickness=2));
-        connect(stateShHP_out.inlet, hRSG.Sh_HP_Out) 
-          annotation (points=[-40,-19.2; -40,-6], style(thickness=2));
-        connect(sinkRhIP.flange, stateRhIP_out.outlet) 
-          annotation (points=[-16,-38; -16,-28.8], style(thickness=2));
-        connect(sourceRhIP.flange, stateRhIP_in.inlet) 
-          annotation (points=[-28,-52; -28,-28.8], style(thickness=2));
-        connect(valveLinLP.inlet, stateShLP_out.outlet) 
-          annotation (points=[16,-79; 8,-79; 8,-28.8], style(thickness=2));
-        connect(valveLinIP.inlet, stateShIP_out.outlet) 
-          annotation (points=[-10,-79; -4,-79; -4,-28.8], style(thickness=2));
-        connect(valveLinHP.inlet, stateShHP_out.outlet) annotation (points=[-54,-41;
-              -40,-41; -40,-28.8],      style(thickness=2));
-        connect(outLP.flange, valveLinLP.outlet) 
-          annotation (points=[40,-79; 30,-79], style(thickness=2));
-        connect(commandValve.y, valveLinHP.cmd) annotation (points=[-81.5,-91;
-              -61,-91; -61,-46.6], style(color=74, rgbcolor={0,0,127}));
-        connect(valveLinIP.cmd, commandValve.y) annotation (points=[-17,-84.6;
-              -17,-91; -81.5,-91], style(color=74, rgbcolor={0,0,127}));
-        connect(valveLinLP.cmd, commandValve.y) annotation (points=[23,-84.6;
-              23,-91; -81.5,-91], style(color=74, rgbcolor={0,0,127}));
-        connect(actuators, hRSG.ActuatorsBus) annotation (points=[78,49; 54.6,
-              49; 54.6,54; 32,54],       style(color=52, rgbcolor={213,255,170}));
-        connect(sourceShLP.flange, stateFromCondenser.inlet) annotation (points=
-             [24,-38; 24,-28.8], style(
-            color=3,
-            rgbcolor={0,0,255},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateFromCondenser.outlet, hRSG.WaterIn) annotation (points=[24,
-              -19.2; 24,-6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(outIP.flange, valveLinIP.outlet) annotation (points=[-40,-79;
-              -32,-79; -32,-79; -24,-79], style(thickness=2));
-        connect(valveLinHP.outlet, outHP.flange) annotation (points=[-68,-41;
-              -74,-41; -74,-41; -78,-41], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_n_pump.y, actuators.nPump_feedLP) annotation (points=[85.4,
-              90; 78,90; 78,49], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end TestHRSG_wa;
-      
-      model TestHRSG_wafp 
-        package FlueGasMedium = ThermoPower.Media.FlueGas;
-        package FluidMedium = ThermoPower.Water.StandardWater;
-        
-      protected 
-        Buses.Actuators actuators annotation (extent=[84,46; 72,56]);
-        annotation (Diagram, experiment(StopTime=10000, NumberOfIntervals=5000));
-      public 
-        Water.SinkP outHP(redeclare package Medium = FluidMedium, p0=0) 
-                          annotation (extent=[-78,-48; -92,-34],
-                                                              rotation=0);
-        Water.SinkP outIP(redeclare package Medium = FluidMedium, p0=0) 
-                           annotation (extent=[-36,-86; -50,-72],
-                                                                rotation=0);
-        Water.SinkP outLP(redeclare package Medium = FluidMedium, p0=0) 
-                           annotation (extent=[40,-86; 54,-72], rotation=0);
-        Water.SourceW sourceRhIP(
-          redeclare package Medium = FluidMedium,
-          h=3.22e6,
-          w0=81.10,
-          p0=28.4e5)          annotation (extent=[-34,-64; -22,-52],
-                                                                   rotation=90);
-        Water.SinkP sinkRhIP(
-          redeclare package Medium = FluidMedium,
-          h=3.548e6,
-          p0=28.4e5)       annotation (extent=[-22,-38; -10,-50],
-                                                                rotation=90);
-        Gas.SourceW sourceGas(
-          redeclare package Medium = FlueGasMedium,
-          w0=585.5,
-          T=884.65)          annotation (extent=[-100,18; -84,34]);
-        Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=379.448) 
-                         annotation (extent=[72,18; 88,34]);
-        Water.ValveLin valveLinHP(redeclare package Medium = FluidMedium, Kv=
-              69.5/134.3e5)     annotation (extent=[-54,-34; -68,-48]);
-        Water.ValveLin valveLinIP(redeclare package Medium = FluidMedium, Kv=
-              12.7/29.6e5)       annotation (extent=[-10,-72; -24,-86],
-            rotation=0);
-        Water.ValveLin valveLinLP(redeclare package Medium = FluidMedium, Kv=
-              6.91/6.6e5)        annotation (extent=[30,-86; 16,-72], rotation=
-              180);
-        Modelica.Blocks.Sources.Constant com_pumpFeedHP(k=64.5) 
-          annotation (extent=[98,66; 86,78]);
-        Modelica.Blocks.Sources.Constant com_pumpFeedIP(k=13.5) 
-          annotation (extent=[58,66; 70,78]);
-        Modelica.Blocks.Sources.Constant commandValve 
-          annotation (extent=[-92,-96; -82,-86], rotation=0);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
-                                               redeclare package Medium = 
-              FlueGasMedium) annotation (extent=[-76,16; -56,36],   rotation=0);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
-                                                redeclare package Medium = 
-              FlueGasMedium) annotation (extent=[42,16; 62,36],   rotation=0);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShHP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-48,-16; -32,-32], rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShIP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-12,-16; 4,-32],   rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShLP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[0,-16; 16,-32],    rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateRhIP_out(
-                                                   redeclare package Medium = 
-              FluidMedium) annotation (extent=[-24,-16; -8,-32],  rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateRhIP_in(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (extent=[-36,-16; -20,-32], rotation=270);
-        ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wafp hRSG(
-                           redeclare package FlueGasMedium = FlueGasMedium, redeclare 
-            package FluidMedium = FluidMedium) 
-          annotation (extent=[-48,-6; 32,74]);
-        Water.SourceP sourceShLP(
-          redeclare package Medium = FluidMedium,
-          p0=5398.2,
-          h=1.43495e5) 
-          annotation (extent=[18,-38; 30,-50],
-                                             rotation=270);
-        Components.StateReader_water stateFromCondenser(redeclare package 
-            Medium = 
-              FluidMedium) annotation (extent=[32,-16; 16,-32],
-                                                              rotation=270);
-      public 
-        Modelica.Blocks.Sources.Constant com_LPpump(k=89.8) 
-          annotation (extent=[98,86; 86,98]);
-      equation 
-        connect(com_pumpFeedIP.y, actuators.flowRate_feedIP) 
-                                                     annotation (points=[70.6,72;
-              78,72; 78,51], style(color=74, rgbcolor={0,0,127}));
-        connect(com_pumpFeedHP.y, actuators.flowRate_feedHP) 
-                                                     annotation (points=[85.4,72;
-              78,72; 78,51],        style(color=74, rgbcolor={0,0,127}));
-        connect(stateGas_in.inlet, sourceGas.flange) annotation (points=[-72,26;
-              -84,26],       style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=76,
-            rgbfillColor={170,170,255},
-            fillPattern=1));
-        connect(sinkGas.flange, stateGas_out.outlet) annotation (points=[72,26;
-              58,26],  style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2,
-            fillColor=76,
-            rgbfillColor={170,170,255},
-            fillPattern=1));
-        connect(stateGas_in.outlet, hRSG.GasIn) annotation (points=[-60,26; -48,
-              26],         style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2));
-        connect(stateGas_out.inlet, hRSG.GasOut) annotation (points=[46,26; 32,
-              26],        style(
-            color=76,
-            rgbcolor={159,159,223},
-            thickness=2));
-        connect(stateShLP_out.inlet, hRSG.Sh_LP_Out) 
-          annotation (points=[8,-19.2; 8,-6], style(thickness=2));
-        connect(stateShIP_out.inlet, hRSG.Sh_IP_Out) 
-          annotation (points=[-4,-19.2; -4,-6], style(thickness=2));
-        connect(stateRhIP_out.inlet, hRSG.Rh_IP_Out) 
-          annotation (points=[-16,-19.2; -16,-6], style(thickness=2));
-        connect(stateRhIP_in.outlet, hRSG.Rh_IP_In) 
-          annotation (points=[-28,-19.2; -28,-6], style(thickness=2));
-        connect(stateShHP_out.inlet, hRSG.Sh_HP_Out) 
-          annotation (points=[-40,-19.2; -40,-6], style(thickness=2));
-        connect(sinkRhIP.flange, stateRhIP_out.outlet) 
-          annotation (points=[-16,-38; -16,-28.8], style(thickness=2));
-        connect(sourceRhIP.flange, stateRhIP_in.inlet) 
-          annotation (points=[-28,-52; -28,-28.8], style(thickness=2));
-        connect(valveLinLP.inlet, stateShLP_out.outlet) 
-          annotation (points=[16,-79; 8,-79; 8,-28.8], style(thickness=2));
-        connect(valveLinIP.inlet, stateShIP_out.outlet) 
-          annotation (points=[-10,-79; -4,-79; -4,-28.8], style(thickness=2));
-        connect(valveLinIP.outlet, outIP.flange) 
-          annotation (points=[-24,-79; -36,-79], style(thickness=2));
-        connect(valveLinHP.inlet, stateShHP_out.outlet) annotation (points=[-54,-41;
-              -40,-41; -40,-28.8],      style(thickness=2));
-        connect(outLP.flange, valveLinLP.outlet) 
-          annotation (points=[40,-79; 30,-79], style(thickness=2));
-        connect(commandValve.y, valveLinHP.cmd) annotation (points=[-81.5,-91;
-              -61,-91; -61,-46.6], style(color=74, rgbcolor={0,0,127}));
-        connect(valveLinIP.cmd, commandValve.y) annotation (points=[-17,-84.6;
-              -17,-91; -81.5,-91], style(color=74, rgbcolor={0,0,127}));
-        connect(valveLinLP.cmd, commandValve.y) annotation (points=[23,-84.6;
-              23,-91; -81.5,-91], style(color=74, rgbcolor={0,0,127}));
-        connect(valveLinHP.outlet, outHP.flange) 
-          annotation (points=[-68,-41; -78,-41], style(thickness=2));
-        connect(actuators, hRSG.ActuatorsBus) annotation (points=[78,51; 54.6,
-              51; 54.6,54; 32,54],       style(color=52, rgbcolor={213,255,170}));
-        connect(sourceShLP.flange,stateFromCondenser. inlet) annotation (points=[24,-38;
-              24,-28.8],         style(
-            color=3,
-            rgbcolor={0,0,255},
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(stateFromCondenser.outlet, hRSG.WaterIn) annotation (points=[24,
-              -19.2; 24,-6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-        connect(com_LPpump.y, actuators.flowRate_feedLP) annotation (points=[
-              85.4,92; 78,92; 78,52], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
-      end TestHRSG_wafp;
+      end TestHEG_3LRh;
       
     end Tests;
     
@@ -17380,13 +13264,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={240,240,240},
             fillPattern=1));
-        connect(feed_w.inlet, pump.outlet)          annotation (points=[20,-10; 
+        connect(feed_w.inlet, pump.outlet)          annotation (points=[20,-10;
               10,-10; 10,-10; 0,-10],      style(
             thickness=2,
             fillColor=30,
             rgbfillColor={240,240,240},
             fillPattern=1));
-        connect(sourceShLP.flange, pump.inlet)          annotation (points=[-60,-10; 
+        connect(sourceShLP.flange, pump.inlet)          annotation (points=[-60,-10;
               -50,-10; -50,-10; -40,-10; -40,-10; -20,-10],          style(
             thickness=2,
             fillColor=30,
@@ -17398,7 +13282,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={240,240,240},
             fillPattern=1));
-        connect(pIDController.PV, feed_w.w) annotation (points=[32,32; 40,32; 
+        connect(pIDController.PV, feed_w.w) annotation (points=[32,32; 40,32;
               40,-8.88178e-016; 34,-8.88178e-016],       style(
             color=74,
             rgbcolor={0,0,127},
@@ -17407,7 +13291,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillPattern=1));
         connect(pIDController.CS, firstOrder.u) annotation (points=[11.4,36; -2,
               36],    style(color=74, rgbcolor={0,0,127}));
-        connect(firstOrder.y, pump.pumpSpeed_rpm)          annotation (points=[-25,36; 
+        connect(firstOrder.y, pump.pumpSpeed_rpm)          annotation (points=[-25,36;
               -40,36; -40,-4; -20.8,-4],         style(color=74, rgbcolor={0,
                 0,127}));
       end TestPumpControl;
@@ -17432,9 +13316,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShHP_out(
             redeclare package Medium = FluidMedium) 
                            annotation (extent=[-48,-16; -32,-32], rotation=90);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShIP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-12,-16; 4,-32],   rotation=90);
         ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShLP_out(
             redeclare package Medium = FluidMedium) 
                            annotation (extent=[0,-16; 16,-32],    rotation=90);
@@ -17444,16 +13325,12 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateRhIP_in(
                                                   redeclare package Medium = 
               FluidMedium) annotation (extent=[-36,-16; -20,-32], rotation=270);
-        ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
-                                redeclare package FlueGasMedium = 
+        Examples.HRSG_3LRh hRSG(redeclare package FlueGasMedium = 
               FlueGasMedium,                                                     redeclare 
-            package FluidMedium = FluidMedium) 
+            package FluidMedium = FluidMedium,
+          drums(SSInit=true),
+          HeatExchangersGroup(SSInit=true)) 
           annotation (extent=[-48,-6; 32,74]);
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water 
-          stateFromCondenser(                           redeclare package 
-            Medium = 
-              FluidMedium) annotation (extent=[32,-16; 16,-32],
-                                                              rotation=270);
         Water.SinkP OutLP(redeclare package Medium = FluidMedium,
           p0=5389.2,
           h=2.3854e6)      annotation (extent=[64,-80; 76,-68], rotation=0);
@@ -17490,16 +13367,9 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           V=10,
           pstart=7.19e5,
           hstart=2.89295e6,
-          initOpt=ThermoPower.Choices.Init.Options.noInit) 
+          initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                           annotation (extent=[18,-76; 28,-66],
                                                             rotation=0);
-        Water.Mixer mixIP(
-          redeclare package Medium = FluidMedium,
-          V=10,
-          pstart=3.38e6,
-          initOpt=ThermoPower.Choices.Init.Options.noInit,
-          hstart=3.1076e6) annotation (extent=[-34,-50; -22,-38],
-                                                                rotation=90);
         Modelica.Mechanics.Rotational.ConstantSpeed constantSpeed(w_fixed=
               314.16/2) 
                       annotation (extent=[98,-88; 88,-78]);
@@ -17507,11 +13377,28 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           redeclare package Medium = FluidMedium,
           p0=5398.2,
           h=1.43495e5) 
-          annotation (extent=[40,-34; 52,-46],
+          annotation (extent=[78,-34; 90,-46],
                                              rotation=180);
         ThermoPower.PowerPlants.HRSG.Control.levelsControl 
-          levelsControlSimplified 
+          levelsControlSimplified(
+          Level_HP(steadyStateInit=true),
+          Level_IP(steadyStateInit=true),
+          Level_LP(steadyStateInit=true)) 
           annotation (extent=[60,60; 80,80]);
+        Components.PrescribedSpeedPump totalFeedPump(
+          redeclare package WaterMedium = FluidMedium,
+          rho_nom=1000,
+          q_nom={0.0898,0,0.1},
+          head_nom={72.74,130,0},
+          nominalCondensationPressure=5398.2,
+          nominalSteamFlow=89.8,
+          n0=1500,
+          hstart=1.43495e5,
+          nominalSteamPressure=6e5) 
+                                  annotation (extent=[38,-34; 50,-46],
+            rotation=180);
+      protected 
+        Buses.Actuators actuators annotation (extent=[60,-20; 68,-12]);
       equation 
         connect(stateGas_in.inlet, sourceGas.flange) annotation (points=[-72,26;
               -84,26],       style(
@@ -17541,20 +13428,12 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             thickness=2));
         connect(stateShLP_out.inlet, hRSG.Sh_LP_Out) 
           annotation (points=[8,-19.2; 8,-6], style(thickness=2));
-        connect(stateShIP_out.inlet, hRSG.Sh_IP_Out) 
-          annotation (points=[-4,-19.2; -4,-6], style(thickness=2));
         connect(stateRhIP_out.inlet, hRSG.Rh_IP_Out) 
           annotation (points=[-16,-19.2; -16,-6], style(thickness=2));
         connect(stateRhIP_in.outlet, hRSG.Rh_IP_In) 
           annotation (points=[-28,-19.2; -28,-6], style(thickness=2));
         connect(stateShHP_out.inlet, hRSG.Sh_HP_Out) 
           annotation (points=[-40,-19.2; -40,-6], style(thickness=2));
-        connect(stateFromCondenser.outlet, hRSG.WaterIn) annotation (points=[24,
-              -19.2; 24,-6], style(
-            thickness=2,
-            fillColor=30,
-            rgbfillColor={230,230,230},
-            fillPattern=1));
         connect(OutLP.flange, turbineLP.outlet) annotation (points=[64,-74; 52,
               -74],                      style(thickness=2));
         connect(turbineHP.shaft_b, turbineIP.shaft_a) annotation (points=[-33.6,
@@ -17565,29 +13444,55 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           annotation (points=[19.05,-74; 8,-74],    style(thickness=2));
         connect(constantSpeed.flange, turbineLP.shaft_b) annotation (points=[88,-83;
               88,-82; 50.4,-82],         style(color=0, rgbcolor={0,0,0}));
-        connect(turbineLP.inlet, mixLP.out) annotation (points=[36,-74; 36,-71; 
+        connect(turbineLP.inlet, mixLP.out) annotation (points=[36,-74; 36,-71;
               28,-71],           style(thickness=2));
-        connect(sourceShLP.flange, stateFromCondenser.inlet) 
-          annotation (points=[40,-40; 24,-40; 24,-28.8], style(thickness=2));
         connect(mixLP.in1, stateShLP_out.outlet) 
           annotation (points=[19,-68; 8,-68; 8,-28.8], style(thickness=2));
-        connect(turbineHP.inlet, stateShHP_out.outlet) annotation (points=[-48,-74; 
+        connect(turbineHP.inlet, stateShHP_out.outlet) annotation (points=[-48,-74;
               -48,-52.05; -40,-52.05; -40,-28.8],                style(
               thickness=2));
-        connect(turbineHP.outlet, mixIP.in1) annotation (points=[-32,-74; -31.6,
-              -74; -31.6,-48.8],       style(thickness=2));
-        connect(mixIP.out, stateRhIP_in.inlet) 
-          annotation (points=[-28,-38; -28,-28.8], style(thickness=2));
-        connect(turbineIP.inlet, stateRhIP_out.outlet) annotation (points=[-8,-74; 
+        connect(turbineIP.inlet, stateRhIP_out.outlet) annotation (points=[-8,-74;
               -16,-74; -16,-28.8],               style(thickness=2));
-        connect(stateShIP_out.outlet, mixIP.in2) annotation (points=[-4,-28.8; 
-              -4,-60; -24.4,-60; -24.4,-48.74], style(thickness=2));
         connect(levelsControlSimplified.SensorsBus, hRSG.SensorsBus) 
           annotation (points=[60,70; 46,70; 46,66; 32,66],         style(
               color=84, rgbcolor={255,170,213}));
         connect(levelsControlSimplified.ActuatorsBus, hRSG.ActuatorsBus) 
           annotation (points=[80,70; 92,70; 92,54; 32,54],       style(color=
                 52, rgbcolor={213,255,170}));
+        connect(sourceShLP.flange, totalFeedPump.inlet) annotation (points=[78,
+              -40; 50,-40], style(
+            color=3,
+            rgbcolor={0,0,255},
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(actuators, levelsControlSimplified.ActuatorsBus) annotation (
+            points=[64,-16; 92,-16; 92,70; 80,70], style(
+            color=52,
+            rgbcolor={213,255,170},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.pumpSpeed_rpm, actuators.nPump_feedLP) 
+          annotation (points=[50.48,-36.4; 64,-36.4; 64,-16], style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.outlet, hRSG.WaterIn) annotation (points=[38,-40;
+              24,-40; 24,-6], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(turbineHP.outlet, stateRhIP_in.inlet) annotation (points=[-32,
+              -74; -28,-74; -28,-28.8], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
       end TestHRSG_wac;
       
     end TestsControl;
@@ -17680,11 +13585,11 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                                          annotation (extent=[-20,180; 20,220]);
         annotation (Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Rectangle(extent=[-200,14; 202,-14],
+            Rectangle(extent=[-200,14; 200,-14],
                                                style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -17692,33 +13597,36 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-120,30; -120,-30; -60,-100; -60,100; -120,30],
-                                                                       style(
+            Line(points=[-120,30; -120,200], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[0,30; 0,200], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[60,-90; 60,-192], style(color=3, rgbcolor={0,0,255})),
+            Polygon(points=[-126,148; -114,148; -120,132; -126,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-6,148; 6,148; 0,132; -6,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[54,-132; 66,-132; 60,-148; 54,-132], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-120,30; -120,-30; -60,-90; -60,90; -120,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[0,30; 0,-30; 60,-100; 60,100; 0,30],       style(
+            Polygon(points=[0,30; 0,-30; 60,-90; 60,90; 0,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[-120,30; -120,200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[0,30; 0,200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[60,-98; 60,-192], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2))), Diagram,
+                fillPattern=1))),
+                                Diagram,
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         
         Water.FlangeB LPT_Out(            redeclare package Medium = 
@@ -17833,35 +13741,29 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         annotation (Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Line(points=[-160,198; -160,30],
-                                          style(
+            Line(points=[-160,198; -160,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
+            Line(points=[-100,200; -100,88], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-40,200; -40,30],
-                                        style(
+            Line(points=[-40,200; -40,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Rectangle(extent=[-200,14; 202,-14],
+            Rectangle(extent=[-200,14; 200,-14],
                                                style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -17869,29 +13771,45 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
-                                                                       style(
+            Line(points=[20,58; 20,140; 80,140; 80,198], style(color=3,
+                  rgbcolor={0,0,255})),
+            Line(points=[80,-90; 80,-198], style(color=3, rgbcolor={0,0,255})),
+            Polygon(points=[-166,148; -154,148; -160,132; -166,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-106,134; -94,134; -100,150; -106,134], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,148; -34,148; -40,132; -46,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[14,116; 26,116; 20,100; 14,116], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,-132; 86,-132; 80,-148; 74,-132], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-160,30; -160,-30; -100,-90; -100,90; -160,30],
+                style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 80,-100; 80,100; -40,30], style(
+            Polygon(points=[-40,30; -40,-30; 80,-90; 80,90; -40,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[20,64; 20,140; 80,140; 80,198], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[80,-100; 80,-198], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2))), Diagram,
+                fillPattern=1))),
+                                Diagram,
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         
         Water.FlangeA HPT_In(            redeclare package Medium = FluidMedium)
@@ -18013,75 +13931,38 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         annotation (Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Rectangle(extent=[-202,14; 200,-14],
-                                               style(
+            Rectangle(extent=[-200,14; 200,-14], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
-                                                                       style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 20,-100; 20,100; -40,30], style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Polygon(points=[80,30; 80,-30; 140,-100; 140,100; 80,30],  style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
+            Line(points=[-100,200; -100,90], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-40,30; -40,200],style(
+            Line(points=[-40,30; -40,200], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[80,30; 80,200],style(
+            Line(points=[80,30; 80,200], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[20,200; 20,150; -100,150],
-                                                style(
+            Line(points=[20,90; 20,130; 80,130], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[20,100; 20,130; 80,130],
-                                               style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
@@ -18093,27 +13974,67 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Ellipse(extent=[-96,154; -104,146],
-                                             style(
+            Line(points=[140,-90; 140,-200], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[140,-100; 140,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
             Line(points=[-160,30; -160,120; -160,146; -160,204], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Polygon(points=[-166,148; -154,148; -160,132; -166,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,148; -34,148; -40,132; -46,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-106,134; -94,134; -100,150; -106,134], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[40,136; 40,124; 56,130; 40,136], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,166; 86,166; 80,150; 74,166], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,106; 86,106; 80,90; 74,106], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[134,-132; 146,-132; 140,-148; 134,-132], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-160,30; -160,-30; -100,-90; -100,90; -160,30],
+                style(
+                color=0,
+                rgbcolor={0,0,0},
+                thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-40,30; -40,-30; 20,-90; 20,90; -40,30], style(
+                color=0,
+                rgbcolor={0,0,0},
+                thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[80,30; 80,-30; 140,-90; 140,90; 80,30], style(
+                color=0,
+                rgbcolor={0,0,0},
+                thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255},
                 fillPattern=1))),
                                 Diagram,
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
@@ -18124,8 +14045,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
               FluidMedium)                annotation (extent=[-120,180; -80,220]);
         Water.FlangeA IPT_In(            redeclare package Medium = FluidMedium)
                                          annotation (extent=[-60,180; -20,220]);
-        Water.FlangeA SteamToMix(            redeclare package Medium = 
-              FluidMedium)                   annotation (extent=[0,180; 40,220]);
         Water.FlangeA LPT_In(            redeclare package Medium = FluidMedium)
                                          annotation (extent=[60,180; 100,220]);
         Water.FlangeB LPT_Out(            redeclare package Medium = 
@@ -18213,44 +14132,38 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
               FluidMedium)                   annotation (extent=[-80,-220; -40,
               -180]);
         ThermoPower.Water.FlangeB LPT_Out(redeclare package Medium = 
-              FluidMedium)                annotation (extent=[40,-220; 80,-180]);
+              FluidMedium)                annotation (extent=[28,-220; 68,-180]);
         annotation (Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Ellipse(extent=[-4,144; 4,136],style(
+            Ellipse(extent=[-20,134; -12,126], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-60,-198; -60,-140; 140,-140; 140,140; 0,140],
-                                                                  style(
+            Line(points=[-60,-198; -60,-140; 140,-140; 140,130; 0,130], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-60,100; -60,140; 0,140],
-                                                 style(
+            Line(points=[-60,90; -60,130; 0,130], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[0,140; 0,198], style(
+            Line(points=[0,130; 0,198], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Rectangle(extent=[-200,14; 202,-14],
+            Rectangle(extent=[-200,14; 200,-14],
                                                style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -18258,48 +14171,60 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-120,30; -120,-30; -60,-100; -60,100; -120,30],
-                                                                       style(
+            Line(points=[-120,28; -120,200], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[48,-90; 48,-192], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[-12,130; -12,120; -12,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-50,136; -50,124; -34,130; -50,136], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-126,148; -114,148; -120,132; -126,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-6,168; 6,168; 0,152; -6,168], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[42,-152; 54,-152; 48,-168; 42,-152], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-18,102; -6,102; -12,86; -18,102], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[26,136; 26,124; 42,130; 26,136], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[0,134; 8,126], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Rectangle(extent=[-16,134; 4,126], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-120,30; -120,-30; -60,-90; -60,90; -120,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[0,30; 0,-30; 60,-100; 60,100; 0,30],       style(
+            Polygon(points=[-12,30; -12,-30; 48,-90; 48,90; -12,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[-120,32; -120,200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[60,-98; 60,-192], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-60,120; 0,120; 0,30], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[-64,124; -56,116],
-                                           style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Polygon(points=[-6,80; 6,80; -6,60; 6,60; -6,80],      style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255}))),
+                fillPattern=1))),
                                 Diagram,
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         
@@ -18349,7 +14274,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Inlet pressure start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "HP Turbine"));
-        parameter SI.Pressure HPT_pstart_out = steamIPNomPressure 
+        parameter SI.Pressure HPT_pstart_out = steamLPNomPressure 
           "Outlet pressure start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "HP Turbine"));
@@ -18392,52 +14317,38 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         annotation (Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Ellipse(extent=[76,144; 84,136],
-                                           style(
+            Ellipse(extent=[76,136; 84,128], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-100,140; 140,140; 140,-140; -40,-140; -40,-198],
-                                                                   style(
+            Line(points=[-98,132; 140,132; 140,-140; -40,-140; -40,-198], style(
+                  color=3, rgbcolor={0,0,255})),
+            Line(points=[80,132; 80,192], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[-160,198; -160,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[80,140; 80,200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-160,198; -160,30],
-                                          style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
+            Line(points=[-100,200; -100,88], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-40,200; -40,30],
-                                        style(
+            Line(points=[-40,200; -40,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Rectangle(extent=[-200,14; 202,-14],
+            Rectangle(extent=[-200,14; 200,-14],
                                                style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -18445,40 +14356,56 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
-                                                                       style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 80,-100; 80,100; -40,30], style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[80,-100; 80,-198], style(
+            Line(points=[80,-90; 80,-198], style(color=3, rgbcolor={0,0,255})),
+            Ellipse(extent=[-104,136; -96,128], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Ellipse(extent=[-104,144; -96,136],
-                                           style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[-46,100; -34,100; -46,80; -34,80; -46,100],
-                                                                   style(
+            Polygon(points=[-74,138; -74,126; -58,132; -74,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-166,128; -154,128; -160,112; -166,128], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[104,138; 104,126; 120,132; 104,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,170; 86,170; 80,154; 74,170], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,106; -34,106; -40,90; -46,106], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,-152; 86,-152; 80,-168; 74,-152], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-106,152; -94,152; -100,168; -106,152], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-160,30; -160,-30; -100,-90; -100,90; -160,30],
+                style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
-                rgbfillColor={0,0,255}))),
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-40,30; -40,-30; 80,-90; 80,90; -40,30], style(
+                color=0,
+                rgbcolor={0,0,0},
+                thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1))),
                                 Diagram,
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         
@@ -18602,31 +14529,25 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         annotation (Diagram, Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Line(points=[-160,198; -160,30],
-                                          style(
+            Line(points=[-160,198; -160,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
+            Line(points=[-100,200; -100,86], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-40,200; -40,30],
-                                        style(
+            Line(points=[-40,200; -40,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
@@ -18638,7 +14559,29 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
+            Line(points=[20,52; 20,140; 80,140; 80,198], style(color=3,
+                  rgbcolor={0,0,255})),
+            Line(points=[80,-76; 80,-198], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[-130,-50; -130,-200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Line(points=[-40,-200; -40,-100; -10,-100; -10,-40], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Line(points=[0,-200; 0,-130; 50,-130; 50,-66], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Polygon(points=[-40,30; -40,-30; 80,-90; 80,92; -40,30],   style(
+                color=0,
+                rgbcolor={0,0,0},
+                thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-160,30; -160,-30; -100,-90; -100,90; -160,30],
                                                                        style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -18646,26 +14589,26 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 80,-100; 80,100; -40,30], style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
+            Polygon(points=[-166,148; -154,148; -160,132; -166,148], style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillPattern=1)),
-            Line(points=[20,64; 20,140; 80,140; 80,198], style(
+            Polygon(points=[-106,134; -94,134; -100,150; -106,134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[80,-100; 80,-198], style(
+                fillPattern=1)),
+            Polygon(points=[-46,148; -34,148; -40,132; -46,148], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-130,-66; -130,-200], style(color=3, rgbcolor={0,0,255})),
-            Line(points=[-40,-200; -40,-100; -10,-100; -10,-46], style(color=3,
-                  rgbcolor={0,0,255})),
-            Line(points=[0,-200; 0,-130; 50,-130; 50,-82], style(color=3,
-                  rgbcolor={0,0,255}))),
+                fillPattern=1)),
+            Polygon(points=[14,108; 26,108; 20,92; 14,108], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,-134; 86,-134; 80,-150; 74,-134], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         
         ThermoPower.Water.FlangeB Tap1(redeclare package Medium = FluidMedium) 
@@ -18794,8 +14737,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         annotation (Diagram, Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Rectangle(extent=[-202,14; 200,-14],
@@ -18806,7 +14749,77 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
+            Line(points=[-100,200; -100,88], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-40,30; -40,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Line(points=[80,30; 80,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Line(points=[20,84; 20,130; 80,130], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[76,134; 84,126], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Line(points=[140,-84; 140,-200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Line(points=[-160,30; -160,120; -160,146; -160,204], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255},
+                fillPattern=1)),
+            Line(points=[-170,-200; -170,-108; -140,-108; -140,-44], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Line(points=[-130,-200; -130,-120; -120,-120; -120,-58], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Line(points=[-50,-196; -50,-120; 0,-120; 0,-60], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Line(points=[-90,-198; -90,-108; -20,-108; -20,-40], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Line(points=[70,-198; 70,-150; 124,-150; 124,-64], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Line(points=[30,-194; 30,-140; 110,-140; 110,-52], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Line(points=[-10,-198; -10,-130; 92,-130; 92,-36], style(
+                color=3,
+                rgbcolor={0,0,255},
+                pattern=2)),
+            Polygon(points=[-160,30; -160,-30; -100,-90; -100,90; -160,30],
                                                                        style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -18814,102 +14827,48 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 20,-100; 20,100; -40,30], style(
+            Polygon(points=[-40,30; -40,-30; 20,-90; 20,90; -40,30],   style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[80,30; 80,-30; 140,-100; 140,100; 80,30],  style(
+            Polygon(points=[80,30; 80,-30; 140,-90; 140,90; 80,30],    style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
+            Polygon(points=[-166,148; -154,148; -160,132; -166,148], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-40,30; -40,200],style(
+            Polygon(points=[-106,134; -94,134; -100,150; -106,134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[80,30; 80,200],style(
+            Polygon(points=[-46,148; -34,148; -40,132; -46,148], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[20,200; 20,150; -100,150],
-                                                style(
+            Polygon(points=[134,-134; 146,-134; 140,-150; 134,-134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[20,100; 20,130; 80,130],
-                                               style(
+            Polygon(points=[40,136; 40,124; 56,130; 40,136], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Ellipse(extent=[76,134; 84,126],
-                                           style(
+            Polygon(points=[74,166; 86,166; 80,150; 74,166], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Ellipse(extent=[-96,154; -104,146],
-                                             style(
+            Polygon(points=[74,106; 86,106; 80,90; 74,106], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[140,-100; 140,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-160,30; -160,120; -160,146; -160,204], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-170,-200; -170,-108; -140,-108; -140,-52], style(
-                  color=3, rgbcolor={0,0,255})),
-            Line(points=[-130,-200; -130,-120; -120,-120; -120,-76], style(
-                  color=3, rgbcolor={0,0,255})),
-            Line(points=[-50,-196; -50,-120; 0,-120; 0,-76], style(color=3,
-                  rgbcolor={0,0,255})),
-            Line(points=[-90,-198; -90,-108; -20,-108; -20,-54], style(color=3,
-                  rgbcolor={0,0,255})),
-            Line(points=[70,-198; 70,-150; 124,-150; 124,-78], style(color=3,
-                  rgbcolor={0,0,255})),
-            Line(points=[30,-194; 30,-140; 110,-140; 110,-64], style(color=3,
-                  rgbcolor={0,0,255})),
-            Line(points=[-10,-198; -10,-130; 92,-130; 92,-44], style(color=3,
-                  rgbcolor={0,0,255}))),
+                fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         ThermoPower.Water.FlangeB Tap1(redeclare package Medium = FluidMedium) 
                                           annotation (extent=[-180,-210; -160,
@@ -18936,8 +14895,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
               FluidMedium)                annotation (extent=[-120,180; -80,220]);
         Water.FlangeA IPT_In(            redeclare package Medium = FluidMedium)
                                          annotation (extent=[-60,180; -20,220]);
-        Water.FlangeA SteamToMix(            redeclare package Medium = 
-              FluidMedium)                   annotation (extent=[0,180; 40,220]);
         Water.FlangeA LPT_In(            redeclare package Medium = FluidMedium)
                                          annotation (extent=[60,180; 100,220]);
         Water.FlangeB LPT_Out(            redeclare package Medium = 
@@ -19055,7 +15012,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         parameter SI.Pressure p "Pressure of condesation";
         parameter SI.Volume Vtot "Total volume condensing fluid side";
         parameter SI.Volume Vlstart "Start value of the liquid volume";
-        
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
         ThermoPower.Water.FlangeA SteamIn(redeclare package Medium = 
               FluidMedium)                annotation (extent=[-20,80; 20,120]);
         ThermoPower.Water.FlangeB WaterOut(redeclare package Medium = 
@@ -19063,14 +15020,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         Buses.Sensors SensorsBus annotation (extent=[88,-50; 108,-30]);
         Buses.Actuators ActuatorsBus annotation (extent=[108,-82; 88,-62]);
         annotation (Diagram, Icon(Rectangle(extent=[-100,100; 100,-100], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Ellipse(extent=[-60,60; 60,-60], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
@@ -19084,14 +15040,12 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             Line(points=[0,60; 0,100], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
             Line(points=[0,-60; 0,-100], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1))));
@@ -19107,9 +15061,9 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         parameter SI.Pressure p "Pressure of condesation";
         parameter SI.Volume Vtot "Total volume condensing fluid side";
         parameter SI.Volume Vlstart "Start value of the liquid volume";
-        
-        ThermoPower.Water.FlangeA SteamToHU(redeclare package Medium = 
-              FluidMedium)                  annotation (extent=[-68,80; -28,120]);
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
+        ThermoPower.Water.FlangeA CondensatedFromHU(redeclare package Medium = 
+              FluidMedium)                  annotation (extent=[-70,80; -30,120]);
         ThermoPower.Water.FlangeA SteamIn(redeclare package Medium = 
               FluidMedium)                annotation (extent=[30,80; 70,120]);
         ThermoPower.Water.FlangeB WaterOut(redeclare package Medium = 
@@ -19117,14 +15071,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         Buses.Sensors SensorsBus annotation (extent=[88,-50; 108,-30]);
         Buses.Actuators ActuatorsBus annotation (extent=[108,-82; 88,-62]);
         annotation (Diagram, Icon(Rectangle(extent=[-100,100; 100,-100], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Ellipse(extent=[-60,60; 60,-60], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
@@ -19138,21 +15091,18 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             Line(points=[0,-60; 0,-98], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
             Line(points=[-60,0; -80,0; -80,70; -50,70; -50,102], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
             Line(points=[0,60; 0,70; 50,70; 50,88], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1))));
@@ -19214,20 +15164,19 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                                                                                           tab = "Initialization"));
         
         ThermoPower.Water.FlangeA SteamIn(redeclare package Medium = 
-              FluidMedium)                annotation (extent=[-10,90; 10,110]);
+              FluidMedium)                annotation (extent=[-20,80; 20,120]);
         ThermoPower.Water.FlangeB WaterOut(redeclare package Medium = 
-              FluidMedium)                 annotation (extent=[-10,-110; 10,-90]);
+              FluidMedium)                 annotation (extent=[-20,-120; 20,-80]);
         Buses.Sensors SensorsBus annotation (extent=[88,-50; 108,-30]);
         Buses.Actuators ActuatorsBus annotation (extent=[108,-82; 88,-62]);
         annotation (Diagram, Icon(Rectangle(extent=[-100,100; 100,-100], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Ellipse(extent=[-60,60; 60,-60], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
@@ -19241,14 +15190,12 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             Line(points=[0,60; 0,100], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
             Line(points=[0,-60; 0,-100], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1))));
@@ -19310,23 +15257,22 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Outlet cooling fluid specific enthalpy start value"          annotation(Dialog(enable = not use_T,
                                                                                           tab = "Initialization"));
         
-        ThermoPower.Water.FlangeA SteamToHU(redeclare package Medium = 
-              FluidMedium)                  annotation (extent=[-60,90; -40,110]);
+        ThermoPower.Water.FlangeA CondensatedFromHU(redeclare package Medium = 
+              FluidMedium)                  annotation (extent=[-70,80; -30,120]);
         ThermoPower.Water.FlangeA SteamIn(redeclare package Medium = 
-              FluidMedium)                annotation (extent=[40,90; 60,110]);
+              FluidMedium)                annotation (extent=[30,80; 70,120]);
         ThermoPower.Water.FlangeB WaterOut(redeclare package Medium = 
-              FluidMedium)                 annotation (extent=[-10,-110; 10,-90]);
+              FluidMedium)                 annotation (extent=[-20,-120; 20,-80]);
         Buses.Sensors SensorsBus annotation (extent=[88,-50; 108,-30]);
         Buses.Actuators ActuatorsBus annotation (extent=[108,-82; 88,-62]);
         annotation (Diagram, Icon(Rectangle(extent=[-100,100; 100,-100], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Ellipse(extent=[-60,60; 60,-60], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
@@ -19340,21 +15286,18 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             Line(points=[0,-60; 0,-98], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
             Line(points=[-60,0; -80,0; -80,80; -50,80; -50,102], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
             Line(points=[0,60; 0,80; 50,80; 50,98], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1))));
@@ -19369,11 +15312,41 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         annotation (Diagram, Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Rectangle(extent=[-200,14; 202,-14],
+            Rectangle(extent=[46,-162; 74,-170], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Line(points=[60,-126; 60,-78], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[40,-126; 80,-166], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[70,-136; 50,-136; 70,-146; 50,-156; 70,-156; 70,-156], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[60,-170; 60,-180; 140,-180; 140,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[126,-132; 154,-160], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[140,-160; 140,-132; 152,-154; 140,-132; 128,-154],
+                style(color=3, rgbcolor={0,0,255})),
+            Rectangle(extent=[-200,14; 200,-14],
                                                style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -19381,63 +15354,37 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-120,30; -120,-30; -60,-100; -60,100; -120,30],
-                                                                       style(
+            Line(points=[-120,30; -120,200], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[0,30; 0,200], style(color=3, rgbcolor={0,0,255})),
+            Polygon(points=[-126,148; -114,148; -120,132; -126,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-6,148; 6,148; 0,132; -6,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-120,30; -120,-30; -60,-90; -60,90; -120,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[0,30; 0,-30; 60,-100; 60,100; 0,30],       style(
+            Polygon(points=[0,30; 0,-30; 60,-90; 60,90; 0,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[0,30; 0,200], style(
+            Polygon(points=[134,134; 146,134; 140,150; 134,134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-120,30; -120,200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Rectangle(extent=[46,-162; 74,-170],
-                                               style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[60,-126; 60,-98], style(
+            Polygon(points=[94,-174; 94,-186; 110,-180; 94,-174], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[40,-126; 80,-166],   style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255})),
-            Line(points=[70,-136; 50,-136; 70,-146; 50,-156; 70,-156; 70,-156],
-                         style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[60,-170; 60,-180; 140,-180; 140,-14], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[140,14; 140,196], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         ThermoPower.Water.FlangeA From_SH_HP(redeclare package Medium = 
@@ -19463,35 +15410,59 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Modelica.Media.Interfaces.PartialPureSubstance;
         
         annotation (Diagram, Icon(Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Line(points=[-160,198; -160,30],
-                                          style(
+            Rectangle(extent=[66,-162; 94,-170], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
+            Line(points=[80,-128; 80,-80], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillPattern=1)),
+            Ellipse(extent=[60,-126; 100,-166], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[90,-136; 70,-136; 90,-146; 70,-156; 90,-156; 90,-156], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[80,-170; 80,-180; 160,-180; 160,196], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[146,-132; 174,-160], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[160,-160; 160,-132; 172,-154; 160,-132; 148,-154],
+                style(color=3, rgbcolor={0,0,255})),
+            Line(points=[-160,198; -160,30], style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-40,200; -40,30],
-                                        style(
+            Line(points=[-100,200; -100,88], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Rectangle(extent=[-200,14; 202,-14],
+            Line(points=[-40,200; -40,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Rectangle(extent=[-200,14; 200,-14],
                                                style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -19499,59 +15470,46 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
-                                                                       style(
+            Line(points=[20,58; 20,140; 80,140; 80,198], style(color=3,
+                  rgbcolor={0,0,255})),
+            Polygon(points=[-166,148; -154,148; -160,132; -166,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-106,134; -94,134; -100,150; -106,134], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,148; -34,148; -40,132; -46,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[14,116; 26,116; 20,100; 14,116], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-160,30; -160,-30; -100,-90; -100,90; -160,30],
+                style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 80,-100; 80,100; -40,30], style(
+            Polygon(points=[-40,30; -40,-30; 80,-90; 80,90; -40,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[20,64; 20,140; 80,140; 80,198], style(
+            Polygon(points=[154,134; 166,134; 160,150; 154,134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Rectangle(extent=[66,-162; 94,-170],
-                                               style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[80,-128; 80,-100], style(
+            Polygon(points=[114,-174; 114,-186; 130,-180; 114,-174], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[60,-126; 100,-166],  style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255})),
-            Line(points=[90,-136; 70,-136; 90,-146; 70,-156; 90,-156; 90,-156],
-                         style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[80,-170; 80,-180; 160,-180; 160,-14], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[160,14; 160,196], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         ThermoPower.Water.FlangeA From_SH_HP(redeclare package Medium = 
@@ -19583,75 +15541,69 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Modelica.Media.Interfaces.PartialPureSubstance;
         
         annotation (Diagram, Icon(Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Rectangle(extent=[-202,14; 200,-14],
-                                               style(
+            Rectangle(extent=[86,-162; 114,-170], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[80,-126; 120,-166], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[110,-136; 90,-136; 110,-146; 90,-156; 110,-156; 110,
+                  -156], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[100,-168; 100,-186; 160,-186; 160,202], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Line(points=[140,-88; 140,-110; 100,-110; 100,-126], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[146,-132; 174,-160], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[160,-160; 160,-132; 172,-154; 160,-132; 148,-154],
+                style(color=3, rgbcolor={0,0,255})),
+            Rectangle(extent=[-200,14; 200,-14], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
-                                                                       style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 20,-100; 20,100; -40,30], style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Polygon(points=[80,30; 80,-30; 140,-100; 140,100; 80,30],  style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
+            Line(points=[-100,200; -100,90], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-40,30; -40,200],style(
+            Line(points=[-40,30; -40,200], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[80,30; 80,200],style(
+            Line(points=[80,30; 80,200], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[20,200; 20,150; -100,150],
-                                                style(
+            Line(points=[20,90; 20,130; 80,130], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[20,100; 20,130; 80,130],
-                                               style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
@@ -19663,59 +15615,67 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Ellipse(extent=[-96,154; -104,146],
-                                             style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
             Line(points=[-160,30; -160,120; -160,146; -160,204], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=7,
                 rgbfillColor={255,255,255},
                 fillPattern=1)),
-            Rectangle(extent=[106,-162; 134,-170],
-                                               style(
+            Polygon(points=[-166,148; -154,148; -160,132; -166,148], style(
                 color=3,
                 rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,148; -34,148; -40,132; -46,148], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-106,134; -94,134; -100,150; -106,134], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[40,136; 40,124; 56,130; 40,136], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,166; 86,166; 80,150; 74,166], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,106; 86,106; 80,90; 74,106], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-160,30; -160,-30; -100,-90; -100,90; -160,30],
+                style(
+                color=0,
+                rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Ellipse(extent=[100,-126; 140,-166], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Polygon(points=[-40,30; -40,-30; 20,-90; 20,90; -40,30], style(
+                color=0,
+                rgbcolor={0,0,0},
                 thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255})),
-            Line(points=[130,-136; 110,-136; 130,-146; 110,-156; 130,-156; 130,
-                  -156], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[120,-168; 120,-180; 160,-180; 160,-14], style(
-                color=3,
-                rgbcolor={0,0,255},
+            Polygon(points=[80,30; 80,-30; 140,-90; 140,90; 80,30], style(
+                color=0,
+                rgbcolor={0,0,0},
                 thickness=2,
+                fillColor=3,
+                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[140,-100; 140,-110; 120,-110; 120,-126], style(
+            Polygon(points=[154,134; 166,134; 160,150; 154,134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillPattern=1)),
-            Line(points=[160,14; 160,196], style(
+            Polygon(points=[126,-180; 126,-192; 142,-186; 126,-180], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
-        ThermoPower.Water.FlangeA From_SH_IP(redeclare package Medium = 
-              FluidMedium)                   annotation (extent=[0,180; 40,220]);
         Water.FlangeA From_SH_HP(            redeclare package Medium = 
               FluidMedium)                   annotation (extent=[-180,180; -140,
               220]);
@@ -19738,161 +15698,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         Buses.Actuators ActuatorsBus annotation (extent=[220,-160; 180,-120]);
       end STGroup3LRh;
       
-      partial model STGroup3LRh_is 
-        "Base class for Steam Turbine Group with three pressure levels and reheat, ideal sink of steam included" 
-        
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater extends 
-          Modelica.Media.Interfaces.PartialPureSubstance;
-        
-        annotation (Diagram, Icon(Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                fillColor=30,
-                rgbfillColor={230,230,230})),
-            Rectangle(extent=[-202,14; 200,-14],
-                                               style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                gradient=2,
-                fillColor=10,
-                rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
-                                                                       style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 20,-100; 20,100; -40,30], style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Polygon(points=[80,30; 80,-30; 140,-100; 140,100; 80,30],  style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[-40,30; -40,200],style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[80,30; 80,200],style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[20,200; 20,150; -100,150],
-                                                style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[20,100; 20,130; 80,130],
-                                               style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Ellipse(extent=[76,134; 84,126],
-                                           style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Ellipse(extent=[-96,154; -104,146],
-                                             style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Rectangle(extent=[126,-172; 154,-180],
-                                               style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Ellipse(extent=[120,-136; 160,-176], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255})),
-            Line(points=[150,-146; 130,-146; 150,-156; 130,-166; 150,-166; 150,
-                  -166], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Line(points=[140,-100; 140,-136], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1)),
-            Line(points=[-160,30; -160,120; -160,146; -160,204], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255},
-                fillPattern=1))),
-          Coordsys(extent=[-200,-200; 200,200], scale=0.1));
-        ThermoPower.Water.FlangeA From_SH_HP(redeclare package Medium = 
-              FluidMedium)                   annotation (extent=[-180,180; -140,
-              220]);
-        ThermoPower.Water.FlangeB To_RH_IP(redeclare package Medium = 
-              FluidMedium)                 annotation (extent=[-120,180; -80,
-              220]);
-        ThermoPower.Water.FlangeA From_RH_IP(redeclare package Medium = 
-              FluidMedium)                   annotation (extent=[-60,180; -20,
-              220]);
-        ThermoPower.Water.FlangeA From_SH_IP(redeclare package Medium = 
-              FluidMedium)                   annotation (extent=[0,180; 40,220]);
-        ThermoPower.Water.FlangeA From_SH_LP(redeclare package Medium = 
-              FluidMedium)                   annotation (extent=[60,180; 100,
-              220]);
-        Modelica.Mechanics.Rotational.Interfaces.Flange_b Shaft_b 
-          annotation (extent=[180,-20; 220,20]);
-        Modelica.Mechanics.Rotational.Interfaces.Flange_a Shaft_a 
-          annotation (extent=[-220,-20; -180,20]);
-        ThermoPower.PowerPlants.Buses.Sensors SensorsBus 
-                                 annotation (extent=[180,-100; 220,-60]);
-        ThermoPower.PowerPlants.Buses.Actuators ActuatorsBus 
-                                     annotation (extent=[220,-160; 180,-120]);
-        
-      end STGroup3LRh_is;
-      
       partial model STGroup2LHU 
         "Base class for Steam Turbine Group with two pressure levels and coupling Heat Usage" 
         
@@ -19901,41 +15706,71 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         annotation (Diagram, Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Ellipse(extent=[-4,144; 4,136],style(
+            Rectangle(extent=[34,-168; 62,-176], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-60,-198; -60,-120; 100,-120; 100,140; 0,140],
-                                                                  style(
+            Line(points=[48,-134; 48,-70], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillPattern=1)),
+            Ellipse(extent=[28,-132; 68,-172], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[58,-142; 38,-142; 58,-152; 38,-162; 58,-162; 58,-162], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[136,-136; 144,-144], style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-60,100; -60,140; 0,140],
-                                                 style(
+            Line(points=[140,-140; 140,-198], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[140,-140; 140,190], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[48,-174; 48,-186; 110,-186; 110,-140; 140,-140], style(
+                  color=3, rgbcolor={0,0,255})),
+            Ellipse(extent=[126,-92; 154,-120],  style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[140,-120; 140,-92; 152,-114; 140,-92; 128,-114],
+                style(color=3, rgbcolor={0,0,255})),
+            Ellipse(extent=[-20,136; -12,128], style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[0,140; 0,198], style(
+            Line(points=[-60,-196; -60,-110; 100,-110; 100,132; 0,132], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Rectangle(extent=[-200,14; 202,-14],
+            Line(points=[-60,92; -60,132; 0,132], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Line(points=[0,132; 0,200], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Rectangle(extent=[-200,16; 200,-12],
                                                style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -19943,93 +15778,71 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-120,30; -120,-30; -60,-100; -60,100; -120,30],
-                                                                       style(
+            Line(points=[-120,30; -120,202], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[-12,132; -12,122; -12,32], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-50,138; -50,126; -34,132; -50,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-126,150; -114,150; -120,134; -126,150], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-6,170; 6,170; 0,154; -6,170], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-18,104; -6,104; -12,88; -18,104], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[26,138; 26,126; 42,132; 26,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Ellipse(extent=[0,136; 8,128], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Rectangle(extent=[-16,136; 4,128], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-120,32; -120,-28; -60,-88; -60,92; -120,32], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[0,30; 0,-30; 60,-100; 60,100; 0,30],       style(
+            Polygon(points=[-12,32; -12,-28; 48,-88; 48,92; -12,32], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-120,32; -120,200], style(
+            Polygon(points=[-66,-134; -54,-134; -60,-150; -66,-134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-60,120; 0,120; 0,30], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
                 fillPattern=1)),
-            Ellipse(extent=[-64,124; -56,116],
-                                           style(
+            Polygon(points=[134,134; 146,134; 140,150; 134,134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Rectangle(extent=[46,-168; 74,-176],
-                                               style(
+            Polygon(points=[134,-170; 146,-170; 140,-154; 134,-170], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[60,-134; 60,-100],style(
+            Polygon(points=[80,-180; 80,-192; 96,-186; 80,-180], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[40,-132; 80,-172],   style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255})),
-            Line(points=[70,-142; 50,-142; 70,-152; 50,-162; 70,-162; 70,-162],
-                         style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[136,-136; 144,-144],
-                                           style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[140,-140; 140,-198], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[140,-140; 140,-14], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[140,14; 140,200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[60,-176; 60,-186; 110,-186; 110,-140; 140,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Polygon(points=[-6,80; 6,80; -6,60; 6,60; -6,80],      style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255}))),
+                fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         ThermoPower.Water.FlangeB WaterOut(redeclare package Medium = 
               FluidMedium)                 annotation (extent=[120,180; 160,220]);
@@ -20059,52 +15872,74 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         
         annotation (Diagram, Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=3,
-                rgbcolor={0,0,255},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
-            Ellipse(extent=[76,144; 84,136],
-                                           style(
+            Rectangle(extent=[66,-168; 94,-176], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-100,140; 120,140; 120,-120; -40,-120; -40,-200],
-                                                                   style(
+            Line(points=[80,-134; 80,-74], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[80,140; 80,200], style(
+                fillPattern=1)),
+            Ellipse(extent=[60,-132; 100,-172], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-160,198; -160,30],
-                                          style(
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[90,-142; 70,-142; 90,-152; 70,-162; 90,-162; 90,-162], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillPattern=1)),
+            Ellipse(extent=[156,-136; 164,-144], style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-100,200; -100,100],
-                                          style(
+            Line(points=[160,-140; 160,-198], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[160,-140; 160,194], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[80,-176; 80,-186; 130,-186; 130,-140; 160,-140], style(
+                  color=3, rgbcolor={0,0,255})),
+            Ellipse(extent=[146,-92; 174,-120],  style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
+                fillColor=7,
+                rgbfillColor={255,255,255})),
+            Line(points=[160,-120; 160,-92; 172,-114; 160,-92; 148,-114],
+                style(color=3, rgbcolor={0,0,255})),
+            Ellipse(extent=[76,136; 84,128], style(
+                color=3,
+                rgbcolor={0,0,255},
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[-40,200; -40,30],
-                                        style(
+            Line(points=[-98,132; 134,132; 134,-110; -40,-110; -40,-198], style(
+                  color=3, rgbcolor={0,0,255})),
+            Line(points=[80,132; 80,192], style(color=3, rgbcolor={0,0,255})),
+            Line(points=[-160,198; -160,30], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Rectangle(extent=[-200,14; 202,-14],
+            Line(points=[-100,200; -100,88], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Line(points=[-40,200; -40,30], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Rectangle(extent=[-200,14; 200,-14],
                                                style(
                 color=0,
                 rgbcolor={0,0,0},
@@ -20112,85 +15947,67 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
                 gradient=2,
                 fillColor=10,
                 rgbfillColor={135,135,135})),
-            Polygon(points=[-160,30; -160,-30; -100,-100; -100,100; -160,30],
-                                                                       style(
+            Ellipse(extent=[-104,136; -96,128], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillColor=3,
+                rgbfillColor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-74,138; -74,126; -58,132; -74,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-166,128; -154,128; -160,112; -166,128], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[104,138; 104,126; 120,132; 104,138], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[74,170; 86,170; 80,154; 74,170], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-46,106; -34,106; -40,90; -46,106], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-106,152; -94,152; -100,168; -106,152], style(
+                color=3,
+                rgbcolor={0,0,255},
+                fillPattern=1)),
+            Polygon(points=[-160,30; -160,-30; -100,-90; -100,90; -160,30],
+                style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Polygon(points=[-40,30; -40,-30; 80,-100; 80,100; -40,30], style(
+            Polygon(points=[-40,30; -40,-30; 80,-90; 80,90; -40,30], style(
                 color=0,
                 rgbcolor={0,0,0},
                 thickness=2,
                 fillColor=3,
                 rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Ellipse(extent=[-104,144; -96,136],
-                                           style(
+            Polygon(points=[154,-170; 166,-170; 160,-154; 154,-170], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Rectangle(extent=[66,-168; 94,-176],
-                                               style(
+            Polygon(points=[100,-180; 100,-192; 116,-186; 100,-180], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
                 fillPattern=1)),
-            Line(points=[80,-134; 80,-100],style(
+            Polygon(points=[-46,-134; -34,-134; -40,-150; -46,-134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
                 fillPattern=1)),
-            Ellipse(extent=[60,-132; 100,-172],  style(
+            Polygon(points=[154,134; 166,134; 160,150; 154,134], style(
                 color=3,
                 rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=7,
-                rgbfillColor={255,255,255})),
-            Line(points=[90,-142; 70,-142; 90,-152; 70,-162; 90,-162; 90,-162],
-                         style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillPattern=1)),
-            Ellipse(extent=[156,-136; 164,-144],
-                                           style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255},
-                fillPattern=1)),
-            Line(points=[160,-140; 160,-198], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[160,-140; 160,-14], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[80,-176; 80,-186; 130,-186; 130,-140; 160,-140], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[160,14; 160,200], style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Polygon(points=[-46,80; -34,80; -46,60; -34,60; -46,80],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255}))),
+                fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         ThermoPower.Water.FlangeB SteamForHU(redeclare package Medium = 
               FluidMedium)                   annotation (extent=[-58,-220; -18,
@@ -20671,7 +16488,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         Modelica.Blocks.Interfaces.RealInput partialArc 
           annotation (extent=[-68,-48; -48,-28]);
         Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
-          annotation (extent=[-74,-10; -54,10]);
+          annotation (extent=[-76,-10; -56,10]);
         Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
           annotation (extent=[56,-10; 76,10]);
         Water.FlangeB tap1(redeclare package Medium = FluidMedium) 
@@ -20701,17 +16518,6 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           annotation (extent=[62,62; 96,96]);
         
       equation 
-        connect(Shaft_a, Shaft_a) annotation (points=[-50,0; -50,0; -50,0],
-            style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2,
-            fillPattern=1));
-        connect(Shaft_b, Shaft_b) annotation (points=[48,0; 48,0], style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2,
-            fillPattern=1));
         connect(shaft_b, ST_secondStages.shaft_b) annotation (points=[66,0;
               49.16,0], style(
             color=0,
@@ -20722,27 +16528,27 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_firstStages.shaft_a, shaft_a) annotation (points=[-37.88,0;
-              -64,0],  style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
         connect(flowSplit.out1, ST_secondStages.inlet) annotation (points=[3.2,
-              45.94; 12,45.94; 12,46; 22.75,46; 22.75,14.22],
+              45.94; 12,45.94; 12,46; 21.8,46; 21.8,14.4],
                                                        style(thickness=2));
         connect(flowSplit.out2, tap1) 
           annotation (points=[3.2,40.2; 3.2,-79; 3,-79], style(thickness=2));
         connect(flangeA, ST_firstStages.inlet) 
-          annotation (points=[-73,79; -39.5,79; -39.5,14.22],
+          annotation (points=[-73,79; -40.4,79; -40.4,14.4],
                                                          style(thickness=2));
         connect(flangeB, ST_secondStages.outlet) 
-          annotation (points=[79,79; 51.63,79; 51.63,14.4],
+          annotation (points=[79,79; 52.2,79; 52.2,14.4],
                                                         style(thickness=2));
         connect(flowSplit.in1, ST_firstStages.outlet) annotation (points=[-5.2,43;
-              -12.14,43; -12.14,14.4], style(thickness=2));
+              -11.6,43; -11.6,14.4],   style(thickness=2));
         connect(partialArc, ST_firstStages.partialArc) annotation (points=[-58,-38;
               -36,-38; -36,-26; -52,-26; -52,-7.2; -35,-7.2],      style(color=
                 74, rgbcolor={0,0,127}));
+        connect(ST_firstStages.shaft_a, shaft_a) annotation (points=[-37.88,0;
+              -66,0], style(
+            color=0,
+            rgbcolor={0,0,0},
+            thickness=2));
       end SteamTurbine_1tapping;
       
       model EffectHE "Effect of ideal HE" 
@@ -20984,28 +16790,28 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=2));
         connect(mixLP.in1, LPT_In) 
           annotation (points=[80,98; 80,200; 80,200], style(thickness=2));
-        connect(ST_HP.inlet, stateHPT_in.outlet) annotation (points=[-145,15.8;
-              -160,15.8; -160,64], style(thickness=2));
+        connect(ST_HP.inlet, stateHPT_in.outlet) annotation (points=[-146,16;
+              -160,16; -160,64],   style(thickness=2));
         connect(stateHPT_in.inlet, HPT_In) 
           annotation (points=[-160,76; -160,200], style(thickness=2));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (points=[-114.6,16;
+        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (points=[-114,16;
               -100,16; -100,64], style(thickness=2));
         connect(stateHPT_out.outlet, HPT_Out) 
           annotation (points=[-100,76; -100,200], style(thickness=2));
         connect(ST_IP.inlet, stateIPT_in.outlet) 
-          annotation (points=[-15,15.8; -40,15.8; -40,64], style(thickness=2));
+          annotation (points=[-16,16; -40,16; -40,64],     style(thickness=2));
         connect(stateIPT_in.inlet, IPT_In) 
           annotation (points=[-40,76; -40,200; -40,200], style(thickness=2));
         connect(ST_IP.outlet, stateIPT_out.inlet) 
-          annotation (points=[15.4,16; 40,16; 40,64], style(thickness=2));
+          annotation (points=[16,16; 40,16; 40,64],   style(thickness=2));
         connect(stateIPT_out.outlet, mixLP.in2) annotation (points=[40,76; 40,
               120; 68,120; 68,97.9], style(thickness=2));
         connect(stateLPT_in.inlet, mixLP.out) 
           annotation (points=[74,56; 74,80; 74,80], style(thickness=2));
         connect(stateLPT_in.outlet, ST_LP.inlet) 
-          annotation (points=[74,44; 74,15.8; 105,15.8], style(thickness=2));
+          annotation (points=[74,44; 74,16; 104,16],     style(thickness=2));
         connect(ST_LP.outlet, stateLPT_out.inlet) 
-          annotation (points=[135.4,16; 160,16; 160,-24], style(thickness=2));
+          annotation (points=[136,16; 160,16; 160,-24],   style(thickness=2));
         connect(LPT_Out, stateLPT_out.outlet) annotation (points=[80,-200; 80,
               -50; 160,-50; 160,-36], style(thickness=2));
       end ST2LRh_base;
@@ -21022,14 +16828,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           "Pressure start value of the LP mixer" 
               annotation (Dialog(tab = "Initialization",
                                  group = "LP mixer"));
-        parameter SI.Volume mixIP_V "Internal volume of the IP mixer";
-        parameter SI.Enthalpy mixIP_hstart = HPT_hstart_out 
-          "Enthalpy start value of the IP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "IP mixer"));
-        parameter SI.Pressure mixIP_pstart = steamIPNomPressure 
-          "Pressure start value of the IP mixer" 
-              annotation (Dialog(tab = "Initialization",
-                                 group = "IP mixer"));
         
         annotation (Diagram);
         Water.SteamTurbineStodola ST_HP(
@@ -21067,15 +16865,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           wstart=LPT_wstart,
           wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
                                         annotation (extent=[100,-20; 140,20]);
-        Water.Mixer mixIP(
-          redeclare package Medium = FluidMedium,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          V=mixIP_V,
-          pstart=mixIP_pstart,
-          hstart=mixIP_hstart) 
-                          annotation (extent=[-110,120; -90,140],
-                                                             rotation=90);
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
@@ -21092,7 +16881,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         replaceable Components.BaseReader_water stateHPT_out(redeclare package 
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-116,80; -96,60],  rotation=270);
+                           annotation (extent=[-110,80; -90,60],  rotation=270);
         replaceable Components.BaseReader_water stateIPT_in(redeclare package 
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
@@ -21109,10 +16898,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
                            annotation (extent=[150,-20; 170,-40], rotation=90);
-        replaceable Components.BaseReader_water stateForRh(redeclare package 
-            Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-110,170; -90,150],rotation=270);
       equation 
         connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-147.2,0; -200,0],
             style(
@@ -21137,36 +16922,30 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=2));
         connect(mixLP.in1, LPT_In) 
           annotation (points=[80,98; 80,200], style(thickness=2));
-        connect(SteamToMix, mixIP.in2) annotation (points=[20,200; 20,100; -94,
-              100; -94,122.1], style(thickness=2));
-        connect(ST_HP.inlet, stateHPT_in.outlet) annotation (points=[-149,15.8;
-              -160,15.8; -160,64], style(thickness=2));
+        connect(ST_HP.inlet, stateHPT_in.outlet) annotation (points=[-150,16;
+              -160,16; -160,64],   style(thickness=2));
         connect(stateHPT_in.inlet, HPT_In) 
           annotation (points=[-160,76; -160,200], style(thickness=2));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (points=[-118.6,16;
-              -106,16; -106,64], style(thickness=2));
+        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (points=[-118,16;
+              -100,16; -100,64], style(thickness=2));
         connect(ST_IP.inlet, stateIPT_in.outlet) 
-          annotation (points=[-15,15.8; -40,15.8; -40,64], style(thickness=2));
+          annotation (points=[-16,16; -40,16; -40,64],     style(thickness=2));
         connect(stateIPT_in.inlet, IPT_In) 
           annotation (points=[-40,76; -40,200], style(thickness=2));
         connect(ST_IP.outlet, stateIPT_out.inlet) 
-          annotation (points=[15.4,16; 40,16; 40,64], style(thickness=2));
+          annotation (points=[16,16; 40,16; 40,64],   style(thickness=2));
         connect(stateIPT_out.outlet, mixLP.in2) annotation (points=[40,76; 40,
               120; 68,120; 68,97.9], style(thickness=2));
         connect(stateLPT_in.inlet, mixLP.out) 
           annotation (points=[74,56; 74,80], style(thickness=2));
         connect(stateLPT_in.outlet, ST_LP.inlet) 
-          annotation (points=[74,44; 74,15.8; 105,15.8], style(thickness=2));
+          annotation (points=[74,44; 74,16; 104,16],     style(thickness=2));
         connect(ST_LP.outlet, stateLPT_out.inlet) 
-          annotation (points=[135.4,16; 160,16; 160,-24], style(thickness=2));
+          annotation (points=[136,16; 160,16; 160,-24],   style(thickness=2));
         connect(LPT_Out, stateLPT_out.outlet) annotation (points=[140,-200; 140,
               -50; 160,-50; 160,-36], style(thickness=2));
-        connect(stateHPT_out.outlet, mixIP.in1) 
-          annotation (points=[-106,76; -106,122], style(thickness=2));
-        connect(mixIP.out, stateForRh.inlet) 
-          annotation (points=[-100,140; -100,154], style(thickness=2));
-        connect(stateForRh.outlet, HPT_Out) 
-          annotation (points=[-100,166; -100,200], style(thickness=2));
+        connect(stateHPT_out.outlet, HPT_Out) 
+          annotation (points=[-100,76; -100,200], style(thickness=2));
       end ST3LRh_base;
       
       model ST2LRh_valve 
@@ -21194,27 +16973,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         parameter SI.Pressure valveLP_dpnom 
           "Nominal pressure drop of the LP valve"                                   annotation(Dialog(group= "LP valve"));
         
-        annotation (Diagram, Icon(
-            Polygon(points=[-166,100; -154,100; -166,80; -154,80; -166,100],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-46,100; -34,100; -46,80; -34,80; -46,100],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[14,100; 26,100; 14,80; 26,80; 14,100], style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255}))));
+        annotation (Diagram, Icon);
         Water.SteamTurbineStodola ST_HP(
           redeclare package Medium = FluidMedium,
           wnom=steamHPNomFlowRate,
@@ -21316,8 +17075,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(valveIP.outlet,ST_IP. inlet) annotation (points=[-10,16; -10,
-              15.8; 5,15.8],     style(thickness=2));
+        connect(valveIP.outlet,ST_IP. inlet) annotation (points=[-10,16; -10,16;
+              4,16],             style(thickness=2));
         connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (points=[200,-140;
               -180,-140; -180,30; -140,30; -140,24],       style(color=52, rgbcolor={
                 213,255,170}));
@@ -21327,15 +17086,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,24],
                                         style(color=52, rgbcolor={213,255,170}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
-              -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-116,16;
+              -126.5,16; -126.5,16; -130,16],   style(thickness=2));
         connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-113.2,0; -200,0],
             style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
-              118.5,15.8; 118.5,16; 110,16], style(thickness=2));
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[124,16; 118.5,
+              16; 118.5,16; 110,16],         style(thickness=2));
         connect(Shaft_b,ST_LP. shaft_b) annotation (points=[200,0; 152.8,0],
             style(
             color=0,
@@ -21355,20 +17114,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[80,98; 80,200], style(thickness=2));
         connect(stateHPT_in.inlet, HPT_In) 
           annotation (points=[-160,76; -160,200], style(thickness=2));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (points=[-84.6,16;
+        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (points=[-84,16;
               -70,16; -70,40; -100,40; -100,64], style(thickness=2));
         connect(stateHPT_out.outlet, HPT_Out) 
           annotation (points=[-100,76; -100,200], style(thickness=2));
         connect(stateIPT_in.inlet, IPT_In) 
           annotation (points=[-40,76; -40,200], style(thickness=2));
         connect(ST_IP.outlet, stateIPT_out.inlet) 
-          annotation (points=[35.4,16; 40,16; 40,64], style(thickness=2));
+          annotation (points=[36,16; 40,16; 40,64],   style(thickness=2));
         connect(stateIPT_out.outlet, mixLP.in2) annotation (points=[40,76; 40,
               120; 68,120; 68,97.9], style(thickness=2));
         connect(stateLPT_in.inlet, mixLP.out) 
           annotation (points=[74,56; 74,80], style(thickness=2));
         connect(ST_LP.outlet, stateLPT_out.inlet) 
-          annotation (points=[155.4,16; 180,16; 180,-24], style(thickness=2));
+          annotation (points=[156,16; 180,16; 180,-24],   style(thickness=2));
         connect(LPT_Out, stateLPT_out.outlet) annotation (points=[80,-200; 80,
               -50; 180,-50; 180,-36], style(thickness=2));
         connect(valveHP.inlet, stateHPT_in.outlet) 
@@ -21392,14 +17151,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           "Pressure start value of the LP mixer" 
               annotation (Dialog(tab = "Initialization",
                                  group = "LP mixer"));
-        parameter SI.Volume mixIP_V "Internal volume of the IP mixer";
-        parameter SI.Enthalpy mixIP_hstart = HPT_hstart_out 
-          "Enthalpy start value of the IP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "IP mixer"));
-        parameter SI.Pressure mixIP_pstart = steamIPNomPressure 
-          "Pressure start value of the IP mixer" 
-              annotation (Dialog(tab = "Initialization",
-                                 group = "IP mixer"));
         
         //Valves Parameters
         parameter Real valveHP_Cv=0 "Cv (US) flow coefficient of the HP valve" annotation(Dialog(group= "HP valve"));
@@ -21412,27 +17163,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         parameter SI.Pressure valveLP_dpnom 
           "Nominal pressure drop of the LP valve"                                   annotation(Dialog(group= "LP valve"));
         
-        annotation (Diagram, Icon(
-            Polygon(points=[-166,100; -154,100; -166,80; -154,80; -166,100],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-46,100; -34,100; -46,80; -34,80; -46,100],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[74,100; 86,100; 74,80; 86,80; 74,100], style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255}))));
+        annotation (Diagram, Icon);
         Water.SteamTurbineStodola ST_HP(
           redeclare package Medium = FluidMedium,
           wnom=steamHPNomFlowRate,
@@ -21443,7 +17174,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           hstartout=HPT_hstart_out,
           pstart_in=HPT_pstart_in,
           pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (extent=[-120,-20; -80,20]);
+          wstart=HPT_wstart)            annotation (extent=[-122,-20; -82,20]);
         Water.SteamTurbineStodola ST_IP(
           redeclare package Medium = FluidMedium,
           eta_mech=IPT_eta_mech,
@@ -21468,15 +17199,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           wstart=LPT_wstart,
           wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
                                         annotation (extent=[120,-20; 160,20]);
-        Water.Mixer mixIP(
-          redeclare package Medium = FluidMedium,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          V=mixIP_V,
-          pstart=mixIP_pstart,
-          hstart=mixIP_hstart) 
-                          annotation (extent=[-110,120; -90,140],
-                                                             rotation=90);
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
@@ -21521,7 +17243,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         replaceable Components.BaseReader_water stateHPT_out(redeclare package 
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-116,80; -96,60],  rotation=270);
+                           annotation (extent=[-84,80; -64,60],   rotation=270);
         replaceable Components.BaseReader_water stateIPT_in(redeclare package 
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
@@ -21538,13 +17260,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
                            annotation (extent=[160,-20; 180,-40], rotation=90);
-        replaceable Components.BaseReader_water stateForRh(redeclare package 
-            Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-110,170; -90,150],rotation=270);
       equation 
-        connect(valveIP.outlet,ST_IP. inlet) annotation (points=[-10,16; -10,
-              15.8; 5,15.8],     style(thickness=2));
+        connect(valveIP.outlet,ST_IP. inlet) annotation (points=[-10,16; -10,16;
+              4,16],             style(thickness=2));
         connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (points=[200,-140;
               -180,-140; -180,30; -140,30; -140,24],       style(color=52, rgbcolor={
                 213,255,170}));
@@ -21554,15 +17272,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,24],
                                         style(color=52, rgbcolor={213,255,170}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
-              -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
-        connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-113.2,0; -200,0],
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-118,16; -124,
+              16; -124,16; -130,16],            style(thickness=2));
+        connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-115.2,0; -200,0],
             style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
-              118.5,15.8; 118.5,16; 110,16], style(thickness=2));
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[124,16; 118.5,
+              16; 118.5,16; 110,16],         style(thickness=2));
         connect(Shaft_b,ST_LP. shaft_b) annotation (points=[200,0; 152.8,0],
             style(
             color=0,
@@ -21573,43 +17291,37 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[6.8,0; -87.2,
+        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (points=[6.8,0; -89.2,
               0], style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(mixIP.in2, SteamToMix) annotation (points=[-94,122.1; -94,110;
-              20,110; 20,200], style(thickness=2));
         connect(mixLP.in1, LPT_In) 
           annotation (points=[80,98; 80,200; 80,200], style(thickness=2));
         connect(stateHPT_in.inlet, HPT_In) 
           annotation (points=[-160,76; -160,200], style(thickness=2));
-        connect(stateHPT_out.outlet, mixIP.in1) 
-          annotation (points=[-106,76; -106,122], style(thickness=2));
         connect(stateIPT_in.inlet, IPT_In) 
           annotation (points=[-40,76; -40,200], style(thickness=2));
         connect(ST_IP.outlet, stateIPT_out.inlet) 
-          annotation (points=[35.4,16; 46,16; 46,64], style(thickness=2));
+          annotation (points=[36,16; 46,16; 46,64],   style(thickness=2));
         connect(stateIPT_out.outlet, mixLP.in2) annotation (points=[46,76; 46,120;
               68,120; 68,97.9], style(thickness=2));
         connect(stateLPT_in.inlet, mixLP.out) 
           annotation (points=[74,56; 74,80], style(thickness=2));
         connect(ST_LP.outlet, stateLPT_out.inlet) 
-          annotation (points=[155.4,16; 170,16; 170,-24], style(thickness=2));
+          annotation (points=[156,16; 170,16; 170,-24],   style(thickness=2));
         connect(LPT_Out, stateLPT_out.outlet) annotation (points=[140,-200; 140,
               -50; 170,-50; 170,-36], style(thickness=2));
-        connect(mixIP.out, stateForRh.inlet) 
-          annotation (points=[-100,140; -100,154], style(thickness=2));
-        connect(stateForRh.outlet, HPT_Out) 
-          annotation (points=[-100,166; -100,200], style(thickness=2));
         connect(valveIP.inlet, stateIPT_in.outlet) 
           annotation (points=[-30,16; -40,16; -40,64], style(thickness=2));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (points=[-84.6,16;
-              -68,16; -68,48; -106,48; -106,64], style(thickness=2));
+        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (points=[-86,16;
+              -74,16; -74,64],                   style(thickness=2));
         connect(valveHP.inlet, stateHPT_in.outlet) 
           annotation (points=[-150,16; -160,16; -160,64], style(thickness=2));
         connect(valveLP.inlet, stateLPT_in.outlet) 
           annotation (points=[90,16; 74,16; 74,44], style(thickness=2));
+        connect(stateHPT_out.outlet, HPT_Out) annotation (points=[-74,76; -74,
+              120; -100,120; -100,200], style(thickness=2));
       end ST3LRh_valve;
       
       model ST2LRh_bypass 
@@ -21646,77 +17358,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           "Cv (US) flow coefficient of the valve of pressurization LP drum" 
                                                                           annotation(Dialog(group= "LP valves"));
         
-        annotation (Diagram, Icon(
-            Line(points=[-140,120; -160,120],
-                                          style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-120,120; -100,120],
-                                          style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-40,120; -20,120],
-                                        style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[0,120; 20,120],style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[20,120; 40,120],
-                                        style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[80,100; 80,120; 60,120],
-                                               style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Polygon(points=[-166,80; -154,80; -166,60; -154,60; -166,80],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-46,80; -34,80; -46,60; -34,60; -46,80],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[14,100; 26,100; 14,80; 26,80; 14,100], style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-140,114; -140,126; -120,114; -120,126; -140,114],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-20,114; -20,126; 0,114; 0,126; -20,114],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[40,114; 40,126; 60,114; 60,126; 40,114],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255}))));
+        annotation (Diagram, Icon);
         Water.SteamTurbineStodola ST_HP(
           redeclare package Medium = FluidMedium,
           wnom=steamHPNomFlowRate,
@@ -21847,15 +17489,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           rev_in1=false,
           rev_out1=false,
           rev_out2=false)          annotation (extent=[64,36; 84,56], rotation=270);
-        Water.ValveVap valveDrumLP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          redeclare package Medium = FluidMedium,
-          Cv=valveDrumLP_Cv,
-          pnom=steamLPNomPressure,
-          wnom=steamLPNomFlowRate,
-          hstart=LPT_hstart_in,
-          dpnom=valveLP_dpnom,
-          CheckValve=true)     annotation (extent=[70,140; 90,120],rotation=90);
         Water.SensP p_ST_LP(            redeclare package Medium = FluidMedium)
           annotation (extent=[90,74; 110,94]);
       protected 
@@ -21884,8 +17517,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             redeclare package Medium = FluidMedium) 
                            annotation (extent=[166,-10; 186,-30], rotation=90);
       equation 
-        connect(valveIP.outlet,ST_IP. inlet) annotation (points=[-10,16; -10,
-              15.8; 5,15.8],     style(thickness=2));
+        connect(valveIP.outlet,ST_IP. inlet) annotation (points=[-10,16; -10,16;
+              4,16],             style(thickness=2));
         connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (points=[200,-140;
               -180,-140; -180,30; -140,30; -140,24],       style(color=52, rgbcolor={
                 213,255,170}));
@@ -21904,9 +17537,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_byPassLP,byPassLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,60; 120,60; 120,48],
                                              style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.Opening_valveDrumLP,valveDrumLP. theta) annotation (
-            points=[200,-140; 60,-140; 60,130; 72,130],                   style(
-              color=52, rgbcolor={213,255,170}));
         connect(SensorsBus.p_STLP_in,p_ST_LP. p) annotation (points=[200,-80;
               166,-80; 166,90; 108,90],
                                   style(
@@ -21915,14 +17545,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
-              -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-116,16;
+              -126.5,16; -126.5,16; -130,16],   style(thickness=2));
         connect(valveHP.inlet,flowHPSplit. out2) 
           annotation (points=[-150,16; -164,16; -164,40], style(thickness=2));
         connect(byPassHP.inlet,flowHPSplit. out1) 
           annotation (points=[-130,40; -155.8,40], style(thickness=2));
         connect(flowHPJoin.in2,ST_HP. outlet) 
-          annotation (points=[-72,40; -72,16; -84.6,16], style(thickness=2));
+          annotation (points=[-72,40; -72,16; -84,16],   style(thickness=2));
         connect(flowHPJoin.in1,byPassHP. outlet) 
           annotation (points=[-80,40; -110,40], style(thickness=2));
         connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-113.2,0; -200,0],
@@ -21935,17 +17565,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(byPassIP.inlet,flowIPSplit. out1) 
           annotation (points=[-10,40; -35.8,40], style(thickness=2));
         connect(ST_IP.outlet,flowIPJoin. in2) 
-          annotation (points=[35.4,16; 48,16; 48,40], style(thickness=2));
+          annotation (points=[36,16; 48,16; 48,40],   style(thickness=2));
         connect(flowIPJoin.in1,byPassIP. outlet) 
           annotation (points=[40,40; 10,40], style(thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
-              118.5,15.8; 118.5,16; 110,16], style(thickness=2));
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[124,16; 118.5,
+              16; 118.5,16; 110,16],         style(thickness=2));
         connect(valveLP.inlet,flowLPSplit. out2) 
           annotation (points=[90,16; 70,16; 70,40], style(thickness=2));
         connect(byPassLP.inlet,flowLPSplit. out1) 
           annotation (points=[110,40; 78.2,40], style(thickness=2));
         connect(flowLPJoin.in2,ST_LP. outlet) 
-          annotation (points=[172,16; 155.4,16], style(thickness=2));
+          annotation (points=[172,16; 156,16],   style(thickness=2));
         connect(flowLPJoin.in1,byPassLP. outlet) 
           annotation (points=[180,16; 180,40; 130,40], style(thickness=2));
         connect(p_ST_LP.flange,mixLP. out) annotation (points=[100,80; 74,80],
@@ -21968,10 +17598,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(mixLP.in1,valveDrumLP. outlet) 
-          annotation (points=[80,98; 80,120], style(thickness=2));
-        connect(valveDrumLP.inlet, LPT_In) 
-          annotation (points=[80,140; 80,200],         style(thickness=2));
         connect(stateHPT_in.inlet, HPT_In) 
           annotation (points=[-160,96; -160,200], style(thickness=2));
         connect(stateHPT_out.outlet, HPT_Out) 
@@ -21996,6 +17622,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[74,52; 74,60], style(thickness=2));
         connect(stateLPT_out.inlet, flowLPJoin.out) 
           annotation (points=[176,-14; 176,4], style(thickness=2));
+        connect(mixLP.in1, LPT_In) annotation (points=[80,98; 80,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
       end ST2LRh_bypass;
       
       model ST3LRh_bypass 
@@ -22011,14 +17642,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           "Pressure start value of the LP mixer" 
               annotation (Dialog(tab = "Initialization",
                                  group = "LP mixer"));
-        parameter SI.Volume mixIP_V "Internal volume of the IP mixer";
-        parameter SI.Enthalpy mixIP_hstart = HPT_hstart_out 
-          "Enthalpy start value of the IP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "IP mixer"));
-        parameter SI.Pressure mixIP_pstart = steamIPNomPressure 
-          "Pressure start value of the IP mixer" 
-              annotation (Dialog(tab = "Initialization",
-                                 group = "IP mixer"));
         
         //Valves Parameters
         parameter Real valveHP_Cv=0 "Cv (US) flow coefficient of the HP valve" annotation(Dialog(group= "HP valves"));
@@ -22043,77 +17666,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           "Cv (US) flow coefficient of the valve of pressurization LP drum" 
                                                                           annotation(Dialog(group= "LP valves"));
         
-        annotation (Diagram, Icon(
-            Polygon(points=[-166,80; -154,80; -166,60; -154,60; -166,80],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[-140,120; -160,120],
-                                          style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[-120,120; -100,120],
-                                          style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Polygon(points=[-46,80; -34,80; -46,60; -34,60; -46,80],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[-40,120; -20,120],
-                                        style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[0,120; 20,120],style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Polygon(points=[74,80; 86,80; 74,60; 86,60; 74,80],    style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Line(points=[80,120; 100,120],
-                                        style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Line(points=[140,100; 140,120; 120,120],
-                                               style(
-                color=3,
-                rgbcolor={0,0,255},
-                thickness=2)),
-            Polygon(points=[100,114; 100,126; 120,114; 120,126; 100,114],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-20,114; -20,126; 0,114; 0,126; -20,114],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255})),
-            Polygon(points=[-140,114; -140,126; -120,114; -120,126; -140,114],
-                                                                   style(
-                color=0,
-                rgbcolor={0,0,0},
-                thickness=2,
-                fillColor=3,
-                rgbfillColor={0,0,255}))));
+        annotation (Diagram, Icon);
         Water.SteamTurbineStodola ST_HP(
           redeclare package Medium = FluidMedium,
           wnom=steamHPNomFlowRate,
@@ -22149,15 +17702,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           wstart=LPT_wstart,
           wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
                                         annotation (extent=[120,-20; 160,20]);
-        Water.Mixer mixIP(
-          redeclare package Medium = FluidMedium,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          V=mixIP_V,
-          pstart=mixIP_pstart,
-          hstart=mixIP_hstart) 
-                          annotation (extent=[-110,120; -90,140],
-                                                             rotation=90);
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
@@ -22253,28 +17797,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           rev_in1=false,
           rev_out1=false,
           rev_out2=false)          annotation (extent=[64,36; 84,56], rotation=270);
-        Water.ValveVap valveDrumIP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          redeclare package Medium = FluidMedium,
-          Cv=valveDrumIP_Cv,
-          pnom=steamIPNomPressure,
-          wnom=steamIPNomFlowRate,
-          hstart=HPT_hstart_out,
-          dpnom=valveIP_dpnom,
-          CheckValve=true)     annotation (extent=[10,140; 30,120],rotation=90);
-        Water.ValveVap valveDrumLP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          redeclare package Medium = FluidMedium,
-          Cv=valveDrumLP_Cv,
-          pnom=steamLPNomPressure,
-          wnom=steamLPNomFlowRate,
-          hstart=LPT_hstart_in,
-          dpnom=valveLP_dpnom,
-          CheckValve=true)     annotation (extent=[70,140; 90,120],rotation=90);
         Water.SensP p_ST_LP(            redeclare package Medium = FluidMedium)
           annotation (extent=[90,74; 110,94]);
-        Water.SensP p_ST_IP(            redeclare package Medium = FluidMedium)
-          annotation (extent=[-90,134; -70,154]);
       protected 
         replaceable Components.BaseReader_water stateHPT_in(redeclare package 
             Medium = FluidMedium) extends Components.BaseReader_water(
@@ -22283,7 +17807,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         replaceable Components.BaseReader_water stateHPT_out(redeclare package 
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-116,100; -96,80], rotation=270);
+                           annotation (extent=[-110,100; -90,80], rotation=270);
         replaceable Components.BaseReader_water stateIPT_in(redeclare package 
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
@@ -22300,13 +17824,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             Medium = FluidMedium) extends Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
                            annotation (extent=[166,-10; 186,-30], rotation=90);
-        replaceable Components.BaseReader_water stateForRh(redeclare package 
-            Medium = FluidMedium) extends Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (extent=[-110,170; -90,150],rotation=270);
       equation 
-        connect(valveIP.outlet,ST_IP. inlet) annotation (points=[-10,16; -10,
-              15.8; 5,15.8],     style(thickness=2));
+        connect(valveIP.outlet,ST_IP. inlet) annotation (points=[-10,16; -10,16;
+              4,16],             style(thickness=2));
         connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (points=[200,-140;
               -180,-140; -180,30; -140,30; -140,24],       style(color=52, rgbcolor={
                 213,255,170}));
@@ -22325,12 +17845,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_byPassLP,byPassLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,60; 120,60; 120,48],
                                              style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.Opening_valveDrumIP,valveDrumIP. theta) annotation (
-            points=[200,-140; -60,-140; -60,130; 12,130],
-                                   style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.Opening_valveDrumLP,valveDrumLP. theta) annotation (
-            points=[200,-140; 60,-140; 60,130; 72,130],                   style(
-              color=52, rgbcolor={213,255,170}));
         connect(SensorsBus.p_STLP_in,p_ST_LP. p) annotation (points=[200,-80;
               160,-80; 160,90; 108,90],
                                   style(
@@ -22339,27 +17853,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(SensorsBus.p_STIP_in,p_ST_IP. p) annotation (points=[200,-80;
-              160,-80; 160,150; -72,150],
-                                   style(
-            color=84,
-            rgbcolor={255,170,213},
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(p_ST_IP.flange,mixIP. out) annotation (points=[-80,140; -100,
-              140],                    style(
-            color=3,
-            rgbcolor={0,0,255},
-            thickness=2));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-115,15.8;
-              -126.5,15.8; -126.5,16; -130,16], style(thickness=2));
+        connect(ST_HP.inlet,valveHP. outlet) annotation (points=[-116,16;
+              -126.5,16; -126.5,16; -130,16],   style(thickness=2));
         connect(valveHP.inlet,flowHPSplit. out2) 
           annotation (points=[-150,16; -164,16; -164,40], style(thickness=2));
         connect(byPassHP.inlet,flowHPSplit. out1) 
           annotation (points=[-130,40; -155.8,40], style(thickness=2));
         connect(flowHPJoin.in2,ST_HP. outlet) 
-          annotation (points=[-72,40; -72,16; -84.6,16], style(thickness=2));
+          annotation (points=[-72,40; -72,16; -84,16],   style(thickness=2));
         connect(flowHPJoin.in1,byPassHP. outlet) 
           annotation (points=[-80,40; -110,40], style(thickness=2));
         connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-113.2,0; -200,0],
@@ -22367,24 +17868,22 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(valveDrumIP.outlet,mixIP. in2) annotation (points=[20,120; 20,
-              110; -94,110; -94,122.1], style(thickness=2));
         connect(valveIP.inlet,flowIPSplit. out2) 
           annotation (points=[-30,16; -44,16; -44,40], style(thickness=2));
         connect(byPassIP.inlet,flowIPSplit. out1) 
           annotation (points=[-10,40; -35.8,40], style(thickness=2));
         connect(ST_IP.outlet,flowIPJoin. in2) 
-          annotation (points=[35.4,16; 48,16; 48,40], style(thickness=2));
+          annotation (points=[36,16; 48,16; 48,40],   style(thickness=2));
         connect(flowIPJoin.in1,byPassIP. outlet) 
           annotation (points=[40,40; 10,40], style(thickness=2));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[125,15.8;
-              118.5,15.8; 118.5,16; 110,16], style(thickness=2));
+        connect(ST_LP.inlet,valveLP. outlet) annotation (points=[124,16; 118.5,
+              16; 118.5,16; 110,16],         style(thickness=2));
         connect(valveLP.inlet,flowLPSplit. out2) 
           annotation (points=[90,16; 70,16; 70,40], style(thickness=2));
         connect(byPassLP.inlet,flowLPSplit. out1) 
           annotation (points=[110,40; 78.2,40], style(thickness=2));
         connect(flowLPJoin.in2,ST_LP. outlet) 
-          annotation (points=[172,16; 155.4,16], style(thickness=2));
+          annotation (points=[172,16; 156,16],   style(thickness=2));
         connect(flowLPJoin.in1,byPassLP. outlet) 
           annotation (points=[180,16; 180,40; 130,40], style(thickness=2));
         connect(p_ST_LP.flange,mixLP. out) annotation (points=[100,80; 74,80],
@@ -22407,16 +17906,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(valveDrumIP.inlet, SteamToMix) 
-          annotation (points=[20,140; 20,200],         style(thickness=2));
-        connect(mixLP.in1,valveDrumLP. outlet) 
-          annotation (points=[80,98; 80,120], style(thickness=2));
-        connect(valveDrumLP.inlet, LPT_In) 
-          annotation (points=[80,140; 80,200],         style(thickness=2));
         connect(stateHPT_in.inlet, HPT_In) 
           annotation (points=[-160,96; -160,200], style(thickness=2));
-        connect(stateHPT_out.outlet, mixIP.in1) 
-          annotation (points=[-106,96; -106,122], style(thickness=2));
         connect(stateIPT_in.inlet, IPT_In) 
           annotation (points=[-40,96; -40,200], style(thickness=2));
         connect(stateIPT_out.outlet, mixLP.in2) annotation (points=[44,96; 44,140;
@@ -22425,10 +17916,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[74,72; 74,80], style(thickness=2));
         connect(LPT_Out, stateLPT_out.outlet) annotation (points=[140,-200; 140,
               -40; 176,-40; 176,-26], style(thickness=2));
-        connect(stateForRh.outlet, HPT_Out) 
-          annotation (points=[-100,166; -100,200], style(thickness=2));
-        connect(mixIP.out, stateForRh.inlet) 
-          annotation (points=[-100,140; -100,154], style(thickness=2));
         connect(flowLPSplit.in1, stateLPT_in.outlet) 
           annotation (points=[74,52; 74,60], style(thickness=2));
         connect(flowIPJoin.out, stateIPT_out.inlet) 
@@ -22436,11 +17923,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(flowIPSplit.in1, stateIPT_in.outlet) 
           annotation (points=[-40,52; -40,84], style(thickness=2));
         connect(flowHPJoin.out, stateHPT_out.inlet) annotation (points=[-76,52;
-              -76,66; -106,66; -106,84], style(thickness=2));
+              -76,66; -100,66; -100,84], style(thickness=2));
         connect(flowHPSplit.in1, stateHPT_in.outlet) 
           annotation (points=[-160,52; -160,84], style(thickness=2));
         connect(stateLPT_out.inlet, flowLPJoin.out) 
           annotation (points=[176,-14; 176,4; 176,4], style(thickness=2));
+        connect(stateHPT_out.outlet, HPT_Out) 
+          annotation (points=[-100,96; -100,200], style(thickness=2));
+        connect(mixLP.in1, LPT_In) 
+          annotation (points=[80,98; 80,200; 80,200], style(thickness=2));
       end ST3LRh_bypass;
       
       model ST_2LHU 
@@ -22483,7 +17974,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           hstartout=HPT_hstart_out,
           pstart_in=HPT_pstart_in,
           pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (extent=[-72,-34; -32,6]);
+          wstart=HPT_wstart)            annotation (extent=[-86,-20; -46,20]);
         Water.SteamTurbineStodola ST_LP(
           redeclare package Medium = FluidMedium,
           eta_mech=LPT_eta_mech,
@@ -22494,14 +17985,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pstart_in=LPT_pstart_in,
           pstart_out=LPT_pstart_out,
           wstart=LPT_wstart,
-          wnom=steamHPNomFlowRate)      annotation (extent=[10,-34; 50,6]);
+          wnom=steamHPNomFlowRate)      annotation (extent=[94,-20; 134,20]);
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           hstart=mixLP_hstart,
           V=mixLP_V,
           pstart=mixLP_pstart) 
-                          annotation (extent=[-42,-70; -26,-54],
+                          annotation (extent=[-50,-120; -30,-100],
                                                              rotation=180);
         Water.ValveVap valveHU(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -22512,7 +18003,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pnom=steamLPNomPressure,
           wnom=steamHPNomFlowRate,
           hstart=HPT_hstart_out) 
-                               annotation (extent=[-8,-28; -26,-46],
+                               annotation (extent=[-10,-16; -28,-34],
                                                                   rotation=90);
         Water.ValveVap valveLP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -22523,9 +18014,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Cv=valveLP_Cv,
           wnom=steamHPNomFlowRate,
           hstart=LPT_hstart_in) 
-                               annotation (extent=[6,40; 26,20], rotation=90);
+                               annotation (extent=[60,6; 80,26], rotation=0);
         Water.FlowSplit flowHUSplit(redeclare package Medium = FluidMedium) 
-                                  annotation (extent=[-20,-6; -8,6],   rotation=270);
+                                  annotation (extent=[-26,20; -6,40],  rotation=270);
         Water.ValveVap valveHP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           Cv=valveHP_Cv,
@@ -22535,7 +18026,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           dpnom=valveHP_dpnom,
           redeclare package Medium = FluidMedium,
           hstart=HPT_hstart_in) 
-                               annotation (extent=[-76,40; -56,20],rotation=90);
+                               annotation (extent=[-118,6; -98,26],rotation=0);
         Water.ValveVap byPassHP(redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           pnom=steamHPNomPressure,
@@ -22543,13 +18034,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CheckValve=true,
           Cv=bypassHP_Cv,
           dpnom=steamHPNomPressure - steamLPNomPressure,
-          hstart=HPT_hstart_in) annotation (extent=[-46,58; -26,38], rotation=90);
+          hstart=HPT_hstart_in) annotation (extent=[-100,40; -80,60],rotation=0);
         Water.FlowJoin flowHPJoin(redeclare package Medium = FluidMedium) 
-                                annotation (extent=[-20,12; -8,24], rotation=
-              270);
+                                annotation (extent=[-44,36; -24,56],rotation=0);
         Water.FlowSplit flowHPSplit1(
                                     redeclare package Medium = FluidMedium) 
-                                  annotation (extent=[-56,70; -44,82], rotation=270);
+                                  annotation (extent=[-130,90; -110,110],
+                                                                       rotation=270);
         Water.ValveVap byPassLP(redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           pnom=steamLPNomPressure,
@@ -22557,78 +18048,86 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Cv=bypassLP_Cv,
           dpnom=steamLPNomPressure - pcond,
           wnom=steamHPNomFlowRate,
-          hstart=LPT_hstart_in)  annotation (extent=[36,58; 56,38], rotation=90);
+          hstart=LPT_hstart_in)  annotation (extent=[80,40; 100,60],rotation=0);
         Water.FlowSplit flowLPSplit(redeclare package Medium = FluidMedium) 
-                                   annotation (extent=[22,70; 34,82], rotation=270);
+                                   annotation (extent=[20,10; 40,30], rotation=0);
         Water.FlowJoin flowLPJoin(redeclare package Medium = FluidMedium) 
-                                 annotation (extent=[54,24; 66,36], rotation=0);
+                                 annotation (extent=[140,36; 160,56],
+                                                                    rotation=0);
         annotation (Diagram);
       equation 
-        connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-65.2,-14; -82,-14;
-              -82,0; -200,0],
+        connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-79.2,0; -200,0],
                        style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.shaft_b, Shaft_b) annotation (points=[42.8,-14; 58,-14;
-              58,0; 200,0], style(
+        connect(ST_LP.shaft_b, Shaft_b) annotation (points=[126.8,0; 200,0],
+                            style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[16.8,-14;
-              -39.2,-14], style(
+        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[100.8,0;
+              -53.2,0],   style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
         connect(flowHPSplit1.in1, HPT_In) 
-          annotation (points=[-50,79.6; -50,200; -120,200],style(thickness=2));
-        connect(flowHPSplit1.out2, valveHP.inlet) annotation (points=[-52.4,
-              72.4; -52.4,66; -66,66; -66,40], style(thickness=2));
+          annotation (points=[-120,106; -120,200],         style(thickness=2));
+        connect(flowHPSplit1.out2, valveHP.inlet) annotation (points=[-124,94;
+              -124,16; -118,16],               style(thickness=2));
         connect(valveHP.outlet, ST_HP.inlet) 
-          annotation (points=[-66,20; -66,1.8; -67,1.8], style(thickness=2));
-        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-11.6,21.6;
-              -12,22; -12,32; -36,32; -36,38], style(thickness=2));
+          annotation (points=[-98,16; -82,16],           style(thickness=2));
+        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-40,50;
+              -80,50],                         style(thickness=2));
         connect(mixLP.out, SteamForHU) 
-          annotation (points=[-42,-62; -60,-62; -60,-200], style(thickness=2));
-        connect(valveHU.inlet, flowHUSplit.out2) annotation (points=[-17,-28;
-              -16.4,-28; -16.4,-3.6], style(thickness=2));
-        connect(LPT_In, mixLP.in1) annotation (points=[0,200; 0,80; 72,80; 72,
-              -66; -27.6,-66; -27.6,-66.8], style(thickness=2));
+          annotation (points=[-50,-110; -60,-110; -60,-200],
+                                                           style(thickness=2));
+        connect(valveHU.inlet, flowHUSplit.out2) annotation (points=[-19,-16;
+              -20,-16; -20,24],       style(thickness=2));
+        connect(LPT_In, mixLP.in1) annotation (points=[0,200; 0,-116; -32,-116],
+                                            style(thickness=2));
         connect(valveLP.outlet, ST_LP.inlet) 
-          annotation (points=[16,20; 16,1.8; 15,1.8], style(thickness=2));
-        connect(flowHPJoin.in2, ST_HP.outlet) annotation (points=[-16.4,21.6;
-              -16.4,26; -36.6,26; -36.6,2], style(thickness=2));
-        connect(mixLP.in2, valveHU.outlet) annotation (points=[-27.68,-57.2;
-              -17,-57.2; -17,-46], style(thickness=2));
-        connect(byPassLP.inlet,flowLPSplit. out1) annotation (points=[46,58; 46,
-              66; 30.52,66; 30.52,72.4], style(thickness=2));
-        connect(flowLPSplit.out2, valveLP.inlet) annotation (points=[25.6,72.4;
-              26,66; 16,66; 16,40], style(thickness=2));
-        connect(flowLPSplit.in1, flowHUSplit.out1) annotation (points=[28,79.6;
-              28,86; -4,86; -4,-10; -11.48,-10; -11.48,-3.6], style(thickness=2));
+          annotation (points=[80,16; 98,16],          style(thickness=2));
+        connect(flowHPJoin.in2, ST_HP.outlet) annotation (points=[-40,42; -50,
+              42; -50,16],                  style(thickness=2));
+        connect(mixLP.in2, valveHU.outlet) annotation (points=[-32.1,-104; -19,
+              -104; -19,-34],      style(thickness=2));
+        connect(byPassLP.inlet,flowLPSplit. out1) annotation (points=[80,50; 36,
+              50; 36,24.2],              style(thickness=2));
+        connect(flowLPSplit.out2, valveLP.inlet) annotation (points=[36,16; 60,
+              16],                  style(thickness=2));
+        connect(flowLPSplit.in1, flowHUSplit.out1) annotation (points=[24,20;
+              -12,20; -12,22; -11.8,24],                      style(thickness=2));
         connect(flowHUSplit.in1, flowHPJoin.out) 
-          annotation (points=[-14,3.6; -14,14.4], style(thickness=2));
-        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58;
-              -36,66; -47.48,66; -47.48,72.4], style(thickness=2));
-        connect(flowLPJoin.out, LPT_Out) annotation (points=[63.6,30; 80,30; 80,
-              -80; 60,-80; 60,-200], style(thickness=2));
+          annotation (points=[-16,36; -16,46; -28,46],
+                                                  style(thickness=2));
+        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-100,50;
+              -115.8,50; -115.8,94],           style(thickness=2));
+        connect(flowLPJoin.out, LPT_Out) annotation (points=[156,46; 160,46;
+              160,-120; 60,-120; 60,-200],
+                                     style(thickness=2));
         connect(flowLPJoin.in1, byPassLP.outlet) 
-          annotation (points=[56.4,32.4; 46,32.4; 46,38], style(thickness=2));
-        connect(flowLPJoin.in2, ST_LP.outlet) annotation (points=[56.4,27.6;
-              45.4,27.6; 45.4,2], style(thickness=2));
-        connect(ActuatorsBus.Opening_valveHP, valveHP.theta) annotation (points=[98,-72;
-              -88,-72; -88,30; -74,30],         style(color=52, rgbcolor={213,
+          annotation (points=[144,50; 100,50],            style(thickness=2));
+        connect(flowLPJoin.in2, ST_LP.outlet) annotation (points=[144,42; 130,
+              42; 130,16],        style(thickness=2));
+        connect(ActuatorsBus.Opening_valveHP, valveHP.theta) annotation (points=[200,-140;
+              -140,-140; -140,32; -108,32; -108,24],
+                                                style(color=52, rgbcolor={213,
                 255,170}));
-        connect(ActuatorsBus.Opening_valveLP, valveLP.theta) annotation (points=
-             [98,-72; 0,-72; 0,30; 8,30], style(color=52, rgbcolor={213,255,170}));
+        connect(ActuatorsBus.Opening_valveLP, valveLP.theta) annotation (points=[200,-140;
+              50,-140; 50,32; 70,32; 70,24],
+                                          style(color=52, rgbcolor={213,255,170}));
         connect(ActuatorsBus.Opening_byPassHP, byPassHP.theta) annotation (
-            points=[98,-72; -88,-72; -88,48; -44,48], style(color=52, rgbcolor=
+            points=[200,-140; 20,-140; 20,70; -90,70; -90,58],
+                                                      style(color=52, rgbcolor=
                 {213,255,170}));
         connect(ActuatorsBus.Opening_byPassLP, byPassLP.theta) annotation (
-            points=[98,-72; 0,-72; 0,48; 38,48], style(color=52, rgbcolor={213,
+            points=[200,-140; 50,-140; 50,70; 90,70; 90,58],
+                                                 style(color=52, rgbcolor={213,
                 255,170}));
-        connect(ActuatorsBus.Opening_valveHU, valveHU.theta) annotation (points=
-             [98,-72; 0,-72; 0,-37; -9.8,-37], style(color=52, rgbcolor={213,
+        connect(ActuatorsBus.Opening_valveHU, valveHU.theta) annotation (points=[200,-140;
+              50,-140; 50,-26; 20,-26; -11.8,-25],
+                                               style(color=52, rgbcolor={213,
                 255,170}));
       end ST_2LHU;
       
@@ -22658,6 +18157,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         parameter Real bypassLP_Cv=0 
           "Cv (US) flow coefficient of the HP valve of bypass" annotation(Dialog(group= "LP valves"));
         
+        annotation (Diagram);
         Water.SteamTurbineStodola ST_HP(
           redeclare package Medium = FluidMedium,
           wnom=steamHPNomFlowRate,
@@ -22668,7 +18168,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           hstartout=HPT_hstart_out,
           pstart_in=HPT_pstart_in,
           pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (extent=[-72,-40; -32,0]);
+          wstart=HPT_wstart)            annotation (extent=[-126,-20; -86,20]);
         Water.SteamTurbineStodola ST_LP(
           redeclare package Medium = FluidMedium,
           eta_mech=LPT_eta_mech,
@@ -22679,15 +18179,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pstart_in=LPT_pstart_in,
           pstart_out=LPT_pstart_out,
           wstart=LPT_wstart,
-          wnom=steamHPNomFlowRate)      annotation (extent=[12,-40; 52,0]);
+          wnom=steamHPNomFlowRate)      annotation (extent=[54,-20; 94,20]);
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           hstart=mixLP_hstart,
           V=mixLP_V,
           pstart=mixLP_pstart) 
-                          annotation (extent=[-36,-52; -24,-40],
-                                                             rotation=180);
+                          annotation (extent=[-54,-94; -34,-74],
+                                                             rotation=270);
         Water.ValveVap valveLP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           pnom=steamLPNomPressure,
@@ -22697,7 +18197,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Cv=valveLP_Cv,
           wnom=steamHPNomFlowRate,
           hstart=LPT_hstart_in) 
-                               annotation (extent=[8,40; 28,20], rotation=90);
+                               annotation (extent=[20,6; 40,26], rotation=0);
+        Water.FlowSplit flowHUSplit(redeclare package Medium = FluidMedium) 
+                                  annotation (extent=[-54,-138; -34,-118],
+                                                                       rotation=270);
         Water.ValveVap valveHP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           Cv=valveHP_Cv,
@@ -22707,7 +18210,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           dpnom=valveHP_dpnom,
           redeclare package Medium = FluidMedium,
           hstart=HPT_hstart_in) 
-                               annotation (extent=[-76,40; -56,20],rotation=90);
+                               annotation (extent=[-158,6; -138,26],
+                                                                   rotation=0);
         Water.ValveVap byPassHP(redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           pnom=steamHPNomPressure,
@@ -22715,12 +18219,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CheckValve=true,
           Cv=bypassHP_Cv,
           dpnom=steamHPNomPressure - steamLPNomPressure,
-          hstart=HPT_hstart_in) annotation (extent=[-46,58; -26,38], rotation=90);
+          hstart=HPT_hstart_in) annotation (extent=[-140,40; -120,60],
+                                                                     rotation=0);
         Water.FlowJoin flowHPJoin(redeclare package Medium = FluidMedium) 
-                                annotation (extent=[-22,10; -10,22],rotation=270);
+                                annotation (extent=[-84,36; -64,56],rotation=0);
         Water.FlowSplit flowHPSplit1(
                                     redeclare package Medium = FluidMedium) 
-                                  annotation (extent=[-66,72; -54,84], rotation=270);
+                                  annotation (extent=[-170,90; -150,110],
+                                                                       rotation=270);
         Water.ValveVap byPassLP(redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           pnom=steamLPNomPressure,
@@ -22728,88 +18234,81 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Cv=bypassLP_Cv,
           dpnom=steamLPNomPressure - pcond,
           wnom=steamHPNomFlowRate,
-          hstart=LPT_hstart_in)  annotation (extent=[36,58; 56,38], rotation=90);
+          hstart=LPT_hstart_in)  annotation (extent=[40,40; 60,60], rotation=0);
         Water.FlowSplit flowLPSplit(redeclare package Medium = FluidMedium) 
-                                   annotation (extent=[14,70; 26,82], rotation=270);
+                                   annotation (extent=[-20,10; 0,30], rotation=0);
         Water.FlowJoin flowLPJoin(redeclare package Medium = FluidMedium) 
-                                 annotation (extent=[54,14; 66,26], rotation=0);
-        annotation (Diagram);
-        Water.FlowSplit flowHUSplit(redeclare package Medium = FluidMedium) 
-                                  annotation (extent=[-54,-68; -42,-56],
-                                                                       rotation=270);
+                                 annotation (extent=[100,10; 120,30],
+                                                                    rotation=0);
       equation 
-        connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-65.2,-20; -82,-20;
-              -82,0; -200,0],
+        connect(ST_HP.shaft_a, Shaft_a) annotation (points=[-119.2,0; -200,0],
                        style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.shaft_b, Shaft_b) annotation (points=[44.8,-20; 58,-20;
-              58,0; 200,0], style(
+        connect(ST_LP.shaft_b, Shaft_b) annotation (points=[86.8,0; 200,0],
+                            style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (points=[18.8,-20;
-              -39.2,-20],
-            style(
+        connect(ST_LP.shaft_a,ST_HP. shaft_b) annotation (points=[60.8,0; -93.2,
+              0],         style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
         connect(flowHPSplit1.in1, HPT_In) 
-          annotation (points=[-60,81.6; -60,140.8; -60,200; -160,200],
-                                                  style(thickness=2));
-        connect(flowHPSplit1.out2, valveHP.inlet) annotation (points=[-62.4,
-              74.4; -62,66; -66,66; -66,40],
-                                         style(thickness=2));
-        connect(valveHP.outlet, ST_HP.inlet) 
-          annotation (points=[-66,20; -66,-4.2; -67,-4.2],  style(thickness=2));
-        connect(flowHPJoin.in1, byPassHP.outlet) annotation (points=[-13.6,19.6;
-              -14,20; -14,30; -36,30; -36,38],
-                                           style(thickness=2));
-        connect(LPT_In, mixLP.in1) annotation (points=[80,200; 80,80; 74,80; 74,
-              -49.6; -25.2,-49.6],     style(thickness=2));
-        connect(valveLP.outlet, ST_LP.inlet) 
-          annotation (points=[18,20; 18,-4.2; 17,-4.2],  style(thickness=2));
-        connect(flowHPJoin.in2, ST_HP.outlet) annotation (points=[-18.4,19.6;
-              -18.4,24; -36.6,24; -36.6,-4],
-                                        style(thickness=2));
-        connect(byPassLP.inlet,flowLPSplit. out1) annotation (points=[46,58; 46,
-              64; 22.52,64; 22.52,72.4], style(thickness=2));
-        connect(flowLPSplit.out2, valveLP.inlet) 
-          annotation (points=[17.6,72.4; 18,54; 18,40], style(thickness=2));
-        connect(flowLPJoin.out, LPT_Out) annotation (points=[63.6,20; 80,20; 80,
-              -80; 80,-80; 80,-200],
-                                style(thickness=2));
-        connect(flowLPJoin.in1, byPassLP.outlet) 
-          annotation (points=[56.4,22.4; 46,22.4; 46,38], style(thickness=2));
-        connect(flowLPJoin.in2, ST_LP.outlet) 
-          annotation (points=[56.4,17.6; 47.4,17.6; 47.4,-4],  style(thickness=2));
-        connect(flowLPSplit.in1, IPT_In) 
-          annotation (points=[20,79.6; 20,139.8; 20,200; -40,200],
-                                                style(thickness=2));
-        connect(ActuatorsBus.Opening_valveHP, valveHP.theta) annotation (points=[98,-72;
-              -88,-72; -88,30; -74,30],         style(color=52, rgbcolor={213,
+          annotation (points=[-160,106; -160,200],         style(thickness=2));
+        connect(flowHPSplit1.out2,valveHP. inlet) annotation (points=[-164,94;
+              -164,16; -158,16],               style(thickness=2));
+        connect(valveHP.outlet,ST_HP. inlet) 
+          annotation (points=[-138,16; -122,16],         style(thickness=2));
+        connect(flowHPJoin.in1,byPassHP. outlet) annotation (points=[-80,50;
+              -120,50],                        style(thickness=2));
+        connect(LPT_In,mixLP. in1) annotation (points=[80,200; 80,-60; -38,-60;
+              -38,-76],                     style(thickness=2));
+        connect(valveLP.outlet,ST_LP. inlet) 
+          annotation (points=[40,16; 58,16],          style(thickness=2));
+        connect(flowHPJoin.in2,ST_HP. outlet) annotation (points=[-80,42; -90,
+              42; -90,16],                  style(thickness=2));
+        connect(byPassLP.inlet,flowLPSplit. out1) annotation (points=[40,50; 6,
+              50; 6,24; -4,24; -4,24.2], style(thickness=2));
+        connect(flowLPSplit.out2,valveLP. inlet) annotation (points=[-4,16; 20,
+              16],                  style(thickness=2));
+        connect(byPassHP.inlet,flowHPSplit1. out1) annotation (points=[-140,50;
+              -155.8,50; -155.8,94],           style(thickness=2));
+        connect(flowLPJoin.out, LPT_Out) annotation (points=[116,20; 140,20;
+              140,-120; 80,-120; 80,-200],
+                                     style(thickness=2));
+        connect(flowLPJoin.in1,byPassLP. outlet) 
+          annotation (points=[104,24; 98,24; 98,50; 60,50],
+                                                          style(thickness=2));
+        connect(flowLPJoin.in2,ST_LP. outlet) annotation (points=[104,16; 90,16],
+                                  style(thickness=2));
+        connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (points=[200,-140;
+              -180,-140; -180,32; -148,32; -148,24],
+                                                style(color=52, rgbcolor={213,
                 255,170}));
-        connect(ActuatorsBus.Opening_valveLP, valveLP.theta) annotation (points=[98,-72;
-              0,-72; 0,30; 10,30],        style(color=52, rgbcolor={213,255,170}));
-        connect(ActuatorsBus.Opening_byPassHP, byPassHP.theta) annotation (
-            points=[98,-72; -88,-72; -88,48; -44,48], style(color=52, rgbcolor=
+        connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (points=[200,-140;
+              10,-140; 10,32; 30,32; 30,24],
+                                          style(color=52, rgbcolor={213,255,170}));
+        connect(ActuatorsBus.Opening_byPassHP,byPassHP. theta) annotation (
+            points=[200,-140; -20,-140; -20,70; -130,70; -130,58],
+                                                      style(color=52, rgbcolor=
                 {213,255,170}));
-        connect(ActuatorsBus.Opening_byPassLP, byPassLP.theta) annotation (
-            points=[98,-72; 0,-72; 0,48; 38,48], style(color=52, rgbcolor={213,
+        connect(ActuatorsBus.Opening_byPassLP,byPassLP. theta) annotation (
+            points=[200,-140; 10,-140; 10,70; 50,70; 50,58],
+                                                 style(color=52, rgbcolor={213,
                 255,170}));
-        connect(byPassHP.inlet, flowHPSplit1.out1) annotation (points=[-36,58;
-              -36,66; -58,66; -58,74.4; -57.48,74.4], style(thickness=2));
-        connect(mixLP.in2, flowHPJoin.out) annotation (points=[-25.26,-42.4;
-              -16,-42.4; -16,12.4],
-                                style(thickness=2));
-        connect(SteamForHU, flowHUSplit.out2) annotation (points=[-40,-200; -40,
-              -65.6; -50.4,-65.6], style(thickness=2));
-        connect(flowHUSplit.in1, mixLP.out) annotation (points=[-48,-58.4; -48,
-              -46; -36,-46], style(thickness=2));
-        connect(flowHUSplit.out1, HPT_Out) annotation (points=[-45.48,-65.6;
-              -45.48,-80; -6,-80; -6,60; -100,60; -100,200],
-                                                           style(thickness=2));
+        connect(SteamForHU, flowHUSplit.out1) annotation (points=[-40,-200; -40,
+              -134; -39.8,-134], style(thickness=2));
+        connect(flowHUSplit.in1, mixLP.out) 
+          annotation (points=[-44,-122; -44,-94], style(thickness=2));
+        connect(mixLP.in2, flowHPJoin.out) 
+          annotation (points=[-50,-76.1; -50,46; -68,46], style(thickness=2));
+        connect(flowLPSplit.in1, IPT_In) 
+          annotation (points=[-16,20; -40,20; -40,200], style(thickness=2));
+        connect(flowHUSplit.out2, HPT_Out) annotation (points=[-48,-134; -48,
+              -160; -60,-160; -60,160; -100,160; -100,200], style(thickness=2));
       end ST_2LRhHU;
       
       model CondPlant "Condensation Plant" 
@@ -23003,21 +18502,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               -1.83691e-015,-60], style(thickness=2));
         connect(mixCondenser.in1, condPlant_cc.WaterOut) 
           annotation (points=[6,-42; 6,-20; 50,-20; 50,0], style(thickness=2));
-        connect(mixCondenser.in2, SteamToHU) annotation (points=[-6,-42.1; -6,
-              -20; -48,-20; -48,100], style(thickness=2));
         connect(SensorsBus, condPlant_cc.SensorsBus) annotation (points=[98,-40;
               80,-40; 80,-20; 96,-20; 96,18; 79.4,18], style(color=84, rgbcolor=
                {255,170,213}));
         connect(ActuatorsBus, condPlant_cc.ActuatorsBus) annotation (points=[98,-72;
               72,-72; 72,-12; 88,-12; 88,8.4; 79.4,8.4],      style(color=52,
               rgbcolor={213,255,170}));
+        connect(mixCondenser.in2, CondensatedFromHU) annotation (points=[-6,
+              -42.1; -6,-20; -50,-20; -50,100], style(thickness=2));
       end CondPlantHU_cc;
       
       model STG_3LRh "Steam turbine group (three pressure levels, reheat)" 
         extends Interfaces.STGroup3LRh;
         annotation (Diagram);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_base 
-          steamTurbines(
+        ST3LRh_base steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
           steamHPNomPressure=1.28e7,
@@ -23025,7 +18523,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamLPNomPressure=6e5,
           pcond=5.3982e3,
           HPT_hstart_in=3.47e6,
-          mixIP_hstart=3.1076e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
@@ -23039,7 +18536,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           LPT_hstart_out=2.39102e6,
           mixLP_hstart=3.11911e6,
           mixLP_V=5,
-          mixIP_V=5,
           steamIPNomFlowRate=81.3524 - 67.6,
           steamLPNomFlowRate=89.438 - 81.3524) 
                        annotation (extent=[-80,-50; 20,50]);
@@ -23047,6 +18543,18 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           condenserIdeal(redeclare package Medium = FluidMedium, p=5389.2) 
           annotation (extent=[26,-140; -14,-100],
                                                rotation=0);
+        HRSG.Components.PrescribedSpeedPump totalFeedPump(
+          redeclare package WaterMedium = FluidMedium,
+          rho_nom=1000,
+          q_nom={0.0898,0,0.1},
+          head_nom={72.74,130,0},
+          nominalCondensationPressure=5398.2,
+          nominalSteamFlow=89.8,
+          n0=1500,
+          hstart=1.43495e5,
+          nominalSteamPressure=6e5) 
+                                  annotation (extent=[92,-148; 60,-180],
+            rotation=180);
       equation 
         connect(steamTurbines.Shaft_b, Shaft_b) annotation (points=[20,0; 200,0],
             style(
@@ -23058,9 +18566,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(condenserIdeal.waterOut, WaterOut) 
-          annotation (points=[6,-140; 6,-182; 160,-182; 160,200],
-                                                       style(thickness=2));
         connect(SensorsBus.ratioVvVtot, condenserIdeal.ratio_Vv_Vtot) 
           annotation (points=[200,-80; 76,-80; 76,-124; 26,-124],      style(
               color=84, rgbcolor={255,170,213}));
@@ -23074,19 +18579,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(steamTurbines.IPT_In, From_RH_IP) annotation (points=[-40,50;
-              -40,50; -40,200], style(
+              -40,200],         style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(steamTurbines.HPT_Out, To_RH_IP) annotation (points=[-55,50;
               -55,140; -100,140; -100,200], style(
-            thickness=2,
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(steamTurbines.SteamToMix, From_SH_IP) annotation (points=[-25,
-              50; -25,140; 20,140; 20,200], style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
@@ -23117,14 +18616,33 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
+        connect(totalFeedPump.inlet, condenserIdeal.waterOut) annotation (
+            points=[60,-164; 6,-164; 6,-140], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.outlet, WaterOut) annotation (points=[92,-164;
+              160,-164; 160,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
+          annotation (points=[200,-140; 40,-140; 40,-154.4; 58.72,-154.4],
+            style(
+            color=52,
+            rgbcolor={213,255,170},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
       end STG_3LRh;
       
       model STG_3LRh_valve 
         "Steam turbine group (three pressure levels, reheat) with inlet valves" 
         extends Interfaces.STGroup3LRh;
         annotation (Diagram);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_valve 
-          steamTurbines(
+        ST3LRh_valve steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
           steamHPNomPressure=1.28e7,
@@ -23142,12 +18660,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           valveHP_dpnom=1.6e5,
           valveIP_dpnom=5e4,
           mixLP_hstart=3.109e6,
-          mixIP_hstart=3.1076e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
           mixLP_V=20,
-          mixIP_V=20,
           valveHP_Cv=1165,
           valveIP_Cv=5625,
           valveLP_Cv=14733,
@@ -23161,6 +18677,18 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           redeclare package Medium = FluidMedium) 
           annotation (extent=[26,-140; -14,-100],
                                                rotation=0);
+        HRSG.Components.PrescribedSpeedPump totalFeedPump(
+          redeclare package WaterMedium = FluidMedium,
+          rho_nom=1000,
+          q_nom={0.0898,0,0.1},
+          head_nom={72.74,130,0},
+          nominalCondensationPressure=5398.2,
+          nominalSteamFlow=89.8,
+          n0=1500,
+          hstart=1.43495e5,
+          nominalSteamPressure=6e5) 
+                                  annotation (extent=[92,-148; 60,-180],
+            rotation=180);
       equation 
         connect(steamTurbines.Shaft_a, Shaft_a) annotation (points=[-80,0; -200,
               0], style(
@@ -23175,9 +18703,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus, steamTurbines.ActuatorsBus) annotation (points=[200,-140;
               60,-140; 60,-35; 20,-35],        style(color=52, rgbcolor={213,
                 255,170}));
-        connect(condenserIdeal.waterOut, WaterOut) 
-          annotation (points=[6,-140; 6,-180; 160,-180; 160,200],
-                                                         style(thickness=2));
         connect(SensorsBus.ratioVvVtot, condenserIdeal.ratio_Vv_Vtot) annotation (
             points=[200,-80; 66,-80; 66,-124; 26,-124],              style(
               color=84, rgbcolor={255,170,213}));
@@ -23196,12 +18721,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(steamTurbines.SteamToMix, From_SH_IP) annotation (points=[-25,
-              50; -25,140; 20,140; 20,200], style(
-            thickness=2,
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
         connect(steamTurbines.LPT_In, From_SH_LP) annotation (points=[-10,50;
               -10,100; 80,100; 80,200], style(
             thickness=2,
@@ -23215,7 +18734,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(steamTurbines.HPT_In, From_SH_HP) annotation (points=[-70,50;
-              -72,50; -72,100; -160,100; -160,200], style(
+              -70,100; -160,100; -160,200],         style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
@@ -23227,14 +18746,33 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
+        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
+          annotation (points=[200,-140; 40,-140; 40,-154.4; 58.72,-154.4],
+            style(
+            color=52,
+            rgbcolor={213,255,170},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.inlet, condenserIdeal.waterOut) annotation (
+            points=[60,-164; 6,-164; 6,-140], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.outlet, WaterOut) annotation (points=[92,-164;
+              160,-164; 160,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
       end STG_3LRh_valve;
       
       model STG_3LRh_cc 
         "Steam turbine group (three pressure levels, reheat) and controlled condenser" 
         extends Interfaces.STGroup3LRh;
         annotation (Diagram);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_base 
-          steamTurbines(
+        ST3LRh_base steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
           steamHPNomPressure=1.28e7,
@@ -23242,7 +18780,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamLPNomPressure=6e5,
           pcond=5.3982e3,
           HPT_hstart_in=3.47e6,
-          mixIP_hstart=3.1076e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
@@ -23256,7 +18793,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           LPT_hstart_out=2.39102e6,
           mixLP_hstart=3.11911e6,
           mixLP_V=5,
-          mixIP_V=5,
           steamIPNomFlowRate=81.3524 - 67.6,
           steamLPNomFlowRate=89.438 - 81.3524) 
                        annotation (extent=[-80,-50; 20,50]);
@@ -23266,8 +18802,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           p=5398.2,
           Vtot=10,
           Vlstart=1.5,
-          setPoint_ratio=0.85) annotation (extent=[-24,-160; 36,-100],
+          setPoint_ratio=0.85) annotation (extent=[-26,-140; 34,-80],
                                                                     rotation=0);
+        HRSG.Components.PrescribedSpeedPump totalFeedPump(
+          redeclare package WaterMedium = FluidMedium,
+          rho_nom=1000,
+          q_nom={0.0898,0,0.1},
+          head_nom={72.74,130,0},
+          nominalCondensationPressure=5398.2,
+          nominalSteamFlow=89.8,
+          n0=1500,
+          hstart=1.43495e5,
+          nominalSteamPressure=6e5) 
+                                  annotation (extent=[112,-154; 80,-186],
+            rotation=180);
       equation 
         connect(steamTurbines.Shaft_b, Shaft_b) annotation (points=[20,0; 200,0],
             style(
@@ -23280,19 +18828,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbcolor={0,0,0},
             thickness=2));
         connect(controlledCondeser.SteamIn, steamTurbines.LPT_Out) annotation (
-            points=[6,-100; 6,-50; 5,-50], style(
-            thickness=2,
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(controlledCondeser.WaterOut, WaterOut) annotation (points=[6,
-              -160; 6,-180; 160,-180; 160,200], style(
+            points=[4,-80; 4,-50; 5,-50],  style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(steamTurbines.IPT_In, From_RH_IP) annotation (points=[-40,50;
-              -40,200; -40,200], style(
+              -40,200],          style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
@@ -23304,13 +18846,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(steamTurbines.HPT_In, From_SH_HP) annotation (points=[-70,50;
-              -70,100; -160,100; -160,200; -160,200], style(
-            thickness=2,
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(steamTurbines.SteamToMix, From_SH_IP) annotation (points=[-25,
-              50; -25,140; 20,140; 20,200], style(
+              -70,100; -160,100; -160,200],           style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
@@ -23328,8 +18864,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(SensorsBus, controlledCondeser.SensorsBus) annotation (points=[
-              200,-80; 80,-80; 80,-142; 35.4,-142], style(
+        connect(SensorsBus, controlledCondeser.SensorsBus) annotation (points=[200,-80;
+              80,-80; 80,-122; 33.4,-122],          style(
             color=84,
             rgbcolor={255,170,213},
             fillColor=7,
@@ -23343,11 +18879,31 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(ActuatorsBus, controlledCondeser.ActuatorsBus) annotation (
-            points=[200,-140; 100,-140; 100,-151.6; 35.4,-151.6], style(
+            points=[200,-140; 100,-140; 100,-131.6; 33.4,-131.6], style(
             color=52,
             rgbcolor={213,255,170},
             fillColor=7,
             rgbfillColor={255,255,255},
+            fillPattern=1));
+        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
+          annotation (points=[200,-140; 60,-140; 60,-160.4; 78.72,-160.4],
+            style(
+            color=52,
+            rgbcolor={213,255,170},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.inlet, controlledCondeser.WaterOut) annotation (
+            points=[80,-170; 4,-170; 4,-140], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.outlet, WaterOut) annotation (points=[112,-170;
+              160,-170; 160,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
             fillPattern=1));
       end STG_3LRh_cc;
       
@@ -23363,7 +18919,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamLPNomPressure=6e5,
           pcond=5.3982e3,
           HPT_hstart_in=3.47e6,
-          mixIP_hstart=3.1076e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
@@ -23377,7 +18932,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           LPT_hstart_out=2.39102e6,
           mixLP_hstart=3.11911e6,
           mixLP_V=5,
-          mixIP_V=5,
           steamIPNomFlowRate=81.3524 - 67.6,
           steamLPNomFlowRate=89.438 - 81.3524,
           valveHP_Cv=1165,
@@ -23393,8 +18947,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           p=5398.2,
           Vtot=10,
           Vlstart=1.5,
-          setPoint_ratio=0.85) annotation (extent=[-24,-160; 36,-100],
+          setPoint_ratio=0.85) annotation (extent=[-24,-140; 36,-80],
                                                                     rotation=0);
+        HRSG.Components.PrescribedSpeedPump totalFeedPump(
+          redeclare package WaterMedium = FluidMedium,
+          rho_nom=1000,
+          q_nom={0.0898,0,0.1},
+          head_nom={72.74,130,0},
+          nominalCondensationPressure=5398.2,
+          nominalSteamFlow=89.8,
+          n0=1500,
+          hstart=1.43495e5,
+          nominalSteamPressure=6e5) 
+                                  annotation (extent=[112,-158; 80,-190],
+            rotation=180);
       equation 
         connect(steamTurbines.Shaft_b, Shaft_b) annotation (points=[20,0; 200,0],
             style(
@@ -23410,25 +18976,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               100,-140; 100,-35; 20,-35],         style(color=52, rgbcolor={213,
                 255,170}));
         connect(controlledCondeser.SteamIn, steamTurbines.LPT_Out) annotation (
-            points=[6,-100; 6,-50; 5,-50], style(
-            thickness=2,
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(controlledCondeser.WaterOut, WaterOut) annotation (points=[6,
-              -160; 6,-180; 160,-180; 160,200], style(
+            points=[6,-80; 6,-50; 5,-50],  style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(steamTurbines.IPT_In, From_RH_IP) annotation (points=[-40,50;
               -40,200], style(
-            thickness=2,
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(steamTurbines.SteamToMix, From_SH_IP) annotation (points=[-25,
-              50; -25,140; 20,140; 20,200], style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
@@ -23458,19 +19012,39 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(SensorsBus, controlledCondeser.SensorsBus) annotation (points=[
-              200,-80; 80,-80; 80,-142; 35.4,-142], style(
+        connect(SensorsBus, controlledCondeser.SensorsBus) annotation (points=[200,-80;
+              80,-80; 80,-122; 35.4,-122],          style(
             color=84,
             rgbcolor={255,170,213},
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(ActuatorsBus, controlledCondeser.ActuatorsBus) annotation (
-            points=[200,-140; 100,-140; 100,-151.6; 35.4,-151.6], style(
+            points=[200,-140; 100,-140; 100,-131.6; 35.4,-131.6], style(
             color=52,
             rgbcolor={213,255,170},
             fillColor=7,
             rgbfillColor={255,255,255},
+            fillPattern=1));
+        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
+          annotation (points=[200,-140; 60,-140; 60,-164.4; 78.72,-164.4],
+            style(
+            color=52,
+            rgbcolor={213,255,170},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.inlet, controlledCondeser.WaterOut) annotation (
+            points=[80,-174; 6,-174; 6,-140], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.outlet, WaterOut) annotation (points=[112,-174;
+              160,-174; 160,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
             fillPattern=1));
       end STG_3LRh_valve_cc;
       
@@ -23486,7 +19060,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamLPNomPressure=6e5,
           pcond=5.3982e3,
           HPT_hstart_in=3.47e6,
-          mixIP_hstart=3.1076e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
@@ -23500,7 +19073,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           LPT_hstart_out=2.39102e6,
           mixLP_hstart=3.11911e6,
           mixLP_V=5,
-          mixIP_V=5,
           steamIPNomFlowRate=81.3524 - 67.6,
           steamLPNomFlowRate=89.438 - 81.3524,
           valveHP_Cv=1165,
@@ -23519,8 +19091,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           p=5398.2,
           Vtot=10,
           Vlstart=1.5,
-          setPoint_ratio=0.85) annotation (extent=[-24,-160; 36,-100],
+          setPoint_ratio=0.85) annotation (extent=[-26,-140; 34,-80],
                                                                     rotation=0);
+        HRSG.Components.PrescribedSpeedPump totalFeedPump(
+          redeclare package WaterMedium = FluidMedium,
+          rho_nom=1000,
+          q_nom={0.0898,0,0.1},
+          head_nom={72.74,130,0},
+          nominalCondensationPressure=5398.2,
+          nominalSteamFlow=89.8,
+          n0=1500,
+          hstart=1.43495e5,
+          nominalSteamPressure=6e5) 
+                                  annotation (extent=[104,-160; 72,-192],
+            rotation=180);
       equation 
         connect(steamTurbines.Shaft_b, Shaft_b) annotation (points=[20,0; 200,0],
             style(
@@ -23533,7 +19117,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbcolor={0,0,0},
             thickness=2));
         connect(ActuatorsBus, controlledCondeser.ActuatorsBus) annotation (
-            points=[200,-140; 80,-140; 80,-152; 58,-152; 35.4,-151.6],
+            points=[200,-140; 80,-140; 80,-132; 33.4,-132; 33.4,-131.6],
                                                          style(color=52,
               rgbcolor={213,255,170}));
         connect(ActuatorsBus, steamTurbines.ActuatorsBus) annotation (points=[200,-140;
@@ -23543,28 +19127,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               52,-80; 52,-20; 20,-20],       style(color=84, rgbcolor={255,170,
                 213}));
         connect(SensorsBus, controlledCondeser.SensorsBus) annotation (points=[200,-80;
-              52,-80; 52,-142; 35.4,-142],     style(color=84, rgbcolor={255,
+              52,-80; 52,-122; 33.4,-122],     style(color=84, rgbcolor={255,
                 170,213}));
         connect(controlledCondeser.SteamIn, steamTurbines.LPT_Out) annotation (
-            points=[6,-100; 6,-50; 5,-50], style(
-            thickness=2,
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(controlledCondeser.WaterOut, WaterOut) annotation (points=[6,
-              -160; 6,-180; 160,-180; 160,200], style(
+            points=[4,-80; 4,-50; 5,-50],  style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(steamTurbines.LPT_In, From_SH_LP) annotation (points=[-10,50;
               -10,100; 80,100; 80,200], style(
-            thickness=2,
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(steamTurbines.SteamToMix, From_SH_IP) annotation (points=[-25,
-              50; -25,140; 20,140; 20,200], style(
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
@@ -23586,6 +19158,26 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=2,
             fillColor=7,
             rgbfillColor={255,255,255},
+            fillPattern=1));
+        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
+          annotation (points=[200,-140; 52,-140; 52,-166.4; 70.72,-166.4],
+            style(
+            color=52,
+            rgbcolor={213,255,170},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.inlet, controlledCondeser.WaterOut) annotation (
+            points=[72,-176; 4,-176; 4,-140], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
+        connect(totalFeedPump.outlet, WaterOut) annotation (points=[104,-176;
+              160,-176; 160,200], style(
+            thickness=2,
+            fillColor=30,
+            rgbfillColor={230,230,230},
             fillPattern=1));
       end STG_3LRh_bypass_cc;
     end Examples;
@@ -23639,15 +19231,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[-80,60; -60,80]);
       equation 
         connect(sinkP.flange, steamTurbineStodola.outlet) annotation (points=[30,70;
-              13.1,70; 13.1,14],               style(thickness=2));
+              14,70; 14,14],                   style(thickness=2));
         annotation (Diagram);
         connect(constantSpeed.flange, steamTurbineStodola.shaft_b) annotation (
             points=[50,-10; 9.2,-10],                             style(
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(sourceP.flange, steamTurbineStodola.inlet) annotation (points=[
-              -60,70; -32.5,70; -32.5,13.7], style(thickness=2));
+        connect(sourceP.flange, steamTurbineStodola.inlet) annotation (points=[-60,70;
+              -34,70; -34,14],               style(thickness=2));
       end TestSettingTurbineHP;
       
       model TestSettingTurbineIP 
@@ -23669,10 +19261,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                       annotation (extent=[70,-20; 50,0]);
       equation 
         connect(sinkP.flange, steamTurbineStodola.outlet) annotation (points=[30,70;
-              13.1,70; 13.1,14],               style(thickness=2));
+              14,70; 14,14],                   style(thickness=2));
         annotation (Diagram);
-        connect(sourceP.flange, steamTurbineStodola.inlet) annotation (points=[
-              -60,70; -32.5,70; -32.5,13.7], style(thickness=2));
+        connect(sourceP.flange, steamTurbineStodola.inlet) annotation (points=[-60,70;
+              -34,70; -34,14],               style(thickness=2));
         connect(constantSpeed.flange, steamTurbineStodola.shaft_b) annotation (
             points=[50,-10; 9.2,-10],                             style(
             color=0,
@@ -23699,10 +19291,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                       annotation (extent=[70,-20; 50,0]);
       equation 
         connect(sinkP.flange, steamTurbineStodola.outlet) annotation (points=[30,70;
-              13.1,70; 13.1,14],               style(thickness=2));
+              14,70; 14,14],                   style(thickness=2));
         annotation (Diagram);
         connect(sourceP.flange, steamTurbineStodola.inlet) annotation (points=[-60,70;
-              -32.5,70; -32.5,13.7],         style(thickness=2));
+              -34,70; -34,14],               style(thickness=2));
         connect(constantSpeed.flange, steamTurbineStodola.shaft_b) annotation (
             points=[50,-10; 9.2,-10],                             style(
             color=0,
@@ -23741,10 +19333,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                       annotation (extent=[70,-20; 50,0]);
       equation 
         connect(sinkP.flange, steamTurbineStodola.outlet) annotation (points=[30,70;
-              11.1,70; 11.1,14],               style(thickness=2));
+              12,70; 12,14],                   style(thickness=2));
         annotation (Diagram);
         connect(valveHP.outlet, steamTurbineStodola.inlet) annotation (points=[-34,40;
-              -34,13.7; -34.5,13.7],         style(thickness=2));
+              -34,14; -36,14],               style(thickness=2));
         connect(sourceP.flange, valveHP.inlet) 
           annotation (points=[-60,70; -34,70; -34,60], style(thickness=2));
         connect(com_valveHP.y, valveHP.theta) annotation (points=[-17,50; -26,
@@ -23792,10 +19384,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                       annotation (extent=[70,-20; 50,0]);
       equation 
         connect(sinkP.flange, steamTurbineStodola.outlet) annotation (points=[30,70;
-              11.1,70; 11.1,14],               style(thickness=2));
+              12,70; 12,14],                   style(thickness=2));
         annotation (Diagram);
         connect(valveIP.outlet, steamTurbineStodola.inlet) annotation (points=[-34,40;
-              -34,13.7; -34.5,13.7],         style(thickness=2));
+              -34,14; -36,14],               style(thickness=2));
         connect(sourceP.flange,valveIP. inlet) 
           annotation (points=[-60,70; -34,70; -34,60], style(thickness=2));
         connect(com_valveHP.y, valveIP.theta) 
@@ -23838,7 +19430,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                       annotation (extent=[70,-20; 50,0]);
       equation 
         connect(sinkP.flange, steamTurbineStodola.outlet) annotation (points=[30,70;
-              11.1,70; 11.1,14],               style(thickness=2));
+              12,70; 12,14],                   style(thickness=2));
         annotation (Diagram);
         connect(valveLP.inlet, sourceP.flange) annotation (points=[-34,60; -34,
               70; -60,70], style(
@@ -23849,7 +19441,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(valveLP.outlet, steamTurbineStodola.inlet) annotation (points=[-34,40;
-              -34,13.7; -34.5,13.7],         style(
+              -34,14; -36,14],               style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -23893,7 +19485,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Cv=1165)             annotation (extent=[-40,12; -60,-8],rotation=90);
         Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
           annotation (extent=[-96,12; -76,32]);
-        annotation (Diagram);
+        annotation (Diagram,
+          experiment(StopTime=1000),
+          experimentSetupOutput(equdistant=false));
       public 
         Modelica.Blocks.Sources.Ramp com_valveHP(
           offset=1,
@@ -23931,9 +19525,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[100,-40; 80,-20]);
       equation 
         connect(sinkP.flange, steamTurbineVarEta.outlet)  annotation (points=[14,22;
-              -4.9,22; -4.9,-34],              style(thickness=2));
+              -4,22; -4,-34],                  style(thickness=2));
         connect(valveHP.outlet, steamTurbineVarEta.inlet)  annotation (points=[-50,-8;
-              -50,-34.3; -50.5,-34.3],       style(thickness=2));
+              -50,-34; -52,-34],             style(thickness=2));
         connect(sourceP.flange, valveHP.inlet) 
           annotation (points=[-76,22; -50,22; -50,12], style(thickness=2));
         connect(constantSpeed.flange, steamTurbineVarEta.shaft_b)  annotation (
@@ -23960,8 +19554,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       model TestST3LRh_base 
         package FluidMedium = ThermoPower.Water.StandardWater;
         
-        ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_base 
-          steamTurbines(
+        Examples.ST3LRh_base steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
           steamHPNomPressure=1.28e7,
@@ -23977,16 +19570,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           LPT_hstart_in=3.109e6,
           LPT_hstart_out=2.3854e6,
           mixLP_hstart=3.109e6,
-          mixIP_hstart=3.1076e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
           LPT_Kt=0.078004,
-          mixLP_V=10,
-          mixIP_V=10)  annotation (extent=[-80,-40; 0,40]);
-        annotation (Diagram);
+          mixLP_V=10)  annotation (extent=[-80,-40; 0,40]);
+        annotation (Diagram,
+          experiment(StopTime=1000),
+          experimentSetupOutput(equdistant=false));
         Water.SinkP sinkLPT(
           redeclare package Medium = FluidMedium,
           p0=5.3982e3,
@@ -23998,8 +19591,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[-78,68; -66,80], rotation=270);
         Water.SourceP sourceLPT(h=3.109e6, p0=6e5) 
           annotation (extent=[-30,54; -18,66], rotation=270);
-        Water.SourceP sourceToMix(p0=2.98e6, h=3.1076e6) 
-          annotation (extent=[-42,68; -30,80], rotation=270);
         Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.68e6) 
           annotation (extent=[-48,54; -60,66], rotation=180);
       equation 
@@ -24016,19 +19607,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[-24,40; -24,54], style(thickness=2));
         connect(steamTurbines.HPT_In, sourceHPT.flange) 
           annotation (points=[-72,40; -72,68], style(thickness=2));
-        connect(sourceToMix.flange, steamTurbines.SteamToMix) 
-          annotation (points=[-36,68; -36,40], style(thickness=2));
         connect(steamTurbines.IPT_In, Rh.out1) 
           annotation (points=[-48,40; -48,60], style(thickness=2));
         connect(steamTurbines.HPT_Out, Rh.in1) annotation (points=[-60,40; -60,
-              50; -60,60; -60.06,60], style(thickness=2));
+              60; -60.06,60],         style(thickness=2));
       end TestST3LRh_base;
       
       model TestST3LRh_valve 
         package FluidMedium = ThermoPower.Water.StandardWater;
         
-        ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_valve 
-          steamTurbines(
+        Examples.ST3LRh_valve steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
           steamHPNomPressure=1.28e7,
@@ -24046,12 +19634,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           valveHP_dpnom=1.6e5,
           valveIP_dpnom=5e4,
           mixLP_hstart=3.109e6,
-          mixIP_hstart=3.1076e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
           mixLP_V=20,
-          mixIP_V=20,
           valveHP_Cv=1165,
           valveIP_Cv=5625,
           valveLP_Cv=14733,
@@ -24060,7 +19646,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           IPT_Kt=0.018883,
           LPT_Kt=0.078004) 
                        annotation (extent=[-80,-40; 0,40]);
-        annotation (Diagram);
+        annotation (Diagram,
+          experiment(StopTime=1000),
+          experimentSetupOutput(equdistant=false));
         Water.SinkP sinkLPT_p(
           redeclare package Medium = FluidMedium,
           p0=5.3982e3,
@@ -24087,8 +19675,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           offset=1,
           startTime=40,
           height=-0.5)  annotation (extent=[92,-50; 72,-30]);
-        Water.SourceP sourceToMix(p0=2.98e6, h=3.1076e6) 
-          annotation (extent=[-42,68; -30,80], rotation=270);
         Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.73e6) 
           annotation (extent=[-48,54; -60,66], rotation=180);
       equation 
@@ -24115,8 +19701,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(com_valveLP.y, actuators.Opening_valveLP) annotation (points=[
               71,-80; 54,-80; 54,-40; 38,-40], style(color=74, rgbcolor={0,0,
                 127}));
-        connect(sourceToMix.flange, steamTurbines.SteamToMix) 
-          annotation (points=[-36,68; -36,40], style(thickness=2));
         connect(steamTurbines.IPT_In, Rh.out1) 
           annotation (points=[-48,40; -48,60], style(thickness=2));
         connect(steamTurbines.HPT_Out, Rh.in1) 
@@ -24135,7 +19719,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamLPNomPressure=6e5,
           pcond=5.3982e3,
           mixLP_V=50,
-          mixIP_V=50,
           steamLPNomFlowRate=89.82 - 81.10,
           HPT_hstart_in=3.47e6,
           HPT_hstart_out=3.1076e6,
@@ -24147,7 +19730,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           valveIP_dpnom=5e4,
           valveLP_dpnom=2.64e4,
           mixLP_hstart=3.109e6,
-          mixIP_hstart=3.1076e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
@@ -24163,7 +19745,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           valveDrumIP_Cv=810,
           valveDrumLP_Cv=1670) 
                        annotation (extent=[-94,-40; -14,40]);
-        annotation (Diagram);
+        annotation (Diagram,
+          experiment(StopTime=1000),
+          experimentSetupOutput(equdistant=false));
         Modelica.Mechanics.Rotational.ConstantSpeed constantSpeed(w_fixed=
               314.16/2) 
           annotation (extent=[20,-10; 0,10]);
@@ -24197,16 +19781,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[-92,68; -80,80], rotation=270);
         Water.SourceP sourceLPT(h=3.109e6, p0=6.296e5) 
           annotation (extent=[-44,54; -32,66], rotation=270);
-        Water.SourceP sourceToMix(p0=2.98e6, h=3.1076e6) 
-          annotation (extent=[-56,68; -44,80], rotation=270);
         Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.73e6) 
           annotation (extent=[-62,54; -74,66], rotation=180);
-      public 
-        Modelica.Blocks.Sources.Constant com_valveDrumIP(k=1) 
-          annotation (extent=[96,70; 76,90]);
-      public 
-        Modelica.Blocks.Sources.Constant com_valveDrumLP(k=1) 
-          annotation (extent=[36,70; 56,90]);
       equation 
         connect(com_valveHP.y, actuators.Opening_valveHP) 
                                                       annotation (points=[75,40;
@@ -24239,131 +19815,18 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[-38,40; -38,54], style(thickness=2));
         connect(steamTurbines.HPT_In,sourceHPT_p. flange) 
           annotation (points=[-86,40; -86,68], style(thickness=2));
-        connect(sourceToMix.flange, steamTurbines.SteamToMix) 
-          annotation (points=[-50,68; -50,40], style(thickness=2));
-        connect(com_valveDrumLP.y, actuators.Opening_valveDrumLP) annotation (
-            points=[57,80; 66,80; 66,-74], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(com_valveDrumIP.y, actuators.Opening_valveDrumIP) annotation (
-            points=[75,80; 66,80; 66,-72], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
         connect(steamTurbines.IPT_In, Rh.out1) 
           annotation (points=[-62,40; -62,60], style(thickness=2));
         connect(steamTurbines.HPT_Out, Rh.in1) annotation (points=[-74,40; -74,
               60; -74.06,60],         style(thickness=2));
       end TestST3LRh_bypass;
       
-      model TestST3LRh_condenser 
-        package FluidMedium = ThermoPower.Water.StandardWater;
-        //other data
-        constant Real pi=Modelica.Constants.pi;
-        
-        annotation (Diagram);
-        Modelica.Mechanics.Rotational.ConstantSpeed constantSpeed(w_fixed=
-              314.16/2) 
-          annotation (extent=[30,0; 10,20]);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Examples.ST3LRh_base 
-          steamTurbines(
-          redeclare package FluidMedium = FluidMedium,
-          steamHPNomFlowRate=67.6,
-          steamHPNomPressure=1.28e7,
-          steamIPNomFlowRate=81.10 - 67.5,
-          steamIPNomPressure=2.68e6,
-          steamLPNomPressure=6e5,
-          pcond=5.3982e3,
-          mixLP_V=50,
-          mixIP_V=50,
-          steamLPNomFlowRate=89.82 - 81.10,
-          HPT_hstart_in=3.47e6,
-          HPT_hstart_out=3.1076e6,
-          IPT_hstart_in=3.554e6,
-          IPT_hstart_out=3.12810e6,
-          LPT_hstart_in=3.109e6,
-          LPT_hstart_out=2.3854e6,
-          mixLP_hstart=3.109e6,
-          mixIP_hstart=3.1076e6,
-          HPT_eta_iso_nom=0.833,
-          IPT_eta_iso_nom=0.903,
-          LPT_eta_iso_nom=0.876,
-          HPT_Kt=0.0032078,
-          IPT_Kt=0.018883,
-          LPT_Kt=0.078004) 
-                       annotation (extent=[-92,-30; -12,50]);
-        ThermoPower.PowerPlants.SteamTurbineGroup.Examples.CondPlant 
-          condenserPlant(
-          condNomFlowRate=89.82,
-          coolNomFlowRate=22.782,
-          condNomPressure=5.3982e3,
-          coolNomPressure=3e5,
-          condExchSurface=0.02*pi*514*4.88,
-          coolExchSurface=(0.02 - (2*0.0016))*pi*514*4.88,
-          condVol=4.162 - (0.02^2/4*pi*514*4.88),
-          cm=419,
-          rhoMetal=7500,
-          coolVol=(0.02 - (2*0.0016))^2/4*pi*514*4.88,
-          pstart_cond=5.3982e3,
-          redeclare package FluidMedium = FluidMedium,
-          condenser(gamma_cond=1536, gamma_cool=5006),
-          metalVol=(0.02^2/4*pi*514*4.88) - ((0.02 - (2*0.0016))^2/4*pi*514*
-              4.88),
-          use_T=false,
-          SSInit=false,
-          Tstart_M_in=FluidMedium.temperature_ph(3e5, 62641),
-          Tstart_M_out=FluidMedium.temperature_ph(3e5, 140760),
-          hstart_cool_in=62641,
-          hstart_cool_out=140760) 
-          annotation (extent=[-16,-52; 24,-92],rotation=90);
-        Water.SourceP sourceHPT(h=3.47e6, p0=1.28e7,
-          redeclare package Medium = FluidMedium) 
-          annotation (extent=[-90,76; -78,88], rotation=270);
-        Water.SourceP sourceLPT(h=3.109e6, p0=6e5,
-          redeclare package Medium = FluidMedium) 
-          annotation (extent=[-42,62; -30,74], rotation=270);
-        Water.SourceP sourceToMix(p0=2.98e6, h=3.1076e6,
-          redeclare package Medium = FluidMedium) 
-          annotation (extent=[-54,76; -42,88], rotation=270);
-        Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.68e6) 
-          annotation (extent=[-72,74; -60,62], rotation=0);
-        Water.SinkW sinkW(
-          w0=89.8,
-          p0=5.3982e3,
-          h=1.43495e5,
-          redeclare package Medium = FluidMedium) 
-                       annotation (extent=[56,-30; 76,-10]);
-      equation 
-        connect(steamTurbines.Shaft_b, constantSpeed.flange) annotation (points=[-12,10;
-              10,10],         style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
-        connect(steamTurbines.LPT_In,sourceLPT. flange) 
-          annotation (points=[-36,50; -36,62], style(thickness=2));
-        connect(steamTurbines.HPT_In,sourceHPT. flange) 
-          annotation (points=[-84,50; -84,76], style(thickness=2));
-        connect(sourceToMix.flange, steamTurbines.SteamToMix) 
-          annotation (points=[-48,76; -48,50], style(thickness=2));
-        connect(steamTurbines.IPT_In, Rh.out1) 
-          annotation (points=[-60,50; -60,68], style(thickness=2));
-        connect(steamTurbines.HPT_Out, Rh.in1) annotation (points=[-72,50; -72,59;
-              -72,68; -72.06,68], style(thickness=2));
-        connect(condenserPlant.SteamIn, steamTurbines.LPT_Out) 
-          annotation (points=[-16,-72; -24,-72; -24,-30], style(thickness=2));
-        connect(condenserPlant.WaterOut, sinkW.flange) annotation (points=[24,
-              -72; 34,-72; 34,-20; 56,-20], style(thickness=2));
-      end TestST3LRh_condenser;
-      
       model TestCondenserControl 
         package FluidMedium = ThermoPower.Water.StandardWater;
         
-        annotation (Diagram);
+        annotation (Diagram,
+          experiment,
+          experimentSetupOutput(equdistant=false));
         Components.StateReader_water stateTapping(
                        redeclare package Medium = FluidMedium) 
           annotation (extent=[-30,-2; -10,18],  rotation=0);
@@ -24433,29 +19896,28 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       model TestSTG_cc "Test of STG with condenser control" 
         package FluidMedium = ThermoPower.Water.StandardWater;
         
-        annotation (Diagram, experiment(StopTime=20000, NumberOfIntervals=10000));
+        annotation (Diagram, experiment(StopTime=20000, NumberOfIntervals=10000),
+          experimentSetupOutput(equdistant=false));
+        
         Modelica.Mechanics.Rotational.ConstantSpeed constantSpeed(w_fixed=
               314.16/2) 
-          annotation (extent=[26,-26; 6,-6]);
+          annotation (extent=[30,-26; 10,-6]);
         Water.SourceP sourceHPT(h=3.47e6, p0=1.28e7,
           redeclare package Medium = FluidMedium) 
           annotation (extent=[-88,72; -76,84], rotation=270);
         Water.SourceP sourceLPT(h=3.109e6, p0=6e5,
           redeclare package Medium = FluidMedium) 
           annotation (extent=[-40,58; -28,70], rotation=270);
-        Water.SourceP sourceToMix(p0=2.98e6, h=3.1076e6,
-          redeclare package Medium = FluidMedium) 
-          annotation (extent=[-52,72; -40,84], rotation=270);
         Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.68e6) 
           annotation (extent=[-70,70; -58,58], rotation=0);
         Examples.STG_3LRh_bypass_cc sTG_3LRh(
-                                   redeclare package FluidMedium = FluidMedium)
+                                   redeclare package FluidMedium = FluidMedium,
+            steamTurbines(SSInit=true)) 
                                    annotation (extent=[-90,-56; -10,24]);
-        Water.SinkW sinkWater(
+        Water.SinkP sinkWater(
           redeclare package Medium = FluidMedium,
-          p0=5398.2,
           h=1.43495e5,
-          w0=89.8) annotation (extent=[-26,68; -10,84],
+          p0=6e5)  annotation (extent=[-12,68; -24,80],
                                                       rotation=90);
       public 
         Modelica.Blocks.Sources.Constant com_valveHP(k=1) 
@@ -24475,17 +19937,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       public 
         Modelica.Blocks.Sources.Constant com_bypassLP(k=0) 
           annotation (extent=[40,-50; 60,-30]);
-      public 
-        Modelica.Blocks.Sources.Constant com_valveDrumIP(k=1) 
-          annotation (extent=[100,70; 80,90]);
-      public 
-        Modelica.Blocks.Sources.Constant com_valveDrumLP(k=1) 
-          annotation (extent=[40,70; 60,90]);
       protected 
         Buses.Actuators actuators annotation (extent=[50,-80; 90,-68], rotation=
              180);
+      public 
+        Modelica.Blocks.Sources.Constant n_pump(k=1425) 
+          annotation (extent=[40,66; 60,86]);
       equation 
-        connect(constantSpeed.flange, sTG_3LRh.Shaft_b) annotation (points=[6,-16;
+        connect(constantSpeed.flange, sTG_3LRh.Shaft_b) annotation (points=[10,-16;
               -10,-16],     style(
             color=0,
             rgbcolor={0,0,0},
@@ -24508,20 +19967,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(com_bypassLP.y,actuators. Opening_byPassLP) 
                                                         annotation (points=[61,-40;
               70,-40; 70,-74],      style(color=74, rgbcolor={0,0,127}));
-        connect(com_valveDrumLP.y, actuators.Opening_valveDrumLP) annotation (
-            points=[61,80; 70,80; 70,-74], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
-        connect(com_valveDrumIP.y, actuators.Opening_valveDrumIP) annotation (
-            points=[79,80; 70,80; 70,-74], style(
-            color=74,
-            rgbcolor={0,0,127},
-            fillColor=7,
-            rgbfillColor={255,255,255},
-            fillPattern=1));
         connect(actuators, sTG_3LRh.ActuatorsBus) annotation (points=[70,-74; 6,
               -74; 6,-44; -10,-44], style(
             color=52,
@@ -24533,14 +19978,19 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (points=[-18,24; -18,68], style(thickness=2));
         connect(sTG_3LRh.From_SH_LP, sourceLPT.flange) 
           annotation (points=[-34,24; -34,58], style(thickness=2));
-        connect(sTG_3LRh.From_SH_IP, sourceToMix.flange) 
-          annotation (points=[-46,24; -46,72], style(thickness=2));
         connect(sTG_3LRh.From_RH_IP, Rh.out1) 
-          annotation (points=[-58,24; -58,64; -58,64], style(thickness=2));
-        connect(sTG_3LRh.To_RH_IP, Rh.in1) annotation (points=[-70,24; -70,44;
-              -70,64; -70.06,64], style(thickness=2));
+          annotation (points=[-58,24; -58,64],         style(thickness=2));
+        connect(sTG_3LRh.To_RH_IP, Rh.in1) annotation (points=[-70,24; -70,64;
+              -70.06,64],         style(thickness=2));
         connect(sTG_3LRh.From_SH_HP, sourceHPT.flange) 
           annotation (points=[-82,24; -82,72], style(thickness=2));
+        connect(n_pump.y, actuators.nPump_feedLP) annotation (points=[61,76; 70,
+              76; 70,-74], style(
+            color=74,
+            rgbcolor={0,0,127},
+            fillColor=30,
+            rgbfillColor={230,230,230},
+            fillPattern=1));
       end TestSTG_cc;
       
     end Tests;
@@ -24584,8 +20034,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         annotation (Diagram, Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=0,
-                rgbcolor={0,0,0},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Rectangle(extent=[-202,14; -122,-14],
@@ -24688,8 +20138,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
           annotation (extent=[-220,-20; -180,20]);
-        Buses.Sensors SensorsBus annotation (extent=[180,-120; 220,-80]);
-        Buses.Actuators ActuatorsBus annotation (extent=[220,-180; 180,-140]);
+        Buses.Sensors SensorsBus annotation (extent=[180,-100; 220,-60]);
+        Buses.Actuators ActuatorsBus annotation (extent=[220,-160; 180,-120]);
       end SingleShaft;
       
       partial model DoubleShaft 
@@ -24723,8 +20173,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[-222,80; -182,120]);
         annotation (Diagram, Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=0,
-                rgbcolor={0,0,0},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Rectangle(extent=[-204,114; -124,86],
@@ -24922,8 +20372,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 rgbfillColor={0,0,0},
                 fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
-        Buses.Sensors SensorsBus annotation (extent=[180,-120; 220,-80]);
-        Buses.Actuators ActuatorsBus annotation (extent=[220,-180; 180,-140]);
+        Buses.Sensors SensorsBus annotation (extent=[180,-100; 220,-60]);
+        Buses.Actuators ActuatorsBus annotation (extent=[220,-160; 180,-120]);
       end DoubleShaft;
       
       partial model TripleShaft 
@@ -24966,8 +20416,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[-220,-140; -180,-100]);
         annotation (Diagram, Icon(
             Rectangle(extent=[-200,200; 200,-200], style(
-                color=0,
-                rgbcolor={0,0,0},
+                color=76,
+                rgbcolor={170,170,255},
                 fillColor=30,
                 rgbfillColor={230,230,230})),
             Rectangle(extent=[-200,134; -120,106],
@@ -25249,8 +20699,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 fillPattern=1))),
           Coordsys(extent=[-200,-200; 200,200], scale=0.1));
         
-        Buses.Sensors SensorsBus annotation (extent=[180,-120; 220,-80]);
-        Buses.Actuators ActuatorsBus annotation (extent=[220,-180; 180,-140]);
+        Buses.Sensors SensorsBus annotation (extent=[180,-100; 220,-60]);
+        Buses.Actuators ActuatorsBus annotation (extent=[220,-160; 180,-120]);
       end TripleShaft;
     end Interfaces;
     
@@ -25721,59 +21171,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           
         end Generator_SE_Breaker;
         
-        model SwingEquation 
-          
-          parameter SI.Power Pmax "Output maximum power";
-          parameter Real J "Moment of inertia of the system-shaft";
-          parameter Real r=0.3 "Damping of the system";
-          parameter SI.Angle delta_start "Start value of loaded angle";
-          parameter SI.AngularVelocity omega_nom 
-            "Nominal angulary velocity of shaft";
-          
-          SI.Angle delta(start=delta_start) "Loaded angle";
-          SI.AngularVelocity d_delta "Variation of loaded angle";
-          SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
-          SI.AngularVelocity omegaGen "Angulary velocity of the generator";
-          SI.Power Pe "Outlet electric power";
-          SI.Power Pm "Inlet mechanical power";
-          Real M "Auxiliary variable";
-          Real D "Auxiliary variable";
-          
-          ThermoPower.Electrical.PowerConnection powerConnection_a 
-            annotation (extent=[-94,-14; -66,14]);
-          ThermoPower.Electrical.PowerConnection powerConnection_b 
-                                            annotation (extent=[66,-14; 94,14]);
-          Modelica.Blocks.Interfaces.RealOutput delta_out 
-            annotation (extent=[-10,56; 10,76], rotation=90);
-          annotation (Diagram, Icon(Rectangle(extent=[-80,60; 80,-60], style(
-                  color=0,
-                  rgbcolor={0,0,0},
-                  fillColor=30,
-                  rgbfillColor={230,230,230})), Text(
-                extent=[-80,40; 86,-40],
-                style(color=0, rgbcolor={0,0,0}),
-                string="S.E.")));
-          
-        equation 
-          M=J/(Np^2)*omega_nom*Np;
-          D=2*r*sqrt(Pmax*J*omega_nom*Np/(Np^2));
-          Pm=powerConnection_a.W;
-          omegaGrid = 2*Modelica.Constants.pi*powerConnection_b.f;
-          omegaGen = 2*Modelica.Constants.pi*powerConnection_a.f;
-          powerConnection_b.W = - Pe;
-          
-          //Definition of loaded angle  
-          d_delta = omega*Np - omegaGrid;
-          der(delta) = d_delta;
-          
-          //Swing Equation    
-          M*der(d_delta) + D*d_delta = Pm - Pe/eta;
-          Pe = Pmax*Modelica.Math.sin(delta);
-          
-          //Output signal
-          delta_out = delta - integer(delta/(2*Modelica.Constants.pi))*2*Modelica.Constants.pi;
-          
-        end SwingEquation;
       end OldElementsSwingEquation;
     end Components;
     
@@ -25838,7 +21235,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             fillColor=7,
             rgbfillColor={255,255,255},
             fillPattern=1));
-        connect(powerSensor.port_b, breaker.connection1) annotation (points=[28,-0.16; 
+        connect(powerSensor.port_b, breaker.connection1) annotation (points=[28,-0.16;
               34,-0.16; 34,-3.55271e-016; 50.8,-3.55271e-016],      style(
             pattern=0,
             thickness=2,
@@ -25846,7 +21243,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbfillColor={255,255,255},
             fillPattern=1));
         connect(breaker.connection2, grid.connection) annotation (points=[85.2,
-              -3.55271e-016; 86,-3.1606e-022; 86,0; 94,0; 94,3.55271e-016; 
+              -3.55271e-016; 86,-3.1606e-022; 86,0; 94,0; 94,3.55271e-016;
               102.8,3.55271e-016],
                              style(
             pattern=0,
@@ -26335,260 +21732,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                                                    style(pattern=0, thickness=2));
       end TripleShaft_static;
       
-      model SingleShaft_SE 
-        "Alternator group in configuration single-shaft (one generator)" 
-        extends 
-          ThermoPower.PowerPlants.ElectricGeneratorGroup.Interfaces.SingleShaft;
-        parameter SI.Power Pmax "Outlet maximum power";
-        parameter SI.Angle delta_start "Loaded angle start value";
-        
-        Electrical.Grid grid(fn=fn, Pn=Pn) annotation (extent=[60,-20; 100,20]);
-        Components.PowerSensor powerSensor annotation (extent=[0,-10; 20,10]);
-        annotation (Diagram);
-        Components.FrequencySensor frequencySensor 
-          annotation (extent=[0,20; 20,40]);
-        ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
-          generator_SE(
-          eta=eta,
-          Pmax=Pmax,
-          J=J_shaft,
-          delta_start=delta_start,
-          omega_nom=omega_nom)    annotation (extent=[-120,-30; -60,30]);
-      equation 
-        connect(SensorsBus.power, powerSensor.W) annotation (points=[200,-100;
-              10,-100; 10,-9.4],
-                              style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.frequency, frequencySensor.f) annotation (points=[200,-100;
-              34,-100; 34,30; 20.2,30],      style(color=84, rgbcolor={255,170,
-                213}));
-        connect(generator_SE.shaft, shaft) annotation (points=[-117,0; -200,0],
-            style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
-        connect(generator_SE.powerConnection, powerSensor.port_a) annotation (
-            points=[-68.4,5.32907e-016; -8.8,5.32907e-016; -8.8,0; 0,0],  style(
-              pattern=0, thickness=2));
-        connect(powerSensor.port_b, grid.connection) annotation (points=[20,-0.2;
-              48,-0.2; 48,3.55271e-016; 62.8,3.55271e-016],         style(
-              pattern=0, thickness=2));
-        connect(frequencySensor.port, generator_SE.powerConnection) annotation (
-           points=[0,30; -20,30; -20,5.32907e-016; -68.4,5.32907e-016],style(
-              pattern=0, thickness=2));
-      end SingleShaft_SE;
-      
-      model DoubleShaft_SE 
-        "Alternator group in configuration double-shaft (two generator)" 
-        extends 
-          ThermoPower.PowerPlants.ElectricGeneratorGroup.Interfaces.DoubleShaft;
-        parameter SI.Power Pmax_A "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft A"));
-        parameter SI.Angle delta_start_A "Loaded angle start value" 
-                                         annotation (Dialog(group = "Generator-Shaft A"));
-        parameter SI.Power Pmax_B "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft B"));
-        parameter SI.Angle delta_start_B "Loaded angle start value" 
-                                         annotation (Dialog(group = "Generator-Shaft B"));
-        
-        Components.PowerSensor powerSensor_A 
-                                            annotation (extent=[20,90; 40,110]);
-        Components.FrequencySensor frequencySensor_A 
-          annotation (extent=[20,130; 40,150]);
-        Components.PowerSensor powerSensor_B 
-                                            annotation (extent=[20,-110; 40,-90]);
-        Components.FrequencySensor frequencySensor_B 
-          annotation (extent=[20,-70; 40,-50]);
-        annotation (Diagram);
-        ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.Grid_2in grid(
-            Pn=Pn, fn=fn) 
-                   annotation (extent=[140,-20; 178,20]);
-        ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
-          generator_SE_A(
-          eta=eta_A,
-          Pmax=Pmax_A,
-          J=J_shaft_A,
-          D=d_shaft_A,
-          delta_start=delta_start_A,
-          omega_nom=omega_nom_A)    annotation (extent=[-100,70; -40,130]);
-        ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
-          generator_SE_B(
-          eta=eta_B,
-          Pmax=Pmax_B,
-          J=J_shaft_B,
-          D=d_start_B,
-          delta_start=delta_start_B,
-          omega_nom=omega_nom_B)    annotation (extent=[-100,-130; -40,-70]);
-        
-      equation 
-        connect(SensorsBus.power_shaftA, powerSensor_A.W) annotation (points=[200,-100;
-              140,-100; 140,-60; 80,-60; 80,40; 30,40; 30,90.6],
-                                                       style(color=84, rgbcolor=
-               {255,170,213}));
-        connect(SensorsBus.power_shaftB, powerSensor_B.W) annotation (points=[200,-100;
-              140,-100; 140,-120; 30,-120; 30,-109.4],    style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.frequency_shaftA, frequencySensor_A.f) annotation (
-            points=[200,-100; 140,-100; 140,-60; 80,-60; 80,140; 40.2,140],
-                                                      style(color=84, rgbcolor=
-                {255,170,213}));
-        connect(SensorsBus.frequency_shaftB, frequencySensor_B.f) annotation (
-            points=[200,-100; 140,-100; 140,-60; 40.2,-60],
-                                                        style(color=84,
-              rgbcolor={255,170,213}));
-        connect(powerSensor_B.port_b, grid.connection_B) annotation (points=[40,
-              -100.2; 46,-100.2; 46,-100; 100,-100; 100,-8; 142.66,-8],
-                                                                style(pattern=0,
-              thickness=2));
-        connect(grid.connection_A, powerSensor_A.port_b) annotation (points=[142.66,8;
-              100,8; 100,99.8; 40,99.8],           style(pattern=0, thickness=2));
-        connect(generator_SE_B.powerConnection, powerSensor_B.port_a) 
-          annotation (points=[-48.4,-100; 20,-100],
-                                                  style(pattern=0, thickness=2));
-        connect(frequencySensor_B.port, generator_SE_B.powerConnection) 
-          annotation (points=[20,-60; 0,-60; 0,-100; -48.4,-100],
-                                                                style(pattern=0,
-              thickness=2));
-        connect(powerSensor_A.port_a, generator_SE_A.powerConnection) 
-          annotation (points=[20,100; -48.4,100],
-                                                style(pattern=0, thickness=2));
-        connect(frequencySensor_A.port, generator_SE_A.powerConnection) 
-          annotation (points=[20,140; 0,140; 0,100; -48.4,100],
-                                                            style(pattern=0,
-              thickness=2));
-        connect(generator_SE_A.shaft, shaft_A) annotation (points=[-97,100;
-              -202,100],
-                   style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
-        connect(generator_SE_B.shaft, shaft_B) annotation (points=[-97,-100;
-              -200,-100],style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
-      end DoubleShaft_SE;
-      
-      model TripleShaft_SE 
-        "Alternator group in configuration triple-shaft (three generator)" 
-        extends 
-          ThermoPower.PowerPlants.ElectricGeneratorGroup.Interfaces.TripleShaft;
-        parameter SI.Power Pmax_A "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft A"));
-        parameter SI.Angle delta_start_A "Loaded angle start value" 
-                                         annotation (Dialog(group = "Generator-Shaft A"));
-        parameter SI.Power Pmax_B "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft B"));
-        parameter SI.Angle delta_start_B "Loaded angle start value" 
-                                         annotation (Dialog(group = "Generator-Shaft B"));
-        parameter SI.Power Pmax_C "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft C"));
-        parameter SI.Angle delta_start_C "Loaded angle start value" 
-                                         annotation (Dialog(group = "Generator-Shaft C"));
-        
-        Components.PowerSensor powerSensor_A 
-                                           annotation (extent=[10,110; 30,130]);
-        Components.FrequencySensor frequencySensor_A 
-          annotation (extent=[10,150; 30,170]);
-        Components.PowerSensor powerSensor_B 
-                                            annotation (extent=[10,-10; 30,10]);
-        Components.FrequencySensor frequencySensor_B 
-          annotation (extent=[10,30; 30,50]);
-        Components.PowerSensor powerSensor_C 
-                                            annotation (extent=[10,-130; 30,
-              -110]);
-        Components.FrequencySensor frequencySensor_C 
-          annotation (extent=[10,-90; 30,-70]);
-        annotation (Diagram);
-        Components.Grid_3in grid_3in(Pn=Pn, fn=fn) 
-          annotation (extent=[140,-20; 180,20],
-                                              rotation=0);
-        ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
-          generator_SE_A(
-          eta=eta_A,
-          Pmax=Pmax_A,
-          J=J_shaft_A,
-          D=d_shaft_A,
-          delta_start=delta_start_A,
-          omega_nom=omega_nom_A)    annotation (extent=[-120,90; -60,150]);
-        ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
-          generator_SE_B(
-          eta=eta_B,
-          Pmax=Pmax_B,
-          J=J_shaft_B,
-          D=d_start_B,
-          delta_start=delta_start_B,
-          omega_nom=omega_nom_B)    annotation (extent=[-120,-30; -60,30]);
-        ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
-          generator_SE_B1(
-          eta=eta_C,
-          Pmax=Pmax_C,
-          J=J_shaft_C,
-          D=d_start_C,
-          delta_start=delta_start_C,
-          omega_nom=omega_nom_C)    annotation (extent=[-120,-150; -60,-90]);
-      equation 
-        connect(SensorsBus.power_shaftC, powerSensor_C.W) annotation (points=[200,-100;
-              120,-100; 120,-140; 20,-140; 20,-129.4],    style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.frequency_shaftC, frequencySensor_C.f) annotation (
-            points=[200,-100; 60,-100; 60,-80; 30.2,-80],
-                                        style(color=84, rgbcolor={255,170,213}));
-        connect(SensorsBus.power_shaftB, powerSensor_B.W) annotation (points=[200,-100;
-              60,-100; 60,-20; 20,-20; 20,-9.4],         style(color=84,
-              rgbcolor={255,170,213}));
-        connect(SensorsBus.frequency_shaftB, frequencySensor_B.f) annotation (
-            points=[200,-100; 60,-100; 60,40; 30.2,40],
-                                                      style(color=84, rgbcolor=
-                {255,170,213}));
-        connect(SensorsBus.power_shaftA, powerSensor_A.W) annotation (points=[200,-100;
-              60,-100; 60,100; 20,100; 20,110.6],      style(color=84, rgbcolor=
-               {255,170,213}));
-        connect(SensorsBus.frequency_shaftA, frequencySensor_A.f) annotation (
-            points=[200,-100; 60,-100; 60,160; 30.2,160],
-                                                      style(color=84, rgbcolor=
-                {255,170,213}));
-        connect(generator_SE_B1.powerConnection, powerSensor_C.port_a) 
-          annotation (points=[-68.4,-120; 10,-120],
-                                                  style(pattern=0, thickness=2));
-        connect(frequencySensor_C.port, generator_SE_B1.powerConnection) 
-          annotation (points=[10,-80; -20,-80; -20,-120; -68.4,-120],
-                                                                  style(pattern=
-               0, thickness=2));
-        connect(powerSensor_B.port_a, generator_SE_B.powerConnection) 
-          annotation (points=[10,0; -6.8,0; -6.8,5.32907e-016; -68.4,
-              5.32907e-016], style(pattern=0, thickness=2));
-        connect(frequencySensor_B.port, generator_SE_B.powerConnection) 
-          annotation (points=[10,40; -20,40; -20,5.32907e-016; -68.4,
-              5.32907e-016],
-            style(pattern=0, thickness=2));
-        connect(powerSensor_A.port_a, generator_SE_A.powerConnection) 
-          annotation (points=[10,120; -68.4,120],
-                                                style(pattern=0, thickness=2));
-        connect(frequencySensor_A.port, generator_SE_A.powerConnection) 
-          annotation (points=[10,160; -20,160; -20,120; -68.4,120],
-                                                              style(pattern=0,
-              thickness=2));
-        connect(generator_SE_A.shaft, shaft_A) annotation (points=[-117,120;
-              -200,120],
-                   style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
-        connect(generator_SE_B.shaft, shaft_B) annotation (points=[-117,0; -200,
-              0], style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
-        connect(generator_SE_B1.shaft, shaft_C) annotation (points=[-117,-120;
-              -200,-120],style(
-            color=0,
-            rgbcolor={0,0,0},
-            thickness=2));
-        connect(grid_3in.connection_A, powerSensor_A.port_b) annotation (points=[142.8,16;
-              100,16; 100,119.8; 30,119.8],      style(pattern=0, thickness=2));
-        connect(grid_3in.connection_B, powerSensor_B.port_b) annotation (points=[142.8,
-              3.55271e-016; 51.7,3.55271e-016; 51.7,-0.2; 30,-0.2],
-            style(pattern=0, thickness=2));
-        connect(grid_3in.connection_C, powerSensor_C.port_b) annotation (points=[142.8,
-              -16; 100,-16; 100,-120.2; 30,-120.2],  style(pattern=0, thickness=
-               2));
-      end TripleShaft_SE;
-      
       model GeneratorGroup 
         "Alternator group in configuration single-shaft (one generator)" 
         extends Interfaces.SingleShaft( final Pn = 0, final omega_nom = 0);
@@ -26665,6 +21808,257 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(SensorsBus.loadedAngle, network.delta_out) annotation (points=[200,-100;
               100,-100; 100,-18],     style(color=84, rgbcolor={255,170,213}));
       end GeneratorGroup;
+      
+      package OldSwingEquation 
+        model SingleShaft_SE 
+          "Alternator group in configuration single-shaft (one generator)" 
+          extends 
+            ThermoPower.PowerPlants.ElectricGeneratorGroup.Interfaces.SingleShaft;
+          parameter SI.Power Pmax "Outlet maximum power";
+          parameter SI.Angle delta_start "Loaded angle start value";
+          
+          Electrical.Grid grid(fn=fn, Pn=Pn) annotation (extent=[60,-20; 100,20]);
+          Components.PowerSensor powerSensor annotation (extent=[0,-10; 20,10]);
+          annotation (Diagram);
+          Components.FrequencySensor frequencySensor 
+            annotation (extent=[0,20; 20,40]);
+          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
+            generator_SE(
+            eta=eta,
+            Pmax=Pmax,
+            J=J_shaft,
+            delta_start=delta_start,
+            omega_nom=omega_nom)    annotation (extent=[-120,-30; -60,30]);
+        equation 
+          connect(SensorsBus.power, powerSensor.W) annotation (points=[200,-100;
+                10,-100; 10,-9.4],
+                                style(color=84, rgbcolor={255,170,213}));
+          connect(SensorsBus.frequency, frequencySensor.f) annotation (points=[200,-100;
+                34,-100; 34,30; 20.2,30],      style(color=84, rgbcolor={255,170,
+                  213}));
+          connect(generator_SE.shaft, shaft) annotation (points=[-117,0; -200,0],
+              style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2));
+          connect(generator_SE.powerConnection, powerSensor.port_a) annotation (
+              points=[-68.4,5.32907e-016; -8.8,5.32907e-016; -8.8,0; 0,0],  style(
+                pattern=0, thickness=2));
+          connect(powerSensor.port_b, grid.connection) annotation (points=[20,-0.2;
+                48,-0.2; 48,3.55271e-016; 62.8,3.55271e-016],         style(
+                pattern=0, thickness=2));
+          connect(frequencySensor.port, generator_SE.powerConnection) annotation (
+             points=[0,30; -20,30; -20,5.32907e-016; -68.4,5.32907e-016],style(
+                pattern=0, thickness=2));
+        end SingleShaft_SE;
+        
+        model DoubleShaft_SE 
+          "Alternator group in configuration double-shaft (two generator)" 
+          extends 
+            ThermoPower.PowerPlants.ElectricGeneratorGroup.Interfaces.DoubleShaft;
+          parameter SI.Power Pmax_A "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft A"));
+          parameter SI.Angle delta_start_A "Loaded angle start value" 
+                                           annotation (Dialog(group = "Generator-Shaft A"));
+          parameter SI.Power Pmax_B "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft B"));
+          parameter SI.Angle delta_start_B "Loaded angle start value" 
+                                           annotation (Dialog(group = "Generator-Shaft B"));
+          
+          Components.PowerSensor powerSensor_A 
+                                              annotation (extent=[20,90; 40,110]);
+          Components.FrequencySensor frequencySensor_A 
+            annotation (extent=[20,130; 40,150]);
+          Components.PowerSensor powerSensor_B 
+                                              annotation (extent=[20,-110; 40,-90]);
+          Components.FrequencySensor frequencySensor_B 
+            annotation (extent=[20,-70; 40,-50]);
+          annotation (Diagram);
+          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.Grid_2in 
+            grid(
+              Pn=Pn, fn=fn) 
+                     annotation (extent=[140,-20; 178,20]);
+          Components.OldElementsSwingEquation.Generator_SE generator_SE_A(
+            eta=eta_A,
+            Pmax=Pmax_A,
+            J=J_shaft_A,
+            delta_start=delta_start_A,
+            omega_nom=omega_nom_A)    annotation (extent=[-100,70; -40,130]);
+          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
+            generator_SE_B(
+            eta=eta_B,
+            Pmax=Pmax_B,
+            J=J_shaft_B,
+            delta_start=delta_start_B,
+            omega_nom=omega_nom_B)    annotation (extent=[-100,-130; -40,-70]);
+          
+        equation 
+          connect(SensorsBus.power_shaftA, powerSensor_A.W) annotation (points=[200,-100;
+                140,-100; 140,-60; 80,-60; 80,40; 30,40; 30,90.6],
+                                                         style(color=84, rgbcolor=
+                 {255,170,213}));
+          connect(SensorsBus.power_shaftB, powerSensor_B.W) annotation (points=[200,-100;
+                140,-100; 140,-120; 30,-120; 30,-109.4],    style(color=84,
+                rgbcolor={255,170,213}));
+          connect(SensorsBus.frequency_shaftA, frequencySensor_A.f) annotation (
+              points=[200,-100; 140,-100; 140,-60; 80,-60; 80,140; 40.2,140],
+                                                        style(color=84, rgbcolor=
+                  {255,170,213}));
+          connect(SensorsBus.frequency_shaftB, frequencySensor_B.f) annotation (
+              points=[200,-100; 140,-100; 140,-60; 40.2,-60],
+                                                          style(color=84,
+                rgbcolor={255,170,213}));
+          connect(powerSensor_B.port_b, grid.connection_B) annotation (points=[40,
+                -100.2; 46,-100.2; 46,-100; 100,-100; 100,-8; 142.66,-8],
+                                                                  style(pattern=0,
+                thickness=2));
+          connect(grid.connection_A, powerSensor_A.port_b) annotation (points=[142.66,8;
+                100,8; 100,99.8; 40,99.8],           style(pattern=0, thickness=2));
+          connect(generator_SE_B.powerConnection, powerSensor_B.port_a) 
+            annotation (points=[-48.4,-100; 20,-100],
+                                                    style(pattern=0, thickness=2));
+          connect(frequencySensor_B.port, generator_SE_B.powerConnection) 
+            annotation (points=[20,-60; 0,-60; 0,-100; -48.4,-100],
+                                                                  style(pattern=0,
+                thickness=2));
+          connect(powerSensor_A.port_a, generator_SE_A.powerConnection) 
+            annotation (points=[20,100; -48.4,100],
+                                                  style(pattern=0, thickness=2));
+          connect(frequencySensor_A.port, generator_SE_A.powerConnection) 
+            annotation (points=[20,140; 0,140; 0,100; -48.4,100],
+                                                              style(pattern=0,
+                thickness=2));
+          connect(generator_SE_A.shaft, shaft_A) annotation (points=[-97,100;
+                -202,100],
+                     style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2));
+          connect(generator_SE_B.shaft, shaft_B) annotation (points=[-97,-100;
+                -200,-100],style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2));
+        end DoubleShaft_SE;
+        
+        model TripleShaft_SE 
+          "Alternator group in configuration triple-shaft (three generator)" 
+          extends 
+            ThermoPower.PowerPlants.ElectricGeneratorGroup.Interfaces.TripleShaft;
+          parameter SI.Power Pmax_A "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft A"));
+          parameter SI.Angle delta_start_A "Loaded angle start value" 
+                                           annotation (Dialog(group = "Generator-Shaft A"));
+          parameter SI.Power Pmax_B "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft B"));
+          parameter SI.Angle delta_start_B "Loaded angle start value" 
+                                           annotation (Dialog(group = "Generator-Shaft B"));
+          parameter SI.Power Pmax_C "Outlet maximum power" annotation (Dialog(group = "Generator-Shaft C"));
+          parameter SI.Angle delta_start_C "Loaded angle start value" 
+                                           annotation (Dialog(group = "Generator-Shaft C"));
+          
+          Components.PowerSensor powerSensor_A 
+                                             annotation (extent=[10,110; 30,130]);
+          Components.FrequencySensor frequencySensor_A 
+            annotation (extent=[10,150; 30,170]);
+          Components.PowerSensor powerSensor_B 
+                                              annotation (extent=[10,-10; 30,10]);
+          Components.FrequencySensor frequencySensor_B 
+            annotation (extent=[10,30; 30,50]);
+          Components.PowerSensor powerSensor_C 
+                                              annotation (extent=[10,-130; 30,
+                -110]);
+          Components.FrequencySensor frequencySensor_C 
+            annotation (extent=[10,-90; 30,-70]);
+          annotation (Diagram);
+          Components.Grid_3in grid_3in(Pn=Pn, fn=fn) 
+            annotation (extent=[140,-20; 180,20],
+                                                rotation=0);
+          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
+            generator_SE_A(
+            eta=eta_A,
+            Pmax=Pmax_A,
+            J=J_shaft_A,
+            delta_start=delta_start_A,
+            omega_nom=omega_nom_A)    annotation (extent=[-120,90; -60,150]);
+          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
+            generator_SE_B(
+            eta=eta_B,
+            Pmax=Pmax_B,
+            J=J_shaft_B,
+            delta_start=delta_start_B,
+            omega_nom=omega_nom_B)    annotation (extent=[-120,-30; -60,30]);
+          ThermoPower.PowerPlants.ElectricGeneratorGroup.Components.OldElementsSwingEquation.Generator_SE
+            generator_SE_B1(
+            eta=eta_C,
+            Pmax=Pmax_C,
+            J=J_shaft_C,
+            delta_start=delta_start_C,
+            omega_nom=omega_nom_C)    annotation (extent=[-120,-150; -60,-90]);
+        equation 
+          connect(SensorsBus.power_shaftC, powerSensor_C.W) annotation (points=[200,-100;
+                120,-100; 120,-140; 20,-140; 20,-129.4],    style(color=84,
+                rgbcolor={255,170,213}));
+          connect(SensorsBus.frequency_shaftC, frequencySensor_C.f) annotation (
+              points=[200,-100; 60,-100; 60,-80; 30.2,-80],
+                                          style(color=84, rgbcolor={255,170,213}));
+          connect(SensorsBus.power_shaftB, powerSensor_B.W) annotation (points=[200,-100;
+                60,-100; 60,-20; 20,-20; 20,-9.4],         style(color=84,
+                rgbcolor={255,170,213}));
+          connect(SensorsBus.frequency_shaftB, frequencySensor_B.f) annotation (
+              points=[200,-100; 60,-100; 60,40; 30.2,40],
+                                                        style(color=84, rgbcolor=
+                  {255,170,213}));
+          connect(SensorsBus.power_shaftA, powerSensor_A.W) annotation (points=[200,-100;
+                60,-100; 60,100; 20,100; 20,110.6],      style(color=84, rgbcolor=
+                 {255,170,213}));
+          connect(SensorsBus.frequency_shaftA, frequencySensor_A.f) annotation (
+              points=[200,-100; 60,-100; 60,160; 30.2,160],
+                                                        style(color=84, rgbcolor=
+                  {255,170,213}));
+          connect(generator_SE_B1.powerConnection, powerSensor_C.port_a) 
+            annotation (points=[-68.4,-120; 10,-120],
+                                                    style(pattern=0, thickness=2));
+          connect(frequencySensor_C.port, generator_SE_B1.powerConnection) 
+            annotation (points=[10,-80; -20,-80; -20,-120; -68.4,-120],
+                                                                    style(pattern=
+                 0, thickness=2));
+          connect(powerSensor_B.port_a, generator_SE_B.powerConnection) 
+            annotation (points=[10,0; -6.8,0; -6.8,5.32907e-016; -68.4,
+                5.32907e-016], style(pattern=0, thickness=2));
+          connect(frequencySensor_B.port, generator_SE_B.powerConnection) 
+            annotation (points=[10,40; -20,40; -20,5.32907e-016; -68.4,
+                5.32907e-016],
+              style(pattern=0, thickness=2));
+          connect(powerSensor_A.port_a, generator_SE_A.powerConnection) 
+            annotation (points=[10,120; -68.4,120],
+                                                  style(pattern=0, thickness=2));
+          connect(frequencySensor_A.port, generator_SE_A.powerConnection) 
+            annotation (points=[10,160; -20,160; -20,120; -68.4,120],
+                                                                style(pattern=0,
+                thickness=2));
+          connect(generator_SE_A.shaft, shaft_A) annotation (points=[-117,120;
+                -200,120],
+                     style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2));
+          connect(generator_SE_B.shaft, shaft_B) annotation (points=[-117,0; -200,
+                0], style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2));
+          connect(generator_SE_B1.shaft, shaft_C) annotation (points=[-117,-120;
+                -200,-120],style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2));
+          connect(grid_3in.connection_A, powerSensor_A.port_b) annotation (points=[142.8,16;
+                100,16; 100,119.8; 30,119.8],      style(pattern=0, thickness=2));
+          connect(grid_3in.connection_B, powerSensor_B.port_b) annotation (points=[142.8,
+                3.55271e-016; 51.7,3.55271e-016; 51.7,-0.2; 30,-0.2],
+              style(pattern=0, thickness=2));
+          connect(grid_3in.connection_C, powerSensor_C.port_b) annotation (points=[142.8,
+                -16; 100,-16; 100,-120.2; 30,-120.2],  style(pattern=0, thickness=
+                 2));
+        end TripleShaft_SE;
+      end OldSwingEquation;
     end Examples;
     
     package Tests "Test cases" 
@@ -26722,9 +22116,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[66,-18; 86,2]);
       equation 
         connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40;
-              -51.68,40; -51.68,4.8],          style(thickness=2));
+              -51.2,40; -51.2,4.8],            style(thickness=2));
         connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18;
-              -76,4.64],                     style(thickness=2));
+              -76,11.4; -76,4.8; -76.8,4.8], style(thickness=2));
         connect(sourceP.flange,valveHP. inlet) 
           annotation (points=[-84,40; -76,40; -76,30], style(thickness=2));
         connect(add.y, valveHP.theta) annotation (points=[-56.7,69; -62,69; -62,
@@ -26742,8 +22136,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             rgbcolor={0,0,0},
             thickness=2));
         connect(grid.connection, generator_SE.powerConnection) annotation (
-            points=[67.4,-8; 53.1,-8; 53.1,-8; 38.8,-8],
-                                         style(pattern=0, thickness=2));
+            points=[67.4,-8; 38.8,-8],   style(pattern=0, thickness=2));
       end Test_Generator_SE;
       
       model Test_Generator_SE_com 
@@ -26796,9 +22189,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[66,-18; 86,2]);
       equation 
         connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40;
-              -51.68,40; -51.68,4.8],          style(thickness=2));
+              -51.2,40; -51.2,4.8],            style(thickness=2));
         connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18;
-              -76,4.64],                     style(thickness=2));
+              -76,11.4; -76,4.8; -76.8,4.8], style(thickness=2));
         connect(sourceP.flange,valveHP. inlet) 
           annotation (points=[-84,40; -76,40; -76,30], style(thickness=2));
         connect(add.y, valveHP.theta) annotation (points=[-56.7,69; -62,69; -62,
@@ -26876,9 +22269,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (extent=[38,46; 58,66]);
       equation 
         connect(sinkP.flange,steamTurbineStodola. outlet) annotation (points=[-44,40;
-              -51.68,40; -51.68,4.8],          style(thickness=2));
+              -51.2,40; -51.2,4.8],            style(thickness=2));
         connect(valveHP.outlet,steamTurbineStodola. inlet) annotation (points=[-76,18;
-              -76,4.64],                     style(thickness=2));
+              -76,11.4; -76,4.8; -76.8,4.8], style(thickness=2));
         connect(sourceP.flange,valveHP. inlet) 
           annotation (points=[-84,40; -76,40; -76,30], style(thickness=2));
         connect(add.y, valveHP.theta) annotation (points=[-56.7,69; -62,69; -62,
@@ -26941,10 +22334,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color=0,
             rgbcolor={0,0,0},
             thickness=2));
-        connect(sourceW.flange, steamTurbineStodola.inlet) annotation (points=[
-              -82,60; -75.5,60; -75.5,17.38], style(thickness=2));
-        connect(sinkP.flange, steamTurbineStodola.outlet) annotation (points=[
-              -36,60; -48.14,60; -48.14,17.6], style(thickness=2));
+        connect(sourceW.flange, steamTurbineStodola.inlet) annotation (points=[-82,60;
+              -76.4,60; -76.4,17.6],          style(thickness=2));
+        connect(sinkP.flange, steamTurbineStodola.outlet) annotation (points=[-36,60;
+              -47.6,60; -47.6,17.6],           style(thickness=2));
         connect(sensors, singleShaft.SensorsBus) annotation (points=[72,50; 90,
               50; 90,-20; 80,-20],   style(color=84, rgbcolor={255,170,213}));
         connect(actuators, singleShaft.ActuatorsBus) annotation (points=[74,-50;
@@ -27332,930 +22725,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 </html>"));
   end Buses;
   
-  package Tests "Tests for complessive steam power plants" 
-    
-    model TestSteamPlant 
-      "Test total plant with parameters initial resetting and without control" 
-      package FlueGasMedium = ThermoPower.Media.FlueGas;
-      package FluidMedium = ThermoPower.Water.StandardWater;
-      ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
-                                   drums(
-          fluidHPNomPressure=1.22116e7,
-          fluidIPNomPressure=2.63694e6,
-          fluidLPNomPressure=6.047e5,
-          HPd_hvstart=2.61182e6,
-          HPd_hlstart=1.411212e6,
-          IPd_hvstart=2.79542e6,
-          IPd_hlstart=9.22034e5,
-          LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5), HeatExchangersGroup(
-          fluidHPNomPressure_Sh=1.22116e7,
-          fluidHPNomPressure_Ev=1.22116e7,
-          fluidHPNomPressure_Ec=1.22116e7,
-          fluidIPNomPressure_Rh=2.63694e6,
-          fluidIPNomPressure_Sh=2.63694e6,
-          fluidIPNomPressure_Ev=2.63694e6,
-          fluidIPNomPressure_Ec=2.63694e6,
-          fluidLPNomPressure_Sh=6.0474e5,
-          fluidLPNomPressure_Ev=6.0474e5,
-          fluidLPNomPressure_Ec=6.0474e5,
-          fluidHPNomFlowRate_Sh=62.8,
-          fluidHPNomFlowRate_Ec=64.5,
-          fluidIPNomFlowRate_Rh=77.36,
-          fluidIPNomFlowRate_Sh=14.5,
-          fluidIPNomFlowRate_Ec=13.5,
-          fluidLPNomFlowRate_Sh=10.95,
-          fluidLPNomFlowRate_Ec=89.8,
-          Ec2_HP_Tstart_G_In=605.074,
-          Ec2_HP_Tstart_G_Out=548.522,
-          Ec2_HP_Tstart_M_In=488.443,
-          Ec2_HP_Tstart_M_Out=588.719,
-          Ec2_HP_Tstart_F_In=476.660,
-          Ec2_HP_Tstart_F_Out=585.495,
-          Ec1_HP_Tstart_M_In=426.384,
-          Ec1_HP_Tstart_M_Out=479.885,
-          Ec1_HP_Tstart_F_In=420.129,
-          Ec1_HP_Tstart_F_Out=476.660,
-          Ec_IP_Tstart_G_In=501.802,
-          Ec_IP_Tstart_G_Out=468.900,
-          Ec_IP_Tstart_M_In=427.707,
-          Ec_IP_Tstart_M_Out=490.160,
-          Ec_IP_Tstart_F_In=421.552,
-          Ec_IP_Tstart_F_Out=488.422,
-          Ec_LP_Tstart_G_In=427.671,
-          Ec_LP_Tstart_M_In=336.404,
-          Ec_LP_Tstart_M_Out=419.330,
-          Ec_LP_Tstart_F_In=331.506,
-          Ec_LP_Tstart_F_Out=418.193,
-          Ev_HP_Tstart_G_In=732.000,
-          Ev_HP_Tstart_G_Out=611.190,
-          Ev_HP_Tstart_M_In=594.933,
-          Ev_HP_Tstart_M_Out=603.160,
-          Ev_HP_hstart_F_In=1.46797e6,
-          Ev_HP_hstart_F_Out=1.90129e6,
-          Ev_IP_Tstart_G_In=548.522,
-          Ev_IP_Tstart_G_Out=503.810,
-          Ev_IP_Tstart_M_In=497.865,
-          Ev_IP_Tstart_M_Out=501.763,
-          Ev_IP_hstart_F_In=9.64527e5,
-          Ev_IP_hstart_F_Out=1.36736e6,
-          Ev_LP_Tstart_G_In=468.900,
-          Ev_LP_Tstart_G_Out=427.671,
-          Ev_LP_Tstart_M_In=422.216,
-          Ev_LP_Tstart_M_Out=434.622,
-          Ev_LP_hstart_F_In=6.26623e5,
-          Ev_LP_hstart_F_Out=1.22154e6,
-          Sh2_HP_Tstart_G_In=884.650,
-          Sh2_HP_Tstart_G_Out=849.290,
-          Sh2_HP_Tstart_M_In=801.698,
-          Sh2_HP_Tstart_M_Out=861.343,
-          Sh2_HP_Tstart_F_In=792.680,
-          Sh2_HP_Tstart_F_Out=857.106,
-          Sh1_HP_Tstart_G_In=849.290,
-          Sh1_HP_Tstart_G_Out=732.000,
-          Sh1_HP_Tstart_M_In=624.205,
-          Sh1_HP_Tstart_M_Out=803.585,
-          Sh1_HP_Tstart_F_In=599.180,
-          Sh1_HP_Tstart_F_Out=792.680,
-          Rh2_IP_Tstart_M_In=793.962,
-          Rh2_IP_Tstart_M_Out=863.890,
-          Rh2_IP_Tstart_F_In=787.973,
-          Rh2_IP_Tstart_F_Out=861.625,
-          Rh1_IP_Tstart_M_In=641.307,
-          Rh1_IP_Tstart_M_Out=793.753,
-          Rh1_IP_Tstart_F_In=631.882,
-          Rh1_IP_Tstart_F_Out=787.973,
-          Sh_IP_Tstart_G_In=611.19,
-          Sh_IP_Tstart_G_Out=605.074,
-          Sh_IP_Tstart_M_In=504.237,
-          Sh_IP_Tstart_M_Out=594.703,
-          Sh_IP_Tstart_F_In=499.962,
-          Sh_IP_Tstart_F_Out=594.001,
-          Sh_LP(gamma_G=30, gamma_F=4000),
-          Sh_LP_N_F=4,
-          Ec_LP_Tstart_G_Out=372.309)) 
-                              annotation (extent=[-100,20; 0,120]);
-      SteamTurbineGroup.Examples.STG_3LRh sTG_3LRh(steamTurbines(
-          steamHPNomPressure=1.2202e7,
-          steamIPNomPressure=2.63681e6,
-          steamLPNomPressure=6.047e5,
-          HPT_hstart_in=3.56678e6,
-          HPT_hstart_out=3.16451e6,
-          IPT_hstart_in=3.65985e6,
-          IPT_hstart_out=3.21285e6,
-          LPT_hstart_in=3.16961e6,
-          LPT_hstart_out=2.41849e6,
-          mixLP_hstart=3.16953e6,
-          mixIP_hstart=3.14446e6,
-          steamHPNomFlowRate=62.8,
-          steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9)) 
-        annotation (extent=[-100,-140; 0,-40]);
-      annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1),
-        Documentation(revisions="<html>
-<ul>
-<li><i>15 Apr 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      Gas.SourceW sourceGas(
-        redeclare package Medium = FlueGasMedium,
-        w0=585.5,
-        T=884.65)          annotation (extent=[-180,50; -160,70]);
-      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
-                                             redeclare package Medium = 
-            FlueGasMedium) annotation (extent=[-150,50; -130,70], rotation=0);
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309) 
-                       annotation (extent=[60,50; 80,70]);
-      Modelica.Blocks.Sources.Constant feedHP(k=62.5) 
-        annotation (extent=[180,140; 160,160]);
-      Modelica.Blocks.Sources.Constant feedIP(k=14.5) 
-        annotation (extent=[180,100; 160,120]);
-      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
-                                              redeclare package Medium = 
-            FlueGasMedium) annotation (extent=[30,50; 50,70],   rotation=0);
-    protected 
-      Buses.Actuators actuators annotation (extent=[120,-20; 100,0]);
-    public 
-      Modelica.Blocks.Sources.Constant n_pumpLP(k=1450) 
-        annotation (extent=[180,60; 160,80]);
-      ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
-        eta=0.9,
-        J_shaft=15000,
-        d_shaft=25,
-        Pmax=150e6,
-        delta_start=0.7) 
-                    annotation (extent=[40,-140; 140,-40]);
-    public 
-      Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
-        annotation (extent=[180,20; 160,40]);
-    equation 
-      connect(stateGas_in.inlet, sourceGas.flange) annotation (points=[-146,60;
-            -160,60],style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(stateGas_in.outlet, hRSG.GasIn) annotation (points=[-134,60; -100,
-            60], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(sinkGas.flange, stateGas_out.outlet) annotation (points=[60,60;
-            46,60],                 style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(stateGas_out.inlet, hRSG.GasOut) annotation (points=[34,60; 0,60],
-                 style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (points=[40,-90;
-            0,-90], style(
-          color=0,
-          rgbcolor={0,0,0},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(feedHP.y, actuators.flowRate_feedHP) annotation (points=[159,150;
-            110,150; 110,-10],
-                           style(color=74, rgbcolor={0,0,127}));
-      connect(feedIP.y, actuators.flowRate_feedIP) annotation (points=[159,110;
-            110,110; 110,-10],
-                           style(color=74, rgbcolor={0,0,127}));
-      connect(n_pumpLP.y, actuators.nPump_feedLP) annotation (points=[159,70;
-            110,70; 110,-10], style(
-          color=74,
-          rgbcolor={0,0,127},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (
-          points=[159,30; 110,30; 110,-10], style(
-          color=5,
-          rgbcolor={255,0,255},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.SensorsBus, hRSG.SensorsBus) annotation (points=[0,-110;
-            20,-110; 20,110; 0,110], style(
-          color=84,
-          rgbcolor={255,170,213},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (points=[
-            0,-110; 20,-110; 20,-160; 160,-160; 160,-115; 140,-115], style(
-          color=84,
-          rgbcolor={255,170,213},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(hRSG.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (points=[0,
-            95; 14,95; 14,-125; 0,-125], style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.ActuatorsBus, singleShaft.ActuatorsBus) annotation (
-          points=[0,-125; 8,-125; 8,-106; 14,-106; 14,-132; 152,-132; 152,-130;
-            140,-130], style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(actuators, hRSG.ActuatorsBus) annotation (points=[110,-10; 14,-10;
-            14,95; 0,95], style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.WaterOut, hRSG.WaterIn) annotation (points=[-10,-40; -10,
-            20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_SH_LP, hRSG.Sh_LP_Out) annotation (points=[-30,-40;
-            -30,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_SH_IP, hRSG.Sh_IP_Out) annotation (points=[-45,-40;
-            -45,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_RH_IP, hRSG.Rh_IP_Out) annotation (points=[-60,-40;
-            -60,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (points=[-75,-40;
-            -75,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_SH_HP, hRSG.Sh_HP_Out) annotation (points=[-90,-40;
-            -90,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-    end TestSteamPlant;
-    
-    model TestSteamPlant_valve 
-      "Test total plant with parameters initial resetting, level control and inlet valve on the steam turbine group" 
-      package FlueGasMedium = ThermoPower.Media.FlueGas;
-      package FluidMedium = ThermoPower.Water.StandardWater;
-      ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
-                                   drums(
-          fluidHPNomPressure=1.22116e7,
-          fluidIPNomPressure=2.63694e6,
-          fluidLPNomPressure=6.047e5,
-          HPd_hvstart=2.61182e6,
-          HPd_hlstart=1.411212e6,
-          IPd_hvstart=2.79542e6,
-          IPd_hlstart=9.22034e5,
-          LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5), HeatExchangersGroup(
-          fluidHPNomPressure_Sh=1.22116e7,
-          fluidHPNomPressure_Ev=1.22116e7,
-          fluidHPNomPressure_Ec=1.22116e7,
-          fluidIPNomPressure_Rh=2.63694e6,
-          fluidIPNomPressure_Sh=2.63694e6,
-          fluidIPNomPressure_Ev=2.63694e6,
-          fluidIPNomPressure_Ec=2.63694e6,
-          fluidLPNomPressure_Sh=6.0474e5,
-          fluidLPNomPressure_Ev=6.0474e5,
-          fluidLPNomPressure_Ec=6.0474e5,
-          fluidHPNomFlowRate_Sh=62.8,
-          fluidHPNomFlowRate_Ec=64.5,
-          fluidIPNomFlowRate_Rh=77.36,
-          fluidIPNomFlowRate_Sh=14.5,
-          fluidIPNomFlowRate_Ec=13.5,
-          fluidLPNomFlowRate_Sh=10.95,
-          fluidLPNomFlowRate_Ec=89.8,
-          Ec2_HP_Tstart_G_In=605.074,
-          Ec2_HP_Tstart_G_Out=548.522,
-          Ec2_HP_Tstart_M_In=488.443,
-          Ec2_HP_Tstart_M_Out=588.719,
-          Ec2_HP_Tstart_F_In=476.660,
-          Ec2_HP_Tstart_F_Out=585.495,
-          Ec1_HP_Tstart_M_In=426.384,
-          Ec1_HP_Tstart_M_Out=479.885,
-          Ec1_HP_Tstart_F_In=420.129,
-          Ec1_HP_Tstart_F_Out=476.660,
-          Ec_IP_Tstart_G_In=501.802,
-          Ec_IP_Tstart_G_Out=468.900,
-          Ec_IP_Tstart_M_In=427.707,
-          Ec_IP_Tstart_M_Out=490.160,
-          Ec_IP_Tstart_F_In=421.552,
-          Ec_IP_Tstart_F_Out=488.422,
-          Ec_LP_Tstart_G_In=427.671,
-          Ec_LP_Tstart_M_In=336.404,
-          Ec_LP_Tstart_M_Out=419.330,
-          Ec_LP_Tstart_F_In=331.506,
-          Ec_LP_Tstart_F_Out=418.193,
-          Ev_HP_Tstart_G_In=732.000,
-          Ev_HP_Tstart_G_Out=611.190,
-          Ev_HP_Tstart_M_In=594.933,
-          Ev_HP_Tstart_M_Out=603.160,
-          Ev_HP_hstart_F_In=1.46797e6,
-          Ev_HP_hstart_F_Out=1.90129e6,
-          Ev_IP_Tstart_G_In=548.522,
-          Ev_IP_Tstart_G_Out=503.810,
-          Ev_IP_Tstart_M_In=497.865,
-          Ev_IP_Tstart_M_Out=501.763,
-          Ev_IP_hstart_F_In=9.64527e5,
-          Ev_IP_hstart_F_Out=1.36736e6,
-          Ev_LP_Tstart_G_In=468.900,
-          Ev_LP_Tstart_G_Out=427.671,
-          Ev_LP_Tstart_M_In=422.216,
-          Ev_LP_Tstart_M_Out=434.622,
-          Ev_LP_hstart_F_In=6.26623e5,
-          Ev_LP_hstart_F_Out=1.22154e6,
-          Sh2_HP_Tstart_G_In=884.650,
-          Sh2_HP_Tstart_G_Out=849.290,
-          Sh2_HP_Tstart_M_In=801.698,
-          Sh2_HP_Tstart_M_Out=861.343,
-          Sh2_HP_Tstart_F_In=792.680,
-          Sh2_HP_Tstart_F_Out=857.106,
-          Sh1_HP_Tstart_G_In=849.290,
-          Sh1_HP_Tstart_G_Out=732.000,
-          Sh1_HP_Tstart_M_In=624.205,
-          Sh1_HP_Tstart_M_Out=803.585,
-          Sh1_HP_Tstart_F_In=599.180,
-          Sh1_HP_Tstart_F_Out=792.680,
-          Rh2_IP_Tstart_M_In=793.962,
-          Rh2_IP_Tstart_M_Out=863.890,
-          Rh2_IP_Tstart_F_In=787.973,
-          Rh2_IP_Tstart_F_Out=861.625,
-          Rh1_IP_Tstart_M_In=641.307,
-          Rh1_IP_Tstart_M_Out=793.753,
-          Rh1_IP_Tstart_F_In=631.882,
-          Rh1_IP_Tstart_F_Out=787.973,
-          Sh_IP_Tstart_G_In=611.19,
-          Sh_IP_Tstart_G_Out=605.074,
-          Sh_IP_Tstart_M_In=504.237,
-          Sh_IP_Tstart_M_Out=594.703,
-          Sh_IP_Tstart_F_In=499.962,
-          Sh_IP_Tstart_F_Out=594.001,
-          Sh_LP(gamma_G=30, gamma_F=4000),
-          Sh_LP_N_F=4,
-          Ec_LP_Tstart_G_Out=372.309,
-          Ev_LP(gamma_G=80, gamma_F=20000),
-          redeclare HRSG.Components.StateReader_water stateEcLP_out,
-          redeclare HRSG.Components.StateReader_water stateEcIP_out,
-          redeclare HRSG.Components.StateReader_water stateEc2HP_out)) 
-                              annotation (extent=[-100,20; 0,120]);
-      SteamTurbineGroup.Examples.STG_3LRh_valve steamTurbineGroup(steamTurbines(
-          steamHPNomPressure=1.2202e7,
-          steamIPNomPressure=2.63681e6,
-          steamLPNomPressure=6.047e5,
-          HPT_hstart_in=3.56678e6,
-          HPT_hstart_out=3.16451e6,
-          IPT_hstart_in=3.65985e6,
-          IPT_hstart_out=3.21285e6,
-          LPT_hstart_in=3.16961e6,
-          LPT_hstart_out=2.41849e6,
-          mixLP_hstart=3.16953e6,
-          mixIP_hstart=3.14446e6,
-          steamHPNomFlowRate=62.8,
-          steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9)) 
-        annotation (extent=[-100,-180; 0,-80]);
-      annotation (Diagram, Coordsys(extent=[-200,-200; 200,200], scale=0.1),
-        Documentation(revisions="<html>
-<ul>
-<li><i>15 Apr 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      Gas.SourceW sourceGas(
-        redeclare package Medium = FlueGasMedium,
-        w0=585.5,
-        T=884.65)          annotation (extent=[-180,50; -160,70]);
-      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
-                                             redeclare package Medium = 
-            FlueGasMedium) annotation (extent=[-150,50; -130,70], rotation=0);
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309) 
-                       annotation (extent=[60,50; 80,70]);
-      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
-                                              redeclare package Medium = 
-            FlueGasMedium) annotation (extent=[30,50; 50,70],   rotation=0);
-      ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
-        eta=0.9,
-        J_shaft=15000,
-        d_shaft=25,
-        Pmax=150e6,
-        delta_start=0.8) 
-                    annotation (extent=[40,-180; 140,-80]);
-    public 
-      Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
-        annotation (extent=[180,-60; 160,-40]);
-    public 
-      ThermoPower.PowerPlants.HRSG.Control.levelsControl 
-        levelsControlSimplified(
-          CSmin_levelLP=500, CSmax_levelLP=2500) 
-        annotation (extent=[60,120; 120,180]);
-    public 
-      Modelica.Blocks.Sources.Ramp valveHP_com(height=0, offset=1) 
-        annotation (extent=[180,60; 160,80]);
-      Modelica.Blocks.Sources.Ramp valveIP_com(height=0, offset=1) 
-        annotation (extent=[180,20; 160,40]);
-      Modelica.Blocks.Sources.Ramp valveLP_com(height=0, offset=1) 
-        annotation (extent=[180,-20; 160,0]);
-    protected 
-      Buses.Actuators actuators annotation (extent=[120,-60; 100,-40]);
-    equation 
-      connect(singleShaft.shaft, steamTurbineGroup.Shaft_b) 
-                                                   annotation (points=[40,-130;
-            0,-130],style(
-          color=0,
-          rgbcolor={0,0,0},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(stateGas_in.inlet, sourceGas.flange) annotation (points=[-146,60;
-            -160,60], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sinkGas.flange, stateGas_out.outlet) annotation (points=[60,60;
-            46,60], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(stateGas_in.outlet, hRSG.GasIn) annotation (points=[-134,60; -100,
-            60], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(stateGas_out.inlet, hRSG.GasOut) annotation (points=[34,60; 0,60],
-          style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.From_SH_HP, hRSG.Sh_HP_Out) annotation (points=
-            [-90,-80; -88,-80; -88,20; -90,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.To_RH_IP, hRSG.Rh_IP_In) annotation (points=[
-            -75,-80; -75,-80; -75,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.From_RH_IP, hRSG.Rh_IP_Out) annotation (points=
-            [-60,-80; -60,20; -60,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.From_SH_IP, hRSG.Sh_IP_Out) annotation (points=
-            [-45,-80; -45,-29; -45,-29; -45,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.From_SH_LP, hRSG.Sh_LP_Out) annotation (points=
-            [-30,-80; -30,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.WaterOut, hRSG.WaterIn) annotation (points=[-10,
-            -80; -10,20; -10,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.SensorsBus, hRSG.SensorsBus) annotation (points=
-           [0,-150; 20,-150; 20,110; 0,110], style(
-          color=84,
-          rgbcolor={255,170,213},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.SensorsBus, singleShaft.SensorsBus) annotation (
-         points=[0,-150; 20,-150; 20,-190; 160,-190; 160,-155; 140,-155], style(
-          color=84,
-          rgbcolor={255,170,213},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(hRSG.ActuatorsBus, steamTurbineGroup.ActuatorsBus) annotation (
-          points=[0,95; 14,95; 14,-165; 0,-165], style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(steamTurbineGroup.ActuatorsBus, singleShaft.ActuatorsBus) 
-        annotation (points=[0,-165; 14,-165; 14,-198; 168,-198; 168,-170; 140,
-            -170], style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(actuators, hRSG.ActuatorsBus) annotation (points=[110,-50; 14,-50;
-            14,95; 0,95], style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(hRSG.ActuatorsBus, levelsControlSimplified.ActuatorsBus) 
-        annotation (points=[0,95; 76,95; 76,96; 140,96; 140,150; 120,150],
-          style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(levelsControlSimplified.SensorsBus, hRSG.SensorsBus) annotation (
-          points=[60,150; 20,150; 20,110; 0,110], style(
-          color=84,
-          rgbcolor={255,170,213},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (points=[159,
-            70; 110,70; 110,-50], style(
-          color=74,
-          rgbcolor={0,0,127},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (points=[159,
-            30; 110,30; 110,-50], style(
-          color=74,
-          rgbcolor={0,0,127},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (points=[159,
-            -10; 110,-10; 110,-50], style(
-          color=74,
-          rgbcolor={0,0,127},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (
-          points=[159,-50; 112,-50], style(
-          color=5,
-          rgbcolor={255,0,255},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-    end TestSteamPlant_valve;
-    
-    model TestSteamPlant_controls 
-      "Test total plant with levels control and ratio control on the condenser " 
-      package FlueGasMedium = ThermoPower.Media.FlueGas;
-      package FluidMedium = ThermoPower.Water.StandardWater;
-      ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
-                                  HeatExchangersGroup(
-          fluidHPNomPressure_Sh=1.22116e7,
-          fluidHPNomPressure_Ev=1.22116e7,
-          fluidHPNomPressure_Ec=1.22116e7,
-          fluidIPNomPressure_Rh=2.63694e6,
-          fluidIPNomPressure_Sh=2.63694e6,
-          fluidIPNomPressure_Ev=2.63694e6,
-          fluidIPNomPressure_Ec=2.63694e6,
-          fluidLPNomPressure_Sh=6.0474e5,
-          fluidLPNomPressure_Ev=6.0474e5,
-          fluidLPNomPressure_Ec=6.0474e5,
-          fluidHPNomFlowRate_Sh=62.8,
-          fluidHPNomFlowRate_Ec=64.5,
-          fluidIPNomFlowRate_Rh=77.36,
-          fluidIPNomFlowRate_Sh=14.5,
-          fluidIPNomFlowRate_Ec=13.5,
-          fluidLPNomFlowRate_Sh=10.95,
-          fluidLPNomFlowRate_Ec=89.8,
-          Ec2_HP_Tstart_G_In=605.074,
-          Ec2_HP_Tstart_G_Out=548.522,
-          Ec2_HP_Tstart_M_In=488.443,
-          Ec2_HP_Tstart_M_Out=588.719,
-          Ec2_HP_Tstart_F_In=476.660,
-          Ec2_HP_Tstart_F_Out=585.495,
-          Ec1_HP_Tstart_M_In=426.384,
-          Ec1_HP_Tstart_M_Out=479.885,
-          Ec1_HP_Tstart_F_In=420.129,
-          Ec1_HP_Tstart_F_Out=476.660,
-          Ec_IP_Tstart_G_In=501.802,
-          Ec_IP_Tstart_G_Out=468.900,
-          Ec_IP_Tstart_M_In=427.707,
-          Ec_IP_Tstart_M_Out=490.160,
-          Ec_IP_Tstart_F_In=421.552,
-          Ec_IP_Tstart_F_Out=488.422,
-          Ec_LP_Tstart_G_In=427.671,
-          Ec_LP_Tstart_M_In=336.404,
-          Ec_LP_Tstart_M_Out=419.330,
-          Ec_LP_Tstart_F_In=331.506,
-          Ec_LP_Tstart_F_Out=418.193,
-          Ev_HP_Tstart_G_In=732.000,
-          Ev_HP_Tstart_G_Out=611.190,
-          Ev_HP_Tstart_M_In=594.933,
-          Ev_HP_Tstart_M_Out=603.160,
-          Ev_HP_hstart_F_In=1.46797e6,
-          Ev_HP_hstart_F_Out=1.90129e6,
-          Ev_IP_Tstart_G_In=548.522,
-          Ev_IP_Tstart_G_Out=503.810,
-          Ev_IP_Tstart_M_In=497.865,
-          Ev_IP_Tstart_M_Out=501.763,
-          Ev_IP_hstart_F_In=9.64527e5,
-          Ev_IP_hstart_F_Out=1.36736e6,
-          Ev_LP_Tstart_G_In=468.900,
-          Ev_LP_Tstart_G_Out=427.671,
-          Ev_LP_Tstart_M_In=422.216,
-          Ev_LP_Tstart_M_Out=434.622,
-          Ev_LP_hstart_F_In=6.26623e5,
-          Ev_LP_hstart_F_Out=1.22154e6,
-          Sh2_HP_Tstart_G_In=884.650,
-          Sh2_HP_Tstart_G_Out=849.290,
-          Sh2_HP_Tstart_M_In=801.698,
-          Sh2_HP_Tstart_M_Out=861.343,
-          Sh2_HP_Tstart_F_In=792.680,
-          Sh2_HP_Tstart_F_Out=857.106,
-          Sh1_HP_Tstart_G_In=849.290,
-          Sh1_HP_Tstart_G_Out=732.000,
-          Sh1_HP_Tstart_M_In=624.205,
-          Sh1_HP_Tstart_M_Out=803.585,
-          Sh1_HP_Tstart_F_In=599.180,
-          Sh1_HP_Tstart_F_Out=792.680,
-          Rh2_IP_Tstart_M_In=793.962,
-          Rh2_IP_Tstart_M_Out=863.890,
-          Rh2_IP_Tstart_F_In=787.973,
-          Rh2_IP_Tstart_F_Out=861.625,
-          Rh1_IP_Tstart_M_In=641.307,
-          Rh1_IP_Tstart_M_Out=793.753,
-          Rh1_IP_Tstart_F_In=631.882,
-          Rh1_IP_Tstart_F_Out=787.973,
-          Sh_IP_Tstart_G_In=611.19,
-          Sh_IP_Tstart_G_Out=605.074,
-          Sh_IP_Tstart_M_In=504.237,
-          Sh_IP_Tstart_M_Out=594.703,
-          Sh_IP_Tstart_F_In=499.962,
-          Sh_IP_Tstart_F_Out=594.001,
-          Sh_LP(gamma_G=30, gamma_F=4000),
-          Sh_LP_N_F=4,
-          Ec_LP_Tstart_G_Out=372.309,
-          Ec_LP(gamma_G=35, gamma_F=3000),
-          Ev_LP(gamma_G=60, gamma_F=20000),
-          Sh1HP_Rh1IP(
-            gamma_G_A=70,
-            gamma_G_B=70,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh2HP_Rh2IP(
-            gamma_F_A=4000,
-            gamma_F_B=4000,
-            gamma_G_A=70,
-            gamma_G_B=70),
-          redeclare HRSG.Components.StateReader_water stateEcLP_out,
-          redeclare HRSG.Components.StateReader_water stateEcIP_out,
-          redeclare HRSG.Components.StateReader_water stateEc2HP_out),
-                                       drums(
-          fluidHPNomPressure=1.22116e7,
-          fluidIPNomPressure=2.63694e6,
-          fluidLPNomPressure=6.047e5,
-          HPd_hvstart=2.61182e6,
-          HPd_hlstart=1.411212e6,
-          IPd_hvstart=2.79542e6,
-          IPd_hlstart=9.22034e5,
-          LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5)) 
-                              annotation (extent=[-100,20; 0,120]);
-      SteamTurbineGroup.Examples.STG_3LRh_cc sTG_3LRh(steamTurbines(
-          steamHPNomPressure=1.2202e7,
-          steamIPNomPressure=2.63681e6,
-          steamLPNomPressure=6.047e5,
-          HPT_hstart_in=3.56678e6,
-          HPT_hstart_out=3.16451e6,
-          IPT_hstart_in=3.65985e6,
-          IPT_hstart_out=3.21285e6,
-          LPT_hstart_in=3.16961e6,
-          LPT_hstart_out=2.41849e6,
-          mixLP_hstart=3.16953e6,
-          mixIP_hstart=3.14446e6,
-          steamHPNomFlowRate=62.8,
-          steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9), controlledCondeser(Vlstart=5)) 
-        annotation (extent=[-100,-180; 0,-80]);
-      annotation (Diagram, experiment(
-          StopTime=20000,
-          NumberOfIntervals=10000,
-          Tolerance=1e-006),
-        Coordsys(extent=[-200,-200; 200,200], scale=0.1),
-        Documentation(revisions="<html>
-<ul>
-<li><i>15 Apr 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-      Gas.SourceW sourceGas(
-        redeclare package Medium = FlueGasMedium,
-        w0=585.5,
-        T=884.65)          annotation (extent=[-160,50; -140,70]);
-      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
-                                             redeclare package Medium = 
-            FlueGasMedium) annotation (extent=[-130,50; -110,70], rotation=0);
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309) 
-                       annotation (extent=[60,50; 80,70]);
-      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
-                                              redeclare package Medium = 
-            FlueGasMedium) annotation (extent=[30,50; 50,70],   rotation=0);
-      ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
-        eta=0.9,
-        J_shaft=15000,
-        d_shaft=25,
-        Pmax=150e6,
-        delta_start=0.7) 
-                    annotation (extent=[60,-180; 160,-80]);
-    public 
-      Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
-        annotation (extent=[180,-20; 160,0]);
-    protected 
-      Buses.Actuators actuators 
-        annotation (extent=[120,-60; 140,-40],rotation=0);
-    public 
-      HRSG.Control.levelsControl levelsControl(
-        CSmin_levelHP=30,
-        CSmax_levelHP=96,
-        CSmin_levelIP=5,
-        CSmax_levelIP=25,
-        CSmax_levelLP=2400) 
-        annotation (extent=[60,120; 120,180]);
-      Modelica.Blocks.Sources.Ramp ramp(
-        height=-50,
-        duration=500,
-        offset=585.5,
-        startTime=5000) annotation (extent=[-190,100; -170,120]);
-    equation 
-      connect(actuators, singleShaft.ActuatorsBus)  annotation (points=[130,-50;
-            180,-50; 180,-170; 160,-170],  style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (points=[60,-130;
-            0,-130],style(
-          color=0,
-          rgbcolor={0,0,0},
-          thickness=2,
-          fillColor=30,
-          rgbfillColor={230,230,230},
-          fillPattern=1));
-      connect(sinkGas.flange, stateGas_out.outlet) annotation (points=[60,60;
-            46,60],   style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(stateGas_out.inlet, hRSG.GasOut) annotation (points=[34,60; 0,60],
-                 style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(hRSG.GasIn, stateGas_in.outlet) annotation (points=[-100,60; -114,
-            60],                   style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2));
-      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (points=[60,150;
-            40,150; 40,110; 0,110],    style(color=84, rgbcolor={255,170,213}));
-      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[120,150;
-            160,150; 160,95; 0,95],           style(color=52, rgbcolor={213,255,
-              170}));
-      connect(ramp.y, sourceGas.in_w0) annotation (points=[-169,110; -156,110;
-            -156,65],                  style(color=74, rgbcolor={0,0,127}));
-      connect(stateGas_in.inlet, sourceGas.flange) annotation (points=[-126,60;
-            -140,60], style(
-          color=76,
-          rgbcolor={159,159,223},
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.WaterOut, hRSG.WaterIn) annotation (points=[-10,-80; -10,
-            20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_SH_LP, hRSG.Sh_LP_Out) annotation (points=[-30,-80;
-            -30,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_RH_IP, hRSG.Rh_IP_Out) annotation (points=[-60,-80;
-            -60,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_SH_HP, hRSG.Sh_HP_Out) annotation (points=[-90,-80;
-            -90,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (
-          points=[159,-10; 130,-10; 130,-50], style(
-          color=5,
-          rgbcolor={255,0,255},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(hRSG.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (points=[0,
-            95; 14,95; 14,-165; 0,-165], style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.ActuatorsBus, singleShaft.ActuatorsBus) annotation (
-          points=[0,-165; 8,-165; 8,-164; 14,-164; 14,-192; 180,-192; 180,-170;
-            160,-170], style(
-          color=52,
-          rgbcolor={213,255,170},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(singleShaft.SensorsBus, sTG_3LRh.SensorsBus) annotation (points=[
-            160,-155; 172,-155; 172,-186; 20,-186; 20,-150; 0,-150], style(
-          color=84,
-          rgbcolor={255,170,213},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.SensorsBus, hRSG.SensorsBus) annotation (points=[0,-150;
-            20,-150; 20,110; 0,110], style(
-          color=84,
-          rgbcolor={255,170,213},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (points=[-75,-80;
-            -75,-31; -75,-31; -75,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_SH_IP, hRSG.Sh_IP_Out) annotation (points=[-45,-80;
-            -45,-31; -45,-31; -45,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-    end TestSteamPlant_controls;
-    
-    annotation (Documentation(revisions="<html>
-<ul>
-<li><i>15 Apr 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-  end Tests;
-  
   package Simulators 
     "Simulators for steam power plants and simple combined cycles" 
     model SteamPlant_Sim1 
       "Test total plant with levels control and ratio control on the condenser, inlet valves" 
       package FlueGasMedium = ThermoPower.Media.FlueGas;
       package FluidMedium = ThermoPower.Water.StandardWater;
-      ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
+      HRSG.Examples.HRSG_3LRh hRSG(
                                   HeatExchangersGroup(
           fluidHPNomPressure_Sh=1.22116e7,
           fluidHPNomPressure_Ev=1.22116e7,
@@ -28353,7 +22829,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             gamma_F_B=4000,
             gamma_G_A=70,
             gamma_G_B=70),
-          Sh_IP_Tstart_F_In=499.962),  drums(
+          Sh_IP_Tstart_F_In=499.962,
+          SSInit=true),                drums(
           fluidHPNomPressure=1.22116e7,
           fluidIPNomPressure=2.63694e6,
           fluidLPNomPressure=6.047e5,
@@ -28362,10 +22839,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           IPd_hvstart=2.79542e6,
           IPd_hlstart=9.22034e5,
           LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5)) 
-                              annotation (extent=[-100,20; 0,120]);
+          LPd_hlstart=6.10909e5,
+          SSInit=true))       annotation (extent=[-100,20; 0,120]);
       SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
-                                                      steamTurbines(
+                                    controlledCondeser(Vlstart=5,
+            setPoint_ratio=0.5,
+          SSInit=true), steamTurbines(
           steamHPNomPressure=1.2202e7,
           steamIPNomPressure=2.63681e6,
           steamLPNomPressure=6.047e5,
@@ -28376,15 +22855,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           LPT_hstart_in=3.16961e6,
           LPT_hstart_out=2.41849e6,
           mixLP_hstart=3.16953e6,
-          mixIP_hstart=3.14446e6,
           steamHPNomFlowRate=62.8,
           steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9), controlledCondeser(Vlstart=5,
-            setPoint_ratio=0.5)) 
+          steamLPNomFlowRate=10.9,
+          SSInit=true)) 
         annotation (extent=[-100,-180; 0,-80]);
       annotation (Diagram, experiment(
-          StopTime=15000,
-          NumberOfIntervals=10000,
+          StopTime=6000,
+          NumberOfIntervals=3000,
           Tolerance=1e-006),
         Coordsys(extent=[-200,-200; 200,200], scale=0.1),
         Documentation(info="<html>
@@ -28395,21 +22873,27 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     by <a>Luca Savoldelli</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+        experimentSetupOutput(equdistant=false));
     public 
       HRSG.Control.levelsControl levelsControl(
         CSmin_levelHP=30,
         CSmax_levelHP=96,
         CSmin_levelIP=5,
         CSmax_levelIP=25,
-        CSmax_levelLP=2400) 
+        CSmax_levelLP=2400,
+        Level_HP(steadyStateInit=true),
+        Level_IP(steadyStateInit=true),
+        Level_LP(steadyStateInit=true)) 
         annotation (extent=[60,100; 120,160]);
       ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
         eta=0.9,
         J_shaft=15000,
         d_shaft=25,
         Pmax=150e6,
-        delta_start=0.7) 
+        delta_start=0.7,
+        generator(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+        network(initOpt=ThermoPower.Choices.Init.Options.steadyState)) 
                     annotation (extent=[40,-180; 140,-80]);
       Gas.SourceW sourceGas(
         redeclare package Medium = FlueGasMedium,
@@ -28422,7 +22906,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         height=-50,
         duration=500,
         offset=585.5,
-        startTime=5000) annotation (extent=[-190,100; -170,120]);
+        startTime=50)   annotation (extent=[-190,100; -170,120]);
       Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309) 
                        annotation (extent=[60,50; 80,70]);
       HRSG.Components.StateReader_gas stateGas_out(
@@ -28510,12 +22994,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           points=[159,-50; 110,-50], style(
           color=5,
           rgbcolor={255,0,255},
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
-      connect(sTG_3LRh.From_SH_IP, hRSG.Sh_IP_Out) annotation (points=[-45,-80;
-            -45,20],                   style(
-          thickness=2,
           fillColor=7,
           rgbfillColor={255,255,255},
           fillPattern=1));
@@ -28555,15 +23033,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fillColor=7,
           rgbfillColor={255,255,255},
           fillPattern=1));
-      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (points=[
-            0,-150; 20,-150; 20,-190; 160,-190; 160,-155; 140,-155], style(
+      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (points=[0,-150;
+            20,-150; 20,-190; 160,-190; 160,-150; 140,-150],         style(
           color=84,
           rgbcolor={255,170,213},
           fillColor=7,
           rgbfillColor={255,255,255},
           fillPattern=1));
       connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (
-          points=[140,-170; 152,-170; 152,-184; 14,-184; 14,-165; 0,-165],
+          points=[140,-165; 152,-165; 152,-184; 14,-184; 14,-165; 0,-165],
           style(
           color=52,
           rgbcolor={213,255,170},
@@ -28597,7 +23075,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       "Test total plant with levels control and ratio control on the condenser, inlet valves" 
       package FlueGasMedium = ThermoPower.Media.FlueGas;
       package FluidMedium = ThermoPower.Water.StandardWater;
-      ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
+      HRSG.Examples.HRSG_3LRh hRSG(
                                   HeatExchangersGroup(
           fluidHPNomPressure_Sh=1.22116e7,
           fluidHPNomPressure_Ev=1.22116e7,
@@ -28695,7 +23173,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             gamma_F_B=4000,
             gamma_G_A=70,
             gamma_G_B=70),
-          Sh_IP_Tstart_F_In=499.962),  drums(
+          Sh_IP_Tstart_F_In=499.962,
+          SSInit=true),                drums(
           fluidHPNomPressure=1.22116e7,
           fluidIPNomPressure=2.63694e6,
           fluidLPNomPressure=6.047e5,
@@ -28704,10 +23183,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           IPd_hvstart=2.79542e6,
           IPd_hlstart=9.22034e5,
           LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5)) 
-                              annotation (extent=[-100,20; 0,120]);
+          LPd_hlstart=6.10909e5,
+          SSInit=true))       annotation (extent=[-100,20; 0,120]);
       SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
-                                                      steamTurbines(
+                                    controlledCondeser(Vlstart=5,
+            setPoint_ratio=0.5,
+          SSInit=true), steamTurbines(
           steamHPNomPressure=1.2202e7,
           steamIPNomPressure=2.63681e6,
           steamLPNomPressure=6.047e5,
@@ -28718,15 +23199,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           LPT_hstart_in=3.16961e6,
           LPT_hstart_out=2.41849e6,
           mixLP_hstart=3.16953e6,
-          mixIP_hstart=3.14446e6,
           steamHPNomFlowRate=62.8,
           steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9), controlledCondeser(Vlstart=5,
-            setPoint_ratio=0.5)) 
+          steamLPNomFlowRate=10.9,
+          SSInit=true)) 
         annotation (extent=[-100,-180; 0,-80]);
       annotation (Diagram, experiment(
-          StopTime=15000,
-          NumberOfIntervals=10000,
+          StopTime=6000,
+          NumberOfIntervals=3000,
           Tolerance=1e-006),
         Coordsys(extent=[-200,-200; 200,200], scale=0.1),
         Documentation(info="<html>
@@ -28737,21 +23217,27 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     by <a>Luca Savoldelli</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+        experimentSetupOutput(equdistant=false));
     public 
       HRSG.Control.levelsControl levelsControl(
         CSmin_levelHP=30,
         CSmax_levelHP=96,
         CSmin_levelIP=5,
         CSmax_levelIP=25,
-        CSmax_levelLP=2400) 
+        CSmax_levelLP=2400,
+        Level_HP(steadyStateInit=true),
+        Level_IP(steadyStateInit=true),
+        Level_LP(steadyStateInit=true)) 
         annotation (extent=[60,100; 120,160]);
       ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
         eta=0.9,
         J_shaft=15000,
         d_shaft=25,
         Pmax=150e6,
-        delta_start=0.7) 
+        delta_start=0.7,
+        generator(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+        network(initOpt=ThermoPower.Choices.Init.Options.steadyState)) 
                     annotation (extent=[40,-180; 140,-80]);
       Gas.SourceW sourceGas(
         redeclare package Medium = FlueGasMedium,
@@ -28777,7 +23263,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       Modelica.Blocks.Sources.Ramp valveHP_com(          offset=1,
         height=-0.5,
         duration=100,
-        startTime=500) 
+        startTime=50) 
         annotation (extent=[180,60; 160,80]);
       Modelica.Blocks.Sources.Ramp valveIP_com(height=0, offset=1) 
         annotation (extent=[180,20; 160,40]);
@@ -28858,14 +23344,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fillColor=7,
           rgbfillColor={255,255,255},
           fillPattern=1));
-      connect(sTG_3LRh.From_SH_IP, hRSG.Sh_IP_Out) annotation (points=[-45,-80;
-            -45,-31; -45,-31; -45,20], style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
       connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (points=[-75,-80;
-            -75,-32; -75,-32; -75,20], style(
+            -75,20],                   style(
           thickness=2,
           fillColor=7,
           rgbfillColor={255,255,255},
@@ -28900,15 +23380,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fillColor=7,
           rgbfillColor={255,255,255},
           fillPattern=1));
-      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (points=[
-            0,-150; 20,-150; 20,-190; 160,-190; 160,-155; 140,-155], style(
+      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (points=[0,-150;
+            20,-150; 20,-190; 160,-190; 160,-150; 140,-150],         style(
           color=84,
           rgbcolor={255,170,213},
           fillColor=7,
           rgbfillColor={255,255,255},
           fillPattern=1));
       connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (
-          points=[140,-170; 152,-170; 152,-184; 14,-184; 14,-165; 0,-165],
+          points=[140,-165; 152,-165; 152,-184; 14,-184; 14,-165; 0,-165],
           style(
           color=52,
           rgbcolor={213,255,170},
@@ -28942,7 +23422,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       "Test total plant with levels control and ratio control on the condenser, inlet valves" 
       package FlueGasMedium = ThermoPower.Media.FlueGas;
       package FluidMedium = ThermoPower.Water.StandardWater;
-      ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh_wa hRSG(
+      HRSG.Examples.HRSG_3LRh hRSG(
                                   HeatExchangersGroup(
           fluidHPNomPressure_Sh=1.22116e7,
           fluidHPNomPressure_Ev=1.22116e7,
@@ -29040,7 +23520,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             gamma_F_B=4000,
             gamma_G_A=70,
             gamma_G_B=70),
-          Sh_IP_Tstart_F_In=499.962),  drums(
+          Sh_IP_Tstart_F_In=499.962,
+          SSInit=true),                drums(
           fluidHPNomPressure=1.22116e7,
           fluidIPNomPressure=2.63694e6,
           fluidLPNomPressure=6.047e5,
@@ -29049,12 +23530,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           IPd_hvstart=2.79542e6,
           IPd_hlstart=9.22034e5,
           LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5),
+          LPd_hlstart=6.10909e5,
+          SSInit=true),
         redeclare package FlueGasMedium = FlueGasMedium,
         redeclare package FluidMedium = FluidMedium) 
                               annotation (extent=[-20,-20; 60,60]);
       SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
-                                                      steamTurbines(
+                                    controlledCondeser(Vlstart=5,
+            setPoint_ratio=0.5,
+          SSInit=true),
+        redeclare package FluidMedium = FluidMedium,
+        steamTurbines(
           steamHPNomPressure=1.2202e7,
           steamIPNomPressure=2.63681e6,
           steamLPNomPressure=6.047e5,
@@ -29065,16 +23551,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           LPT_hstart_in=3.16961e6,
           LPT_hstart_out=2.41849e6,
           mixLP_hstart=3.16953e6,
-          mixIP_hstart=3.14446e6,
           steamHPNomFlowRate=62.8,
           steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9), controlledCondeser(Vlstart=5,
-            setPoint_ratio=0.5),
-        redeclare package FluidMedium = FluidMedium) 
+          steamLPNomFlowRate=10.9,
+          SSInit=true)) 
         annotation (extent=[-20,-160; 60,-80]);
       annotation (Diagram, experiment(
-          StopTime=15000,
-          NumberOfIntervals=10000,
+          StopTime=7000,
+          NumberOfIntervals=3000,
           Tolerance=1e-006),
         Coordsys(extent=[-200,-200; 200,200], scale=0.1),
         Documentation(revisions="<html>
@@ -29083,30 +23567,36 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     by <a>Luca Savoldelli</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+        experimentSetupOutput(equdistant=false));
     public 
       HRSG.Control.levelsControl levelsControl(
         CSmin_levelHP=30,
         CSmax_levelHP=96,
         CSmin_levelIP=5,
         CSmax_levelIP=25,
-        CSmax_levelLP=2400) 
+        CSmax_levelLP=2400,
+        Level_HP(steadyStateInit=true),
+        Level_IP(steadyStateInit=true),
+        Level_LP(steadyStateInit=true)) 
         annotation (extent=[100,60; 160,120]);
       ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
         eta=0.9,
         J_shaft=15000,
         d_shaft=25,
         Pmax=150e6,
-        delta_start=0.7) 
+        delta_start=0.7,
+        generator(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+        network(initOpt=ThermoPower.Choices.Init.Options.steadyState)) 
                     annotation (extent=[100,-160; 180,-80]);
       HRSG.Components.StateReader_gas stateGas_in(
                                              redeclare package Medium = 
             FlueGasMedium) annotation (extent=[-50,2; -30,22],    rotation=0);
       Modelica.Blocks.Sources.Ramp ramp(
         duration=500,
-        startTime=5000,
         offset=1,
-        height=-0.1)    annotation (extent=[-180,-30; -160,-10]);
+        height=-0.1,
+        startTime=50)   annotation (extent=[-180,-30; -160,-10]);
       Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309) 
                        annotation (extent=[120,2; 140,22]);
       HRSG.Components.StateReader_gas stateGas_out(
@@ -29193,12 +23683,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fillColor=7,
           rgbfillColor={255,255,255},
           fillPattern=1));
-      connect(sTG_3LRh.From_SH_IP, hRSG.Sh_IP_Out) annotation (points=[24,-80;
-            24,-20],                   style(
-          thickness=2,
-          fillColor=7,
-          rgbfillColor={255,255,255},
-          fillPattern=1));
       connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (points=[0,-80; 0,
             -20],                      style(
           thickness=2,
@@ -29239,11 +23723,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             40; 72,40; 72,-148; 60,-148], style(color=52, rgbcolor={213,255,170}));
       connect(sTG_3LRh.SensorsBus, hRSG.SensorsBus) annotation (points=[60,-136;
             80,-136; 80,52; 60,52], style(color=84, rgbcolor={255,170,213}));
-      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (points=[
-            60,-136; 80,-136; 80,-180; 194,-180; 194,-140; 180,-140], style(
+      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (points=[60,-136;
+            80,-136; 80,-180; 194,-180; 194,-136; 180,-136],          style(
             color=84, rgbcolor={255,170,213}));
       connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (
-          points=[180,-152; 190,-152; 190,-172; 72,-172; 72,-148; 60,-148],
+          points=[180,-148; 190,-148; 190,-172; 72,-172; 72,-148; 60,-148],
           style(color=52, rgbcolor={213,255,170}));
     end CCPP_Sim3;
     annotation (Documentation(revisions="<html>
