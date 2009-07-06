@@ -2,33 +2,25 @@ package ThermoPower "Open library for thermal power plant simulation"
   import Modelica.Math.*;
   import Modelica.SIunits.*;
 
-
   type HydraulicConductance = Real (final quantity="HydraulicConductance",
         final unit="(kg/s)/Pa");
-
 
   type HydraulicResistance = Real (final quantity="HydraulicResistance", final unit
       =      "Pa/(kg/s)");
 
-
   type PerUnit = Real (
                      final quantity="PerUnit",final unit="pu");
 
-
   type Density = Modelica.SIunits.Density (start=40) "generic start value";
-
 
   type LiquidDensity = Density (start=1000) "start value for liquids";
 
-
   type GasDensity = Density (start=5) "start value for gases/vapours";
 
-
-  type AbsoluteTemperature = Temperature (start=300) "generic temperature";
-
+  type AbsoluteTemperature = Temperature (start=300, nominal = 500) 
+  "generic temperature";
 
   type AbsolutePressure = Pressure (start=1e5) "generic pressure";
-
 
   package Icons "Icons for ThermoPower library" 
     extends Modelica.Icons.Library;
@@ -582,7 +574,6 @@ package ThermoPower "Open library for thermal power plant simulation"
     end Gas;
   end Icons;
 
-
   package Functions "Miscellaneous functions" 
     extends Modelica.Icons.Library;
     function linear 
@@ -820,9 +811,11 @@ This package contains general-purpose functions and models
         "Volume flow rate for N operating points (single pump)";
         input Modelica.SIunits.Height head_nom[:] 
         "Pump head for N operating points";
+        constant VolumeFlowRate q_eps = 1e-6 
+        "Small coefficient to avoid numerical singularities";
     protected 
         Integer N = size(q_nom,1) "Number of nominal operating points";
-        Real q_nom_pow[N,N] = {{q_nom[j]^(i-1) for j in 1:N} for i in 1:N} 
+        Real q_nom_pow[N,N] = {{q_nom[i]^(j-1) for j in 1:N} for i in 1:N} 
         "Rows: different operating points; columns: increasing powers";
         /* Linear system to determine the coefficients (example N=3):
   head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
@@ -834,7 +827,7 @@ This package contains general-purpose functions and models
       algorithm 
         // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
         // Note: the implementation is numerically efficient only for low values of N
-        head := sum(q_flow^(i-1)*c[i] for i in 1:N);
+        head := sum((q_flow + q_eps)^(i-1)*c[i] for i in 1:N);
       end polynomialFlow;
     
       function constantPower "Constant power consumption characteristic" 
@@ -843,7 +836,7 @@ This package contains general-purpose functions and models
       algorithm 
         consumption := power;
       end constantPower;
-
+    
       function linearPower "Linear power consumption characteristic" 
         extends basePower;
         input Modelica.SIunits.VolumeFlowRate q_nom[2] 
@@ -860,7 +853,7 @@ This package contains general-purpose functions and models
       algorithm 
         consumption := c[1] + q_flow*c[2];
       end linearPower;
-
+    
       function quadraticPower "Quadratic power consumption characteristic" 
         extends basePower;
         input Modelica.SIunits.VolumeFlowRate q_nom[3] 
@@ -880,14 +873,13 @@ This package contains general-purpose functions and models
       algorithm 
         consumption := c[1] + q_flow*c[2] + q_flow^2*c[3];
       end quadraticPower;
-
+    
       function constantEfficiency "Constant efficiency characteristic" 
          extends baseEfficiency;
          input Real eta_nom "Nominal efficiency";
       algorithm 
         eta := eta_nom;
       end constantEfficiency;
-    
     
     end PumpCharacteristics;
   
@@ -1051,6 +1043,13 @@ This characteristic is such that the relative change of the flow coefficient is 
         eta := eta_nom;
       end constantEfficiency;
     
+      function constantPower "Constant power consumption characteristic" 
+          extends FanCharacteristics.basePower;
+        input Modelica.SIunits.Power power = 0 "Constant power consumption";
+      algorithm 
+        consumption := power;
+      end constantPower;
+    
       function quadraticPower 
       "Quadratic power consumption characteristic, fixed blades" 
         extends basePower;
@@ -1130,24 +1129,71 @@ This characteristic is such that the relative change of the flow coefficient is 
     end FanCharacteristics;
   end Functions;
 
-
   annotation (Documentation(info="<HTML>
 <p><h2>General Information</h2></p>
 <p>The ThermoFluid library is an open Modelica library for the dynamic modeling of thermal power plants.
 <p>A general description of the library can be found in the papers:
-<ul><li>F. Casella, A. Leva, \"Modelling of distributed thermo-hydraulic processes using Modelica\", <i>Proceedings of the MathMod '03 Conference</i>, Wien, Austria, 2003.
-<li>F. Casella, A. Leva, \"Modelica open library for power plant simulation: design and experimental validation\", <i>Proceedings of the 2003 Modelica Conference</i>, Link&ouml ping, Sweden, 2003.
+<ul><li>F. Casella, A. Leva, <a href=\"http://www.modelica.org/Conference2003/papers/h08_Leva.pdf\">\"Modelica open library for power plant simulation: design and experimental validation\"</a>, <i>Proceedings of the 2003 Modelica Conference</i>, Link&ouml ping, Sweden, 2003.</li>
+<li>F. Casella, A. Leva, <a href=\"http://dx.doi.org/10.1080/13873950500071082\">\"Modelling of Thermo-Hydraulic Power Generation Processes Using Modelica\"</a>. Mathematical and Computer Modeling of Dynamical Systems, vol. 12, n. 1, pp. 19-33, Feb. 2006.</li>
+ 
 </ul>
 <p>The papers are available from the <a href=\"mailto:francesco.casella@polimi.it\">authors</a> upon request, or can be downloaded from the <a href=\"http://www.elet.polimi.it/upload/casella/thermopower/\">library home page</a>.
 <p>The ThermoPower library uses the medium models provided by the Modelica.Media library, which is freely available from the <a href= \"http://www.modelica.org/\">Modelica Association</a> web site.
  
 <p><h2>Library home page</h2></p>
-<p>For additional information and library updates, consult the <a href=\"http://www.elet.polimi.it/upload/casella/thermopower/\"> 
+<p>For additional information and library updates, consult the <a href=\"http://home.dei.polimi.it/casella/thermopower/\"> 
 library home page</a>, and the <a href=\"http://sourceforge.net/projects/thermopower/\"> ThermoPower project page </a> on SourceForge.net.
 <p>Contributions to the library are welcome: please contact the authors if you are interested.
  
 <p><h2>Release notes:</h2></p>
- 
+<h3>Version 2.1 (<i>6 Jul 2009</i>)</h3>
+The 2.1 release of ThermoPower contains several additions and a few bug
+fixes with respect to version 2.0. We tried to keep the new version
+backwards-compatible with the old one, but there might be a few cases
+where small adaptations could be required.<br>
+<br>
+ThermoPower 2.1 requires the Modelica Standard Library version 2.2.1 or
+2.2.2. It has been tested with Dymola 6.1 (using MSL 2.2.1) and with
+Dymola 7.1 (using MSL 2.2.2). It is planned to be usable also with
+other tools, in particular OpenModelica, MathModelica and SimulationX,
+but this is not possible with the currently released versions of those
+tools. It is expected that this should become at least partially
+possible within the year 2009. <br>
+<br>
+ThermoPower 2.1 is the last major revision compatible with Modelica
+2.1 and the Modelica Standard Library 2.2.x. The next version is planned to use Modelica 3.1 and the Modelica Standard Library 3.1. It will use
+use stream connectors, which generalize the concept of Flange
+connectors, lifting the restrictions that only two complementary
+connectors can be bound.<br>
+<br>
+This is a list of the main changes with respect to v. 2.0<br>
+<ul>
+  <li>New PowerPlants package, containing a library of high-level
+reusable components for the modelling of combined-cycle power plants,
+including full models that can be simulated.</li>
+  <li>New examples cases in the Examples package.</li>
+  <li>New components in the Electrical package, to model the generator-grid connection by the swing equation</li>
+  <li>Three-way junctions (FlowJoin and FlowSplit) now have an option
+to describe unidirectional flow at each flange. This feature can
+substantially enhance numerical robustness and simulation performance
+in all cases when it is known a priori that no flow reversal will occur.</li>
+  <li>The Flow1D and Flow1D2ph models are now restricted to positive
+flow direction, since it was found that it is not possible to describe
+flow reversal consistently with the average-density approach adopted in
+this library. For full flow reversal support please use the Flow1Dfem
+model, which does not have any restriction in this respect.</li>
+  <li>A bug in Flow1D and Flow1D2ph has been corrected, which caused
+significant errors in the mass balance under dynamic conditions; this
+was potentially critical in closed-loop models, but has now been
+resolved.&nbsp;</li>
+  <li>The connectors for lumped- and distribute-parameters heat
+transfer with variable heat transfer coefficients have been split:
+HThtc and DHThtc now have an output qualifier on the h.t.c., while
+HThtc_in and DHThtc_in have an input qualifier. This was necessary to
+avoid incorrect connections, and is also required by tools to correctly
+checked if a model is balanced. This change should have no impact on
+most user-developed models.</li>
+</ul> 
 <h3>Version 2.0 (<i>10 Jun 2005</i>)</h3>
 <ul>
     <li>The new Modelica 2.2 standard library is used.
@@ -1185,19 +1231,11 @@ library home page</a>, and the <a href=\"http://sourceforge.net/projects/thermop
     <li>First release in the public domain</li>
 </ul>
 <h2>License agreement</h2></p>
-<p>The ThermoPower package is <b>free</b> software;
-it can be redistributed and/or modified
-under the terms of the <b>Modelica license</b>, see the license conditions
-and the accompanying <b>disclaimer</b> in the documentation of package
-Modelica in file \"Modelica/package.mo\".
-<p><b>Copyright &copy; 2002-2004, Politecnico di Milano.</b></p>
-</HTML>"), uses(Modelica(version="2.2.2")),
-    version="2",
-    conversion(from(
-        version="1",
-        script="ConvertFromThermoPower_1.mos",
-        version="")));
-
+<p>The ThermoPower package is licensed by Politecnico di Milano under the  <a href=\"http://www.modelica.org/licenses/ModelicaLicense2\"><b>Modelica License 2</b></a>.</p> 
+<p><b>Copyright &copy; 2002-2009, Politecnico di Milano.</b></p>
+</HTML>"),
+uses(Modelica(version="2.2.1")),
+version="2.1");
 
   package Electrical "Simplified models of electric power components" 
     extends Modelica.Icons.Library;
@@ -1279,6 +1317,87 @@ Modelica in file \"Modelica/package.mo\".
               rgbfillColor={255,255,255}))));
     end Grid;
   
+    model Generator "Active power generator" 
+    import Modelica.SIunits.Conversions.NonSIunits.*;
+      parameter Real eta=1 "Conversion efficiency";
+      parameter Modelica.SIunits.MomentOfInertia J=0 "Moment of inertia";
+      parameter Integer Np=2 "Number of electrical poles";
+      parameter Modelica.SIunits.Frequency fstart=50 
+      "Start value of the electrical frequency"   annotation (Dialog(tab="Initialization"));
+      parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
+      "Initialization option"   annotation(Dialog(tab = "Initialization"));
+      Modelica.SIunits.Power Pm "Mechanical power";
+      Modelica.SIunits.Power Pe "Electrical Power";
+      Modelica.SIunits.Power Ploss "Inertial power Loss";
+      Modelica.SIunits.Torque tau "Torque at shaft";
+      Modelica.SIunits.AngularVelocity omega_m( start=2*Modelica.Constants.pi*fstart/Np) 
+      "Angular velocity of the shaft";
+      Modelica.SIunits.AngularVelocity omega_e 
+      "Angular velocity of the e.m.f. rotating frame";
+      AngularVelocity_rpm n "Rotational speed";
+      Modelica.SIunits.Frequency f "Electrical frequency";
+      PowerConnection powerConnection annotation (extent=[72,-14; 100,14]);
+      Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
+        annotation (extent=[-100,-14; -72,14]);
+      annotation (Icon(
+          Rectangle(extent=[-72,6; -48,-8],  style(
+              color=76,
+              gradient=2,
+              fillColor=9)),
+          Ellipse(extent=[50,-50; -50,50], style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2,
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Line(points=[50,0; 72,0], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Text(
+            extent=[-26,24; 28,-28],
+            style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1),
+            string="G")), Diagram,
+        Documentation(info="<html>
+<p>This model describes the conversion between mechanical power and electrical power in an ideal synchronous generator. 
+The frequency in the electrical connector is the e.m.f. of generator.
+<p>It is possible to consider the generator inertia in the model, by setting the parameter <tt>J > 0</tt>. 
+</html>"));
+    equation 
+      omega_m = der(shaft.phi) "Mechanical boundary condition";
+      omega_e = omega_m*Np;
+      f = omega_e/(2*Modelica.Constants.pi) "Electrical frequency";
+      n = Modelica.SIunits.Conversions.to_rpm(omega_m) 
+      "Rotational speed in rpm";
+      Pm = omega_m*tau;
+      if J>0 then
+        Ploss = J*der(omega_m)*omega_m;
+      else
+        Ploss = 0;
+      end if annotation (Diagram);
+      Pm = Pe/eta + Ploss "Energy balance";
+      // Boundary conditions
+      f = powerConnection.f;
+      Pe = -powerConnection.W;
+      tau = shaft.tau;
+    initial equation 
+      if initOpt == ThermoPower.Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
+        der(omega_m) = 0;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+    end Generator;
+  
     model Breaker "Circuit breaker" 
       PowerConnection connection1 annotation (extent=[-100,-14; -72,14]);
       PowerConnection connection2 annotation (extent=[72,-14; 100,14]);
@@ -1319,7 +1438,10 @@ Modelica in file \"Modelica/package.mo\".
               rgbcolor={255,85,255},
               fillColor=83,
               rgbfillColor={255,85,255},
-              fillPattern=1))));
+              fillPattern=1))),
+      Documentation(info="<html>
+Ideal breaker model. Can only be used to connect a generator to a grid with finite droop. Otherwise, please consider the other models in this package.
+</html>"));
       Modelica.Blocks.Interfaces.BooleanInput closed 
         annotation (extent=[-20,60; 20,100], rotation=-90);
     equation 
@@ -1331,67 +1453,12 @@ Modelica in file \"Modelica/package.mo\".
       end if;
     end Breaker;
   
-    model Generator "Active power generator" 
-    import Modelica.SIunits.Conversions.NonSIunits.*;
-      parameter Real eta=1 "Conversion efficiency";
-      parameter Boolean hasInertia = false 
-      "Model accounts for rotational inertia";
-      parameter MomentOfInertia J=0 "Moment of inertia";
-      parameter Integer Np=2 "Number of electrical poles";
-      Energy E "Rotational kinetic energy";
-      AngularVelocity omega "Shaft angular velocity";
-      AngularVelocity_rpm n "Rotational speed";
-      Frequency f "Electrical frequency";
-      PowerConnection powerConnection annotation (extent=[72,-14; 100,14]);
-      Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
-        annotation (extent=[-100,-14; -72,14]);
-    equation 
-      omega=der(shaft.phi) "Mechanical boundary condition";
-      f=Np*omega/(2*Modelica.Constants.pi) "Electrical frequency";
-      n = Modelica.SIunits.Conversions.to_rpm(omega) "Rotational speed in rpm";
-      powerConnection.f=f "Electrical boundary condition";
-      if hasInertia then
-        E=1/2*J*omega^2 "Kinetic energy";
-        der(E)=omega*shaft.tau-powerConnection.W/eta "Energy balance";
-      else
-        E=0 "Kinetic energy";
-        0=omega*shaft.tau+powerConnection.W/eta "Energy balance";
-      end if annotation (Diagram);
-      annotation (Icon(
-          Rectangle(extent=[-72,6; -48,-8],  style(
-              color=76,
-              gradient=2,
-              fillColor=9)),
-          Ellipse(extent=[50,-50; -50,50], style(
-              color=0,
-              rgbcolor={0,0,0},
-              thickness=2,
-              fillColor=7,
-              rgbfillColor={255,255,255},
-              fillPattern=1)),
-          Line(points=[50,0; 72,0], style(
-              color=0,
-              rgbcolor={0,0,0},
-              fillColor=7,
-              rgbfillColor={255,255,255},
-              fillPattern=1)),
-          Text(
-            extent=[-26,24; 28,-28],
-            style(
-              color=0,
-              rgbcolor={0,0,0},
-              fillColor=7,
-              rgbfillColor={255,255,255},
-              fillPattern=1),
-            string="G")));
-    end Generator;
-  
     model Load "Electrical load" 
       parameter Power Wn "Nominal active power consumption";
       parameter Frequency fn=50 "Nominal frequency";
       replaceable function powerCurve = Functions.one 
       "Normalised power consumption vs. frequency curve";
-      PowerConnection connection annotation (extent=[-14,74; 12,100]);
+      PowerConnection connection annotation (extent=[-14,72; 14,100]);
       Power W "Actual power consumption";
       Frequency f "Frequency";
       annotation (
@@ -1437,7 +1504,8 @@ Modelica in file \"Modelica/package.mo\".
               rgbcolor={0,0,0},
               fillColor=7,
               rgbfillColor={255,255,255},
-              fillPattern=1))));
+              fillPattern=1))),
+      Diagram);
       Modelica.Blocks.Interfaces.RealInput powerConsumption 
         annotation (extent=[-20,12; -46,-12], rotation=-180);
     equation 
@@ -1523,5 +1591,685 @@ Modelica in file \"Modelica/package.mo\".
       port.W = 0;
       f = port.f;
     end FrequencySensor;
+  
+    partial model Network1portBase "Base class for one-port network" 
+      parameter Boolean hasBreaker = false 
+      "Model includes a breaker controlled by external input";
+      parameter Modelica.SIunits.Angle deltaStart=0 
+      "Start value of the load angle"                                               annotation(Dialog(tab="Initialization"));
+      parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
+      "Initialization option"   annotation(Dialog(tab = "Initialization"));
+      parameter Modelica.SIunits.Power C "Max. power transfer";
+      Modelica.SIunits.Power Pe "Net electrical power";
+      Modelica.SIunits.Power Ploss "Electrical power loss";
+      Modelica.SIunits.AngularVelocity omega "Angular velocity";
+      Modelica.SIunits.AngularVelocity omegaRef "Angular velocity reference";
+      Modelica.SIunits.Angle delta( stateSelect = StateSelect.prefer, start=deltaStart) 
+      "Load angle";
+    
+      PowerConnection powerConnection   annotation (extent=[-114,-14; -86,14]);
+      annotation (Diagram, Icon(
+          Ellipse(extent=[-80,80; 80,-80], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255}))),
+        Documentation(info="<html>
+<p>Basic interface of the Network models with one electrical port for the connection to the generator, containing the common parameters, variables and connectors.</p>
+<p><b>Modelling options</b>
+<p>The net electrical power is defined by the following relationship:
+<ul><tt>Pe = C*sin(delta)</tt></ul> 
+<p><tt>delta</tt> is the load angle, defined by the following relationship:
+<ul><tt>der(delta) = omega - omegaRef</tt></ul>
+<p>where <tt>omega</tt> is related to the frequency on the power connector (generator frequency), and <tt>omegaRef</tt> is the reference angular velocity of the network embedded in the model.
+<p>The electrical power losses are described by the variable <tt>Ploss</tt>.
+<p>If <tt>hasBreaker</tt> is true, the model provides a circuit breaker, controlled by the boolean input signal, to describe the connection/disconnection of the electrical port from the grid; otherwise it is assumed that the electrical port is always connected to the grid. 
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker 
+        annotation (extent=[-16,82; 16,112], rotation=270);
+  protected 
+      Modelica.Blocks.Interfaces.BooleanInput closedInternal 
+        annotation (extent=[-8,40; 8,58],   rotation=270);
+  public 
+      Modelica.Blocks.Interfaces.RealOutput delta_out 
+        annotation (extent=[-10,-100; 10,-80],
+                                            rotation=270);
+    equation 
+      // Load angle
+      der(delta) = omega - omegaRef;
+      // Power flow
+      if closedInternal then
+        Pe = C*Modelica.Math.sin(delta);
+      else
+        Pe = 0;
+      end if;
+      // Boundary conditions
+      Pe + Ploss = powerConnection.W;
+      omega = 2*Modelica.Constants.pi*powerConnection.f;
+      if not hasBreaker then
+        closedInternal = true;
+      end if;
+      connect(closed, closedInternal);
+      //Output signal
+      delta_out = delta;
+    initial equation 
+      if initOpt == ThermoPower.Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
+        der(delta) = 0;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+    end Network1portBase;
+  
+    model NetworkGrid_eX 
+      extends ThermoPower.Electrical.Network1portBase( final C = e*v/(X+Xline));
+      parameter Modelica.SIunits.Voltage e "e.m.f voltage"        annotation(Dialog(group="Generator"));
+      parameter Modelica.SIunits.Voltage v "Network voltage";
+      parameter Modelica.SIunits.Frequency fnom=50 
+      "Nominal frequency of network";
+      parameter Modelica.SIunits.Reactance X "Internal reactance" annotation(Dialog(group="Generator"));
+      parameter Modelica.SIunits.Reactance Xline "Line reactance";
+      parameter Modelica.SIunits.MomentOfInertia J=0 
+      "Moment of inertia of the generator/shaft system (for damping term calculation only)"
+           annotation(Dialog(group="Generator"));
+      parameter Real r=0.2 "Damping coefficient of the swing equation" 
+                             annotation(dialog(enable=if J>0 then true else false, group="Generator"));
+      parameter Integer Np=2 "Number of electrical poles" 
+                               annotation(dialog(enable=if J>0 then true else false, group="Generator"));
+      Real D "Electrical damping coefficient";
+    equation 
+      // Definition of the reference angular velocity
+      omegaRef = 2*Modelica.Constants.pi*fnom;
+      // Damping power loss
+      if J>0 then
+        D = 2*r*sqrt(C*J*(2*Modelica.Constants.pi*fnom*Np)/(Np^2));
+      else
+        D = 0;
+      end if;
+      if closedInternal then
+        Ploss = D*der(delta);
+      else
+        Ploss = 0;
+      end if;
+      annotation (Icon(
+          Line(points=[40,40; 40,-40], style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2)),
+          Line(points=[-56,0; -98,0], style(color=0, rgbcolor={0,0,0})),
+          Line(points=[-34,0; -16,0; 12,16],style(color=0, rgbcolor={0,0,0})),
+          Line(points=[14,0; 40,0], style(color=0, rgbcolor={0,0,0})),
+          Rectangle(extent=[-60,6; -34,-6], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1))), Documentation(info="<html>
+<p>This model extends <tt>Network1portBase</tt> partial model, by defining the power coefficient <tt>C</tt> in terms of <tt>e</tt>, <tt>v</tt>, <tt>X</tt>, and <tt>Xline</tt>.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J</tt> is zero, zero damping is assumed by default. Note that <tt>J</tt> is only used to compute the dissipative term and should refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+    end NetworkGrid_eX;
+  
+    model NetworkGrid_Pmax 
+      extends ThermoPower.Electrical.Network1portBase( final C = Pmax);
+      parameter Modelica.SIunits.Power Pmax "Maximum power transfer";
+      parameter Modelica.SIunits.Frequency fnom=50 
+      "Nominal frequency of network";
+      parameter Modelica.SIunits.MomentOfInertia J=0 
+      "Moment of inertia of the generator/shaft system (for damping term calculation)"
+           annotation(Dialog(group="Generator"));
+      parameter Real r=0.2 "Electrical damping of generator/shaft system" 
+                             annotation(dialog(enable=if J>0 then true else false, group="Generator"));
+      parameter Integer Np=2 "Number of electrical poles" 
+                               annotation(dialog(enable=if J>0 then true else false, group="Generator"));
+      Real D "Electrical damping coefficient";
+    equation 
+      // Definition of the reference
+      omegaRef = 2*Modelica.Constants.pi*fnom;
+      // Definition of damping power loss
+      if J>0 then
+        D = 2*r*sqrt(C*J*(2*Modelica.Constants.pi*fnom*Np)/(Np^2));
+      else
+        D = 0;
+      end if;
+      if closedInternal then
+        Ploss = D*der(delta);
+      else
+        Ploss = 0;
+      end if;
+      annotation (Icon(
+          Rectangle(extent=[-54,6; -28,-6], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Line(points=[-54,0; -92,0], style(color=0, rgbcolor={0,0,0})),
+          Line(points=[-28,0; -10,0; 18,16],style(color=0, rgbcolor={0,0,0})),
+          Line(points=[20,0; 46,0], style(color=0, rgbcolor={0,0,0})),
+          Line(points=[46,40; 46,-40], style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2))), Documentation(info="<html>
+<p>This model extends <tt>Network1portBase</tt> partial model, by directly defining the maximum power that can be transferred between the electrical port and the grid <tt>Pmax</tt>.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J</tt> is zero, zero damping is assumed. Note that <tt>J</tt> is only used to compute the dissipative term and should refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+    end NetworkGrid_Pmax;
+  
+    partial model Network2portBase "Base class for network with two port" 
+      parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 
+      "Initialization option"   annotation(Dialog(tab = "Initialization"));
+      parameter Modelica.SIunits.Power C_ab "Coefficient of Pe_ab";
+      Modelica.SIunits.Power Pe_ab "Exchanged electrical power from A to B";
+      Modelica.SIunits.Power Pe_a "Net electrical power side A";
+      Modelica.SIunits.Power Pe_b "Net electrical power side B";
+      Modelica.SIunits.Power Ploss_a "Electrical power loss side A";
+      Modelica.SIunits.Power Ploss_b "Electrical power loss side B";
+      Modelica.SIunits.AngularVelocity omega_a "Angular velocity A";
+      Modelica.SIunits.AngularVelocity omega_b "Angular velocity B";
+      Modelica.SIunits.Angle delta_a "Phase A";
+      Modelica.SIunits.Angle delta_b "Phase B";
+      Modelica.SIunits.Angle delta_ab( stateSelect = StateSelect.prefer, start=deltaStart) 
+      "Load angle between A and B";
+    
+  protected 
+      parameter Real deltaStart = 0;
+  public 
+      PowerConnection powerConnection_a "A" 
+                                        annotation (extent=[-114,-14; -86,14]);
+      annotation (Diagram, Icon(
+          Ellipse(extent=[-80,80; 80,-80], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255}))),
+        Documentation(info="<html>
+<p>Basic interface of the Network models with two electrical ports, containing the common parameters, variables and connectors.</p>
+<p><b>Modelling options</b>
+<p>The flow of electrical power from side A to side B is defined by the following relationship:
+<ul><tt>Pe_ab = C*sin(delta_ab)</tt></ul> 
+<p>where
+<ul><tt>delta_ab = delta_a - delta_b</tt></ul>
+<p>is the relative load angle.</p>
+<p><tt>delta_a</tt> and <tt>delta_b</tt> are the phases of the rotating frames in the corresponding ports.
+<p>The electrical power loss on each side are described by the variables <tt>Ploss_a</tt> and <tt>Ploss_b</tt>.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+      PowerConnection powerConnection_b "B" 
+                                        annotation (extent=[86,-14; 114,14]);
+  protected 
+      Modelica.Blocks.Interfaces.BooleanInput closedInternal_gen_a 
+        annotation (extent=[-48,20; -32,38],rotation=270);
+      Modelica.Blocks.Interfaces.BooleanInput closedInternal_gen_b 
+        annotation (extent=[32,20; 48,38],  rotation=270);
+    equation 
+      // Definition of load angles
+      der(delta_a) = omega_a;
+      der(delta_b) = omega_b;
+      delta_ab = delta_a - delta_b;
+      // Definition of power flow
+      if closedInternal_gen_a and closedInternal_gen_b then
+        Pe_ab = C_ab*Modelica.Math.sin(delta_ab);
+      else
+        Pe_ab = 0;
+      end if;
+      // Boundary conditions
+      Pe_a + Ploss_a = powerConnection_a.W;
+      Pe_b + Ploss_b = powerConnection_b.W;
+      omega_a = 2*Modelica.Constants.pi*powerConnection_a.f;
+      omega_b = 2*Modelica.Constants.pi*powerConnection_b.f;
+    initial equation 
+      if initOpt == ThermoPower.Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
+        der(delta_ab) = 0;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+    end Network2portBase;
+  
+    model NetworkTwoGenerators_eX 
+    "Connection: generator(a) - generator(b); Parameters: voltages and reactances" 
+      extends ThermoPower.Electrical.Network2portBase( deltaStart=deltaStart_ab,
+                                                      final C_ab = e_a*e_b/(X_a+X_b+Xline));
+      parameter Boolean hasBreaker = false 
+      "Model includes a breaker controlled by external input";
+      parameter Modelica.SIunits.Voltage e_a "e.m.f voltage (generator A)" 
+                                                       annotation(Dialog(group="Generator side A"));
+      parameter Modelica.SIunits.Voltage e_b "e.m.f voltage (generator B)" 
+                                                       annotation(Dialog(group="Generator side B"));
+      parameter Modelica.SIunits.Reactance X_a 
+      "Internal reactance (generator A)"                   annotation(Dialog(group="Generator side A"));
+      parameter Modelica.SIunits.Reactance X_b 
+      "Internal reactance (generator B)"                   annotation(Dialog(group="Generator side B"));
+      parameter Modelica.SIunits.Reactance Xline "Line reactance";
+      parameter Modelica.SIunits.MomentOfInertia J_a=0 
+      "Moment of inertia of the generator/shaft system A (for damping term calculation only)"
+                                                                                                          annotation(Dialog(group="Generator side A"));
+      parameter Real r_a=0.2 
+      "Electrical damping of generator/shaft system (generator A)" 
+                             annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
+      parameter Integer Np_a=2 "Number of electrical poles (generator A)" 
+                               annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
+      parameter Modelica.SIunits.MomentOfInertia J_b=0 
+      "Moment of inertia of the generator/shaft system B (for damping term calculation only)"
+                                                                                                          annotation(Dialog(group="Generator side B"));
+      parameter Real r_b=0.2 
+      "Electrical damping of generator/shaft system (generator B)" 
+                             annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
+      parameter Integer Np_b=2 "Number of electrical poles (generator B)" 
+                               annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
+      parameter Modelica.SIunits.Frequency fnom=50 
+      "Nominal frequency of the network";
+      parameter Modelica.SIunits.Angle deltaStart_ab=0 
+      "Start value of the load angle between side A and side B"                     annotation(Dialog(tab="Initialization"));
+      Real D_a "Electrical damping coefficient side A";
+      Real D_b "Electrical damping coefficient side B";
+      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker 
+        annotation (extent=[-16,82; 16,112], rotation=270);
+    equation 
+      // Breaker and its connections (unique breaker => closedInternal_gen_a = closedInternal_gen_b)
+      if not hasBreaker then
+        closedInternal_gen_a = true;
+        closedInternal_gen_b = true;
+      end if;
+      connect(closed, closedInternal_gen_a);
+      connect(closed, closedInternal_gen_b);
+    
+      // Definitions of net powers
+      Pe_a = Pe_ab;
+      Pe_a = -Pe_b;
+      // Definitions of damping power losses
+      if J_a>0 then
+        D_a = 2*r_a*sqrt(C_ab*J_a*(2*Modelica.Constants.pi*fnom*Np_a)/(Np_a^2));
+      else
+        D_a = 0;
+      end if;
+      if J_b>0 then
+        D_b = 2*r_b*sqrt(C_ab*J_b*(2*Modelica.Constants.pi*fnom*Np_b)/(Np_b^2));
+      else
+        D_b = 0;
+      end if;
+      if closedInternal_gen_a then
+        Ploss_a = D_a*der(delta_ab);
+        Ploss_b = - D_b*der(delta_ab);
+      else
+        Ploss_a = 0;
+        Ploss_b = 0;
+      end if;
+      annotation (Documentation(info="<html>
+<p>Simplified model of connection between two generators based on the swing equation. It completes <tt>Netowrk2portBase</tt> partial model, by defining the power coefficient <tt>C</tt> in terms of the parameters <tt>e_a</tt>, <tt>e_b</tt>, <tt>X_a</tt>, <tt>X_b</tt> and <tt>Xline</tt>.
+<p>The net electrical powers of two port coincides with the power <tt>P_ab</tt>.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed. Note that <tt>J_a</tt> and <tt>J_b</tt> are only used to compute the dissipative term and should each refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
+</html>"),   Icon(
+          Line(points=[-54,0; -94,0], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[62,0; 98,0], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[-34,0; -14,0; 12,18],style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[14,0; 38,0], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Rectangle(extent=[-58,6; -34,-6], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Rectangle(extent=[38,6; 62,-6], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255}))));
+    end NetworkTwoGenerators_eX;
+  
+    model NetworkTwoGenerators_Pmax 
+    "Connection: generator(a) - generator(b); Parameters: maximum power" 
+      extends ThermoPower.Electrical.Network2portBase( deltaStart=deltaStart_ab,
+                                                      final C_ab = Pmax);
+      parameter Boolean hasBreaker = false;
+      parameter Modelica.SIunits.Power Pmax "Maximum power transfer";
+      parameter Modelica.SIunits.MomentOfInertia J_a=0 
+      "Moment of inertia of the generator/shaft system A (for damping term calculation only)"
+                                                                                                          annotation(Dialog(group="Generator side A"));
+      parameter Real r_a=0.2 
+      "Electrical damping of generator/shaft system (generator A)" 
+                             annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
+      parameter Integer Np_a=2 "Number of electrical poles (generator A)" 
+                               annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
+      parameter Modelica.SIunits.MomentOfInertia J_b=0 
+      "Moment of inertia of the generator/shaft system B (for damping term calculation only)"
+                                                                                                          annotation(Dialog(group="Generator side B"));
+      parameter Real r_b=0.2 
+      "Electrical damping of generator/shaft system (generator B)" 
+                             annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
+      parameter Integer Np_b=2 "Number of electrical poles (generator B)" 
+                               annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
+      parameter Modelica.SIunits.Frequency fnom=50 
+      "Nominal frequency of the network";
+      parameter Modelica.SIunits.Angle deltaStart_ab=0 
+      "Start value of the load angle between side A and side B"                     annotation(Dialog(tab="Initialization"));
+      Real D_a "Electrical damping coefficient side A";
+      Real D_b "Electrical damping coefficient side B";
+      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker 
+        annotation (extent=[-16,82; 16,112], rotation=270);
+    equation 
+      // Breaker and its connections (unique breaker => closedInternal_gen_a = closedInternal_gen_b)
+      if not hasBreaker then
+        closedInternal_gen_a = true;
+        closedInternal_gen_b = true;
+      end if;
+      connect(closed, closedInternal_gen_a);
+      connect(closed, closedInternal_gen_b);
+    
+      // Definition of net powers
+      Pe_a = Pe_ab;
+      Pe_a = -Pe_b;
+      // Definition of damping power losses
+      if J_a>0 then
+        D_a = 2*r_a*sqrt(C_ab*J_a*(2*Modelica.Constants.pi*fnom*Np_a)/(Np_a^2));
+      else
+        D_a = 0;
+      end if;
+      if J_b>0 then
+        D_b = 2*r_b*sqrt(C_ab*J_b*(2*Modelica.Constants.pi*fnom*Np_b)/(Np_b^2));
+      else
+        D_b = 0;
+      end if;
+      if closedInternal_gen_a then
+        Ploss_a = D_a*der(delta_ab);
+        Ploss_b = - D_b*der(delta_ab);
+      else
+        Ploss_a = 0;
+        Ploss_b = 0;
+      end if;
+      annotation (Documentation(info="<html>
+<p>Simplified model of connection between two generators based on swing equation. It completes <tt>Netowrk2portBase</tt> partial model, defining the coefficient of the exchanged clean electrical power and the damping power losses.
+<p>The power coefficient is given by directly defining the maximum power that can be transferred between the electrical port and the grid <tt>Pmax</tt>.
+<p>The net electrical powers of two port coincide with the power <tt>P_ab</tt>.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed. Note that <tt>J_a</tt> and <tt>J_b</tt> are only used to compute the dissipative term and should each refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
+</html>"),   Icon(
+          Line(points=[-54,0; -94,0], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[56,0; 92,0], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[-34,0; -14,0; 12,18],style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[14,0; 38,0], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Rectangle(extent=[-58,6; -34,-6], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Rectangle(extent=[38,6; 62,-6], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255}))));
+    end NetworkTwoGenerators_Pmax;
+  
+    model NetworkGridTwoGenerators "Base class for network with two port" 
+      extends ThermoPower.Electrical.Network2portBase( final C_ab = e_a*e_b/(X_a+X_b));
+      parameter Boolean hasBreaker = false 
+      "Model includes a breaker controlled by external input";
+      parameter Modelica.SIunits.Voltage v "Network connection frame";
+      parameter Modelica.SIunits.Voltage e_a "e.m.f voltage (generator A)" 
+                                                       annotation(Dialog(group="Generator side A"));
+      parameter Modelica.SIunits.Voltage e_b "e.m.f voltage (generator B)" 
+                                                       annotation(Dialog(group="Generator side B"));
+      parameter Modelica.SIunits.Reactance X_a 
+      "Internal reactance (generator A)"                   annotation(Dialog(group="Generator side A"));
+      parameter Modelica.SIunits.Reactance X_b 
+      "Internal reactance (generator B)"                   annotation(Dialog(group="Generator side B"));
+      parameter Modelica.SIunits.Reactance Xline "Line reactance";
+      parameter Modelica.SIunits.MomentOfInertia J_a=0 
+      "Moment of inertia of the generator/shaft system A (for damping term calculation only)"
+                                                                                                          annotation(Dialog(group="Generator side A"));
+      parameter Real r_a=0.2 
+      "Electrical damping of generator/shaft system (generator A)" 
+                             annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
+      parameter Integer Np_a=2 "Number of electrical poles (generator A)" 
+                               annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
+      parameter Modelica.SIunits.MomentOfInertia J_b=0 
+      "Moment of inertia of the generator/shaft system B (for damping term calculation only)"
+                                                                                                          annotation(Dialog(group="Generator side B"));
+      parameter Real r_b=0.2 
+      "Electrical damping of generator/shaft system (generator B)" 
+                             annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
+      parameter Integer Np_b=2 "Number of electrical poles (generator B)" 
+                               annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
+      parameter Modelica.SIunits.Frequency fnom=50 "Frequency of the network";
+      Real D_a "Electrical damping coefficient side A";
+      Real D_b "Electrical damping coefficient side B";
+      Modelica.SIunits.Power Pe_g "Electrical Power provided to the grid";
+      Modelica.SIunits.Power Pe_ag 
+      "Power transferred from generator A to the grid";
+      Modelica.SIunits.Power Pe_bg 
+      "Power transferred from generator B to the grid";
+      final parameter Modelica.SIunits.Power C_ag = e_a*v/(X_a+Xline) 
+      "Coefficient of Pe_ag";
+      final parameter Modelica.SIunits.Power C_bg = e_b*v/(X_b+Xline) 
+      "Coefficient of Pe_bg";
+      Modelica.SIunits.AngularVelocity omegaRef "Angular velocity reference";
+      Modelica.SIunits.Angle delta_ag(  stateSelect = StateSelect.prefer) 
+      "Load angle between generator side A and the grid";
+      Modelica.SIunits.Angle delta_bg 
+      "Load angle between generator side B and the grid";
+      Modelica.SIunits.Angle delta_g "Grid phase";
+      Modelica.Blocks.Interfaces.BooleanInput closed_gen_a if 
+                                                        hasBreaker 
+        annotation (extent=[-84,44; -52,74], rotation=270);
+      Modelica.Blocks.Interfaces.BooleanInput closed_gen_b if 
+                                                        hasBreaker 
+        annotation (extent=[52,44; 84,74],   rotation=270);
+      Modelica.Blocks.Interfaces.BooleanInput closed_grid if 
+                                                        hasBreaker 
+        annotation (extent=[-16,82; 16,112], rotation=270);
+  protected 
+      Modelica.Blocks.Interfaces.BooleanInput closedInternal_grid 
+        annotation (extent=[-8,40; 8,58],   rotation=270);
+    equation 
+      // Load angles
+      omegaRef = 2*Modelica.Constants.pi*fnom;
+      der(delta_g) = omegaRef;
+      delta_ag = delta_a - delta_g;
+      delta_bg = delta_b - delta_g;
+      // Breakers and their connections
+      if not hasBreaker then
+        closedInternal_gen_a = true;
+        closedInternal_gen_b = true;
+        closedInternal_grid = true;
+      end if;
+      connect(closed_gen_a, closedInternal_gen_a);
+      connect(closed_gen_b, closedInternal_gen_b);
+      connect(closed_grid, closedInternal_grid);
+      // Coefficients of exchanged powers (power = zero if open breaker)
+      if closedInternal_gen_a and closedInternal_grid then
+        Pe_ag = C_ag*Modelica.Math.sin(delta_ag);
+      else
+        Pe_ag = 0;
+      end if;
+      if closedInternal_gen_b and closedInternal_grid then
+        Pe_bg = C_bg*Modelica.Math.sin(delta_bg);
+      else
+        Pe_bg = 0;
+      end if;
+      if closedInternal_gen_a then
+        Ploss_a = D_a*der(delta_ag);
+      else
+        Ploss_a = 0;
+      end if;
+      if closedInternal_gen_b then
+        Ploss_b = D_b*der(delta_bg);
+      else
+        Ploss_b = 0;
+      end if;
+      // Net and exchanged powers
+      Pe_a = Pe_ab + Pe_ag;
+      Pe_b = -Pe_ab + Pe_bg;
+      Pe_g = Pe_ag + Pe_bg;
+      // Damping power losses
+      if J_a>0 then
+        D_a = 2*r_a*sqrt(C_ab*J_a*(2*Modelica.Constants.pi*fnom*Np_a)/(Np_a^2));
+      else
+        D_a = 0;
+      end if;
+      if J_b>0 then
+        D_b = 2*r_b*sqrt(C_ab*J_b*(2*Modelica.Constants.pi*fnom*Np_b)/(Np_b^2));
+      else
+        D_b = 0;
+      end if;
+    initial equation 
+      if initOpt == Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == Choices.Init.Options.steadyState then
+        der(delta_ag) = 0;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+      annotation (Diagram, Icon(
+          Line(points=[32,0; 98,0],     style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[-40,0; -32,0; -16,8],       style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[-16,0; 16,0],     style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[0,2; 0,12; 8,24],   style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1)),
+          Line(points=[-30,64; 30,64], style(
+              color=0,
+              rgbcolor={0,0,0},
+              thickness=2,
+              fillPattern=1)),
+          Line(points=[0,64; 0,26], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Rectangle(extent=[-4,54; 4,36], style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Ellipse(extent=[-4,4; 4,-4],     style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=0,
+              rgbfillColor={0,0,0})),
+          Line(points=[-36,0; -102,0],    style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Rectangle(extent=[-66,4; -48,-4],    style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Rectangle(extent=[48,4; 66,-4],    style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillColor=7,
+              rgbfillColor={255,255,255},
+              fillPattern=1)),
+          Line(points=[8,0; 16,0; 32,8],           style(
+              color=0,
+              rgbcolor={0,0,0},
+              fillPattern=1))),
+        Documentation(info="<html>
+<p>Simplified model of connection between two generators and the grid.
+<p>This model adds to <tt>Netowrk2portBase</tt> partial model, in more in comparison to the concepts expressed by the <tt>NetowrkTwoGenerators_eX</tt> model, two further electrical flows: from port_a to grid and from port_b to grid, so that to describe the interactions between two ports and the grid.
+<p>The clean electrical powers of two ports are defined by opportune combinations of the power flows introduced.
+<p>The power losses are represented by a linear dissipative term. It is possible to directly set the damping coefficient <tt>r</tt> of the generator/shaft system. 
+If <tt>J_a</tt> or <tt>J_b</tt> are zero, zero damping is assumed. Note that <tt>J_a</tt> and <tt>J_b</tt> are only used to compute the dissipative term and should each refer to the total inertia of the generator-shaft system; the network model does not add any inertial effects.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Jul 2008</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a> and <a> Luca Savoldelli </a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+    end NetworkGridTwoGenerators;
+  annotation (Documentation(info="<html>
+<p>This package allows to describe the flow of active power between a synchronous generator and a grid, through simplified power transmission line models, assuming ideal voltage control. </p>
+<p>These models are meant to be used as simplified boundary conditions for a thermal power plant model, rather than for fully modular description of three-phase networks. Specialized libraries should be used for this purpose; bear in mind, however, that full three-phase models of electrical machinery and power lines could make the power plant simulation substantially heavier, if special numeric integration strategies are not adopted.
+</html>"));
   end Electrical;
 end ThermoPower;
