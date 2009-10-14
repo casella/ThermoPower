@@ -16,7 +16,7 @@ package Media "Medium models for the ThermoPower library"
   /*
   constant Modelica.SIunits.SpecificHeatCapacity cp0=4200;
   constant ThermoPower.Density rho0=998;
-  constant RelativePressureCoefficient beta=2.5e-4;
+  constant RelativePressureCoefficient beta_r=2.5e-4;
   constant Modelica.SIunits.SpecificEnthalpy h0=1e5;
   constant Modelica.SIunits.DynamicViscosity eta0=0.00095;
   constant Modelica.SIunits.DynamicViscosity lambda0=0.6;
@@ -25,7 +25,7 @@ package Media "Medium models for the ThermoPower library"
         Modelica.Media.Water.IF97_Utilities.cp_pT(p0, T0);
     constant ThermoPower.Density rho0=
         Modelica.Media.Water.IF97_Utilities.rho_pT(p0, T0);
-    constant RelativePressureCoefficient beta=Modelica.Media.Water.IF97_Utilities.beta_pT(p0,T0);
+    constant RelativePressureCoefficient beta0=Modelica.Media.Water.IF97_Utilities.beta_pT(p0,T0);
     constant Modelica.SIunits.SpecificEnthalpy h0=
         Modelica.Media.Water.IF97_Utilities.h_pT(p0, T0);
     constant Modelica.SIunits.DynamicViscosity eta0=
@@ -41,29 +41,29 @@ package Media "Medium models for the ThermoPower library"
     equation 
       // h = cp0*(T-T0)+h0;
       T = T0 + (h-h0)/cp0;
-      d = rho0*(1-beta*(T-T0));
+      d = rho0*(1-beta0*(T-T0));
       u = h;
       R=1;
       MM=0.018;
       state.T=T;
     end BaseProperties;
     
-    redeclare function extends heatCapacity_cp 
+    redeclare function extends specificHeatCapacityCp 
       "Return specific heat capacity at constant pressure" 
     algorithm 
       cp := cp0;
-    end heatCapacity_cp;
+    end specificHeatCapacityCp;
     
-    redeclare function extends heatCapacity_cv 
+    redeclare function extends specificHeatCapacityCv 
       "Return specific heat capacity at constant volume" 
     algorithm 
       cv := cp0;
-    end heatCapacity_cv;
+    end specificHeatCapacityCv;
     
     redeclare function extends density_derh_p 
       "density derivative by specific enthalpy at const pressure" 
     algorithm 
-      ddhp:=-rho0*beta/cp0;
+      ddhp:=-rho0*beta0/cp0;
     end density_derh_p;
     
     redeclare function extends density_derp_h 
