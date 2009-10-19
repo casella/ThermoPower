@@ -2,25 +2,34 @@ package ThermoPower "Open library for thermal power plant simulation"
   import Modelica.Math.*;
   import Modelica.SIunits.*;
 
+
   type HydraulicConductance = Real (final quantity="HydraulicConductance",
         final unit="(kg/s)/Pa");
+
 
   type HydraulicResistance = Real (final quantity="HydraulicResistance", final unit
       =      "Pa/(kg/s)");
 
+
   type PerUnit = Real (
                      final quantity="PerUnit",final unit="pu");
 
+
   type Density = Modelica.SIunits.Density (start=40) "generic start value";
+
 
   type LiquidDensity = Density (start=1000) "start value for liquids";
 
+
   type GasDensity = Density (start=5) "start value for gases/vapours";
+
 
   type AbsoluteTemperature = Temperature (start=300, nominal = 500) 
   "generic temperature";
 
+
   type AbsolutePressure = Pressure (start=1e5) "generic pressure";
+
 
   package Icons "Icons for ThermoPower library" 
     extends Modelica.Icons.Library;
@@ -574,6 +583,7 @@ package ThermoPower "Open library for thermal power plant simulation"
     end Gas;
   end Icons;
 
+
   package Functions "Miscellaneous functions" 
     extends Modelica.Icons.Library;
     function linear 
@@ -791,14 +801,14 @@ This package contains general-purpose functions and models
         input Modelica.SIunits.Height head_nom[3] 
         "Pump head for three operating points";
     protected 
-        Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
+        parameter Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
         "Squared nominal flow rates";
         /* Linear system to determine the coefficients:
   head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
   head_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
   head_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
   */
-        Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],head_nom) 
+        parameter Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],head_nom) 
         "Coefficients of quadratic head curve";
       algorithm 
         // Flow equation: head = c[1] + q_flow*c[2] + q_flow^2*c[3];
@@ -1129,6 +1139,7 @@ This characteristic is such that the relative change of the flow coefficient is 
     end FanCharacteristics;
   end Functions;
 
+
   annotation (Documentation(info="<HTML>
 <p><h2>General Information</h2></p>
 <p>The ThermoFluid library is an open Modelica library for the dynamic modeling of thermal power plants.
@@ -1236,6 +1247,7 @@ most user-developed models.</li>
 </HTML>"),
 uses(Modelica(version="2.2.1")),
 version="2.1");
+
 
   package Electrical "Simplified models of electric power components" 
     extends Modelica.Icons.Library;

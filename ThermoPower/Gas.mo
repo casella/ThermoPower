@@ -447,21 +447,27 @@ The latter options can be useful when two or more components are connected direc
         "Independent component mass balance";
     end for;
     
-    // Boundary conditions  
-    if inlet.w >= 0 then
-      hi = inlet.hBA;
-      Xi_i = inlet.XBA;
-    else
-      hi = gas.h;
-      Xi_i = gas.Xi;
-    end if;
-    if outlet.w >= 0 then
-      ho = outlet.hAB;
-      Xi_o = outlet.XAB;
-    else
-      ho = gas.h;
-      Xi_o = gas.Xi;
-    end if;
+    // Boundary conditions
+    hi = Como.continuation(inlet.hBA, if inlet.w>=0 then inlet.hBA else gas.h);
+    Xi_i = Como.continuation(inlet.XBA, if inlet.w>=0 then inlet.XBA else gas.Xi);
+    ho = Como.continuation(gas.h, if outlet.w>=0 then outlet.hAB else gas.h);
+    Xi_o = Como.continuation(gas.Xi, if outlet.w>=0 then outlet.XAB else gas.Xi);
+  /*  
+  if inlet.w >= 0 then
+    hi = inlet.hBA;
+    Xi_i = inlet.XBA;
+  else
+    hi = gas.h;
+    Xi_i = gas.Xi;
+  end if;
+  if outlet.w >= 0 then
+    ho = outlet.hAB;
+    Xi_o = outlet.XAB;
+  else
+    ho = gas.h;
+    Xi_o = gas.Xi;
+  end if;
+*/
     inlet.hAB = gas.h;
     inlet.XAB = gas.Xi;
     outlet.hBA = gas.h;
@@ -558,20 +564,25 @@ The latter options can be useful when two or more components are connected direc
       end if;
     
       // Boundary conditions
-      if inlet.w >= 0 then
-        hi = inlet.hBA;
-        Xi_i = inlet.XBA;
-      else
-        hi = gas.h;
-        Xi_i = gas.Xi;
-      end if;
-      if outlet.w >= 0 then
-        ho = outlet.hAB;
-        Xi_o = outlet.XAB;
-      else
-        ho = gas.h;
-        Xi_o = gas.Xi;
-      end if;
+      hi = Como.continuation(inlet.hBA, if inlet.w>=0 then inlet.hBA else gas.h);
+      Xi_i = Como.continuation(inlet.XBA, if inlet.w>=0 then inlet.XBA else gas.Xi);
+      ho = Como.continuation(gas.h, if outlet.w>=0 then outlet.hAB else gas.h);
+      Xi_o = Como.continuation(gas.Xi, if outlet.w>=0 then outlet.XAB else gas.Xi);
+    /* if inlet.w >= 0 then
+    hi = inlet.hBA;
+    Xi_i = inlet.XBA;
+  else
+    hi = gas.h;
+    Xi_i = gas.Xi;
+  end if;
+    if outlet.w >= 0 then
+    ho = outlet.hAB;
+    Xi_o = outlet.XAB;
+  else
+    ho = gas.h;
+    Xi_o = gas.Xi;
+  end if;
+*/
       inlet.p = gas.p;
       inlet.hAB = gas.h;
       inlet.XAB = gas.Xi;
@@ -680,7 +691,6 @@ The latter options can be useful when two or more components are connected direc
 </ul>
 </html>"),   Icon,
       Diagram);
-    
     replaceable Thermal.HT thermalPort 
       annotation (extent=[-38,60; 42,80]);
   equation 
@@ -700,27 +710,34 @@ The latter options can be useful when two or more components are connected direc
     end if;
     
     // Boundary conditions
-    if in1.w >= 0 then
-      hi1 = in1.hBA;
-      Xi1 = in1.XBA;
-    else
-      hi1 = gas.h;
-      Xi1 = gas.X;
-    end if;
-    if in2.w >= 0 then
-      hi2 = in2.hBA;
-      Xi2 = in2.XBA;
-    else
-      hi2 = gas.h;
-      Xi2 = gas.X;
-    end if;
-    if out.w >= 0 then
-      ho = out.hAB;
-      Xo = out.XAB;
-    else
-      ho = gas.h;
-      Xo = gas.X;
-    end if;
+    hi1 = Como.continuation(in1.hBA, if in1.w>=0 then in1.hBA else gas.h);
+    Xi1 = Como.continuation(in1.XBA, if in1.w>=0 then in1.XBA else gas.X);
+    hi2 = Como.continuation(in2.hBA, if in2.w>=0 then in2.hBA else gas.h);
+    Xi2 = Como.continuation(in2.XBA, if in2.w>=0 then in2.XBA else gas.X);
+    ho = Como.continuation(gas.h, if out.w>=0 then out.hAB else gas.h);
+    Xo = Como.continuation(gas.X, if out.w>=0 then out.XAB else gas.X);
+  /*  if in1.w >= 0 then
+    hi1 = in1.hBA;
+    Xi1 = in1.XBA;
+  else
+    hi1 = gas.h;
+    Xi1 = gas.X;
+  end if;
+  if in2.w >= 0 then
+    hi2 = in2.hBA;
+    Xi2 = in2.XBA;
+  else
+    hi2 = gas.h;
+    Xi2 = gas.X;
+  end if;
+  if out.w >= 0 then
+    ho = out.hAB;
+    Xo = out.XAB;
+  else
+    ho = gas.h;
+    Xo = gas.X;
+  end if;
+*/
     in1.p   = gas.p;
     in1.hAB = gas.h;
     in1.XAB = gas.X;
@@ -962,17 +979,21 @@ The latter options can be useful when two or more components are connected direc
     assert(Kf >= 0, "Negative friction coefficient");
   equation 
     // Set fluid properties
-    if inlet.w >= 0 then
-      gas.p = inlet.p;
-      gas.h = inlet.hBA;
-      gas.Xi = inlet.XBA;
-    else
-      gas.p = outlet.p;
-      gas.h = outlet.hAB;
-      gas.Xi = outlet.XAB;
-    end if;
-    
-    inlet.p - outlet.p = noEvent(Kf*abs(inlet.w) + Kfl)*inlet.w/gas.d 
+    gas.p = Como.continuation(inlet.p, if inlet.w>=0 then inlet.p else outlet.p);
+    gas.h = Como.continuation(inlet.hBA, if inlet.w>=0 then inlet.hBA else outlet.hAB);
+    gas.Xi = Como.continuation(inlet.XBA, if inlet.w>=0 then inlet.XBA else outlet.XAB);
+  /*
+  if inlet.w >= 0 then
+    gas.p = inlet.p;
+    gas.h = inlet.hBA;
+    gas.Xi = inlet.XBA;
+  else
+    gas.p = outlet.p;
+    gas.h = outlet.hAB;
+    gas.Xi = outlet.XAB;
+  end if;
+*/
+    inlet.p - outlet.p = Como.continuation(dpnom/wnom*inlet.w, noEvent(Kf*abs(inlet.w) + Kfl)*inlet.w/gas.d) 
       "Flow characteristics";
     inlet.w + outlet.w = 0 "Mass balance";
     
@@ -1030,13 +1051,8 @@ The latter options can be useful when two or more components are connected direc
     
     // Set gas properties
     inlet.p=gas.p;
-    if inlet.w >= 0 then
-      gas.h = inlet.hBA;
-      gas.Xi = inlet.XBA;
-    else
-      gas.h = inlet.hAB;
-      gas.Xi = inlet.XAB;
-    end if;
+    gas.h =  Como.continuation(inlet.hBA, noEvent(if inlet.w >= 0 then inlet.hBA else outlet.hAB));
+    gas.Xi = Como.continuation(inlet.XBA, noEvent(if inlet.w >= 0 then inlet.XBA else outlet.XAB));
     
     T = gas.T "Sensor output";
     annotation (Documentation(info="<html>
@@ -1142,8 +1158,8 @@ The latter options can be useful when two or more components are connected direc
     
     // Gas properties
     gas.p = inlet.p;
-    gas.h =  noEvent(if w >= 0 then inlet.hBA else outlet.hAB);
-    gas.Xi = noEvent(if w >= 0 then inlet.XBA else outlet.XAB);
+    gas.h =  Como.continuation(inlet.hBA, noEvent(if w >= 0 then inlet.hBA else outlet.hAB));
+    gas.Xi = Como.continuation(inlet.XBA, noEvent(if w >= 0 then inlet.XBA else outlet.XAB));
     
     q = inlet.w/gas.d "Sensor output";
     annotation (Documentation(revisions="<html>
@@ -1309,10 +1325,10 @@ The latter options can be useful when two or more components are connected direc
     xs = noEvent(smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x));
     Y = noEvent(1 - abs(xs)/(3*Fxt));
     if CheckValve then
-      w = FlowChar(theta)*Av*Y*sqrt(gas.d)*
-          noEvent(smooth(0, if xs>=0 then sqrtR(p*xs) else 0));
+      w = Como.continuation(wnom/dpnom*dp, FlowChar(theta)*Av*Y*sqrt(gas.d)*
+          noEvent(smooth(0, if xs>=0 then sqrtR(p*xs) else 0)));
     else
-      w = FlowChar(theta)*Av*Y*sqrt(gas.d)*sqrtR(p*xs);
+      w = Como.continuation(wnom/dpnom*dp, FlowChar(theta)*Av*Y*sqrt(gas.d)*sqrtR(p*xs));
     end if;
     
     // Energy balance
@@ -1497,7 +1513,7 @@ The latter options can be useful when two or more components are connected direc
     sum(dMdt) = (infl.w + outfl.w)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpfric = 0 "Momentum balance";
     Dpfric = (if FFtype == FFtypes.NoFriction then 0 else 
-              noEvent(Kf*abs(w) + Kfl)*w*sum(vbar)/(N - 1)) 
+              Como.continuation(dpnom/(wnom/Nt)*w, noEvent(Kf*abs(w) + Kfl)*w*sum(vbar)/(N - 1))) 
       "Pressure drop due to friction";
     for j in 1:N - 1 loop
       if not QuasiStatic then
@@ -2211,7 +2227,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
 </html>"), Icon(Text(
           extent=[-128,-60; 128,-100],
           style(color=3, rgbcolor={0,0,255}),
-          string="%name")), 
+          string="%name")),
       Diagram);
   end TurbineBase;
   
