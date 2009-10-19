@@ -403,15 +403,19 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Kfl = wnom*wnf*Kf "Linear friction factor";
   equation 
     // Fluid properties
-    if inlet.w>=0 then
-      fluid.p=inlet.p;
-      fluid.h=inlet.hBA;
-    else
-      fluid.p=outlet.p;
-      fluid.h=outlet.hAB;
-    end if;
+    fluid.p = Como.continuation(inlet.p, if inlet.w >= 0 then inlet.p else outlet.p);
+    fluid.h = Como.continuation(inlet.hBA, if inlet.w >= 0 then inlet.hBA else outlet.hAB);
+  /*
+  if inlet.w>=0 then
+    fluid.p=inlet.p;
+    fluid.h=inlet.hBA;
+  else
+    fluid.p=outlet.p;
+    fluid.h=outlet.hAB;
+  end if;
+*/
     rho = fluid.d "Fluid density";
-    inlet.p - outlet.p = noEvent(Kf*abs(inlet.w) + Kfl)*inlet.w/rho 
+    inlet.p - outlet.p = Como.continuation(dpnom/wnom*inlet.w,noEvent(Kf*abs(inlet.w) + Kfl)*inlet.w/rho) 
       "Flow characteristics";
     inlet.w + outlet.w = 0 "Mass  balance";
     // Energy balance
@@ -506,8 +510,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
     
     // Boundary conditions
-    hi = if inlet.w >= 0 then inlet.hBA else h;
-    ho = if outlet.w >= 0 then outlet.hAB else h;
+    hi = Como.continuation(inlet.hBA, if inlet.w >= 0 then inlet.hBA else h);
+    ho = Como.continuation(h, if outlet.w >= 0 then outlet.hAB else h);
     inlet.hAB = h;
     outlet.hBA = h;
     inlet.p = p+fluid.d*Modelica.Constants.g_n*H;
@@ -641,9 +645,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
     
     // Boundary conditions
-    hi1 = if in1.w >= 0 then in1.hBA else h;
-    hi2 = if in2.w >= 0 then in2.hBA else h;
-    ho = if out.w >= 0 then out.hAB else h;
+    hi1 = Como.continuation(in1.hBA, if in1.w >= 0 then in1.hBA else h);
+    hi2 = Como.continuation(in2.hBA, if in2.w >= 0 then in2.hBA else h);
+    ho = Como.continuation(h, if out.w >= 0 then out.hAB else h);
     in1.hAB = h;
     in2.hAB = h;
     out.hBA = h;
@@ -743,8 +747,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     p - pext = liquid.d*g*y "Stevino's law";
     
     // Boundary conditions
-    hin = if inlet.w >= 0 then inlet.hBA else h;
-    hout = if outlet.w >= 0 then outlet.hAB else h;
+    hin = Como.continuation(inlet.hBA, if inlet.w >= 0 then inlet.hBA else h);
+    hout = Como.continuation(h, if outlet.w >= 0 then outlet.hAB else h);
     inlet.hAB = h;
     outlet.hBA = h;
     inlet.p = p;
@@ -1009,16 +1013,16 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Dpfric2 = 0;
     elseif HydraulicCapacitance == 0 then
       assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
-      Dpfric1 = noEvent(Kf*abs(win)  + Kfl)*win* sum(vbar[1:integer((N-1)/2)])/(N-1) 
+      Dpfric1 = Como.continuation(dpnom/(wnom/Nt)*win,noEvent(Kf*abs(win)  + Kfl)*win* sum(vbar[1:integer((N-1)/2)])/(N-1)) 
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar[1+integer((N-1)/2):N-1])/(N-1) 
+      Dpfric2 = Como.continuation(dpnom/(wnom/Nt)*wout,noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar[1+integer((N-1)/2):N-1])/(N-1)) 
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == 1 then
       Dpfric1 = 0 "Pressure drop from inlet to capacitance";
-      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar)/(N - 1) 
+      Dpfric2 = Como.continuation(dpnom/(wnom/Nt)*wout,noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar)/(N - 1)) 
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == 2 then
-      Dpfric1 = noEvent(Kf*abs(win) + Kfl)*win*sum(vbar)/(N - 1) 
+      Dpfric1 = Como.continuation(dpnom/(wnom/Nt)*win,noEvent(Kf*abs(win) + Kfl)*win*sum(vbar)/(N - 1)) 
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
     else
@@ -1325,7 +1329,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       vbar[j] = 1/rhobar[j] "Average specific volume";
       wbar[j] = infl.w/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
       dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else 
-                noEvent(Kf[j]*abs(w) + Kfl[j])*w*vbar[j]);
+                Como.continuation(dpnom/(wnom/Nt)*w,noEvent(Kf[j]*abs(w) + Kfl[j])*w*vbar[j]));
       if avoidInletEnthalpyDerivative and j == 1 then
         // first volume properties computed by the outlet properties
         rhobar[j] = rho[j+1];
@@ -3012,7 +3016,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     inlet.p = outlet.p "No pressure drop";
     // Set fluid properties
     fluid.p=inlet.p;
-    fluid.h = if inlet.w >= 0 then inlet.hBA else inlet.hAB;
+    fluid.h = Como.continuation(inlet.hBA, if inlet.w >= 0 then inlet.hBA else inlet.hAB);
     T = fluid.T;
     
     // Boundary conditions
@@ -3194,8 +3198,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     
     // Boundary conditions 
     // (Thermal effects of the water going out of the accumulator are neglected)
-    hl_in = if wl_in >= 0 then WaterInfl.hBA else hl;
-    hl_out = if wl_out >= 0 then WaterOutfl.hAB else hl;
+    hl_in = Como.continuation(WaterInfl.hBA, if wl_in >= 0 then WaterInfl.hBA else hl);
+    hl_out = Como.continuation(hl, if wl_out >= 0 then WaterOutfl.hAB else hl);
     WaterInfl.hAB = WaterOutfl.hAB;
     WaterOutfl.hBA = WaterInfl.hBA;
     wl_in = WaterInfl.w;
@@ -3334,7 +3338,7 @@ The latter options can be useful when two or more components are connected direc
     // Boundary conditions
     p = feed.p;
     p = steam.p;
-    hf = if feed.w >= 0 then feed.hBA else hl;
+    hf = Como.continuation(feed.hBA, if feed.w >= 0 then feed.hBA else hl);
     feed.w = qf;
     -steam.w = qs;
     feed.hAB = hl;
@@ -3540,11 +3544,11 @@ The latter options can be useful when two or more components are connected direc
     feedwater.p = p;
     feedwater.w = wf;
     feedwater.hAB = hl;
-    hf = noEvent(if wf >= 0 then feedwater.hBA else hl);
+    hf = Como.continuation(feedwater.hBA, noEvent(if wf >= 0 then feedwater.hBA else hl));
     downcomer.p = p + rhol*g*y;
     downcomer.w = -wd;
     downcomer.hBA = hd;
-    hd = noEvent(if wd >= 0 then afd*hf + (1 - afd)*hl else downcomer.hAB);
+    hd = Como.continuation(afd*hf + (1 - afd)*hl, noEvent(if wd >= 0 then afd*hf + (1 - afd)*hl else downcomer.hAB));
     blowdown.p = p;
     blowdown.w = -wb;
     blowdown.hBA = hl;
@@ -3553,15 +3557,15 @@ The latter options can be useful when two or more components are connected direc
     riser.hAB = hl;
     hrv = hls + xrv*(hvs - hls);
     xrv = 1 - (rhov/rhol)^avr;
-    hr=noEvent(if wr>=0 then riser.hBA else hl);
-    xr=noEvent(if wr>=0 then (if hr>hls then (hr - hls)/(hvs - hls) else 0) else xl);
-    hrl=noEvent(if wr>=0 then (if hr>hls then hls else hr) else hl);
-    wrv=noEvent(if wr>=0 then xr*wr/xrv else 0);
+    hr = Como.continuation(riser.hBA, noEvent(if wr>=0 then riser.hBA else hl));
+    xr = Como.continuation((hr - hls)/(hvs - hls), noEvent(if wr>=0 then (if hr>hls then (hr - hls)/(hvs - hls) else 0) else xl));
+    hrl = Como.continuation(hls, noEvent(if wr>=0 then (if hr>hls then hls else hr) else hl));
+    wrv = Como.continuation(xr*wr/xrv, noEvent(if wr>=0 then xr*wr/xrv else 0));
     wrl=wr-wrv;
     steam.p = p;
     steam.w = -wv;
     steam.hBA = hv;
-    hvout = noEvent(if wv >= 0 then hv else steam.hAB);
+    hvout = Como.continuation(hv, noEvent(if wv >= 0 then hv else steam.hAB));
   initial equation 
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -3820,9 +3824,9 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     
   equation 
     if CheckValve then
-      w = FlowChar(theta)*Av*sqrt(rho)*smooth(0,if dp>=0 then sqrtR(dp) else 0);
+      w = Como.continuation(wnom/dpnom*dp,FlowChar(theta)*Av*sqrt(rho)*smooth(0,if dp>=0 then sqrtR(dp) else 0));
     else
-      w = FlowChar(theta)*Av*sqrt(rho)*sqrtR(dp);
+      w = Como.continuation(wnom/dpnom*dp,FlowChar(theta)*Av*sqrt(rho)*sqrtR(dp));
     end if;
   end ValveLiq;
   
@@ -3890,10 +3894,10 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
     Y = 1 - abs(xs)/(3*Fxt);
     if CheckValve then
-      w = FlowChar(theta)*Av*Y*sqrt(rho)*
-          smooth(0,if xs>=0 then sqrtR(p*xs) else 0);
+      w = Como.continuation(wnom/dpnom*dp,FlowChar(theta)*Av*Y*sqrt(rho)*
+          smooth(0,if xs>=0 then sqrtR(p*xs) else 0));
     else
-      w = FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(p*xs);
+      w = Como.continuation(wnom/dpnom*dp,FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(p*xs));
     end if;
   end ValveVap;
   
@@ -4002,13 +4006,27 @@ li><i>1 Jul 2004</i>
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
       "Initialisation option" annotation(Dialog(tab="Initialisation"));
     constant Acceleration g=Modelica.Constants.g_n;
+    parameter Modelica.SIunits.MassFlowRate w0 "Nominal mass flow rate" 
+       annotation(Dialog(group="Characteristics"));
+    parameter Modelica.SIunits.Pressure dp0 "Nominal pressure head" 
+       annotation(Dialog(group="Characteristics"));
+    final parameter Modelica.SIunits.VolumeFlowRate q_single0=w0/(Np0*rho0) 
+      "Nominal volume flow rate (single pump)";
+    final parameter Modelica.SIunits.Height head0=dp0/(rho0*g) 
+      "Nominal pump head";
+  protected 
+    function df_dqflow 
+     extends flowCharacteristic;
+     annotation (partialderivative(q_flow));
+    end df_dqflow;
+  public 
     MassFlowRate w_single(start = wstart/Np0) "Mass flow rate (single pump)";
     MassFlowRate w = Np*w_single "Mass flow rate (total)";
     VolumeFlowRate q_single(start = wstart/(Np0*rho0)) 
       "Volume flow rate (single pump)";
     VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
     Pressure dp "Outlet pressure minus inlet pressure";
-    Height head = dp/(rho*g) "Pump head";
+    Height head "Pump head";
     Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";
     Medium.SpecificEnthalpy hout(start=hstart) "Enthalpy of outgoing fluid";
@@ -4039,14 +4057,17 @@ li><i>1 Jul 2004</i>
     end if;
     
     // Flow equations
-    q_single = w_single/rho;
+    q_single = w_single/Como.continuation(rho0,rho);
+    head = dp/(Como.continuation(rho0,rho)*g);
     if noEvent(s > 0 or (not CheckValve)) then
       // Flow characteristics when check valve is open
       q_single = s;
-      head = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps));
+      head = Como.continuation(df_dqflow(q_single0)*(q_single-q_single0) + (2/n0*flowCharacteristic(q_single0)-q_single0/n0*df_dqflow(q_single0))*(n-n0)-head0,
+                              (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps)));
     else
       // Flow characteristics when check valve is closed
-      head = (n/n0)^2*flowCharacteristic(0) - s;
+      head = Como.continuation(df_dqflow(q_single0)*(q_single-q_single0) + (2/n0*flowCharacteristic(q_single0)-q_single0/n0*df_dqflow(q_single0))*(n-n0)-head0,
+                              (n/n0)^2*flowCharacteristic(0) - s);
       q_single = 0;
     end if;
     
@@ -4069,11 +4090,7 @@ li><i>1 Jul 2004</i>
     // Boundary conditions
     dp = outfl.p - infl.p;
     w = infl.w "Pump total flow rate";
-    if w >= 0 then
-      hin = infl.hBA;
-    else
-      hin = outfl.hAB;
-    end if;
+    hin = if w>=0 then infl.hBA else outfl.hAB;
     infl.hAB = hout;
     outfl.hBA = hout;
     h = hout;
@@ -4514,8 +4531,9 @@ Input variables changed. This function now computes the heat transfer coefficien
     extends SteamTurbineBase;
     parameter Real eta_iso_nom=0.92 "Nominal isentropic efficiency";
     parameter Area Kt "Kt coefficient of Stodola's law";
+    parameter Pressure pnom "Nominal inlet pressure";
   equation 
-    w = Kt*partialArc*sqrt(steam_in.p*steam_in.d)*Functions.sqrtReg(1-(1/PR)^2) 
+    w = Como.continuation(wnom/pnom*steam_in.p,Kt*partialArc*sqrt(steam_in.p*steam_in.d)*Functions.sqrtReg(1-(1/PR)^2)) 
       "Stodola's law";
     eta_iso = eta_iso_nom "Constant efficiency";
    annotation (
