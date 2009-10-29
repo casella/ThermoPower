@@ -1,3 +1,4 @@
+within ThermoPower;
 package Water "Models of components with water/steam as working fluid" 
   extends Modelica.Icons.Library;
   
@@ -4007,10 +4008,7 @@ li><i>1 Jul 2004</i>
     final parameter Modelica.SIunits.Height head0=dp0/(rho0*g) 
       "Nominal pump head";
   protected 
-    function df_dqflow 
-     extends flowCharacteristic;
-     annotation (partialderivative(q_flow));
-    end df_dqflow;
+    function df_dqflow = der(flowCharacteristic, q_flow) annotation(smoothOrder=2);
   public 
     MassFlowRate w_single(start = wstart/Np0) "Mass flow rate (single pump)";
     MassFlowRate w = Np*w_single "Mass flow rate (total)";
