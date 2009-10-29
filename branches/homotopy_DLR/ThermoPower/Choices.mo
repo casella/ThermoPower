@@ -190,7 +190,7 @@ package Choices "Choice enumerations for ThermoPower models"
       end Temp;
     end Options;
   end Init;
-
+  
   package FlowReversal "Options for flow reversal support" 
     package Options 
       "Type, constants and menu choices to select the flow reversal support options" 
@@ -214,4 +214,24 @@ package Choices "Choice enumerations for ThermoPower models"
       end Temp;
     end Options;
   end FlowReversal;
+
+  package FluidPhase 
+    package FluidPhases 
+      "Type, constants and menu choices to select the fluid phase" 
+      
+      annotation (preferedView="text");
+      extends Modelica.Icons.Enumeration;
+      constant Integer Liquid = 0 "Liquid";
+      constant Integer Steam = 1 "Steam";
+      constant Integer TwoPhases = 2 "Two Phases";
+      type Temp 
+        "Temporary type with choices for menus (until enumerations are available)" 
+      extends Integer(min=0, max=2);
+      annotation (Evaluate=true, choices(
+        choice=ThermoPower.Choices.FluidPhase.FluidPhases.Liquid "Liquid",
+        choice=ThermoPower.Choices.FluidPhase.FluidPhases.Steam "Steam",
+        choice=ThermoPower.Choices.FluidPhase.FluidPhases.TwoPhases "TwoPhases"));
+      end Temp;
+    end FluidPhases;
+  end FluidPhase;
 end Choices;
