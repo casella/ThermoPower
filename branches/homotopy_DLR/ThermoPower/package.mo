@@ -1,3 +1,4 @@
+within ;
 package ThermoPower "Open library for thermal power plant simulation"
   import Modelica.Math.*;
   import Modelica.SIunits.*;
@@ -796,11 +797,12 @@ This package contains general-purpose functions and models
     
       function quadraticFlow "Quadratic flow characteristic" 
         extends baseFlow;
-        input Modelica.SIunits.VolumeFlowRate q_nom[3] 
+        annotation(smoothOrder = 3);
+        parameter Modelica.SIunits.VolumeFlowRate q_nom[3] 
         "Volume flow rate for three operating points (single pump)";
-        input Modelica.SIunits.Height head_nom[3] 
+        parameter Modelica.SIunits.Height head_nom[3] 
         "Pump head for three operating points";
-    protected 
+      
         parameter Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2} 
         "Squared nominal flow rates";
         /* Linear system to determine the coefficients:
@@ -1245,7 +1247,7 @@ most user-developed models.</li>
 <p>The ThermoPower package is licensed by Politecnico di Milano under the  <a href=\"http://www.modelica.org/licenses/ModelicaLicense2\"><b>Modelica License 2</b></a>.</p> 
 <p><b>Copyright &copy; 2002-2009, Politecnico di Milano.</b></p>
 </HTML>"),
-uses(Modelica(version="2.2.1")),
+uses(Modelica(version="2.2.2")),
 version="2.1");
 
 
