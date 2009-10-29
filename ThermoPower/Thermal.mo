@@ -593,28 +593,8 @@ This model computes the thermal and mechanical properties of a generic material.
     parameter Integer N=2 "Number of Nodes";
     parameter CoefficientOfHeatTransfer gamma 
       "Constant heat transfer coefficient";
-    parameter Temperature Tstart11=300 
-      "Temperature start value - side 1 node 1" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart1N=300 
-      "Temperature start value - side 1 node N" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart1[N] = ThermoPower.Thermal.linspaceExt(Tstart11,Tstart1N,N) 
-      "Start value of temperature vector - side 1 (initialized by default)" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart21=300 
-      "Temperature start value - side 2 node 1" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart2N=300 
-      "Temperature start value - side 2 node N" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart2[N] = ThermoPower.Thermal.linspaceExt(Tstart21,Tstart2N,N) 
-      "Start value of temperature vector - side 2 (initialized by default)" 
-      annotation(Dialog(tab = "Initialisation"));
-    DHT side1(N=N, T(start=Tstart1)) 
-                   annotation (extent=[-40, 20; 40, 40]);
-    DHT side2(N=N, T(start=Tstart2)) 
-                   annotation (extent=[-40, -42; 40, -20]);
+    DHT side1(N=N) annotation (extent=[-40, 20; 40, 40]);
+    DHT side2(N=N) annotation (extent=[-40, -42; 40, -20]);
   equation 
     side1.phi = gamma*(side1.T - side2.T) "Convective heat transfer";
     side1.phi = - side2.phi "Energy balance";
@@ -640,27 +620,9 @@ This model computes the thermal and mechanical properties of a generic material.
     parameter Integer N2(min=1)=2 "Number of nodes on side 2";
     parameter CoefficientOfHeatTransfer gamma 
       "Constant heat transfer coefficient";
-    parameter Temperature Tstart11=300 
-      "Temperature start value - side 1 node 1" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart1N=300 
-      "Temperature start value - side 1 node N" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart1[N1] = ThermoPower.Thermal.linspaceExt(Tstart11,Tstart1N,N1) 
-      "Start value of temperature vector - side 1 (initialized by default)" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart21=300 
-      "Temperature start value - side 2 node 1" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart2N=300 
-      "Temperature start value - side 2 node N" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart2[N2] = ThermoPower.Thermal.linspaceExt(Tstart21,Tstart2N,N2) 
-      "Start value of temperature vector - side 2 (initialized by default)" 
-      annotation(Dialog(tab = "Initialisation"));
-    DHT side1(N=N1, T(start=Tstart1)) 
+    DHT side1(N=N1) 
                    annotation (extent=[-40, 20; 40, 40]);
-    DHT side2(N=N2, T(start=Tstart2)) 
+    DHT side2(N=N2) 
                    annotation (extent=[-40, -42; 40, -20]);
   protected 
     Real G1[N2, N1] "Temperature weight matrix - side 1";
@@ -839,24 +801,8 @@ This model computes the thermal and mechanical properties of a generic material.
   model ConvHT_htc "1D Convective heat transfer between a DHT and a DHT_htc" 
     extends Icons.HeatFlow;
     parameter Integer N=2 "Number of Nodes";
-    parameter Temperature TstartF1=300 
-      "Temperature start value - fluid side node 1" annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature TstartFN=300 
-      "Temperature start value - fluid side node N" annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature TstartF[N] = ThermoPower.Thermal.linspaceExt(TstartF1,TstartFN,N) 
-      "Start value of temperature vector - fluid side (initialized by default)"
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature TstartO1=300 
-      "Temperature start value - other side node 1" annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature TstartON=300 
-      "Temperature start value - other side node N" annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature TstartO[N] = ThermoPower.Thermal.linspaceExt(TstartO1,TstartON,N) 
-      "Start value of temperature vector - other side (initialized by default)"
-      annotation(Dialog(tab = "Initialisation"));
-    DHT otherside(        N=N, T(start=TstartF)) 
-                               annotation (extent=[-40,-40; 40,-20]);
-    DHThtc_in fluidside(             N=N, T(start=TstartO)) 
-                                  annotation (extent=[-40,20; 40,40]);
+    DHT otherside(N=N)         annotation (extent=[-40,-40; 40,-20]);
+    DHThtc_in fluidside(N=N)      annotation (extent=[-40,20; 40,40]);
   equation 
     for j in 1:N loop
       fluidside.phi[j] = fluidside.gamma[j]*(fluidside.T[j] - otherside.T[j]) 
@@ -1093,11 +1039,15 @@ The latter options can be useful when two or more components are connected direc
     parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
     parameter ThermalConductivity lambda "Thermal conductivity";
     parameter Boolean WallRes=true "Wall conduction resistance accounted for";
-    parameter Temperature Tstart1=300 "Temperature start value - first node" 
+    parameter Temperature Tstartbar=300 "Avarage temperature" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature TstartN=300 "Temperature start value - last node" 
+    final parameter Temperature Tstart1=Tstartbar 
+      "Temperature start value - first node" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N) 
+    final parameter Temperature TstartN=Tstartbar 
+      "Temperature start value - last node" 
+      annotation(Dialog(tab = "Initialisation"));
+    final parameter Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N) 
       "Start value of temperature vector (initialized by default)" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
@@ -1181,13 +1131,15 @@ The latter options can be useful when two or more components are connected direc
       parameter Modelica.SIunits.Area Sext "External surface";
       parameter Modelica.SIunits.SpecificHeatCapacity cm 
       "Specific heat capacity of metal";
-      parameter Modelica.SIunits.Temperature Tstart1=300 
+      parameter Temperature Tstartbar=300 "Avarage temperature" 
+        annotation(Dialog(tab = "Initialisation"));
+      final parameter Modelica.SIunits.Temperature Tstart1=Tstartbar 
       "Temperature start value - first node" 
         annotation(Dialog(tab = "Initialisation"));
-      parameter Modelica.SIunits.Temperature TstartN=300 
+      final parameter Modelica.SIunits.Temperature TstartN=Tstartbar 
       "Temperature start value - last node" 
         annotation(Dialog(tab = "Initialisation"));
-      parameter Modelica.SIunits.Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N) 
+      final parameter Modelica.SIunits.Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N) 
       "Start value of temperature vector (initialized by default)" 
         annotation(Dialog(tab = "Initialisation"));
       parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.noInit 

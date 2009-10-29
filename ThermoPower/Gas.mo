@@ -410,12 +410,10 @@ The latter options can be useful when two or more components are connected direc
     extends Icons.Gas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
-      p(start=pstart, stateSelect=StateSelect.prefer),
+      p(stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
     parameter Volume V "Inner volume";
-    parameter Pressure pstart=101325 "Pressure start value" 
-      annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
@@ -515,7 +513,7 @@ The latter options can be useful when two or more components are connected direc
       extends Icons.Gas.Mixer;
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
       Medium.BaseProperties gas(
-        p(start=pstart, stateSelect=StateSelect.prefer),
+        p(stateSelect=StateSelect.prefer),
         T(start=Tstart, stateSelect=StateSelect.prefer),
         Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
       parameter AbsoluteTemperature Tmstart=300 "Metal wall start temperature";
@@ -523,8 +521,6 @@ The latter options can be useful when two or more components are connected direc
       parameter Area S=0 "Inner surface";
       parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient" annotation(Evaluate = true);
       parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate = true);
-      parameter Pressure pstart=101325 "Pressure start value" 
-        annotation(Dialog(tab = "Initialisation"));
       parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
         annotation(Dialog(tab = "Initialisation"));
       parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
@@ -637,20 +633,18 @@ The latter options can be useful when two or more components are connected direc
     extends Icons.Gas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
-      p(start=pstart, stateSelect=StateSelect.prefer),
+      p(stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
     parameter Volume V "Inner volume";
     parameter Area S=0 "Inner surface";
     parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient" annotation(Evaluate = true);
     parameter HeatCapacity Cm=0 "Metal heat capacity" annotation(Evaluate = true);
-    parameter Pressure pstart=101325 "Pressure start value" 
-      annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
       "Start gas composition" annotation(Dialog(tab = "Initialisation"));
-    parameter Temperature Tmstart=300 "Metal wall start temperature" 
+    final parameter Temperature Tmstart=Tstart "Metal wall start temperature" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
@@ -880,20 +874,20 @@ The latter options can be useful when two or more components are connected direc
     outlet2.p=inlet.p;
     
     // Energy balance
-    outlet1.hBA= if (inlet.w<0 and rev_inlet) then outlet2.hAB else if (outlet2.w<0 or not rev_outlet2) then inlet.hBA else 
-      (inlet.hBA*(inlet.w+wzero)+outlet2.hAB*(outlet2.w+wzero))/(inlet.w+2*wzero+outlet2.w);
-    outlet2.hBA= if (inlet.w<0 and rev_inlet) then outlet1.hAB else if (outlet1.w<0 or not rev_outlet1) then inlet.hBA else 
-      (inlet.hBA*(inlet.w+wzero)+outlet1.hAB*(outlet1.w+wzero))/(inlet.w+2*wzero+outlet1.w);
-    inlet.hAB= if (outlet1.w<0 or not rev_outlet1) then outlet2.hAB else if (outlet2.w<0 or not rev_outlet2) then outlet1.hAB else 
-      (outlet1.hAB*(outlet1.w+wzero)+outlet2.hAB*(outlet2.w+wzero))/(outlet1.w+2*wzero+outlet2.w);
+    outlet1.hBA= Como.continuation(inlet.hBA, if (inlet.w<0 and rev_inlet) then outlet2.hAB else if (outlet2.w<0 or not rev_outlet2) then inlet.hBA else 
+      (inlet.hBA*(inlet.w+wzero)+outlet2.hAB*(outlet2.w+wzero))/(inlet.w+2*wzero+outlet2.w));
+    outlet2.hBA= Como.continuation(inlet.hBA, if (inlet.w<0 and rev_inlet) then outlet1.hAB else if (outlet1.w<0 or not rev_outlet1) then inlet.hBA else 
+      (inlet.hBA*(inlet.w+wzero)+outlet1.hAB*(outlet1.w+wzero))/(inlet.w+2*wzero+outlet1.w));
+    inlet.hAB= Como.continuation(outlet1.hAB, if (outlet1.w<0 or not rev_outlet1) then outlet2.hAB else if (outlet2.w<0 or not rev_outlet2) then outlet1.hAB else 
+      (outlet1.hAB*(outlet1.w+wzero)+outlet2.hAB*(outlet2.w+wzero))/(outlet1.w+2*wzero+outlet2.w));
     
     // Independent component mass balances
-    outlet1.XBA= if (inlet.w<0 and rev_inlet) then outlet2.XAB else if (outlet2.w<0 or not rev_outlet2) then inlet.XBA else 
-      (inlet.XBA*(inlet.w+wzero)+outlet2.XAB*(outlet2.w+wzero))/(inlet.w+2*wzero+outlet2.w);
-    outlet2.XBA= if (inlet.w<0 and rev_inlet) then outlet1.XAB else if (outlet1.w<0 or not rev_outlet1) then inlet.XBA else 
-      (inlet.XBA*(inlet.w+wzero)+outlet1.XAB*(outlet1.w+wzero))/(inlet.w+2*wzero+outlet1.w);
-    inlet.XAB= if (outlet1.w<0 or not rev_outlet1) then outlet2.XAB else if (outlet2.w<0 or not rev_outlet2) then outlet1.XAB else 
-      (outlet1.XAB*(outlet1.w+wzero)+outlet2.XAB*(outlet2.w+wzero))/(outlet1.w+2*wzero+outlet2.w);
+    outlet1.XBA= Como.continuation(inlet.XBA, if (inlet.w<0 and rev_inlet) then outlet2.XAB else if (outlet2.w<0 or not rev_outlet2) then inlet.XBA else 
+      (inlet.XBA*(inlet.w+wzero)+outlet2.XAB*(outlet2.w+wzero))/(inlet.w+2*wzero+outlet2.w));
+    outlet2.XBA= Como.continuation(inlet.XBA, if (inlet.w<0 and rev_inlet) then outlet1.XAB else if (outlet1.w<0 or not rev_outlet1) then inlet.XBA else 
+      (inlet.XBA*(inlet.w+wzero)+outlet1.XAB*(outlet1.w+wzero))/(inlet.w+2*wzero+outlet1.w));
+    inlet.XAB= Como.continuation(outlet1.XAB, if (outlet1.w<0 or not rev_outlet1) then outlet2.XAB else if (outlet2.w<0 or not rev_outlet2) then outlet1.XAB else 
+      (outlet1.XAB*(outlet1.w+wzero)+outlet2.XAB*(outlet2.w+wzero))/(outlet1.w+2*wzero+outlet2.w));
     
     //Check flow direction
     assert( not checkFlowDirection or ((rev_inlet or inlet.w >= 0) and 
@@ -1220,7 +1214,7 @@ The latter options can be useful when two or more components are connected direc
     extends Icons.Gas.Valve;
     import ThermoPower.Choices.Valve.CvTypes;
     replaceable package Medium=Modelica.Media.Interfaces.PartialMedium;
-    Medium.BaseProperties gas(p(start=pin_start),T(start=Tstart),
+    Medium.BaseProperties gas(p(start=pnom),T(start=Tstart),
                               Xi(start=Xstart[1:Medium.nXi]),
                               d(start=pnom/(8314/30*Tstart)));
     parameter CvTypes.Temp CvData = CvTypes.Av "Selection of flow coefficient";
@@ -1257,10 +1251,6 @@ The latter options can be useful when two or more components are connected direc
     replaceable function xtfun = Functions.ValveCharacteristics.one 
       extends Functions.ValveCharacteristics.baseFun 
       "Critical ratio characteristic";
-    parameter Pressure pin_start = pnom "Inlet pressure start value" 
-      annotation(Dialog(tab = "Initialisation"));
-    parameter Pressure pout_start = pnom-dpnom "Inlet pressure start value" 
-      annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstart=300 "Start temperature" 
       annotation(Dialog(tab="Initialisation"));
     parameter MassFraction Xstart[Medium.nX]=Medium.reference_X 
@@ -1281,9 +1271,9 @@ The latter options can be useful when two or more components are connected direc
     parameter Real Y_nom(fixed=false) "Nominal compressibility factor";
     
   public 
-    FlangeA inlet(redeclare package Medium = Medium, w(start=wnom), p(start=pin_start)) 
+    FlangeA inlet(redeclare package Medium = Medium, w(start=wnom), p(start=pnom)) 
       annotation (extent=[-120,-20; -80,20]);
-    FlangeB outlet(redeclare package Medium = Medium, w(start=-wnom), p(start=pout_start)) 
+    FlangeB outlet(redeclare package Medium = Medium, w(start=-wnom), p(start=pnom-dpnom)) 
       annotation (extent=[80,-20; 120,20]);
     Modelica.Blocks.Interfaces.RealInput theta 
       annotation (extent=[-10,62; 10,82], rotation=270);
@@ -1402,16 +1392,20 @@ The latter options can be useful when two or more components are connected direc
     parameter Integer HydraulicCapacitance=2 "1: Upstream, 2: Downstream";
     parameter Boolean avoidInletEnthalpyDerivative = true 
       "Avoid inlet enthalpy derivative";
-    parameter AbsoluteTemperature Tstartin=300 "Inlet temperature start value" 
+    parameter AbsoluteTemperature Tstartbar=300 
+      "Avarage temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter AbsoluteTemperature Tstartout=300 
+    final parameter AbsoluteTemperature Tstartin=Tstartbar 
+      "Inlet temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
+    final parameter AbsoluteTemperature Tstartout=Tstartbar 
       "Outlet temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter AbsoluteTemperature Tstart[N]=linspace(Tstartin,Tstartout,N) 
+    final parameter AbsoluteTemperature Tstart[N]=linspace(Tstartin,Tstartout,N) 
       "Start value of temperature vector (initialized by default)" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Pressure pstart=101325 "Pressure start value" 
-      annotation(Dialog(tab = "Initialisation"));
+    final parameter Velocity unom = 10 
+      "Nominal velocity for simplified equation";
     parameter Real wnf=0.01 
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
@@ -1433,10 +1427,8 @@ The latter options can be useful when two or more components are connected direc
       Dialog(enable = false));
   public 
     Medium.BaseProperties gas[N](
-      p(start=ones(N)*pstart),
       T(start=Tstart),
-      state(p(start=ones(N)*pstart),
-      T(start=ones(N)*Tstartin+(0:(N-1))/(N-1)*(Tstartout-Tstartin)))) 
+      state(T(start=ones(N)*Tstartin+(0:(N-1))/(N-1)*(Tstartout-Tstartin)))) 
       "Gas nodal properties";
       // Xi(start=fill(Xstart[1:nXi],N)),
       // X(start=fill(Xstart,N)),
@@ -1455,7 +1447,7 @@ The latter options can be useful when two or more components are connected direc
         stateSelect=StateSelect.prefer) "Composition state variables";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
     Velocity u[N] "Fluid velocity";
-    Pressure p(start=pstart, stateSelect=StateSelect.prefer);
+    Pressure p(stateSelect=StateSelect.prefer);
     Time Tr "Residence time";
     Mass M "Gas Mass";
     Real Q "Total heat flow through the wall (all Nt tubes)";
@@ -1574,11 +1566,11 @@ The latter options can be useful when two or more components are connected direc
       Xtilde = fill(if w>=0 then infl.XBA else outfl.XAB, size(Xtilde,1)) 
         "Gas composition equal to actual inlet";
     elseif UniformComposition then
-      der(Xtilde[1, :]) = 1/L*sum(u)/N*(gas[1].X - gas[N].X) 
+      der(Xtilde[1, :]) = Como.continuation(1/L*unom*(gas[1].X - gas[N].X), 1/L*sum(u)/N*(gas[1].X - gas[N].X)) 
         "Partial mass balance for the whole pipe";
     else
       for j in 1:N - 1 loop
-        der(Xtilde[j, :]) = (u[j + 1] + u[j])/(2*l)*(gas[j].X - gas[j + 1].X) 
+        der(Xtilde[j, :]) =  Como.continuation(1/L*unom*(gas[j].X - gas[j + 1].X), (u[j + 1] + u[j])/(2*l)*(gas[j].X - gas[j + 1].X)) 
           "Partial mass balance for single volume";
       end for;
     end if;

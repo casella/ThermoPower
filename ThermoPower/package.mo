@@ -1658,7 +1658,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       der(delta) = omega - omegaRef;
       // Power flow
       if closedInternal then
-        Pe = C*Modelica.Math.sin(delta);
+        Pe = Como.continuation(C*delta, C*Modelica.Math.sin(delta));
       else
         Pe = 0;
       end if;
