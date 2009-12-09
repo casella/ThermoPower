@@ -1,40 +1,12 @@
-package Water "Models of components with water/steam as working fluid" 
-  extends Modelica.Icons.Library;
-  
-  package StandardWater=Modelica.Media.Water.StandardWater;
-  
-  connector Flange "Generic flange connector for water/steam flows" 
-    replaceable package Medium = StandardWater extends 
+within ThermoPower;
+package Water "Models of components with water/steam as working fluid"
+  connector Flange "A-type flange connector for water/steam flows"
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.AbsolutePressure p "Pressure";
     flow Medium.MassFlowRate w "Mass flowrate";
-    Medium.SpecificEnthalpy hAB;
-    Medium.SpecificEnthalpy hBA;
-    annotation (Icon(Ellipse(extent=[-100, 100; 100, -100])), Documentation(
-          info="<HTML>
-<p>Can be connected either to a type-A (<tt>FlangeA</tt>) or to a type B (<tt>FlangeB</tt>) connector.
-</HTML>",
-        revisions="<html>
-<ul>
-<li><i>16 Dec 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Medium model added.</li>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-  end Flange;
-  
-  connector FlangeA "A-type flange connector for water/steam flows" 
-    replaceable package Medium = StandardWater extends 
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.AbsolutePressure p "Pressure";
-    flow Medium.MassFlowRate w "Mass flowrate";
-    output Medium.SpecificEnthalpy hAB "Specific enthalpy of fluid going out";
-    input Medium.SpecificEnthalpy hBA "Specific enthalpy of entering fluid";
-    annotation (Icon(Ellipse(extent=[-100, 100; 100, -100], style(fillPattern=
-               1))), Documentation(info="<HTML>
+    stream Medium.SpecificEnthalpy h "Specific enthalpy of fluid going out";
+    annotation (Documentation(info="<HTML>
 <p> Must always be connected to a single type-B connector <tt>FlangeB</tt>.
 </HTML>",
         revisions="<html>
@@ -46,67 +18,86 @@ package Water "Models of components with water/steam as working fluid"
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+      Diagram(graphics),
+      Icon(graphics={Rectangle(
+            extent={{-60,60},{60,-60}},
+            lineColor={0,0,255},
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid)}));
+  end Flange;
+
+  connector FlangeA
+    extends ThermoPower.Water.Flange;
+    annotation (Icon(graphics={Ellipse(
+            extent={{-100,100},{100,-100}},
+            lineColor={0,0,255},
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid)}));
   end FlangeA;
-  
-  connector FlangeB "B-type flange connector for water/steam flows" 
-    replaceable package Medium = StandardWater extends 
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.AbsolutePressure p "Pressure";
-    flow Medium.MassFlowRate w "Mass flowrate";
-    input Medium.SpecificEnthalpy hAB "Specific enthalpy of entering fluid";
-    output Medium.SpecificEnthalpy hBA "Specific enthalpy of fluid going out";
-    annotation (Icon(Ellipse(extent=[-100, 100; 100, -100], style(fillPattern=
-               1)), Ellipse(extent=[-42, 44; 44, -40], style(fillColor=7,
-              fillPattern=1))), Documentation(info="<HTML>
-<p> Must always be connected to a single type-A connector <tt>FlangeA</tt>.
-</HTML>",
-        revisions="<html>
-<ul>
-<li><i>16 Dec 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Medium model added.</li>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
+
+  connector FlangeB
+    extends ThermoPower.Water.Flange;
+    annotation (Icon(graphics={Ellipse(
+            extent={{-100,100},{100,-100}},
+            lineColor={0,0,255},
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid), Ellipse(
+            extent={{-40,40},{40,-40}},
+            lineColor={0,0,255},
+            fillColor={255,255,255},
+            fillPattern=FillPattern.Solid)}));
   end FlangeB;
-  
-  model SourceP "Pressure source for water/steam flows" 
+  extends Modelica.Icons.Library;
+
+  package StandardWater=Modelica.Media.Water.StandardWater;
+
+
+
+
+  model SourceP "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter Pressure p0=1.01325e5 "Nominal pressure";
     parameter HydraulicResistance R=0 "Hydraulic resistance";
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     Pressure p "Actual pressure";
     FlangeB flange(redeclare package Medium=Medium) 
-                   annotation (extent=[80, -20; 120, 20]);
+                   annotation (Placement(transformation(extent={{80,-20},{120,
+              20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p0 
-      annotation (extent=[-60, 72; -20, 112], rotation=-90);
+      annotation (Placement(transformation(
+          origin={-40,92},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
     Modelica.Blocks.Interfaces.RealInput in_h 
-      annotation (extent=[20, 70; 60, 110], rotation=-90);
-  equation 
+      annotation (Placement(transformation(
+          origin={40,90},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
     if R == 0 then
       flange.p = p;
     else
       flange.p = p + flange.w*R;
     end if;
-    
+
     p = in_p0;
     if cardinality(in_p0)==0 then
       in_p0 = p0 "Pressure set by parameter";
     end if;
-    
-    flange.hBA =in_h;
+
+    flange.h =in_h;
     if cardinality(in_h)==0 then
       in_h = h "Enthalpy set by parameter";
     end if;
     annotation (
-      Diagram,
-      Icon(Text(extent=[-106, 90; -52, 50], string="p0"), Text(extent=[66, 90;
-               98, 52], string="h")),
+      Diagram(graphics),
+      Icon(graphics={Text(extent={{-106,90},{-52,50}}, textString=
+                                                   "p0"), Text(extent={{66,90},
+                {98,52}}, textString=
+                               "h")}),
       Documentation(info="<HTML>
 <p><b>Modelling options</b></p>
 <p>If <tt>R</tt> is set to zero, the pressure source is ideal; otherwise, the outlet pressure decreases proportionally to the outgoing flowrate.</p>
@@ -127,41 +118,50 @@ package Water "Models of components with water/steam as working fluid"
 </ul>
 </html>"));
   end SourceP;
-  
-  model SinkP "Pressure sink for water/steam flows" 
+
+  model SinkP "Pressure sink for water/steam flows"
     extends Icons.Water.SourceP;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter Pressure p0=1.01325e5 "Nominal pressure";
     parameter HydraulicResistance R=0 "Hydraulic resistance" annotation(Evaluate=true);
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     Pressure p;
     FlangeA flange(redeclare package Medium=Medium) 
-                   annotation (extent=[-120, -20; -80, 20]);
+                   annotation (Placement(transformation(extent={{-120,-20},{-80,
+              20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p0 
-      annotation (extent=[-60, 68; -20, 108], rotation=-90);
+      annotation (Placement(transformation(
+          origin={-40,88},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
     Modelica.Blocks.Interfaces.RealInput in_h 
-      annotation (extent=[20, 68; 60, 108], rotation=-90);
-  equation 
+      annotation (Placement(transformation(
+          origin={40,88},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
     if R == 0 then
       flange.p = p;
     else
       flange.p = p + flange.w*R;
     end if;
-    
+
     p = in_p0;
     if cardinality(in_p0)==0 then
       in_p0 = p0 "Pressure set by parameter";
     end if;
-    
-    flange.hAB =in_h;
+
+    flange.h =in_h;
     if cardinality(in_h)==0 then
       in_h = h "Enthalpy set by parameter";
     end if;
     annotation (
-      Icon(Text(extent=[-106, 92; -56, 50], string="p0"), Text(extent=[54, 94;
-               112, 52], string="h")),
-      Diagram,
+      Icon(graphics={Text(extent={{-106,92},{-56,50}}, textString=
+                                                   "p0"), Text(extent={{54,94},
+                {112,52}}, textString=
+                                "h")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p><b>Modelling options</b></p>
 <p>If <tt>R</tt> is set to zero, the pressure sink is ideal; otherwise, the inlet pressure increases proportionally to the incoming flowrate.</p>
@@ -182,10 +182,10 @@ package Water "Models of components with water/steam as working fluid"
 </ul>
 </html>"));
   end SinkP;
-  
-  model SourceW "Flowrate source for water/steam flows" 
+
+  model SourceW "Flowrate source for water/steam flows"
     extends Icons.Water.SourceW;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Pressure p0=1e5 "Nominal pressure";
@@ -193,31 +193,40 @@ package Water "Models of components with water/steam as working fluid"
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     MassFlowRate w "Mass flowrate";
     FlangeB flange(redeclare package Medium=Medium) 
-                   annotation (extent=[80, -20; 120, 20]);
+                   annotation (Placement(transformation(extent={{80,-20},{120,
+              20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 
-      annotation (extent=[-60, 40; -20, 80], rotation=-90);
+      annotation (Placement(transformation(
+          origin={-40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
     Modelica.Blocks.Interfaces.RealInput in_h 
-      annotation (extent=[20, 40; 60, 80], rotation=-90);
-  equation 
+      annotation (Placement(transformation(
+          origin={40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
     if G == 0 then
       flange.w = -w;
     else
       flange.w = -w + (flange.p - p0)*G;
     end if;
-    
+
     w = in_w0;
     if cardinality(in_w0) == 0 then
       in_w0 = w0 "Flow rate set by parameter";
     end if;
-    
-    flange.hBA = in_h "Enthalpy set by connector";
+
+    flange.h = in_h "Enthalpy set by connector";
     if cardinality(in_h) == 0 then
       in_h = h "Enthalpy set by parameter";
     end if;
     annotation (
-      Icon(Text(extent=[-98, 74; -48, 42], string="w0"), Text(extent=[48, 74;
-               98, 42], string="h")),
-      Diagram,
+      Icon(graphics={Text(extent={{-98,74},{-48,42}}, textString=
+                                                  "w0"), Text(extent={{48,74},{
+                98,42}}, textString=
+                               "h")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p><b>Modelling options</b></p>
 <p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the outgoing flowrate decreases proportionally to the outlet pressure.</p>
@@ -238,41 +247,50 @@ package Water "Models of components with water/steam as working fluid"
 </ul>
 </html>"));
   end SourceW;
-  
-  model SinkW "Flowrate sink for water/steam flows" 
+
+  model SinkW "Flowrate sink for water/steam flows"
     extends Icons.Water.SourceW;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Pressure p0=1e5 "Nominal pressure";
     parameter HydraulicConductance G=0 "Hydraulic conductance";
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     MassFlowRate w "Mass flowrate";
-    Water.FlangeA flange(redeclare package Medium=Medium) 
-                         annotation (extent=[-120, -20; -80, 20]);
+    FlangeA flange(      redeclare package Medium=Medium) 
+                         annotation (Placement(transformation(extent={{-120,-20},
+              {-80,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 
-      annotation (extent=[-60, 40; -20, 80], rotation=-90);
+      annotation (Placement(transformation(
+          origin={-40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
     Modelica.Blocks.Interfaces.RealInput in_h 
-      annotation (extent=[20, 40; 60, 80], rotation=-90);
-  equation 
+      annotation (Placement(transformation(
+          origin={40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
     if G == 0 then
       flange.w = w;
     else
       flange.w = w + (flange.p - p0)*G;
     end if;
-    
+
     w = in_w0 "Flow rate set by connector";
     if cardinality(in_w0) == 0 then
       in_w0 = w0 "Flow rate set by parameter";
     end if;
-    
-    flange.hAB = in_h "Enthalpy set by connector";
+
+    flange.h = in_h "Enthalpy set by connector";
     if cardinality(in_h) == 0 then
       in_h = h "Enthalpy set by parameter";
     end if;
     annotation (
-      Icon(Text(extent=[-98, 72; -48, 40], string="w0"), Text(extent=[48, 72;
-               98, 40], string="h")),
+      Icon(graphics={Text(extent={{-98,72},{-48,40}}, textString=
+                                                  "w0"), Text(extent={{48,72},{
+                98,40}}, textString=
+                               "h")}),
       Documentation(info="<HTML>
 <p><b>Modelling options</b></p>
 <p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the incoming flowrate increases proportionally to the inlet pressure.</p>
@@ -292,33 +310,39 @@ package Water "Models of components with water/steam as working fluid"
        First release.</li>
 </ul>
 </html>"),
-      Diagram);
+      Diagram(graphics));
   end SinkW;
-  
-  model ThroughW "Prescribes the flow rate across the component" 
+
+  model ThroughW "Prescribes the flow rate across the component"
     extends Icons.Water.SourceW;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
     MassFlowRate w "Mass flowrate";
-    FlangeA inlet(redeclare package Medium=Medium) annotation (extent=[-120, -20; -80, 20]);
-    FlangeB outlet(redeclare package Medium=Medium) annotation (extent=[80,-20; 120,20]);
+    FlangeA inlet(redeclare package Medium=Medium) annotation (Placement(
+          transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+    FlangeB outlet(redeclare package Medium=Medium) annotation (Placement(
+          transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 
-      annotation (extent=[-60, 40; -20, 80], rotation=-90);
-  equation 
+      annotation (Placement(transformation(
+          origin={-40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
     inlet.w + outlet.w = 0 "Mass balance";
     inlet.w = w "Flow characteristics";
-    
+
     w = in_w0;
     if cardinality(in_w0) == 0 then
       in_w0 = w0 "Flow rate set by parameter";
     end if;
-    
+
     // Energy balance
-    inlet.hAB = outlet.hAB;
-    inlet.hBA = outlet.hBA;
+    inlet.h = inStream(outlet.h);
+    inStream(inlet.h) = outlet.h;
     annotation (
-      Icon(Text(extent=[-98, 72; -48, 40], string="w0")),
+      Icon(graphics={Text(extent={{-98,72},{-48,40}}, textString=
+                                                  "w0")}),
       Documentation(info="<HTML>
 This component prescribes the flow rate passing through it. The change of 
 specific enthalpy due to the pressure difference between the inlet and the
@@ -333,25 +357,28 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>"),
-      Diagram);
+      Diagram(graphics));
   end ThroughW;
-  
-  model PressDropLin "Linear pressure drop for water/steam flows" 
+
+  model PressDropLin "Linear pressure drop for water/steam flows"
     extends Icons.Water.PressDrop;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter HydraulicResistance R "Hydraulic resistance";
     FlangeA inlet(redeclare package Medium=Medium) 
-                  annotation (extent=[-120, -20; -80, 20]);
+                  annotation (Placement(transformation(extent={{-120,-20},{-80,
+              20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium=Medium) 
-                   annotation (extent=[80, -20; 120, 20]);
-  equation 
+                   annotation (Placement(transformation(extent={{80,-20},{120,
+              20}}, rotation=0)));
+  equation
     inlet.w + outlet.w = 0;
     inlet.p - outlet.p = R*inlet.w "Flow characteristics";
     // Energy balance
-    inlet.hAB = outlet.hAB;
-    inlet.hBA = outlet.hBA;
-    annotation (Icon(Text(extent=[-100, -44; 100, -76], string="%name")),
+    inlet.h = inStream(outlet.h);
+    inStream(inlet.h) = outlet.h;
+    annotation (Icon(graphics={Text(extent={{-100,-44},{100,-76}}, textString=
+                                                               "%name")}),
         Documentation(info="<HTML>
 <p>This very simple model provides a pressure drop which is proportional to the flowrate, without computing any fluid property.</p>
 </HTML>",
@@ -365,35 +392,37 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>
-"));
+"),   Diagram(graphics));
   end PressDropLin;
-  
-  model PressDrop "Pressure drop for water/steam flows" 
+
+  model PressDrop "Pressure drop for water/steam flows"
     extends Icons.Water.PressDrop;
     import ThermoPower.Choices.PressDrop.FFtypes;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.BaseProperties fluid;
     parameter MassFlowRate wnom "Nominal mass flowrate";
-    parameter FFtypes.Temp FFtype=FFtypes.Kf "Friction Factor Type";
+    parameter FFtypes FFtype=FFtypes.Kf "Friction Factor Type";
     parameter Real Kf(fixed = if FFtype==FFtypes.Kf then true else false,
-       unit = "Pa.kg/m^3/(kg/s)^2")=0 "Hydraulic resistance coefficient";
+       unit = "Pa.kg/(m3.kg2/s2)")=0 "Hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop";
     parameter Density rhonom=0 "Nominal density";
-    parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity^2/2)";
+    parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity2/2)";
     parameter Area A=0 "Cross-section";
-    parameter Real wnf=0.01 
+    parameter Real wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
-  protected 
+  protected
     parameter Real Kfl(fixed = false) "Linear friction coefficient";
-  public 
+  public
     Medium.Density rho "Fluid density";
     FlangeA inlet(w(start=wnom),redeclare package Medium=Medium) 
-                  annotation (extent=[-120, -20; -80, 20]);
+                  annotation (Placement(transformation(extent={{-120,-20},{-80,
+              20}}, rotation=0)));
     FlangeB outlet(w(start=-wnom),redeclare package Medium=Medium) 
-                   annotation (extent=[80, -20; 120, 20]);
-  initial equation 
+                   annotation (Placement(transformation(extent={{80,-20},{120,
+              20}}, rotation=0)));
+  initial equation
     // Set Kf if FFtype <> FFtypes.Kf
     if FFtype == FFtypes.OpPoint then
       Kf = dpnom*rhonom/wnom^2*Kfc;
@@ -401,23 +430,24 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       Kf = K/(2*A^2)*Kfc;
     end if;
     Kfl = wnom*wnf*Kf "Linear friction factor";
-  equation 
+  equation
     // Fluid properties
     if inlet.w>=0 then
       fluid.p=inlet.p;
-      fluid.h=inlet.hBA;
+      fluid.h=outlet.h;
     else
       fluid.p=outlet.p;
-      fluid.h=outlet.hAB;
+      fluid.h=inlet.h;
     end if;
     rho = fluid.d "Fluid density";
-    inlet.p - outlet.p = noEvent(Kf*abs(inlet.w) + Kfl)*inlet.w/rho 
+    inlet.p - outlet.p = noEvent(Kf*abs(inlet.w) + Kfl)*inlet.w/rho
       "Flow characteristics";
     inlet.w + outlet.w = 0 "Mass  balance";
     // Energy balance
-    inlet.hAB = outlet.hAB;
-    inlet.hBA = outlet.hBA;
-    annotation (Icon(Text(extent=[-100, -50; 100, -82], string="%name")),
+    inlet.h = inStream(outlet.h);
+    inStream(inlet.h) = outlet.h;
+    annotation (Icon(graphics={Text(extent={{-100,-50},{100,-82}}, textString=
+                                                               "%name")}),
         Documentation(info="<HTML>
 <p>The pressure drop across the inlet and outlet connectors is computed according to a turbulent friction model, i.e. is proportional to the squared velocity of the fluid. The friction coefficient can be specified directly, or by giving an operating point, or as a multiple of the kinetic pressure. In the latter two cases, the correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit some experimental operating point.</p>
 <p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified; the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate).
@@ -443,12 +473,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>
-"));
+"),   Diagram(graphics));
   end PressDrop;
-  
-  model Header "Header with metal walls for water/steam flows" 
+
+  model Header "Header with metal walls for water/steam flows"
     extends Icons.Water.Header;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.BaseProperties fluid(p(start=pstartout),h(start=hstart));
     parameter Volume V "Inner volume";
@@ -464,18 +494,20 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tmstart=300 "Metal wall start temperature" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
-    FlangeA inlet(p(start=pstartin), hAB(start=hstart),
+    FlangeA inlet(p(start=pstartin), h(start=hstart),
       redeclare package Medium = Medium) 
-                  annotation (extent=[-122, -20; -80, 20]);
-    FlangeB outlet(p(start=pstartout), hBA(start=hstart),
+                  annotation (Placement(transformation(extent={{-122,-20},{-80,
+              20}}, rotation=0)));
+    FlangeB outlet(p(start=pstartout), h(start=hstart),
       redeclare package Medium = Medium) 
-                   annotation (extent=[80, -20; 120, 20]);
+                   annotation (Placement(transformation(extent={{80,-20},{120,
+              20}}, rotation=0)));
     Pressure p(start=pstartout, stateSelect=if Medium.singleState then 
-               StateSelect.avoid else StateSelect.prefer) 
+               StateSelect.avoid else StateSelect.prefer)
       "Fluid pressure at the outlet";
-    SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer) 
+    SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Fluid specific enthalpy";
     SpecificEnthalpy hi;
     SpecificEnthalpy ho;
@@ -485,37 +517,37 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
     Time Tr "Residence time";
     replaceable Thermal.HT thermalPort "Internal surface of metal wall" 
-      annotation (extent=[-24,50; 24,64],
-                  Dialog(enable = false));
-  equation 
+      annotation (Dialog(enable = false), Placement(transformation(extent={{-24,
+              50},{24,64}}, rotation=0)));
+  equation
     // Set fluid properties
     fluid.p=p;
     fluid.h=h;
     fluid.T=T;
-    
+
     M=fluid.d*V "Fluid mass";
     E=M*fluid.u "Fluid energy";
     der(M) = inlet.w + outlet.w "Fluid mass balance";
     der(E)= inlet.w*hi + outlet.w*ho + gamma*S*(Tm - T) +
             thermalPort.Q_flow "Fluid energy balance";
     if Cm > 0 and gamma >0 then
-      Cm*der(Tm) =  gamma*S*(T - Tm) 
+      Cm*der(Tm) =  gamma*S*(T - Tm)
         "Energy balance of the built-in wall model";
     else
       Tm = T "Trivial equation for metal temperature";
     end if;
-    
+
     // Boundary conditions
-    hi = if inlet.w >= 0 then inlet.hBA else h;
-    ho = if outlet.w >= 0 then outlet.hAB else h;
-    inlet.hAB = h;
-    outlet.hBA = h;
+    hi = if inlet.w >= 0 then inStream(inlet.h) else h;
+    ho = if outlet.w >= 0 then inStream(outlet.h) else h;
+    inlet.h = h;
+    outlet.h = h;
     inlet.p = p+fluid.d*Modelica.Constants.g_n*H;
     outlet.p = p;
     thermalPort.T = T;
-    
+
     Tr=noEvent(M/max(inlet.w,Modelica.Constants.eps)) "Residence time";
-  initial equation 
+  initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -535,7 +567,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     else
       assert(false, "Unsupported initialisation option");
     end if;
-    annotation (Icon, Documentation(info="<HTML>
+    annotation (Icon(graphics),
+                      Documentation(info="<HTML>
 <p>This model describes a constant volume header with metal walls. The fluid can be water, steam, or a two-phase mixture. 
 <p>It is possible to take into account the heat storage and transfer in the metal wall in two ways:
 <ul>
@@ -580,37 +613,40 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>
-"),   Diagram);
+"),   Diagram(graphics));
   end Header;
-  
-  model Mixer "Mixer with metal walls for water/steam flows" 
+
+  model Mixer "Mixer with metal walls for water/steam flows"
     extends Icons.Water.Mixer;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties fluid(p(start=pstart), h(start=hstart)) 
+    Medium.BaseProperties fluid(p(start=pstart), h(start=hstart))
       "Fluid properties";
     parameter Volume V "Internal volume";
     parameter Area S=0 "Internal surface";
-    parameter CoefficientOfHeatTransfer gamma=0 
+    parameter CoefficientOfHeatTransfer gamma=0
       "Internal Heat Transfer Coefficient" annotation(Evaluate=true);
     parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate=true);
     parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Enthalpy hstart=1e5 "Enthalpy start value" 
+    parameter SpecificEnthalpy hstart=1e5 "Enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tmstart=300 "Wall temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
-    FlangeA in1(p(start=pstart), hAB(start=hstart),redeclare package Medium=Medium) 
-                annotation (extent=[-100, 40; -60, 80]);
-    FlangeA in2(p(start=pstart), hAB(start=hstart),redeclare package Medium=Medium) 
-                annotation (extent=[-100, -80; -58, -40]);
-    FlangeB out(p(start=pstart), hBA(start=hstart),redeclare package Medium=Medium) 
-                annotation (extent=[80, -20; 120, 20]);
+    FlangeA in1(p(start=pstart), h(start=hstart),redeclare package Medium=Medium) 
+                annotation (Placement(transformation(extent={{-100,40},{-60,80}},
+            rotation=0)));
+    FlangeA in2(p(start=pstart), h(start=hstart),redeclare package Medium=Medium) 
+                annotation (Placement(transformation(extent={{-100,-80},{-60,
+              -40}}, rotation=0)));
+    FlangeB out(p(start=pstart), h(start=hstart),redeclare package Medium=Medium) 
+                annotation (Placement(transformation(extent={{80,-20},{120,20}},
+            rotation=0)));
     Medium.AbsolutePressure p(start=pstart, stateSelect=if Medium.singleState then 
                StateSelect.avoid else StateSelect.prefer) "Fluid pressure";
-    Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer) 
+    Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hi1 "Inlet 1 specific enthalpy";
     Medium.SpecificEnthalpy hi2 "Inlet 2 specific enthalpy";
@@ -622,40 +658,41 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
     Time Tr "Residence time";
     replaceable Thermal.HT thermalPort "Internal surface of metal wall" 
-      annotation (extent=[-24,66; 24,80]);
-  equation 
+      annotation (Placement(transformation(extent={{-24,66},{24,80}}, rotation=
+              0)));
+  equation
     // Set fluid properties
     fluid.p=p;
     fluid.h=h;
     fluid.T=T;
-    
+
     M=fluid.d*V "Fluid mass";
     E=M*fluid.u "Fluid energy";
     der(M) = in1.w + in2.w + out.w "Fluid mass balance";
-    der(E) = in1.w*hi1 + in2.w*hi2 + out.w*ho - gamma*S*(T - Tm) + Q 
+    der(E) = in1.w*hi1 + in2.w*hi2 + out.w*ho - gamma*S*(T - Tm) + Q
       "Fluid energy balance";
     if Cm > 0 and gamma >0 then
       Cm*der(Tm) = gamma*S*(T - Tm) "Metal wall energy balance";
     else
       Tm = T;
     end if;
-    
+
     // Boundary conditions
-    hi1 = if in1.w >= 0 then in1.hBA else h;
-    hi2 = if in2.w >= 0 then in2.hBA else h;
-    ho = if out.w >= 0 then out.hAB else h;
-    in1.hAB = h;
-    in2.hAB = h;
-    out.hBA = h;
+    hi1 = if in1.w >= 0 then inStream(in1.h) else h;
+    hi2 = if in2.w >= 0 then inStream(in2.h) else h;
+    ho = if out.w >= 0 then inStream(out.h) else h;
+    in1.h = h;
+    in2.h = h;
+    out.h = h;
     in1.p = p;
     in2.p = p;
     out.p = p;
     thermalPort.Q_flow = Q;
     thermalPort.T = T;
-    
+
     Tr=noEvent(M/max(-out.w,Modelica.Constants.eps)) "Residence time";
-    
-  initial equation 
+
+  initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
@@ -674,7 +711,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     else
       assert(false, "Unsupported initialisation option");
     end if;
-    
+
     annotation (Documentation(info="<HTML>
 <p>This model describes a constant volume mixer with metal walls. The fluid can be water, steam, or a two-phase mixture. The metal wall temperature and the heat transfer coefficient between the wall and the fluid are uniform. The wall is thermally insulated from the outside.
 </HTML>",
@@ -697,15 +734,15 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>"),
-      Icon,
-      Diagram);
+      Icon(graphics),
+      Diagram(graphics));
   end Mixer;
-  
-  model Tank "Open tank with free surface" 
+
+  model Tank "Open tank with free surface"
     extends Icons.Water.Tank;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties liquid(p(start=pext),h(start=hstart)) 
+    Medium.BaseProperties liquid(p(start=pext),h(start=hstart))
       "Liquid properties";
     parameter Area A "Cross-sectional area";
     parameter Volume V0=0 "Volume at zero level";
@@ -718,38 +755,40 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Volume V "Liquid volume";
     Mass M "Liquid mass";
     Enthalpy H "Liquid (total) enthalpy";
-    Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer) 
+    Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Liquid specific enthalpy";
     Medium.SpecificEnthalpy hin;
     Medium.SpecificEnthalpy hout;
     Medium.AbsolutePressure p(start=pext) "Bottom pressure";
     constant Real g=Modelica.Constants.g_n;
     FlangeA inlet(redeclare package Medium=Medium) 
-                  annotation (extent=[-100, -80; -60, -40]);
+                  annotation (Placement(transformation(extent={{-100,-80},{-60,
+              -40}}, rotation=0)));
     FlangeB outlet(redeclare package Medium=Medium) 
-                   annotation (extent=[60, -80; 100, -40]);
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+                   annotation (Placement(transformation(extent={{60,-80},{100,
+              -40}}, rotation=0)));
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
-  equation 
+  equation
     // Set liquid properties
     liquid.p=pext;
     liquid.h=h;
-    
+
     V=V0+A*y "Liquid volume";
     M=liquid.d*V "Liquid mass";
     H=M*liquid.h "Liquid enthalpy";
     der(M)= inlet.w + outlet.w "Mass balance";
     der(H) = inlet.w*hin+ outlet.w*hout "Energy balance";
     p - pext = liquid.d*g*y "Stevino's law";
-    
+
     // Boundary conditions
-    hin = if inlet.w >= 0 then inlet.hBA else h;
-    hout = if outlet.w >= 0 then outlet.hAB else h;
-    inlet.hAB = h;
-    outlet.hBA = h;
+    hin = if inlet.w >= 0 then inStream(inlet.h) else h;
+    hout = if outlet.w >= 0 then inStream(outlet.h) else h;
+    inlet.h = h;
+    outlet.h = h;
     inlet.p = p;
     outlet.p = p;
-  initial equation 
+  initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
@@ -758,8 +797,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     else
       assert(false, "Unsupported initialisation option");
     end if;
-    
-    annotation (Icon(Text(extent=[-100, 90; 100, 64], string="%name")),
+
+    annotation (Icon(graphics={Text(extent={{-100,90},{100,64}}, textString=
+                                                             "%name")}),
         Documentation(info="<html>
 <p>This model describes a simple free-surface cylindrical water tank. The model is based on mass and energy balances, assuming that no heat transfer takes place except through the inlet and outlet flows.
 </html>",
@@ -778,12 +818,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+      Diagram(graphics));
   end Tank;
-  
-  partial model Flow1DBase 
-    "Basic interface for 1-dimensional water/steam fluid flow models" 
-    replaceable package Medium = StandardWater extends 
+
+  partial model Flow1DBase
+    "Basic interface for 1-dimensional water/steam fluid flow models"
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     extends Icons.Water.Tube;
     import ThermoPower.Choices.Flow1D.FFtypes;
@@ -796,17 +837,17 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Length omega "Perimeter of heat transfer surface (single tube)";
     parameter Length Dhyd "Hydraulic Diameter (single tube)";
     parameter MassFlowRate wnom "Nominal mass flowrate (total)";
-    parameter FFtypes.Temp FFtype "Friction Factor Type" annotation(Evaluate = true);
-    parameter Real Kfnom(unit = "Pa.kg/m^3/(kg/s)^2", min=0)=0 
+    parameter FFtypes FFtype "Friction Factor Type";
+    parameter Real Kfnom(unit = "Pa.kg/(m3.kg2/s2)", min=0)=0
       "Nominal hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop (friction term only!)";
     parameter Density rhonom=0 "Nominal inlet density";
     parameter Real Cfnom=0 "Nominal Fanning friction factor";
     parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
     parameter Boolean DynamicMomentum=false "Inertial phenomena accounted for" annotation(Evaluate = true);
-    parameter HCtypes.Temp HydraulicCapacitance = HCtypes.Downstream 
+    parameter HCtypes HydraulicCapacitance = HCtypes.Downstream
       "Location of the hydraulic capacitance";
-    parameter Boolean avoidInletEnthalpyDerivative = true 
+    parameter Boolean avoidInletEnthalpyDerivative = true
       "Avoid inlet enthalpy derivative";
     parameter Pressure pstartin=1e5 "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -816,27 +857,29 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstartout=1e5 "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstart[N] = linspace(hstartin, hstartout, N) 
+    parameter SpecificEnthalpy hstart[N] = linspace(hstartin, hstartout, N)
       "Start value of enthalpy vector (initialized by default)" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Real wnf=0.01 
+    parameter Real wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     constant Real g=Modelica.Constants.g_n;
-    FlangeA infl(p(start=pstartin),w(start=wnom),hAB(start=hstartin),
+    FlangeA infl(p(start=pstartin),w(start=wnom),h(start=hstartin),
       redeclare package Medium = Medium) 
-                 annotation (extent=[-120, -20; -80, 20]);
-    FlangeB outfl(p(start=pstartout),w(start=-wnom),hBA(start=hstartout),
+                 annotation (Placement(transformation(extent={{-120,-20},{-80,
+              20}}, rotation=0)));
+    FlangeB outfl(p(start=pstartout),w(start=-wnom),h(start=hstartout),
       redeclare package Medium = Medium) 
-                  annotation (extent=[80, -20; 120, 20]);
+                  annotation (Placement(transformation(extent={{80,-20},{120,20}},
+            rotation=0)));
     replaceable ThermoPower.Thermal.DHT wall(N=N) 
-      annotation (extent=[-40, 40; 40, 60],
-                  Dialog(enable = false));
+      annotation (Dialog(enable = false), Placement(transformation(extent={{-40,
+              40},{40,60}}, rotation=0)));
     Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
     Time Tr "Residence time";
-  protected 
+  protected
     parameter Real dzdx = H/L "Slope" annotation(Evaluate=true);
     parameter Length l = L/(N - 1) "Length of a single volume" annotation(Evaluate = true);
     annotation (Documentation(info="<HTML>
@@ -860,21 +903,24 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Created.</li>
 </ul>
-</html>"));
-    
+</html>"),
+      Diagram(graphics),
+      Icon(graphics));
+
   end Flow1DBase;
-  
-  model Flow1D 
-    "1-dimensional fluid flow model for water/steam (finite volumes)" 
+
+  model Flow1D
+    "1-dimensional fluid flow model for water/steam (finite volumes)"
     extends Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
+    import ThermoPower.Choices.Flow1D.HCtypes;
     Medium.BaseProperties fluid[N](each p(start=pstartin),
       h(start=hstart)) "Properties of the fluid at the nodes";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction (total)";
-    Pressure Dpfric1 
+    Pressure Dpfric1
       "Pressure drop due to friction (from inlet to capacitance)";
-    Pressure Dpfric2 
+    Pressure Dpfric2
       "Pressure drop due to friction (from capacitance to outlet)";
     Pressure Dpstat "Pressure drop due to static head";
     MassFlowRate win "Flow rate at the inlet (single tube)";
@@ -883,32 +929,159 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Real Kfl "Linear friction coefficient";
     Real dwdt "Dynamic momentum term";
     Real Cf "Fanning friction factor";
-    Medium.AbsolutePressure p(start=if HydraulicCapacitance==1 then pstartin else 
+    Medium.AbsolutePressure p(start=if HydraulicCapacitance==HCtypes.Upstream then pstartin else 
            pstartout) "Fluid pressure for property calculations";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
     Velocity u[N] "Fluid velocity";
     Medium.Temperature T[N] "Fluid temperature";
-    Medium.SpecificEnthalpy h[N](start=hstart) 
+    Medium.SpecificEnthalpy h[N](start=hstart)
       "Fluid specific enthalpy at the nodes";
-    Medium.SpecificEnthalpy htilde[N - 1](start=hstart[2:N]) 
+    Medium.SpecificEnthalpy htilde[N - 1](start=hstart[2:N])
       "Enthalpy state variables";
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-  protected 
+  protected
     Density rhobar[N - 1] "Fluid average density";
     SpecificVolume vbar[N - 1] "Fluid average specific volume";
     HeatFlux phibar[N - 1] "Average heat flux";
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
-    DerDensityByEnthalpy drbdh[N - 1] 
+    DerDensityByEnthalpy drbdh[N - 1]
       "Derivative of average density by enthalpy";
     DerDensityByPressure drdp[N] "Derivative of density by pressure";
-    DerDensityByPressure drbdp[N - 1] 
+    DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
+  equation
+  //All equations are referred to a single tube
+    // Friction factor selection
+    omega_hyd = 4*A/Dhyd;
+    if FFtype == FFtypes.Kfnom then
+      Kf = Kfnom*Kfc;
+      Cf = 2*Kf*A^3/(omega_hyd*L);
+    elseif FFtype == FFtypes.OpPoint then
+      Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
+      Cf = 2*Kf*A^3/(omega_hyd*L);
+    elseif FFtype == FFtypes.Cfnom then
+      Kf = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
+      Cf = Cfnom*Kfc;
+    elseif FFtype == FFtypes.Colebrook then
+      Cf = f_colebrook(w, Dhyd/A, e,
+           Medium.dynamicViscosity(fluid[integer(N/2)].state))*Kfc;
+      Kf = Cf*omega_hyd*L/(2*A^3);
+    elseif FFtype == FFtypes.NoFriction then
+      Cf = 0;
+      Kf = 0;
+    end if;
+    assert(Kf>=0, "Negative friction coefficient");
+    Kfl = wnom/Nt*wnf*Kf "Linear friction factor";
+
+    // Dynamic momentum term
+    if DynamicMomentum then
+      dwdt = der(w);
+    else
+      dwdt = 0;
+    end if;
+
+    sum(dMdt) = (infl.w + outfl.w)/Nt "Mass balance";
+    L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
+    Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
+    if FFtype == FFtypes.NoFriction then
+      Dpfric1 = 0;
+      Dpfric2 = 0;
+    elseif HydraulicCapacitance == HCtypes.Middle then
+      assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
+      Dpfric1 = noEvent(Kf*abs(win)  + Kfl)*win* sum(vbar[1:integer((N-1)/2)])/(N-1)
+        "Pressure drop from inlet to capacitance";
+      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar[1+integer((N-1)/2):N-1])/(N-1)
+        "Pressure drop from capacitance to outlet";
+    elseif HydraulicCapacitance == HCtypes.Upstream then
+      Dpfric1 = 0 "Pressure drop from inlet to capacitance";
+      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar)/(N - 1)
+        "Pressure drop from capacitance to outlet";
+    elseif HydraulicCapacitance == HCtypes.Downstream then
+      Dpfric1 = noEvent(Kf*abs(win) + Kfl)*win*sum(vbar)/(N - 1)
+        "Pressure drop from inlet to capacitance";
+      Dpfric2 = 0 "Pressure drop from capacitance to outlet";
+    else
+       assert(false, "Unsupported HydraulicCapacitance option");
+    end if "Pressure drop due to friction";
+    Dpstat = if abs(dzdx)<1e-6 then 0 else g*l*dzdx*sum(rhobar)
+      "Pressure drop due to static head";
+    for j in 1:N - 1 loop
+      if Medium.singleState then
+        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) =
+           l*omega*phibar[j] "Energy balance (pressure effects neglected)";
+      else
+        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
+          l*omega*phibar[j] "Energy balance";
+      end if;
+      dMdt[j] = A*l*(drbdh[j]*der(htilde[j]) + drbdp[j]*der(p))
+        "Mass derivative for each volume";
+      // Average volume quantities
+      rhobar[j] = (rho[j] + rho[j + 1])/2;
+      drbdp[j] = (drdp[j] + drdp[j + 1])/2;
+      drbdh[j] = (drdh[j] + drdh[j + 1])/2;
+      vbar[j] = 1/rhobar[j];
+      wbar[j] = infl.w/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+    end for;
+
+    // Fluid property calculations
+    for j in 1:N loop
+      fluid[j].p=p;
+      fluid[j].h=h[j];
+      T[j]=fluid[j].T;
+      rho[j]=fluid[j].d;
+      drdp[j]= if Medium.singleState then 0 else 
+              Medium.density_derp_h(fluid[j].state);
+      drdh[j]=Medium.density_derh_p(fluid[j].state);
+      u[j] = w/(rho[j]*A);
+    end for;
+
+    // Boundary conditions
+    win = infl.w/Nt;
+    wout = -outfl.w/Nt;
+    if HydraulicCapacitance == HCtypes.Middle then
+      p = infl.p - Dpfric1 - Dpstat/2;
+      w = win;
+    elseif HydraulicCapacitance == HCtypes.Upstream then
+      p = infl.p;
+      w = wout;
+    elseif HydraulicCapacitance == HCtypes.Downstream then
+      p = outfl.p;
+      w = win;
+    else
+      assert(false, "Unsupported HydraulicCapacitance option");
+    end if;
+    infl.h = htilde[1];
+    outfl.h = htilde[N - 1];
+
+    h[1] = inStream(infl.h);
+    h[2:N] = htilde;
+
+    T = wall.T;
+    phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
+
+    Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
+    M=sum(rhobar)*A*l "Total fluid mass";
+    Tr=noEvent(M/max(infl.w/Nt,Modelica.Constants.eps)) "Residence time";
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.steadyState then
+      der(htilde) = zeros(N-1);
+      if (not Medium.singleState) then
+        der(p) = 0;
+      end if;
+    elseif initOpt == Choices.Init.Options.steadyStateNoP then
+      der(htilde) = zeros(N-1);
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
     annotation (
-      Diagram,
-      Icon(Text(extent=[-100, -52; 100, -80], string="%name")),
+      Diagram(graphics),
+      Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString=
+                                                     "%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
@@ -970,147 +1143,21 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 </ul>
 </html>
 "));
-  equation 
-  //All equations are referred to a single tube
-    // Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    if FFtype == FFtypes.Kfnom then
-      Kf = Kfnom*Kfc;
-      Cf = 2*Kf*A^3/(omega_hyd*L);
-    elseif FFtype == FFtypes.OpPoint then
-      Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-      Cf = 2*Kf*A^3/(omega_hyd*L);
-    elseif FFtype == FFtypes.Cfnom then
-      Kf = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
-      Cf = Cfnom*Kfc;
-    elseif FFtype == FFtypes.Colebrook then
-      Cf = f_colebrook(w, Dhyd/A, e,
-           Medium.dynamicViscosity(fluid[integer(N/2)].state))*Kfc;
-      Kf = Cf*omega_hyd*L/(2*A^3);
-    elseif FFtype == FFtypes.NoFriction then
-      Cf = 0;
-      Kf = 0;
-    end if;
-    assert(Kf>=0, "Negative friction coefficient");
-    Kfl = wnom/Nt*wnf*Kf "Linear friction factor";
-    
-    // Dynamic momentum term
-    if DynamicMomentum then
-      dwdt = der(w);
-    else
-      dwdt = 0;
-    end if;
-    
-    sum(dMdt) = (infl.w + outfl.w)/Nt "Mass balance";
-    L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
-    Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
-    if FFtype == FFtypes.NoFriction then
-      Dpfric1 = 0;
-      Dpfric2 = 0;
-    elseif HydraulicCapacitance == 0 then
-      assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
-      Dpfric1 = noEvent(Kf*abs(win)  + Kfl)*win* sum(vbar[1:integer((N-1)/2)])/(N-1) 
-        "Pressure drop from inlet to capacitance";
-      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar[1+integer((N-1)/2):N-1])/(N-1) 
-        "Pressure drop from capacitance to outlet";
-    elseif HydraulicCapacitance == 1 then
-      Dpfric1 = 0 "Pressure drop from inlet to capacitance";
-      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar)/(N - 1) 
-        "Pressure drop from capacitance to outlet";
-    elseif HydraulicCapacitance == 2 then
-      Dpfric1 = noEvent(Kf*abs(win) + Kfl)*win*sum(vbar)/(N - 1) 
-        "Pressure drop from inlet to capacitance";
-      Dpfric2 = 0 "Pressure drop from capacitance to outlet";
-    else
-       assert(false, "Unsupported HydraulicCapacitance option");
-    end if "Pressure drop due to friction";
-    Dpstat = if abs(dzdx)<1e-6 then 0 else g*l*dzdx*sum(rhobar) 
-      "Pressure drop due to static head";
-    for j in 1:N - 1 loop
-      if Medium.singleState then
-        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) =
-           l*omega*phibar[j] "Energy balance (pressure effects neglected)";
-      else
-        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
-          l*omega*phibar[j] "Energy balance";
-      end if;
-      dMdt[j] = A*l*(drbdh[j]*der(htilde[j]) + drbdp[j]*der(p)) 
-        "Mass derivative for each volume";
-      // Average volume quantities
-      rhobar[j] = (rho[j] + rho[j + 1])/2;
-      drbdp[j] = (drdp[j] + drdp[j + 1])/2;
-      drbdh[j] = (drdh[j] + drdh[j + 1])/2;
-      vbar[j] = 1/rhobar[j];
-      wbar[j] = infl.w/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
-    end for;
-    
-    // Fluid property calculations
-    for j in 1:N loop
-      fluid[j].p=p;
-      fluid[j].h=h[j];
-      T[j]=fluid[j].T;
-      rho[j]=fluid[j].d;
-      drdp[j]= if Medium.singleState then 0 else 
-              Medium.density_derp_h(fluid[j].state);
-      drdh[j]=Medium.density_derh_p(fluid[j].state);
-      u[j] = w/(rho[j]*A);
-    end for;
-    
-    // Boundary conditions
-    win = infl.w/Nt;
-    wout = -outfl.w/Nt;
-    if HydraulicCapacitance == 0 then
-      p = infl.p - Dpfric1 - Dpstat/2;
-      w = win;
-    elseif HydraulicCapacitance == 1 then
-      p = infl.p;
-      w = wout;
-    elseif HydraulicCapacitance == 2 then
-      p = outfl.p;
-      w = win;
-    else
-      assert(false, "Unsupported HydraulicCapacitance option");
-    end if;
-    infl.hAB = htilde[1];
-    outfl.hBA = htilde[N - 1];
-    
-    h[1] = infl.hBA;
-    h[2:N] = htilde;
-    
-    T = wall.T;
-    phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
-    
-    Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
-    M=sum(rhobar)*A*l "Total fluid mass";
-    Tr=noEvent(M/max(infl.w/Nt,Modelica.Constants.eps)) "Residence time";
-  initial equation 
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-    elseif initOpt == Choices.Init.Options.steadyState then
-      der(htilde) = zeros(N-1);
-      if (not Medium.singleState) then
-        der(p) = 0;
-      end if;
-    elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(htilde) = zeros(N-1);
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
   end Flow1D;
-  
-  model Flow1DDB 
-    "1-dimensional fluid flow model for water or steam flow (finite volumes, Dittus-Boelter heat transfer)" 
+
+  model Flow1DDB
+    "1-dimensional fluid flow model for water or steam flow (finite volumes, Dittus-Boelter heat transfer)"
     extends Flow1D(redeclare Thermal.DHThtc wall);
     Medium.DynamicViscosity mu[N] "Dynamic viscosity";
     Medium.ThermalConductivity k[N] "Thermal conductivity";
     Medium.SpecificHeatCapacity cp[N] "Heat capacity at constant pressure";
-  equation 
+  equation
     for j in 1:N loop
       // Additional fluid properties
       mu[j] =  Medium.dynamicViscosity(fluid[j].state);
       k[j] =  Medium.thermalConductivity(fluid[j].state);
       cp[j] =  Medium.heatCapacity_cp(fluid[j]);
-      wall.gamma[j] =  f_dittus_boelter(w, Dhyd, A, mu[j], k[j], cp[j]) 
+      wall.gamma[j] =  f_dittus_boelter(w, Dhyd, A, mu[j], k[j], cp[j])
         "Heat transfer on the wall connector";
     end for;
     annotation (Documentation(info="<HTML>
@@ -1141,12 +1188,13 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 </ul>
 </html>"));
   end Flow1DDB;
-  
-  model Flow1D2ph 
-    "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)" 
-    extends Flow1DBase(redeclare replaceable package Medium = StandardWater extends 
+
+  model Flow1D2ph
+    "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)"
+    extends Flow1DBase(redeclare replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
     import ThermoPower.Choices.Flow1D.FFtypes;
+    import ThermoPower.Choices.Flow1D.HCtypes;
     package SmoothMedium=Medium(final smoothModel = true);
     constant Pressure pzero=10 "Small deltap for calculations";
     constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
@@ -1162,8 +1210,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Real Cf[N - 1] "Fanning friction factor";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p(
-     start=if HydraulicCapacitance==1 then pstartin else pstartout,
-     stateSelect = StateSelect.prefer) 
+     start=if HydraulicCapacitance==HCtypes.Upstream then pstartin else pstartout,
+     stateSelect = StateSelect.prefer)
       "Fluid pressure for property calculations";
     Pressure dpf[N - 1] "Pressure drop due to friction between two nodes";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
@@ -1182,95 +1230,30 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     LiquidDensity rhol "Saturated liquid density";
     GasDensity rhov "Saturated vapour density";
     Mass M "Fluid mass";
-  protected 
-    DerEnthalpyByPressure dhldp 
+  protected
+    DerEnthalpyByPressure dhldp
       "Derivative of saturated liquid enthalpy by pressure";
-    DerEnthalpyByPressure dhvdp 
+    DerEnthalpyByPressure dhvdp
       "Derivative of saturated vapour enthalpy by pressure";
     Density rhobar[N - 1] "Fluid average density";
     DerDensityByPressure drdp[N] "Derivative of density by pressure";
-    DerDensityByPressure drbdp[N - 1] 
+    DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
-    DerDensityByPressure drldp 
+    DerDensityByPressure drldp
       "Derivative of saturated liquid density by pressure";
-    DerDensityByPressure drvdp 
+    DerDensityByPressure drvdp
       "Derivative of saturated vapour density by pressure";
     SpecificVolume vbar[N - 1] "Average specific volume";
     HeatFlux phibar[N - 1] "Average heat flux";
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
-    DerDensityByEnthalpy drbdh1[N - 1] 
+    DerDensityByEnthalpy drbdh1[N - 1]
       "Derivative of average density by left enthalpy";
-    DerDensityByEnthalpy drbdh2[N - 1] 
+    DerDensityByEnthalpy drbdh2[N - 1]
       "Derivative of average density by right enthalpy";
     Real AA;
     Real AA1;
     Real dMdt[N - 1] "Derivative of fluid mass in each volume";
-    annotation (
-      Diagram,
-      Icon(Text(extent=[-100, -54; 100, -80], string="%name")),
-      Documentation(info="<HTML>
-<p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
-<ul><li>The fluid state is either one-phase, or a two-phase mixture.
-<li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
-<li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
-<li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
-<li>The longitudinal heat diffusion term is neglected.
-<li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
-<li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
-</ul>
-<p>The mass, momentum, and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional) and N-1 specific enthalpies.
-<p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
-<p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
-<p>The model assumes that the mass flow rate is always from the inlet to the outlet. Small reverse flow is allowed (e.g. when closing a valve at the outlet), but the model will not account for it explicitly.
-<p><b>Modelling options</b></p>
-<p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater than or equal to 2.
-<p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
-<p>The density is computed assuming a linear distribution of the specific
-enthalpy between the nodes; this requires the availability of the time derivative of the inlet enthalpy. If this is not available, it is possible to set <tt>avoidInletEnthalpyDerivative</tt> to true, which will cause the mean density of the first volume to be approximated as its outlet density, thus avoiding the need of the inlet enthalpy derivative.
-<p>The following options are available to specify the friction coefficient:
-<ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
-<li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
-<li><tt>FFtype = FFtypes.Cfnom</tt>: the friction coefficient is computed by giving the (constant) value of the Fanning friction factor <tt>Cfnom</tt>.
-<li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).
-<li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul><p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass storage term depending on the pressure is lumped at the outlet, while the optional momentum storage term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
-<p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
-<p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt > 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
-<p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
-</HTML>",
-        revisions="<html>
-<ul>
-<li><i>27 Jul 2007</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Corrected error in the mass balance equation, which lead to loss/gain of
-       mass during transients.</li>
-<li><i>30 May 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Initialisation support added.</li>
-<li><i>24 Mar 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       <tt>FFtypes</tt> package and <tt>NoFriction</tt> option added.</li>
-<li><i>16 Dec 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Standard medium definition added.</li>
-<li><i>8 Oct 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Model now based on <tt>Flow1DBase</tt>.
-<li><i>24 Sep 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Removed <tt>wstart</tt>, <tt>pstart</tt>. Added <tt>pstartin</tt>, <tt>pstartout</tt>.
-<li><i>28 Jul 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Adapted to <tt>Modelica.Media</tt>.
-<li><i>15 Jan 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Computation of fluid velocity <i>u</i> added. Improved treatment of geometric parameters</li>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-  equation 
+  equation
     //All equations are referred to a single tube
     omega_hyd = 4*A/Dhyd;
     // Friction factor selection
@@ -1301,25 +1284,25 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         Kf[j] = 0;
       end if;
       assert(Kf[j]>=0, "Negative friction coefficient");
-      Kfl[j] = wnom*wnf*Kf[j];
+      Kfl[j] = wnom/Nt*wnf*Kf[j];
     end for;
-    
+
     // Dynamic momentum term
     if DynamicMomentum then
       dwdt = der(w);
     else
       dwdt = 0;
     end if;
-    
+
     sum(dMdt) = (infl.w/Nt + outfl.w/Nt) "Mass balance";
     sum(dpf) = Dpfric "Total pressure drop due to friction";
-    Dpstat = if abs(dzdx)<1e-6 then 0 else g*l*dzdx*sum(rhobar) 
+    Dpstat = if abs(dzdx)<1e-6 then 0 else g*l*dzdx*sum(rhobar)
       "Pressure drop due to static head";
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
     for j in 1:(N - 1) loop
       A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
          l*omega*phibar[j] "Energy balance";
-      dMdt[j] = A*l*(drbdh1[j]*der(h[j]) + drbdh2[j]*der(h[j+1]) + drbdp[j]*der(p)) 
+      dMdt[j] = A*l*(drbdh1[j]*der(h[j]) + drbdh2[j]*der(h[j+1]) + drbdp[j]*der(p))
         "Mass balance for each volume";
       // Average volume quantities
       vbar[j] = 1/rhobar[j] "Average specific volume";
@@ -1409,7 +1392,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         drbdh2[j] = (rho[j+1] - rhobar[j]) / (h[j+1] - h[j]);
       end if;
     end for;
-    
+
     // Saturated fluid property calculations
     sat = Medium.setSat_p(p);
     Ts=sat.Tsat;
@@ -1424,7 +1407,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     AA = (hv - hl)/(1/rhov - 1/rhol);
     AA1 = ((dhvdp - dhldp)*(rhol - rhov)*rhol*rhov
             - (hv - hl)*(rhov^2*drldp - rhol^2*drvdp))/(rhol - rhov)^2;
-    
+
     // Fluid property calculations
     for j in 1:N loop
       fluid[j].p=p;
@@ -1437,29 +1420,29 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       x[j]=noEvent(if h[j]<=hl then 0 else 
                 if h[j]>=hv then 1 else (h[j]-hl)/(hv-hl));
     end for;
-    
+
     // Selection of representative pressure and flow rate variables
-    if HydraulicCapacitance == 1 then
+    if HydraulicCapacitance == HCtypes.Upstream then
       p = infl.p;
       w = -outfl.w/Nt;
     else
       p = outfl.p;
       w = infl.w/Nt;
     end if;
-    
+
     // Boundary conditions
-    infl.hAB = htilde[1];
-    outfl.hBA = htilde[N - 1];
-    h[1] = infl.hBA;
+    infl.h = htilde[1];
+    outfl.h = htilde[N - 1];
+    h[1] = inStream(infl.h);
     h[2:N] = htilde;
     T = wall.T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
-    
+
     Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
     M=sum(rhobar)*A*l "Fluid mass (single tube)";
     Tr=noEvent(M/max(infl.w/Nt,Modelica.Constants.eps)) "Residence time";
-    
-  initial equation 
+
+  initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
@@ -1472,25 +1455,91 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     else
       assert(false, "Unsupported initialisation option");
     end if;
-    
+
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(extent={{-100,-54},{100,-80}}, textString=
+                                                     "%name")}),
+      Documentation(info="<HTML>
+<p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
+<ul><li>The fluid state is either one-phase, or a two-phase mixture.
+<li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
+<li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
+<li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The longitudinal heat diffusion term is neglected.
+<li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
+<li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
+</ul>
+<p>The mass, momentum, and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional) and N-1 specific enthalpies.
+<p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
+<p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
+<p>The model assumes that the mass flow rate is always from the inlet to the outlet. Small reverse flow is allowed (e.g. when closing a valve at the outlet), but the model will not account for it explicitly.
+<p><b>Modelling options</b></p>
+<p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater than or equal to 2.
+<p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
+<p>The density is computed assuming a linear distribution of the specific
+enthalpy between the nodes; this requires the availability of the time derivative of the inlet enthalpy. If this is not available, it is possible to set <tt>avoidInletEnthalpyDerivative</tt> to true, which will cause the mean density of the first volume to be approximated as its outlet density, thus avoiding the need of the inlet enthalpy derivative.
+<p>The following options are available to specify the friction coefficient:
+<ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
+<li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
+<li><tt>FFtype = FFtypes.Cfnom</tt>: the friction coefficient is computed by giving the (constant) value of the Fanning friction factor <tt>Cfnom</tt>.
+<li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).
+<li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul><p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass storage term depending on the pressure is lumped at the outlet, while the optional momentum storage term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
+<p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
+<p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt > 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
+<p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
+</HTML>",
+        revisions="<html>
+<ul>
+<li><i>27 Jul 2007</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Corrected error in the mass balance equation, which lead to loss/gain of
+       mass during transients.</li>
+<li><i>30 May 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Initialisation support added.</li>
+<li><i>24 Mar 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       <tt>FFtypes</tt> package and <tt>NoFriction</tt> option added.</li>
+<li><i>16 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Standard medium definition added.</li>
+<li><i>8 Oct 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Model now based on <tt>Flow1DBase</tt>.
+<li><i>24 Sep 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>wstart</tt>, <tt>pstart</tt>. Added <tt>pstartin</tt>, <tt>pstartout</tt>.
+<li><i>28 Jul 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Adapted to <tt>Modelica.Media</tt>.
+<li><i>15 Jan 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Computation of fluid velocity <i>u</i> added. Improved treatment of geometric parameters</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end Flow1D2ph;
-  
-  model Flow1D2phDB 
-    "1-dimensional fluid flow model for 2-phase boiling flow (finite volumes, 2-phase, computation of heat transfer coeff.)" 
+
+  model Flow1D2phDB
+    "1-dimensional fluid flow model for 2-phase boiling flow (finite volumes, 2-phase, computation of heat transfer coeff.)"
     extends Flow1D2ph(redeclare Thermal.DHThtc wall);
-    parameter CoefficientOfHeatTransfer gamma_b=20000 
+    parameter CoefficientOfHeatTransfer gamma_b=20000
       "Coefficient of heat transfer for boiling flow";
-    parameter Real xCHF=0.9 
+    parameter Real xCHF=0.9
       "Steam quality corresponding to the Critical Heat Flux";
     Medium.ThermodynamicState bubble "Bubble point state";
     Medium.ThermodynamicState dew "Dew point state";
-  protected 
+  protected
     CoefficientOfHeatTransfer gamma[N] "Raw heat transfer coefficient";
     CoefficientOfHeatTransfer gamma_ls "H.t.c. just before bubble point";
     CoefficientOfHeatTransfer gamma_chf "H.t.c. just after CHF";
-    CoefficientOfHeatTransfer gamma_corr_left[N] 
+    CoefficientOfHeatTransfer gamma_corr_left[N]
       "Correction term to get smooth h.t.c.";
-    CoefficientOfHeatTransfer gamma_corr_right[N] 
+    CoefficientOfHeatTransfer gamma_corr_right[N]
       "Correction term to get smooth h.t.c.";
     SpecificEnthalpy hCHF "Enthalpy corresponding to the Critical Heat Flux";
     DynamicViscosity mu_ls "Dynamic viscosity at bubble point";
@@ -1499,8 +1548,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     ThermalConductivity k_vs "Thermal conductivity at dew point";
     SpecificHeatCapacity cp_ls "Specific heat capacity at bubble point";
     SpecificHeatCapacity cp_vs "Specific heat capacity at dew point";
-  equation 
-    hCHF = hl + xCHF*(hv - hl) 
+  equation
+    hCHF = hl + xCHF*(hv - hl)
       "Specific enthalpy corresponding to critical heat flux";
     // Saturated fluid properties
     bubble = Medium.setBubbleState(sat,1);
@@ -1514,10 +1563,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     // H.t.c. just outside the nucleate boiling region
     gamma_ls =f_dittus_boelter(w, Dhyd, A, mu_ls, k_ls, cp_ls);
     gamma_chf =f_dittus_boelter(w*xCHF, Dhyd, A, mu_vs, k_vs, cp_vs);
-    
+
     // Nodal h.t.c.
     for j in 1:N loop
-        // a) Subcooled liquid 
+        // a) Subcooled liquid
         // b) Wet steam after dryout: Dittus-Boelter's correlation considering
         //    only the vapour phase
         // c) Nucleate boiling: constant h.t.c.
@@ -1530,7 +1579,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         f_dittus_boelter(w*x[j], Dhyd, A, mu_vs, k_vs, cp_vs) else 
         gamma_b);
     end for;
-    
+
     // Corrections due to boundaries near the nodes to the left
     // to achieve continuous h.t.c.
     gamma_corr_left[1]=0;
@@ -1554,7 +1603,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
               (if j==N then 2 else 1) else 
             0);
     end for;
-    
+
     // Corrections due to boundaries near the nodes to the right
     // to achieve continuous h.t.c.
     gamma_corr_right[N]=0;
@@ -1578,8 +1627,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
             (if j==1 then 2 else 1) else 
           0);
     end for;
-    
-    wall.gamma = gamma + gamma_corr_left + gamma_corr_right 
+
+    wall.gamma = gamma + gamma_corr_left + gamma_corr_right
       "H.t.c. including smoothing terms";
     annotation (Documentation(info="<HTML>
 <p>This model extends <tt>Flow1D2ph</tt> by computing the distribution of the heat transfer coefficient <tt>gamma</tt> and making it available through an extended version of the <tt>wall</tt> connector.
@@ -1617,22 +1666,22 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </ul>
 </html>"));
   end Flow1D2phDB;
-  
-  model Flow1D2phChen 
-    "1-dimensional fluid flow model for 2-phase boiling flow (finite volumes, 2-phase, Chen correlation)" 
+
+  model Flow1D2phChen
+    "1-dimensional fluid flow model for 2-phase boiling flow (finite volumes, 2-phase, Chen correlation)"
     extends Flow1D2ph(redeclare Thermal.DHThtc wall);
     parameter Real xCHF=0.9 "Steam quality corresponding to Critical Heat Flux";
     Medium.ThermodynamicState bubble "Bubble point state";
     Medium.ThermodynamicState dew "Dew point state";
-  protected 
+  protected
     CoefficientOfHeatTransfer gamma[N] "Raw heat transfer coefficient";
     CoefficientOfHeatTransfer gamma_ls "H.t.c. just before bubble point";
     CoefficientOfHeatTransfer gamma_chf "H.t.c. just after CHF";
-    CoefficientOfHeatTransfer gamma_corr_left[N] 
+    CoefficientOfHeatTransfer gamma_corr_left[N]
       "Correction term to get smooth h.t.c.";
-    CoefficientOfHeatTransfer gamma_corr_right[N] 
+    CoefficientOfHeatTransfer gamma_corr_right[N]
       "Correction term to get smooth h.t.c.";
-    Medium.SpecificEnthalpy hCHF 
+    Medium.SpecificEnthalpy hCHF
       "Enthalpy corresponding to the Critical Heat Flux";
     Medium.DynamicViscosity mu_ls "Dynamic viscosity at bubble point";
     Medium.DynamicViscosity mu_vs "Dynamic viscosity at dew point";
@@ -1641,8 +1690,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.SpecificHeatCapacity cp_ls "Specific heat capacity at bubble point";
     Medium.SpecificHeatCapacity cp_vs "Specific heat capacity at dew point";
     Medium.SurfaceTension sigma "Surface tension";
-  equation 
-    hCHF = hl + xCHF*(hv - hl) 
+  equation
+    hCHF = hl + xCHF*(hv - hl)
       "Specific enthalpy corresponding to critical heat flux";
     // Saturated water and steam properties
     bubble = Medium.setBubbleState(sat,1);
@@ -1657,10 +1706,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     // H.t.c. just outside the nucleate boiling region
     gamma_ls = f_dittus_boelter(w, Dhyd, A, mu_ls, k_ls, cp_ls);
     gamma_chf = f_dittus_boelter(w*xCHF, Dhyd, A, mu_vs, k_vs, cp_vs);
-    
+
     // Nodal h.t.c. computations
     for j in 1:N loop
-        // a) Subcooled liquid 
+        // a) Subcooled liquid
         // b) Wet steam after dryout: Dittus-Boelter's correlation considering
         //    only the vapour phase
         // c) Nucleate boiling: constant h.t.c.
@@ -1677,7 +1726,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
           Medium.saturationPressure(wall.T[j]) - p,
           hv - hl, x[j]));
     end for;
-    
+
     // Corrections due to boundaries near the nodes to the left
     // to achieve continuous h.t.c.
     gamma_corr_left[1]=0;
@@ -1721,7 +1770,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
               (if j==N then 2 else 1) else 
             0);
     end for;
-    
+
     // Compute corrections due to boundaries near the nodes to the right
     // to achieve continuous h.t.c.
     gamma_corr_right[N]=0;
@@ -1765,8 +1814,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
              (if j==1 then 2 else 1) else 
          0);
     end for;
-    
-    wall.gamma = gamma + gamma_corr_left + gamma_corr_right 
+
+    wall.gamma = gamma + gamma_corr_left + gamma_corr_right
       "H.t.c. including smoothing terms";
     annotation (Documentation(info="<HTML>
 <p>This model extends <tt>Flow1D2ph</tt> by computing the distribution of the heat transfer coefficient <tt>gamma</tt> and making it available through an extended version of the <tt>wall</tt> connector.
@@ -1804,13 +1853,14 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </ul>
 </html>"));
   end Flow1D2phChen;
-  
-  model Flow1Dfem 
-    "1-dimensional fluid flow model for water/steam (finite elements)" 
-    
+
+  model Flow1Dfem
+    "1-dimensional fluid flow model for water/steam (finite elements)"
+
     extends Flow1DBase;
     import Modelica.Math.*;
     import ThermoPower.Choices.Flow1D.FFtypes;
+    import ThermoPower.Choices.Flow1D.HCtypes;
     Medium.BaseProperties fluid[N](each p(start=pstartin),
       h(start=hstart)) "Properties of the fluid at the nodes";
     parameter Real alpha(
@@ -1825,7 +1875,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real Kfl[N] "Linear friction coefficient";
     Real Cf[N] "Fanning friction factor";
     Real dwdt "Dynamic momentum term";
-    Medium.AbsolutePressure p(start=if HydraulicCapacitance==1 then pstartin else 
+    Medium.AbsolutePressure p(start=if HydraulicCapacitance==HCtypes.Upstream then pstartin else 
            pstartout) "Fluid pressure";
     Pressure Dpfric "Pressure drop due to friction";
     Pressure Dpstat "Pressure drop due to static head";
@@ -1836,10 +1886,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
     Medium.Density rho[N] "Fluid density";
     SpecificVolume v[N] "Fluid specific volume";
-  protected 
+  protected
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     DerDensityByPressure drdp[N] "Derivative of density by pressure";
-    
+
     Real Y[N, N];
     Real M[N, N];
     Real D[N];
@@ -1847,14 +1897,246 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real B[N, N];
     Real C[N, N];
     Real K[N, N];
-    
+
     Real alpha_sgn;
-    
+
     Real YY[N, N];
-    
+
+  equation
+    //All equations are referred to a single tube
+
+    // Selection of representative pressure and flow rate variables
+    if HydraulicCapacitance == HCtypes.Upstream then
+      p = infl.p;
+    else
+      p = outfl.p;
+    end if;
+
+    //Friction factor selection
+    omega_hyd = 4*A/Dhyd;
+    for i in 1:N loop
+      if FFtype == FFtypes.Kfnom then
+        Kf[i] = Kfnom*Kfc;
+        Cf[i] = 2*Kf[i]*A^3/(omega_hyd*L);
+      elseif FFtype == FFtypes.OpPoint then
+        Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
+        Cf[i] = 2*Kf[i]*A^3/(omega_hyd*L);
+      elseif FFtype == FFtypes.Cfnom then
+        Kf[i] = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
+        Cf[i] = Cfnom*Kfc;
+      elseif FFtype == FFtypes.Colebrook then
+        Cf[i] = f_colebrook(w[i], Dhyd/A, e,
+          Medium.dynamicViscosity(fluid[i].state))*Kfc;
+        Kf[i] = Cf[i]*omega_hyd*L/(2*A^3);
+      elseif FFtype == FFtypes.NoFriction then
+        Cf[i] = 0;
+        Kf[i] = 0;
+      end if;
+      assert(Kf[i]>=0, "Negative friction coefficient");
+      Kfl[i] = wnom/Nt*wnf*Kf[i];
+    end for;
+
+    //Dynamic Momentum [not] accounted for
+    if DynamicMomentum then
+      if HydraulicCapacitance == HCtypes.Upstream then
+        dwdt = -der(outfl.w)/Nt;
+      else
+        dwdt = der(infl.w)/Nt;
+      end if;
+    else
+      dwdt = 0;
+    end if;
+
+    L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0
+      "Momentum balance equation";
+
+    w[1] = infl.w/Nt "Inlet flow rate - single tube";
+    w[N] = -outfl.w/Nt "Outlet flow rate - single tube";
+
+    Dpfric = if FFtype == FFtypes.NoFriction then 0 else 
+      noEvent(sign(infl.w))*sum((Kf[i]*w[i]^2/rho[i] + Kfl[i]*w[i]/
+      rho[i])*D[i] for i in 1:N)/L "Pressure drop due to friction";
+    Dpstat = if abs(dzdx)<1e-6 then 0 else g*dzdx*rho*D
+      "Pressure drop due to static head";
+    ((1 - ML)*Y + ML*YY)*der(h) + B/A*h + C*h/A = der(p)*G + M*(omega/A)*phi
+       + K*w/A "Energy balance equation";
+
+    //Computation of fluid properties
+    for i in 1:N loop
+      fluid[i].p=p;
+      fluid[i].h=h[i];
+      T[i]=fluid[i].T;
+      rho[i]=fluid[i].d;
+      drdp[i]= if Medium.singleState then 0 else 
+              Medium.density_derp_h(fluid[i].state);
+      drdh[i]=Medium.density_derh_p(fluid[i].state);
+      v[i] = 1/rho[i];
+      u[i] = w[i]/(rho[i]*A);
+    end for;
+
+    //Wall energy flux and  temperature
+    T = wall.T;
+    phi = wall.phi;
+
+    //Boundary Values of outflowing fluid enthalpies
+    h[1] = infl.h;
+    h[N] = outfl.h;
+
+    alpha_sgn = alpha*sign(infl.w - outfl.w);
+
+    for i in 1:N - 1 loop
+      (w[i + 1] - w[i]) = -A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(
+        h[i])*(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i
+         + 1]))) "Mass balance equations";
+    end for;
+
+    // Energy equation FEM matrices
+    Y[1, 1] = rho[1]*((-l/12)*(2*alpha_sgn - 3)) + rho[2]*((-l/12)*(alpha_sgn
+       - 1));
+    Y[1, 2] = rho[1]*((-l/12)*(alpha_sgn - 1)) + rho[2]*((-l/12)*(2*alpha_sgn
+       - 1));
+    Y[N, N] = rho[N - 1]*((l/12)*(alpha_sgn + 1)) + rho[N]*((l/12)*(2*
+      alpha_sgn + 3));
+    Y[N, N - 1] = rho[N - 1]*((l/12)*(2*alpha_sgn + 1)) + rho[N]*((l/12)*(
+      alpha_sgn + 1));
+    if N > 2 then
+      for i in 2:N - 1 loop
+        Y[i, i - 1] = rho[i - 1]*((l/12)*(2*alpha_sgn + 1)) + rho[i]*((l/12)*
+          (alpha_sgn + 1));
+        Y[i, i] = rho[i - 1]*((l/12)*(alpha_sgn + 1)) + rho[i]*(l/2) + rho[i
+           + 1]*(-(l/12)*(alpha_sgn - 1));
+        Y[i, i + 1] = rho[i]*((-l/12)*(alpha_sgn - 1)) + rho[i + 1]*((-l/12)*
+          (2*alpha_sgn - 1));
+        Y[1, i + 1] = 0;
+        Y[N, i - 1] = 0;
+        for j in 1:(i - 2) loop
+          Y[i, j] = 0;
+        end for;
+        for j in (i + 2):N loop
+          Y[i, j] = 0;
+        end for;
+      end for;
+    end if;
+
+    for i in 1:N loop
+      for j in 1:N loop
+        YY[i, j] = if (i <> j) then 0 else sum(Y[:, j]);
+      end for;
+    end for;
+
+    M[1, 1] = l/3 - l*alpha_sgn/4;
+    M[N, N] = l/3 + l*alpha_sgn/4;
+    M[1, 2] = l/6 - l*alpha_sgn/4;
+    M[N, (N - 1)] = l/6 + l*alpha_sgn/4;
+    if N > 2 then
+      for i in 2:N - 1 loop
+        M[i, i - 1] = l/6 + l*alpha_sgn/4;
+        M[i, i] = 2*l/3;
+        M[i, i + 1] = l/6 - l*alpha_sgn/4;
+        M[1, i + 1] = 0;
+        M[N, i - 1] = 0;
+        for j in 1:(i - 2) loop
+          M[i, j] = 0;
+        end for;
+        for j in (i + 2):N loop
+          M[i, j] = 0;
+        end for;
+      end for;
+    end if;
+
+    B[1, 1] = (-1/3 + alpha_sgn/4)*w[1] + (-1/6 + alpha_sgn/4)*w[2];
+    B[1, 2] = (1/3 - alpha_sgn/4)*w[1] + (1/6 - alpha_sgn/4)*w[2];
+    B[N, N] = (1/6 + alpha_sgn/4)*w[N - 1] + (1/3 + alpha_sgn/4)*w[N];
+    B[N, N - 1] = (-1/(6) - alpha_sgn/4)*w[N - 1] + (-1/3 - alpha_sgn/4)*w[N];
+    if N > 2 then
+      for i in 2:N - 1 loop
+        B[i, i - 1] = (-1/6 - alpha_sgn/4)*w[i - 1] + (-1/3 - alpha_sgn/4)*w[
+          i];
+        B[i, i] = (1/6 + alpha_sgn/4)*w[i - 1] + (alpha_sgn/2)*w[i] + (-1/6
+           + alpha_sgn/4)*w[i + 1];
+        B[i, i + 1] = (1/3 - alpha_sgn/4)*w[i] + (1/6 - alpha_sgn/4)*w[i + 1];
+        B[1, i + 1] = 0;
+        B[N, i - 1] = 0;
+        for j in 1:(i - 2) loop
+          B[i, j] = 0;
+        end for;
+        for j in (i + 2):N loop
+          B[i, j] = 0;
+        end for;
+      end for;
+    end if;
+
+    if Medium.singleState then
+      G=zeros(N) "No influence of pressure";
+    else
+      G[1] = l/2*(1 - alpha_sgn);
+      G[N] = l/2*(1 + alpha_sgn);
+      if N > 2 then
+        for i in 2:N - 1 loop
+          G[i] = l;
+        end for;
+      end if;
+    end if;
+
+    //boundary condition matrices
+    C[1, 1] = if noEvent(infl.w >= 0) then (1 - alpha_sgn/2)*w[1] else 0;
+    C[N, N] = if noEvent(outfl.w >= 0) then -(1 + alpha_sgn/2)*w[N] else 0;
+    C[N, 1] = 0;
+    C[1, N] = 0;
+    if (N > 2) then
+      for i in 2:(N - 1) loop
+        C[1, i] = 0;
+        C[N, i] = 0;
+        for j in 1:N loop
+          C[i, j] = 0;
+        end for;
+      end for;
+    end if;
+
+    K[1, 1] = if noEvent(infl.w >= 0) then (1 - alpha_sgn/2)*inStream(infl.h) else 0;
+    K[N, N] = if noEvent(outfl.w >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h) else 
+            0;
+    K[N, 1] = 0;
+    K[1, N] = 0;
+    if (N > 2) then
+      for i in 2:(N - 1) loop
+        K[1, i] = 0;
+        K[N, i] = 0;
+        for j in 1:N loop
+          K[i, j] = 0;
+        end for;
+      end for;
+    end if;
+
+    // Momentum and Mass balance equation matrices
+    D[1] = l/2;
+    D[N] = l/2;
+    if N > 2 then
+      for i in 2:N - 1 loop
+        D[i] = l;
+      end for;
+    end if;
+
+    Q = Nt*l*omega*D*phi "Total heat flow through lateral boundary";
+    Tr=noEvent(sum(rho)*A*l/max(infl.w/Nt,Modelica.Constants.eps))
+      "Residence time";
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.steadyState then
+      der(h) = zeros(N);
+      if (not Medium.singleState) then
+        der(p) = 0;
+      end if;
+    elseif initOpt == Choices.Init.Options.steadyStateNoP then
+      der(h) = zeros(N);
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
     annotation (
-      Diagram,
-      Icon(Text(extent=[-100, -52; 100, -82], string="%name")),
+      Diagram(graphics),
+      Icon(graphics={Text(extent={{-100,-52},{100,-82}}, textString=
+                                                     "%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
@@ -1914,17 +2196,120 @@ enthalpy between the nodes; this requires the availability of the time derivativ
        First release.</li>
 </ul>
 </html>"));
-  equation 
+  end Flow1Dfem;
+
+  model Flow1Dfem2ph
+    "1-dimensional fluid flow model for water/steam (finite elements)"
+    import Modelica.Math.*;
+    import ThermoPower.Choices.Flow1D.FFtypes;
+    import ThermoPower.Choices.Flow1D.HCtypes;
+    extends Flow1DBase(redeclare replaceable package Medium = StandardWater constrainedby
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
+    package SmoothMedium=Medium(final smoothModel = true);
+    parameter Real alpha(
+      min=0,
+      max=2) = 1 "Numerical stabilization coefficient";
+    parameter Real ML(
+      min=0,
+      max=1) = 0.2 "Mass Lumping Coefficient";
+    constant Real g=Modelica.Constants.g_n;
+    constant Pressure pzero=10 "Small deltap for calculations";
+    constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
+    constant SpecificEnthalpy hzero=1e-3;
+    SmoothMedium.BaseProperties fluid[N] "Properties of the fluid at the nodes";
+    Medium.SaturationProperties sat "Properties of saturated fluid";
+    Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
+    Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
+    Length omega_hyd "Hydraulic perimeter (single tube)";
+    Real dwdt "Dynamic momentum term";
+    Medium.AbsolutePressure p(start=if HydraulicCapacitance==HCtypes.Upstream then pstartin else 
+           pstartout) "Fluid pressure";
+    Pressure Dpfric "Pressure drop due to friction";
+    Pressure Dpstat "Pressure drop due to static head";
+    MassFlowRate w[N](start=wnom*ones(N)) "Mass flowrate (single tube)";
+    Velocity u[N] "Fluid velocity";
+    HeatFlux phi[N] "External heat flux";
+    Medium.Temperature T[N] "Fluid temperature";
+    Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
+    Medium.Density rho[N] "Fluid density";
+    SpecificVolume v[N] "Fluid specific volume";
+
+    Medium.Temperature Ts "Saturation temperature";
+    Medium.SpecificEnthalpy hl "Saturated liquid specific enthalpy";
+    Medium.SpecificEnthalpy hv "Saturated vapour specific enthalpy";
+    Real x[N] "Steam quality";
+    LiquidDensity rhol "Saturated liquid density";
+    GasDensity rhov "Saturated vapour density";
+  protected
+    DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
+    DerDensityByPressure drdp[N] "Derivative of density by pressure";
+
+    Real Kf[N] "Friction coefficient";
+    Real Kfl[N] "Linear friction coefficient";
+    Real Cf[N] "Fanning friction factor";
+
+    DerDensityByPressure drl_dp
+      "Derivative of liquid density by pressure just before saturation";
+    DerDensityByPressure drv_dp
+      "Derivative of vapour density by pressure just before saturation";
+    DerDensityByEnthalpy drl_dh
+      "Derivative of liquid density by enthalpy just before saturation";
+    DerDensityByEnthalpy drv_dh
+      "Derivative of vapour density by enthalpy just before saturation";
+
+    Real dhl "Derivative of saturated liquid enthalpy by pressure";
+    Real dhv "Derivative of saturated vapour enthalpy by pressure";
+
+    Real drl "Derivative of saturatd liquid density by pressure";
+    Real drv "Derivative of saturated vapour density by pressure";
+
+    Density rhos[N - 1];
+    MassFlowRate ws[N - 1];
+    Real rs[N - 1];
+
+    Real Y[N, N];
+    Real YY[N, N];
+
+    Real Y2ph[N, N];
+    Real M[N, N];
+    Real D[N];
+    Real G[N];
+    Real B[N, N];
+    Real B2ph[N, N];
+    Real C[N, N];
+    Real K[N, N];
+
+    Real by[8, N];
+    Real beta[8, N];
+    //coefficients matrix for 2-phases augmented FEM matrices
+    Real alpha_sgn;
+
+    Real gamma_rho[N - 1];
+    Real gamma_w[N - 1];
+    //coefficients for gamma functions
+
+    Real a;
+    Real b;
+    Real betap;
+    Real c;
+    Real d;
+    Real ee[N - 1];
+    Real f[N - 1];
+
+    Real dMbif[N - 1];
+    Real dMmono[N - 1];
+
+  equation
     //All equations are referred to a single tube
-    
+
     // Selection of representative pressure and flow rate variables
-    if HydraulicCapacitance == 1 then
+    if HydraulicCapacitance == HCtypes.Upstream then
       p = infl.p;
     else
       p = outfl.p;
     end if;
-    
-    //Friction factor selection
+
+    //Friction factor calculation
     omega_hyd = 4*A/Dhyd;
     for i in 1:N loop
       if FFtype == FFtypes.Kfnom then
@@ -1937,8 +2322,14 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         Kf[i] = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
         Cf[i] = Cfnom*Kfc;
       elseif FFtype == FFtypes.Colebrook then
-        Cf[i] = f_colebrook(w[i], Dhyd/A, e,
-          Medium.dynamicViscosity(fluid[i].state))*Kfc;
+        if noEvent(h[i] < hl or h[i] > hv) then
+          Cf[i] = f_colebrook(w[i], Dhyd/A, e,
+            Medium.dynamicViscosity(fluid[i].state))*Kfc;
+        else
+          Cf[i] = f_colebrook_2ph(w[i], Dhyd/A, e,
+            Medium.dynamicViscosity(bubble),
+            Medium.dynamicViscosity(dew), x[i])*Kfc;
+        end if;
         Kf[i] = Cf[i]*omega_hyd*L/(2*A^3);
       elseif FFtype == FFtypes.NoFriction then
         Cf[i] = 0;
@@ -1947,78 +2338,284 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       assert(Kf[i]>=0, "Negative friction coefficient");
       Kfl[i] = wnom/Nt*wnf*Kf[i];
     end for;
-    
+
     //Dynamic Momentum [not] accounted for
     if DynamicMomentum then
-      if HydraulicCapacitance == 1 then
+      if HydraulicCapacitance == HCtypes.Upstream then
         dwdt = -der(outfl.w)/Nt;
       else
         dwdt = der(infl.w)/Nt;
       end if;
+
     else
       dwdt = 0;
     end if;
-    
-    L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 
-      "Momentum balance equation";
-    
-    w[1] = infl.w/Nt "Inlet flow rate - single tube";
-    w[N] = -outfl.w/Nt "Outlet flow rate - single tube";
-    
+
+    //Momentum balance equation
+    L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0;
+
+    w[1] = infl.w/Nt;
+    w[N] = -outfl.w/Nt;
+
     Dpfric = if FFtype == FFtypes.NoFriction then 0 else 
-      noEvent(sign(infl.w))*sum((Kf[i]*w[i]^2/rho[i] + Kfl[i]*w[i]/
-      rho[i])*D[i] for i in 1:N)/L "Pressure drop due to friction";
-    Dpstat = if abs(dzdx)<1e-6 then 0 else g*dzdx*rho*D 
+      sum((Kf[i]*w[i]*noEvent(abs(w[i]))/rho[i] + Kfl[i]*w[i]/rho[i])*
+      D[i] for i in 1:N)/L;
+    Dpstat = if abs(dzdx)<1e-6 then 0 else g*dzdx*rho*D
       "Pressure drop due to static head";
-    ((1 - ML)*Y + ML*YY)*der(h) + B/A*h + C*h/A = der(p)*G + M*(omega/A)*phi
-       + K*w/A "Energy balance equation";
-    
-    //Computation of fluid properties 
+
+    //Energy balance equations
+    l/12*((1 - ML)*Y + ML*YY + 0*Y2ph)*der(h) + (1/A)*(B + 0*B2ph)*h + C*h/A
+      = der(p)*G + M*(omega/A)*phi + K*w/A;
+
+  //  (Ts,rhol,rhov,hl,hv,drl_dp,drv_dp,drl_dh,drv_dh,dhl,dhv,drl,drv) =
+  //  propsat_p_2der(noEvent(min(p, pc - pzero)));
+
+    sat.psat=p;
+    sat.Tsat=Medium.saturationTemperature(p);
+    Ts=sat.Tsat;
+    bubble=Medium.setBubbleState(sat);
+    dew=Medium.setDewState(sat);
+    rhol=Medium.bubbleDensity(sat);
+    rhov=Medium.dewDensity(sat);
+    hl=Medium.bubbleEnthalpy(sat);
+    hv=Medium.dewEnthalpy(sat);
+    drl=Medium.dBubbleDensity_dPressure(sat);
+    drv=Medium.dDewDensity_dPressure(sat);
+    dhl=Medium.dBubbleEnthalpy_dPressure(sat);
+    dhv=Medium.dDewEnthalpy_dPressure(sat);
+    drl_dp=Medium.density_derp_h(bubble);
+    drv_dp=Medium.density_derp_h(dew);
+    drl_dh=Medium.density_derh_p(bubble);
+    drv_dh=Medium.density_derh_p(dew);
+
+    a = ((hv - hl)*(rhol^2*drv + rhov^2*drl) + rhov*rhol*(rhol - rhov)*(dhv
+       - dhl))/(rhol - rhov)^2;
+
+    betap = ((rhol - rhov)*(rhov*dhv - rhol*dhl) + (hv - hl)*(rhol*drv - rhov
+      *drl))/(rhol - rhov)^2;
+
+    b = a*c + d*betap;
+
+    c = (rhov*hv - rhol*hl)/(rhol - rhov);
+
+    d = -rhol*rhov*(hv - hl)/(rhol - rhov);
+
+    //Computation of fluid properties
     for i in 1:N loop
       fluid[i].p=p;
       fluid[i].h=h[i];
       T[i]=fluid[i].T;
       rho[i]=fluid[i].d;
-      drdp[i]= if Medium.singleState then 0 else 
-              Medium.density_derp_h(fluid[i].state);
+      drdp[i]=Medium.density_derp_h(fluid[i].state);
       drdh[i]=Medium.density_derh_p(fluid[i].state);
       v[i] = 1/rho[i];
       u[i] = w[i]/(rho[i]*A);
+      x[i]=noEvent(if h[i]<=hl then 0 else 
+                if h[i]>=hv then 1 else (h[i]-hl)/(hv-hl));
     end for;
-    
+
     //Wall energy flux and  temperature
     T = wall.T;
     phi = wall.phi;
-    
-    //Boundary Values of outflowing fluid enthalpies
-    h[1] = infl.hAB;
-    h[N] = outfl.hBA;
-    
+
+    //Boundary Values
+
+    h[1] = infl.h;
+    h[N] = outfl.h;
+
     alpha_sgn = alpha*sign(infl.w - outfl.w);
-    
+
+    //phase change determination
     for i in 1:N - 1 loop
-      (w[i + 1] - w[i]) = -A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(
-        h[i])*(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i
-         + 1]))) "Mass balance equations";
+      (w[i] - w[i + 1]) = dMmono[i] + dMbif[i];
+      if noEvent(abs(h[i + 1] - h[i]) < hzero) then
+
+        rs[i] = 0;
+        rhos[i] = 0;
+        gamma_rho[i] = 0;
+
+        gamma_w[i] = 0;
+        ws[i] = 0;
+
+        dMmono[i] = A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[i])*
+          (2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i + 1])));
+        dMbif[i] = 0;
+
+        ee[i] = 0;
+        f[i] = 0;
+      else
+
+        if noEvent((h[i] < hl) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
+          //liquid - two phase
+
+          rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
+          rhos[i] = rhol;
+          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
+
+          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
+
+          (w[i] - ws[i]) = dMmono[i];
+
+          dMmono[i] = A*rs[i]*l*(der(p)*1/2*(drl_dp + drdp[i]) + 1/6*(der(h[i])
+            *(2*drdh[i] + drl_dh) + (der(h[i])*(1 - rs[i]) + der(h[i + 1])*rs[
+            i])*(drdh[i] + 2*drl_dh)));
+
+          dMbif[i] = A*(1 - rs[i])*l/(h[i + 1] - hl)*(der(p)*((b - a*c)*(h[i
+             + 1] - hl)/((c + h[i + 1])*(c + hl)) + a*log((c + h[i + 1])/(c
+             + hl))) + ((d*f[i] - d*c*ee[i])*(h[i + 1] - hl)/((c + h[i + 1])*
+            (c + hl)) + d*ee[i]*log((c + h[i + 1])/(c + hl))));
+
+          //(der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) = 0;
+
+          ee[i] = (der(h[i + 1]) - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])))
+            /(h[i + 1] - hl);
+          f[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i + 1] -
+            der(h[i + 1])*hl)/(h[i + 1] - hl);
+
+        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] < hl)) then
+          //two phase-liquid
+
+          rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
+          rhos[i] = rhol;
+          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
+
+          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
+
+          (w[i] - ws[i]) = dMbif[i];
+
+          dMmono[i] = A*(1 - rs[i])*l*(der(p)*1/2*(drdp[i + 1] + drl_dp) + 1/
+            6*(der(h[i])*(2*drl_dh + drdh[i + 1]) + (der(h[i + 1])*rs[i] +
+            der(h[i])*(1 - rs[i]))*(drl_dh + 2*drdh[i + 1])));
+
+          dMbif[i] = A*rs[i]*l/(hl - h[i])*(der(p)*((b - a*c)*(hl - h[i])/((c
+             + hl)*(c + h[i])) + a*log((c + hl)/(c + h[i]))) + ((d*f[i] - d*c
+            *ee[i])*(hl - h[i])/((c + hl)*(c + h[i])) + d*ee[i]*log((c + hl)/
+            (c + h[i]))));
+
+          ee[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) - der(h[i]))
+            /(hl - h[i]);
+          f[i] = (der(h[i])*hl - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))
+            *h[i])/(hl - h[i]);
+
+        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] > hv)) then
+          //two phase - vapour
+
+          rs[i] = (hv - h[i])/(h[i + 1] - h[i]);
+          rhos[i] = rhov;
+          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
+
+          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
+          (w[i] - ws[i]) = dMbif[i];
+
+          dMmono[i] = A*(1 - rs[i])*l*(der(p)*1/2*(drdp[i + 1] + drv_dp) + 1/
+            6*(der(h[i])*(2*drv_dh + drdh[i + 1]) + (der(h[i + 1])*rs[i] +
+            der(h[i])*(1 - rs[i]))*(drv_dh + 2*drdh[i + 1])));
+
+          dMbif[i] = A*rs[i]*l/(hv - h[i])*(der(p)*((b - a*c)*(hv - h[i])/((c
+             + hv)*(c + h[i])) + a*log((c + hv)/(c + h[i]))) + ((d*f[i] - d*c
+            *ee[i])*(hv - h[i])/((c + hv)*(c + h[i])) + d*ee[i]*log((c + hv)/
+            (c + h[i]))));
+
+          ee[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) - der(h[i]))
+            /(hv - h[i]);
+          f[i] = (der(h[i])*hv - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))
+            *h[i])/(hv - h[i]);
+
+        elseif noEvent((h[i] > hv) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
+          // vapour - two phase
+
+          rs[i] = (hv - h[i])/(h[i + 1] - h[i]);
+          rhos[i] = rhov;
+          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
+
+          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
+          (w[i] - ws[i]) = dMmono[i];
+
+          dMmono[i] = A*rs[i]*l*(der(p)*1/2*(drv_dp + drdp[i]) + 1/6*(der(h[i])
+            *(2*drdh[i] + drv_dh) + (der(h[i])*(1 - rs[i]) + der(h[i + 1])*rs[
+            i])*(drdh[i] + 2*drv_dh)));
+
+          dMbif[i] = A*(1 - rs[i])*(der(p)*((b - a*c)*(h[i + 1] - hv)/((c + h[
+            i + 1])*(c + hv)) + a*log((c + h[i + 1])/(c + hv))) + ((d*f[i] -
+            d*c*ee[i])*(h[i + 1] - hv)/((c + h[i + 1])*(c + hv)) + d*ee[i]*
+            log((c + h[i + 1])/(c + hv))));
+
+          ee[i] = (der(h[i + 1]) - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])))
+            /(h[i + 1] - hv);
+          f[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i + 1] -
+            der(h[i + 1])*hv)/(h[i + 1] - hv);
+
+        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] >= hl)
+             and (h[i + 1] <= hv)) then
+          //two phase
+          rs[i] = 0;
+          rhos[i] = 0;
+          gamma_rho[i] = 0;
+
+          gamma_w[i] = 0;
+
+          ws[i] = 0;
+
+          dMmono[i] = 0;
+
+          dMbif[i] = A*l/(h[i + 1] - h[i])*(der(p)*((b - a*c)*(h[i + 1] - h[i])
+            /((c + h[i + 1])*(c + h[i])) + a*log((c + h[i + 1])/(c + h[i])))
+             + ((d*f[i] - d*c*ee[i])*(h[i + 1] - h[i])/((c + h[i + 1])*(c + h[
+            i])) + d*ee[i]*log((c + h[i + 1])/(c + h[i]))));
+
+          ee[i] = (der(h[i + 1]) - der(h[i]))/(h[i + 1] - h[i]);
+          f[i] = (der(h[i])*h[i + 1] - der(h[i + 1])*h[i])/(h[i + 1] - h[i]);
+
+        elseif noEvent(((h[i] < hl) and (h[i + 1] < hl)) or ((h[i] > hv) and 
+            (h[i + 1] > hv))) then
+
+          //single-phase
+          rs[i] = 0;
+          rhos[i] = 0;
+          gamma_rho[i] = 0;
+
+          gamma_w[i] = 0;
+          ws[i] = 0;
+
+          dMmono[i] = A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[i])
+            *(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i +
+            1])));
+          dMbif[i] = 0;
+
+          ee[i] = 0;
+          f[i] = 0;
+        else
+          //double transition (not supported!)
+          assert(0 > 1,
+            "Error: two phase trasitions between two adiacent nodes. Try increasing the number of nodes");
+          rs[i] = 0;
+          rhos[i] = 0;
+          gamma_rho[i] = 0;
+
+          gamma_w[i] = 0;
+          ws[i] = 0;
+
+          dMmono[i] = 0;
+          dMbif[i] = 0;
+
+          ee[i] = 0;
+          f[i] = 0;
+        end if;
+      end if;
     end for;
-    
+
     // Energy equation FEM matrices
-    Y[1, 1] = rho[1]*((-l/12)*(2*alpha_sgn - 3)) + rho[2]*((-l/12)*(alpha_sgn
-       - 1));
-    Y[1, 2] = rho[1]*((-l/12)*(alpha_sgn - 1)) + rho[2]*((-l/12)*(2*alpha_sgn
-       - 1));
-    Y[N, N] = rho[N - 1]*((l/12)*(alpha_sgn + 1)) + rho[N]*((l/12)*(2*
-      alpha_sgn + 3));
-    Y[N, N - 1] = rho[N - 1]*((l/12)*(2*alpha_sgn + 1)) + rho[N]*((l/12)*(
-      alpha_sgn + 1));
+
+    Y[1, 1] = rho[1]*(3 - 2*alpha_sgn) + rho[2]*(1 - alpha_sgn);
+    Y[1, 2] = rho[1]*(1 - alpha_sgn) + rho[2]*(1 - 2*alpha_sgn);
+    Y[N, N] = rho[N - 1]*(alpha_sgn + 1) + rho[N]*(3 + 2*alpha_sgn);
+    Y[N, N - 1] = rho[N - 1]*(1 + 2*alpha_sgn) + rho[N]*(1 + alpha_sgn);
     if N > 2 then
       for i in 2:N - 1 loop
-        Y[i, i - 1] = rho[i - 1]*((l/12)*(2*alpha_sgn + 1)) + rho[i]*((l/12)*
-          (alpha_sgn + 1));
-        Y[i, i] = rho[i - 1]*((l/12)*(alpha_sgn + 1)) + rho[i]*(l/2) + rho[i
-           + 1]*(-(l/12)*(alpha_sgn - 1));
-        Y[i, i + 1] = rho[i]*((-l/12)*(alpha_sgn - 1)) + rho[i + 1]*((-l/12)*
-          (2*alpha_sgn - 1));
+        Y[i, i - 1] = rho[i - 1]*(1 + 2*alpha_sgn) + rho[i]*(1 + alpha_sgn);
+        Y[i, i] = rho[i - 1]*(1 + alpha_sgn) + rho[i]*6 + rho[i + 1]*(1 -
+          alpha_sgn);
+        Y[i, i + 1] = rho[i]*(1 - alpha_sgn) + rho[i + 1]*(1 - 2*alpha_sgn);
         Y[1, i + 1] = 0;
         Y[N, i - 1] = 0;
         for j in 1:(i - 2) loop
@@ -2029,13 +2626,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         end for;
       end for;
     end if;
-    
+
     for i in 1:N loop
       for j in 1:N loop
         YY[i, j] = if (i <> j) then 0 else sum(Y[:, j]);
       end for;
     end for;
-    
+
     M[1, 1] = l/3 - l*alpha_sgn/4;
     M[N, N] = l/3 + l*alpha_sgn/4;
     M[1, 2] = l/6 - l*alpha_sgn/4;
@@ -2055,18 +2652,20 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         end for;
       end for;
     end if;
-    
-    B[1, 1] = (-1/3 + alpha_sgn/4)*w[1] + (-1/6 + alpha_sgn/4)*w[2];
-    B[1, 2] = (1/3 - alpha_sgn/4)*w[1] + (1/6 - alpha_sgn/4)*w[2];
-    B[N, N] = (1/6 + alpha_sgn/4)*w[N - 1] + (1/3 + alpha_sgn/4)*w[N];
-    B[N, N - 1] = (-1/(6) - alpha_sgn/4)*w[N - 1] + (-1/3 - alpha_sgn/4)*w[N];
+
+    B[1, 1] = (-1/(3) + alpha_sgn/4)*w[1] + (-1/(6) + alpha_sgn/4)*w[2];
+    B[1, 2] = (1/(3) - alpha_sgn/4)*w[1] + (1/(6) - alpha_sgn/4)*w[2];
+    B[N, N] = (1/(6) + alpha_sgn/4)*w[N - 1] + (1/(3) + alpha_sgn/4)*w[N];
+    B[N, N - 1] = (-1/(6) - alpha_sgn/4)*w[N - 1] + (-1/(3) - alpha_sgn/4)*w[
+      N];
     if N > 2 then
       for i in 2:N - 1 loop
-        B[i, i - 1] = (-1/6 - alpha_sgn/4)*w[i - 1] + (-1/3 - alpha_sgn/4)*w[
-          i];
-        B[i, i] = (1/6 + alpha_sgn/4)*w[i - 1] + (alpha_sgn/2)*w[i] + (-1/6
-           + alpha_sgn/4)*w[i + 1];
-        B[i, i + 1] = (1/3 - alpha_sgn/4)*w[i] + (1/6 - alpha_sgn/4)*w[i + 1];
+        B[i, i - 1] = (-1/(6) - alpha_sgn/4)*w[i - 1] + (-1/(3) - alpha_sgn/4)
+          *w[i];
+        B[i, i] = (1/(6) + alpha_sgn/4)*w[i - 1] + (alpha_sgn/2)*w[i] + (-1/(
+          6) + alpha_sgn/4)*w[i + 1];
+        B[i, i + 1] = (1/(3) - alpha_sgn/4)*w[i] + (1/(6) - alpha_sgn/4)*w[i
+           + 1];
         B[1, i + 1] = 0;
         B[N, i - 1] = 0;
         for j in 1:(i - 2) loop
@@ -2077,20 +2676,17 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         end for;
       end for;
     end if;
-    
-    if Medium.singleState then
-      G=zeros(N) "No influence of pressure";
-    else
-      G[1] = l/2*(1 - alpha_sgn);
-      G[N] = l/2*(1 + alpha_sgn);
-      if N > 2 then
-        for i in 2:N - 1 loop
-          G[i] = l;
-        end for;
-      end if;
+
+    G[1] = l/2*(1 - alpha_sgn);
+    G[N] = l/2*(1 + alpha_sgn);
+    if N > 2 then
+      for i in 2:N - 1 loop
+        G[i] = l;
+      end for;
     end if;
-    
-    //boundary condition matrices
+
+    //boundary conditions
+
     C[1, 1] = if noEvent(infl.w >= 0) then (1 - alpha_sgn/2)*w[1] else 0;
     C[N, N] = if noEvent(outfl.w >= 0) then -(1 + alpha_sgn/2)*w[N] else 0;
     C[N, 1] = 0;
@@ -2104,9 +2700,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         end for;
       end for;
     end if;
-    
-    K[1, 1] = if noEvent(infl.w >= 0) then (1 - alpha_sgn/2)*infl.hBA else 0;
-    K[N, N] = if noEvent(outfl.w >= 0) then -(1 + alpha_sgn/2)*outfl.hAB else 
+
+    K[1, 1] = if noEvent(infl.w >= 0) then (1 - alpha_sgn/2)*inStream(infl.h) else 0;
+    K[N, N] = if noEvent(outfl.w >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h) else 
             0;
     K[N, 1] = 0;
     K[1, N] = 0;
@@ -2119,7 +2715,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         end for;
       end for;
     end if;
-    
+
     // Momentum and Mass balance equation matrices
     D[1] = l/2;
     D[N] = l/2;
@@ -2128,11 +2724,123 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         D[i] = l;
       end for;
     end if;
-    
+
+    by[1, 1] = 0;
+    by[2, 1] = 0;
+    by[3, 1] = l/12*rs[1]*(6 - 8*rs[1] + 3*rs[1]^2 + alpha_sgn*(2*rs[1] - 3));
+    by[4, 1] = -l/12*(1 - rs[1])^2*(2*alpha_sgn + 3*rs[1] - 3);
+    by[5, 1] = -l/12*rs[1]^2*(2*alpha_sgn + 3*rs[1] - 4);
+    by[6, 1] = -l/12*(1 - rs[1])*(3*rs[1]^2 - 2*rs[1] + 2*alpha_sgn*rs[1] +
+      alpha_sgn - 1);
+    by[7, 1] = 0;
+    by[8, 1] = 0;
+    by[1, N] = l/12*rs[N - 1]^2*(2*alpha_sgn + 3*rs[N - 1]);
+    by[2, N] = l/12*(1 - rs[N - 1])*(1 + alpha_sgn + 2*rs[N - 1] + 2*
+      alpha_sgn*rs[N - 1] + 3*rs[N - 1]^2);
+    by[3, N] = 0;
+    by[4, N] = 0;
+    by[5, N] = 0;
+    by[6, N] = 0;
+    by[7, N] = l/12*rs[N - 1]*(alpha_sgn*(3 - 2*rs[N - 1]) + rs[N - 1]*(4 - 3
+      *rs[N - 1]));
+    by[8, N] = l/12*(1 - rs[N - 1])^2*(2*alpha_sgn + 3*rs[N - 1] + 1);
+    if N > 2 then
+      for i in 2:N - 1 loop
+        by[1, i] = l/12*rs[i - 1]^2*(2*alpha_sgn + 3*rs[i - 1]);
+        by[2, i] = l/12*(1 - rs[i - 1])*(1 + alpha_sgn + 2*rs[i - 1] + 2*
+          alpha_sgn*rs[i - 1] + 3*rs[i - 1]^2);
+
+        by[3, i] = l/12*rs[i]*(6 - 8*rs[i] + 3*rs[i]^2 + alpha_sgn*(2*rs[i]
+           - 3));
+        by[4, i] = -l/12*(1 - rs[i])^2*(2*alpha_sgn + 3*rs[i] - 3);
+
+        by[5, i] = -l/12*rs[i]^2*(2*alpha_sgn + 3*rs[i] - 4);
+        by[6, i] = -l/12*(1 - rs[i])*(3*rs[i]^2 - 2*rs[i] + 2*alpha_sgn*rs[i]
+           + alpha_sgn - 1);
+        by[7, i] = l/12*rs[i - 1]*(alpha_sgn*(3 - 2*rs[i - 1]) + rs[i - 1]*(4
+           - 3*rs[i - 1]));
+        by[8, i] = l/12*(1 - rs[i - 1])^2*(2*alpha_sgn + 3*rs[i - 1] + 1);
+      end for;
+    end if;
+
+    //additional 2 phases Y-matrix
+    Y2ph[1, 1] = (gamma_rho[1]*by[3, 1] + gamma_rho[1]*by[4, 1]);
+    Y2ph[1, 2] = (gamma_rho[1]*by[5, 1] + gamma_rho[1]*by[6, 1]);
+    Y2ph[N, N] = (gamma_rho[N - 1]*by[1, N] + gamma_rho[N - 1]*by[2, N]);
+    Y2ph[N, N - 1] = (gamma_rho[N - 1]*by[7, N] + gamma_rho[N - 1]*by[8, N]);
+    if N > 2 then
+      for i in 2:N - 1 loop
+        Y2ph[i, i - 1] = (gamma_rho[i - 1]*by[7, i] + gamma_rho[i - 1]*by[8,
+          i]);
+        Y2ph[i, i] = (gamma_rho[i - 1]*by[1, i] + gamma_rho[i - 1]*by[2, i])
+           + (gamma_rho[i]*by[3, i] + gamma_rho[i]*by[4, i]);
+        Y2ph[i, i + 1] = (gamma_rho[i]*by[5, i] + gamma_rho[i]*by[6, i]);
+        Y2ph[1, i + 1] = 0;
+        Y2ph[N, i - 1] = 0;
+        for j in 1:(i - 2) loop
+          Y2ph[i, j] = 0;
+        end for;
+        for j in (i + 2):N loop
+          Y2ph[i, j] = 0;
+        end for;
+      end for;
+    end if;
+
+    //computation of beta functions for additional matrices
+    beta[1, 1] = 0;
+    beta[2, 1] = 0;
+    beta[3, 1] = 1/12*rs[1]*(3*alpha_sgn + 4*rs[1] - 6);
+    beta[4, 1] = 1/12*(1 - rs[1])*(3*alpha_sgn + 4*rs[1] - 4);
+    beta[5, 1] = -beta[3, 1];
+    beta[6, 1] = -beta[4, 1];
+    beta[7, 1] = 0;
+    beta[8, 1] = 0;
+    beta[1, N] = 1/12*rs[N - 1]*(3*alpha_sgn + 4*rs[N - 1]);
+    beta[2, N] = 1/12*(1 - rs[N - 1])*(3*alpha_sgn + 4*rs[N - 1] + 2);
+    beta[3, N] = 0;
+    beta[4, N] = 0;
+    beta[5, N] = 0;
+    beta[6, N] = 0;
+    beta[7, N] = -beta[1, N];
+    beta[8, N] = -beta[2, N];
+    if N > 2 then
+      for i in 2:N - 1 loop
+        beta[1, i] = 1/12*rs[i - 1]*(3*alpha_sgn + 4*rs[i - 1]);
+        beta[2, i] = 1/12*(1 - rs[i - 1])*(3*alpha_sgn + 4*rs[i - 1] + 2);
+        beta[3, i] = 1/12*rs[i]*(3*alpha_sgn + 4*rs[i] - 6);
+        beta[4, i] = 1/12*(1 - rs[i])*(3*alpha_sgn + 4*rs[i] - 4);
+        beta[5, i] = -beta[3, i];
+        beta[6, i] = -beta[4, i];
+        beta[7, i] = -beta[1, i];
+        beta[8, i] = -beta[2, i];
+      end for;
+    end if;
+
+    //additional 2 phases B-matrix
+    B2ph[1, 1] = (gamma_w[1]*beta[3, 1] + gamma_w[1]*beta[4, 1]);
+    B2ph[1, 2] = (gamma_w[1]*beta[5, 1] + gamma_w[1]*beta[6, 1]);
+    B2ph[N, N] = (gamma_w[N - 1]*beta[1, N] + gamma_w[N - 1]*beta[2, N]);
+    B2ph[N, N - 1] = (gamma_w[N - 1]*beta[7, N] + gamma_w[N - 1]*beta[8, N]);
+    if N > 2 then
+      for i in 2:N - 1 loop
+        B2ph[i, i - 1] = (gamma_w[i - 1]*beta[7, i] + gamma_w[i - 1]*beta[8,
+          i]);
+        B2ph[i, i] = (gamma_w[i - 1]*beta[1, i] + gamma_w[i - 1]*beta[2, i])
+           + (gamma_w[i]*beta[3, i] + gamma_w[i]*beta[4, i]);
+        B2ph[i, i + 1] = (gamma_w[i]*beta[5, i] + gamma_w[i]*beta[6, i]);
+        B2ph[1, i + 1] = 0;
+        B2ph[N, i - 1] = 0;
+        for j in 1:(i - 2) loop
+          B2ph[i, j] = 0;
+        end for;
+        for j in (i + 2):N loop
+          B2ph[i, j] = 0;
+        end for;
+      end for;
+    end if;
     Q = Nt*l*omega*D*phi "Total heat flow through lateral boundary";
-    Tr=noEvent(sum(rho)*A*l/max(infl.w/Nt,Modelica.Constants.eps)) 
-      "Residence time";
-  initial equation 
+    Tr=noEvent(sum(rho)*A*l/max(infl.w/Nt,Modelica.Constants.eps));
+  initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
@@ -2145,111 +2853,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     else
       assert(false, "Unsupported initialisation option");
     end if;
-  end Flow1Dfem;
-  
-  model Flow1Dfem2ph 
-    "1-dimensional fluid flow model for water/steam (finite elements)" 
-    import Modelica.Math.*;
-    import ThermoPower.Choices.Flow1D.FFtypes;
-    extends Flow1DBase(redeclare replaceable package Medium = StandardWater extends 
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
-    package SmoothMedium=Medium(final smoothModel = true);
-    parameter Real alpha(
-      min=0,
-      max=2) = 1 "Numerical stabilization coefficient";
-    parameter Real ML(
-      min=0,
-      max=1) = 0.2 "Mass Lumping Coefficient";
-    constant Real g=Modelica.Constants.g_n;
-    constant Pressure pzero=10 "Small deltap for calculations";
-    constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
-    constant SpecificEnthalpy hzero=1e-3;
-    SmoothMedium.BaseProperties fluid[N] "Properties of the fluid at the nodes";
-    Medium.SaturationProperties sat "Properties of saturated fluid";
-    Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
-    Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
-    Length omega_hyd "Hydraulic perimeter (single tube)";
-    Real dwdt "Dynamic momentum term";
-    Medium.AbsolutePressure p(start=if HydraulicCapacitance==1 then pstartin else 
-           pstartout) "Fluid pressure";
-    Pressure Dpfric "Pressure drop due to friction";
-    Pressure Dpstat "Pressure drop due to static head";
-    MassFlowRate w[N](start=wnom*ones(N)) "Mass flowrate (single tube)";
-    Velocity u[N] "Fluid velocity";
-    HeatFlux phi[N] "External heat flux";
-    Medium.Temperature T[N] "Fluid temperature";
-    Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
-    Medium.Density rho[N] "Fluid density";
-    SpecificVolume v[N] "Fluid specific volume";
-    
-    Medium.Temperature Ts "Saturation temperature";
-    Medium.SpecificEnthalpy hl "Saturated liquid specific enthalpy";
-    Medium.SpecificEnthalpy hv "Saturated vapour specific enthalpy";
-    Real x[N] "Steam quality";
-    LiquidDensity rhol "Saturated liquid density";
-    GasDensity rhov "Saturated vapour density";
-  protected 
-    DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
-    DerDensityByPressure drdp[N] "Derivative of density by pressure";
-    
-    Real Kf[N] "Friction coefficient";
-    Real Kfl[N] "Linear friction coefficient";
-    Real Cf[N] "Fanning friction factor";
-    
-    DerDensityByPressure drl_dp 
-      "Derivative of liquid density by pressure just before saturation";
-    DerDensityByPressure drv_dp 
-      "Derivative of vapour density by pressure just before saturation";
-    DerDensityByEnthalpy drl_dh 
-      "Derivative of liquid density by enthalpy just before saturation";
-    DerDensityByEnthalpy drv_dh 
-      "Derivative of vapour density by enthalpy just before saturation";
-    
-    Real dhl "Derivative of saturated liquid enthalpy by pressure";
-    Real dhv "Derivative of saturated vapour enthalpy by pressure";
-    
-    Real drl "Derivative of saturatd liquid density by pressure";
-    Real drv "Derivative of saturated vapour density by pressure";
-    
-    Density rhos[N - 1];
-    MassFlowRate ws[N - 1];
-    Real rs[N - 1];
-    
-    Real Y[N, N];
-    Real YY[N, N];
-    
-    Real Y2ph[N, N];
-    Real M[N, N];
-    Real D[N];
-    Real G[N];
-    Real B[N, N];
-    Real B2ph[N, N];
-    Real C[N, N];
-    Real K[N, N];
-    
-    Real by[8, N];
-    Real beta[8, N];
-    //coefficients matrix for 2-phases augmented FEM matrices 
-    Real alpha_sgn;
-    
-    Real gamma_rho[N - 1];
-    Real gamma_w[N - 1];
-    //coefficients for gamma functions
-    
-    Real a;
-    Real b;
-    Real betap;
-    Real c;
-    Real d;
-    Real ee[N - 1];
-    Real f[N - 1];
-    
-    Real dMbif[N - 1];
-    Real dMmono[N - 1];
-    
     annotation (
-      Diagram,
-      Icon(Text(extent=[-100, -52; 100, -82], string="%name")),
+      Diagram(graphics),
+      Icon(graphics={Text(extent={{-100,-52},{100,-82}}, textString=
+                                                     "%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is either one-phase, or a two-phase mixture.
@@ -2305,567 +2912,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </ul>
 </html>
 "));
-  equation 
-    //All equations are referred to a single tube
-    
-    // Selection of representative pressure and flow rate variables
-    if HydraulicCapacitance == 1 then
-      p = infl.p;
-    else
-      p = outfl.p;
-    end if;
-    
-    //Friction factor calculation
-    omega_hyd = 4*A/Dhyd;
-    for i in 1:N loop
-      if FFtype == FFtypes.Kfnom then
-        Kf[i] = Kfnom*Kfc;
-        Cf[i] = 2*Kf[i]*A^3/(omega_hyd*L);
-      elseif FFtype == FFtypes.OpPoint then
-        Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-        Cf[i] = 2*Kf[i]*A^3/(omega_hyd*L);
-      elseif FFtype == FFtypes.Cfnom then
-        Kf[i] = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
-        Cf[i] = Cfnom*Kfc;
-      elseif FFtype == FFtypes.Colebrook then
-        if noEvent(h[i] < hl or h[i] > hv) then
-          Cf[i] = f_colebrook(w[i], Dhyd/A, e,
-            Medium.dynamicViscosity(fluid[i].state))*Kfc;
-        else
-          Cf[i] = f_colebrook_2ph(w[i], Dhyd/A, e,
-            Medium.dynamicViscosity(bubble),
-            Medium.dynamicViscosity(dew), x[i])*Kfc;
-        end if;
-        Kf[i] = Cf[i]*omega_hyd*L/(2*A^3);
-      elseif FFtype == FFtypes.NoFriction then
-        Cf[i] = 0;
-        Kf[i] = 0;
-      end if;
-      assert(Kf[i]>=0, "Negative friction coefficient");
-      Kfl[i] = wnom/Nt*wnf*Kf[i];
-    end for;
-    
-    //Dynamic Momentum [not] accounted for
-    if DynamicMomentum then
-      if HydraulicCapacitance == 1 then
-        dwdt = -der(outfl.w)/Nt;
-      else
-        dwdt = der(infl.w)/Nt;
-      end if;
-      
-    else
-      dwdt = 0;
-    end if;
-    
-    //Momentum balance equation
-    L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0;
-    
-    w[1] = infl.w/Nt;
-    w[N] = -outfl.w/Nt;
-    
-    Dpfric = if FFtype == FFtypes.NoFriction then 0 else 
-      sum((Kf[i]*w[i]*noEvent(abs(w[i]))/rho[i] + Kfl[i]*w[i]/rho[i])*
-      D[i] for i in 1:N)/L;
-    Dpstat = if abs(dzdx)<1e-6 then 0 else g*dzdx*rho*D 
-      "Pressure drop due to static head";
-    
-    //Energy balance equations 
-    l/12*((1 - ML)*Y + ML*YY + 0*Y2ph)*der(h) + (1/A)*(B + 0*B2ph)*h + C*h/A
-      = der(p)*G + M*(omega/A)*phi + K*w/A;
-    
-  //  (Ts,rhol,rhov,hl,hv,drl_dp,drv_dp,drl_dh,drv_dh,dhl,dhv,drl,drv) =
-  //  propsat_p_2der(noEvent(min(p, pc - pzero)));
-    
-    sat.psat=p;
-    sat.Tsat=Medium.saturationTemperature(p);
-    Ts=sat.Tsat;
-    bubble=Medium.setBubbleState(sat);
-    dew=Medium.setDewState(sat);
-    rhol=Medium.bubbleDensity(sat);
-    rhov=Medium.dewDensity(sat);
-    hl=Medium.bubbleEnthalpy(sat);
-    hv=Medium.dewEnthalpy(sat);
-    drl=Medium.dBubbleDensity_dPressure(sat);
-    drv=Medium.dDewDensity_dPressure(sat);
-    dhl=Medium.dBubbleEnthalpy_dPressure(sat);
-    dhv=Medium.dDewEnthalpy_dPressure(sat);
-    drl_dp=Medium.density_derp_h(bubble);
-    drv_dp=Medium.density_derp_h(dew);
-    drl_dh=Medium.density_derh_p(bubble);
-    drv_dh=Medium.density_derh_p(dew);
-    
-    a = ((hv - hl)*(rhol^2*drv + rhov^2*drl) + rhov*rhol*(rhol - rhov)*(dhv
-       - dhl))/(rhol - rhov)^2;
-    
-    betap = ((rhol - rhov)*(rhov*dhv - rhol*dhl) + (hv - hl)*(rhol*drv - rhov
-      *drl))/(rhol - rhov)^2;
-    
-    b = a*c + d*betap;
-    
-    c = (rhov*hv - rhol*hl)/(rhol - rhov);
-    
-    d = -rhol*rhov*(hv - hl)/(rhol - rhov);
-    
-    //Computation of fluid properties 
-    for i in 1:N loop
-      fluid[i].p=p;
-      fluid[i].h=h[i];
-      T[i]=fluid[i].T;
-      rho[i]=fluid[i].d;
-      drdp[i]=Medium.density_derp_h(fluid[i].state);
-      drdh[i]=Medium.density_derh_p(fluid[i].state);
-      v[i] = 1/rho[i];
-      u[i] = w[i]/(rho[i]*A);
-      x[i]=noEvent(if h[i]<=hl then 0 else 
-                if h[i]>=hv then 1 else (h[i]-hl)/(hv-hl));
-    end for;
-    
-    //Wall energy flux and  temperature
-    T = wall.T;
-    phi = wall.phi;
-    
-    //Boundary Values
-    
-    h[1] = infl.hAB;
-    h[N] = outfl.hBA;
-    
-    alpha_sgn = alpha*sign(infl.w - outfl.w);
-    
-    //phase change determination
-    for i in 1:N - 1 loop
-      (w[i] - w[i + 1]) = dMmono[i] + dMbif[i];
-      if noEvent(abs(h[i + 1] - h[i]) < hzero) then
-        
-        rs[i] = 0;
-        rhos[i] = 0;
-        gamma_rho[i] = 0;
-        
-        gamma_w[i] = 0;
-        ws[i] = 0;
-        
-        dMmono[i] = A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[i])*
-          (2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i + 1])));
-        dMbif[i] = 0;
-        
-        ee[i] = 0;
-        f[i] = 0;
-      else
-        
-        if noEvent((h[i] < hl) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
-          //liquid - two phase
-          
-          rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
-          rhos[i] = rhol;
-          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
-          
-          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
-          
-          (w[i] - ws[i]) = dMmono[i];
-          
-          dMmono[i] = A*rs[i]*l*(der(p)*1/2*(drl_dp + drdp[i]) + 1/6*(der(h[i])
-            *(2*drdh[i] + drl_dh) + (der(h[i])*(1 - rs[i]) + der(h[i + 1])*rs[
-            i])*(drdh[i] + 2*drl_dh)));
-          
-          dMbif[i] = A*(1 - rs[i])*l/(h[i + 1] - hl)*(der(p)*((b - a*c)*(h[i
-             + 1] - hl)/((c + h[i + 1])*(c + hl)) + a*log((c + h[i + 1])/(c
-             + hl))) + ((d*f[i] - d*c*ee[i])*(h[i + 1] - hl)/((c + h[i + 1])*
-            (c + hl)) + d*ee[i]*log((c + h[i + 1])/(c + hl))));
-          
-          //(der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) = 0;
-          
-          ee[i] = (der(h[i + 1]) - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])))
-            /(h[i + 1] - hl);
-          f[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i + 1] -
-            der(h[i + 1])*hl)/(h[i + 1] - hl);
-          
-        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] < hl)) then
-          //two phase-liquid
-          
-          rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
-          rhos[i] = rhol;
-          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
-          
-          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
-          
-          (w[i] - ws[i]) = dMbif[i];
-          
-          dMmono[i] = A*(1 - rs[i])*l*(der(p)*1/2*(drdp[i + 1] + drl_dp) + 1/
-            6*(der(h[i])*(2*drl_dh + drdh[i + 1]) + (der(h[i + 1])*rs[i] +
-            der(h[i])*(1 - rs[i]))*(drl_dh + 2*drdh[i + 1])));
-          
-          dMbif[i] = A*rs[i]*l/(hl - h[i])*(der(p)*((b - a*c)*(hl - h[i])/((c
-             + hl)*(c + h[i])) + a*log((c + hl)/(c + h[i]))) + ((d*f[i] - d*c
-            *ee[i])*(hl - h[i])/((c + hl)*(c + h[i])) + d*ee[i]*log((c + hl)/
-            (c + h[i]))));
-          
-          ee[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) - der(h[i]))
-            /(hl - h[i]);
-          f[i] = (der(h[i])*hl - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))
-            *h[i])/(hl - h[i]);
-          
-        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] > hv)) then
-          //two phase - vapour
-          
-          rs[i] = (hv - h[i])/(h[i + 1] - h[i]);
-          rhos[i] = rhov;
-          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
-          
-          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
-          (w[i] - ws[i]) = dMbif[i];
-          
-          dMmono[i] = A*(1 - rs[i])*l*(der(p)*1/2*(drdp[i + 1] + drv_dp) + 1/
-            6*(der(h[i])*(2*drv_dh + drdh[i + 1]) + (der(h[i + 1])*rs[i] +
-            der(h[i])*(1 - rs[i]))*(drv_dh + 2*drdh[i + 1])));
-          
-          dMbif[i] = A*rs[i]*l/(hv - h[i])*(der(p)*((b - a*c)*(hv - h[i])/((c
-             + hv)*(c + h[i])) + a*log((c + hv)/(c + h[i]))) + ((d*f[i] - d*c
-            *ee[i])*(hv - h[i])/((c + hv)*(c + h[i])) + d*ee[i]*log((c + hv)/
-            (c + h[i]))));
-          
-          ee[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) - der(h[i]))
-            /(hv - h[i]);
-          f[i] = (der(h[i])*hv - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))
-            *h[i])/(hv - h[i]);
-          
-        elseif noEvent((h[i] > hv) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
-          // vapour - two phase
-          
-          rs[i] = (hv - h[i])/(h[i + 1] - h[i]);
-          rhos[i] = rhov;
-          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
-          
-          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
-          (w[i] - ws[i]) = dMmono[i];
-          
-          dMmono[i] = A*rs[i]*l*(der(p)*1/2*(drv_dp + drdp[i]) + 1/6*(der(h[i])
-            *(2*drdh[i] + drv_dh) + (der(h[i])*(1 - rs[i]) + der(h[i + 1])*rs[
-            i])*(drdh[i] + 2*drv_dh)));
-          
-          dMbif[i] = A*(1 - rs[i])*(der(p)*((b - a*c)*(h[i + 1] - hv)/((c + h[
-            i + 1])*(c + hv)) + a*log((c + h[i + 1])/(c + hv))) + ((d*f[i] -
-            d*c*ee[i])*(h[i + 1] - hv)/((c + h[i + 1])*(c + hv)) + d*ee[i]*
-            log((c + h[i + 1])/(c + hv))));
-          
-          ee[i] = (der(h[i + 1]) - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])))
-            /(h[i + 1] - hv);
-          f[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i + 1] -
-            der(h[i + 1])*hv)/(h[i + 1] - hv);
-          
-        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] >= hl)
-             and (h[i + 1] <= hv)) then
-          //two phase
-          rs[i] = 0;
-          rhos[i] = 0;
-          gamma_rho[i] = 0;
-          
-          gamma_w[i] = 0;
-          
-          ws[i] = 0;
-          
-          dMmono[i] = 0;
-          
-          dMbif[i] = A*l/(h[i + 1] - h[i])*(der(p)*((b - a*c)*(h[i + 1] - h[i])
-            /((c + h[i + 1])*(c + h[i])) + a*log((c + h[i + 1])/(c + h[i])))
-             + ((d*f[i] - d*c*ee[i])*(h[i + 1] - h[i])/((c + h[i + 1])*(c + h[
-            i])) + d*ee[i]*log((c + h[i + 1])/(c + h[i]))));
-          
-          ee[i] = (der(h[i + 1]) - der(h[i]))/(h[i + 1] - h[i]);
-          f[i] = (der(h[i])*h[i + 1] - der(h[i + 1])*h[i])/(h[i + 1] - h[i]);
-          
-        elseif noEvent(((h[i] < hl) and (h[i + 1] < hl)) or ((h[i] > hv) and 
-            (h[i + 1] > hv))) then
-          
-          //single-phase
-          rs[i] = 0;
-          rhos[i] = 0;
-          gamma_rho[i] = 0;
-          
-          gamma_w[i] = 0;
-          ws[i] = 0;
-          
-          dMmono[i] = A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[i])
-            *(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i +
-            1])));
-          dMbif[i] = 0;
-          
-          ee[i] = 0;
-          f[i] = 0;
-        else
-          //double transition (not supported!)
-          assert(0 > 1,
-            "Error: two phase trasitions between two adiacent nodes. Try increasing the number of nodes");
-          rs[i] = 0;
-          rhos[i] = 0;
-          gamma_rho[i] = 0;
-          
-          gamma_w[i] = 0;
-          ws[i] = 0;
-          
-          dMmono[i] = 0;
-          dMbif[i] = 0;
-          
-          ee[i] = 0;
-          f[i] = 0;
-        end if;
-      end if;
-    end for;
-    
-    // Energy equation FEM matrices
-    
-    Y[1, 1] = rho[1]*(3 - 2*alpha_sgn) + rho[2]*(1 - alpha_sgn);
-    Y[1, 2] = rho[1]*(1 - alpha_sgn) + rho[2]*(1 - 2*alpha_sgn);
-    Y[N, N] = rho[N - 1]*(alpha_sgn + 1) + rho[N]*(3 + 2*alpha_sgn);
-    Y[N, N - 1] = rho[N - 1]*(1 + 2*alpha_sgn) + rho[N]*(1 + alpha_sgn);
-    if N > 2 then
-      for i in 2:N - 1 loop
-        Y[i, i - 1] = rho[i - 1]*(1 + 2*alpha_sgn) + rho[i]*(1 + alpha_sgn);
-        Y[i, i] = rho[i - 1]*(1 + alpha_sgn) + rho[i]*6 + rho[i + 1]*(1 -
-          alpha_sgn);
-        Y[i, i + 1] = rho[i]*(1 - alpha_sgn) + rho[i + 1]*(1 - 2*alpha_sgn);
-        Y[1, i + 1] = 0;
-        Y[N, i - 1] = 0;
-        for j in 1:(i - 2) loop
-          Y[i, j] = 0;
-        end for;
-        for j in (i + 2):N loop
-          Y[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    for i in 1:N loop
-      for j in 1:N loop
-        YY[i, j] = if (i <> j) then 0 else sum(Y[:, j]);
-      end for;
-    end for;
-    
-    M[1, 1] = l/3 - l*alpha_sgn/4;
-    M[N, N] = l/3 + l*alpha_sgn/4;
-    M[1, 2] = l/6 - l*alpha_sgn/4;
-    M[N, (N - 1)] = l/6 + l*alpha_sgn/4;
-    if N > 2 then
-      for i in 2:N - 1 loop
-        M[i, i - 1] = l/6 + l*alpha_sgn/4;
-        M[i, i] = 2*l/3;
-        M[i, i + 1] = l/6 - l*alpha_sgn/4;
-        M[1, i + 1] = 0;
-        M[N, i - 1] = 0;
-        for j in 1:(i - 2) loop
-          M[i, j] = 0;
-        end for;
-        for j in (i + 2):N loop
-          M[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    B[1, 1] = (-1/(3) + alpha_sgn/4)*w[1] + (-1/(6) + alpha_sgn/4)*w[2];
-    B[1, 2] = (1/(3) - alpha_sgn/4)*w[1] + (1/(6) - alpha_sgn/4)*w[2];
-    B[N, N] = (1/(6) + alpha_sgn/4)*w[N - 1] + (1/(3) + alpha_sgn/4)*w[N];
-    B[N, N - 1] = (-1/(6) - alpha_sgn/4)*w[N - 1] + (-1/(3) - alpha_sgn/4)*w[
-      N];
-    if N > 2 then
-      for i in 2:N - 1 loop
-        B[i, i - 1] = (-1/(6) - alpha_sgn/4)*w[i - 1] + (-1/(3) - alpha_sgn/4)
-          *w[i];
-        B[i, i] = (1/(6) + alpha_sgn/4)*w[i - 1] + (alpha_sgn/2)*w[i] + (-1/(
-          6) + alpha_sgn/4)*w[i + 1];
-        B[i, i + 1] = (1/(3) - alpha_sgn/4)*w[i] + (1/(6) - alpha_sgn/4)*w[i
-           + 1];
-        B[1, i + 1] = 0;
-        B[N, i - 1] = 0;
-        for j in 1:(i - 2) loop
-          B[i, j] = 0;
-        end for;
-        for j in (i + 2):N loop
-          B[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    G[1] = l/2*(1 - alpha_sgn);
-    G[N] = l/2*(1 + alpha_sgn);
-    if N > 2 then
-      for i in 2:N - 1 loop
-        G[i] = l;
-      end for;
-    end if;
-    
-    //boundary conditions
-    
-    C[1, 1] = if noEvent(infl.w >= 0) then (1 - alpha_sgn/2)*w[1] else 0;
-    C[N, N] = if noEvent(outfl.w >= 0) then -(1 + alpha_sgn/2)*w[N] else 0;
-    C[N, 1] = 0;
-    C[1, N] = 0;
-    if (N > 2) then
-      for i in 2:(N - 1) loop
-        C[1, i] = 0;
-        C[N, i] = 0;
-        for j in 1:N loop
-          C[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    K[1, 1] = if noEvent(infl.w >= 0) then (1 - alpha_sgn/2)*infl.hBA else 0;
-    K[N, N] = if noEvent(outfl.w >= 0) then -(1 + alpha_sgn/2)*outfl.hAB else 
-            0;
-    K[N, 1] = 0;
-    K[1, N] = 0;
-    if (N > 2) then
-      for i in 2:(N - 1) loop
-        K[1, i] = 0;
-        K[N, i] = 0;
-        for j in 1:N loop
-          K[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    // Momentum and Mass balance equation matrices
-    D[1] = l/2;
-    D[N] = l/2;
-    if N > 2 then
-      for i in 2:N - 1 loop
-        D[i] = l;
-      end for;
-    end if;
-    
-    by[1, 1] = 0;
-    by[2, 1] = 0;
-    by[3, 1] = l/12*rs[1]*(6 - 8*rs[1] + 3*rs[1]^2 + alpha_sgn*(2*rs[1] - 3));
-    by[4, 1] = -l/12*(1 - rs[1])^2*(2*alpha_sgn + 3*rs[1] - 3);
-    by[5, 1] = -l/12*rs[1]^2*(2*alpha_sgn + 3*rs[1] - 4);
-    by[6, 1] = -l/12*(1 - rs[1])*(3*rs[1]^2 - 2*rs[1] + 2*alpha_sgn*rs[1] +
-      alpha_sgn - 1);
-    by[7, 1] = 0;
-    by[8, 1] = 0;
-    by[1, N] = l/12*rs[N - 1]^2*(2*alpha_sgn + 3*rs[N - 1]);
-    by[2, N] = l/12*(1 - rs[N - 1])*(1 + alpha_sgn + 2*rs[N - 1] + 2*
-      alpha_sgn*rs[N - 1] + 3*rs[N - 1]^2);
-    by[3, N] = 0;
-    by[4, N] = 0;
-    by[5, N] = 0;
-    by[6, N] = 0;
-    by[7, N] = l/12*rs[N - 1]*(alpha_sgn*(3 - 2*rs[N - 1]) + rs[N - 1]*(4 - 3
-      *rs[N - 1]));
-    by[8, N] = l/12*(1 - rs[N - 1])^2*(2*alpha_sgn + 3*rs[N - 1] + 1);
-    if N > 2 then
-      for i in 2:N - 1 loop
-        by[1, i] = l/12*rs[i - 1]^2*(2*alpha_sgn + 3*rs[i - 1]);
-        by[2, i] = l/12*(1 - rs[i - 1])*(1 + alpha_sgn + 2*rs[i - 1] + 2*
-          alpha_sgn*rs[i - 1] + 3*rs[i - 1]^2);
-        
-        by[3, i] = l/12*rs[i]*(6 - 8*rs[i] + 3*rs[i]^2 + alpha_sgn*(2*rs[i]
-           - 3));
-        by[4, i] = -l/12*(1 - rs[i])^2*(2*alpha_sgn + 3*rs[i] - 3);
-        
-        by[5, i] = -l/12*rs[i]^2*(2*alpha_sgn + 3*rs[i] - 4);
-        by[6, i] = -l/12*(1 - rs[i])*(3*rs[i]^2 - 2*rs[i] + 2*alpha_sgn*rs[i]
-           + alpha_sgn - 1);
-        by[7, i] = l/12*rs[i - 1]*(alpha_sgn*(3 - 2*rs[i - 1]) + rs[i - 1]*(4
-           - 3*rs[i - 1]));
-        by[8, i] = l/12*(1 - rs[i - 1])^2*(2*alpha_sgn + 3*rs[i - 1] + 1);
-      end for;
-    end if;
-    
-    //additional 2 phases Y-matrix
-    Y2ph[1, 1] = (gamma_rho[1]*by[3, 1] + gamma_rho[1]*by[4, 1]);
-    Y2ph[1, 2] = (gamma_rho[1]*by[5, 1] + gamma_rho[1]*by[6, 1]);
-    Y2ph[N, N] = (gamma_rho[N - 1]*by[1, N] + gamma_rho[N - 1]*by[2, N]);
-    Y2ph[N, N - 1] = (gamma_rho[N - 1]*by[7, N] + gamma_rho[N - 1]*by[8, N]);
-    if N > 2 then
-      for i in 2:N - 1 loop
-        Y2ph[i, i - 1] = (gamma_rho[i - 1]*by[7, i] + gamma_rho[i - 1]*by[8,
-          i]);
-        Y2ph[i, i] = (gamma_rho[i - 1]*by[1, i] + gamma_rho[i - 1]*by[2, i])
-           + (gamma_rho[i]*by[3, i] + gamma_rho[i]*by[4, i]);
-        Y2ph[i, i + 1] = (gamma_rho[i]*by[5, i] + gamma_rho[i]*by[6, i]);
-        Y2ph[1, i + 1] = 0;
-        Y2ph[N, i - 1] = 0;
-        for j in 1:(i - 2) loop
-          Y2ph[i, j] = 0;
-        end for;
-        for j in (i + 2):N loop
-          Y2ph[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    //computation of beta functions for additional matrices
-    beta[1, 1] = 0;
-    beta[2, 1] = 0;
-    beta[3, 1] = 1/12*rs[1]*(3*alpha_sgn + 4*rs[1] - 6);
-    beta[4, 1] = 1/12*(1 - rs[1])*(3*alpha_sgn + 4*rs[1] - 4);
-    beta[5, 1] = -beta[3, 1];
-    beta[6, 1] = -beta[4, 1];
-    beta[7, 1] = 0;
-    beta[8, 1] = 0;
-    beta[1, N] = 1/12*rs[N - 1]*(3*alpha_sgn + 4*rs[N - 1]);
-    beta[2, N] = 1/12*(1 - rs[N - 1])*(3*alpha_sgn + 4*rs[N - 1] + 2);
-    beta[3, N] = 0;
-    beta[4, N] = 0;
-    beta[5, N] = 0;
-    beta[6, N] = 0;
-    beta[7, N] = -beta[1, N];
-    beta[8, N] = -beta[2, N];
-    if N > 2 then
-      for i in 2:N - 1 loop
-        beta[1, i] = 1/12*rs[i - 1]*(3*alpha_sgn + 4*rs[i - 1]);
-        beta[2, i] = 1/12*(1 - rs[i - 1])*(3*alpha_sgn + 4*rs[i - 1] + 2);
-        beta[3, i] = 1/12*rs[i]*(3*alpha_sgn + 4*rs[i] - 6);
-        beta[4, i] = 1/12*(1 - rs[i])*(3*alpha_sgn + 4*rs[i] - 4);
-        beta[5, i] = -beta[3, i];
-        beta[6, i] = -beta[4, i];
-        beta[7, i] = -beta[1, i];
-        beta[8, i] = -beta[2, i];
-      end for;
-    end if;
-    
-    //additional 2 phases B-matrix
-    B2ph[1, 1] = (gamma_w[1]*beta[3, 1] + gamma_w[1]*beta[4, 1]);
-    B2ph[1, 2] = (gamma_w[1]*beta[5, 1] + gamma_w[1]*beta[6, 1]);
-    B2ph[N, N] = (gamma_w[N - 1]*beta[1, N] + gamma_w[N - 1]*beta[2, N]);
-    B2ph[N, N - 1] = (gamma_w[N - 1]*beta[7, N] + gamma_w[N - 1]*beta[8, N]);
-    if N > 2 then
-      for i in 2:N - 1 loop
-        B2ph[i, i - 1] = (gamma_w[i - 1]*beta[7, i] + gamma_w[i - 1]*beta[8,
-          i]);
-        B2ph[i, i] = (gamma_w[i - 1]*beta[1, i] + gamma_w[i - 1]*beta[2, i])
-           + (gamma_w[i]*beta[3, i] + gamma_w[i]*beta[4, i]);
-        B2ph[i, i + 1] = (gamma_w[i]*beta[5, i] + gamma_w[i]*beta[6, i]);
-        B2ph[1, i + 1] = 0;
-        B2ph[N, i - 1] = 0;
-        for j in 1:(i - 2) loop
-          B2ph[i, j] = 0;
-        end for;
-        for j in (i + 2):N loop
-          B2ph[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    Q = Nt*l*omega*D*phi "Total heat flow through lateral boundary";
-    Tr=noEvent(sum(rho)*A*l/max(infl.w/Nt,Modelica.Constants.eps));
-  initial equation 
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-    elseif initOpt == Choices.Init.Options.steadyState then
-      der(h) = zeros(N);
-      if (not Medium.singleState) then
-        der(p) = 0;
-      end if;
-    elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(h) = zeros(N);
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
   end Flow1Dfem2ph;
-  
-  model FlowJoin "Joins two water/steam flows" 
+
+  model FlowJoin "Joins two water/steam flows"
     extends Icons.Water.FlowJoin;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    constant MassFlowRate wzero=1e-9 
+    constant MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
     parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -2875,28 +2928,32 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_in1 or not rev_in2 or not rev_out));
     FlangeB out(p(start=pstart), redeclare package Medium = Medium) 
-                annotation (extent=[40, -20; 80, 20]);
+                annotation (Placement(transformation(extent={{40,-20},{80,20}},
+            rotation=0)));
     FlangeA in1(p(start=pstart), redeclare package Medium = Medium) 
-                annotation (extent=[-80, 20; -40, 60]);
+                annotation (Placement(transformation(extent={{-80,20},{-40,60}},
+            rotation=0)));
     FlangeA in2(p(start=pstart), redeclare package Medium = Medium) 
-                annotation (extent=[-80, -60; -40, -20]);
-  equation 
+                annotation (Placement(transformation(extent={{-80,-60},{-40,-20}},
+            rotation=0)));
+  equation
     in1.w + in2.w + out.w = 0 "Mass balance";
     in1.p = out.p;
     in2.p = out.p;
     // Energy balance
-    out.hBA = if (in2.w < 0 and rev_in2) then in1.hBA else if (in1.w < 0 and rev_in1) then in2.hBA else (
-      in1.hBA*(in1.w + wzero) + in2.hBA*(in2.w + wzero))/(in1.w + 2*wzero + in2.w);
-    in1.hAB = if (in2.w < 0 and rev_in2) then out.hAB else if (out.w < 0 or not rev_out) then in2.hBA else (
-      out.hAB*(out.w + wzero) + in2.hBA*(in2.w + wzero))/(out.w + 2*wzero + in2.w);
-    in2.hAB = if (in1.w < 0 and rev_in1) then out.hAB else if (out.w < 0 or not rev_out) then in1.hBA else (
-      out.hAB*(out.w + wzero) + in1.hBA*(in1.w + wzero))/(out.w + 2*wzero + in1.w);
+    out.h = if (in2.w < 0 and rev_in2) then inStream(in1.h) else if (in1.w < 0 and rev_in1) then inStream(in2.h) else (
+      inStream(in1.h)*(in1.w + wzero) + inStream(in2.h)*(in2.w + wzero))/(in1.w + 2*wzero + in2.w);
+    in1.h = if (in2.w < 0 and rev_in2) then inStream(out.h) else if (out.w < 0 or not rev_out) then inStream(in2.h) else (
+      inStream(out.h)*(out.w + wzero) + inStream(in2.h)*(in2.w + wzero))/(out.w + 2*wzero + in2.w);
+    in2.h = if (in1.w < 0 and rev_in1) then inStream(out.h) else if (out.w < 0 or not rev_out) then inStream(in1.h) else (
+      inStream(out.h)*(out.w + wzero) + inStream(in1.h)*(in1.w + wzero))/(out.w + 2*wzero + in1.w);
     //Check flow direction
     assert( not checkFlowDirection or ((rev_in1 or in1.w >= 0) and 
                                        (rev_in2 or in2.w >= 0) and 
                                        (rev_out or out.w <= 0)),
                                       "Flow reversal not supported");
-    annotation (Icon, Documentation(info="<HTML>
+    annotation (Icon(graphics),
+                      Documentation(info="<HTML>
 <p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
 <p><b>Modelling options</b></p>
 <p> If <tt>rev_in1</tt>, <tt>rev_in2</tt> or <tt>rev_out</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
@@ -2916,12 +2973,12 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </html>
 "));
   end FlowJoin;
-  
-  model FlowSplit "Splits a flow in two" 
+
+  model FlowSplit "Splits a flow in two"
     extends Icons.Water.FlowSplit;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    constant MassFlowRate wzero=1e-9 
+    constant MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
     parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -2931,28 +2988,33 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_in1 or not rev_out1 or not rev_out2));
     FlangeA in1(p(start=pstart), redeclare package Medium = Medium) 
-                                  annotation (extent=[-80, -20; -40, 20]);
+                                  annotation (Placement(transformation(extent={
+              {-80,-20},{-40,20}}, rotation=0)));
     FlangeB out1(p(start=pstart), redeclare package Medium = Medium) 
-                                   annotation (extent=[40, 22; 80, 62]);
+                                   annotation (Placement(transformation(extent=
+              {{40,22},{80,62}}, rotation=0), iconTransformation(extent={{40,20},{
+              80,60}})));
     FlangeB out2(p(start=pstart), redeclare package Medium = Medium) 
-                                   annotation (extent=[40, -60; 80, -20]);
-  equation 
+                                   annotation (Placement(transformation(extent=
+              {{40,-60},{80,-20}}, rotation=0)));
+  equation
     in1.w + out1.w + out2.w = 0 "Mass balance";
     out1.p = in1.p;
     out2.p = in1.p;
     // Energy balance
-    out1.hBA = if (in1.w < 0 and rev_in1) then out2.hAB else if (out2.w < 0 or not rev_out2) then in1.hBA else 
-            (in1.hBA*(in1.w + wzero) + out2.hAB*(out2.w + wzero))/(in1.w + 2*wzero + out2.w);
-    out2.hBA = if (in1.w < 0 and rev_in1) then out1.hAB else if (out1.w < 0 or not rev_out1) then in1.hBA else 
-            (in1.hBA*(in1.w + wzero) + out1.hAB*(out1.w + wzero))/(in1.w + 2*wzero + out1.w);
-    in1.hAB = if (out1.w < 0 or not rev_out1) then out2.hAB else if (out2.w < 0 or not rev_out2) then out1.hAB else 
-            (out1.hAB*(out1.w + wzero) + out2.hAB*(out2.w + wzero))/(out1.w + 2*wzero + out2.w);
+    out1.h = if (in1.w < 0 and rev_in1) then inStream(out2.h) else if (out2.w < 0 or not rev_out2) then inStream(in1.h) else 
+            (inStream(in1.h)*(in1.w + wzero) + inStream(out2.h)*(out2.w + wzero))/(in1.w + 2*wzero + out2.w);
+    out2.h = if (in1.w < 0 and rev_in1) then inStream(out1.h) else if (out1.w < 0 or not rev_out1) then inStream(in1.h) else 
+            (inStream(in1.h)*(in1.w + wzero) + inStream(out1.h)*(out1.w + wzero))/(in1.w + 2*wzero + out1.w);
+    in1.h = if (out1.w < 0 or not rev_out1) then inStream(out2.h) else if (out2.w < 0 or not rev_out2) then inStream(out1.h) else 
+            (inStream(out1.h)*(out1.w + wzero) + inStream(out2.h)*(out2.w + wzero))/(out1.w + 2*wzero + out2.w);
     //Check flow direction
     assert( not checkFlowDirection or ((rev_in1 or in1.w >= 0) and 
                                        (rev_out1 or out1.w <= 0) and 
                                        (rev_out2 or out2.w <= 0)),
                                       "Flow reversal not supported");
-    annotation (Icon, Documentation(info="<HTML>
+    annotation (Icon(graphics),
+                      Documentation(info="<HTML>
 <p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
 <p><b>Modelling options</b></p>
 <p> If <tt>rev_in1</tt>, <tt>rev_out1</tt> or <tt>rev_out2</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
@@ -2972,24 +3034,39 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </html>
 "));
   end FlowSplit;
-  
-  model SensT "Temperature sensor for water-steam" 
+
+  model SensT "Temperature sensor for water-steam"
     extends Icons.Water.SensThrough;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.BaseProperties fluid;
-    ThermoPower.Water.FlangeA inlet(redeclare package Medium = Medium) 
-                                    annotation (extent=[-80, -60; -40, -20]);
-    ThermoPower.Water.FlangeB outlet(redeclare package Medium = Medium) 
-                                     annotation (extent=[40, -60; 80, -20]);
+    FlangeA inlet(                  redeclare package Medium = Medium) 
+                                    annotation (Placement(transformation(extent=
+             {{-80,-60},{-40,-20}}, rotation=0)));
+    FlangeB outlet(                  redeclare package Medium = Medium) 
+                                     annotation (Placement(transformation(
+            extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput T 
-      annotation (extent=[60, 40; 100, 80]);
+      annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
+              0)));
+  equation
+    inlet.w + outlet.w = 0 "Mass balance";
+    inlet.p = outlet.p "No pressure drop";
+    // Set fluid properties
+    fluid.p=inlet.p;
+    fluid.h = actualStream(inlet.h); // if inlet.w >= 0 then inStream(inlet.h) else inlet.h;
+    T = fluid.T;
+
+    // Boundary conditions
+    inlet.h = inStream(outlet.h);
+    inStream(inlet.h) = outlet.h;
     annotation (
-      Diagram,
-      Icon(Text(
-          extent=[-40, 84; 38, 34],
-          style(color=0, fillPattern=1),
-          string="T")),
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-40,84},{38,34}},
+            lineColor={0,0,0},
+            textString=
+                 "T")}),
       Documentation(info="<HTML>
 <p>This component can be inserted in a hydraulic circuit to measure the temperature of the fluid flowing through it.
 <p>Flow reversal is supported.
@@ -3007,35 +3084,36 @@ enthalpy between the nodes; this requires the availability of the time derivativ
        First release.</li>
 </ul>
 </html>"));
-  equation 
-    inlet.w + outlet.w = 0 "Mass balance";
-    inlet.p = outlet.p "No pressure drop";
-    // Set fluid properties
-    fluid.p=inlet.p;
-    fluid.h = if inlet.w >= 0 then inlet.hBA else inlet.hAB;
-    T = fluid.T;
-    
-    // Boundary conditions
-    inlet.hAB = outlet.hAB;
-    inlet.hBA = outlet.hBA;
   end SensT;
-  
-  model SensW "Mass Flowrate sensor for water/steam" 
+
+  model SensW "Mass Flowrate sensor for water/steam"
     extends Icons.Water.SensThrough;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    ThermoPower.Water.FlangeA inlet(redeclare package Medium = Medium) 
-                                    annotation (extent=[-80, -60; -40, -20]);
-    ThermoPower.Water.FlangeB outlet(redeclare package Medium = Medium) 
-                                     annotation (extent=[40, -60; 80, -20]);
+    FlangeA inlet(                  redeclare package Medium = Medium) 
+                                    annotation (Placement(transformation(extent=
+             {{-80,-60},{-40,-20}}, rotation=0)));
+    FlangeB outlet(                  redeclare package Medium = Medium) 
+                                     annotation (Placement(transformation(
+            extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput w 
-      annotation (extent=[60, 40; 100, 80]);
+      annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
+              0)));
+  equation
+    inlet.w + outlet.w = 0 "Mass balance";
+
+    // Boundary conditions
+    inlet.p = outlet.p;
+    inlet.h = inStream(outlet.h);
+    inStream(inlet.h) = outlet.h;
+    w = inlet.w;
     annotation (
-      Diagram,
-      Icon(Text(
-          extent=[-42, 92; 40, 32],
-          style(color=0, fillPattern=1),
-          string="w")),
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-42,92},{40,32}},
+            lineColor={0,0,0},
+            textString=
+                 "w")}),
       Documentation(info="<HTML>
 <p>This component can be inserted in a hydraulic circuit to measure the flowrate of the fluid flowing through it.
 <p>Flow reversal is supported.
@@ -3051,30 +3129,30 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </ul>
 </html>
 "));
-  equation 
-    inlet.w + outlet.w = 0 "Mass balance";
-    
-    // Boundary conditions
-    inlet.p = outlet.p;
-    inlet.hAB = outlet.hAB;
-    inlet.hBA = outlet.hBA;
-    w = inlet.w;
   end SensW;
-  
-  model SensP "Pressure sensor for water/steam flows" 
+
+  model SensP "Pressure sensor for water/steam flows"
     extends Icons.Water.SensP;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Modelica.Blocks.Interfaces.RealOutput p 
-      annotation (extent=[60, 40; 100, 80]);
-    Flange flange(redeclare package Medium = Medium) 
-                                    annotation (extent=[-20, -60; 20, -20]);
+      annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
+              0)));
+    ThermoPower.Water.Flange flange(
+                  redeclare package Medium = Medium, w(min=0)) 
+                                    annotation (Placement(transformation(extent=
+             {{-20,-60},{20,-20}}, rotation=0)));
+  equation
+    flange.w = 0;
+    p = flange.p;
+    flange.h = 0;
     annotation (
-      Diagram,
-      Icon(Text(
-          extent=[-42, 92; 44, 36],
-          style(color=0, fillPattern=1),
-          string="p")),
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-42,92},{44,36}},
+            lineColor={0,0,0},
+            textString=
+                 "p")}),
       Documentation(info="<HTML>
 <p>This component can be connected to any A-type or B-type connector to measure the pressure of the fluid flowing through it. In this case, it is possible to connect more than two <tt>Flange</tt> connectors together.
 </HTML>",   revisions="<html>
@@ -3087,53 +3165,50 @@ enthalpy between the nodes; this requires the availability of the time derivativ
        First release.</li>
 </ul>
 </html>"));
-  equation 
-    flange.w = 0;
-    p = flange.p;
   end SensP;
-  
-  model Accumulator "Water-Gas Accumulator" 
+
+  model Accumulator "Water-Gas Accumulator"
     extends ThermoPower.Icons.Water.Accumulator;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Liquid medium model";
     Medium.BaseProperties liquid "Liquid properties";
-    
+
     parameter Volume V "Total volume";
     parameter Volume Vl0 "Water nominal volume (at reference level)";
     parameter Area A "Cross Sectional Area";
-    
-    parameter Height zl0 
+
+    parameter Height zl0
       "Height of water reference level over inlet/outlet connectors";
     parameter Height zl_start "Water start level (relative to reference)";
     parameter SpecificEnthalpy hl_start "Water start specific enthalpy";
     parameter Pressure pg_start "Gas start pressure";
     parameter AbsoluteTemperature Tg_start=300 "Gas start temperature";
-    
-    parameter CoefficientOfHeatTransfer gamma_ex=50 
+
+    parameter CoefficientOfHeatTransfer gamma_ex=50
       "Water-Gas heat transfer coefficient";
     parameter Temperature Tgin=300 "Inlet gas temperature";
     parameter MolarMass MM=29e-3 "Gas molar mass";
     parameter MassFlowRate wg_out0 "Nominal gas outlet flowrate";
     parameter AbsoluteTemperature Tg0=300 "Nominal gas temperature";
     parameter Pressure pg0 "Nominal gas pressure";
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option";
-  protected 
+  protected
     constant Acceleration g=Modelica.Constants.g_n;
     constant Real R=Modelica.Constants.R "Universal gas constant";
-    parameter SpecificHeatCapacityAtConstantPressure cpg = (7/2)*Rstar 
+    parameter SpecificHeatCapacityAtConstantPressure cpg = (7/2)*Rstar
       "Cp of gas";
-    parameter SpecificHeatCapacityAtConstantVolume cvg = (5/2)*Rstar 
+    parameter SpecificHeatCapacityAtConstantVolume cvg = (5/2)*Rstar
       "Cv of gas";
     parameter Real Rstar = R/MM "Gas constant";
     parameter Real K = wg_out0/(pg0*sqrt(Tg0)) "Gas outlet flow coefficient";
-  public 
+  public
     MassFlowRate wl_in "Water inflow mass flow rate";
     MassFlowRate wl_out "Water outflow mass flow rate";
     Height zl(start=zl_start) "Water level (relative to reference)";
     Medium.SpecificEnthalpy hl_in "Water inlet specific enthalpy";
     Medium.SpecificEnthalpy hl_out "Water outlet specific enthalpy";
-    Medium.SpecificEnthalpy hl(start=hl_start, stateSelect=StateSelect.prefer) 
+    Medium.SpecificEnthalpy hl(start=hl_start, stateSelect=StateSelect.prefer)
       "Water internal specific enthalpy";
     Volume Vl "Volume occupied by water";
     Mass Mg "Mass of gas";
@@ -3146,14 +3221,76 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Volume Vg "Volume occupied by gas";
     Medium.AbsolutePressure pg(start=pg_start) "Gas pressure";
     Modelica.Blocks.Interfaces.RealInput GasInfl 
-      annotation (extent=[-84, 80; -64, 100], rotation=0);
-    ThermoPower.Water.FlangeA WaterInfl(redeclare package Medium = Medium) 
-      annotation (extent=[-44, -100; -24, -80]);
-    ThermoPower.Water.FlangeB WaterOutfl(redeclare package Medium = Medium) 
-      annotation (extent=[24, -100; 44, -80]);
+      annotation (Placement(transformation(extent={{-84,80},{-64,100}},
+            rotation=0)));
+    FlangeA WaterInfl(                  redeclare package Medium = Medium) 
+      annotation (Placement(transformation(extent={{-44,-100},{-24,-80}},
+            rotation=0)));
+    FlangeB WaterOutfl(                  redeclare package Medium = Medium) 
+      annotation (Placement(transformation(extent={{24,-100},{44,-80}},
+            rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput OutletValveOpening 
+      annotation (Placement(transformation(
+          origin={44,90},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+  equation
+
+    //Equations for water and gas volumes and exchanged thermal power
+    Vl = Vl0 + A*zl;
+    Vg = V - Vl;
+    Qp = gamma_ex*A*(liquid.T - Tg);
+
+    // Boundary conditions
+    // (Thermal effects of the water going out of the accumulator are neglected)
+    hl_in = if wl_in >= 0 then inStream(WaterInfl.h) else hl;
+    hl_out = if wl_out >= 0 then inStream(WaterOutfl.h) else hl;
+    WaterInfl.h = inStream(WaterOutfl.h);
+    WaterOutfl.h = inStream(WaterInfl.h);
+    wl_in = WaterInfl.w;
+    wl_out = WaterOutfl.w;
+    WaterInfl.p = pf;
+    WaterOutfl.p = pf;
+
+    liquid.d*A*der(zl) = wl_in + wl_out
+      "Water mass balance (density variations neglected)";
+    liquid.d*Vl*der(hl)-Vl*der(pg)-pg*der(Vl) = wl_in*(hl_in-hl) + wl_out*(hl_out-hl) - Qp
+      "Water energy balance";
+
+    // Set liquid properties
+    liquid.p=pg;
+    liquid.h=hl;
+
+    pf = pg + liquid.d*g*(zl + zl0) "Stevino's law";
+
+    wg_in =GasInfl "Gas inlet mass-flow rate";
+
+    //Gas outlet mass-flow rate
+    wg_out = -OutletValveOpening*K*pg*sqrt(Tg);
+
+    pg = rhog*Rstar*Tg "Gas state equation";
+    Mg=Vg*rhog "Gas mass";
+    der(Mg) = wg_in + wg_out "Gas mass balance";
+    rhog*Vg*cpg*der(Tg) = wg_in*cpg*(Tgin - Tg) + Vg*der(pg) + Qp
+      "Gas energy balance";
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.steadyState then
+      zl = zl_start;
+      der(Tg) = 0;
+      der(hl) = 0;
+      der(Vl) = 0;
+    elseif initOpt == Choices.Init.Options.steadyStateNoP then
+      zl = zl_start;
+      der(Tg) = 0;
+      der(hl) = 0;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
     annotation (
-      Diagram,
-      Icon,
+      Diagram(graphics),
+      Icon(graphics),
       DymolaStoredErrors,
       Documentation(info="<HTML>
 <p>This model describes a water-gas accumulator (the gas is modeled as ideal bi-atomic). <p>
@@ -3183,80 +3320,11 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
        First release.</li>
 </ul>
 </html>"));
-    Modelica.Blocks.Interfaces.RealInput OutletValveOpening 
-      annotation (extent=[34, 80; 54, 100], rotation=270);
-  equation 
-    
-    //Equations for water and gas volumes and exchanged thermal power
-    Vl = Vl0 + A*zl;
-    Vg = V - Vl;
-    Qp = gamma_ex*A*(liquid.T - Tg);
-    
-    // Boundary conditions 
-    // (Thermal effects of the water going out of the accumulator are neglected)
-    hl_in = if wl_in >= 0 then WaterInfl.hBA else hl;
-    hl_out = if wl_out >= 0 then WaterOutfl.hAB else hl;
-    WaterInfl.hAB = WaterOutfl.hAB;
-    WaterOutfl.hBA = WaterInfl.hBA;
-    wl_in = WaterInfl.w;
-    wl_out = WaterOutfl.w;
-    WaterInfl.p = pf;
-    WaterOutfl.p = pf;
-    
-    liquid.d*A*der(zl) = wl_in + wl_out 
-      "Water mass balance (density variations neglected)";
-    liquid.d*Vl*der(hl)-Vl*der(pg)-pg*der(Vl) = wl_in*(hl_in-hl) + wl_out*(hl_out-hl) - Qp 
-      "Water energy balance";
-    
-    // Set liquid properties
-    liquid.p=pg;
-    liquid.h=hl;
-    
-    pf = pg + liquid.d*g*(zl + zl0) "Stevino's law";
-    
-    wg_in =GasInfl "Gas inlet mass-flow rate";
-    
-    //Gas outlet mass-flow rate
-    wg_out = -OutletValveOpening*K*pg*sqrt(Tg);
-    
-    pg = rhog*Rstar*Tg "Gas state equation";
-    Mg=Vg*rhog "Gas mass";
-    der(Mg) = wg_in + wg_out "Gas mass balance";
-    rhog*Vg*cpg*der(Tg) = wg_in*cpg*(Tgin - Tg) + Vg*der(pg) + Qp 
-      "Gas energy balance";
-  initial equation 
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-    elseif initOpt == Choices.Init.Options.steadyState then
-      zl = zl_start;
-      der(Tg) = 0;
-      der(hl) = 0;
-      der(Vl) = 0;
-    elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      zl = zl_start;
-      der(Tg) = 0;
-      der(hl) = 0;
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
   end Accumulator;
-  
-  annotation (Documentation(info="<HTML>
-This package contains models of physical processes and components using water or steam as working fluid.
-<p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
-<p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
-<ul>
-<li><tt>Choices.Init.Options.noInit</tt>: no initialisation
-<li><tt>Choices.Init.Options.steadyState</tt>: full steady-state initialisation
-<li><tt>Choices.Init.Options.steadyStateNoP</tt>: steady-state initialisation (except pressure)
-<li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
-</ul>
-The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
-</HTML>"));
-  
-  model Drum2States 
+
+  model Drum2States
     extends Icons.Water.Drum;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model";
     parameter Volume Vd "Drum volume";
     parameter Volume Vdcr "Volume of downcomer and risers";
@@ -3267,15 +3335,80 @@ The latter options can be useful when two or more components are connected direc
       annotation(Dialog(tab = "Initialisation"));
     parameter Volume Vldstart "Start value of drum water volume" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
-    
+
     Medium.SaturationProperties sat "Saturation conditions";
     FlangeA feed(redeclare package Medium = Medium) 
-                 annotation (extent=[-110,-64; -70,-24]);
+                 annotation (Placement(transformation(extent={{-110,-64},{-70,
+              -24}}, rotation=0)));
     FlangeB steam(redeclare package Medium = Medium) 
-                  annotation (extent=[48,52; 88,92]);
-    annotation (Diagram,
+                  annotation (Placement(transformation(extent={{48,52},{88,92}},
+            rotation=0)));
+    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
+      "Metal wall thermal port" 
+      annotation (Placement(transformation(extent={{-28,-100},{28,-80}},
+            rotation=0)));
+    Mass Ml "Liquid water mass";
+    Mass Mv "Steam mass";
+    Mass M "Total liquid+steam mass";
+    Energy E "Total energy";
+    Volume Vt "Total volume";
+    Volume Vl(start=Vldstart+Vdcr) "Liquid water total volume";
+    Volume Vld(start=Vldstart, stateSelect=StateSelect.prefer)
+      "Liquid water volume in the drum";
+    Volume Vv "Steam volume";
+    Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
+      "Drum pressure";
+    MassFlowRate qf "Feedwater mass flowrate";
+    MassFlowRate qs "Steam mass flowrate";
+    HeatFlowRate Q "Heat flow to the risers";
+    Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
+    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
+    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
+    Medium.Temperature Ts "Saturation temperature";
+    Medium.Density rhol "Density of saturated liquid";
+    Medium.Density rhov "Density of saturated steam";
+  equation
+    Ml=Vl*rhol "Mass of liquid";
+    Mv=Vv*rhov "Mass of vapour";
+    M=Ml+Mv "Total mass";
+    E=Ml*hl+Mv*hv-p*Vt+(Mmd+Mmdcr)*cm*Ts "Total energy";
+    Ts=sat.Tsat "Saturation temperature";
+    der(M) = qf - qs "Mass balance";
+    der(E) = Q + qf*hf - qs*hv "Energy balance";
+    Vl = Vld+Vdcr "Liquid volume";
+    Vt = Vd + Vdcr "Total volume";
+    Vt = Vl + Vv "Total volume";
+
+    // Boundary conditions
+    p = feed.p;
+    p = steam.p;
+    hf = if feed.w >= 0 then inStream(feed.h) else hl;
+    feed.w = qf;
+    -steam.w = qs;
+    feed.h = hl;
+    steam.h = hv;
+    Q =heat.Q_flow;
+    heat.T = Ts;
+
+    // Fluid properties
+    sat.psat=p;
+    sat.Tsat=Medium.saturationTemperature(p);
+    rhol=Medium.bubbleDensity(sat);
+    rhov=Medium.dewDensity(sat);
+    hl=Medium.bubbleEnthalpy(sat);
+    hv=Medium.dewEnthalpy(sat);
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.steadyState then
+      der(p) = 0;
+      der(Vld) = 0;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+    annotation (Diagram(graphics),
       Documentation(info="<HTML>
 <p>Simplified model of a drum for drum boilers. This model assumes thermodynamic equilibrium between the liquid and vapour volumes. The model has two state variables (i.e., pressure and liquid volume).
 </HTML>",
@@ -3295,74 +3428,12 @@ The latter options can be useful when two or more components are connected direc
        First release.</li>
 </ul>
 </html>"),
-      Icon);
-    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat 
-      "Metal wall thermal port" 
-      annotation (extent=[-28,-100; 28,-80]);
-    Mass Ml "Liquid water mass";
-    Mass Mv "Steam mass";
-    Mass M "Total liquid+steam mass";
-    Energy E "Total energy";
-    Volume Vt "Total volume";
-    Volume Vl(start=Vldstart+Vdcr) "Liquid water total volume";
-    Volume Vld(start=Vldstart, stateSelect=StateSelect.prefer) 
-      "Liquid water volume in the drum";
-    Volume Vv "Steam volume";
-    Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer) 
-      "Drum pressure";
-    MassFlowRate qf "Feedwater mass flowrate";
-    MassFlowRate qs "Steam mass flowrate";
-    HeatFlowRate Q "Heat flow to the risers";
-    Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
-    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
-    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
-    Medium.Temperature Ts "Saturation temperature";
-    Medium.Density rhol "Density of saturated liquid";
-    Medium.Density rhov "Density of saturated steam";
-  equation 
-    Ml=Vl*rhol "Mass of liquid";
-    Mv=Vv*rhov "Mass of vapour";
-    M=Ml+Mv "Total mass";
-    E=Ml*hl+Mv*hv-p*Vt+(Mmd+Mmdcr)*cm*Ts "Total energy";
-    Ts=sat.Tsat "Saturation temperature";
-    der(M) = qf - qs "Mass balance";
-    der(E) = Q + qf*hf - qs*hv "Energy balance";
-    Vl = Vld+Vdcr "Liquid volume";
-    Vt = Vd + Vdcr "Total volume";
-    Vt = Vl + Vv "Total volume";
-    
-    // Boundary conditions
-    p = feed.p;
-    p = steam.p;
-    hf = if feed.w >= 0 then feed.hBA else hl;
-    feed.w = qf;
-    -steam.w = qs;
-    feed.hAB = hl;
-    steam.hBA = hv;
-    Q =heat.Q_flow;
-    heat.T = Ts;
-    
-    // Fluid properties
-    sat.psat=p;
-    sat.Tsat=Medium.saturationTemperature(p);
-    rhol=Medium.bubbleDensity(sat);
-    rhov=Medium.dewDensity(sat);
-    hl=Medium.bubbleEnthalpy(sat);
-    hv=Medium.dewEnthalpy(sat);
-  initial equation 
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-    elseif initOpt == Choices.Init.Options.steadyState then
-      der(p) = 0;
-      der(Vld) = 0;
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
+      Icon(graphics));
   end Drum2States;
-  
-  model Drum "Drum for circulation boilers" 
+
+  model Drum "Drum for circulation boilers"
     extends Icons.Water.Drum;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model";
     Medium.BaseProperties liquid;
     Medium.BaseProperties vapour;
@@ -3374,13 +3445,13 @@ The latter options can be useful when two or more components are connected direc
     parameter Temperature Text=293 "External atmospheric temperature";
     parameter Time tauev=15 "Time constant of bulk evaporation";
     parameter Time tauc=15 "Time constant of bulk condensation";
-    parameter Real Kcs=0 "Surface condensation coefficient [kg/(s.m^2.K)]";
-    parameter Real Ks=0 "Surface heat transfer coefficient [W/(m^2.K)]";
-    parameter CoefficientOfHeatTransfer gext=0 
+    parameter Real Kcs=0 "Surface condensation coefficient [kg/(s.m2.K)]";
+    parameter Real Ks=0 "Surface heat transfer coefficient [W/(m2.K)]";
+    parameter CoefficientOfHeatTransfer gext=0
       "Heat transfer coefficient between metal wall and external atmosphere";
-    parameter CoefficientOfHeatTransfer gl=200 
+    parameter CoefficientOfHeatTransfer gl=200
       "Heat transfer coefficient between metal wall and liquid phase" annotation(Evaluate=true);
-    parameter CoefficientOfHeatTransfer gv=200 
+    parameter CoefficientOfHeatTransfer gv=200
       "Heat transfer coefficient between metal wall and vapour phase" annotation(Evaluate=true);
     parameter ThermalConductivity lm=20 "Metal wall thermal conductivity";
     parameter Real afd=0.05 "Ratio of feedwater in downcomer flowrate";
@@ -3396,21 +3467,21 @@ The latter options can be useful when two or more components are connected direc
       annotation(Dialog(tab = "Initialisation"));
     parameter Length ystart=0 "Start level value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     constant Real g=Modelica.Constants.g_n;
     constant Real pi=Modelica.Constants.pi;
-    
+
     Volume Vv(start=pi*rint^2*L/2) "Volume occupied by the vapour";
     Volume Vl(start=pi*rint^2*L/2) "Volume occupied by the liquid";
     Pressure p(start=pstart, stateSelect=StateSelect.prefer) "Surface pressure";
-    SpecificEnthalpy hl(start=hlstart, stateSelect=StateSelect.prefer) 
+    SpecificEnthalpy hl(start=hlstart, stateSelect=StateSelect.prefer)
       "Liquid specific enthalpy";
-    SpecificEnthalpy hv(start=hvstart, stateSelect=StateSelect.prefer) 
+    SpecificEnthalpy hv(start=hvstart, stateSelect=StateSelect.prefer)
       "Vapour specific enthalpy";
-    SpecificEnthalpy hrv 
+    SpecificEnthalpy hrv
       "Specific enthalpy of vapour from the risers after separation";
-    SpecificEnthalpy hrl 
+    SpecificEnthalpy hrl
       "Specific enthalpy of liquid from the risers after separation";
     SpecificEnthalpy hls "Specific enthalpy of saturated liquid";
     SpecificEnthalpy hvs "Specific enthalpy of saturated vapour";
@@ -3430,7 +3501,7 @@ The latter options can be useful when two or more components are connected direc
     MassFlowRate wev "Mass flowrate of bulk evaporation";
     AbsoluteTemperature Tl "Liquid temperature";
     AbsoluteTemperature Tv "Vapour temperature";
-    AbsoluteTemperature Tm(start=Tmstart, stateSelect=StateSelect.prefer) 
+    AbsoluteTemperature Tm(start=Tmstart, stateSelect=StateSelect.prefer)
       "Wall temperature";
     AbsoluteTemperature Ts "Saturated water temperature";
     Power Qmv "Heat flow from the wall to the vapour";
@@ -3450,33 +3521,38 @@ The latter options can be useful when two or more components are connected direc
     Real gml "Total heat transfer coefficient (wall-liquid)";
     Real gmv "Total heat transfer coefficient (wall-vapour)";
     Real a;
-    Length y(start=ystart, stateSelect=StateSelect.prefer) 
+    Length y(start=ystart, stateSelect=StateSelect.prefer)
       "Level (referred to the centreline)";
     Area Aml "Surface of the wall-liquid interface";
     Area Amv "Surface of the wall-vapour interface";
     Area Asup "Surface of the liquid-vapour interface";
     Area Aext "External drum surface";
-    FlangeA feedwater(p(start=pstart), hAB(start=hlstart),
+    FlangeA feedwater(p(start=pstart), h(start=hlstart),
       redeclare package Medium = Medium) 
-                      annotation (extent=[-114, -32; -80, 2]);
-    FlangeA riser(p(start=pstart), hAB(start=hlstart),
+                      annotation (Placement(transformation(extent={{-114,-32},{
+              -80,2}}, rotation=0)));
+    FlangeA riser(p(start=pstart), h(start=hlstart),
       redeclare package Medium = Medium) 
-                  annotation (extent=[60, -74; 96, -40]);
-    FlangeB downcomer(p(start=pstart), hAB(start=hlstart),
+                  annotation (Placement(transformation(extent={{60,-74},{96,-40}},
+            rotation=0)));
+    FlangeB downcomer(p(start=pstart), h(start=hlstart),
       redeclare package Medium = Medium) 
-                      annotation (extent=[-88, -88; -52, -52]);
-    FlangeB blowdown(p(start=pstart), hBA(start=hlstart),
+                      annotation (Placement(transformation(extent={{-88,-88},{
+              -52,-52}}, rotation=0)));
+    FlangeB blowdown(p(start=pstart), h(start=hlstart),
       redeclare package Medium = Medium) 
-                     annotation (extent=[-18, -116; 18, -80]);
-    FlangeB steam(p(start=pstart), hBA(start=hvstart),
+                     annotation (Placement(transformation(extent={{-18,-116},{
+              18,-80}}, rotation=0)));
+    FlangeB steam(p(start=pstart), h(start=hvstart),
       redeclare package Medium = Medium) 
-                  annotation (extent=[40, 52; 76, 88]);
-  equation 
+                  annotation (Placement(transformation(extent={{40,52},{76,88}},
+            rotation=0)));
+  equation
     der(Mv)= wrv + wev - wv - wc - wcs "Vapour volume mass balance";
     der(Ml)= wf + wrl + wc +  wcs - wd - wb - wev "Liquid volume mass balance";
-    der(Ev)= wrv*hrv + (wev - wcs)*hvs - wc*hls - wv*hvout + Qmv - Qvl-p*der(Vv) 
+    der(Ev)= wrv*hrv + (wev - wcs)*hvs - wc*hls - wv*hvout + Qmv - Qvl-p*der(Vv)
       "Vapour volume energy balance";
-    der(El)= wf*hf + wrl*hrl + wc*hls + (wcs - wev)*hvs - wd*hd -wb*hl + Qml + Qvl-p*der(Vl) 
+    der(El)= wf*hf + wrl*hrl + wc*hls + (wcs - wev)*hvs - wd*hd -wb*hl + Qml + Qvl-p*der(Vl)
       "Liquid volume energy balance";
     //Metal wall energy balance with singular cases
     if Cm > 0 and (gl > 0 or gv > 0) then
@@ -3491,21 +3567,21 @@ The latter options can be useful when two or more components are connected direc
     Ev=Mv*vapour.u "Vapour volume energy";
     El=Ml*liquid.u "Liquid volume energy";
     wev = xl*rhol*Vl/tauev "Bulk evaporation flow rate in the liquid volume";
-    wc = (1 - xv)*rhov*Vv/tauc 
+    wc = (1 - xv)*rhov*Vv/tauc
       "Bulk condensation flow rate in the vapour volume";
     wcs = Kcs*Asup*(Ts - Tl) "Surface condensation flow rate";
-    Qme = gext*Aext*(Tm - Text) 
+    Qme = gext*Aext*(Tm - Text)
       "Heat flow from metal wall to external environment";
     Qml = gml*Aml*(Tm - Tl) "Heat flow from metal wall to liquid volume";
     Qmv = gmv*Amv*(Tm - Tv) "Heat flow from metal wall to vapour volume";
     Qvl = Ks*Asup*(Tv - Ts) "Heat flow from vapour to liquid volume";
-    xv = if hv >= hvs then 1 else (hv - hls)/(hvs - hls) 
+    xv = if hv >= hvs then 1 else (hv - hls)/(hvs - hls)
       "Steam quality in the vapour volume";
-    xl = if hl <= hls then 0 else (hl - hls)/(hvs - hls) 
+    xl = if hl <= hls then 0 else (hl - hls)/(hvs - hls)
       "Steam quality in the liquid volume";
-    gml = if gl == 0 then 0 else 1/(1/gl + a*rint/lm) 
+    gml = if gl == 0 then 0 else 1/(1/gl + a*rint/lm)
       "Total Heat conductance metal-liquid";
-    gmv = if gv == 0 then 0 else 1/(1/gv + a*rint/lm) 
+    gmv = if gv == 0 then 0 else 1/(1/gv + a*rint/lm)
       "Total Heat conductance metal-vapour";
     a = rext^2/(rext^2 - rint^2)*log(rext/rint) - 0.5;
     if DrumOrientation == 0 then
@@ -3520,7 +3596,7 @@ The latter options can be useful when two or more components are connected direc
     Vv = pi*rint^2*L - Vl "Vapour volume";
     Amv = 2*pi*rint*L + 2*pi*rint^2 - Aml "Metal-vapour interface area";
     Aext = 2*pi*rext^2 + 2*pi*rext*L "External metal surface area";
-    
+
     // Fluid properties
     liquid.p=p;
     liquid.h=hl;
@@ -3535,34 +3611,34 @@ The latter options can be useful when two or more components are connected direc
     hls= Medium.bubbleEnthalpy(sat);
     hvs= Medium.dewEnthalpy(sat);
     Ts=sat.Tsat;
-    
+
     // Boundary conditions
     feedwater.p = p;
     feedwater.w = wf;
-    feedwater.hAB = hl;
-    hf = noEvent(if wf >= 0 then feedwater.hBA else hl);
+    feedwater.h = hl;
+    hf = noEvent(if wf >= 0 then inStream(feedwater.h) else hl);
     downcomer.p = p + rhol*g*y;
     downcomer.w = -wd;
-    downcomer.hBA = hd;
-    hd = noEvent(if wd >= 0 then afd*hf + (1 - afd)*hl else downcomer.hAB);
+    downcomer.h = hd;
+    hd = noEvent(if wd >= 0 then afd*hf + (1 - afd)*hl else inStream(downcomer.h));
     blowdown.p = p;
     blowdown.w = -wb;
-    blowdown.hBA = hl;
+    blowdown.h = hl;
     riser.p = p;
     riser.w = wr;
-    riser.hAB = hl;
+    riser.h = hl;
     hrv = hls + xrv*(hvs - hls);
     xrv = 1 - (rhov/rhol)^avr;
-    hr=noEvent(if wr>=0 then riser.hBA else hl);
+    hr=noEvent(if wr>=0 then inStream(riser.h) else hl);
     xr=noEvent(if wr>=0 then (if hr>hls then (hr - hls)/(hvs - hls) else 0) else xl);
     hrl=noEvent(if wr>=0 then (if hr>hls then hls else hr) else hl);
     wrv=noEvent(if wr>=0 then xr*wr/xrv else 0);
     wrl=wr-wrv;
     steam.p = p;
     steam.w = -wv;
-    steam.hBA = hv;
-    hvout = noEvent(if wv >= 0 then hv else steam.hAB);
-  initial equation 
+    steam.h = hv;
+    hvout = noEvent(if wv >= 0 then hv else inStream(steam.h));
+  initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
@@ -3583,12 +3659,17 @@ The latter options can be useful when two or more components are connected direc
     else
       assert(false, "Unsupported initialisation option");
     end if;
-    annotation (Icon(
-        Text(extent=[-150, 26; -78, 0], string="Feed"),
-        Text(extent=[-180, -34; -66, -58], string="Downcomer"),
-        Text(extent=[-38, -102; 46, -142], string="Blowdown"),
-        Text(extent=[52, -22; 146, -40], string="Risers"),
-        Text(extent=[-22, 100; 50, 80], string="Steam")), Documentation(info="<HTML>
+    annotation (Icon(graphics={
+          Text(extent={{-150,26},{-78,0}}, textString=
+                                               "Feed"),
+          Text(extent={{-180,-34},{-66,-58}}, textString=
+                                                  "Downcomer"),
+          Text(extent={{-38,-102},{46,-142}}, textString=
+                                                  "Blowdown"),
+          Text(extent={{52,-22},{146,-40}}, textString=
+                                                "Risers"),
+          Text(extent={{-22,100},{50,80}}, textString=
+                                               "Steam")}),Documentation(info="<HTML>
 <p>This model describes the cylindrical drum of a drum boiler, without assuming thermodynamic equilibrium between the liquid and vapour holdups. Connectors are provided for feedwater inlet, steam outlet, downcomer outlet, riser inlet, and blowdown outlet.
 <p>The model is based on dynamic mass and energy balance equations of the liquid volume and vapour volume inside the drum. Mass and energy tranfer between the two phases is provided by bulk condensation and surface condensation of the vapour phase, and by bulk boiling of the liquid phase. Additional energy transfer can take place at the surface if the steam is superheated.
 <p>The riser flowrate is separated before entering the drum, at the vapour pressure. The (saturated) liquid fraction goes into the liquid volume; the (wet) vapour fraction goes into the vapour volume, vith a steam quality depending on the liquid/vapour density ratio and on the <tt>avr</tt> parameter.
@@ -3620,33 +3701,39 @@ The latter options can be useful when two or more components are connected direc
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-"));
+"),   Diagram(graphics));
   end Drum;
-  
-  model ValveLin "Valve for water/steam flows with linear pressure drop" 
+
+  model ValveLin "Valve for water/steam flows with linear pressure drop"
     extends Icons.Water.Valve;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter HydraulicConductance Kv "Nominal hydraulic conductance";
     MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium) 
-                  annotation (extent=[-120, -20; -80, 20]);
+                  annotation (Placement(transformation(extent={{-120,-20},{-80,
+              20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium) 
-                   annotation (extent=[80, -20; 120, 20]);
+                   annotation (Placement(transformation(extent={{80,-20},{120,
+              20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput cmd 
-      annotation (extent=[-20, 60; 20, 100], rotation=-90);
-  equation 
+      annotation (Placement(transformation(
+          origin={0,80},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
     inlet.w + outlet.w = 0 "Mass balance";
     w = Kv*cmd *(inlet.p - outlet.p) "Valve characteristics";
-    
+
     // Boundary conditions
     w = inlet.w;
-    inlet.hAB = outlet.hAB;
-    inlet.hBA = outlet.hBA;
-    
+    inlet.h = inStream(outlet.h);
+    inStream(inlet.h) = outlet.h;
+
     annotation (
-      Icon(Text(extent=[-100, -40; 100, -74], string="%name")),
-      Diagram,
+      Icon(graphics={Text(extent={{-100,-40},{100,-74}}, textString=
+                                                     "%name")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>This very simple model provides a pressure drop which is proportional to the flowrate and to the <tt>cmd</tt> signal, without computing any fluid property.</p>
 </HTML>",
@@ -3661,20 +3748,20 @@ The latter options can be useful when two or more components are connected direc
 </ul>
 </html>"));
   end ValveLin;
-  
-  partial model ValveBase "Base model for valves" 
+
+  partial model ValveBase "Base model for valves"
     extends Icons.Water.Valve;
     import ThermoPower.Choices.Valve.CvTypes;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.BaseProperties fluid(p(start=pin_start), h(start=hstart));
-    parameter CvTypes.Temp CvData = CvTypes.Av "Selection of flow coefficient";
+    parameter CvTypes CvData = CvTypes.Av "Selection of flow coefficient";
     parameter Area Av(fixed = if CvData==CvTypes.Av then true else false,
-      start = wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))=0 
+      start = wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))=0
       "Av (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Av)));
-    parameter Real Kv(unit="m^3/h")=0 "Kv (metric) flow coefficient" 
+    parameter Real Kv(unit="m3/h")=0 "Kv (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Kv)));
     parameter Real Cv(unit="USG/min")=0 "Cv (US) flow coefficient" 
@@ -3695,7 +3782,8 @@ The latter options can be useful when two or more components are connected direc
     parameter Boolean CheckValve=false "Reverse flow stopped";
     parameter Real b=0.01 "Regularisation factor";
     replaceable function FlowChar = Functions.ValveCharacteristics.linear 
-      extends Functions.ValveCharacteristics.baseFun "Flow characteristic" 
+      constrainedby Functions.ValveCharacteristics.baseFun
+      "Flow characteristic" 
       annotation(choicesAllMatching=true);
     parameter Pressure pin_start = pnom "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -3707,19 +3795,47 @@ The latter options can be useful when two or more components are connected direc
     LiquidDensity rho "Inlet density";
     Medium.Temperature Tin;
     Pressure dp "Pressure drop across the valve";
-  protected 
+  protected
     function sqrtR = Functions.sqrtReg(delta = b*dpnom);
-  public 
+  public
     FlangeA inlet(w(start=wnom),p(start=pin_start),redeclare package Medium = Medium) 
-                  annotation (extent=[-120, -20; -80, 20]);
-    FlangeB outlet(w(start=-wnom),p(start=pout_start),redeclare package Medium 
+                  annotation (Placement(transformation(extent={{-120,-20},{-80,
+              20}}, rotation=0)));
+    FlangeB outlet(w(start=-wnom),p(start=pout_start),redeclare package Medium
         =                                                                        Medium) 
-                   annotation (extent=[80, -20; 120, 20]);
+                   annotation (Placement(transformation(extent={{80,-20},{120,
+              20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput theta "Valve opening in per unit" 
-      annotation (extent=[-20, 60; 20, 100], rotation=-90);
+      annotation (Placement(transformation(
+          origin={0,80},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  initial equation
+    if CvData == CvTypes.Kv then
+      Av = 2.7778e-5*Kv;
+    elseif CvData == CvTypes.Cv then
+      Av = 2.4027e-5*Cv;
+    end if;
+    // assert(CvData>=0 and CvData<=3, "Invalid CvData");
+  equation
+    inlet.w + outlet.w = 0 "Mass balance";
+    w = inlet.w;
+
+    // Fluid properties
+    fluid.p = inlet.p;
+    fluid.h = outlet.h;
+    Tin = fluid.T;
+    rho = fluid.d;
+
+    // Energy balance
+    inlet.h = inStream(outlet.h);
+    inStream(inlet.h) = outlet.h;
+
+    dp = inlet.p - outlet.p "Definition of dp";
     annotation (
-      Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
-      Diagram,
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
+                                                     "%name")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>This is the base model for the <tt>ValveLiq</tt>, <tt>ValveLiqChoked</tt>, and <tt>ValveVap</tt> valve models. The model is based on the IEC 534 / ISA S.75 standards for valve sizing.
 <p>The model optionally supports reverse flow conditions (assuming symmetrical behaviour) or check valve operation, and has been suitably modified to avoid numerical singularities at zero pressure drop. 
@@ -3761,36 +3877,27 @@ The latter options can be useful when two or more components are connected direc
        First release.</li>
 </ul>
 </html>"));
-  initial equation 
-    if CvData == CvTypes.Kv then
-      Av = 2.7778e-5*Kv;
-    elseif CvData == CvTypes.Cv then
-      Av = 2.4027e-5*Cv;
-    end if;
-    assert(CvData>=0 and CvData<=3, "Invalid CvData");
-  equation 
-    inlet.w + outlet.w = 0 "Mass balance";
-    w = inlet.w;
-    
-    // Fluid properties
-    fluid.p = inlet.p;
-    fluid.h = inlet.hBA;
-    Tin = fluid.T;
-    rho = fluid.d;
-    
-    // Energy balance
-    inlet.hAB = outlet.hAB;
-    inlet.hBA = outlet.hBA;
-    
-    dp = inlet.p - outlet.p "Definition of dp";
   end ValveBase;
-  
-  model ValveLiq "Valve for liquid water flow" 
+
+  model ValveLiq "Valve for liquid water flow"
     extends ValveBase;
     import ThermoPower.Choices.Valve.CvTypes;
+  initial equation
+    if CvData == CvTypes.OpPoint then
+      wnom = FlowChar(thetanom)*Av*sqrt(rhonom)*sqrtR(dpnom)
+        "Determination of Av by the operating point";
+    end if;
+
+  equation
+    if CheckValve then
+      w = FlowChar(theta)*Av*sqrt(rho)*smooth(0,if dp>=0 then sqrtR(dp) else 0);
+    else
+      w = FlowChar(theta)*Av*sqrt(rho)*sqrtR(dp);
+    end if;
     annotation (
-      Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
-      Diagram,
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
+                                                     "%name")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>Liquid water valve model according to the IEC 534/ISA S.75 standards for valve sizing, incompressible fluid. <p>
 Extends the <tt>ValveBase</tt> model (see the corresponding documentation for common valve features).
@@ -3812,40 +3919,56 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
        First release.</li>
 </ul>
 </HTML>"));
-  initial equation 
-    if CvData == CvTypes.OpPoint then
-      wnom = FlowChar(thetanom)*Av*sqrt(rhonom)*sqrtR(dpnom) 
-        "Determination of Av by the operating point";
-    end if;
-    
-  equation 
-    if CheckValve then
-      w = FlowChar(theta)*Av*sqrt(rho)*smooth(0,if dp>=0 then sqrtR(dp) else 0);
-    else
-      w = FlowChar(theta)*Av*sqrt(rho)*sqrtR(dp);
-    end if;
   end ValveLiq;
-  
-  model ValveVap "Valve for steam flow" 
+
+  model ValveVap "Valve for steam flow"
     extends ValveBase;
     import ThermoPower.Choices.Valve.CvTypes;
     parameter Real Fxt_full=0.5 "Fk*xt critical ratio at full opening";
     replaceable function xtfun = Functions.ValveCharacteristics.one 
-      extends Functions.ValveCharacteristics.baseFun 
+      constrainedby Functions.ValveCharacteristics.baseFun
       "Critical ratio characteristic";
     Real x "Pressure drop ratio";
     Real xs "Saturated pressure drop ratio";
     Real Y "Compressibility factor";
     Real Fxt "Fxt coefficient";
     Medium.AbsolutePressure p "Inlet pressure";
-  protected 
+  protected
     parameter Real Fxt_nom(fixed=false) "Nominal Fxt";
     parameter Real x_nom(fixed=false) "Nominal pressure drop ratio";
     parameter Real xs_nom(fixed=false) "Nominal saturated pressure drop ratio";
     parameter Real Y_nom(fixed=false) "Nominal compressibility factor";
+  initial equation
+    if CvData == CvTypes.OpPoint then
+      // Determination of Av by the nominal operating point conditions
+      Fxt_nom = Fxt_full*xtfun(thetanom);
+      x_nom = dpnom/pnom;
+      xs_nom = smooth(0, if x_nom > Fxt_nom then Fxt_nom else x_nom);
+      Y_nom = 1 - abs(xs_nom)/(3*Fxt_nom);
+      wnom = FlowChar(thetanom)*Av*Y_nom*sqrt(rhonom)*sqrtR(pnom*xs_nom);
+    else
+      // Dummy values
+      Fxt_nom = 0;
+      x_nom = 0;
+      xs_nom = 0;
+      Y_nom = 0;
+    end if;
+  equation
+    p = noEvent(if dp>=0 then inlet.p else outlet.p);
+    Fxt = Fxt_full*xtfun(theta);
+    x = dp/p;
+    xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
+    Y = 1 - abs(xs)/(3*Fxt);
+    if CheckValve then
+      w = FlowChar(theta)*Av*Y*sqrt(rho)*
+          smooth(0,if xs>=0 then sqrtR(p*xs) else 0);
+    else
+      w = FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(p*xs);
+    end if;
     annotation (
-      Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
-      Diagram,
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
+                                                     "%name")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>Liquid water valve model according to the IEC 534/ISA S.75 standards for valve sizing, compressible fluid. <p>
 Extends the <tt>ValveBase</tt> model (see the corresponding documentation for common valve features).
@@ -3868,52 +3991,44 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
        First release.</li>
 </ul>
 </HTML>"));
-  initial equation 
-    if CvData == CvTypes.OpPoint then
-      // Determination of Av by the nominal operating point conditions
-      Fxt_nom = Fxt_full*xtfun(thetanom);
-      x_nom = dpnom/pnom;
-      xs_nom = smooth(0, if x_nom > Fxt_nom then Fxt_nom else x_nom);
-      Y_nom = 1 - abs(xs_nom)/(3*Fxt_nom);
-      wnom = FlowChar(thetanom)*Av*Y_nom*sqrt(rhonom)*sqrtR(pnom*xs_nom);
-    else
-      // Dummy values
-      Fxt_nom = 0;
-      x_nom = 0;
-      xs_nom = 0;
-      Y_nom = 0;
-    end if;
-  equation 
-    p = noEvent(if dp>=0 then inlet.p else outlet.p);
-    Fxt = Fxt_full*xtfun(theta);
-    x = dp/p;
-    xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
-    Y = 1 - abs(xs)/(3*Fxt);
-    if CheckValve then
-      w = FlowChar(theta)*Av*Y*sqrt(rho)*
-          smooth(0,if xs>=0 then sqrtR(p*xs) else 0);
-    else
-      w = FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(p*xs);
-    end if;
   end ValveVap;
-  
-  model ValveLiqChoked 
-    "Valve for liquid water flow, allows choked flow conditions" 
-    extends ValveBase(redeclare replaceable package Medium = StandardWater extends 
+
+  model ValveLiqChoked
+    "Valve for liquid water flow, allows choked flow conditions"
+    extends ValveBase(redeclare replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium);
     import ThermoPower.Choices.Valve.CvTypes;
     parameter Real Flnom=0.9 "Liquid pressure recovery factor";
     replaceable function Flfun = Functions.ValveCharacteristics.one 
-      extends Functions.ValveCharacteristics.baseFun 
+      constrainedby Functions.ValveCharacteristics.baseFun
       "Pressure recovery characteristic";
     MassFlowRate w "Mass flowrate";
     Real Ff "Ff coefficient (see IEC/ISA standard)";
     Real Fl "Pressure recovery coefficient Fl (see IEC/ISA standard)";
     AbsolutePressure pv "Saturation pressure";
     Pressure dpEff "Effective pressure drop";
+  initial equation
+    if CvData == CvTypes.OpPoint then
+      wnom = FlowChar(theta)*Av*sqrt(rhonom)*sqrtR(dpnom)
+        "Determination of Av by the operating point";
+    end if;
+  equation
+    pv = Medium.saturationPressure(Tin);
+    Ff = 0.96 - 0.28*sqrt(pv/Medium.fluidConstants[1].criticalPressure);
+    Fl = Flnom*Flfun(theta);
+    dpEff = if outlet.p < (1 - Fl^2)*inlet.p + Ff*Fl^2*pv then 
+              Fl^2*(inlet.p - Ff*pv) else inlet.p - outlet.p
+      "Effective pressure drop, accounting for possible choked conditions";
+    if CheckValve then
+       w = FlowChar(theta)*Av*sqrt(rho)*
+           (if dpEff>=0 then sqrtR(dpEff) else 0);
+     else
+       w = FlowChar(theta)*Av*sqrt(rho)*sqrtR(dpEff);
+    end if;
     annotation (
-      Icon(Text(extent=[-100, -40; 100, -80], string="%name")),
-      Diagram,
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
+                                                     "%name")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>Liquid water valve model according to the IEC 534/ISA S.75 standards for valve sizing, incompressible fluid, with possible choked flow conditions. <p>
 Extends the <tt>ValveBase</tt> model (see the corresponding documentation for common valve features).<p>
@@ -3938,49 +4053,31 @@ li><i>1 Jul 2004</i>
        First release.</li>
 </ul>
 </HTML>"));
-  initial equation 
-    if CvData == CvTypes.OpPoint then
-      wnom = FlowChar(theta)*Av*sqrt(rhonom)*sqrtR(dpnom) 
-        "Determination of Av by the operating point";
-    end if;
-  equation 
-    pv = Medium.saturationPressure(Tin);
-    Ff = 0.96 - 0.28*sqrt(pv/Medium.fluidConstants[1].criticalPressure);
-    Fl = Flnom*Flfun(theta);
-    dpEff = if outlet.p < (1 - Fl^2)*inlet.p + Ff*Fl^2*pv then 
-              Fl^2*(inlet.p - Ff*pv) else inlet.p - outlet.p 
-      "Effective pressure drop, accounting for possible choked conditions";
-    if CheckValve then
-       w = FlowChar(theta)*Av*sqrt(rho)*
-           (if dpEff>=0 then sqrtR(dpEff) else 0);
-     else
-       w = FlowChar(theta)*Av*sqrt(rho)*sqrtR(dpEff);
-    end if;
   end ValveLiqChoked;
-  
-  partial model PumpBase "Base model for centrifugal pumps" 
+
+  partial model PumpBase "Base model for centrifugal pumps"
     extends Icons.Water.Pump;
     import Modelica.SIunits.Conversions.NonSIunits.*;
-    replaceable package Medium = StandardWater extends 
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties inletFluid(p(start=pin_start),h(start=hstart)) 
+    Medium.BaseProperties inletFluid(p(start=pin_start),h(start=hstart))
       "Fluid properties at the inlet";
     replaceable function flowCharacteristic = 
-        Functions.PumpCharacteristics.baseFlow 
+        Functions.PumpCharacteristics.baseFlow
       "Head vs. q_flow characteristic at nominal speed and density" 
       annotation(Dialog(group="Characteristics"), choicesAllMatching=true);
-    parameter Boolean usePowerCharacteristic = false 
+    parameter Boolean usePowerCharacteristic = false
       "Use powerCharacteristic (vs. efficiencyCharacteristic)" 
        annotation(Dialog(group="Characteristics"));
     replaceable function powerCharacteristic = 
         Functions.PumpCharacteristics.constantPower 
-      extends Functions.PumpCharacteristics.basePower 
+      constrainedby Functions.PumpCharacteristics.basePower
       "Power consumption vs. q_flow at nominal speed and density" 
       annotation(Dialog(group="Characteristics", enable = usePowerCharacteristic),
                  choicesAllMatching=true);
     replaceable function efficiencyCharacteristic = 
       Functions.PumpCharacteristics.constantEfficiency(eta_nom = 0.8) 
-      extends Functions.PumpCharacteristics.baseEfficiency 
+      constrainedby Functions.PumpCharacteristics.baseEfficiency
       "Efficiency vs. q_flow at nominal speed and density" 
       annotation(Dialog(group="Characteristics",enable = not usePowerCharacteristic),
                  choicesAllMatching=true);
@@ -3999,12 +4096,12 @@ li><i>1 Jul 2004</i>
       annotation(Dialog(tab="Initialisation"));
     parameter SpecificEnthalpy hstart=1e5 "Fluid Specific Enthalpy Start Value"
       annotation(Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options.Temp initOpt=Choices.Init.Options.noInit 
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab="Initialisation"));
     constant Acceleration g=Modelica.Constants.g_n;
     MassFlowRate w_single(start = wstart/Np0) "Mass flow rate (single pump)";
     MassFlowRate w = Np*w_single "Mass flow rate (total)";
-    VolumeFlowRate q_single(start = wstart/(Np0*rho0)) 
+    VolumeFlowRate q_single(start = wstart/(Np0*rho0))
       "Volume flow rate (single pump)";
     VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
     Pressure dp "Outlet pressure minus inlet pressure";
@@ -4018,76 +4115,80 @@ li><i>1 Jul 2004</i>
     Integer Np(min=1) "Number of pumps in parallel";
     Power W_single "Power Consumption (single pump)";
     Power W = Np*W_single "Power Consumption (total)";
-    constant Power W_eps=1e-8 
+    constant Power W_eps=1e-8
       "Small coefficient to avoid numerical singularities";
     constant AngularVelocity_rpm n_eps=1e-6;
     Real eta "Pump efficiency";
     Real s "Auxiliary Variable";
-    FlangeA infl(p(start=pin_start),hAB(start=hstart),
+    FlangeA infl(p(start=pin_start),h(start=hstart),
       redeclare package Medium = Medium) 
-      annotation (extent=[-100,0; -60,40]);
-    FlangeB outfl(p(start=pout_start),hBA(start=hstart),
+      annotation (Placement(transformation(extent={{-100,0},{-60,40}}, rotation=
+             0)));
+    FlangeB outfl(p(start=pout_start),h(start=hstart),
       redeclare package Medium = Medium) 
-      annotation (extent=[40,50; 80,90]);
+      annotation (Placement(transformation(extent={{40,50},{80,90}}, rotation=0)));
     Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps" 
-      annotation (extent=[18, 70; 38, 90], rotation=-90);
-  equation 
+      annotation (Placement(transformation(
+          origin={28,80},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+  equation
     // Number of pumps in parallel
     Np = in_Np;
     if cardinality(in_Np)==0 then
       in_Np = Np0 "Number of pumps selected by parameter";
     end if;
-    
+
     // Flow equations
     q_single = w_single/rho;
     if noEvent(s > 0 or (not CheckValve)) then
       // Flow characteristics when check valve is open
-      q_single = s;
+      q_single = s*wstart/(Np0*rho0);
       head = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps));
     else
       // Flow characteristics when check valve is closed
-      head = (n/n0)^2*flowCharacteristic(0) - s;
+      head = (n/n0)^2*flowCharacteristic(0) - s*(pout_start-pin_start)/(rho0*g);
       q_single = 0;
     end if;
-    
-    // Power consumption  
+
+    // Power consumption
     if usePowerCharacteristic then
-      W_single = (n/n0)^3*(rho/rho0)*powerCharacteristic(q_single*n0/(n+n_eps)) 
+      W_single = (n/n0)^3*(rho/rho0)*powerCharacteristic(q_single*n0/(n+n_eps))
         "Power consumption (single pump)";
       eta = (dp*q_single)/(W_single + W_eps) "Hydraulic efficiency";
     else
       eta = efficiencyCharacteristic(q_single*n0/(n+n_eps));
       W_single = dp*q_single/eta;
     end if;
-    
+
     // Fluid properties
     inletFluid.p=infl.p;
     inletFluid.h=hin;
     rho = inletFluid.d;
     Tin = inletFluid.T;
-    
+
     // Boundary conditions
     dp = outfl.p - infl.p;
     w = infl.w "Pump total flow rate";
     if w >= 0 then
-      hin = infl.hBA;
+      hin = inStream(infl.h);
     else
-      hin = outfl.hAB;
+      hin = inStream(outfl.h);
     end if;
-    infl.hAB = hout;
-    outfl.hBA = hout;
+    infl.h = hout;
+    outfl.h = hout;
     h = hout;
-    
+
     // Mass and energy balances
     infl.w + outfl.w = 0 "Mass balance";
     if V>0 then
-      (rho*V*der(h)) = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single 
+      (rho*V*der(h)) = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single
         "Energy balance";
     else
       0 = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single "Energy balance";
     end if;
-    
-  initial equation 
+
+  initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
@@ -4097,10 +4198,10 @@ li><i>1 Jul 2004</i>
     else
       assert(false, "Unsupported initialisation option");
     end if;
-    
+
     annotation (
-      Icon,
-      Diagram,
+      Icon(graphics),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>This is the base model for the <tt>Pump</tt> and <tt>
 PumpMech</tt> pump models.
@@ -4153,23 +4254,26 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </html>"));
   end PumpBase;
-  
-  model Pump "Centrifugal pump with ideally controlled speed" 
+
+  model Pump "Centrifugal pump with ideally controlled speed"
     extends PumpBase;
     import Modelica.SIunits.Conversions.NonSIunits.*;
     parameter AngularVelocity_rpm n_const=n0 "Constant rotational speed";
     Modelica.Blocks.Interfaces.RealInput in_n "RPM" 
-      annotation (extent=[-36, 70; -16, 90], rotation=-90);
-  equation 
+      annotation (Placement(transformation(
+          origin={-26,80},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+  equation
       n = in_n "Rotational speed";
     if cardinality(in_n)==0 then
       in_n = n_const "Rotational speed provided by parameter";
     end if;
     annotation (
-      Icon(
-        Text(extent=[-58,94; -30,74], string="n"),
-        Text(extent=[-10,102; 18,82], string="Np")),
-      Diagram,
+      Icon(graphics={Text(extent={{-58,94},{-30,74}}, textString=
+                                             "n"), Text(extent={{-10,102},{18,
+                82}}, textString =           "Np")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>This model describes a centrifugal pump (or a group of <tt>Np</tt> pumps in parallel) with controlled speed, either fixed or provided by an external signal.
 <p>The model extends <tt>PumpBase</tt>
@@ -4189,13 +4293,13 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </html>"));
   end Pump;
-  
-  model PumpNPSH 
+
+  model PumpNPSH
     extends Pump(redeclare replaceable package Medium = 
         Modelica.Media.Interfaces.PartialTwoPhaseMedium);
     Height NPSHa "Net Positive Suction Head available";
     Medium.AbsolutePressure pv "Saturated liquid pressure";
-  equation 
+  equation
     pv=Medium.saturationPressure(inletFluid.T);
     NPSHa=(infl.p-pv)/(rho*g);
     annotation (Documentation(info="<html>Same as Pump. Additionally, the net positive suction head available is computed. Requires a two-phase medium model to compute the saturation properties.
@@ -4207,25 +4311,25 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </html>"));
   end PumpNPSH;
-  
-  model PumpMech "Centrifugal pump with mechanical connector for the shaft" 
+
+  model PumpMech "Centrifugal pump with mechanical connector for the shaft"
     extends PumpBase;
     extends Icons.Water.PumpMech;
     Angle phi "Shaft angle";
     AngularVelocity omega "Shaft angular velocity";
     Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort 
-      annotation (extent=[76,6; 106,36]);
-  equation 
+      annotation (Placement(transformation(extent={{76,6},{106,36}}, rotation=0)));
+  equation
     // Mechanical boundary condition
     phi = MechPort.phi;
     omega = der(phi);
     W = omega*MechPort.tau;
-    
+
     n = Modelica.SIunits.Conversions.to_rpm(omega) "Rotational speed";
     annotation (
-      Icon(
-        Text(extent=[-10,104; 18,84], string="Np")),
-      Diagram,
+      Icon(graphics={Text(extent={{-10,104},{18,84}}, textString=
+                                             "Np")}),
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>This model describes a centrifugal pump (or a group of <tt>Np</tt> pumps in parallel) with a mechanical rotational connector for the shaft, to be used when the pump drive has to be modelled explicitly. In the case of <tt>Np</tt> pumps in parallel, the mechanical connector is relative to a single pump.
 <p>The model extends <tt>PumpBase</tt>
@@ -4244,9 +4348,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </html>"));
   end PumpMech;
-  
-  function f_chen "Chen's correlation for two-phase flow in a tube" 
-    
+
+  function f_chen "Chen's correlation for two-phase flow in a tube"
+
     input MassFlowRate w "Mass flowrate";
     input Length D "Tube hydraulic diameter";
     input Area A "Tube cross-section";
@@ -4261,9 +4365,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     input Pressure Dpsat "Saturation pressure difference (wall-bulk)";
     input SpecificEnthalpy ifg "Latent heat of vaporization";
     input Real x "Steam quality";
-    output CoefficientOfHeatTransfer hTP 
+    output CoefficientOfHeatTransfer hTP
       "Two-phase total heat transfer coefficient";
-  protected 
+  protected
     Real invXtt;
     Real F;
     Real S;
@@ -4272,7 +4376,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     Real ReTP;
     CoefficientOfHeatTransfer hC;
     CoefficientOfHeatTransfer hNcB;
-  algorithm 
+  algorithm
     invXtt := (x/(1 - x))^0.9*(rhof/rhog)^0.5*(mug/muf)^0.1;
     if invXtt < 0.1 then
       F := 1;
@@ -4297,17 +4401,17 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </HTML>"));
   end f_chen;
-  
-  function f_colebrook "Fanning friction factor for water/steam flows" 
+
+  function f_colebrook "Fanning friction factor for water/steam flows"
     input MassFlowRate w;
     input Real D_A;
     input Real e;
     input DynamicViscosity mu;
     output Real f;
-  protected 
+  protected
     Real Re;
-  algorithm 
-    Re := w*D_A/mu;
+  algorithm
+    Re := abs(w)*D_A/mu;
     Re := if Re > 2100 then Re else 2100;
     f := 0.332/(log(e/3.7 + 5.47/Re^0.9)^2);
     annotation (Documentation(info="<HTML>
@@ -4320,9 +4424,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </HTML>"));
   end f_colebrook;
-  
-  function f_colebrook_2ph 
-    "Fanning friction factor for a two phase water/steam flow" 
+
+  function f_colebrook_2ph
+    "Fanning friction factor for a two phase water/steam flow"
     input MassFlowRate w;
     input Real D_A;
     input Real e;
@@ -4330,11 +4434,11 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     input DynamicViscosity muv;
     input Real x;
     output Real f;
-  protected 
+  protected
     Real Re;
-  protected 
+  protected
     DynamicViscosity mu;
-  algorithm 
+  algorithm
     mu := 1/(x/muv + (1 - x)/mul);
     Re := w*D_A/mu;
     Re := if Re > 2100 then Re else 2100;
@@ -4349,10 +4453,10 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </HTML>"));
   end f_colebrook_2ph;
-  
-  function f_dittus_boelter 
-    "Dittus-Boelter correlation for one-phase flow in a tube" 
-    
+
+  function f_dittus_boelter
+    "Dittus-Boelter correlation for one-phase flow in a tube"
+
     input MassFlowRate w;
     input Length D;
     input Area A;
@@ -4360,10 +4464,10 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     input ThermalConductivity k;
     input SpecificHeatCapacity cp;
     output CoefficientOfHeatTransfer hTC;
-  protected 
+  protected
     Real Re;
     Real Pr;
-  algorithm 
+  algorithm
     Re := w*D/A/mu;
     Pr := cp*mu/k;
     hTC := 0.023*k/D*Re^0.8*Pr^0.4;
@@ -4380,11 +4484,11 @@ Input variables changed. This function now computes the heat transfer coefficien
 </ul>
 </HTML>"));
   end f_dittus_boelter;
-  
-  partial model SteamTurbineBase "Steam turbine" 
-    replaceable package Medium = ThermoPower.Water.StandardWater extends 
+
+  partial model SteamTurbineBase "Steam turbine"
+    replaceable package Medium = ThermoPower.Water.StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    parameter Boolean explicitIsentropicEnthalpy=true 
+    parameter Boolean explicitIsentropicEnthalpy=true
       "Outlet enthalpy computed by isentropicEnthalpy function";
     parameter Pressure pstart_in "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -4398,46 +4502,10 @@ Input variables changed. This function now computes the heat transfer coefficien
       annotation(Dialog(tab = "Initialisation"));
     parameter MassFlowRate wnom "Inlet nominal flowrate";
     parameter Real eta_mech=0.98 "Mechanical efficiency";
-    
-   annotation (Icon(
-        Polygon(points=[-28, 76; -28, 28; -22, 28; -22, 82; -60, 82; -60,
-              76; -28, 76], style(
-            color=0,
-            fillColor=3,
-            thickness=2)),
-        Polygon(points=[26, 56; 32, 56; 32, 76; 60, 76; 60, 82; 26, 82; 26,
-               56], style(
-            color=0,
-            fillColor=3,
-            thickness=2)),
-        Rectangle(extent=[-60, 8; 60, -8], style(
-            color=76,
-            gradient=3,
-            fillColor=9)),
-        Polygon(points=[-28,28; -28,-26; 32,-60; 32,60; -28,28],      style(
-            color=0,
-            fillColor=3,
-            thickness=2,
-            fillPattern=1)),
-           Text(extent=[-130,-60; 128,-100],  string="%name")),
-                              Diagram,
-      Documentation(info="<html>
-<p>This base model contains the basic interface, parameters and definitions for steam turbine models. It lacks the actual performance characteristics, i.e. two more equations to determine the flow rate and the efficiency.
-<p>This model does not include any shaft inertia by itself; if that is needed, connect a <tt>Modelica.Mechanics.Rotational.Inertia</tt> model to one of the shaft connectors.
-<p><b>Modelling options</b></p>
-<p>The following options are available to calculate the enthalpy of the outgoing steam:
-<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is given equating the specific entropy of the inlet steam <tt>steam_in</tt> and of a fictional steam state <tt>steam_iso</tt>, which has the same pressure of the outgoing steam, both computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
-</html>", revisions="<html>
-<ul>
-<li><i>20 Apr 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"),
-      uses(ThermoPower(version="2"), Modelica(version="2.2")));
+
     Medium.BaseProperties steam_in(p(start=pstart_in),h(start=hstartin));
     Medium.BaseProperties steam_iso(p(start=pstart_out),h(start=hstartout));
-    
+
     Angle phi "shaft rotation angle";
     Torque tau "net torque acting on the turbine";
     AngularVelocity omega "shaft angular velocity";
@@ -4450,29 +4518,34 @@ Input variables changed. This function now computes the heat transfer coefficien
     Real PR "pressure ratio";
     Power Pm "Mechanical power input";
     Real eta_iso "Isentropic efficiency";
-    
+
     Modelica.Blocks.Interfaces.RealInput partialArc 
-      annotation (extent=[-60,-50; -40,-30]);
+      annotation (Placement(transformation(extent={{-60,-50},{-40,-30}},
+            rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
-      annotation (extent=[-76,-10; -56,10]);
+      annotation (Placement(transformation(extent={{-76,-10},{-56,10}},
+            rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
-      annotation (extent=[54,-10; 74,10]);
-    ThermoPower.Water.FlangeA inlet(
+      annotation (Placement(transformation(extent={{54,-10},{74,10}}, rotation=
+              0)));
+    FlangeA inlet(
       redeclare package Medium = Medium,
       p(start=pstart_in)) 
-      annotation (extent=[-100,60; -60,100]);
-    ThermoPower.Water.FlangeB outlet(
+      annotation (Placement(transformation(extent={{-100,60},{-60,100}},
+            rotation=0)));
+    FlangeB outlet(
       redeclare package Medium = Medium,
       p(start=pstart_out)) 
-      annotation (extent=[60,60; 100,100]);
-    
-  equation 
+      annotation (Placement(transformation(extent={{60,60},{100,100}}, rotation=
+             0)));
+
+  equation
     PR=inlet.p/outlet.p "Pressure ratio";
     if cardinality(partialArc)==0 then
       partialArc =1 "Default value if not connected";
     end if;
     if explicitIsentropicEnthalpy then
-      hiso=Medium.isentropicEnthalpy(outlet.p, steam_in.state) 
+      hiso=Medium.isentropicEnthalpy(outlet.p, steam_in.state)
         "Isentropic enthalpy";
       //dummy assignments
       sin=0;
@@ -4487,35 +4560,77 @@ Input variables changed. This function now computes the heat transfer coefficien
       hin-hout=eta_iso*(hin-hiso) "Computation of outlet enthalpy";
     Pm=eta_mech*w*(hin-hout) "Mechanical power from the steam";
     Pm = -tau*omega "Mechanical power balance";
-    
+
     // Mechanical boundary conditions
     shaft_a.phi = phi;
     shaft_b.phi = phi;
     shaft_a.tau + shaft_b.tau = tau;
     der(phi) = omega;
-    
+
     // steam boundary conditions and inlet steam properties
     steam_in.p=inlet.p;
-    steam_in.h=inlet.hBA;
+    steam_in.h=inStream(inlet.h);
     hin=steam_in.h;
-    hout=outlet.hBA;
+    hout=outlet.h;
     pout=outlet.p;
     w = inlet.w;
-    
+
     inlet.w + outlet.w = 0 "Mass balance";
     // assert(w >= -wnom/100, "The turbine model does not support flow reversal");
-    
+
     // The next equation is provided to close the balance but never actually used
-    inlet.hAB = outlet.hBA;
-    
+    inlet.h = outlet.h;
+
+   annotation (Icon(graphics={
+          Polygon(
+            points={{-28,76},{-28,28},{-22,28},{-22,82},{-60,82},{-60,76},{-28,
+                76}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{26,56},{32,56},{32,76},{60,76},{60,82},{26,82},{26,56}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid),
+          Rectangle(
+            extent={{-60,8},{60,-8}},
+            lineColor={0,0,0},
+            fillPattern=FillPattern.Sphere,
+            fillColor={160,160,164}),
+          Polygon(
+            points={{-28,28},{-28,-26},{32,-60},{32,60},{-28,28}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid),
+          Text(extent={{-130,-60},{128,-100}}, textString=
+                                                     "%name")}),
+                              Diagram(graphics),
+      Documentation(info="<html>
+<p>This base model contains the basic interface, parameters and definitions for steam turbine models. It lacks the actual performance characteristics, i.e. two more equations to determine the flow rate and the efficiency.
+<p>This model does not include any shaft inertia by itself; if that is needed, connect a <tt>Modelica.Mechanics.Rotational.Inertia</tt> model to one of the shaft connectors.
+<p><b>Modelling options</b></p>
+<p>The following options are available to calculate the enthalpy of the outgoing steam:
+<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is given equating the specific entropy of the inlet steam <tt>steam_in</tt> and of a fictional steam state <tt>steam_iso</tt>, which has the same pressure of the outgoing steam, both computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
+</html>", revisions="<html>
+<ul>
+<li><i>20 Apr 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+      uses(ThermoPower(version="2"), Modelica(version="2.2")));
   end SteamTurbineBase;
-  
-  model SteamTurbineStodola "Steam turbine" 
+
+  model SteamTurbineStodola "Steam turbine"
     extends SteamTurbineBase;
     parameter Real eta_iso_nom=0.92 "Nominal isentropic efficiency";
     parameter Area Kt "Kt coefficient of Stodola's law";
-  equation 
-    w = Kt*partialArc*sqrt(steam_in.p*steam_in.d)*Functions.sqrtReg(1-(1/PR)^2) 
+  equation
+    w = Kt*partialArc*sqrt(steam_in.p*steam_in.d)*Functions.sqrtReg(1-(1/PR)^2)
       "Stodola's law";
     eta_iso = eta_iso_nom "Constant efficiency";
    annotation (
@@ -4535,16 +4650,17 @@ Input variables changed. This function now computes the heat transfer coefficien
 </html>"),
       uses(ThermoPower(version="2"), Modelica(version="2.2")));
   end SteamTurbineStodola;
-  
-  model SteamTurbineUnit "Turbine for steam flows" 
-    replaceable package Medium = StandardWater extends 
+
+  model SteamTurbineUnit "Turbine for steam flows"
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     extends Icons.Water.SteamTurbineUnit;
     parameter Real pnom "Inlet nominal pressure";
     parameter Real wnom "Inlet nominal flowrate";
-    parameter PerUnit eta_iso "Isentropic efficiency";
-    parameter PerUnit eta_mech=0.98 "Mechanical efficiency";
-    parameter PerUnit hpFraction "Fraction of power provided by the HP turbine";
+    parameter Real eta_iso "Isentropic efficiency [PerUnit]";
+    parameter Real eta_mech=0.98 "Mechanical efficiency [PerUnit]";
+    parameter Real hpFraction
+      "Fraction of power provided by the HP turbine [PerUnit]";
     parameter Time T_HP "Time constant of HP mechanical power response";
     parameter Time T_LP "Time constant of LP mechanical power response";
     parameter Pressure pstartin = pnom "Inlet start pressure" 
@@ -4553,17 +4669,21 @@ Input variables changed. This function now computes the heat transfer coefficien
       annotation(Dialog(tab = "Initialization"));
     parameter SpecificEnthalpy hstartout "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialization"));
-    parameter ThermoPower.Choices.Init.Options.Temp initOpt=ThermoPower.Choices.Init.Options.steadyState 
+    parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.steadyState
       "Initialization option" annotation(Dialog(tab = "Initialization"));
     Medium.BaseProperties fluid_in(p(start=pstartin),h(start=hstartin));
     FlangeA inlet(redeclare package Medium = Medium) 
-                  annotation (extent=[-120,50; -80,90]);
+                  annotation (Placement(transformation(extent={{-120,50},{-80,
+              90}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium) 
-                   annotation (extent=[80,-90; 120,-50]);
+                   annotation (Placement(transformation(extent={{80,-90},{120,
+              -50}}, rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
-      annotation (extent=[-110,-14; -84,14]);
+      annotation (Placement(transformation(extent={{-110,-14},{-84,14}},
+            rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
-      annotation (extent=[86,-14; 112,14]);
+      annotation (Placement(transformation(extent={{86,-14},{112,14}}, rotation=
+             0)));
     MassFlowRate w "Mass flowrate";
     Angle phi "Shaft rotation angle";
     AngularVelocity omega "Shaft angular velocity";
@@ -4576,40 +4696,41 @@ Input variables changed. This function now computes the heat transfer coefficien
     Power P_HP "Mechanical power produced by the HP turbine";
     Power P_LP "Mechanical power produced by the LP turbine";
     Modelica.Blocks.Interfaces.RealInput partialArc 
-      annotation (extent=[-110,-88; -74,-52]);
-  equation 
+      annotation (Placement(transformation(extent={{-110,-88},{-74,-52}},
+            rotation=0)));
+  equation
     if cardinality(partialArc)==0 then
       partialArc =1 "Default value if not connected";
     end if;
     Kv = partialArc*wnom/pnom "Definition of Kv coefficient";
     w=Kv*inlet.p "Flow characteristics";
-    hiso=Medium.isentropicEnthalpy(outlet.p, fluid_in.state) 
+    hiso=Medium.isentropicEnthalpy(outlet.p, fluid_in.state)
       "Isentropic enthalpy";
     hin-hout=eta_iso*(hin-hiso) "Computation of outlet enthalpy";
     Pm=eta_mech*w*(hin-hout) "Mechanical power from the fluid";
     T_HP*der(P_HP)=Pm*hpFraction-P_HP "Power output to HP turbine";
     T_LP*der(P_LP)=Pm*(1-hpFraction)-P_LP "Power output to LP turbine";
     P_HP+P_LP = -tau*omega "Mechanical power balance";
-    
+
     // Mechanical boundary conditions
     shaft_a.phi = phi;
     shaft_b.phi = phi;
     shaft_a.tau + shaft_b.tau = tau;
     der(phi) = omega;
-    
+
     // Fluid boundary conditions and inlet fluid properties
     fluid_in.p=inlet.p;
     fluid_in.h=hin;
-    hin=inlet.hBA;
-    hout=outlet.hBA;
+    hin=inStream(inlet.h);
+    hout=outlet.h;
     w = inlet.w;
-    
+
     inlet.w + outlet.w = 0 "Mass balance";
     assert(w >= 0, "The turbine model does not support flow reversal");
-    
+
     // The next equation is provided to close the balance but never actually used
-    inlet.hAB = outlet.hBA;
-  initial equation 
+    inlet.h = outlet.h;
+  initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
@@ -4618,17 +4739,13 @@ Input variables changed. This function now computes the heat transfer coefficien
     else
       assert(false, "Unsupported initialisation option");
     end if;
-    
+
     annotation (
-      Icon(Text(extent=[-108,-80; 108,-110],  string="%name"),
-        Line(points=[-74,-70; -74,-70; -56,-70; -56,-30],
-                                                        style(
-            color=3,
-            rgbcolor={0,0,255},
-            thickness=2,
-            gradient=2,
-            fillColor=3,
-            rgbfillColor={0,0,255}))),
+      Icon(graphics={Text(extent={{-108,-80},{108,-110}}, textString=
+                                                     "%name"), Line(
+            points={{-74,-70},{-74,-70},{-56,-70},{-56,-30}},
+            color={0,0,0},
+            thickness=0.5)}),
       Documentation(info="<HTML>
 <p>This model describes a simplified steam turbine unit, with a high pressure and a low pressure turbine.<p>
 The inlet flowrate is proportional to the inlet pressure, and to the <tt>partialArc</tt> signal if the corresponding connector is wired. In this case, it is assumed that the flow rate is reduced by partial arc admission, not by throttling (i.e., no loss of thermodynamic efficiency occurs). To simulate throttling, insert a valve before the turbine unit inlet.
@@ -4645,12 +4762,12 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
        First release.</li>
 </ul>
 </html>"),
-      Diagram);
+      Diagram(graphics));
   end SteamTurbineUnit;
-  
-  partial model EvaporatorBase 
-    "Basic interface for 1-dimensional water/steam fluid flow models" 
-    replaceable package Medium = StandardWater extends 
+
+  partial model EvaporatorBase
+    "Basic interface for 1-dimensional water/steam fluid flow models"
+    replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model";
     Medium.BaseProperties fluid_in "Fluid properties at the inlet";
     Medium.BaseProperties fluid_out "Fluid properties at the outlet";
@@ -4664,7 +4781,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     parameter Length omega "Perimeter of heat transfer surface (single tube)";
     parameter Length Dhyd "Hydraulic Diameter (single tube)";
     parameter MassFlowRate wnom "Nominal mass flowrate (total)";
-    parameter Integer FFtype 
+    parameter Integer FFtype
       "Friction Factor Type (0: Kf; 1:OpPoint, 2:Cfnom, 3:Colebrook)";
     parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop (friction term only!)";
@@ -4679,7 +4796,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     parameter SpecificEnthalpy hstartout=1e5 "Outlet enthalpy start value";
     parameter Pressure pstartin=1e5 "Inlet pressure start value";
     parameter Pressure pstartout=1e5 "Outlet pressure start value";
-    parameter Real wnf=0.01 
+    parameter Real wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
     constant Real g=Modelica.Constants.g_n;
@@ -4695,13 +4812,13 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
 */
     Medium.AbsolutePressure p(start=pstartin, stateSelect=StateSelect.prefer);
     MassFlowRate win(start=wnom) "Inlet flow rate";
-    MassFlowRate wlb(start=wnom) 
+    MassFlowRate wlb(start=wnom)
       "Flowrate from liquid volume to boiling volume";
-    MassFlowRate wbv(start=wnom) 
+    MassFlowRate wbv(start=wnom)
       "Flowrate from boiling volume to vapour volume";
     MassFlowRate wout(start=wnom) "Outlet flow rate";
     Medium.SpecificEnthalpy hin( start=hstartin) "Inlet specific enthalpy";
-    Medium.SpecificEnthalpy hout(start=hstartout, stateSelect=StateSelect.prefer) 
+    Medium.SpecificEnthalpy hout(start=hstartout, stateSelect=StateSelect.prefer)
       "Outlet specific enthalpy";
     Medium.SpecificEnthalpy hls "Saturated liquid specific enthalpy";
     Medium.SpecificEnthalpy hvs "Saturated vapour specific enthalpy";
@@ -4727,17 +4844,17 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     Power Ql "Thermal power to the liquid volume";
     Power Qb "Thermal power to the boiling volume";
     Power Qv "Thermal power to the vapour volume";
-    Length csil(start=csilstart, stateSelect=StateSelect.prefer) 
+    Length csil(start=csilstart, stateSelect=StateSelect.prefer)
       "Abscissa of liqid boundary";
-    Length csiv(start=csivstart, stateSelect=StateSelect.prefer) 
+    Length csiv(start=csivstart, stateSelect=StateSelect.prefer)
       "Abscissa of vapour boundary";
     Time Tr "Residence time";
-    
-  equation 
+
+  equation
     Vl=A*csil "Volume of subcooled liquid";
     Vb=A*(csiv-csil) "Volume of boiling liquid";
     Vv=A*(L-csiv) "Volume of superheated vapour";
-    Ml=(rhoin+(if hout>hls then rhols else rhoout))/2*Vl 
+    Ml=(rhoin+(if hout>hls then rhols else rhoout))/2*Vl
       "Mass of subcooled liquid";
     Mb=(if (hout > hvs) then 
         rhols*rhovs/(rhols-rhovs)*log(rhols/rhovs) else 
@@ -4755,7 +4872,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
            * Vb "Mass of vapour in boiling liquid";
     Mbl=Mb-Mbv "Mass of liquid in boiling liquid";
     Mv=Vv*(rhovs+rhoout)/2 "Mass of superheated vapour";
-    El=Ml*(hin+(if hout>hls then hls else hout))/2-p*Vl 
+    El=Ml*(hin+(if hout>hls then hls else hout))/2-p*Vl
       "Energy of subcooled liquid";
     Eb=Mbl*hls+Mbv*hvs-p*Vb "Energy of boiling water";
     Ev=Mv*(hvs+hout)/2-p*Vv "Energy of superheated vapour";
@@ -4777,17 +4894,17 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       wlb=wout;
     end if;
     if hout>hvs then
-      der(Ev) = wbv*hbv-wout*hout-p*der(Vv)+Qv 
+      der(Ev) = wbv*hbv-wout*hout-p*der(Vv)+Qv
         "Superheated volume energy balance";
     else
       wbv=wout;
     end if;
-    hlb=if (hout>hls) then hls else hout 
+    hlb=if (hout>hls) then hls else hout
       "Enthalpy at the liquid-boiling interface";
-    hbv=if (hout>hvs) then hvs else hout 
+    hbv=if (hout>hvs) then hvs else hout
       "Enthalpy at the boiling-vapour interface";
     Tr=(Ml+Mb+Mv)/win "Residence time";
-    
+
     // Fluid properties
     sat.psat=p;
     sat.Tsat=Medium.saturationTemperature(p);
@@ -4795,14 +4912,14 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     fluid_in.h=hin;
     fluid_out.p=p;
     fluid_out.h=hout;
-    
+
     rhoin=fluid_in.d;
     rhoout=fluid_out.d;
     rhols=Medium.bubbleDensity(sat);
     rhovs=Medium.dewDensity(sat);
     hls=Medium.bubbleEnthalpy(sat);
     hvs=Medium.dewEnthalpy(sat);
-    
+
     // Temporary boundary conditions
     Q=Ql+Qb+Qv+win*hin-wout*hout-der(El)-der(Eb)-der(Ev);
     M_flow=win-wout-der(Ml)-der(Mb)-der(Mv);
@@ -4810,5 +4927,17 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
 This model is not yet complete
 </html>"));
   end EvaporatorBase;
-  
+
+  annotation (Documentation(info="<HTML>
+This package contains models of physical processes and components using water or steam as working fluid.
+<p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
+<p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
+<ul>
+<li><tt>Choices.Init.Options.noInit</tt>: no initialisation
+<li><tt>Choices.Init.Options.steadyState</tt>: full steady-state initialisation
+<li><tt>Choices.Init.Options.steadyStateNoP</tt>: steady-state initialisation (except pressure)
+<li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
+</ul>
+The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
+</HTML>"));
 end Water;
