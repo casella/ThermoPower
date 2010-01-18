@@ -53,6 +53,8 @@ package Test "Test cases for the ThermoPower models"
       Water.SinkP SinkP2(p0=0) 
                          annotation (Placement(transformation(extent={{40,-40},
                 {60,-20}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceW1.flange, mixer.in1) 
         annotation (Line(points={{-70,50},{-60,50},{-60,36},{-50,36}},
@@ -71,7 +73,7 @@ package Test "Test cases for the ThermoPower models"
           color={0,0,255},
           thickness=0.5));
       connect(mixer.out, pressDrop.inlet)   annotation (Line(points={{-32,30},{
-              -20,30}},
+              -30,30},{-28,30},{-20,30}},
           color={0,0,255},
           thickness=0.5));
       connect(SourceW3.flange, header.inlet) 
@@ -153,6 +155,8 @@ Casella</a>:<br>
         offset=1e5,
         startTime=4)    annotation (Placement(transformation(extent={{-92,50},{
                 -72,70}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceW1.flange, Mixer1.in1) 
         annotation (Line(points={{-78,20},{-66,20},{-66,6},{-58,6}}, thickness=0.5,
@@ -269,6 +273,8 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf) 
         annotation (Placement(transformation(extent={{0,60},{20,80}}, rotation=
                 0)));
+      inner System system
+        annotation (Placement(transformation(extent={{70,70},{90,90}})));
     initial equation
       PressDrop2a.inlet.w=1;
     equation
@@ -373,6 +379,8 @@ This test model demonstrate four possible ways of setting the friction coefficie
         offset=2,
         startTime=0.5) annotation (Placement(transformation(extent={{-60,-20},{
                 -40,0}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ThroughW1.outlet, PressDropLin1.inlet) 
         annotation (Line(
@@ -453,6 +461,8 @@ Casella</a>:<br>
               rotation=0)));
       ThermoPower.Water.SinkW Plug2(w0=0) annotation (Placement(transformation(
               extent={{60,-10},{80,10}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Pipe.outfl, Tank2.inlet) annotation (Line(
           points={{0,0},{22,0}},
@@ -573,6 +583,8 @@ Casella</a>:<br>
         startTime=1) 
                     annotation (Placement(transformation(extent={{-90,-10},{-70,
                 10}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(CloseValves.y, V3.theta) annotation (Line(points={{-69,0},{-20,0},
               {-20,-22}}, color={0,0,127}));
@@ -702,6 +714,8 @@ Casella</a>:<br>
         phase=3.14159,
         startTime=1)  annotation (Placement(transformation(extent={{10,-20},{30,
                 0}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ValveLiqChocked.outlet, SinkP1.flange) 
         annotation (Line(points={{10,40},{40,40}}, thickness=0.5,
@@ -804,6 +818,8 @@ Casella</a>:<br>
         wnom=1.012,
         rhonom=989)       annotation (Placement(transformation(extent={{-10,-70},
                 {10,-50}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ValveLiq1.outlet, SinkP1.flange) 
         annotation (Line(points={{10,60},{40,60}}, thickness=0.5,
@@ -906,6 +922,8 @@ Casella</a>:<br>
         offset=1,
         startTime=0.6)   annotation (Placement(transformation(extent={{10,20},{
                 30,40}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Source.flange, V1.inlet) annotation (Line(points={{-70,0},{-50,0}},
             thickness=0.5,
@@ -975,6 +993,8 @@ Casella</a>:<br>
               rotation=0)));
       ThermoPower.Water.SinkW SinkW1(w0=0) annotation (Placement(transformation(
               extent={{70,-20},{90,0}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Tank1.outlet, Valve.inlet) annotation (Line(
           points={{-32,-10},{-10,-10}},
@@ -1095,6 +1115,8 @@ Casella</a>:<br>
               rotation=0)));
       ThermoPower.Water.SensP P1 annotation (Placement(transformation(extent={{-42,-48},
                 {-22,-28}},          rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(LossP1.outlet, S3.flange) 
         annotation (Line(points={{60,40},{70,40}}, thickness=0.5,
@@ -1263,6 +1285,8 @@ Casella</a>:<br>
         amplitude=-1.2) 
         annotation (Placement(transformation(extent={{-90,-50},{-70,-30}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(LossP1.outlet, S3.flange) 
         annotation (Line(points={{60,40},{70,40}}, thickness=0.5,
@@ -1431,6 +1455,8 @@ Casella</a>:<br>
         amplitude=-1.2) 
         annotation (Placement(transformation(extent={{40,26},{60,46}}, rotation=
                0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(S4.flange, LossP2.inlet) 
         annotation (Line(points={{-70,-60},{-60,-60}}, thickness=0.5,
@@ -1563,6 +1589,8 @@ Casella</a>:<br>
         offset=1e-6,
         duration=1)  annotation (Placement(transformation(extent={{-20,10},{0,
                 30}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ValveLin1.outlet, SinkP1.flange) 
         annotation (Line(
@@ -1706,6 +1734,8 @@ Schiavo</a>:<br>
         pout_start=400000,
         wstart=0)           annotation (Placement(transformation(extent={{-40,
                 -62},{-20,-42}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ValveLin1.outlet, SinkP1.flange) 
         annotation (Line(
@@ -1829,6 +1859,8 @@ Algorithm Tolerance = 1e-6
         Jm=10,
         dm=1) annotation (Placement(transformation(extent={{-40,-40},{-20,-20}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Source.flange, Pump.infl) 
         annotation (Line(
@@ -2046,6 +2078,8 @@ Schiavo</a>:<br>
         startTime=5000) 
                       annotation (Placement(transformation(extent={{-60,-60},{
                 -40,-40}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Accumulator1.WaterOutfl, PressDropLin1.inlet) 
         annotation (Line(points={{16.8,-80},{38,-80}}, thickness=0.5,
@@ -2160,6 +2194,8 @@ Algorithm Tolerance = 1e-6
       Water.SensT SensT1(redeclare package Medium=Medium) 
                          annotation (Placement(transformation(extent={{-46,8},{
                 -26,28}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ST.shaft_b, Inertia1.flange_a) 
         annotation (Line(
@@ -2279,6 +2315,8 @@ Algorithm Tolerance = 1e-4
       Modelica.Blocks.Sources.Constant Constant1(k=omega) 
         annotation (Placement(transformation(extent={{60,20},{80,40}}, rotation=
                0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ST.shaft_b, Inertia1.flange_a) 
         annotation (Line(
@@ -2532,6 +2570,8 @@ Algorithm Tolerance = 1e-4
       redeclare package Medium = Medium) 
                                     annotation (Placement(transformation(extent=
                {{40,-6},{60,14}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       tau = sum(hex.rho)/Nnodes*Lhex*Ahex/whex;
       connect(hex.outfl, Valve.inlet) annotation (Line(points={{0,0},{10,0}},
@@ -2657,6 +2697,8 @@ Algorithm Tolerance = 1e-6
       redeclare package Medium = Medium) 
                                     annotation (Placement(transformation(extent=
                {{40,-6},{60,14}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(hex.outfl, ValveLin1.inlet) annotation (Line(points={{-6,0},{10,0}},
             thickness=0.5,
@@ -2779,6 +2821,8 @@ Algorithm Tolerance = 1e-6
               rotation=0)));
       Water.SensP SensP annotation (Placement(transformation(extent={{10,14},{
                 30,34}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       // RC constant of equivalent circuit
       tau = (1/ValveLin1.Kv)*(Ahex*Lhex/1200^2);
@@ -2943,6 +2987,8 @@ Algorithm Tolerance = 1e-6
       Thermal.CounterCurrent CounterCurrent1(N=Nnodes) 
         annotation (Placement(transformation(extent={{-20,0},{0,20}}, rotation=
                 0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) 
         annotation (Line(points={{-54,-60},{-46,-60}}, thickness=0.5,
@@ -3138,6 +3184,8 @@ Algorithm Tolerance = 1e-6
       Thermal.CounterCurrent CounterCurrent1(N=Nnodes) 
         annotation (Placement(transformation(extent={{-20,0},{0,20}}, rotation=
                 0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) 
         annotation (Line(points={{-56,-50},{-46,-50}}, thickness=0.5,
@@ -3300,6 +3348,8 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium) 
                                     annotation (Placement(transformation(extent=
                {{40,-6},{60,14}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       tau = sum(hex.rho)/Nnodes*Lhex*Ahex/whex;
       connect(hex.outfl, Valve.inlet) annotation (Line(points={{0,0},{10,0}},
@@ -3428,6 +3478,8 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Thermal.ConvHT_htc ConvHTe_htc1(N=Nnodes) 
         annotation (Placement(transformation(extent={{-20,36},{0,16}}, rotation=
                0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(hex.outfl, ValveLin1.inlet) annotation (Line(points={{0,0},{14,0}},
             thickness=0.5,
@@ -3564,6 +3616,8 @@ Algorithm Tolerance = 1e-6
       redeclare package Medium = Medium) 
                                     annotation (Placement(transformation(extent=
                {{38,-6},{58,14}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(hex.outfl, Valve.inlet) annotation (Line(
           points={{0,0},{12,0}},
@@ -3694,6 +3748,8 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.SensT T_out(redeclare package Medium=Medium) 
                                     annotation (Placement(transformation(extent=
                {{40,-6},{60,14}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(hex.outfl, ValveLin1.inlet) annotation (Line(points={{0,0},{10,0}},
             thickness=0.5,
@@ -3821,6 +3877,8 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.SensT T_out(redeclare package Medium=Medium) 
                                     annotation (Placement(transformation(extent=
                {{10,-6},{30,14}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ValveLin1.outlet, SinkP1.flange) 
         annotation (Line(
@@ -3949,6 +4007,8 @@ Algorithm Tolerance = 1e-6
               rotation=0)));
       Water.SensP SensP annotation (Placement(transformation(extent={{12,4},{32,
                 24}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ValveLin1.inlet, hex.outfl) annotation (Line(
           points={{40,0},{0,0}},
@@ -4112,6 +4172,8 @@ Algorithm Tolerance = 1e-6
       Thermal.CounterCurrent CounterCurrent1(N=Nnodes) 
         annotation (Placement(transformation(extent={{-20,10},{0,30}}, rotation=
                0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) 
         annotation (Line(
@@ -4330,6 +4392,8 @@ Casella</a>:<br>
       Thermal.CounterCurrent CounterCurrent1(N=Nnodes) 
         annotation (Placement(transformation(extent={{-20,0},{0,20}}, rotation=
                 0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) 
         annotation (Line(
@@ -4501,6 +4565,8 @@ Casella</a>:<br>
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) 
         annotation (Placement(transformation(extent={{0,20},{20,40}}, rotation=
                 0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(heatSource.wall, hex.wall) 
         annotation (Line(points={{-10,7},{-10,-15}}, color={255,127,0}));
@@ -4653,6 +4719,8 @@ Algorithm Tolerance = 1e-9
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) 
         annotation (Placement(transformation(extent={{0,20},{20,40}}, rotation=
                 0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(heatSource.wall, hex.wall) 
         annotation (Line(points={{-10,7},{-10,-15}}, color={255,127,0}));
@@ -4785,6 +4853,8 @@ Algorithm Tolerance = 1e-9
                 -60,80}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-40,40},{-20,60}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(heatSource.wall, hex.wall) 
         annotation (Line(points={{0,7},{0,-15}}, color={255,127,0}));
@@ -4932,6 +5002,8 @@ Algorithm Tolerance = 1e-9
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) 
         annotation (Placement(transformation(extent={{0,20},{20,40}}, rotation=
                 0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(heatSource.wall, hex.wall) 
         annotation (Line(points={{-10,7},{-10,-15}}, color={255,127,0}));
@@ -5309,6 +5381,8 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
       Modelica.Blocks.Sources.Constant DT(k=5) 
         annotation (Placement(transformation(extent={{-36,60},{-16,80}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(hex.outfl, valve.inlet) annotation (Line(
           points={{0,-60},{30,-60}},
@@ -5467,6 +5541,8 @@ Algorithm Tolerance = 1e-8
                 64}}, rotation=0)));
       Modelica.Blocks.Math.Add Add3 annotation (Placement(transformation(extent=
                {{-46,0},{-26,20}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     initial equation
       der(hex.p) = 0;
       der(hex.htilde) = zeros(Nnodes - 1);
@@ -5630,6 +5706,8 @@ Algorithm Tolerance = 1e-7
       Modelica.Blocks.Sources.Constant DT(k=5) 
         annotation (Placement(transformation(extent={{-36,60},{-16,80}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(hex.outfl, valve.inlet) 
         annotation (Line(
@@ -5790,6 +5868,8 @@ Algorithm Tolerance = 1e-8
                 64}}, rotation=0)));
       Modelica.Blocks.Math.Add Add3 annotation (Placement(transformation(extent=
                {{-52,0},{-32,20}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(heatSource.wall, hex.wall) 
         annotation (Line(points={{-20,-21},{-20,-35}}, color={255,127,0}));
@@ -5952,6 +6032,8 @@ Algorithm Tolerance = 1e-7
         omega=(rhex + thhex)*2*Modelica.Constants.pi) 
         annotation (Placement(transformation(extent={{-30,4},{-10,24}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(hex.outfl, valve.inlet) annotation (Line(
           points={{-10,-40},{20,-40}},
@@ -6132,6 +6214,8 @@ Casella</a>:<br>
         startTime=40) 
         annotation (Placement(transformation(extent={{0,40},{20,60}}, rotation=
                 0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceW1.flange, SensT1.inlet) annotation (Line(
           points={{-58,0},{-46,0}},
@@ -6350,6 +6434,8 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint) 
                   annotation (Placement(transformation(extent={{40,-10},{60,10}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Ramp1.y, ValveLin1.cmd)   annotation (Line(points={{-39,30},{-32,
               30},{-32,7}}, color={0,0,127}));
@@ -6426,6 +6512,8 @@ This model tests the <tt>Plenum</tt> model.
         p0=5e5,
         T=450) annotation (Placement(transformation(extent={{-90,-10},{-70,10}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     initial equation
 
     equation
@@ -6531,6 +6619,8 @@ This model tests the <tt>Header</tt> model.
         p0=4e5,
         T=450)     annotation (Placement(transformation(extent={{-74,18},{-54,
                 38}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Mixer1.out, PressDrop1.inlet)     annotation (Line(
           points={{-18,0},{0,0}},
@@ -6612,6 +6702,8 @@ Simulate for 20 s. At time t=1 the first inlet flow rate is reduced. At time t=8
       Modelica.Blocks.Sources.Constant Constant1 
         annotation (Placement(transformation(extent={{22,28},{42,48}}, rotation=
                0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Wfuel.flange, CombustionChamber1.inf) annotation (Line(
           points={{-30,38},{-28,38},{-28,10}},
@@ -6747,6 +6839,8 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
     //initial equation
     //Valve2.w=1;
 
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(PressDrop1.outlet, PressDropLin1.inlet)     annotation (Line(
           points={{-10,20},{6,20}},
@@ -6881,6 +6975,8 @@ This model tests the <tt>PressDrop</tt>, <tt>PressDropLin</tt> and <tt>Valve</tt
   Valve3.w=1;
   Valve4.inlet.p=4e5;*/
 
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceP1.flange, Valve1.inlet) annotation (Line(
           points={{-60,20},{-40,20}},
@@ -7053,6 +7149,8 @@ This models tests the Valve model in different operating conditions. The valve f
         amplitude=2e5,
         offset=4e5) annotation (Placement(transformation(extent={{46,-30},{66,
                 -10}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(S2.y,V1. theta) annotation (Line(points={{-49,50},{-40,50},{-40,
               27.2}}, color={0,0,127}));
@@ -7169,6 +7267,8 @@ This model tests the <tt>Valve</tt> model, in each possible configuration, i.e. 
           useSupport=false) 
         annotation (Placement(transformation(extent={{-50,-10},{-30,10}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceP1.flange, Compressor.inlet)     annotation (Line(
           points={{-60,16},{-16,16}},
@@ -7246,6 +7346,8 @@ This model test the <tt>Compressor</tt> model at constant speed.
         Ndesign=523.3,
         Tdes_in=244.4)  annotation (Placement(transformation(extent={{-40,-20},
                 {0,20}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     initial equation
       Inertia1.w=523.3;
 
@@ -7313,6 +7415,8 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         p0=1.52e5,
         T=883) annotation (Placement(transformation(extent={{40,6},{60,26}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceP1.flange, Turbine1.inlet)    annotation (Line(
           points={{-60,16},{-36,16}},
@@ -7383,6 +7487,8 @@ This model test the Turbine model with an inertial load. Boundary conditions and
           useSupport=false) 
         annotation (Placement(transformation(extent={{-50,-10},{-30,10}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceP1.flange, Turbine1.inlet)    annotation (Line(
           points={{-60,16},{-16,16}},
@@ -7533,6 +7639,8 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
         offset=2.02,
         startTime=1) annotation (Placement(transformation(extent={{-60,50},{-40,
                 70}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceW1.flange, CombustionChamber1.inf)     annotation (Line(
           points={{0,44},{18,44},{18,20}},
@@ -7707,6 +7815,8 @@ This is the full model of a turbojet-type engine at 11.000m [1].
           useSupport=false) 
         annotation (Placement(transformation(extent={{-98,-30},{-78,-10}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceW1.flange, CombustionChamber1.inf)     annotation (Line(
           points={{-10,40},{4,40},{4,20}},
@@ -7816,6 +7926,8 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
         offset=0.317,
         startTime=1) annotation (Placement(transformation(extent={{-70,50},{-50,
                 70}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceW1.flange, GT.Fuel_in)      annotation (Line(
           points={{-20,34},{-10,34},{-10,14.4}},
@@ -7937,6 +8049,8 @@ This model tests <tt>GTunit_ISO</tt>.
       Modelica.Blocks.Sources.BooleanStep BooleanStep1(startTime=1, startValue=true) 
         annotation (Placement(transformation(extent={{40,20},{60,40}}, rotation=
                0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceW1.flange, GTunit.Fuel_in)  annotation (Line(
           points={{-60,30},{-52,30},{-52,14.4}},
@@ -8051,6 +8165,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                                                    fn_max=1e6) 
         annotation (Placement(transformation(extent={{30,-10},{50,10}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceP1.flange, FanMech1.infl) annotation (Line(
           points={{-78,0},{-78,0.4},{-66,0.4}},

@@ -1,13 +1,12 @@
 within ThermoPower;
 package Water "Models of components with water/steam as working fluid"
-  connector Flange "A-type flange connector for water/steam flows"
+  connector Flange "Flange connector for water/steam flows"
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.AbsolutePressure p "Pressure";
     flow Medium.MassFlowRate w "Mass flowrate";
     stream Medium.SpecificEnthalpy h "Specific enthalpy of fluid going out";
-    annotation (Documentation(info="<HTML>
-<p> Must always be connected to a single type-B connector <tt>FlangeB</tt>.
+    annotation (Documentation(info="<HTML>.
 </HTML>",
         revisions="<html>
 <ul>
@@ -20,14 +19,10 @@ package Water "Models of components with water/steam as working fluid"
 </ul>
 </html>"),
       Diagram(graphics),
-      Icon(graphics={Rectangle(
-            extent={{-60,60},{60,-60}},
-            lineColor={0,0,255},
-            fillColor={0,0,255},
-            fillPattern=FillPattern.Solid)}));
+      Icon(graphics));
   end Flange;
 
-  connector FlangeA
+  connector FlangeA "A-type flange connector for water/steam flows"
     extends ThermoPower.Water.Flange;
     annotation (Icon(graphics={Ellipse(
             extent={{-100,100},{100,-100}},
@@ -36,7 +31,7 @@ package Water "Models of components with water/steam as working fluid"
             fillPattern=FillPattern.Solid)}));
   end FlangeA;
 
-  connector FlangeB
+  connector FlangeB "B-type flange connector for water/steam flows"
     extends ThermoPower.Water.Flange;
     annotation (Icon(graphics={Ellipse(
             extent={{-100,100},{100,-100}},
@@ -52,9 +47,6 @@ package Water "Models of components with water/steam as working fluid"
 
   package StandardWater=Modelica.Media.Water.StandardWater;
 
-
-
-
   model SourceP "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
     replaceable package Medium = StandardWater constrainedby
@@ -62,8 +54,11 @@ package Water "Models of components with water/steam as working fluid"
     parameter Pressure p0=1.01325e5 "Nominal pressure";
     parameter HydraulicResistance R=0 "Hydraulic resistance";
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     Pressure p "Actual pressure";
-    FlangeB flange(redeclare package Medium=Medium) 
+    FlangeB flange(redeclare package Medium=Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p0 
@@ -126,8 +121,11 @@ package Water "Models of components with water/steam as working fluid"
     parameter Pressure p0=1.01325e5 "Nominal pressure";
     parameter HydraulicResistance R=0 "Hydraulic resistance" annotation(Evaluate=true);
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     Pressure p;
-    FlangeA flange(redeclare package Medium=Medium) 
+    FlangeA flange(redeclare package Medium=Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p0 
@@ -191,8 +189,11 @@ package Water "Models of components with water/steam as working fluid"
     parameter Pressure p0=1e5 "Nominal pressure";
     parameter HydraulicConductance G=0 "Hydraulic conductance";
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
-    FlangeB flange(redeclare package Medium=Medium) 
+    FlangeB flange(redeclare package Medium=Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 
@@ -256,8 +257,11 @@ package Water "Models of components with water/steam as working fluid"
     parameter Pressure p0=1e5 "Nominal pressure";
     parameter HydraulicConductance G=0 "Hydraulic conductance";
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
-    FlangeA flange(      redeclare package Medium=Medium) 
+    FlangeA flange(      redeclare package Medium=Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                          annotation (Placement(transformation(extent={{-120,-20},
               {-80,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 
@@ -318,10 +322,13 @@ package Water "Models of components with water/steam as working fluid"
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
-    FlangeA inlet(redeclare package Medium=Medium) annotation (Placement(
+    FlangeA inlet(redeclare package Medium=Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (Placement(
           transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium=Medium) annotation (Placement(
+    FlangeB outlet(redeclare package Medium=Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (Placement(
           transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 
       annotation (Placement(transformation(
@@ -365,10 +372,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter HydraulicResistance R "Hydraulic resistance";
-    FlangeA inlet(redeclare package Medium=Medium) 
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+    FlangeA inlet(redeclare package Medium=Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium=Medium) 
+    FlangeB outlet(redeclare package Medium=Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
   equation
@@ -412,14 +422,19 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Real wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
   protected
     parameter Real Kfl(fixed = false) "Linear friction coefficient";
   public
     Medium.Density rho "Fluid density";
-    FlangeA inlet(w(start=wnom),redeclare package Medium=Medium) 
+    FlangeA inlet(w(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0),
+                  redeclare package Medium=Medium) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    FlangeB outlet(w(start=-wnom),redeclare package Medium=Medium) 
+    FlangeB outlet(w(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0),
+                   redeclare package Medium=Medium) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
   initial equation
@@ -432,7 +447,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Kfl = wnom*wnf*Kf "Linear friction factor";
   equation
     // Fluid properties
-    if inlet.w>=0 then
+    if not allowFlowReversal then
+      fluid.p = inlet.p;
+      fluid.h = outlet.h;
+    elseif inlet.w>=0 then
       fluid.p=inlet.p;
       fluid.h=outlet.h;
     else
@@ -486,6 +504,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Position H=0 "Elevation of outlet over inlet" annotation (Evaluate=true);
     parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient" annotation(Evaluate=true);
     parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate=true);
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Pressure pstartin=1.01325e5 "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pstartout=1.01325e5 "Outlet pressure start value" 
@@ -497,11 +518,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     FlangeA inlet(p(start=pstartin), h(start=hstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-122,-20},{-80,
               20}}, rotation=0)));
     FlangeB outlet(p(start=pstartout), h(start=hstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
     Pressure p(start=pstartout, stateSelect=if Medium.singleState then 
@@ -538,8 +559,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
-    hi = if inlet.w >= 0 then inStream(inlet.h) else h;
-    ho = if outlet.w >= 0 then inStream(outlet.h) else h;
+    hi = if not allowFlowReversal then inStream(inlet.h) else if inlet.w >= 0 then inStream(inlet.h) else h;
+    ho = if not allowFlowReversal then h else if outlet.w >= 0 then inStream(outlet.h) else h;
     inlet.h = h;
     outlet.h = h;
     inlet.p = p+fluid.d*Modelica.Constants.g_n*H;
@@ -627,6 +648,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter CoefficientOfHeatTransfer gamma=0
       "Internal Heat Transfer Coefficient" annotation(Evaluate=true);
     parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate=true);
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart=1e5 "Enthalpy start value" 
@@ -635,15 +659,19 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
-    FlangeA in1(p(start=pstart), h(start=hstart),redeclare package Medium=Medium) 
+    FlangeA in1(p(start=pstart), h(start=hstart),redeclare package Medium=Medium,
+                w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{-100,40},{-60,80}},
             rotation=0)));
-    FlangeA in2(p(start=pstart), h(start=hstart),redeclare package Medium=Medium) 
+    FlangeA in2(p(start=pstart), h(start=hstart),redeclare package Medium=Medium,
+                w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{-100,-80},{-60,
               -40}}, rotation=0)));
-    FlangeB out(p(start=pstart), h(start=hstart),redeclare package Medium=Medium) 
-                annotation (Placement(transformation(extent={{80,-20},{120,20}},
-            rotation=0)));
+    FlangeB out(p(start=pstart), h(start=hstart),redeclare package Medium=Medium,
+                w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+                                                                                annotation (Placement(transformation(extent={{80,-20},
+              {120,20}},
+                     rotation=0)));
     Medium.AbsolutePressure p(start=pstart, stateSelect=if Medium.singleState then 
                StateSelect.avoid else StateSelect.prefer) "Fluid pressure";
     Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
@@ -678,9 +706,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
-    hi1 = if in1.w >= 0 then inStream(in1.h) else h;
-    hi2 = if in2.w >= 0 then inStream(in2.h) else h;
-    ho = if out.w >= 0 then inStream(out.h) else h;
+    hi1 = if not allowFlowReversal then inStream(in1.h) else if in1.w >= 0 then inStream(in1.h) else h;
+    hi2 = if not allowFlowReversal then inStream(in2.h) else if in2.w >= 0 then inStream(in2.h) else h;
+    ho = if not allowFlowReversal then h else if out.w >= 0 then inStream(out.h) else h;
     in1.h = h;
     in2.h = h;
     out.h = h;
@@ -712,7 +740,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       assert(false, "Unsupported initialisation option");
     end if;
 
-    annotation (Documentation(info="<HTML>
+                annotation (Placement(transformation(extent={{80,-20},{120,20}},
+            rotation=0)),
+                Documentation(info="<HTML>
 <p>This model describes a constant volume mixer with metal walls. The fluid can be water, steam, or a two-phase mixture. The metal wall temperature and the heat transfer coefficient between the wall and the fluid are uniform. The wall is thermally insulated from the outside.
 </HTML>",
         revisions="<html>
@@ -747,6 +777,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Area A "Cross-sectional area";
     parameter Volume V0=0 "Volume at zero level";
     parameter Pressure pext=1.01325e5 "Surface pressure";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Length ystart "Start level" 
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart=1e5 
@@ -761,10 +794,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.SpecificEnthalpy hout;
     Medium.AbsolutePressure p(start=pext) "Bottom pressure";
     constant Real g=Modelica.Constants.g_n;
-    FlangeA inlet(redeclare package Medium=Medium) 
+    FlangeA inlet(redeclare package Medium=Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-100,-80},{-60,
               -40}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium=Medium) 
+    FlangeB outlet(redeclare package Medium=Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{60,-80},{100,
               -40}}, rotation=0)));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
@@ -782,8 +815,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     p - pext = liquid.d*g*y "Stevino's law";
 
     // Boundary conditions
-    hin = if inlet.w >= 0 then inStream(inlet.h) else h;
-    hout = if outlet.w >= 0 then inStream(outlet.h) else h;
+    hin = if not allowFlowReversal then inStream(inlet.h) else if inlet.w >= 0 then inStream(inlet.h) else h;
+    hout = if not allowFlowReversal then h else if outlet.w >= 0 then inStream(outlet.h) else h;
     inlet.h = h;
     outlet.h = h;
     inlet.p = p;
@@ -849,6 +882,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Location of the hydraulic capacitance";
     parameter Boolean avoidInletEnthalpyDerivative = true
       "Avoid inlet enthalpy derivative";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Pressure pstartin=1e5 "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pstartout=1e5 "Outlet pressure start value" 
@@ -866,12 +902,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     constant Real g=Modelica.Constants.g_n;
-    FlangeA infl(p(start=pstartin),w(start=wnom),h(start=hstartin),
-      redeclare package Medium = Medium) 
+    FlangeA infl(p(start=pstartin),h(start=hstartin),
+      redeclare package Medium = Medium, w(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                  annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    FlangeB outfl(p(start=pstartout),w(start=-wnom),h(start=hstartout),
-      redeclare package Medium = Medium) 
+    FlangeB outfl(p(start=pstartout),h(start=hstartout),
+      redeclare package Medium = Medium, w(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{80,-20},{120,20}},
             rotation=0)));
     replaceable ThermoPower.Thermal.DHT wall(N=N) 
@@ -2918,6 +2954,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     extends Icons.Water.FlowJoin;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     constant MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
     parameter Pressure pstart=1e5 "Pressure start value" 
@@ -2927,31 +2966,24 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean rev_out = true "Allow flow reversal at out";
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_in1 or not rev_in2 or not rev_out));
-    FlangeB out(p(start=pstart), redeclare package Medium = Medium) 
+    FlangeB out(p(start=pstart), redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{40,-20},{80,20}},
             rotation=0)));
-    FlangeA in1(p(start=pstart), redeclare package Medium = Medium) 
+    FlangeA in1(p(start=pstart), redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{-80,20},{-40,60}},
             rotation=0)));
-    FlangeA in2(p(start=pstart), redeclare package Medium = Medium) 
+    FlangeA in2(p(start=pstart), redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{-80,-60},{-40,-20}},
             rotation=0)));
   equation
-    in1.w + in2.w + out.w = 0 "Mass balance";
-    in1.p = out.p;
-    in2.p = out.p;
-    // Energy balance
-    out.h = if (in2.w < 0 and rev_in2) then inStream(in1.h) else if (in1.w < 0 and rev_in1) then inStream(in2.h) else (
-      inStream(in1.h)*(in1.w + wzero) + inStream(in2.h)*(in2.w + wzero))/(in1.w + 2*wzero + in2.w);
-    in1.h = if (in2.w < 0 and rev_in2) then inStream(out.h) else if (out.w < 0 or not rev_out) then inStream(in2.h) else (
-      inStream(out.h)*(out.w + wzero) + inStream(in2.h)*(in2.w + wzero))/(out.w + 2*wzero + in2.w);
-    in2.h = if (in1.w < 0 and rev_in1) then inStream(out.h) else if (out.w < 0 or not rev_out) then inStream(in1.h) else (
-      inStream(out.h)*(out.w + wzero) + inStream(in1.h)*(in1.w + wzero))/(out.w + 2*wzero + in1.w);
-    //Check flow direction
-    assert( not checkFlowDirection or ((rev_in1 or in1.w >= 0) and 
-                                       (rev_in2 or in2.w >= 0) and 
-                                       (rev_out or out.w <= 0)),
-                                      "Flow reversal not supported");
+    connect(out, in1) annotation (Line(
+        points={{60,0},{0,0},{0,40},{-60,40}},
+        color={0,0,255},
+        smooth=Smooth.None));
+    connect(in2, out) annotation (Line(
+        points={{-60,-40},{0,-40},{0,0},{60,0}},
+        color={0,0,255},
+        smooth=Smooth.None));
     annotation (Icon(graphics),
                       Documentation(info="<HTML>
 <p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
@@ -2971,13 +3003,16 @@ enthalpy between the nodes; this requires the availability of the time derivativ
        First release.</li>
 </ul>
 </html>
-"));
+"),   Diagram(graphics));
   end FlowJoin;
 
   model FlowSplit "Splits a flow in two"
     extends Icons.Water.FlowSplit;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     constant MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
     parameter Pressure pstart=1e5 "Pressure start value" 
@@ -2987,32 +3022,25 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean rev_out2 = true "Allow flow reversal at out2";
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_in1 or not rev_out1 or not rev_out2));
-    FlangeA in1(p(start=pstart), redeclare package Medium = Medium) 
+    FlangeA in1(p(start=pstart), redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                   annotation (Placement(transformation(extent={
               {-80,-20},{-40,20}}, rotation=0)));
-    FlangeB out1(p(start=pstart), redeclare package Medium = Medium) 
-                                   annotation (Placement(transformation(extent=
-              {{40,22},{80,62}}, rotation=0), iconTransformation(extent={{40,20},{
+    FlangeB out1(p(start=pstart), redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+                                   annotation (Placement(transformation(extent={{40,20},
+              {80,60}},          rotation=0), iconTransformation(extent={{40,20},{
               80,60}})));
-    FlangeB out2(p(start=pstart), redeclare package Medium = Medium) 
+    FlangeB out2(p(start=pstart), redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                    annotation (Placement(transformation(extent=
               {{40,-60},{80,-20}}, rotation=0)));
   equation
-    in1.w + out1.w + out2.w = 0 "Mass balance";
-    out1.p = in1.p;
-    out2.p = in1.p;
-    // Energy balance
-    out1.h = if (in1.w < 0 and rev_in1) then inStream(out2.h) else if (out2.w < 0 or not rev_out2) then inStream(in1.h) else 
-            (inStream(in1.h)*(in1.w + wzero) + inStream(out2.h)*(out2.w + wzero))/(in1.w + 2*wzero + out2.w);
-    out2.h = if (in1.w < 0 and rev_in1) then inStream(out1.h) else if (out1.w < 0 or not rev_out1) then inStream(in1.h) else 
-            (inStream(in1.h)*(in1.w + wzero) + inStream(out1.h)*(out1.w + wzero))/(in1.w + 2*wzero + out1.w);
-    in1.h = if (out1.w < 0 or not rev_out1) then inStream(out2.h) else if (out2.w < 0 or not rev_out2) then inStream(out1.h) else 
-            (inStream(out1.h)*(out1.w + wzero) + inStream(out2.h)*(out2.w + wzero))/(out1.w + 2*wzero + out2.w);
-    //Check flow direction
-    assert( not checkFlowDirection or ((rev_in1 or in1.w >= 0) and 
-                                       (rev_out1 or out1.w <= 0) and 
-                                       (rev_out2 or out2.w <= 0)),
-                                      "Flow reversal not supported");
+    connect(in1, out1) annotation (Line(
+        points={{-60,0},{0,0},{0,40},{60,40}},
+        color={0,0,255},
+        smooth=Smooth.None));
+    connect(in1, out2) annotation (Line(
+        points={{-60,0},{0,0},{0,-40},{60,-40}},
+        color={0,0,255},
+        smooth=Smooth.None));
     annotation (Icon(graphics),
                       Documentation(info="<HTML>
 <p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
@@ -3032,18 +3060,21 @@ enthalpy between the nodes; this requires the availability of the time derivativ
        First release.</li>
 </ul>
 </html>
-"));
+"),   Diagram(graphics));
   end FlowSplit;
 
   model SensT "Temperature sensor for water-steam"
     extends Icons.Water.SensThrough;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     Medium.BaseProperties fluid;
-    FlangeA inlet(                  redeclare package Medium = Medium) 
+    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                     annotation (Placement(transformation(extent=
              {{-80,-60},{-40,-20}}, rotation=0)));
-    FlangeB outlet(                  redeclare package Medium = Medium) 
+    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                      annotation (Placement(transformation(
             extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput T 
@@ -3086,14 +3117,52 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </html>"));
   end SensT;
 
+  model SensT1 "Temperature sensor for water/steam flows, single port"
+    extends ThermoPower.Icons.Water.SensP;
+    replaceable package Medium = ThermoPower.Water.StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialMedium "Medium model";
+    Modelica.Blocks.Interfaces.RealOutput T 
+      annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
+              0)));
+    FlangeA flange(redeclare package Medium = Medium, w(min=0)) 
+      annotation (Placement(transformation(extent=
+             {{-20,-60},{20,-20}}, rotation=0)));
+  equation
+    flange.w = 0;
+    flange.h = 0;
+    T = Medium.temperature(Medium.setState_ph(flange.p, inStream(flange.h)));
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-40,84},{38,34}},
+            lineColor={0,0,0},
+            textString=
+                 "T")}),
+      Documentation(info="<HTML>
+<p>This component can be connected to any A-type or B-type connector to measure the pressure of the fluid flowing through it. In this case, it is possible to connect more than two <tt>Flange</tt> connectors together.
+</HTML>",   revisions="<html>
+<ul>
+<li><i>16 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Standard medium definition added.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end SensT1;
+
   model SensW "Mass Flowrate sensor for water/steam"
     extends Icons.Water.SensThrough;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    FlangeA inlet(                  redeclare package Medium = Medium) 
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                     annotation (Placement(transformation(extent=
              {{-80,-60},{-40,-20}}, rotation=0)));
-    FlangeB outlet(                  redeclare package Medium = Medium) 
+    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                      annotation (Placement(transformation(
             extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput w 
@@ -3138,8 +3207,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Modelica.Blocks.Interfaces.RealOutput p 
       annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
               0)));
-    ThermoPower.Water.Flange flange(
-                  redeclare package Medium = Medium, w(min=0)) 
+    FlangeA flange(redeclare package Medium = Medium, w(min=0)) 
                                     annotation (Placement(transformation(extent=
              {{-20,-60},{20,-20}}, rotation=0)));
   equation
@@ -3191,6 +3259,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter MassFlowRate wg_out0 "Nominal gas outlet flowrate";
     parameter AbsoluteTemperature Tg0=300 "Nominal gas temperature";
     parameter Pressure pg0 "Nominal gas pressure";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option";
   protected
@@ -3223,10 +3294,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Modelica.Blocks.Interfaces.RealInput GasInfl 
       annotation (Placement(transformation(extent={{-84,80},{-64,100}},
             rotation=0)));
-    FlangeA WaterInfl(                  redeclare package Medium = Medium) 
+    FlangeA WaterInfl(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-44,-100},{-24,-80}},
             rotation=0)));
-    FlangeB WaterOutfl(                  redeclare package Medium = Medium) 
+    FlangeB WaterOutfl(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{24,-100},{44,-80}},
             rotation=0)));
     Modelica.Blocks.Interfaces.RealInput OutletValveOpening 
@@ -3243,8 +3314,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     // Boundary conditions
     // (Thermal effects of the water going out of the accumulator are neglected)
-    hl_in = if wl_in >= 0 then inStream(WaterInfl.h) else hl;
-    hl_out = if wl_out >= 0 then inStream(WaterOutfl.h) else hl;
+    hl_in = if not allowFlowReversal then inStream(WaterInfl.h) else if wl_in >= 0 then inStream(WaterInfl.h) else hl;
+    hl_out = if not allowFlowReversal then hl else if wl_out >= 0 then inStream(WaterOutfl.h) else hl;
     WaterInfl.h = inStream(WaterOutfl.h);
     WaterOutfl.h = inStream(WaterInfl.h);
     wl_in = WaterInfl.w;
@@ -3331,6 +3402,9 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     parameter Mass Mmd "Drum metal mass";
     parameter Mass Mmdcr "Metal mass of downcomer and risers";
     parameter SpecificHeatCapacity cm "Specific heat capacity of the metal";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Pressure pstart "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Volume Vldstart "Start value of drum water volume" 
@@ -3339,10 +3413,10 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
 
     Medium.SaturationProperties sat "Saturation conditions";
-    FlangeA feed(redeclare package Medium = Medium) 
+    FlangeA feed(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                  annotation (Placement(transformation(extent={{-110,-64},{-70,
               -24}}, rotation=0)));
-    FlangeB steam(redeclare package Medium = Medium) 
+    FlangeB steam(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{48,52},{88,92}},
             rotation=0)));
     Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
@@ -3384,7 +3458,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     // Boundary conditions
     p = feed.p;
     p = steam.p;
-    hf = if feed.w >= 0 then inStream(feed.h) else hl;
+    hf = if not allowFlowReversal then inStream(feed.h) else if feed.w >= 0 then inStream(feed.h) else hl;
     feed.w = qf;
     -steam.w = qs;
     feed.h = hl;
@@ -3457,6 +3531,9 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     parameter Real afd=0.05 "Ratio of feedwater in downcomer flowrate";
     parameter Real avr=1.2 "Phase separation efficiency coefficient";
     parameter Integer DrumOrientation=0 "0: Horizontal; 1: Vertical";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hlstart=1e5 "Liquid enthalpy start value" 
@@ -3528,23 +3605,23 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     Area Asup "Surface of the liquid-vapour interface";
     Area Aext "External drum surface";
     FlangeA feedwater(p(start=pstart), h(start=hlstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                       annotation (Placement(transformation(extent={{-114,-32},{
               -80,2}}, rotation=0)));
     FlangeA riser(p(start=pstart), h(start=hlstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{60,-74},{96,-40}},
             rotation=0)));
     FlangeB downcomer(p(start=pstart), h(start=hlstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                       annotation (Placement(transformation(extent={{-88,-88},{
               -52,-52}}, rotation=0)));
     FlangeB blowdown(p(start=pstart), h(start=hlstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                      annotation (Placement(transformation(extent={{-18,-116},{
               18,-80}}, rotation=0)));
     FlangeB steam(p(start=pstart), h(start=hvstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{40,52},{76,88}},
             rotation=0)));
   equation
@@ -3616,11 +3693,11 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     feedwater.p = p;
     feedwater.w = wf;
     feedwater.h = hl;
-    hf = noEvent(if wf >= 0 then inStream(feedwater.h) else hl);
+    hf = if not allowFlowReversal then inStream(feedwater.h) else noEvent(if wf >= 0 then inStream(feedwater.h) else hl);
     downcomer.p = p + rhol*g*y;
     downcomer.w = -wd;
     downcomer.h = hd;
-    hd = noEvent(if wd >= 0 then afd*hf + (1 - afd)*hl else inStream(downcomer.h));
+    hd = if not allowFlowReversal then afd*hf + (1 - afd)*hl else noEvent(if wd >= 0 then afd*hf + (1 - afd)*hl else inStream(downcomer.h));
     blowdown.p = p;
     blowdown.w = -wb;
     blowdown.h = hl;
@@ -3629,15 +3706,15 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     riser.h = hl;
     hrv = hls + xrv*(hvs - hls);
     xrv = 1 - (rhov/rhol)^avr;
-    hr=noEvent(if wr>=0 then inStream(riser.h) else hl);
-    xr=noEvent(if wr>=0 then (if hr>hls then (hr - hls)/(hvs - hls) else 0) else xl);
-    hrl=noEvent(if wr>=0 then (if hr>hls then hls else hr) else hl);
-    wrv=noEvent(if wr>=0 then xr*wr/xrv else 0);
+    hr= if not allowFlowReversal then inStream(riser.h) else noEvent(if wr>=0 then inStream(riser.h) else hl);
+    xr= if not allowFlowReversal then (if hr>hls then (hr - hls)/(hvs - hls) else 0) else noEvent(if wr>=0 then (if hr>hls then (hr - hls)/(hvs - hls) else 0) else xl);
+    hrl= if not allowFlowReversal then (if hr>hls then hls else hr) else noEvent(if wr>=0 then (if hr>hls then hls else hr) else hl);
+    wrv= if not allowFlowReversal then xr*wr/xrv else noEvent(if wr>=0 then xr*wr/xrv else 0);
     wrl=wr-wrv;
     steam.p = p;
     steam.w = -wv;
     steam.h = hv;
-    hvout = noEvent(if wv >= 0 then hv else inStream(steam.h));
+    hvout = if not allowFlowReversal then hv else noEvent(if wv >= 0 then hv else inStream(steam.h));
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -3709,11 +3786,14 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter HydraulicConductance Kv "Nominal hydraulic conductance";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
-    FlangeA inlet(redeclare package Medium = Medium) 
+    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium) 
+    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput cmd 
@@ -3785,6 +3865,9 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
       constrainedby Functions.ValveCharacteristics.baseFun
       "Flow characteristic" 
       annotation(choicesAllMatching=true);
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Pressure pin_start = pnom "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pout_start = pnom-dpnom "Inlet pressure start value" 
@@ -3798,11 +3881,12 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
   protected
     function sqrtR = Functions.sqrtReg(delta = b*dpnom);
   public
-    FlangeA inlet(w(start=wnom),p(start=pin_start),redeclare package Medium = Medium) 
+    FlangeA inlet(w(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0),
+                  p(start=pin_start),redeclare package Medium = Medium) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    FlangeB outlet(w(start=-wnom),p(start=pout_start),redeclare package Medium
-        =                                                                        Medium) 
+    FlangeB outlet(w(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0),
+                   p(start=pout_start),redeclare package Medium = Medium) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput theta "Valve opening in per unit" 
@@ -3954,7 +4038,7 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
       Y_nom = 0;
     end if;
   equation
-    p = noEvent(if dp>=0 then inlet.p else outlet.p);
+    p = if not allowFlowReversal then inlet.p else noEvent(if dp>=0 then inlet.p else outlet.p);
     Fxt = Fxt_full*xtfun(theta);
     x = dp/p;
     xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
@@ -4088,6 +4172,9 @@ li><i>1 Jul 2004</i>
        annotation(Dialog(group="Characteristics"));
     parameter Volume V=0 "Pump Internal Volume" annotation(Evaluate=true);
     parameter Boolean CheckValve=false "Reverse flow stopped";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Pressure pin_start "Inlet Pressure Start Value" 
       annotation(Dialog(tab="Initialisation"));
     parameter Pressure pout_start "Outlet Pressure Start Value" 
@@ -4121,11 +4208,11 @@ li><i>1 Jul 2004</i>
     Real eta "Pump efficiency";
     Real s "Auxiliary Variable";
     FlangeA infl(p(start=pin_start),h(start=hstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,0},{-60,40}}, rotation=
              0)));
     FlangeB outfl(p(start=pout_start),h(start=hstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,50},{80,90}}, rotation=0)));
     Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps" 
       annotation (Placement(transformation(
@@ -4170,7 +4257,9 @@ li><i>1 Jul 2004</i>
     // Boundary conditions
     dp = outfl.p - infl.p;
     w = infl.w "Pump total flow rate";
-    if w >= 0 then
+    if not allowFlowReversal then
+      hin = inStream(infl.h);
+    elseif w >= 0 then
       hin = inStream(infl.h);
     else
       hin = inStream(outfl.h);
@@ -4502,6 +4591,9 @@ Input variables changed. This function now computes the heat transfer coefficien
       annotation(Dialog(tab = "Initialisation"));
     parameter MassFlowRate wnom "Inlet nominal flowrate";
     parameter Real eta_mech=0.98 "Mechanical efficiency";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
 
     Medium.BaseProperties steam_in(p(start=pstart_in),h(start=hstartin));
     Medium.BaseProperties steam_iso(p(start=pstart_out),h(start=hstartout));
@@ -4530,12 +4622,14 @@ Input variables changed. This function now computes the heat transfer coefficien
               0)));
     FlangeA inlet(
       redeclare package Medium = Medium,
-      p(start=pstart_in)) 
+      p(start=pstart_in),
+      w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,60},{-60,100}},
             rotation=0)));
     FlangeB outlet(
       redeclare package Medium = Medium,
-      p(start=pstart_out)) 
+      p(start=pstart_out),
+      w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{60,60},{100,100}}, rotation=
              0)));
 
@@ -4663,6 +4757,9 @@ Input variables changed. This function now computes the heat transfer coefficien
       "Fraction of power provided by the HP turbine [PerUnit]";
     parameter Time T_HP "Time constant of HP mechanical power response";
     parameter Time T_LP "Time constant of LP mechanical power response";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
     parameter Pressure pstartin = pnom "Inlet start pressure" 
       annotation(Dialog(tab = "Initialization"));
     parameter SpecificEnthalpy hstartin "Inlet enthalpy start value" 
@@ -4672,10 +4769,10 @@ Input variables changed. This function now computes the heat transfer coefficien
     parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.steadyState
       "Initialization option" annotation(Dialog(tab = "Initialization"));
     Medium.BaseProperties fluid_in(p(start=pstartin),h(start=hstartin));
-    FlangeA inlet(redeclare package Medium = Medium) 
+    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-120,50},{-80,
               90}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium) 
+    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-90},{120,
               -50}}, rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 

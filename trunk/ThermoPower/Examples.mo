@@ -597,6 +597,8 @@ Casella</a>:<br>
       Modelica.Blocks.Math.Add ValveOpening 
                                      annotation (Placement(transformation(
               extent={{40,-60},{60,-40}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{140,140},{160,160}})));
     equation
       // Connection of the control signals to the process variables
       connect(Plant.FeedWaterEnthalpy,hfeed.y);
@@ -1171,6 +1173,8 @@ Casella</a>:<br>
                 -120,70}}, rotation=0)));
       Modelica.Blocks.Math.Add ValveOpening annotation (Placement(
             transformation(extent={{-20,-120},{0,-100}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{140,140},{160,160}})));
     equation
       connect(wfeed3.y, sum_1.u3) annotation (Line(points={{-119,-50},{-100,-50},
               {-100,-28},{-82,-28}}, color={0,0,127}));
@@ -1896,6 +1900,8 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         Modelica.Blocks.Interfaces.RealOutput TWoutOutput 
           annotation (Placement(transformation(extent={{90,-70},{110,-50}},
                 rotation=0)));
+        inner System system
+          annotation (Placement(transformation(extent={{40,80},{60,100}})));
       equation
         connect(Plant.GasOut_T, TGoutOutput) annotation (Line(points={{72.5,39},
                 {80,39},{80,80},{100,80}}, color={0,0,127}));
@@ -1987,6 +1993,8 @@ Casella</a>:<br>
           startTime=150) 
                        annotation (Placement(transformation(extent={{-80,0},{
                   -60,20}}, rotation=0)));
+        inner System system
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
         connect(ValveOpening.y, Plant.ValveOpening) annotation (Line(points={{
                 -59,-30},{6,-30},{6,-25},{20,-25}}, color={0,0,127}));
@@ -2043,6 +2051,8 @@ This model simulates a simple continuous-time control system for the HRB. The wa
           StartSteadyState=true) 
                             annotation (Placement(transformation(extent={{-34,
                   20},{-14,0}}, rotation=0)));
+        inner System system
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
         connect(ValveOpening.y, Plant.ValveOpening) annotation (Line(points={{
                 -59,-30},{6,-30},{6,-25},{20,-25}}, color={0,0,127}));
@@ -3205,6 +3215,8 @@ Casella</a>:<br>
           duration=2) 
           annotation (Placement(transformation(extent={{-80,-40},{-60,-20}},
                 rotation=0)));
+        inner System system
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
         connect(gasTemperature.y, plant.gasTemperature) annotation (Line(points=
                {{-59,50},{-20,50},{-20,20},{20,20}}, color={0,0,127}));
@@ -3282,6 +3294,8 @@ Casella</a>:<br>
           CSstart=0.8,
           Kp=2)                  annotation (Placement(transformation(extent={{-40,74},
                   {-20,54}},         rotation=0)));
+        inner System system
+          annotation (Placement(transformation(extent={{60,-100},{80,-80}})));
       equation
         connect(voidFractionController.SP, voidFractionSetPoint.y) 
                                                 annotation (Line(points={{-40,
@@ -3594,6 +3608,8 @@ Casella</a>:<br>
         startTime=500) 
         annotation (Placement(transformation(extent={{-40,-10},{-20,10}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(plant.combustibleFlowRate, combustibleFlowRate.y) 
         annotation (Line(points={{20,0},{-19,0}}, color={0,0,127}));
@@ -3630,6 +3646,8 @@ Casella</a>:<br>
         steadyStateInit=true,
         Kp=0.25) annotation (Placement(transformation(extent={{-32,-10},{-12,10}},
               rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(plant.combustibleFlowRate, pID.CS) annotation (Line(points={{20,0},{
               -11.4,0}},  color={0,0,127}));

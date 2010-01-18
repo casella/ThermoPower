@@ -5339,10 +5339,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
         "Base reader for the visualization of the state in the simulation (water)"
         replaceable package Medium = Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance "Medium model";
-        Water.FlangeA inlet(            redeclare package Medium = Medium) 
+        parameter Boolean allowFlowReversal = system.allowFlowReversal
+          "= true to allow flow reversal, false restricts to design direction";
+        outer ThermoPower.System system "System wide properties";
+        Water.FlangeA inlet( redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                         annotation (Placement(transformation(
                 extent={{-80,-20},{-40,20}}, rotation=0)));
-        Water.FlangeB outlet(            redeclare package Medium = Medium) 
+        Water.FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                          annotation (Placement(transformation(
                 extent={{40,-20},{80,20}}, rotation=0)));
       equation
@@ -5405,10 +5408,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
       model BaseReader_gas
         "Base reader for the visualization of the state in the simulation (gas)"
         replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
-        Gas.FlangeA inlet(redeclare package Medium = Medium) 
+        parameter Boolean allowFlowReversal = system.allowFlowReversal
+          "= true to allow flow reversal, false restricts to design direction";
+        outer ThermoPower.System system "System wide properties";
+        Gas.FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
           annotation (Placement(transformation(extent={{-80,-20},{-40,20}},
                 rotation=0)));
-        Gas.FlangeB outlet(redeclare package Medium = Medium) 
+        Gas.FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
           annotation (Placement(transformation(extent={{40,-20},{80,20}},
                 rotation=0)));
       equation
@@ -10007,7 +10013,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(drums.Downcomer_IP, HeatExchangersGroup.Ev_IP_In) annotation (
             Line(
-            points={{-2,40},{-2,30},{-2,30},{-2,20},{-2,20},{-2,0}},
+            points={{-2,40},{-2,30},{-2,30},{-2,20},{-2,0},{-2,0}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
@@ -15339,6 +15345,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Volume Vtot = 10 "Total volume of the fluid side";
         parameter SI.Volume Vlstart = 0.15*Vtot
           "Start value of the liquid water volume";
+        parameter Boolean allowFlowReversal = system.allowFlowReversal
+          "= true to allow flow reversal, false restricts to design direction";
+        outer ThermoPower.System system "System wide properties";
 
         //Variable
         SI.Density rhol "Density of saturated liquid";
@@ -15354,10 +15363,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
         SI.Power Q "Thermal power";
 
         //Connectors
-        Water.FlangeA steamIn( redeclare package Medium = Medium) 
+        Water.FlangeA steamIn( redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                        annotation (Placement(transformation(extent={{-20,80},{
                   20,120}}, rotation=0)));
-        Water.FlangeB waterOut( redeclare package Medium = Medium) annotation (Placement(
+        Water.FlangeB waterOut( redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (Placement(
               transformation(extent={{-20,-120},{20,-80}}, rotation=0)));
         Modelica.Blocks.Interfaces.RealOutput Qcond annotation (Placement(
               transformation(
@@ -15421,6 +15430,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Pressure p "Nominal inlet pressure";
         parameter SI.Volume Vtot = 10 "Total volume of the fluid side";
         parameter SI.Volume Vlstart = 0.15*Vtot;
+        parameter Boolean allowFlowReversal = system.allowFlowReversal
+          "= true to allow flow reversal, false restricts to design direction";
+        outer ThermoPower.System system "System wide properties";
 
         SI.Density rhol "Density of saturated liquid";
         SI.Density rhov "Density of saturated steam";
@@ -15435,10 +15447,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
         SI.Energy E "Internal energy";
         SI.Power Q "Thermal power";
 
-        Water.FlangeA steamIn( redeclare package Medium = Medium) 
+        Water.FlangeA steamIn( redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                        annotation (Placement(transformation(extent={{-20,80},{
                   20,120}}, rotation=0)));
-        Water.FlangeB waterOut( redeclare package Medium = Medium) annotation (Placement(
+        Water.FlangeB waterOut( redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (Placement(
               transformation(extent={{-20,-120},{20,-80}}, rotation=0)));
         Modelica.Blocks.Interfaces.RealOutput Qcond annotation (Placement(
               transformation(
@@ -15835,7 +15847,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         in1.h + dh= inStream(out1.h);
         inStream(in1.h) = out1.h - dh;
         annotation (Icon(graphics={Text(extent={{-100,-56},{100,-84}},
-                  textString=                         "%name")}), Diagram(graphics));
+                  textString =                        "%name")}), Diagram(graphics));
       end EffectHE;
 
       model Comp_bubble_h
@@ -15871,10 +15883,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         "Base reader for the visualization of the state in the simulation (water)"
         replaceable package Medium = Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance "Medium model";
-        Water.FlangeA inlet(            redeclare package Medium = Medium) 
+        parameter Boolean allowFlowReversal = system.allowFlowReversal
+          "= true to allow flow reversal, false restricts to design direction";
+        outer ThermoPower.System system "System wide properties";
+        Water.FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                         annotation (Placement(transformation(
                 extent={{-80,-20},{-40,20}}, rotation=0)));
-        Water.FlangeB outlet(            redeclare package Medium = Medium) 
+        Water.FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                          annotation (Placement(transformation(
                 extent={{40,-20},{80,20}}, rotation=0)));
       equation
@@ -22286,6 +22301,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     protected
       Buses.Actuators actuators annotation (Placement(transformation(extent={{
                 120,-60},{100,-40}}, rotation=0)));
+    public
+      inner System system(allowFlowReversal=false) 
+        annotation (Placement(transformation(extent={{180,180},{200,200}})));
     equation
       connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (Line(
           points={{40,-130},{0,-130}},
@@ -22567,6 +22585,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     protected
       Buses.Actuators actuators annotation (Placement(transformation(extent={{
                 120,-60},{100,-40}}, rotation=0)));
+    public
+      inner System system(allowFlowReversal=false) 
+        annotation (Placement(transformation(extent={{180,180},{200,200}})));
     equation
       connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (Line(
           points={{40,-130},{0,-130}},
@@ -22850,6 +22871,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         gasTurbine(redeclare package FlueGasMedium = FlueGasMedium) 
         annotation (Placement(transformation(extent={{-140,-60},{-60,20}},
               rotation=0)));
+      inner System system(allowFlowReversal=false) 
+        annotation (Placement(transformation(extent={{160,160},{180,180}})));
     equation
       connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (Line(
           points={{100,-120},{60,-120}},
