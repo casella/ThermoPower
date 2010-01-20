@@ -1234,7 +1234,7 @@ most user-developed models.</li>
 <p>The ThermoPower package is licensed by Politecnico di Milano under the  <a href=\"http://www.modelica.org/licenses/ModelicaLicense2\"><b>Modelica License 2</b></a>.</p> 
 <p><b>Copyright &copy; 2002-2009, Politecnico di Milano.</b></p>
 </HTML>"),
-uses(Modelica(version="2.2.1")),
+uses(Modelica(version="2.2.2")),
 version="2.1");
 
   package Electrical "Simplified models of electric power components" 
