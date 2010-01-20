@@ -5342,19 +5342,19 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean allowFlowReversal = system.allowFlowReversal
           "= true to allow flow reversal, false restricts to design direction";
         outer ThermoPower.System system "System wide properties";
-        Water.FlangeA inlet( redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+        Water.FlangeA inlet( redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                         annotation (Placement(transformation(
                 extent={{-80,-20},{-40,20}}, rotation=0)));
-        Water.FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+        Water.FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                          annotation (Placement(transformation(
                 extent={{40,-20},{80,20}}, rotation=0)));
       equation
-        inlet.w + outlet.w = 0 "Mass balance";
+        inlet.m_flow + outlet.m_flow = 0 "Mass balance";
         inlet.p = outlet.p "No pressure drop";
 
         // Boundary conditions
-        inlet.h = inStream(outlet.h);
-        inStream(inlet.h) = outlet.h;
+        inlet.h_outflow = inStream(outlet.h_outflow);
+        inStream(inlet.h_outflow) = outlet.h_outflow;
         annotation (
           Diagram(graphics),
           Icon(graphics={Polygon(
@@ -5397,12 +5397,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
       equation
         // Set fluid properties
         fluid.p=inlet.p;
-        fluid.h = if inlet.w >= 0 then inStream(inlet.h) else inlet.h;
+        fluid.h = if inlet.m_flow >= 0 then inStream(inlet.h_outflow) else inlet.h_outflow;
 
         T=fluid.T;
         p=fluid.p;
         h=fluid.h;
-        w=inlet.w;
+        w=inlet.m_flow;
       end StateReader_water;
 
       model BaseReader_gas
@@ -5411,21 +5411,21 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean allowFlowReversal = system.allowFlowReversal
           "= true to allow flow reversal, false restricts to design direction";
         outer ThermoPower.System system "System wide properties";
-        Gas.FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+        Gas.FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
           annotation (Placement(transformation(extent={{-80,-20},{-40,20}},
                 rotation=0)));
-        Gas.FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+        Gas.FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
           annotation (Placement(transformation(extent={{40,-20},{80,20}},
                 rotation=0)));
       equation
-        inlet.w + outlet.w=0 "Mass balance";
+        inlet.m_flow + outlet.m_flow=0 "Mass balance";
         inlet.p = outlet.p "Momentum balance";
         // Energy balance
-        inlet.h = inStream(outlet.h);
-        inStream(inlet.h) = outlet.h;
+        inlet.h_outflow = inStream(outlet.h_outflow);
+        inStream(inlet.h_outflow) = outlet.h_outflow;
         // Independent composition mass balances
-        inlet.X = inStream(outlet.X);
-        inStream(inlet.X) = outlet.X;
+        inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+        inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
         annotation (Diagram(graphics),
           Icon(graphics={Polygon(
                 points={{-80,0},{0,30},{80,0},{0,-30},{-80,0}},
@@ -5452,18 +5452,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
       equation
         // Set gas properties
         inlet.p=gas.p;
-        if inlet.w >= 0 then
-          gas.h = inStream(inlet.h);
-          gas.Xi = inStream(inlet.X);
+        if inlet.m_flow >= 0 then
+          gas.h = inStream(inlet.h_outflow);
+          gas.Xi = inStream(inlet.Xi_outflow);
         else
-          gas.h = inlet.h;
-          gas.Xi = inlet.X;
+          gas.h = inlet.h_outflow;
+          gas.Xi = inlet.Xi_outflow;
         end if;
 
         T=gas.T;
         p=gas.p;
         h=gas.h;
-        w=inlet.w;
+        w=inlet.m_flow;
       end StateReader_gas;
 
       model PrescribedSpeedPump "Prescribed speed pump"
@@ -15363,10 +15363,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
         SI.Power Q "Thermal power";
 
         //Connectors
-        Water.FlangeA steamIn( redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+        Water.FlangeA steamIn( redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                        annotation (Placement(transformation(extent={{-20,80},{
                   20,120}}, rotation=0)));
-        Water.FlangeB waterOut( redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (Placement(
+        Water.FlangeB waterOut( redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (Placement(
               transformation(extent={{-20,-120},{20,-80}}, rotation=0)));
         Modelica.Blocks.Interfaces.RealOutput Qcond annotation (Placement(
               transformation(
@@ -15381,24 +15381,24 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
       equation
         steamIn.p = p;
-        steamIn.h = hl;
+        steamIn.h_outflow = hl;
         sat.psat = p;
         sat.Tsat = Medium.saturationTemperature(p);
         hl = Medium.bubbleEnthalpy(sat);
         waterOut.p = p;
-        waterOut.h = hl;
+        waterOut.h_outflow = hl;
         rhol = Medium.bubbleDensity(sat);
-        rhov = Medium.density_ph(steamIn.p,inStream(steamIn.h));
+        rhov = Medium.density_ph(steamIn.p,inStream(steamIn.h_outflow));
 
         Ml = Vl*rhol;
         Mv = Vv*rhov;
         Vtot= Vv+Vl;
         M = Ml + Mv;
-        E = Ml*hl + Mv*inStream(steamIn.h) - p*Vtot;
+        E = Ml*hl + Mv*inStream(steamIn.h_outflow) - p*Vtot;
 
         //Energy and Mass Bilances
-        der(M) = steamIn.w + waterOut.w;
-        der(E) = steamIn.w*inStream(steamIn.h) + waterOut.w*hl - Q;
+        der(M) = steamIn.m_flow + waterOut.m_flow;
+        der(E) = steamIn.m_flow*inStream(steamIn.h_outflow) + waterOut.m_flow*hl - Q;
 
         //Output signal
         ratio_Vv_Vtot=Vv/Vtot;
@@ -15447,10 +15447,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
         SI.Energy E "Internal energy";
         SI.Power Q "Thermal power";
 
-        Water.FlangeA steamIn( redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+        Water.FlangeA steamIn( redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                        annotation (Placement(transformation(extent={{-20,80},{
                   20,120}}, rotation=0)));
-        Water.FlangeB waterOut( redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (Placement(
+        Water.FlangeB waterOut( redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (Placement(
               transformation(extent={{-20,-120},{20,-80}}, rotation=0)));
         Modelica.Blocks.Interfaces.RealOutput Qcond annotation (Placement(
               transformation(
@@ -15468,27 +15468,27 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
       equation
         steamIn.p = p;
-        steamIn.h = hl;
+        steamIn.h_outflow = hl;
         sat.psat = p;
         sat.Tsat = Medium.saturationTemperature(p);
         hl = Medium.bubbleEnthalpy(sat);
         waterOut.p = p;
-        waterOut.h = hl;
+        waterOut.h_outflow = hl;
         rhol = Medium.bubbleDensity(sat);
-        rhov = Medium.density_ph(steamIn.p,inStream(steamIn.h));
+        rhov = Medium.density_ph(steamIn.p,inStream(steamIn.h_outflow));
 
-        hl=tapWater.h;
+        hl=tapWater.h_outflow;
         tapWater.p=p;
 
         Ml = Vl*rhol;
         Mv = Vv*rhov;
         Vtot= Vv + Vl;
         M = Ml + Mv;
-        E = Ml*hl + Mv*inStream(steamIn.h) - p*Vtot;
+        E = Ml*hl + Mv*inStream(steamIn.h_outflow) - p*Vtot;
 
         //Energy and Mass Bilances
-        der(M) = steamIn.w + (waterOut.w + tapWater.w);
-        der(E) = steamIn.w*inStream(steamIn.h) + (waterOut.w + tapWater.w)*hl - Q;
+        der(M) = steamIn.m_flow + (waterOut.m_flow + tapWater.m_flow);
+        der(E) = steamIn.m_flow*inStream(steamIn.h_outflow) + (waterOut.m_flow + tapWater.m_flow)*hl - Q;
 
         //Output signal
         ratio_Vv_Vtot = Vv/Vtot;
@@ -15886,19 +15886,19 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         parameter Boolean allowFlowReversal = system.allowFlowReversal
           "= true to allow flow reversal, false restricts to design direction";
         outer ThermoPower.System system "System wide properties";
-        Water.FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+        Water.FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                         annotation (Placement(transformation(
                 extent={{-80,-20},{-40,20}}, rotation=0)));
-        Water.FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+        Water.FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                          annotation (Placement(transformation(
                 extent={{40,-20},{80,20}}, rotation=0)));
       equation
-        inlet.w + outlet.w = 0 "Mass balance";
+        inlet.m_flow + outlet.m_flow = 0 "Mass balance";
         inlet.p = outlet.p "No pressure drop";
 
         // Boundary conditions
-        inlet.h = inStream(outlet.h);
-        inStream(inlet.h) = outlet.h;
+        inlet.h_outflow = inStream(outlet.h_outflow);
+        inStream(inlet.h_outflow) = outlet.h_outflow;
         annotation (
           Diagram(graphics),
           Icon(graphics={Polygon(
@@ -15941,12 +15941,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       equation
         // Set fluid properties
         fluid.p=inlet.p;
-        fluid.h = if inlet.w >= 0 then inStream(inlet.h) else inlet.h;
+        fluid.h = if inlet.m_flow >= 0 then inStream(inlet.h_outflow) else inlet.h_outflow;
 
         T=fluid.T;
         p=fluid.p;
         h=fluid.h;
-        w=inlet.w;
+        w=inlet.m_flow;
       end StateReader_water;
     end Components;
 
@@ -22302,7 +22302,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       Buses.Actuators actuators annotation (Placement(transformation(extent={{
                 120,-60},{100,-40}}, rotation=0)));
     public
-      inner System system(allowFlowReversal=false) 
+      inner System system 
         annotation (Placement(transformation(extent={{180,180},{200,200}})));
     equation
       connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (Line(

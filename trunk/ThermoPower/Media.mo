@@ -90,6 +90,7 @@ package Media "Medium models for the ThermoPower library"
     redeclare record extends ThermodynamicState
       Pressure p;
       Temperature T;
+      MassFraction X[nXi];
     end ThermodynamicState;
   end GenericGas;
 
@@ -122,8 +123,13 @@ package Media "Medium models for the ThermoPower library"
                    Common.SingleGasesData.H2O,
                    Common.SingleGasesData.CO2,
                    Common.SingleGasesData.N2},
-                   substanceNames={"Oxygen", "Argon", "Water", "Carbondioxide", "Nitrogen"},
-                   reference_X={0.23,0.02,0.01,0.04,0.7});
+             fluidConstants = {Common.FluidData.O2,
+                               Common.FluidData.Ar,
+                               Common.FluidData.H2O,
+                               Common.FluidData.CO2,
+                               Common.FluidData.N2},
+             substanceNames={"Oxygen", "Argon", "Water", "Carbondioxide", "Nitrogen"},
+             reference_X={0.23,0.02,0.01,0.04,0.7});
 
   end FlueGas;
 
