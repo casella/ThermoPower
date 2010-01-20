@@ -1301,7 +1301,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         Kf[j] = 0;
       end if;
       assert(Kf[j]>=0, "Negative friction coefficient");
-      Kfl[j] = wnom*wnf*Kf[j];
+      Kfl[j] = wnom/Nt*wnf*Kf[j];
     end for;
     
     // Dynamic momentum term
@@ -4307,7 +4307,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
   protected 
     Real Re;
   algorithm 
-    Re := w*D_A/mu;
+    Re := abs(w)*D_A/mu;
     Re := if Re > 2100 then Re else 2100;
     f := 0.332/(log(e/3.7 + 5.47/Re^0.9)^2);
     annotation (Documentation(info="<HTML>
@@ -4336,7 +4336,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     DynamicViscosity mu;
   algorithm 
     mu := 1/(x/muv + (1 - x)/mul);
-    Re := w*D_A/mu;
+    Re := abs(w)*D_A/mu;
     Re := if Re > 2100 then Re else 2100;
     f := 0.332/(log(e/3.7 + 5.47/Re^0.9)^2);
     annotation (Documentation(info="<HTML>
