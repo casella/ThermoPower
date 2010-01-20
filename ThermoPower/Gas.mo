@@ -2,10 +2,15 @@ within ThermoPower;
 package Gas "Models of components with ideal gases as working fluid"
   connector Flange "Flange connector for gas flows"
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
-    Medium.AbsolutePressure p "Pressure";
-    flow MassFlowRate w "Mass flowrate";
-    stream Medium.SpecificEnthalpy h "Specific enthalpy of fluid going out";
-    stream Medium.MassFraction X[Medium.nXi] "Composition of fluid going out";
+    flow Medium.MassFlowRate m_flow
+      "Mass flow rate from the connection point into the component";
+    Medium.AbsolutePressure p "Thermodynamic pressure in the connection point";
+    stream Medium.SpecificEnthalpy h_outflow
+      "Specific thermodynamic enthalpy close to the connection point if m_flow < 0";
+    stream Medium.MassFraction Xi_outflow[Medium.nXi]
+      "Independent mixture mass fractions m_i/m close to the connection point if m_flow < 0";
+    stream Medium.ExtraProperty C_outflow[Medium.nC]
+      "Properties c_i/m close to the connection point if m_flow < 0";
     annotation (Icon(graphics),
                               Documentation(info="<HTML>
 </HTML>", revisions="<html>
@@ -56,7 +61,7 @@ package Gas "Models of components with ideal gases as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
 
-    FlangeB flange(redeclare package Medium=Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB flange(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
              0)));
     Modelica.Blocks.Interfaces.RealInput in_p 
@@ -78,7 +83,7 @@ package Gas "Models of components with ideal gases as working fluid"
     if R == 0 then
       flange.p = gas.p;
     else
-      flange.p = gas.p + flange.w*R;
+      flange.p = gas.p + flange.m_flow*R;
     end if;
 
     gas.p = in_p;
@@ -96,8 +101,8 @@ package Gas "Models of components with ideal gases as working fluid"
       in_X = Xnom "Composition set by parameter";
     end if;
 
-    flange.h = gas.h;
-    flange.X = gas.Xi;
+    flange.h_outflow = gas.h;
+    flange.Xi_outflow = gas.Xi;
 
     annotation (Icon(graphics),
                       Diagram(graphics),
@@ -134,7 +139,7 @@ package Gas "Models of components with ideal gases as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
 
-    FlangeA flange(redeclare package Medium=Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA flange(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-120,-20},{-80,20}},
             rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p 
@@ -156,7 +161,7 @@ package Gas "Models of components with ideal gases as working fluid"
     if R == 0 then
       flange.p = gas.p;
     else
-      flange.p = gas.p + flange.w*R;
+      flange.p = gas.p + flange.m_flow*R;
     end if;
 
     gas.p = in_p;
@@ -174,8 +179,8 @@ package Gas "Models of components with ideal gases as working fluid"
       in_X = Xnom "Composition set by parameter";
     end if;
 
-    flange.h = gas.h;
-    flange.X = gas.Xi;
+    flange.h_outflow = gas.h;
+    flange.Xi_outflow = gas.Xi;
 
     annotation (uses(Modelica(version="1.6")), Icon(graphics),
       DymolaStoredErrors,
@@ -216,7 +221,7 @@ package Gas "Models of components with ideal gases as working fluid"
 
     MassFlowRate w;
 
-    FlangeB flange(redeclare package Medium=Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB flange(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
              0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 
@@ -237,9 +242,9 @@ package Gas "Models of components with ideal gases as working fluid"
   equation
 
     if G == 0 then
-      flange.w = -w;
+      flange.m_flow = -w;
     else
-      flange.w = -w + (flange.p - p0)*G;
+      flange.m_flow = -w + (flange.p - p0)*G;
     end if;
 
     w = in_w0;
@@ -258,8 +263,8 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     flange.p = gas.p;
-    flange.h = gas.h;
-    flange.X = gas.Xi;
+    flange.h_outflow = gas.h;
+    flange.Xi_outflow = gas.Xi;
 
     annotation (Icon(graphics),
                       uses(Modelica(version="1.6")),
@@ -315,14 +320,14 @@ package Gas "Models of components with ideal gases as working fluid"
           extent={{-10,-10},{10,10}},
           rotation=270)));
 
-    FlangeA flange(redeclare package Medium=Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA flange(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-120,-20},{-80,20}},
             rotation=0)));
   equation
     if G == 0 then
-      flange.w = w;
+      flange.m_flow = w;
     else
-      flange.w = w + (flange.p - p0)*G;
+      flange.m_flow = w + (flange.p - p0)*G;
     end if;
 
     w = in_w0;
@@ -341,8 +346,8 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
    flange.p = gas.p;
-   flange.h = gas.h;
-   flange.X = gas.Xi;
+   flange.h_outflow = gas.h;
+   flange.Xi_outflow = gas.Xi;
 
     annotation (Icon(graphics),
                       Diagram(graphics),
@@ -372,10 +377,10 @@ package Gas "Models of components with ideal gases as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
 
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-120,-20},{-80,20}},
             rotation=0)));
-    FlangeB outlet(redeclare package Medium=Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
              0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 
@@ -387,8 +392,8 @@ package Gas "Models of components with ideal gases as working fluid"
     MassFlowRate w "Mass flow rate";
 
   equation
-    inlet.w + outlet.w = 0 "Mass balance";
-    inlet.w = w "Flow characteristics";
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+    inlet.m_flow = w "Flow characteristics";
 
     w = in_w0;
     if cardinality(in_w0) == 0 then
@@ -396,10 +401,10 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     // Energy and partial mass balance
-    inlet.h = inStream(outlet.h);
-    inStream(inlet.h) = outlet.h;
-    inlet.X = inStream(outlet.X);
-    inStream(inlet.X) = outlet.X;
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
 
     annotation (Icon(graphics),
                       uses(Modelica(version="1.6")),
@@ -451,47 +456,49 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.MassFraction Xi_o[Medium.nXi] "Outlet composition";
     Time Tr "Residence Time";
 
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=
              0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     replaceable Thermal.HT thermalPort 
       annotation (Placement(transformation(extent={{-40,60},{40,80}}, rotation=0)));
   equation
     M = gas.d*V "Gas mass";
     E = M*gas.u "Gas internal energy";
-    der(M) = inlet.w + outlet.w "Mass balance";
-    der(E) = inlet.w*hi + outlet.w*ho + thermalPort.Q_flow "Energy balance";
+    der(M) = inlet.m_flow + outlet.m_flow "Mass balance";
+    der(E) = inlet.m_flow*hi + outlet.m_flow*ho + thermalPort.Q_flow
+      "Energy balance";
     for j in 1:Medium.nXi loop
-      M*der(gas.Xi[j]) = inlet.w*(Xi_i[j] - gas.Xi[j]) + outlet.w*(Xi_o[j] - gas.Xi[j])
+      M*der(gas.Xi[j]) = inlet.m_flow*(Xi_i[j] - gas.Xi[j]) + outlet.m_flow*(Xi_o[j] - gas.Xi[j])
         "Independent component mass balance";
     end for;
 
     // Boundary conditions
-    if inlet.w >= 0 then
-      hi = inStream(inlet.h);
-      Xi_i = inStream(inlet.X);
+    if inlet.m_flow >= 0 then
+      hi = inStream(inlet.h_outflow);
+      Xi_i = inStream(inlet.Xi_outflow);
     else
       hi = gas.h;
       Xi_i = gas.Xi;
     end if;
-    if outlet.w >= 0 then
-      ho = inStream(outlet.h);
-      Xi_o = inStream(outlet.X);
+    if outlet.m_flow >= 0 then
+      ho = inStream(outlet.h_outflow);
+      Xi_o = inStream(outlet.Xi_outflow);
     else
       ho = gas.h;
       Xi_o = gas.Xi;
     end if;
-    inlet.h = gas.h;
-    inlet.X = gas.Xi;
-    outlet.h = gas.h;
-    outlet.X = gas.Xi;
+    inlet.h_outflow = gas.h;
+    inlet.Xi_outflow = gas.Xi;
+    outlet.h_outflow = gas.h;
+    outlet.Xi_outflow = gas.Xi;
     inlet.p = gas.p;
     outlet.p = gas.p;
     thermalPort.T = gas.T;
 
-    Tr=noEvent(M/max(abs(outlet.w),Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(abs(outlet.m_flow),Modelica.Constants.eps))
+      "Residence time";
   initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
@@ -559,21 +566,21 @@ package Gas "Models of components with ideal gases as working fluid"
       AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
       Time Tr "Residence Time";
 
-      FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+      FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
         annotation (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=
                0)));
-      FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+      FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
         annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
       replaceable Thermal.HT thermalPort 
         annotation (Placement(transformation(extent={{-40,60},{40,80}}, rotation=0)));
     equation
       M = gas.d*V "Gas mass";
       E = gas.u*M "Gas internal energy";
-      der(M) = inlet.w + outlet.w "Mass balance";
-      der(E) = inlet.w*hi + outlet.w*ho - gamma*S*(gas.T - Tm)
+      der(M) = inlet.m_flow + outlet.m_flow "Mass balance";
+      der(E) = inlet.m_flow*hi + outlet.m_flow*ho - gamma*S*(gas.T - Tm)
                + thermalPort.Q_flow "Energy balance";
       for j in 1:Medium.nXi loop
-        M*der(gas.Xi[j]) = inlet.w*(Xi_i[j] - gas.Xi[j]) + outlet.w*(Xi_o[j] - gas.Xi[j])
+        M*der(gas.Xi[j]) = inlet.m_flow*(Xi_i[j] - gas.Xi[j]) + outlet.m_flow*(Xi_o[j] - gas.Xi[j])
         "Independent component mass balance";
       end for;
       if Cm > 0 and gamma > 0 then
@@ -583,29 +590,30 @@ package Gas "Models of components with ideal gases as working fluid"
       end if;
 
       // Boundary conditions
-      if inlet.w >= 0 then
-        hi = inStream(inlet.h);
-        Xi_i = inStream(inlet.X);
+      if inlet.m_flow >= 0 then
+        hi = inStream(inlet.h_outflow);
+        Xi_i = inStream(inlet.Xi_outflow);
       else
         hi = gas.h;
         Xi_i = gas.Xi;
       end if;
-      if outlet.w >= 0 then
-        ho = inStream(outlet.h);
-        Xi_o = inStream(outlet.X);
+      if outlet.m_flow >= 0 then
+        ho = inStream(outlet.h_outflow);
+        Xi_o = inStream(outlet.Xi_outflow);
       else
         ho = gas.h;
         Xi_o = gas.Xi;
       end if;
       inlet.p = gas.p;
-      inlet.h = gas.h;
-      inlet.X = gas.Xi;
+      inlet.h_outflow = gas.h;
+      inlet.Xi_outflow = gas.Xi;
       outlet.p = gas.p;
-      outlet.h = gas.h;
-      outlet.X = gas.Xi;
+      outlet.h_outflow = gas.h;
+      outlet.Xi_outflow = gas.Xi;
       thermalPort.T = gas.T;
 
-      Tr=noEvent(M/max(abs(outlet.w),Modelica.Constants.eps)) "Residence time";
+      Tr=noEvent(M/max(abs(outlet.m_flow),Modelica.Constants.eps))
+      "Residence time";
     initial equation
       // Initial conditions
       if initOpt == Choices.Init.Options.noInit then
@@ -684,11 +692,11 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.MassFraction Xo[Medium.nX] "Outlet composition";
     Time Tr "Residence time";
 
-    FlangeA in1(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA in1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,40},{-60,80}}, rotation=0)));
-    FlangeB out(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB out(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-    FlangeA in2(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA in2(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,-80},{-60,-40}},
             rotation=0)));
 
@@ -697,12 +705,12 @@ package Gas "Models of components with ideal gases as working fluid"
   equation
     M = gas.d*V "Gas mass";
     E = M*gas.u "Gas internal energy";
-    der(M) = in1.w + in2.w + out.w "Mass balance";
-    der(E) = in1.w*hi1 + in2.w*hi2 + out.w*ho - gamma*S*(gas.T - Tm)
+    der(M) = in1.m_flow + in2.m_flow + out.m_flow "Mass balance";
+    der(E) = in1.m_flow*hi1 + in2.m_flow*hi2 + out.m_flow*ho - gamma*S*(gas.T - Tm)
        + thermalPort.Q_flow "Energy balance";
     for j in 1:Medium.nX loop
-      M*der(gas.X[j]) = in1.w*(Xi1[j] - gas.X[j]) + in2.w*(Xi2[j] - gas.X[j])
-         + out.w*(Xo[j] - gas.X[j]) "Independent component mass balance";
+      M*der(gas.X[j]) = in1.m_flow*(Xi1[j] - gas.X[j]) + in2.m_flow*(Xi2[j] - gas.X[j])
+         + out.m_flow*(Xo[j] - gas.X[j]) "Independent component mass balance";
     end for;
     if Cm > 0 and gamma > 0 then
       Cm*der(Tm) = gamma*S*(gas.T - Tm) "Metal wall energy balance";
@@ -711,39 +719,39 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     // Boundary conditions
-    if in1.w >= 0 then
-      hi1 = inStream(in1.h);
-      Xi1 = inStream(in1.X);
+    if in1.m_flow >= 0 then
+      hi1 = inStream(in1.h_outflow);
+      Xi1 = inStream(in1.Xi_outflow);
     else
       hi1 = gas.h;
       Xi1 = gas.X;
     end if;
-    if in2.w >= 0 then
-      hi2 = inStream(in2.h);
-      Xi2 = inStream(in2.X);
+    if in2.m_flow >= 0 then
+      hi2 = inStream(in2.h_outflow);
+      Xi2 = inStream(in2.Xi_outflow);
     else
       hi2 = gas.h;
       Xi2 = gas.X;
     end if;
-    if out.w >= 0 then
-      ho = inStream(out.h);
-      Xo = inStream(out.X);
+    if out.m_flow >= 0 then
+      ho = inStream(out.h_outflow);
+      Xo = inStream(out.Xi_outflow);
     else
       ho = gas.h;
       Xo = gas.X;
     end if;
     in1.p = gas.p;
-    in1.h = gas.h;
-    in1.X = gas.X;
+    in1.h_outflow = gas.h;
+    in1.Xi_outflow = gas.X;
     in2.p = gas.p;
-    in2.h = gas.h;
-    in2.X = gas.X;
+    in2.h_outflow = gas.h;
+    in2.Xi_outflow = gas.X;
     out.p = gas.p;
-    out.h = gas.h;
-    out.X = gas.X;
+    out.h_outflow = gas.h;
+    out.Xi_outflow = gas.X;
     thermalPort.T = gas.T;
 
-    Tr=noEvent(M/max(abs(out.w),Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(abs(out.m_flow),Modelica.Constants.eps)) "Residence time";
   initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
@@ -799,13 +807,13 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean rev_outlet = true "Allow flow reversal at outlet";
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_inlet1 or not rev_inlet2 or not rev_outlet));
-    FlangeA inlet1(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-80,20},{-40,60}}, rotation=
              0)));
-    FlangeA inlet2(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet2(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-80,-60},{-40,-20}},
             rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,-20},{80,20}}, rotation=
               0)));
   equation
@@ -854,12 +862,12 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean rev_outlet2 = true "Allow flow reversal at outlet2";
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_inlet or not rev_outlet1 or not rev_outlet2));
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-80,-20},{-40,20}},
             rotation=0)));
-    FlangeB outlet1(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet1(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,20},{80,60}}, rotation=0)));
-    FlangeB outlet2(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet2(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=
              0)));
   equation
@@ -904,22 +912,22 @@ package Gas "Models of components with ideal gases as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
 
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-120,-20},{-80,20}},
             rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                           annotation (Placement(transformation(
             extent={{80,-20},{120,20}}, rotation=0)));
 
   equation
-    inlet.w + outlet.w = 0 "Mass balance";
-    inlet.p - outlet.p = R*inlet.w "Flow characteristics";
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+    inlet.p - outlet.p = R*inlet.m_flow "Flow characteristics";
 
     // Boundary conditions
-    inlet.h = inStream(outlet.h);
-    inStream(inlet.h) = outlet.h;
-    inlet.X = inStream(outlet.X);
-    inStream(inlet.X) = outlet.X;
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
     annotation (Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
                                                                "%name")}),
       Diagram(graphics),
@@ -968,11 +976,11 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Real Kfl(fixed=false) "Linear friction coefficient";
   public
     FlangeA inlet(redeclare package Medium = Medium,
-                  w(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+                  m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                           annotation (Placement(transformation(
             extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium,
-                   w(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+                   m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                           annotation (Placement(transformation(
             extent={{80,-20},{120,20}}, rotation=0)));
   initial equation
@@ -988,29 +996,29 @@ package Gas "Models of components with ideal gases as working fluid"
     // Set fluid properties
     if not allowFlowReversal then
       gas.p = inlet.p;
-      gas.h = outlet.h;
-      gas.Xi = outlet.X;
-    elseif inlet.w >= 0 then
+      gas.h = outlet.h_outflow;
+      gas.Xi = outlet.Xi_outflow;
+    elseif inlet.m_flow >= 0 then
       gas.p = inlet.p;
-      gas.h = outlet.h;
-      gas.Xi = outlet.X;
+      gas.h = outlet.h_outflow;
+      gas.Xi = outlet.Xi_outflow;
     else
       gas.p = outlet.p;
-      gas.h = inlet.h;
-      gas.Xi = inlet.X;
+      gas.h = inlet.h_outflow;
+      gas.Xi = inlet.Xi_outflow;
     end if;
 
-    inlet.p - outlet.p = noEvent(Kf*abs(inlet.w) + Kfl)*inlet.w/gas.d
+    inlet.p - outlet.p = noEvent(Kf*abs(inlet.m_flow) + Kfl)*inlet.m_flow/gas.d
       "Flow characteristics";
-    inlet.w + outlet.w = 0 "Mass balance";
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
 
     // Energy balance
-    inlet.h = inStream(outlet.h);
-    inStream(inlet.h) = outlet.h;
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
 
     // Independent component mass balances
-    inlet.X = inStream(outlet.X);
-    inStream(inlet.X) = outlet.X;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
     annotation (Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
                                                                "%name")}),
       Diagram(graphics),
@@ -1044,37 +1052,37 @@ package Gas "Models of components with ideal gases as working fluid"
     outer ThermoPower.System system "System wide properties";
 
     Medium.BaseProperties gas;
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-80,-60},{-40,-20}},
             rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=
              0)));
     Modelica.Blocks.Interfaces.RealOutput T annotation (Placement(
           transformation(extent={{60,50},{80,70}}, rotation=0)));
   equation
-    inlet.w + outlet.w=0 "Mass balance";
+    inlet.m_flow + outlet.m_flow=0 "Mass balance";
     inlet.p = outlet.p "Momentum balance";
 
     // Energy balance
-    inlet.h = inStream(outlet.h);
-    inStream(inlet.h) = outlet.h;
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
 
     // Independent composition mass balances
-    inlet.X = inStream(outlet.X);
-    inStream(inlet.X) = outlet.X;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
 
     // Set gas properties
     inlet.p=gas.p;
     if not allowFlowReversal then
-      gas.h = inStream(inlet.h);
-      gas.Xi = inStream(inlet.X);
-    elseif inlet.w >= 0 then
-      gas.h = inStream(inlet.h);
-      gas.Xi = inStream(inlet.X);
+      gas.h = inStream(inlet.h_outflow);
+      gas.Xi = inStream(inlet.Xi_outflow);
+    elseif inlet.m_flow >= 0 then
+      gas.h = inStream(inlet.h_outflow);
+      gas.Xi = inStream(inlet.Xi_outflow);
     else
-      gas.h = inlet.h;
-      gas.Xi = inlet.X;
+      gas.h = inlet.h_outflow;
+      gas.Xi = inlet.Xi_outflow;
     end if;
 
     T = gas.T "Sensor output";
@@ -1106,14 +1114,14 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealOutput T annotation (Placement(
           transformation(extent={{60,50},{72,70}}, rotation=0),
           iconTransformation(extent={{60,50},{80,70}})));
-    FlangeA flange(redeclare package Medium = Medium, w(min=0)) 
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=0)) 
       annotation (Placement(transformation(extent={{-20,-60},{20,-20}},
             rotation=0)));
   equation
-    flange.w = 0 "Mass balance";
-    T = Medium.temperature(Medium.setState_phX(flange.p, inStream(flange.h), inStream(flange.X)));
-    flange.h = 0;
-    flange.X = zeros(Medium.nXi);
+    flange.m_flow = 0 "Mass balance";
+    T = Medium.temperature(Medium.setState_phX(flange.p, inStream(flange.h_outflow), inStream(flange.Xi_outflow)));
+    flange.h_outflow = 0;
+    flange.Xi_outflow = zeros(Medium.nXi);
     annotation (Documentation(info="<html>
 <p>This component can be connected to any A-type or B-type connector to measure the pressure of the fluid flowing through it.
 </html>", revisions="<html>
@@ -1140,10 +1148,10 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-80,-60},{-40,-20}},
             rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=
              0)));
     Modelica.Blocks.Interfaces.RealOutput w annotation (Placement(
@@ -1151,18 +1159,18 @@ package Gas "Models of components with ideal gases as working fluid"
           iconTransformation(extent={{60,50},{80,70}})));
 
   equation
-    inlet.w + outlet.w=0 "Mass balance";
+    inlet.m_flow + outlet.m_flow=0 "Mass balance";
     inlet.p = outlet.p "Momentum balance";
 
     // Energy balance
-    inlet.h = inStream(outlet.h);
-    inStream(inlet.h) = outlet.h;
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
 
     // Independent composition mass balances
-    inlet.X = inStream(outlet.X);
-    inStream(inlet.X) = outlet.X;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
 
-    w=inlet.w "Sensor output";
+    w=inlet.m_flow "Sensor output";
     annotation (Documentation(revisions="<html>
 <ul>
 <li><i>20 Dec 2004</i>
@@ -1189,14 +1197,14 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealOutput p annotation (Placement(
           transformation(extent={{60,50},{72,70}}, rotation=0),
           iconTransformation(extent={{60,50},{80,70}})));
-    FlangeA flange(redeclare package Medium = Medium, w(min=0)) 
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=0)) 
       annotation (Placement(transformation(extent={{-20,-60},{20,-20}},
             rotation=0)));
   equation
-    flange.w = 0 "Mass balance";
+    flange.m_flow = 0 "Mass balance";
     flange.p = p "Sensor output";
-    flange.h = 0;
-    flange.X = zeros(Medium.nXi);
+    flange.h_outflow = 0;
+    flange.Xi_outflow = zeros(Medium.nXi);
     annotation (Documentation(info="<html>
 <p>This component can be connected to any A-type or B-type connector to measure the pressure of the fluid flowing through it.
 </html>", revisions="<html>
@@ -1224,10 +1232,10 @@ package Gas "Models of components with ideal gases as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     Medium.BaseProperties gas "Gas properties";
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-80,-60},{-40,-20}},
             rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=
              0)));
     Modelica.Blocks.Interfaces.RealOutput q "Volume flow rate" 
@@ -1235,24 +1243,24 @@ package Gas "Models of components with ideal gases as working fluid"
           transformation(extent={{56,50},{76,70}}, rotation=0)));
     MassFlowRate w "Mass flow rate";
   equation
-    inlet.w + outlet.w=0 "Mass balance";
+    inlet.m_flow + outlet.m_flow=0 "Mass balance";
     inlet.p = outlet.p "Momentum balance";
-    w = inlet.w;
+    w = inlet.m_flow;
 
     // Energy balance
-    inlet.h = inStream(outlet.h);
-    inStream(inlet.h) = outlet.h;
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
 
     // Independent composition mass balances
-    inlet.X = inStream(outlet.X);
-    inStream(inlet.X) = outlet.X;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
 
     // Gas properties
     gas.p = inlet.p;
-    gas.h =  if not allowFlowReversal then inStream(inlet.h) else noEvent(if w >= 0 then outlet.h else inlet.h);
-    gas.Xi = if not allowFlowReversal then inStream(inlet.X) else noEvent(if w >= 0 then outlet.X else inlet.X);
+    gas.h =  if not allowFlowReversal then inStream(inlet.h_outflow) else noEvent(if w >= 0 then outlet.h_outflow else inlet.h_outflow);
+    gas.Xi = if not allowFlowReversal then inStream(inlet.Xi_outflow) else noEvent(if w >= 0 then outlet.Xi_outflow else inlet.Xi_outflow);
 
-    q = inlet.w/gas.d "Sensor output";
+    q = inlet.m_flow/gas.d "Sensor output";
     annotation (Documentation(revisions="<html>
 <ul>
 <li><i>20 Dec 2004</i>
@@ -1277,10 +1285,10 @@ package Gas "Models of components with ideal gases as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-120,-20},{-80,20}},
             rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
              0)));
     Modelica.Blocks.Interfaces.RealInput cmd 
@@ -1289,17 +1297,17 @@ package Gas "Models of components with ideal gases as working fluid"
           extent={{-10,-10},{10,10}},
           rotation=270)));
   equation
-    inlet.w + outlet.w = 0 "Mass balance";
-    inlet.w = w;
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+    inlet.m_flow = w;
     w = Kv*cmd*(inlet.p-outlet.p) "Flow characteristics";
 
     // Energy balance
-    inlet.h = inStream(outlet.h);
-    inStream(inlet.h) = outlet.h;
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
 
     // Independent composition mass balances
-    inlet.X = inStream(outlet.X);
-    inStream(inlet.X) = outlet.X;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
     annotation (Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
                                                                "%name")}),
       Diagram(graphics),
@@ -1387,12 +1395,12 @@ package Gas "Models of components with ideal gases as working fluid"
 
   public
     FlangeA inlet(redeclare package Medium = Medium,
-                  w(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0),
+                  m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0),
                   p(start=pin_start)) 
       annotation (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=
              0)));
     FlangeB outlet(redeclare package Medium = Medium,
-                   w(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0),
+                   m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0),
                    p(start=pout_start)) 
       annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput theta 
@@ -1423,13 +1431,13 @@ package Gas "Models of components with ideal gases as working fluid"
       Y_nom = 0;
     end if;
   equation
-    inlet.w + outlet.w = 0 "Mass balance";
-    w = inlet.w;
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+    w = inlet.m_flow;
 
     // Fluid properties
     gas.p = inlet.p;
-    gas.h = inStream(inlet.h);
-    gas.Xi = inStream(inlet.X);
+    gas.h = inStream(inlet.h_outflow);
+    gas.Xi = inStream(inlet.Xi_outflow);
 
     p = noEvent(if inlet.p>=outlet.p then inlet.p else outlet.p);
     Fxt = Fxt_full*xtfun(theta);
@@ -1445,12 +1453,12 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     // Energy balance
-    inlet.h = inStream(outlet.h);
-    inStream(inlet.h) = outlet.h;
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
 
     // Mass balances of independent components
-    inlet.X = inStream(outlet.X);
-    inStream(inlet.X) = outlet.X;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
 
    annotation (Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
                                                               "%name")}),
@@ -1546,11 +1554,11 @@ package Gas "Models of components with ideal gases as working fluid"
     constant Real g=Modelica.Constants.g_n;
   public
     FlangeA infl(redeclare package Medium = Medium,
-                 w(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+                 m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                      annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
     FlangeB outfl(redeclare package Medium = Medium,
-                  w(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+                  m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
     annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     replaceable Thermal.DHT wall(N=N) annotation (
       Dialog(enable = false), Placement(transformation(extent={{-60,40},{60,60}},
@@ -1634,7 +1642,7 @@ package Gas "Models of components with ideal gases as working fluid"
     dwdt = if DynamicMomentum and not QuasiStatic then 
               der(w) else 0;
 
-    sum(dMdt) = (infl.w + outfl.w)/Nt "Mass balance";
+    sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpfric = 0 "Momentum balance";
     Dpfric = (if FFtype == FFtypes.NoFriction then 0 else 
               noEvent(Kf*abs(w) + Kfl)*w*sum(vbar)/(N - 1))
@@ -1673,7 +1681,7 @@ package Gas "Models of components with ideal gases as working fluid"
           drbdX2[j, :] = dddX[j+1,:]/2;
         end if;
         vbar[j] = 1/rhobar[j];
-        wbar[j] = infl.w/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+        wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
         cvbar[j]=(cv[j]+cv[j+1])/2;
       else
         // Static mass and energy balances
@@ -1687,7 +1695,7 @@ package Gas "Models of components with ideal gases as working fluid"
         drbdX1[j, :] = zeros(nX);
         drbdX2[j, :] = zeros(nX);
         vbar[j] = 0;
-        wbar[j] = infl.w/Nt;
+        wbar[j] = infl.m_flow/Nt;
         cvbar[j]= 0;
       end if;
     end for;
@@ -1695,7 +1703,7 @@ package Gas "Models of components with ideal gases as working fluid"
     if Medium.fixedX then
       Xtilde = fill(Medium.reference_X, 1);
     elseif QuasiStatic then
-      Xtilde = fill(if w>=0 then inStream(infl.X) else inStream(outfl.X), size(Xtilde,1))
+      Xtilde = fill(if w>=0 then inStream(infl.Xi_outflow) else inStream(outfl.Xi_outflow), size(Xtilde,1))
         "Gas composition equal to actual inlet";
     elseif UniformComposition then
       der(Xtilde[1, :]) = 1/L*sum(u)/N*(gas[1].X - gas[N].X)
@@ -1731,21 +1739,21 @@ package Gas "Models of components with ideal gases as working fluid"
     // Selection of representative pressure and flow rate variables
     if HydraulicCapacitance == HCtypes.Upstream then
       p = infl.p;
-      w = -outfl.w/Nt;
+      w = -outfl.m_flow/Nt;
     else
       p = outfl.p;
-      w = infl.w/Nt;
+      w = infl.m_flow/Nt;
     end if;
 
     // Boundary conditions
-    infl.h = gas[1].h;
-    outfl.h = gas[N].h;
-    infl.X = gas[1].Xi;
-    outfl.X = gas[N].Xi;
+    infl.h_outflow = gas[1].h;
+    outfl.h_outflow = gas[N].h;
+    infl.Xi_outflow = gas[1].Xi;
+    outfl.Xi_outflow = gas[N].Xi;
 
-      gas[1].h = inStream(infl.h);
+      gas[1].h = inStream(infl.h_outflow);
       gas[2:N].T = Ttilde;
-      gas[1].Xi = inStream(infl.X);
+      gas[1].Xi = inStream(infl.Xi_outflow);
       for j in 2:N loop
         gas[j].Xi = Xtilde[if UniformComposition then 1 else j - 1, 1:nXi];
       end for;
@@ -1771,7 +1779,7 @@ package Gas "Models of components with ideal gases as working fluid"
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
 
     M=sum(rhobar)*A*l "Total gas mass";
-    Tr=noEvent(M/max(infl.w/Nt,Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(infl.m_flow/Nt,Modelica.Constants.eps)) "Residence time";
   initial equation
     if initOpt == Choices.Init.Options.noInit or QuasiStatic then
       // do nothing
@@ -1902,23 +1910,23 @@ package Gas "Models of components with ideal gases as working fluid"
     Power HR "Heat rate";
 
     Time Tr "Residence time";
-    FlangeA ina(redeclare package Medium = Air, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA ina(redeclare package Medium = Air, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
       "inlet air" 
       annotation (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=
              0)));
-    FlangeA inf(redeclare package Medium = Fuel, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA inf(redeclare package Medium = Fuel, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
       "inlet fuel" 
       annotation (Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
-    FlangeB out(redeclare package Medium = Exhaust, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB out(redeclare package Medium = Exhaust, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
       "flue gas" 
       annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
   equation
     M=fluegas.d*V "Gas mass";
     E=fluegas.u*M "Gas energy";
     MX = fluegas.Xi*M "Component masses";
-    HR = inf.w*HH;
-    der(M) = ina.w+inf.w+out.w "Gas mass balance";
-    der(E) = ina.w*hia+inf.w*hif+out.w*ho+HR-gamma*S*(fluegas.T - Tm)
+    HR = inf.m_flow*HH;
+    der(M) = ina.m_flow+inf.m_flow+out.m_flow "Gas mass balance";
+    der(E) = ina.m_flow*hia+inf.m_flow*hif+out.m_flow*ho+HR-gamma*S*(fluegas.T - Tm)
       "Gas energy balance";
     if Cm > 0 and gamma > 0 then
       Cm*der(Tm) = gamma*S*(fluegas.T - Tm) "Metal wall energy balance";
@@ -1928,24 +1936,24 @@ package Gas "Models of components with ideal gases as working fluid"
 
     // Set gas properties
     out.p=fluegas.p;
-    out.h=fluegas.h;
-    out.X=fluegas.Xi;
+    out.h_outflow=fluegas.h;
+    out.Xi_outflow=fluegas.Xi;
 
     // Boundary conditions
     ina.p   = fluegas.p;
-    ina.h = 0;
-    ina.X=Air.reference_X;
+    ina.h_outflow = 0;
+    ina.Xi_outflow=Air.reference_X;
     inf.p   = fluegas.p;
-    inf.h = 0;
-    inf.X=Fuel.reference_X;
-    assert(ina.w >= 0,"The model does not support flow reversal");
-     hia = inStream(ina.h);
-    assert(inf.w >=0, "The model does not support flow reversal");
-     hif = inStream(inf.h);
-    assert(out.w <=0, "The model does not support flow reversal");
+    inf.h_outflow = 0;
+    inf.Xi_outflow=Fuel.reference_X;
+    assert(ina.m_flow >= 0,"The model does not support flow reversal");
+     hia = inStream(ina.h_outflow);
+    assert(inf.m_flow >=0, "The model does not support flow reversal");
+     hif = inStream(inf.h_outflow);
+    assert(out.m_flow <=0, "The model does not support flow reversal");
      ho = fluegas.h;
 
-    Tr=noEvent(M/max(abs(out.w),Modelica.Constants.eps));
+    Tr=noEvent(M/max(abs(out.m_flow),Modelica.Constants.eps));
   initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
@@ -2000,19 +2008,20 @@ This is the model-base of a Combustion Chamber, with a constant volume.
     Real lambda
       "Stoichiometric ratio (>1 if air flow is greater than stoichiometric)";
   protected
-    Real ina_X[Air.nXi] = inStream(ina.X);
-    Real inf_X[Fuel.nXi] = inStream(inf.X);
+    Real ina_X[Air.nXi] = inStream(ina.Xi_outflow);
+    Real inf_X[Fuel.nXi] = inStream(inf.Xi_outflow);
 
   equation
-    wcomb=inf.w*inf_X[3]/Fuel.data[3].MM "Combustion molar flow rate";
-    lambda= (ina.w*ina_X[1]/Air.data[1].MM) / (2 * wcomb);
+    wcomb=inf.m_flow*inf_X[3]/Fuel.data[3].MM "Combustion molar flow rate";
+    lambda= (ina.m_flow*ina_X[1]/Air.data[1].MM) / (2 * wcomb);
     assert(lambda >=1, "Not enough oxygen flow");
-    der(MX[1])=ina.w*ina_X[1] + out.w*fluegas.X[1] - 2*wcomb*Exhaust.data[1].MM "oxygen";
-    der(MX[2])=ina.w*ina_X[3] + out.w*fluegas.X[2] "argon";
-    der(MX[3])=ina.w*ina_X[2] + out.w*fluegas.X[3] + 2*wcomb*Exhaust.data[3].MM "water";
-    der(MX[4])=inf.w*inf_X[2] + out.w*fluegas.X[4] + wcomb*Exhaust.data[4].MM
+    der(MX[1])=ina.m_flow*ina_X[1] + out.m_flow*fluegas.X[1] - 2*wcomb*Exhaust.data[1].MM "oxygen";
+    der(MX[2])=ina.m_flow*ina_X[3] + out.m_flow*fluegas.X[2] "argon";
+    der(MX[3])=ina.m_flow*ina_X[2] + out.m_flow*fluegas.X[3] + 2*wcomb*Exhaust.data[3].MM "water";
+    der(MX[4])=inf.m_flow*inf_X[2] + out.m_flow*fluegas.X[4] + wcomb*Exhaust.data[4].MM
       "carbondioxide";
-    der(MX[5])=ina.w*ina_X[4] + out.w*fluegas.X[5] + inf.w*inf_X[1] "nitrogen";
+    der(MX[5])=ina.m_flow*ina_X[4] + out.m_flow*fluegas.X[5] + inf.m_flow*inf_X[1]
+      "nitrogen";
     annotation (Icon(graphics),
                       Documentation(info="<html>
 This model extends the CombustionChamber Base model, with the definition of the gases.
@@ -2073,10 +2082,10 @@ This model extends the CombustionChamber Base model, with the definition of the 
     Real eta "isentropic efficiency";
     Real PR "pressure ratio";
 
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,60},{-60,100}},
             rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{60,60},{100,100}}, rotation=
              0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
@@ -2087,23 +2096,23 @@ This model extends the CombustionChamber Base model, with the definition of the 
               0)));
 
   equation
-    w = inlet.w;
+    w = inlet.m_flow;
     assert(w >= 0, "The compressor model does not support flow reversal");
-    inlet.w + outlet.w = 0 "Mass balance";
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
 
     // Set inlet gas properties
     gas_in.p = inlet.p;
-    gas_in.h = inStream(inlet.h);
-    gas_in.Xi = inStream(inlet.X);
+    gas_in.h = inStream(inlet.h_outflow);
+    gas_in.Xi = inStream(inlet.Xi_outflow);
 
     // Set outlet gas properties
     outlet.p = pout;
-    outlet.h = hout;
-    outlet.X = gas_in.Xi;
+    outlet.h_outflow = hout;
+    outlet.Xi_outflow = gas_in.Xi;
 
     // Equations for reverse flow (not used)
-    inlet.h = inStream(outlet.h);
-    inlet.X = inStream(outlet.X);
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
 
     // Component mass balances
     gas_iso.Xi = gas_in.Xi;
@@ -2299,30 +2308,30 @@ This model adds the performance characteristics to the Compressor_Base model, by
               0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
     annotation (Placement(transformation(extent={{48,-12},{72,12}}, rotation=0)));
-    FlangeA inlet(redeclare package Medium = Medium, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                        annotation (Placement(transformation(extent={{-100,60},{
               -60,100}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                        annotation (Placement(transformation(extent={{60,60},{
               100,100}}, rotation=0)));
   equation
-    w = inlet.w;
+    w = inlet.m_flow;
     assert(w >= 0, "The turbine model does not support flow reversal");
-    inlet.w + outlet.w = 0 "Mass balance";
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
 
     // Set inlet gas properties
     gas_in.p = inlet.p;
-    gas_in.h = inStream(inlet.h);
-    gas_in.Xi = inStream(inlet.X);
+    gas_in.h = inStream(inlet.h_outflow);
+    gas_in.Xi = inStream(inlet.Xi_outflow);
 
     // Set outlet gas properties
     outlet.p = pout;
-    outlet.h = hout;
-    outlet.X = gas_in.Xi;
+    outlet.h_outflow = hout;
+    outlet.Xi_outflow = gas_in.Xi;
 
     // Equations for reverse flow (not used)
-    inlet.h = inStream(outlet.h);
-    inlet.X = inStream(outlet.X);
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
 
     // Component mass balances
     gas_iso.Xi = gas_in.Xi;
@@ -2578,13 +2587,13 @@ This model extends the Turbine_Base model with the calculation of the performanc
     Modelica.SIunits.Pressure pc "combustion pressure";
     Modelica.SIunits.Pressure pin "inlet pressure";
 
-    FlangeA Air_in( redeclare package Medium=Air, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA Air_in( redeclare package Medium=Air, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,20},{-80,40}},
             rotation=0)));
-    FlangeA Fuel_in( redeclare package Medium=Fuel, w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+    FlangeA Fuel_in( redeclare package Medium=Fuel, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-10,62},{10,82}}, rotation=
               0)));
-    FlangeB FlueGas_out( redeclare package Medium=Exhaust, w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+    FlangeB FlueGas_out( redeclare package Medium=Exhaust, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{80,20},{100,40}}, rotation=
               0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
@@ -2597,7 +2606,7 @@ This model extends the Turbine_Base model with the calculation of the performanc
     HI_ISO=HI*sqrt(Tnom/gas.T)*(pnom/gas.p)
       "heat input, referred to ISO conditions";
 
-    0 = Air_in.w+Fuel_in.w+FlueGas_out.w "Mass balance";
+    0 = Air_in.m_flow+Fuel_in.m_flow+FlueGas_out.m_flow "Mass balance";
     0 = wia*gas.h+wif*(hif+HH)+wout*hout-ZLPout "Energy balance";
     ZLPout_ISO = ZLPout*sqrt(Tnom/gas.T)*(pnom/gas.p)
       "Net power output, referred to ISO conditions";
@@ -2608,25 +2617,25 @@ This model extends the Turbine_Base model with the calculation of the performanc
 
     // Set inlet gas properties
     gas.p = Air_in.p;
-    gas.h = inStream(Air_in.h);
-    gas.Xi = inStream(Air_in.X);
+    gas.h = inStream(Air_in.h_outflow);
+    gas.Xi = inStream(Air_in.Xi_outflow);
 
     // Boundary conditions
-    assert(Air_in.w >= 0,"The model does not support flow reversal");
-    wia = Air_in.w;
-    hia = inStream(Air_in.h);
+    assert(Air_in.m_flow >= 0,"The model does not support flow reversal");
+    wia = Air_in.m_flow;
+    hia = inStream(Air_in.h_outflow);
     Air_in.p= pin;
-    Air_in.h=0;
-    Air_in.X=Air.reference_X;
-    assert(Fuel_in.w >=0, "The model does not support flow reversal");
-    wif = Fuel_in.w;
-    hif = inStream(Fuel_in.h);
+    Air_in.h_outflow=0;
+    Air_in.Xi_outflow=Air.reference_X;
+    assert(Fuel_in.m_flow >=0, "The model does not support flow reversal");
+    wif = Fuel_in.m_flow;
+    hif = inStream(Fuel_in.h_outflow);
     Fuel_in.p   = pc;
-    Fuel_in.h = 0;
-    Fuel_in.X = Fuel.reference_X;
-    assert(FlueGas_out.w <=0, "The model does not support flow reversal");
-    wout = FlueGas_out.w;
-    hout = FlueGas_out.h;
+    Fuel_in.h_outflow = 0;
+    Fuel_in.Xi_outflow = Fuel.reference_X;
+    assert(FlueGas_out.m_flow <=0, "The model does not support flow reversal");
+    wout = FlueGas_out.m_flow;
+    hout = FlueGas_out.h_outflow;
     // Flue gas composition FlueGas_out.XBA to be determined by extended model
 
     // Mechanical boundaries
@@ -2672,23 +2681,24 @@ This model describes a gas turbine unit as a single model, including the interfa
     Real lambda
       "Stoichiometric ratio (>1 if air flow is greater than stoichiometric)";
   protected
-    Real Air_in_X[Air.nXi] = inStream(Air_in.X);
-    Real Fuel_in_X[Fuel.nXi] = inStream(Fuel_in.X);
+    Real Air_in_X[Air.nXi] = inStream(Air_in.Xi_outflow);
+    Real Fuel_in_X[Fuel.nXi] = inStream(Fuel_in.Xi_outflow);
   equation
     wcomb=wif*Fuel_in_X[3]/Fuel.data[3].MM "Combustion molar flow rate";
     lambda= (wia*Air_in_X[1]/Air.data[1].MM) / (2 * wcomb);
     assert(lambda >= 1, "Not enough oxygen flow");
     if constantCompositionExhaust then
-      FlueGas_out.X[1:Exhaust.nXi] = Exhaust.reference_X[1:Exhaust.nXi]
+      FlueGas_out.Xi_outflow[1:Exhaust.nXi] = Exhaust.reference_X[1:Exhaust.nXi]
         "Reference value for exhaust compostion";
     else
     // True mass balances
-      0 = wia*Air_in_X[1] + wout*FlueGas_out.X[1] - 2*wcomb*Exhaust.data[1].MM "oxygen";
-      0 = wia*Air_in_X[3] + wout*FlueGas_out.X[2] "argon";
-      0 = wia*Air_in_X[2] + wout*FlueGas_out.X[3] + 2*wcomb*Exhaust.data[3].MM "water";
-      0 = wout*FlueGas_out.X[4] + wif*Fuel_in_X[2] + wcomb*Exhaust.data[4].MM
+      0 = wia*Air_in_X[1] + wout*FlueGas_out.Xi_outflow[1] - 2*wcomb*Exhaust.data[1].MM "oxygen";
+      0 = wia*Air_in_X[3] + wout*FlueGas_out.Xi_outflow[2] "argon";
+      0 = wia*Air_in_X[2] + wout*FlueGas_out.Xi_outflow[3] + 2*wcomb*Exhaust.data[3].MM "water";
+      0 = wout*FlueGas_out.Xi_outflow[4] + wif*Fuel_in_X[2] + wcomb*Exhaust.data[4].MM
         "carbondioxide";
-      0 = wia*Air_in_X[4] + wout*FlueGas_out.X[5] + wif*Fuel_in_X[1] "nitrogen";
+      0 = wia*Air_in_X[4] + wout*FlueGas_out.Xi_outflow[5] + wif*Fuel_in_X[1]
+        "nitrogen";
     end if;
     annotation (Documentation(info="<html>
 This model extends <tt>GTunitBase</tt>, by adding the computation of the exhaust composition.
@@ -2916,15 +2926,15 @@ The packages Medium are redeclared and a mass balance determines the composition
     Real s "Auxiliary Variable";
     FlangeA infl(
       p(start=pin_start),
-      h(start=hstart),
+      h_outflow(start=hstart),
       redeclare package Medium = Medium,
-      w(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
+      m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=0)));
     FlangeB outfl(
       p(start=pout_start),
-      h(start=hstart),
+      h_outflow(start=hstart),
       redeclare package Medium = Medium,
-      w(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
+      m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,52},{80,92}}, rotation=0)));
     Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps" 
       annotation (Placement(transformation(
@@ -2951,7 +2961,7 @@ The packages Medium are redeclared and a mass balance determines the composition
 
     // Fluid properties (always uses the properties upstream of the inlet flange)
     inletFluid.p=infl.p;
-    inletFluid.h=inStream(infl.h);
+    inletFluid.h=inStream(infl.h_outflow);
     rho = inletFluid.d;
     Tin = inletFluid.T;
 
@@ -2979,23 +2989,25 @@ The packages Medium are redeclared and a mass balance determines the composition
 
     // Boundary conditions
     dp = outfl.p - infl.p;
-    w = infl.w "Fan total flow rate";
-    hin = if not allowFlowReversal then inStream(infl.h) else if w >= 0 then inStream(infl.h) else h;
-    hout = if not allowFlowReversal then h else if w >= 0 then h else inStream(outfl.h);
+    w = infl.m_flow "Fan total flow rate";
+    hin = if not allowFlowReversal then inStream(infl.h_outflow) else if w >= 0 then inStream(infl.h_outflow) else h;
+    hout = if not allowFlowReversal then h else if w >= 0 then h else inStream(outfl.h_outflow);
 
     // Mass balance
-    infl.w + outfl.w = 0 "Mass balance";
+    infl.m_flow + outfl.m_flow = 0 "Mass balance";
 
     // Energy balance
     if V>0 then
-      (rho*V*der(h)) = (outfl.w/Np)*hout + (infl.w/Np)*hin + W_single
+      (rho*V*der(h)) = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single
         "Dynamic energy balance (single fan)";
-      outfl.h = h;
-      infl.h = h;
+      outfl.h_outflow = h;
+      infl.h_outflow = h;
     else
-      outfl.h = inStream(infl.h) + W_single/w "Energy balance for w > 0";
-      infl.h = inStream(outfl.h) + W_single/w "Energy balance for w < 0";
-      h = if not allowFlowReversal then outfl.h else if w>=0 then outfl.h else infl.h
+      outfl.h_outflow = inStream(infl.h_outflow) + W_single/w
+        "Energy balance for w > 0";
+      infl.h_outflow = inStream(outfl.h_outflow) + W_single/w
+        "Energy balance for w < 0";
+      h = if not allowFlowReversal then outfl.h_outflow else if w>=0 then outfl.h_outflow else infl.h_outflow
         "Definition of h";
     end if;
 
