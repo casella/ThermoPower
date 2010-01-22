@@ -1,3 +1,4 @@
+within ThermoPower;
 package PowerPlants "Models of thermoelectrical power plants components" 
   import SI = Modelica.SIunits;
   import ThermoPower.Choices.Init.Options;
@@ -4300,13 +4301,21 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F 
           "Constant heat transfer coefficient in the fluid side";
+        parameter Choices.Flow1D.FFtypes.Temp FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
+          "Friction Factor Type, gas side";
+        parameter Real Kfnom_G=0 
+          "Nominal hydraulic resistance coefficient, gas side";
+        parameter SI.Pressure dpnom_G=0 "Nominal pressure drop, gas side";
+        parameter Density rhonom_G=0 "Nominal inlet density, gas side";
+        parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gas side";
         parameter Choices.Flow1D.FFtypes.Temp FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
           "Friction Factor Type, fluid side";
-        parameter Real Kfnom_F=0 "Nominal hydraulic resistance coefficient";
+        parameter Real Kfnom_F=0 
+          "Nominal hydraulic resistance coefficient, fluid side";
         parameter SI.Pressure dpnom_F=0 
-          "Nominal pressure drop fluid side (friction term only!)";
-        parameter SI.Density rhonom_F=0 "Nominal inlet density fluid side";
-        parameter Real Cfnom_F=0 "Nominal Fanning friction factor";
+          "Nominal pressure drop, fluid side (friction term only!)";
+        parameter SI.Density rhonom_F=0 "Nominal inlet density, fluid side";
+        parameter Real Cfnom_F=0 "Nominal Fanning friction factor, fluid side";
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
           "Location of the hydraulic capacitance, fluid side";
         parameter Boolean counterCurrent=true "Counter-current flow";
@@ -4358,20 +4367,24 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rext=(metalVol + fluidVol)*4/extSurfaceTub/2) 
                  annotation (extent=[-10,-6; 10,-26], rotation=0);
         Gas.Flow1D gasFlow(
-          L=1,
           Dhyd=1,
           wnom=gasNomFlowRate,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           N=N_G,
-          A=gasVol/1,
-          omega=exchSurface_G/1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
           QuasiStatic=gasQuasiStatic,
           Tstartin=Tstart_G_In,
           Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          Tstart=Tstart_G)       annotation (extent=[-12,58; 12,38]);
+          Tstart=Tstart_G,
+          L=L,
+          A=gasVol/L,
+          omega=exchSurface_G/L,
+          FFtype=FFtype_G,
+          Kfnom=Kfnom_G,
+          dpnom=dpnom_G,
+          rhonom=rhonom_G,
+          Cfnom=Cfnom_G)         annotation (extent=[-12,58; 12,38]);
         annotation (Diagram);
         Thermal.CounterCurrent cC(                                    N=N_F,
             counterCurrent=counterCurrent) 
@@ -4392,6 +4405,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart1=Tstart_G,
           Tstart2=Tstart_M)    annotation (extent=[-10,20; 10,40]);
         
+        final parameter SI.Distance L=1 "Tube length";
       equation 
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (points=[0,-45; 0,-33.1],
@@ -4437,13 +4451,21 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F 
           "Constant heat transfer coefficient in the fluid side";
+        parameter Choices.Flow1D.FFtypes.Temp FFtype_G= ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
+          "Friction Factor Type, gas side";
+        parameter Real Kfnom_G=0 
+          "Nominal hydraulic resistance coefficient, gas side";
+        parameter SI.Pressure dpnom_G=0 "Nominal pressure drop, gas side";
+        parameter Density rhonom_G=0 "Nominal inlet density, gas side";
+        parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gas side";
         parameter Choices.Flow1D.FFtypes.Temp FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
           "Friction Factor Type, fluid side";
-        parameter Real Kfnom_F=0 "Nominal hydraulic resistance coefficient";
+        parameter Real Kfnom_F=0 
+          "Nominal hydraulic resistance coefficient, fluid side";
         parameter SI.Pressure dpnom_F=0 
-          "Nominal pressure drop fluid side (friction term only!)";
-        parameter SI.Density rhonom_F=0 "Nominal inlet density fluid side";
-        parameter Real Cfnom_F=0 "Nominal Fanning friction factor";
+          "Nominal pressure drop, fluid side (friction term only!)";
+        parameter SI.Density rhonom_F=0 "Nominal inlet density, fluid side";
+        parameter Real Cfnom_F=0 "Nominal Fanning friction factor, fluid side";
         parameter Choices.Flow1D.HCtypes.Temp HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream 
           "Location of the hydraulic capacitance, fluid side";
         parameter Boolean counterCurrent=true "Counter-current flow";
@@ -4494,21 +4516,24 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rext=1/extSurfaceTub*(metalVol + fluidVol)*4/2) 
                  annotation (extent=[-10,-8; 10,-28]);
         Gas.Flow1D gasFlow(
-          L=1,
           Dhyd=1,
           wnom=gasNomFlowRate,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           N=N_G,
-          A=gasVol/1,
-          omega=exchSurface_G/1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
           pstart=pstart_G,
           Tstartin=Tstart_G_In,
           Tstartout=Tstart_G_Out,
           Tstart=Tstart_G,
-          QuasiStatic=gasQuasiStatic) 
-                                 annotation (extent=[-12,58; 12,38]);
+          QuasiStatic=gasQuasiStatic,
+          L=L,
+          A=gasVol/L,
+          omega=exchSurface_G/L,
+          FFtype=FFtype_G,
+          Kfnom=Kfnom_G,
+          dpnom=dpnom_G,
+          rhonom=rhonom_G,
+          Cfnom=Cfnom_G)         annotation (extent=[-12,58; 12,38]);
         annotation (Diagram);
         Thermal.CounterCurrent cC(     counterCurrent=counterCurrent, N=N_F) 
           annotation (extent=[-10,-10; 10,10]);
@@ -4528,6 +4553,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart1=Tstart_G,
           Tstart2=Tstart_M)    annotation (extent=[-10,22; 10,42]);
         
+        final parameter SI.Distance L=1 "Tube length";
       equation 
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (points=[0,-43; 0,-33.1],
@@ -4578,6 +4604,13 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           "Constant heat transfer coefficient in the fluid side"     annotation (Dialog(group = "side A"));
         parameter SI.CoefficientOfHeatTransfer gamma_F_B 
           "Constant heat transfer coefficient in the fluid side"     annotation (Dialog(group = "side B"));
+        parameter Choices.Flow1D.FFtypes.Temp FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
+          "Friction Factor Type, gas side";
+        parameter Real Kfnom_G=0 
+          "Nominal hydraulic resistance coefficient, gas side";
+        parameter SI.Pressure dpnom_G=0 "Nominal pressure drop, gas side";
+        parameter Density rhonom_G=0 "Nominal inlet density, gas side";
+        parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gas side";
         parameter Choices.Flow1D.FFtypes.Temp FFtype_F_A=ThermoPower.Choices.Flow1D.FFtypes.NoFriction 
           "Friction Factor Type, fluid side"     annotation (Dialog(group = "side A"));
         parameter Real Kfnom_F_A=0 "Nominal hydraulic resistance coefficient" 
@@ -4659,20 +4692,22 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm_A) 
                  annotation (extent=[-38,-6; -18,-26]);
         Gas.Flow1D gasFlow(
-          L=1,
           Dhyd=1,
           wnom=gasNomFlowRate,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           N=N_G,
-          A=gasVol/1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
-          omega=(exchSurface_G_A + exchSurface_G_B)/1,
           QuasiStatic=gasQuasiStatic,
           pstart=pstart_G,
           Tstartin=Tstart_G_In,
           Tstartout=Tstart_G_Out,
-          Tstart=Tstart_G)       annotation (extent=[-12,60; 12,40]);
+          Tstart=Tstart_G,
+          L=L,
+          A=gasVol/L,
+          omega=(exchSurface_G_A + exchSurface_G_B)/L, 
+          FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint, 
+          dpnom=1000, 
+          rhonom=1)              annotation (extent=[-12,60; 12,40]);
       Water.Flow1D fluidBFlow(
           Nt=1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
@@ -4752,6 +4787,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart1=Tstart_G,
           Tstart2=Tstart_M_B)    annotation (extent=[18,24; 38,44]);
         
+        final parameter SI.Distance L=1 "Tube length";
       equation 
         connect(heatFlowDistribution_A.side2, cC_A.side1) annotation (points=[-28,14.9;
               -28,5],           style(color=45, rgbcolor={255,127,0}));
@@ -5071,7 +5107,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=62,
             rgbfillColor={0,127,127},
             fillPattern=1));
-        connect(valveB.outlet,flowJoinB. in2) annotation (points=[-18,10; 
+        connect(valveB.outlet,flowJoinB. in2) annotation (points=[-18,10;
               -12.95,10; -12.95,10; -7.9,10],
                                    style(
             thickness=2,
@@ -5093,11 +5129,11 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         connect(T_intermedB, intermediate_B.T) annotation (points=[101,39; 40,
               39; 40,23.2; 28.6,23.2],
                                    style(color=74, rgbcolor={0,0,127}));
-        connect(intermediate_A.T, T_intermedA) annotation (points=[28.6,-0.8; 
+        connect(intermediate_A.T, T_intermedA) annotation (points=[28.6,-0.8;
               52,-0.8; 52,59; 101,59],style(color=74, rgbcolor={0,0,127}));
         connect(theta_valveA, valveA.theta)  annotation (points=[101,-42; -26,
               -42; -26,-30.4], style(color=74, rgbcolor={0,0,127}));
-        connect(theta_valveB, valveB.theta) annotation (points=[101,-63; 60,-63; 
+        connect(theta_valveB, valveB.theta) annotation (points=[101,-63; 60,-63;
               60,-46; -36,-46; -36,-10; -26,-10; -26,3.6],  style(color=74,
               rgbcolor={0,0,127}));
         connect(LiquidWaterIn_A, valveA.inlet) annotation (points=[-100,-42;
@@ -5106,7 +5142,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(LiquidWaterIn_B, valveB.inlet) annotation (points=[-100,-70; 
+        connect(LiquidWaterIn_B, valveB.inlet) annotation (points=[-100,-70;
               -70,-70; -70,10; -34,10], style(
             thickness=2,
             fillColor=30,
@@ -5162,20 +5198,20 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rext=(metalVol + fluidVol)*4/extSurfaceTub/2) 
                  annotation (extent=[-10,10; 10,-10]);
         Gas.Flow1D gasFlow(
-          L=1,
           Dhyd=1,
           wnom=gasNomFlowRate,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           QuasiStatic=true,
           N=N_G,
-          A=gasVol/1,
-          omega=exchSurface_G/1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
           Tstartin=Tstart_G_In,
           Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          Tstart=Tstart_G)       annotation (extent=[-12,50; 12,30]);
+          Tstart=Tstart_G,
+          L=L,
+          A=gasVol/L,
+          omega=exchSurface_G/L) annotation (extent=[-12,50; 12,30]);
         annotation (Diagram);
         Thermal.ConvHT2N convHT2N(
           N1=N_G,
@@ -5187,6 +5223,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart2N=Tstart_M_Out,
           Tstart1=Tstart_G,
           Tstart2=Tstart_M)    annotation (extent=[-10,10; 10,30]);
+        final parameter SI.Distance L=1 "Tube length";
       equation 
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (points=[0,-35; 0,-23.1],
@@ -5266,20 +5303,20 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rext=1/extSurfaceTub*(metalVol + fluidVol)*4/2) 
                  annotation (extent=[-10,10; 10,-10]);
         Gas.Flow1D gasFlow(
-          L=1,
           Dhyd=1,
           wnom=gasNomFlowRate,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           QuasiStatic=true,
           N=N_G,
-          A=gasVol/1,
-          omega=exchSurface_G/1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
           Tstartin=Tstart_G_In,
           Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          Tstart=Tstart_G)       annotation (extent=[-12,50; 12,30]);
+          Tstart=Tstart_G,
+          L=L,
+          A=gasVol/L,
+          omega=exchSurface_G/L) annotation (extent=[-12,50; 12,30]);
         annotation (Diagram);
         Thermal.ConvHT2N convHT2N(
           N1=N_G,
@@ -5291,6 +5328,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart2N=Tstart_M_Out,
           Tstart1=Tstart_G,
           Tstart2=Tstart_M)    annotation (extent=[-10,10; 10,30]);
+        final parameter SI.Distance L=1 "Tube length";
       equation 
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (points=[0,-35; 0,-23.1],
@@ -5384,20 +5422,21 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rhomcm=rhomcm_A) 
                  annotation (extent=[-38,6; -18,-14]);
         Gas.Flow1D gasFlow(
-          L=1,
           Dhyd=1,
           wnom=gasNomFlowRate,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           QuasiStatic=true,
           N=N_G,
-          A=gasVol/1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
-          omega=(exchSurface_G_A + exchSurface_G_B)/1,
           Tstartin=Tstart_G_In,
           Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          Tstart=Tstart_G)       annotation (extent=[-12,64; 12,44]);
+          Tstart=Tstart_G,
+          L=L,
+          A=gasVol/L,
+          omega=(exchSurface_G_A + exchSurface_G_B)/L) 
+                                 annotation (extent=[-12,64; 12,44]);
       Water.Flow1D fluidBFlow(
           Nt=1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
@@ -5458,6 +5497,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart2N=Tstart_M_B_Out,
           Tstart1=Tstart_G,
           Tstart2=Tstart_M_B)    annotation (extent=[18,10; 38,30]);
+        final parameter SI.Distance L=1 "Tube length";
       equation 
         connect(convHT_A.side2, fluidAFlow.wall)    annotation (points=[-28,
               -23.1; -28,-37], style(color=45, rgbcolor={255,127,0}));
@@ -5538,20 +5578,19 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           rext=(metalVol + fluidVol)*4/extSurfaceTub/2) 
                  annotation (extent=[-10,-4; 10,-24]);
         Gas.Flow1D gasFlow(
-          L=1,
           Dhyd=1,
           wnom=gasNomFlowRate,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           N=N_G,
-          A=gasVol/1,
-          omega=exchSurface_G/1,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
           Tstartin=Tstart_G_In,
           Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          QuasiStatic=gasQuasiStatic) 
-                                 annotation (extent=[-12,60; 12,40]);
+          QuasiStatic=gasQuasiStatic,
+          L=L,
+          A=gasVol/L,
+          omega=exchSurface_G/L) annotation (extent=[-12,60; 12,40]);
         annotation (Diagram);
         Thermal.CounterCurrent cC(counterCurrent=counterCurrent, N=N_F) 
           annotation (extent=[-10,-8; 10,12]);
@@ -5596,6 +5635,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
           Tstart2N=Tstart_M_Out,
           Tstart1=Tstart_G,
           Tstart2=Tstart_M)    annotation (extent=[-10,24; 10,44]);
+        final parameter SI.Distance L=1 "Tube length";
       equation 
         connect(gasFlow.infl, gasIn) annotation (points=[-12,50; -100,50; -100,
               0],
@@ -8453,8 +8493,8 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
               -371.2,-40; -371.2,-12],      style(thickness=2));
         connect(Sh2HP_Rh2IP.waterInA, stateSh1HP_out.outlet) annotation (points=[-452.8,
               12; -452.8,40; -438,40],      style(thickness=2));
-        connect(Sh2HP_Rh2IP.gasIn, GasIn) annotation (points=[-460,0; -442,0;
-              -442,1.77636e-015; -500,1.77636e-015], style(
+        connect(Sh2HP_Rh2IP.gasIn, GasIn) annotation (points=[-460,0; -460,
+              1.77636e-015; -500,1.77636e-015],      style(
             color=76,
             rgbcolor={159,159,223},
             thickness=2,
@@ -8539,7 +8579,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(Ev_IP.waterIn,stateEvIP_in. outlet) annotation (points=[0,12; 0,
-              44; 3.67382e-016,44],
+              44; 3.67394e-016,44],
             style(
             thickness=2,
             fillColor=30,
@@ -8558,7 +8598,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(stateEvIP_out.inlet,Ev_IP. waterOut) annotation (points=[
-              1.10215e-015,-44; 1.10215e-015,-36.5; 0,-36.5; 0,-12], style(
+              1.10218e-015,-44; 1.10218e-015,-36.5; 0,-36.5; 0,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -8672,15 +8712,15 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvIP_in.inlet, Ev_IP_In) annotation (points=[-3.67382e-016,
-              56; -3.67382e-016,200; 1.77636e-015,200],
+        connect(stateEvIP_in.inlet, Ev_IP_In) annotation (points=[-3.67394e-016,
+              56; -3.67394e-016,200; 1.77636e-015,200],
                                 style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(stateEvIP_out.outlet, Ev_IP_Out) annotation (points=[
-              -1.10215e-015,-56; -1.10215e-015,-64; 0,-70; -40,-70; -40,200],
+              -1.10218e-015,-56; -1.10218e-015,-64; 0,-70; -40,-70; -40,200],
                                                                   style(
             thickness=2,
             fillColor=30,
@@ -9630,7 +9670,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(Ev_IP.waterIn,stateEvIP_in. outlet) annotation (points=[0,12; 0,
-              44; 3.67382e-016,44],
+              44; 3.67394e-016,44],
             style(
             thickness=2,
             fillColor=30,
@@ -9649,7 +9689,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(stateEvIP_out.inlet,Ev_IP. waterOut) annotation (points=[
-              1.10215e-015,-44; 1.10215e-015,-36.5; 0,-36.5; 0,-12], style(
+              1.10218e-015,-44; 1.10218e-015,-36.5; 0,-36.5; 0,-12], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -9757,7 +9797,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             fillColor=30,
             rgbfillColor={230,230,230},
             fillPattern=1));
-        connect(stateEvIP_in.inlet, Ev_IP_In) annotation (points=[-3.67382e-016,
+        connect(stateEvIP_in.inlet, Ev_IP_In) annotation (points=[-3.67394e-016,
               56; 1.77636e-015,56; 1.77636e-015,200],
                                 style(
             thickness=2,
@@ -9765,7 +9805,7 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
             rgbfillColor={230,230,230},
             fillPattern=1));
         connect(stateEvIP_out.outlet, Ev_IP_Out) annotation (points=[
-              -1.10215e-015,-56; 0,-64; 0,-70; -40,-70; -40,200], style(
+              -1.10218e-015,-56; 0,-64; 0,-70; -40,-70; -40,200], style(
             thickness=2,
             fillColor=30,
             rgbfillColor={230,230,230},
@@ -16140,12 +16180,15 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         SI.Density rhov "Density of saturated steam";
         Medium.SaturationProperties sat "Saturation properties";
         Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
-        SI.Mass M "Total mass, steam+liquid";
-        SI.Mass Ml "Liquid mass";
-        SI.Mass Mv "Steam mass";
-        SI.Volume Vl(start=Vlstart) "Liquid volume";
-        SI.Volume Vv "Steam volume";
-        SI.Energy E "Internal energy";
+        Medium.SpecificEnthalpy hv "Specific enthalpy of saturated vapour";
+        
+        SI.Mass M( stateSelect=StateSelect.never) "Total mass, steam+liquid";
+        SI.Mass Ml( stateSelect=StateSelect.never) "Liquid mass";
+        SI.Mass Mv( stateSelect=StateSelect.never) "Steam mass";
+        SI.Volume Vl(start=Vlstart, stateSelect=StateSelect.prefer) 
+          "Liquid volume";
+        SI.Volume Vv( stateSelect=StateSelect.never) "Steam volume";
+        SI.Energy E( stateSelect=StateSelect.never) "Internal energy";
         SI.Power Q "Thermal power";
         
         //Connectors
@@ -16181,20 +16224,21 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         sat.psat = p;
         sat.Tsat = Medium.saturationTemperature(p);
         hl = Medium.bubbleEnthalpy(sat);
+        hv = Medium.dewEnthalpy(sat);
         waterOut.p = p;
         waterOut.hBA = hl;
         rhol = Medium.bubbleDensity(sat);
-        rhov = Medium.density_ph(steamIn.p,steamIn.hBA);
+        rhov = Medium.dewDensity(sat);
         
         Ml = Vl*rhol;
         Mv = Vv*rhov;
         Vtot= Vv+Vl;
         M = Ml + Mv;
-        E = Ml*hl + Mv*steamIn.hBA - p*Vtot;
+        E = Ml*hl + Mv*hv - p*Vtot;
         
         //Energy and Mass Bilances 
         der(M) = steamIn.w + waterOut.w;
-        der(E) = steamIn.w*steamIn.hBA + waterOut.w*hl - Q;
+        der(E) = steamIn.w*hv + waterOut.w*hl - Q;
         
         //Output signal
         ratio_Vv_Vtot=Vv/Vtot;
@@ -16214,13 +16258,15 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         SI.Density rhov "Density of saturated steam";
         Medium.SaturationProperties sat "Saturation properties";
         Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
+        Medium.SpecificEnthalpy hv "Specific enthalpy of saturated vapour";
         
-        SI.Mass M "Total mass, steam+liquid";
-        SI.Mass Ml "Liquid mass";
-        SI.Mass Mv "Steam mass";
-        SI.Volume Vl(start=Vlstart) "Liquid volume";
-        SI.Volume Vv "Steam volume";
-        SI.Energy E "Internal energy";
+        SI.Mass M( stateSelect=StateSelect.never) "Total mass, steam+liquid";
+        SI.Mass Ml( stateSelect=StateSelect.never) "Liquid mass";
+        SI.Mass Mv( stateSelect=StateSelect.never) "Steam mass";
+        SI.Volume Vl(start=Vlstart, stateSelect=StateSelect.prefer) 
+          "Liquid volume";
+        SI.Volume Vv( stateSelect=StateSelect.never) "Steam volume";
+        SI.Energy E( stateSelect=StateSelect.never) "Internal energy";
         SI.Power Q "Thermal power";
         
         Water.FlangeA steamIn( redeclare package Medium = Medium) 
@@ -16257,10 +16303,11 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         sat.psat = p;
         sat.Tsat = Medium.saturationTemperature(p);
         hl = Medium.bubbleEnthalpy(sat);
+        hv = Medium.dewEnthalpy(sat);
         waterOut.p = p;
         waterOut.hBA = hl;
         rhol = Medium.bubbleDensity(sat);
-        rhov = Medium.density_ph(steamIn.p,steamIn.hBA);
+        rhov = Medium.dewDensity(sat);
         
         hl=tapWater.hAB;
         tapWater.p=p;
@@ -16269,11 +16316,11 @@ annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
         Mv = Vv*rhov;
         Vtot= Vv + Vl;
         M = Ml + Mv;
-        E = Ml*hl + Mv*steamIn.hBA - p*Vtot;
+        E = Ml*hl + Mv*hv - p*Vtot;
         
         //Energy and Mass Bilances 
         der(M) = steamIn.w + (waterOut.w + tapWater.w);
-        der(E) = steamIn.w*steamIn.hBA + (waterOut.w + tapWater.w)*hl - Q;
+        der(E) = steamIn.w*hv + (waterOut.w + tapWater.w)*hl - Q;
         
         //Output signal
         ratio_Vv_Vtot = Vv/Vtot;
@@ -16689,7 +16736,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.Enthalpy mixLP_hstart = LPT_hstart_in 
+        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in 
           "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
                                                                     group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart = steamLPNomPressure 
@@ -16821,7 +16868,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.Enthalpy mixLP_hstart = LPT_hstart_in 
+        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in 
           "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
                                                                     group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart = steamLPNomPressure 
@@ -16954,7 +17001,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.Enthalpy mixLP_hstart = LPT_hstart_in 
+        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in 
           "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
                                                                     group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart = steamLPNomPressure 
@@ -17144,7 +17191,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.Enthalpy mixLP_hstart = LPT_hstart_in 
+        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in 
           "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
                                                                     group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart = steamLPNomPressure 
@@ -17330,7 +17377,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.Enthalpy mixLP_hstart = LPT_hstart_in 
+        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in 
           "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
                                                                     group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart = steamLPNomPressure 
@@ -17340,17 +17387,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         //Valves Parameters
         parameter Real valveHP_Cv=0 "Cv (US) flow coefficient of the HP valve" annotation(Dialog(group= "HP valves"));
-        parameter Modelica.SIunits.Pressure valveHP_dpnom 
+        parameter SI.Pressure valveHP_dpnom 
           "Nominal pressure drop of the HP valve"                                   annotation(Dialog(group= "HP valves"));
         parameter Real bypassHP_Cv=0 
           "Cv (US) flow coefficient of the HP valve of bypass"                                 annotation(Dialog(group= "HP valves"));
         parameter Real valveIP_Cv=0 "Cv (US) flow coefficient of the IP valve" annotation(Dialog(group= "IP valves"));
-        parameter Modelica.SIunits.Pressure valveIP_dpnom 
+        parameter SI.Pressure valveIP_dpnom 
           "Nominal pressure drop of the IP valve"                                   annotation(Dialog(group= "IP valves"));
         parameter Real bypassIP_Cv=0 
           "Cv (US) flow coefficient of the IP valve of bypass" annotation(Dialog(group= "IP valves"));
         parameter Real valveLP_Cv=0 "Cv (US) flow coefficient of the LP valve" annotation(Dialog(group= "LP valves"));
-        parameter Modelica.SIunits.Pressure valveLP_dpnom 
+        parameter SI.Pressure valveLP_dpnom 
           "Nominal pressure drop of the LP valve"                                   annotation(Dialog(group= "LP valves"));
         parameter Real bypassLP_Cv=0 
           "Cv (US) flow coefficient of the HP valve of bypass" annotation(Dialog(group= "LP valves"));
@@ -17532,7 +17579,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               -180,-140; -180,30; -140,30; -140,60; -120,60; -120,48],
                                              style(color=52, rgbcolor={213,255,170}));
         connect(ActuatorsBus.Opening_byPassIP,byPassIP. theta) annotation (points=[200,-140;
-              -60,-140; -60,34; -20,34; -20,60; 9.79685e-016,60; 9.79685e-016,
+              -60,-140; -60,34; -20,34; -20,60; 9.79717e-016,60; 9.79717e-016,
               48],                       style(color=52, rgbcolor={213,255,170}));
         connect(ActuatorsBus.Opening_byPassLP,byPassLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,60; 120,60; 120,48],
@@ -17635,7 +17682,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.Enthalpy mixLP_hstart = LPT_hstart_in 
+        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in 
           "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
                                                                     group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart = steamLPNomPressure 
@@ -17645,12 +17692,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         
         //Valves Parameters
         parameter Real valveHP_Cv=0 "Cv (US) flow coefficient of the HP valve" annotation(Dialog(group= "HP valves"));
-        parameter Modelica.SIunits.Pressure valveHP_dpnom 
+        parameter SI.Pressure valveHP_dpnom 
           "Nominal pressure drop of the HP valve"                                   annotation(Dialog(group= "HP valves"));
         parameter Real bypassHP_Cv=0 
           "Cv (US) flow coefficient of the HP valve of bypass"                                 annotation(Dialog(group= "HP valves"));
         parameter Real valveIP_Cv=0 "Cv (US) flow coefficient of the IP valve" annotation(Dialog(group= "IP valves"));
-        parameter Modelica.SIunits.Pressure valveIP_dpnom 
+        parameter SI.Pressure valveIP_dpnom 
           "Nominal pressure drop of the IP valve"                                   annotation(Dialog(group= "IP valves"));
         parameter Real bypassIP_Cv=0 
           "Cv (US) flow coefficient of the IP valve of bypass" annotation(Dialog(group= "IP valves"));
@@ -17658,7 +17705,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           "Cv (US) flow coefficient of the valve of pressurization IP drum" 
                                                                           annotation(Dialog(group= "IP valves"));
         parameter Real valveLP_Cv=0 "Cv (US) flow coefficient of the LP valve" annotation(Dialog(group= "LP valves"));
-        parameter Modelica.SIunits.Pressure valveLP_dpnom 
+        parameter SI.Pressure valveLP_dpnom 
           "Nominal pressure drop of the LP valve"                                   annotation(Dialog(group= "LP valves"));
         parameter Real bypassLP_Cv=0 
           "Cv (US) flow coefficient of the HP valve of bypass" annotation(Dialog(group= "LP valves"));
@@ -17840,7 +17887,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               -180,-140; -180,30; -140,30; -140,60; -120,60; -120,48],
                                              style(color=52, rgbcolor={213,255,170}));
         connect(ActuatorsBus.Opening_byPassIP,byPassIP. theta) annotation (points=[200,-140;
-              -60,-140; -60,34; -20,34; -20,60; 9.79685e-016,60; 9.79685e-016,
+              -60,-140; -60,34; -20,34; -20,60; 9.79717e-016,60; 9.79717e-016,
               48],                       style(color=52, rgbcolor={213,255,170}));
         connect(ActuatorsBus.Opening_byPassLP,byPassLP. theta) annotation (points=[200,-140;
               60,-140; 60,32; 100,32; 100,60; 120,60; 120,48],
@@ -23737,5 +23784,444 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
        First release.</li>
 </ul>
 </html>"));
+    model SteamPlant_Sim1_dp 
+      "Test total plant with levels control and ratio control on the condenser, inlet valves" 
+      package FlueGasMedium = ThermoPower.Media.FlueGas;
+      package FluidMedium = ThermoPower.Water.StandardWater;
+      
+      parameter Boolean SSInit=false "Steady-state initialization";
+      ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh hRSG(drums(
+          HPd_hvstart=2.61182e6,
+          HPd_hlstart=1.411212e6,
+          IPd_hvstart=2.79542e6,
+          IPd_hlstart=9.22034e5,
+          LPd_hvstart=2.75273e6,
+          LPd_hlstart=6.10909e5,
+          fluidHPNomPressure=12211600,
+          fluidIPNomPressure=2636940,
+          fluidLPNomPressure=604700,
+          SSInit=SSInit), HeatExchangersGroup(
+          fluidHPNomFlowRate_Sh=62.8,
+          fluidHPNomFlowRate_Ec=64.5,
+          fluidIPNomFlowRate_Rh=77.36,
+          fluidIPNomFlowRate_Sh=14.5,
+          fluidIPNomFlowRate_Ec=13.5,
+          fluidLPNomFlowRate_Sh=10.95,
+          fluidLPNomFlowRate_Ec=89.8,
+          Ev_HP_hstart_F_In=1.46797e6,
+          Ev_HP_hstart_F_Out=1.90129e6,
+          Ev_IP_hstart_F_In=9.64527e5,
+          Ev_IP_hstart_F_Out=1.36736e6,
+          Ev_LP_hstart_F_In=6.26623e5,
+          Ev_LP_hstart_F_Out=1.22154e6,
+          Sh_LP(
+            gamma_G=30,
+            gamma_F=4000,
+            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F=3.2,
+          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000,
+            dpnom_F=20000),
+          Sh_LP_N_F=4,
+          Ec_LP(
+            gamma_G=35,
+            gamma_F=3000,
+            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F=990,
+          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000,
+            dpnom_F=50000),
+          Ev_LP(
+            gamma_G=60,
+            gamma_F=20000,
+            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+            Kfnom_F=2000,
+          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000),
+          Sh1HP_Rh1IP(
+            gamma_G_A=70,
+            gamma_G_B=70,
+            gamma_F_A=4000,
+            gamma_F_B=4000,
+            FFtype_F_A=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F_A=70,
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F_B=9.5,
+          HCtype_F_A=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+          HCtype_F_B=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000,
+            dpnom_F_A=30000,
+            dpnom_F_B=50000),
+          Sh2HP_Rh2IP(
+            gamma_F_A=4000,
+            gamma_F_B=4000,
+            gamma_G_A=70,
+            gamma_G_B=70,
+            FFtype_F_A=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F_A=35,
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F_B=7.5,
+          HCtype_F_A=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+          HCtype_F_B=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000,
+            dpnom_F_A=30000,
+            dpnom_F_B=50000),
+          Sh_IP(
+            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F=13,
+          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000,
+            dpnom_F=20000),
+          Ec2_HP(
+            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F=860,
+          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000,
+            dpnom_F=20000),
+          Ec1HP_EcIP(
+            FFtype_F_A=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F_A=925,
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_F_B=920,
+          HCtype_F_A=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+          HCtype_F_B=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000,
+            dpnom_F_A=20000,
+            dpnom_F_B=20000),
+          Ev_HP(FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom_F=2000,
+          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000),
+          Ev_IP(FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom_F=2000,
+          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+            rhonom_G=1,
+            dpnom_G=1000),
+          SSInit=SSInit,
+          fluidHPNomPressure_Sh=12211600,
+          fluidHPNomPressure_Ev=12211600,
+          fluidHPNomPressure_Ec=12211600,
+          fluidIPNomPressure_Rh=2636940,
+          fluidIPNomPressure_Sh=2636940,
+          fluidIPNomPressure_Ev=2636940,
+          fluidIPNomPressure_Ec=2636940,
+          fluidLPNomPressure_Sh=604740,
+          fluidLPNomPressure_Ev=604740,
+          fluidLPNomPressure_Ec=604740,
+          Sh2_HP_Tstart_G_In=884.65,
+          Sh2_HP_Tstart_G_Out=849.29,
+          Sh2_HP_Tstart_M_In=801.698,
+          Sh2_HP_Tstart_M_Out=861.343,
+          Sh2_HP_Tstart_F_In=792.68,
+          Sh2_HP_Tstart_F_Out=857.106,
+          Sh1_HP_Tstart_G_In=849.29,
+          Sh1_HP_Tstart_G_Out=732,
+          Sh1_HP_Tstart_M_In=624.205,
+          Sh1_HP_Tstart_M_Out=803.585,
+          Sh1_HP_Tstart_F_In=599.18,
+          Sh1_HP_Tstart_F_Out=792.68,
+          Ev_HP_Tstart_G_In=732,
+          Ev_HP_Tstart_G_Out=611.19,
+          Ev_HP_Tstart_M_In=594.933,
+          Ev_HP_Tstart_M_Out=603.16,
+          Ec2_HP_Tstart_G_In=605.074,
+          Ec2_HP_Tstart_G_Out=548.522,
+          Ec2_HP_Tstart_M_In=488.443,
+          Ec2_HP_Tstart_M_Out=588.719,
+          Ec2_HP_Tstart_F_In=476.66,
+          Ec2_HP_Tstart_F_Out=585.495,
+          Ec1_HP_Tstart_M_In=426.384,
+          Ec1_HP_Tstart_M_Out=479.885,
+          Ec1_HP_Tstart_F_In=420.129,
+          Ec1_HP_Tstart_F_Out=476.66,
+          Rh2_IP_Tstart_M_In=793.962,
+          Rh2_IP_Tstart_M_Out=863.89,
+          Rh2_IP_Tstart_F_In=787.973,
+          Rh2_IP_Tstart_F_Out=861.625,
+          Rh1_IP_Tstart_M_In=641.307,
+          Rh1_IP_Tstart_M_Out=793.753,
+          Rh1_IP_Tstart_F_In=631.882,
+          Rh1_IP_Tstart_F_Out=787.973,
+          Sh_IP_Tstart_G_In=611.19,
+          Sh_IP_Tstart_G_Out=605.074,
+          Sh_IP_Tstart_M_In=504.237,
+          Sh_IP_Tstart_M_Out=594.703,
+          Sh_IP_Tstart_F_In=499.962,
+          Sh_IP_Tstart_F_Out=594.001,
+          Ev_IP_Tstart_G_In=548.522,
+          Ev_IP_Tstart_G_Out=503.81,
+          Ev_IP_Tstart_M_In=497.865,
+          Ev_IP_Tstart_M_Out=501.763,
+          Ec_IP_Tstart_G_In=501.802,
+          Ec_IP_Tstart_G_Out=468.9,
+          Ec_IP_Tstart_M_In=427.707,
+          Ec_IP_Tstart_M_Out=490.16,
+          Ec_IP_Tstart_F_In=421.552,
+          Ec_IP_Tstart_F_Out=488.422,
+          Ev_LP_Tstart_G_In=468.9,
+          Ev_LP_Tstart_G_Out=427.671,
+          Ev_LP_Tstart_M_In=422.216,
+          Ev_LP_Tstart_M_Out=434.622,
+          Ec_LP_Tstart_G_In=427.671,
+          Ec_LP_Tstart_G_Out=372.309,
+          Ec_LP_Tstart_M_In=336.404,
+          Ec_LP_Tstart_M_Out=419.33,
+          Ec_LP_Tstart_F_In=331.506,
+          Ec_LP_Tstart_F_Out=418.193)) 
+                              annotation (extent=[-100,20; 0,120]);
+      
+      ThermoPower.PowerPlants.SteamTurbineGroup.Examples.STG_3LRh_valve_cc 
+        sTG_3LRh(
+          steamTurbines(
+          HPT_hstart_in=3.56678e6,
+          HPT_hstart_out=3.16451e6,
+          IPT_hstart_in=3.65985e6,
+          IPT_hstart_out=3.21285e6,
+          LPT_hstart_in=3.16961e6,
+          LPT_hstart_out=2.41849e6,
+          mixLP_hstart=3.16953e6,
+          steamHPNomFlowRate=62.8,
+          steamIPNomFlowRate=14.5,
+          steamLPNomFlowRate=10.9,
+          steamHPNomPressure=12202000,
+          steamIPNomPressure=2636810,
+          steamLPNomPressure=604700,
+          SSInit=SSInit), controlledCondeser(
+          Vlstart=5,
+          setPoint_ratio=0.5,
+          SSInit=SSInit)) 
+        annotation (extent=[-100,-180; 0,-80]);
+      annotation (Diagram, experiment(
+          StopTime=6000,
+          NumberOfIntervals=3000,
+          Tolerance=1e-006),
+        Coordsys(extent=[-200,-200; 200,200], scale=0.1),
+        Documentation(info="<html>
+<p>Characteristic simulations: variation of the gas flow rate.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+        experimentSetupOutput(equdistant=false),
+        uses(ThermoPower(version="2.1"), Modelica(version="2.2.2")));
+    public 
+      ThermoPower.PowerPlants.HRSG.Control.levelsControl levelsControl(
+        CSmin_levelHP=30,
+        CSmax_levelHP=96,
+        CSmin_levelIP=5,
+        CSmax_levelIP=25,
+        CSmax_levelLP=2400,
+        Level_HP(steadyStateInit=SSInit),
+        Level_IP(steadyStateInit=SSInit),
+        Level_LP(steadyStateInit=SSInit)) 
+        annotation (extent=[60,100; 120,160]);
+      ThermoPower.PowerPlants.ElectricGeneratorGroup.Examples.GeneratorGroup 
+        singleShaft(
+        eta=0.9,
+        J_shaft=15000,
+        d_shaft=25,
+        Pmax=150e6,
+        delta_start=0.7,
+        generator(initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
+                    ThermoPower.Choices.Init.Options.noInit),
+        network(initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
+                    ThermoPower.Choices.Init.Options.noInit)) 
+                    annotation (extent=[40,-180; 140,-80]);
+      ThermoPower.Gas.SourceW sourceGas(
+        redeclare package Medium = FlueGasMedium,
+        w0=585.5,
+        T=884.65)          annotation (extent=[-160,50; -140,70]);
+      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
+          redeclare package Medium = FlueGasMedium) 
+                           annotation (extent=[-130,50; -110,70], rotation=0);
+      Modelica.Blocks.Sources.Ramp ramp(
+        height=-50,
+        duration=500,
+        offset=585.5,
+      startTime=4000)   annotation (extent=[-190,100; -170,120]);
+      ThermoPower.Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=
+            362.309)   annotation (extent=[60,50; 80,70]);
+      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
+          redeclare package Medium = FlueGasMedium) 
+                           annotation (extent=[30,50; 50,70],   rotation=0);
+    public 
+      Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
+        annotation (extent=[180,-60; 160,-40]);
+    public 
+      Modelica.Blocks.Sources.Ramp valveHP_com(height=0, offset=1) 
+        annotation (extent=[180,60; 160,80]);
+      Modelica.Blocks.Sources.Ramp valveIP_com(height=0, offset=1) 
+        annotation (extent=[180,20; 160,40]);
+      Modelica.Blocks.Sources.Ramp valveLP_com(height=0, offset=1) 
+        annotation (extent=[180,-20; 160,0]);
+    protected 
+      ThermoPower.PowerPlants.Buses.Actuators actuators 
+                                annotation (extent=[120,-60; 100,-40]);
+    equation 
+      connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (points=[40,-130;
+            0,-130],style(
+          color=0,
+          rgbcolor={0,0,0},
+          thickness=2));
+      connect(sTG_3LRh.WaterOut, hRSG.WaterIn) annotation (points=[-10,-80; -10,
+            20], style(
+          thickness=2,
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(sTG_3LRh.From_SH_LP, hRSG.Sh_LP_Out) annotation (points=[-30,-80;
+            -30,20], style(
+          thickness=2,
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(sTG_3LRh.From_RH_IP, hRSG.Rh_IP_Out) annotation (points=[-60,-80;
+            -60,20], style(
+          thickness=2,
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(sTG_3LRh.From_SH_HP, hRSG.Sh_HP_Out) annotation (points=[-90,-80;
+            -90,20], style(
+          thickness=2,
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(ramp.y,sourceGas. in_w0) annotation (points=[-169,110; -156,110;
+            -156,65],                  style(color=74, rgbcolor={0,0,127}));
+      connect(stateGas_in.inlet,sourceGas. flange) annotation (points=[-126,60;
+            -140,60], style(
+          color=76,
+          rgbcolor={159,159,223},
+          thickness=2,
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(sinkGas.flange,stateGas_out. outlet) annotation (points=[60,60;
+            46,60],   style(
+          color=76,
+          rgbcolor={159,159,223},
+          thickness=2));
+      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (points=[159,
+            70; 110,70; 110,-50], style(
+          color=74,
+          rgbcolor={0,0,127},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (points=[159,
+            30; 110,30; 110,-50], style(
+          color=74,
+          rgbcolor={0,0,127},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (points=[159,
+            -10; 110,-10; 110,-50], style(
+          color=74,
+          rgbcolor={0,0,127},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (
+          points=[159,-50; 110,-50], style(
+          color=5,
+          rgbcolor={255,0,255},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (points=[-75,-80;
+            -75,20],                   style(
+          thickness=2,
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(stateGas_out.inlet, hRSG.GasOut) annotation (points=[34,60; 0,60],
+          style(
+          color=76,
+          rgbcolor={159,159,223},
+          thickness=2,
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(hRSG.GasIn, stateGas_in.outlet) annotation (points=[-100,60; -114,
+            60], style(
+          color=76,
+          rgbcolor={159,159,223},
+          thickness=2,
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (points=[60,130;
+            20,130; 20,110; 0,110],      style(
+          color=84,
+          rgbcolor={255,170,213},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(hRSG.SensorsBus, sTG_3LRh.SensorsBus) annotation (points=[0,110;
+            20,110; 20,-150; 0,-150], style(
+          color=84,
+          rgbcolor={255,170,213},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (points=[0,-150;
+            20,-150; 20,-190; 160,-190; 160,-150; 140,-150],         style(
+          color=84,
+          rgbcolor={255,170,213},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (
+          points=[140,-165; 152,-165; 152,-184; 14,-184; 14,-165; 0,-165],
+          style(
+          color=52,
+          rgbcolor={213,255,170},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[0,-165;
+            14,-165; 14,95; 0,95],       style(
+          color=52,
+          rgbcolor={213,255,170},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(actuators, hRSG.ActuatorsBus) annotation (points=[110,-50; 14,-50;
+            14,95; 0,95], style(
+          color=52,
+          rgbcolor={213,255,170},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (points=[120,130;
+            140,130; 140,95; 0,95],          style(
+          color=52,
+          rgbcolor={213,255,170},
+          fillColor=7,
+          rgbfillColor={255,255,255},
+          fillPattern=1));
+    end SteamPlant_Sim1_dp;
   end Simulators;
 end PowerPlants;
