@@ -1,3 +1,4 @@
+within ThermoPower;
 package Water "Models of components with water/steam as working fluid" 
   extends Modelica.Icons.Library;
   
@@ -377,7 +378,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter MassFlowRate wnom "Nominal mass flowrate";
     parameter FFtypes.Temp FFtype=FFtypes.Kf "Friction Factor Type";
     parameter Real Kf(fixed = if FFtype==FFtypes.Kf then true else false,
-       unit = "Pa.kg/m^3/(kg/s)^2")=0 "Hydraulic resistance coefficient";
+       unit = "Pa.kg/(m3.kg2/s2)")=0 "Hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop";
     parameter Density rhonom=0 "Nominal density";
     parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity^2/2)";
@@ -596,7 +597,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation(Evaluate=true);
     parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Enthalpy hstart=1e5 "Enthalpy start value" 
+    parameter SpecificEnthalpy hstart=1e5 "Enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tmstart=300 "Wall temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -797,7 +798,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Length Dhyd "Hydraulic Diameter (single tube)";
     parameter MassFlowRate wnom "Nominal mass flowrate (total)";
     parameter FFtypes.Temp FFtype "Friction Factor Type" annotation(Evaluate = true);
-    parameter Real Kfnom(unit = "Pa.kg/m^3/(kg/s)^2", min=0)=0 
+    parameter Real Kfnom(unit = "Pa.kg/(m3.kg2/s2)", min=0)=0 
       "Nominal hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop (friction term only!)";
     parameter Density rhonom=0 "Nominal inlet density";
@@ -1008,7 +1009,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Dpfric1 = 0;
       Dpfric2 = 0;
     elseif HydraulicCapacitance == 0 then
-      assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
+      //assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
       Dpfric1 = noEvent(Kf*abs(win)  + Kfl)*win* sum(vbar[1:integer((N-1)/2)])/(N-1) 
         "Pressure drop from inlet to capacitance";
       Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar[1+integer((N-1)/2):N-1])/(N-1) 
@@ -3430,7 +3431,7 @@ The latter options can be useful when two or more components are connected direc
     MassFlowRate wev "Mass flowrate of bulk evaporation";
     AbsoluteTemperature Tl "Liquid temperature";
     AbsoluteTemperature Tv "Vapour temperature";
-    AbsoluteTemperature Tm(start=Tmstart, stateSelect=StateSelect.prefer) 
+    AbsoluteTemperature Tm(start=Tmstart, stateSelect = if Cm>0 then StateSelect.prefer else StateSelect.default) 
       "Wall temperature";
     AbsoluteTemperature Ts "Saturated water temperature";
     Power Qmv "Heat flow from the wall to the vapour";
@@ -3674,7 +3675,7 @@ The latter options can be useful when two or more components are connected direc
       "Av (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Av)));
-    parameter Real Kv(unit="m^3/h")=0 "Kv (metric) flow coefficient" 
+    parameter Real Kv(unit="m3/h")=0 "Kv (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Kv)));
     parameter Real Cv(unit="USG/min")=0 "Cv (US) flow coefficient" 

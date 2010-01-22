@@ -1,3 +1,4 @@
+within ThermoPower;
 package Gas "Models of components with ideal gases as working fluid" 
   extends Modelica.Icons.Library;
   connector Flange "Generic flange connector for gas flows" 
@@ -930,7 +931,7 @@ The latter options can be useful when two or more components are connected direc
     parameter MassFlowRate wnom "Nominal mass flowrate";
     parameter FFtypes.Temp FFtype = FFtypes.Kf "Friction factor type";
     parameter Real Kf(fixed = if FFtype == FFtypes.Kf then true else false,
-      unit = "Pa.kg/m^3/(kg/s)^2")=0 "Hydraulic resistance coefficient";
+      unit = "Pa.kg/(m3.kg2/s2)")=0 "Hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop";
     parameter Density rhonom=0 "Nominal density";
     parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity^2/2)";
@@ -1213,7 +1214,7 @@ The latter options can be useful when two or more components are connected direc
       "Av (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Av)));
-    parameter Real Kv(unit="m^3/h")=0 "Kv (metric) flow coefficient" 
+    parameter Real Kv(unit="m3/h")=0 "Kv (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Kv)));
     parameter Real Cv(unit="USG/min")=0 "Cv (US) flow coefficient" 
@@ -2211,7 +2212,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
 </html>"), Icon(Text(
           extent=[-128,-60; 128,-100],
           style(color=3, rgbcolor={0,0,255}),
-          string="%name")), 
+          string="%name")),
       Diagram);
   end TurbineBase;
   
