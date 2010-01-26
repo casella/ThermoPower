@@ -452,6 +452,8 @@ package Gas "Models of components with ideal gases as working fluid"
     InternalEnergy E "Total internal energy";
     Medium.SpecificEnthalpy hi "Inlet specific enthalpy";
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
+    MassFlowRate wi "Inlet mass flow rate";
+    MassFlowRate wo "Outlet mass flow rate";
     Medium.MassFraction Xi_i[Medium.nXi] "Inlet composition";
     Medium.MassFraction Xi_o[Medium.nXi] "Outlet composition";
     Time Tr "Residence Time";
@@ -466,23 +468,24 @@ package Gas "Models of components with ideal gases as working fluid"
   equation
     M = gas.d*V "Gas mass";
     E = M*gas.u "Gas internal energy";
-    der(M) = inlet.m_flow + outlet.m_flow "Mass balance";
-    der(E) = inlet.m_flow*hi + outlet.m_flow*ho + thermalPort.Q_flow
-      "Energy balance";
+    der(M) = wi - wo "Mass balance";
+    der(E) = wi*hi - wo*ho + thermalPort.Q_flow "Energy balance";
     for j in 1:Medium.nXi loop
-      M*der(gas.Xi[j]) = inlet.m_flow*(Xi_i[j] - gas.Xi[j]) + outlet.m_flow*(Xi_o[j] - gas.Xi[j])
+      M*der(gas.Xi[j]) = wi*(Xi_i[j] - gas.Xi[j]) - wo*(Xi_o[j] - gas.Xi[j])
         "Independent component mass balance";
     end for;
 
     // Boundary conditions
-    if inlet.m_flow >= 0 then
+    wi = inlet.m_flow;
+    wo = -outlet.m_flow;
+    if wi >= 0 then
       hi = inStream(inlet.h_outflow);
       Xi_i = inStream(inlet.Xi_outflow);
     else
       hi = gas.h;
       Xi_i = gas.Xi;
     end if;
-    if outlet.m_flow >= 0 then
+    if wo < 0 then
       ho = inStream(outlet.h_outflow);
       Xi_o = inStream(outlet.Xi_outflow);
     else
@@ -497,8 +500,7 @@ package Gas "Models of components with ideal gases as working fluid"
     outlet.p = gas.p;
     thermalPort.T = gas.T;
 
-    Tr=noEvent(M/max(abs(outlet.m_flow),Modelica.Constants.eps))
-      "Residence time";
+    Tr=noEvent(M/max(abs(-wo),Modelica.Constants.eps)) "Residence time";
   initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
@@ -561,6 +563,8 @@ package Gas "Models of components with ideal gases as working fluid"
       InternalEnergy E "Gas total energy";
       Medium.SpecificEnthalpy hi "Inlet specific enthalpy";
       Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
+      MassFlowRate wi "Inlet mass flow rate";
+      MassFlowRate wo "Outlet mass flow rate";
       Medium.MassFraction Xi_i[Medium.nX] "Inlet composition";
       Medium.MassFraction Xi_o[Medium.nX] "Outlet composition";
       AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
@@ -576,11 +580,11 @@ package Gas "Models of components with ideal gases as working fluid"
     equation
       M = gas.d*V "Gas mass";
       E = gas.u*M "Gas internal energy";
-      der(M) = inlet.m_flow + outlet.m_flow "Mass balance";
-      der(E) = inlet.m_flow*hi + outlet.m_flow*ho - gamma*S*(gas.T - Tm)
+      der(M) = wi - wo "Mass balance";
+      der(E) = wi*hi - wo*ho - gamma*S*(gas.T - Tm)
                + thermalPort.Q_flow "Energy balance";
       for j in 1:Medium.nXi loop
-        M*der(gas.Xi[j]) = inlet.m_flow*(Xi_i[j] - gas.Xi[j]) + outlet.m_flow*(Xi_o[j] - gas.Xi[j])
+        M*der(gas.Xi[j]) = wi*(Xi_i[j] - gas.Xi[j]) - wo*(Xi_o[j] - gas.Xi[j])
         "Independent component mass balance";
       end for;
       if Cm > 0 and gamma > 0 then
@@ -590,14 +594,16 @@ package Gas "Models of components with ideal gases as working fluid"
       end if;
 
       // Boundary conditions
-      if inlet.m_flow >= 0 then
+      wi = inlet.m_flow;
+      wo = -outlet.m_flow;
+      if wi >= 0 then
         hi = inStream(inlet.h_outflow);
         Xi_i = inStream(inlet.Xi_outflow);
       else
         hi = gas.h;
         Xi_i = gas.Xi;
       end if;
-      if outlet.m_flow >= 0 then
+      if wo < 0 then
         ho = inStream(outlet.h_outflow);
         Xi_o = inStream(outlet.Xi_outflow);
       else
@@ -612,8 +618,7 @@ package Gas "Models of components with ideal gases as working fluid"
       outlet.Xi_outflow = gas.Xi;
       thermalPort.T = gas.T;
 
-      Tr=noEvent(M/max(abs(outlet.m_flow),Modelica.Constants.eps))
-      "Residence time";
+      Tr=noEvent(M/max(abs(-wo),Modelica.Constants.eps)) "Residence time";
     initial equation
       // Initial conditions
       if initOpt == Choices.Init.Options.noInit then
@@ -687,6 +692,9 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.SpecificEnthalpy hi1 "Inlet 1 specific enthalpy";
     Medium.SpecificEnthalpy hi2 "Inlet 2 specific enthalpy";
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
+    MassFlowRate wi1 "Inlet 1 mass flow rate";
+    MassFlowRate wi2 "Inlet 2 mass flow rate";
+    MassFlowRate wo "Outlet mass flow rate";
     Medium.MassFraction Xi1[Medium.nX] "Inlet 1 composition";
     Medium.MassFraction Xi2[Medium.nX] "Inlet 2 composition";
     Medium.MassFraction Xo[Medium.nX] "Outlet composition";
@@ -705,12 +713,12 @@ package Gas "Models of components with ideal gases as working fluid"
   equation
     M = gas.d*V "Gas mass";
     E = M*gas.u "Gas internal energy";
-    der(M) = in1.m_flow + in2.m_flow + out.m_flow "Mass balance";
-    der(E) = in1.m_flow*hi1 + in2.m_flow*hi2 + out.m_flow*ho - gamma*S*(gas.T - Tm)
+    der(M) = wi1 + wi2 - wo "Mass balance";
+    der(E) = wi1*hi1 + wi2*hi2 - wo*ho - gamma*S*(gas.T - Tm)
        + thermalPort.Q_flow "Energy balance";
     for j in 1:Medium.nX loop
-      M*der(gas.X[j]) = in1.m_flow*(Xi1[j] - gas.X[j]) + in2.m_flow*(Xi2[j] - gas.X[j])
-         + out.m_flow*(Xo[j] - gas.X[j]) "Independent component mass balance";
+      M*der(gas.X[j]) = wi1*(Xi1[j] - gas.X[j]) + wi2*(Xi2[j] - gas.X[j])
+         - wo*(Xo[j] - gas.X[j]) "Independent component mass balance";
     end for;
     if Cm > 0 and gamma > 0 then
       Cm*der(Tm) = gamma*S*(gas.T - Tm) "Metal wall energy balance";
@@ -719,21 +727,24 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     // Boundary conditions
-    if in1.m_flow >= 0 then
+    wi1 = in1.m_flow;
+    wi2 = in2.m_flow;
+    wo = -out.m_flow;
+    if wi1 >= 0 then
       hi1 = inStream(in1.h_outflow);
       Xi1 = inStream(in1.Xi_outflow);
     else
       hi1 = gas.h;
       Xi1 = gas.X;
     end if;
-    if in2.m_flow >= 0 then
+    if wi2 >= 0 then
       hi2 = inStream(in2.h_outflow);
       Xi2 = inStream(in2.Xi_outflow);
     else
       hi2 = gas.h;
       Xi2 = gas.X;
     end if;
-    if out.m_flow >= 0 then
+    if wo < 0 then
       ho = inStream(out.h_outflow);
       Xo = inStream(out.Xi_outflow);
     else
@@ -751,7 +762,7 @@ package Gas "Models of components with ideal gases as working fluid"
     out.Xi_outflow = gas.X;
     thermalPort.T = gas.T;
 
-    Tr=noEvent(M/max(abs(out.m_flow),Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(abs(-wo),Modelica.Constants.eps)) "Residence time";
   initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
@@ -972,8 +983,14 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(Dialog(tab = "Initialisation"));
     parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation(Dialog(tab = "Initialisation"));
+    function squareReg = ThermoPower.Functions.squareReg;
   protected
     parameter Real Kfl(fixed=false) "Linear friction coefficient";
+  public
+    MassFlowRate w "Mass flow rate in the inlet";
+    Pressure pin "Inlet pressure";
+    Pressure pout "Outlet pressure";
+    Pressure dp "Pressure drop";
   public
     FlangeA inlet(redeclare package Medium = Medium,
                   m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
@@ -995,22 +1012,30 @@ package Gas "Models of components with ideal gases as working fluid"
   equation
     // Set fluid properties
     if not allowFlowReversal then
-      gas.p = inlet.p;
+      gas.p = pin;
       gas.h = outlet.h_outflow;
       gas.Xi = outlet.Xi_outflow;
     elseif inlet.m_flow >= 0 then
-      gas.p = inlet.p;
+      gas.p = pin;
       gas.h = outlet.h_outflow;
       gas.Xi = outlet.Xi_outflow;
     else
-      gas.p = outlet.p;
+      gas.p = pout;
       gas.h = inlet.h_outflow;
       gas.Xi = inlet.Xi_outflow;
     end if;
 
-    inlet.p - outlet.p = noEvent(Kf*abs(inlet.m_flow) + Kfl)*inlet.m_flow/gas.d
+    pin - pout = smooth(1, Kf*squareReg(w,wnom*wnf))/gas.d
       "Flow characteristics";
-    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+
+    //Boundary conditions
+    w = inlet.m_flow;
+    pin = inlet.p;
+    pout = outlet.p;
+    dp = pin - pout;
+
+    // Mass balance
+    inlet.m_flow + outlet.m_flow = 0;
 
     // Energy balance
     inlet.h_outflow = inStream(outlet.h_outflow);
@@ -1548,6 +1573,7 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
+    function squareReg = ThermoPower.Functions.squareReg;
   protected
     parameter Integer nXi=Medium.nXi "number of independent mass fractions";
     parameter Integer nX=Medium.nX "total number of mass fractions";
@@ -1573,6 +1599,10 @@ package Gas "Models of components with ideal gases as working fluid"
       // Xi(start=fill(Xstart[1:nXi],N)),
       // X(start=fill(Xstart,N)),
     Pressure Dpfric "Pressure drop due to friction";
+    MassFlowRate win "Flow rate at the inlet (single tube)";
+    MassFlowRate wout "Flow rate at the outlet (single tube)";
+    Pressure pin "Inlet pressure";
+    Pressure pout "Outlet pressure";
     Length omega_hyd "Wet perimeter (single tube)";
     Real Kf "Friction factor";
     Real Kfl "Linear friction factor";
@@ -1642,10 +1672,10 @@ package Gas "Models of components with ideal gases as working fluid"
     dwdt = if DynamicMomentum and not QuasiStatic then 
               der(w) else 0;
 
-    sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
-    L/A*dwdt + (outfl.p - infl.p) + Dpfric = 0 "Momentum balance";
+    sum(dMdt) = win - wout "Mass balance";
+    L/A*dwdt + (pout - pin) + Dpfric = 0 "Momentum balance";
     Dpfric = (if FFtype == FFtypes.NoFriction then 0 else 
-              noEvent(Kf*abs(w) + Kfl)*w*sum(vbar)/(N - 1))
+              smooth(1, Kf*squareReg(w,wnom/Nt*wnf))*sum(vbar)/(N - 1))
       "Pressure drop due to friction";
     for j in 1:N - 1 loop
       if not QuasiStatic then
@@ -1681,7 +1711,7 @@ package Gas "Models of components with ideal gases as working fluid"
           drbdX2[j, :] = dddX[j+1,:]/2;
         end if;
         vbar[j] = 1/rhobar[j];
-        wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+        wbar[j] = win - sum(dMdt[1:j - 1]) - dMdt[j]/2;
         cvbar[j]=(cv[j]+cv[j+1])/2;
       else
         // Static mass and energy balances
@@ -1695,7 +1725,7 @@ package Gas "Models of components with ideal gases as working fluid"
         drbdX1[j, :] = zeros(nX);
         drbdX2[j, :] = zeros(nX);
         vbar[j] = 0;
-        wbar[j] = infl.m_flow/Nt;
+        wbar[j] = win;
         cvbar[j]= 0;
       end if;
     end for;
@@ -1738,14 +1768,18 @@ package Gas "Models of components with ideal gases as working fluid"
 
     // Selection of representative pressure and flow rate variables
     if HydraulicCapacitance == HCtypes.Upstream then
-      p = infl.p;
-      w = -outfl.m_flow/Nt;
+      p = pin;
+      w = wout;
     else
-      p = outfl.p;
-      w = infl.m_flow/Nt;
+      p = pout;
+      w = win;
     end if;
 
     // Boundary conditions
+    win = infl.m_flow/Nt;
+    wout = - outfl.m_flow/Nt;
+    pin = infl.p;
+    pout = outfl.p;
     infl.h_outflow = gas[1].h;
     outfl.h_outflow = gas[N].h;
     infl.Xi_outflow = gas[1].Xi;
@@ -1779,7 +1813,7 @@ package Gas "Models of components with ideal gases as working fluid"
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
 
     M=sum(rhobar)*A*l "Total gas mass";
-    Tr=noEvent(M/max(infl.m_flow/Nt,Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(win,Modelica.Constants.eps)) "Residence time";
   initial equation
     if initOpt == Choices.Init.Options.noInit or QuasiStatic then
       // do nothing

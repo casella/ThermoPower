@@ -416,6 +416,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     import ThermoPower.Choices.PressDrop.FFtypes;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
+    Medium.ThermodynamicState state "Thermodynamic state of the fluid";
     Medium.BaseProperties fluid;
     parameter MassFlowRate wnom "Nominal mass flowrate";
     parameter FFtypes FFtype=FFtypes.Kf "Friction Factor Type";
@@ -431,10 +432,15 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
+    function squareReg = ThermoPower.Functions.squareReg;
   protected
     parameter Real Kfl(fixed = false) "Linear friction coefficient";
   public
     Medium.Density rho "Fluid density";
+    MassFlowRate w "Flow rate at the inlet";
+    Pressure pin "Inlet pressure";
+    Pressure pout "Outlet pressure";
+    Pressure dp "Pressure drop";
     FlangeA inlet(m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0),
                   redeclare package Medium=Medium) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
@@ -454,22 +460,30 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   equation
     // Fluid properties
     if not allowFlowReversal then
-      fluid.p = inlet.p;
+      fluid.p = pin;
       fluid.h = outlet.h_outflow;
-    elseif inlet.m_flow>=0 then
-      fluid.p=inlet.p;
-      fluid.h=outlet.h_outflow;
+    elseif w>=0 then
+      fluid.p = pin;
+      fluid.h = outlet.h_outflow;
     else
-      fluid.p=outlet.p;
-      fluid.h=inlet.h_outflow;
+      fluid.p = pout;
+      fluid.h = inlet.h_outflow;
     end if;
-    rho = fluid.d "Fluid density";
-    inlet.p - outlet.p = noEvent(Kf*abs(inlet.m_flow) + Kfl)*inlet.m_flow/rho
-      "Flow characteristics";
+    state = Medium.setSmoothState(w,
+                                  Medium.setState_ph(inlet.p, inStream(inlet.h_outflow)),
+                                  Medium.setState_ph(outlet.p, inStream(outlet.h_outflow)),
+                                  wnom*wnf);
+    rho = Medium.density(state) "Fluid density";
+    pin - pout = smooth(1, Kf*squareReg(w,wnom*wnf))/rho "Flow characteristics";
     inlet.m_flow + outlet.m_flow = 0 "Mass  balance";
     // Energy balance
     inlet.h_outflow = inStream(outlet.h_outflow);
     inStream(inlet.h_outflow) = outlet.h_outflow;
+    //Boundary conditions
+    w = inlet.m_flow;
+    pin = inlet.p;
+    pout = outlet.p;
+    dp = pin - pout;
     annotation (Icon(graphics={Text(extent={{-100,-50},{100,-82}}, textString=
                                                                "%name")}),
         Documentation(info="<HTML>
@@ -536,8 +550,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Fluid pressure at the outlet";
     SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Fluid specific enthalpy";
-    SpecificEnthalpy hi;
-    SpecificEnthalpy ho;
+    SpecificEnthalpy hi "Inlet specific enthalpy";
+    SpecificEnthalpy ho "Outlet specific enthalpy";
+    MassFlowRate wi "Inlet mass flow rate";
+    MassFlowRate wo "Outlet mass flow rate";
     Mass M "Fluid mass";
     Energy E "Fluid energy";
     AbsoluteTemperature T "Fluid temperature";
@@ -554,8 +570,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     M=fluid.d*V "Fluid mass";
     E=M*fluid.u "Fluid energy";
-    der(M) = inlet.m_flow + outlet.m_flow "Fluid mass balance";
-    der(E)= inlet.m_flow*hi + outlet.m_flow*ho + gamma*S*(Tm - T) +
+    der(M) = wi - wo "Fluid mass balance";
+    der(E)= wi*hi - wo*ho + gamma*S*(Tm - T) +
             thermalPort.Q_flow "Fluid energy balance";
     if Cm > 0 and gamma >0 then
       Cm*der(Tm) =  gamma*S*(T - Tm)
@@ -565,15 +581,17 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
-    hi = if not allowFlowReversal then inStream(inlet.h_outflow) else if inlet.m_flow >= 0 then inStream(inlet.h_outflow) else h;
-    ho = if not allowFlowReversal then h else if outlet.m_flow >= 0 then inStream(outlet.h_outflow) else h;
+    wi = inlet.m_flow;
+    wo = -outlet.m_flow;
+    hi = if not allowFlowReversal then inStream(inlet.h_outflow) else if wi >= 0 then inStream(inlet.h_outflow) else h;
+    ho = if not allowFlowReversal then h else if wo < 0 then inStream(outlet.h_outflow) else h;
     inlet.h_outflow = h;
     outlet.h_outflow = h;
     inlet.p = p+fluid.d*Modelica.Constants.g_n*H;
     outlet.p = p;
     thermalPort.T = T;
 
-    Tr=noEvent(M/max(inlet.m_flow,Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(wi,Modelica.Constants.eps)) "Residence time";
   initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
@@ -688,6 +706,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.SpecificEnthalpy hi1 "Inlet 1 specific enthalpy";
     Medium.SpecificEnthalpy hi2 "Inlet 2 specific enthalpy";
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
+    MassFlowRate wi1 "Inlet 1 mass flow rate";
+    MassFlowRate wi2 "Inlet 2 mass flow rate";
+    MassFlowRate wo "Outlet mass flow rate";
     Mass M "Fluid mass";
     Energy E "Fluid energy";
     HeatFlowRate Q "Heat flow rate exchanged with the outside";
@@ -705,8 +726,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     M=fluid.d*V "Fluid mass";
     E=M*fluid.u "Fluid energy";
-    der(M) = in1.m_flow + in2.m_flow + out.m_flow "Fluid mass balance";
-    der(E) = in1.m_flow*hi1 + in2.m_flow*hi2 + out.m_flow*ho - gamma*S*(T - Tm) + Q
+    der(M) = wi1 + wi2 - wo "Fluid mass balance";
+    der(E) = wi1*hi1 + wi2*hi2 - wo*ho - gamma*S*(T - Tm) + Q
       "Fluid energy balance";
     if Cm > 0 and gamma >0 then
       Cm*der(Tm) = gamma*S*(T - Tm) "Metal wall energy balance";
@@ -715,9 +736,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
-    hi1 = if not allowFlowReversal then inStream(in1.h_outflow) else if in1.m_flow >= 0 then inStream(in1.h_outflow) else h;
-    hi2 = if not allowFlowReversal then inStream(in2.h_outflow) else if in2.m_flow >= 0 then inStream(in2.h_outflow) else h;
-    ho = if not allowFlowReversal then h else if out.m_flow >= 0 then inStream(out.h_outflow) else h;
+    wi1 = in1.m_flow;
+    wi2 = in2.m_flow;
+    wo = -out.m_flow;
+    hi1 = if not allowFlowReversal then inStream(in1.h_outflow) else if wi1 >= 0 then inStream(in1.h_outflow) else h;
+    hi2 = if not allowFlowReversal then inStream(in2.h_outflow) else if wi2 >= 0 then inStream(in2.h_outflow) else h;
+    ho = if not allowFlowReversal then h else if wo < 0 then inStream(out.h_outflow) else h;
     in1.h_outflow = h;
     in2.h_outflow = h;
     out.h_outflow = h;
@@ -799,8 +823,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Enthalpy H "Liquid (total) enthalpy";
     Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Liquid specific enthalpy";
-    Medium.SpecificEnthalpy hin;
-    Medium.SpecificEnthalpy hout;
+    Medium.SpecificEnthalpy hin "Inlet specific enthalpy";
+    Medium.SpecificEnthalpy hout "Outlet specific enthalpy";
+    MassFlowRate win "Inlet mass flow rate";
+    MassFlowRate wout "Outlet mass flow rate";
     Medium.AbsolutePressure p(start=pext) "Bottom pressure";
     constant Real g=Modelica.Constants.g_n;
     FlangeA inlet(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
@@ -819,13 +845,15 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     V=V0+A*y "Liquid volume";
     M=liquid.d*V "Liquid mass";
     H=M*liquid.h "Liquid enthalpy";
-    der(M)= inlet.m_flow + outlet.m_flow "Mass balance";
-    der(H) = inlet.m_flow*hin+ outlet.m_flow*hout "Energy balance";
+    der(M)= win - wout "Mass balance";
+    der(H) = win*hin - wout*hout "Energy balance";
     p - pext = liquid.d*g*y "Stevino's law";
 
     // Boundary conditions
-    hin = if not allowFlowReversal then inStream(inlet.h_outflow) else if inlet.m_flow >= 0 then inStream(inlet.h_outflow) else h;
-    hout = if not allowFlowReversal then h else if outlet.m_flow >= 0 then inStream(outlet.h_outflow) else h;
+    win = inlet.m_flow;
+    wout = -outlet.m_flow;
+    hin = if not allowFlowReversal then inStream(inlet.h_outflow) else if win >= 0 then inStream(inlet.h_outflow) else h;
+    hout = if not allowFlowReversal then h else if wout < 0 then inStream(outlet.h_outflow) else h;
     inlet.h_outflow = h;
     outlet.h_outflow = h;
     inlet.p = p;
@@ -905,12 +933,14 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter SpecificEnthalpy hstart[N] = linspace(hstartin, hstartout, N)
       "Start value of enthalpy vector (initialized by default)" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Real wnf=0.01
+    parameter Real wnf=0.02
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     constant Real g=Modelica.Constants.g_n;
+    function squareReg = ThermoPower.Functions.squareReg;
+
     FlangeA infl(p(start=pstartin),h_outflow(start=hstartin),
       redeclare package Medium = Medium, m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                  annotation (Placement(transformation(extent={{-120,-20},{-80,
@@ -970,6 +1000,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Pressure Dpstat "Pressure drop due to static head";
     MassFlowRate win "Flow rate at the inlet (single tube)";
     MassFlowRate wout "Flow rate at the outlet (single tube)";
+    Pressure pin "Inlet pressure";
+    Pressure pout "Outlet pressure";
     Real Kf "Hydraulic friction coefficient";
     Real Kfl "Linear friction coefficient";
     Real dwdt "Dynamic momentum term";
@@ -1028,24 +1060,24 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       dwdt = 0;
     end if;
 
-    sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
-    L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
+    sum(dMdt) = win - wout "Mass balance";
+    L/A*dwdt + (pout - pin) + Dpstat + Dpfric = 0 "Momentum balance";
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
     if FFtype == FFtypes.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     elseif HydraulicCapacitance == HCtypes.Middle then
-      assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
-      Dpfric1 = noEvent(Kf*abs(win)  + Kfl)*win* sum(vbar[1:integer((N-1)/2)])/(N-1)
+      //assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
+      Dpfric1 = smooth(1, Kf*squareReg(win,wnom/Nt*wnf))*sum(vbar[1:integer((N-1)/2)])/(N-1)
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar[1+integer((N-1)/2):N-1])/(N-1)
+      Dpfric2 = smooth(1, Kf*squareReg(wout,wnom/Nt*wnf))*sum(vbar[1+integer((N-1)/2):N-1])/(N-1)
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == HCtypes.Upstream then
       Dpfric1 = 0 "Pressure drop from inlet to capacitance";
-      Dpfric2 = noEvent(Kf*abs(wout) + Kfl)*wout*sum(vbar)/(N - 1)
+      Dpfric2 = smooth(1, Kf*squareReg(wout,wnom/Nt*wnf))*sum(vbar)/(N - 1)
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == HCtypes.Downstream then
-      Dpfric1 = noEvent(Kf*abs(win) + Kfl)*win*sum(vbar)/(N - 1)
+      Dpfric1 = smooth(1, Kf*squareReg(win,wnom/Nt*wnf))*sum(vbar)/(N - 1)
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
     else
@@ -1068,7 +1100,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       drbdp[j] = (drdp[j] + drdp[j + 1])/2;
       drbdh[j] = (drdh[j] + drdh[j + 1])/2;
       vbar[j] = 1/rhobar[j];
-      wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+      wbar[j] = win - sum(dMdt[1:j - 1]) - dMdt[j]/2;
     end for;
 
     // Fluid property calculations
@@ -1086,14 +1118,16 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     // Boundary conditions
     win = infl.m_flow/Nt;
     wout = -outfl.m_flow/Nt;
+    pin = infl.p;
+    pout = outfl.p;
     if HydraulicCapacitance == HCtypes.Middle then
-      p = infl.p - Dpfric1 - Dpstat/2;
+      p = pin - Dpfric1 - Dpstat/2;
       w = win;
     elseif HydraulicCapacitance == HCtypes.Upstream then
-      p = infl.p;
+      p = pin;
       w = wout;
     elseif HydraulicCapacitance == HCtypes.Downstream then
-      p = outfl.p;
+      p = pout;
       w = win;
     else
       assert(false, "Unsupported HydraulicCapacitance option");
@@ -1109,7 +1143,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 
     Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
     M=sum(rhobar)*A*l "Total fluid mass";
-    Tr=noEvent(M/max(infl.m_flow/Nt,Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(win,Modelica.Constants.eps)) "Residence time";
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -1250,6 +1284,10 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction";
     Pressure Dpstat "Pressure drop due to static head";
+    MassFlowRate win "Flow rate at the inlet (single tube)";
+    MassFlowRate wout "Flow rate at the outlet (single tube)";
+    Pressure pin "Inlet pressure";
+    Pressure pout "Outlet pressure";
     Real Kf[N - 1] "Friction coefficient";
     Real Kfl[N - 1] "Linear friction coefficient";
     Real Cf[N - 1] "Fanning friction factor";
@@ -1339,11 +1377,11 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       dwdt = 0;
     end if;
 
-    sum(dMdt) = (infl.m_flow/Nt + outfl.m_flow/Nt) "Mass balance";
+    sum(dMdt) = (win - wout) "Mass balance";
     sum(dpf) = Dpfric "Total pressure drop due to friction";
     Dpstat = if abs(dzdx)<1e-6 then 0 else g*l*dzdx*sum(rhobar)
       "Pressure drop due to static head";
-    L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
+    L/A*dwdt + (pout - pin) + Dpstat + Dpfric = 0 "Momentum balance";
     for j in 1:(N - 1) loop
       A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
          l*omega*phibar[j] "Energy balance";
@@ -1351,9 +1389,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         "Mass balance for each volume";
       // Average volume quantities
       vbar[j] = 1/rhobar[j] "Average specific volume";
-      wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+      wbar[j] = win - sum(dMdt[1:j - 1]) - dMdt[j]/2;
       dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else 
-                noEvent(Kf[j]*abs(w) + Kfl[j])*w*vbar[j]);
+                smooth(1, Kf[j]*squareReg(w,wnom/Nt*wnf))*vbar[j]);
       if avoidInletEnthalpyDerivative and j == 1 then
         // first volume properties computed by the outlet properties
         rhobar[j] = rho[j+1];
@@ -1468,14 +1506,18 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 
     // Selection of representative pressure and flow rate variables
     if HydraulicCapacitance == HCtypes.Upstream then
-      p = infl.p;
-      w = -outfl.m_flow/Nt;
+      p = pin;
+      w = wout;
     else
-      p = outfl.p;
-      w = infl.m_flow/Nt;
+      p = pout;
+      w = win;
     end if;
 
     // Boundary conditions
+    win = infl.m_flow/Nt;
+    wout = -outfl.m_flow/Nt;
+    pin = infl.p;
+    pout = outfl.p;
     infl.h_outflow = htilde[1];
     outfl.h_outflow = htilde[N - 1];
     h[1] = inStream(infl.h_outflow);
@@ -1485,7 +1527,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 
     Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
     M=sum(rhobar)*A*l "Fluid mass (single tube)";
-    Tr=noEvent(M/max(infl.m_flow/Nt,Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(win,Modelica.Constants.eps)) "Residence time";
 
   initial equation
     if initOpt == Choices.Init.Options.noInit then
@@ -3587,7 +3629,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     MassFlowRate wev "Mass flowrate of bulk evaporation";
     AbsoluteTemperature Tl "Liquid temperature";
     AbsoluteTemperature Tv "Vapour temperature";
-    AbsoluteTemperature Tm(start=Tmstart, stateSelect=StateSelect.prefer)
+    AbsoluteTemperature Tm(start=Tmstart, stateSelect= if Cm>0 then StateSelect.prefer else StateSelect.default)
       "Wall temperature";
     AbsoluteTemperature Ts "Saturated water temperature";
     Power Qmv "Heat flow from the wall to the vapour";
