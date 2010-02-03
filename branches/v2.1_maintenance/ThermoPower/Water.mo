@@ -3375,8 +3375,8 @@ The latter options can be useful when two or more components are connected direc
     parameter Temperature Text=293 "External atmospheric temperature";
     parameter Time tauev=15 "Time constant of bulk evaporation";
     parameter Time tauc=15 "Time constant of bulk condensation";
-    parameter Real Kcs=0 "Surface condensation coefficient [kg/(s.m^2.K)]";
-    parameter Real Ks=0 "Surface heat transfer coefficient [W/(m^2.K)]";
+    parameter Real Kcs=0 "Surface condensation coefficient [kg/(s.m2.K)]";
+    parameter Real Ks=0 "Surface heat transfer coefficient [W/(m2.K)]";
     parameter CoefficientOfHeatTransfer gext=0 
       "Heat transfer coefficient between metal wall and external atmosphere";
     parameter CoefficientOfHeatTransfer gl=200 
@@ -3431,7 +3431,7 @@ The latter options can be useful when two or more components are connected direc
     MassFlowRate wev "Mass flowrate of bulk evaporation";
     AbsoluteTemperature Tl "Liquid temperature";
     AbsoluteTemperature Tv "Vapour temperature";
-    AbsoluteTemperature Tm(start=Tmstart, stateSelect = if Cm>0 then StateSelect.prefer else StateSelect.default) 
+    AbsoluteTemperature Tm(start=Tmstart, stateSelect=if Cm>0 then StateSelect.prefer else StateSelect.default) 
       "Wall temperature";
     AbsoluteTemperature Ts "Saturated water temperature";
     Power Qmv "Heat flow from the wall to the vapour";
