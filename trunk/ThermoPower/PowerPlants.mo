@@ -5431,15 +5431,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
         SI.Pressure p "Pressure";
         SI.SpecificEnthalpy h "Specific enthalpy";
         SI.MassFlowRate w "Mass flow rate";
-        Medium.BaseProperties fluid;
+        Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
       equation
-        // Set fluid properties
-        fluid.p = inlet.p;
-        fluid.h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
-
-        T = fluid.T;
-        p = fluid.p;
-        h = fluid.h;
+        // Set fluid state
+        p = inlet.p;
+        h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
+        fluidState = Medium.setState_ph(p,h);
+        T = Medium.temperature(fluidState);
         w = inlet.m_flow;
       end StateReader_water;
 
@@ -15739,12 +15737,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Real viso "Mean velocity of the fluid in isentropic conditions";
 
       equation
-        w = Kt*partialArc*sqrt(steam_in.p*steam_in.d)*ThermoPower.Functions.sqrtReg(1-(1/PR)^2)
+        w = Kt*partialArc*sqrt(Medium.pressure(steamState_in)*Medium.density(steamState_in))*ThermoPower.Functions.sqrtReg(1-(1/PR)^2)
           "Stodola's law";
 
-        uf=omega*Rm;
-        viso=sqrt(2*(hin-hiso)/n);
-        y=uf/viso;
+        uf = omega*Rm;
+        viso = sqrt(2*(hin-hiso)/n);
+        y = uf/viso;
         eta_iso = curveEta_iso(eta_iso_nom, y, x) "Variable efficiency";
       end SteamTurbineVarEta;
 
@@ -16011,15 +16009,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         SI.Pressure p "Pressure";
         SI.SpecificEnthalpy h "Specific enthalpy";
         SI.MassFlowRate w "Mass flow rate";
-        Medium.BaseProperties fluid;
+        Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
       equation
-        // Set fluid properties
-        fluid.p = inlet.p;
-        fluid.h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
-
-        T = fluid.T;
-        p = fluid.p;
-        h = fluid.h;
+        // Set fluid state
+        p = inlet.p;
+        h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
+        fluidState = Medium.setState_ph(p,h);
+        T = Medium.temperature(fluidState);
         w = inlet.m_flow;
       end StateReader_water;
     end Components;
@@ -22187,7 +22183,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               lineColor={255,255,255},
               fillColor={127,0,127},
               fillPattern=FillPattern.Solid,
-              textString =       "S")}));
+              textString=        "S")}));
     end Sensors;
 
     expandable connector Actuators
@@ -22202,7 +22198,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               lineColor={255,255,255},
               fillColor={127,0,127},
               fillPattern=FillPattern.Solid,
-              textString =      "A")}));
+              textString=       "A")}));
     end Actuators;
     annotation (Documentation(revisions="<html>
 <ul>

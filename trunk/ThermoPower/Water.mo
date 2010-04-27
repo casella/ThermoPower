@@ -417,7 +417,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.ThermodynamicState state "Thermodynamic state of the fluid";
-    Medium.BaseProperties fluid;
     parameter MassFlowRate wnom "Nominal mass flowrate";
     parameter FFtypes FFtype=FFtypes.Kf "Friction Factor Type";
     parameter Real Kf(fixed = if FFtype==FFtypes.Kf then true else false,
@@ -460,19 +459,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   equation
     // Fluid properties
     if not allowFlowReversal then
-      fluid.p = pin;
-      fluid.h = outlet.h_outflow;
-    elseif w>=0 then
-      fluid.p = pin;
-      fluid.h = outlet.h_outflow;
+      state = Medium.setSmoothState(w,
+                                    Medium.setState_ph(inlet.p, inStream(inlet.h_outflow)),
+                                    Medium.setState_ph(outlet.p, inStream(outlet.h_outflow)),
+                                    wnom*wnf);
     else
-      fluid.p = pout;
-      fluid.h = inlet.h_outflow;
+      state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
     end if;
-    state = Medium.setSmoothState(w,
-                                  Medium.setState_ph(inlet.p, inStream(inlet.h_outflow)),
-                                  Medium.setState_ph(outlet.p, inStream(outlet.h_outflow)),
-                                  wnom*wnf);
     rho = Medium.density(state) "Fluid density";
     pin - pout = smooth(1, Kf*squareReg(w,wnom*wnf))/rho "Flow characteristics";
     inlet.m_flow + outlet.m_flow = 0 "Mass  balance";
@@ -518,7 +511,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends Icons.Water.Header;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties fluid(p(start=pstartout),h(start=hstart));
+    Medium.ThermodynamicState fluidState(p(start=pstartout),h(start=hstart))
+      "Thermodynamic state of the fluid";
     parameter Volume V "Inner volume";
     parameter Area S=0 "Internal surface";
     parameter Position H=0 "Elevation of outlet over inlet" annotation (Evaluate=true);
@@ -564,14 +558,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
               50},{24,64}}, rotation=0)));
   equation
     // Set fluid properties
-    fluid.p=p;
-    fluid.h=h;
-    fluid.T=T;
+    fluidState = Medium.setState_ph(p,h);
+    T = Medium.temperature(fluidState);
 
-    M=fluid.d*V "Fluid mass";
-    E=M*fluid.u "Fluid energy";
+    M = V*Medium.density(fluidState) "Fluid mass";
+    E = M*Medium.specificInternalEnergy(fluidState) "Fluid energy";
     der(M) = wi - wo "Fluid mass balance";
-    der(E)= wi*hi - wo*ho + gamma*S*(Tm - T) +
+    der(E) = wi*hi - wo*ho + gamma*S*(Tm - T) +
             thermalPort.Q_flow "Fluid energy balance";
     if Cm > 0 and gamma >0 then
       Cm*der(Tm) =  gamma*S*(T - Tm)
@@ -587,7 +580,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     ho = if not allowFlowReversal then h else actualStream(outlet.h_outflow);
     inlet.h_outflow = h;
     outlet.h_outflow = h;
-    inlet.p = p+fluid.d*Modelica.Constants.g_n*H;
+    inlet.p = p+Medium.density(fluidState)*Modelica.Constants.g_n*H;
     outlet.p = p;
     thermalPort.T = T;
 
@@ -597,15 +590,15 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(fluid.h) = 0;
+      der(h) = 0;
       if (not Medium.singleState) then
-        der(fluid.p) = 0;
+        der(p) = 0;
       end if;
       if (Cm > 0 and gamma >0) then
         der(Tm) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(fluid.h) = 0;
+      der(h) = 0;
       if (Cm > 0 and gamma >0) then
         der(Tm) = 0;
       end if;
@@ -665,8 +658,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends Icons.Water.Mixer;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties fluid(p(start=pstart), h(start=hstart))
-      "Fluid properties";
+    Medium.ThermodynamicState fluidState(p(start=pstart), h(start=hstart))
+      "Thermodynamic state of the fluid";
     parameter Volume V "Internal volume";
     parameter Area S=0 "Internal surface";
     parameter CoefficientOfHeatTransfer gamma=0
@@ -720,12 +713,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
               0)));
   equation
     // Set fluid properties
-    fluid.p=p;
-    fluid.h=h;
-    fluid.T=T;
+    fluidState = Medium.setState_ph(p,h);
+    T = Medium.temperature(fluidState);
 
-    M=fluid.d*V "Fluid mass";
-    E=M*fluid.u "Fluid energy";
+    M = V*Medium.density(fluidState) "Fluid mass";
+    E = M*Medium.specificInternalEnergy(fluidState) "Fluid energy";
     der(M) = wi1 + wi2 - wo "Fluid mass balance";
     der(E) = wi1*hi1 + wi2*hi2 - wo*ho - gamma*S*(T - Tm) + Q
       "Fluid energy balance";
@@ -757,15 +749,15 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(fluid.h) = 0;
+      der(h) = 0;
       if (not Medium.singleState) then
-        der(fluid.p) = 0;
+        der(p) = 0;
       end if;
       if (Cm > 0 and gamma >0) then
         der(Tm) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(fluid.h) = 0;
+      der(h) = 0;
       if (Cm > 0 and gamma >0) then
         der(Tm) = 0;
       end if;
@@ -805,8 +797,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends Icons.Water.Tank;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties liquid(p(start=pext),h(start=hstart))
-      "Liquid properties";
+    Medium.ThermodynamicState liquidState(p(start=pext),h(start=hstart))
+      "Thermodynamic state of the liquid";
     parameter Area A "Cross-sectional area";
     parameter Volume V0=0 "Volume at zero level";
     parameter Pressure pext=1.01325e5 "Surface pressure";
@@ -839,15 +831,14 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
   equation
     // Set liquid properties
-    liquid.p=pext;
-    liquid.h=h;
+    liquidState = Medium.setState_ph(pext,h);
 
-    V=V0+A*y "Liquid volume";
-    M=liquid.d*V "Liquid mass";
-    H=M*liquid.h "Liquid enthalpy";
-    der(M)= win - wout "Mass balance";
+    V = V0+A*y "Liquid volume";
+    M = V*Medium.density(liquidState) "Liquid mass";
+    H = M*Medium.specificInternalEnergy(liquidState) "Liquid enthalpy";
+    der(M) = win - wout "Mass balance";
     der(H) = win*hin - wout*hout "Energy balance";
-    p - pext = liquid.d*g*y "Stevino's law";
+    p - pext = Medium.density(liquidState)*g*y "Stevino's law";
 
     // Boundary conditions
     win = inlet.m_flow;
@@ -862,7 +853,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(liquid.h) = 0;
+      der(h) = 0;
       der(y) = 0;
     else
       assert(false, "Unsupported initialisation option");
@@ -989,8 +980,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     extends Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
-    Medium.BaseProperties fluid[N](each p(start=pstartin),
-      h(start=hstart)) "Properties of the fluid at the nodes";
+    Medium.ThermodynamicState fluidState[N](each p(start=pstartin),
+      h(start=hstart)) "Thermodynamic state of the fluid at the nodes";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction (total)";
     Pressure Dpfric1
@@ -1044,7 +1035,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Cf = Cfnom*Kfc;
     elseif FFtype == FFtypes.Colebrook then
       Cf = f_colebrook(w, Dhyd/A, e,
-           Medium.dynamicViscosity(fluid[integer(N/2)].state))*Kfc;
+           Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
       Kf = Cf*omega_hyd*L/(2*A^3);
     elseif FFtype == FFtypes.NoFriction then
       Cf = 0;
@@ -1105,13 +1096,12 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 
     // Fluid property calculations
     for j in 1:N loop
-      fluid[j].p=p;
-      fluid[j].h=h[j];
-      T[j]=fluid[j].T;
-      rho[j]=fluid[j].d;
-      drdp[j]= if Medium.singleState then 0 else 
-              Medium.density_derp_h(fluid[j].state);
-      drdh[j]=Medium.density_derh_p(fluid[j].state);
+      fluidState[j] = Medium.setState_ph(p,h[j]);
+      T[j] = Medium.temperature(fluidState[j]);
+      rho[j] = Medium.density(fluidState[j]);
+      drdp[j] = if Medium.singleState then 0 else 
+                Medium.density_derp_h(fluidState[j]);
+      drdh[j] = Medium.density_derh_p(fluidState[j]);
       u[j] = w/(rho[j]*A);
     end for;
 
@@ -1233,9 +1223,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   equation
     for j in 1:N loop
       // Additional fluid properties
-      mu[j] =  Medium.dynamicViscosity(fluid[j].state);
-      k[j] =  Medium.thermalConductivity(fluid[j].state);
-      cp[j] =  Medium.heatCapacity_cp(fluid[j]);
+      mu[j] =  Medium.dynamicViscosity(fluidState[j]);
+      k[j] =  Medium.thermalConductivity(fluidState[j]);
+      cp[j] =  Medium.heatCapacity_cp(fluidState[j]);
       wall.gamma[j] =  f_dittus_boelter(w, Dhyd, A, mu[j], k[j], cp[j])
         "Heat transfer on the wall connector";
     end for;
@@ -1278,8 +1268,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     constant Pressure pzero=10 "Small deltap for calculations";
     constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SpecificEnthalpy hzero=1e-3 "Small value for deltah";
-    SmoothMedium.BaseProperties fluid[N](each p(start=pstartin),
-      h(start=hstart)) "Properties of the fluid at the nodes";
+    SmoothMedium.ThermodynamicState fluidState[N](each p(start=pstartin),
+      h(start=hstart)) "Thermodynamic state of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction";
@@ -1353,7 +1343,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       elseif FFtype == FFtypes.Colebrook then
         Cf[j]=if noEvent(htilde[j] < hl or htilde[j] > hv) then 
           f_colebrook(w, Dhyd/A, e,
-            Medium.dynamicViscosity(fluid[j].state))*Kfc else 
+            Medium.dynamicViscosity(fluidState[j]))*Kfc else 
           f_colebrook_2ph(w, Dhyd/A, e,
             Medium.dynamicViscosity(Medium.setBubbleState(sat,1)),
             Medium.dynamicViscosity(Medium.setDewState(sat,1)),x[j])*Kfc;
@@ -1478,29 +1468,28 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 
     // Saturated fluid property calculations
     sat = Medium.setSat_p(p);
-    Ts=sat.Tsat;
-    rhol=Medium.bubbleDensity(sat);
-    rhov=Medium.dewDensity(sat);
-    hl=Medium.bubbleEnthalpy(sat);
-    hv=Medium.dewEnthalpy(sat);
-    drldp=Medium.dBubbleDensity_dPressure(sat);
-    drvdp=Medium.dDewDensity_dPressure(sat);
-    dhldp=Medium.dBubbleEnthalpy_dPressure(sat);
-    dhvdp=Medium.dDewEnthalpy_dPressure(sat);
+    Ts = sat.Tsat;
+    rhol = Medium.bubbleDensity(sat);
+    rhov = Medium.dewDensity(sat);
+    hl = Medium.bubbleEnthalpy(sat);
+    hv = Medium.dewEnthalpy(sat);
+    drldp = Medium.dBubbleDensity_dPressure(sat);
+    drvdp = Medium.dDewDensity_dPressure(sat);
+    dhldp = Medium.dBubbleEnthalpy_dPressure(sat);
+    dhvdp = Medium.dDewEnthalpy_dPressure(sat);
     AA = (hv - hl)/(1/rhov - 1/rhol);
     AA1 = ((dhvdp - dhldp)*(rhol - rhov)*rhol*rhov
             - (hv - hl)*(rhov^2*drldp - rhol^2*drvdp))/(rhol - rhov)^2;
 
     // Fluid property calculations
     for j in 1:N loop
-      fluid[j].p=p;
-      fluid[j].h=h[j];
-      T[j]=fluid[j].T;
-      rho[j]=fluid[j].d;
-      drdp[j]=Medium.density_derp_h(fluid[j].state);
-      drdh[j]=Medium.density_derh_p(fluid[j].state);
+      fluidState[j] = Medium.setState_ph(p,h[j]);
+      T[j] = Medium.temperature(fluidState[j]);
+      rho[j] = Medium.density(fluidState[j]);
+      drdp[j] = Medium.density_derp_h(fluidState[j]);
+      drdh[j] = Medium.density_derh_p(fluidState[j]);
       u[j] = w/(rho[j]*A);
-      x[j]=noEvent(if h[j]<=hl then 0 else 
+      x[j] = noEvent(if h[j]<=hl then 0 else 
                 if h[j]>=hv then 1 else (h[j]-hl)/(hv-hl));
     end for;
 
@@ -1659,9 +1648,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         // c) Nucleate boiling: constant h.t.c.
       gamma[j] = noEvent(if h[j] < hl or h[j] > hv then 
         f_dittus_boelter(w, Dhyd, A,
-        Medium.dynamicViscosity(fluid[j].state),
-        Medium.thermalConductivity(fluid[j].state),
-        Medium.heatCapacity_cp(fluid[j].state)) else 
+        Medium.dynamicViscosity(fluidState[j]),
+        Medium.thermalConductivity(fluidState[j]),
+        Medium.heatCapacity_cp(fluidState[j])) else 
       if h[j] > hCHF then 
         f_dittus_boelter(w*x[j], Dhyd, A, mu_vs, k_vs, cp_vs) else 
         gamma_b);
@@ -1802,9 +1791,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         // c) Nucleate boiling: constant h.t.c.
       gamma[j] = noEvent(if h[j] < hl or h[j] > hv then 
         f_dittus_boelter(w, Dhyd, A,
-        Medium.dynamicViscosity(fluid[j].state),
-        Medium.thermalConductivity(fluid[j].state),
-        Medium.heatCapacity_cp(fluid[j].state)) else 
+        Medium.dynamicViscosity(fluidState[j]),
+        Medium.thermalConductivity(fluidState[j]),
+        Medium.heatCapacity_cp(fluidState[j])) else 
       if h[j] > hCHF then 
         f_dittus_boelter(w*x[j], Dhyd, A, mu_vs, k_vs, cp_vs) else 
         f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
@@ -3121,7 +3110,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    Medium.BaseProperties fluid;
+    SpecificEnthalpy h "Specific enthalpy of the fluid";
+    Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                     annotation (Placement(transformation(extent=
              {{-80,-60},{-40,-20}}, rotation=0)));
@@ -3135,9 +3125,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
     inlet.p = outlet.p "No pressure drop";
     // Set fluid properties
-    fluid.p = inlet.p;
-    fluid.h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
-    T = fluid.T;
+    h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
+    fluidState = Medium.setState_ph(inlet.p,h);
+    T = Medium.temperature(fluidState);
 
     // Boundary conditions
     inlet.h_outflow = inStream(outlet.h_outflow);
@@ -3290,7 +3280,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     extends ThermoPower.Icons.Water.Accumulator;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Liquid medium model";
-    Medium.BaseProperties liquid "Liquid properties";
+    Medium.ThermodynamicState liquidState "Thermodynamic state of the liquid";
 
     parameter Volume V "Total volume";
     parameter Volume Vl0 "Water nominal volume (at reference level)";
@@ -3342,6 +3332,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.Temperature Tg(start=Tg_start) "Gas temperature";
     Volume Vg "Volume occupied by gas";
     Medium.AbsolutePressure pg(start=pg_start) "Gas pressure";
+    Density rho "Density of tue water";
     Modelica.Blocks.Interfaces.RealInput GasInfl 
       annotation (Placement(transformation(extent={{-84,80},{-64,100}},
             rotation=0)));
@@ -3361,7 +3352,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     //Equations for water and gas volumes and exchanged thermal power
     Vl = Vl0 + A*zl;
     Vg = V - Vl;
-    Qp = gamma_ex*A*(liquid.T - Tg);
+    Qp = gamma_ex*A*(Medium.temperature(liquidState) - Tg);
 
     // Boundary conditions
     // (Thermal effects of the water going out of the accumulator are neglected)
@@ -3374,16 +3365,16 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     WaterInfl.p = pf;
     WaterOutfl.p = pf;
 
-    liquid.d*A*der(zl) = wl_in + wl_out
+    rho*A*der(zl) = wl_in + wl_out
       "Water mass balance (density variations neglected)";
-    liquid.d*Vl*der(hl)-Vl*der(pg)-pg*der(Vl) = wl_in*(hl_in-hl) + wl_out*(hl_out-hl) - Qp
+    rho*Vl*der(hl)-Vl*der(pg)-pg*der(Vl) = wl_in*(hl_in-hl) + wl_out*(hl_out-hl) - Qp
       "Water energy balance";
 
     // Set liquid properties
-    liquid.p=pg;
-    liquid.h=hl;
+    liquidState = Medium.setState_ph(pg,hl);
+    rho = Medium.density(liquidState);
 
-    pf = pg + liquid.d*g*(zl + zl0) "Stevino's law";
+    pf = pg + rho*g*(zl + zl0) "Stevino's law";
 
     wg_in =GasInfl "Gas inlet mass-flow rate";
 
@@ -3495,11 +3486,11 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     Medium.Density rhol "Density of saturated liquid";
     Medium.Density rhov "Density of saturated steam";
   equation
-    Ml=Vl*rhol "Mass of liquid";
-    Mv=Vv*rhov "Mass of vapour";
-    M=Ml+Mv "Total mass";
-    E=Ml*hl+Mv*hv-p*Vt+(Mmd+Mmdcr)*cm*Ts "Total energy";
-    Ts=sat.Tsat "Saturation temperature";
+    Ml = Vl*rhol "Mass of liquid";
+    Mv = Vv*rhov "Mass of vapour";
+    M = Ml+Mv "Total mass";
+    E = Ml*hl+Mv*hv-p*Vt+(Mmd+Mmdcr)*cm*Ts "Total energy";
+    Ts = sat.Tsat "Saturation temperature";
     der(M) = qf - qs "Mass balance";
     der(E) = Q + qf*hf - qs*hv "Energy balance";
     Vl = Vld+Vdcr "Liquid volume";
@@ -3514,16 +3505,16 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     -steam.m_flow = qs;
     feed.h_outflow = hl;
     steam.h_outflow = hv;
-    Q =heat.Q_flow;
+    Q = heat.Q_flow;
     heat.T = Ts;
 
     // Fluid properties
-    sat.psat=p;
-    sat.Tsat=Medium.saturationTemperature(p);
-    rhol=Medium.bubbleDensity(sat);
-    rhov=Medium.dewDensity(sat);
-    hl=Medium.bubbleEnthalpy(sat);
-    hv=Medium.dewEnthalpy(sat);
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    rhol = Medium.bubbleDensity(sat);
+    rhov = Medium.dewDensity(sat);
+    hl = Medium.bubbleEnthalpy(sat);
+    hv = Medium.dewEnthalpy(sat);
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -3560,8 +3551,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     extends Icons.Water.Drum;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model";
-    Medium.BaseProperties liquid;
-    Medium.BaseProperties vapour;
+    Medium.ThermodynamicState liquidState "Thermodynamic state of the liquid";
+    Medium.ThermodynamicState vapourState "Thermodynamic state of the vapour";
     Medium.SaturationProperties sat;
     parameter Length rint=0 "Internal radius";
     parameter Length rext=0 "External radius";
@@ -3690,10 +3681,10 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     else
       Tm = 300 "Wall temperature doesn't matter";
     end if;
-    Mv=Vv*rhov "Vapour volume mass";
-    Ml=Vl*rhol "Liquid volume mass";
-    Ev=Mv*vapour.u "Vapour volume energy";
-    El=Ml*liquid.u "Liquid volume energy";
+    Mv = Vv*rhov "Vapour volume mass";
+    Ml = Vl*rhol "Liquid volume mass";
+    Ev = Mv*Medium.specificInternalEnergy(vapourState) "Vapour volume energy";
+    El = Ml*Medium.specificInternalEnergy(liquidState) "Liquid volume energy";
     wev = xl*rhol*Vl/tauev "Bulk evaporation flow rate in the liquid volume";
     wc = (1 - xv)*rhov*Vv/tauc
       "Bulk condensation flow rate in the vapour volume";
@@ -3726,19 +3717,17 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     Aext = 2*pi*rext^2 + 2*pi*rext*L "External metal surface area";
 
     // Fluid properties
-    liquid.p=p;
-    liquid.h=hl;
-    Tl=liquid.T;
-    rhol=liquid.d;
-    vapour.p=p;
-    vapour.h=hv;
-    Tv=vapour.T;
-    rhov=vapour.d;
-    sat.psat=p;
-    sat.Tsat=Medium.saturationTemperature(p);
-    hls= Medium.bubbleEnthalpy(sat);
-    hvs= Medium.dewEnthalpy(sat);
-    Ts=sat.Tsat;
+    liquidState = Medium.setState_ph(p,hl);
+    Tl = Medium.temperature(liquidState);
+    rhol = Medium.density(liquidState);
+    vapourState = Medium.setState_ph(p,hv);
+    Tv = Medium.temperature(vapourState);
+    rhov = Medium.density(vapourState);
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    hls = Medium.bubbleEnthalpy(sat);
+    hvs = Medium.dewEnthalpy(sat);
+    Ts = sat.Tsat;
 
     // Boundary conditions
     feedwater.p = p;
@@ -3885,7 +3874,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     import ThermoPower.Choices.Valve.CvTypes;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties fluid(p(start=pin_start), h(start=hstart));
+    Medium.ThermodynamicState fluidState(p(start=pin_start), h(start=hstart));
     parameter CvTypes CvData = CvTypes.Av "Selection of flow coefficient";
     parameter Area Av(fixed = if CvData==CvTypes.Av then true else false,
       start = wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))=0
@@ -3957,10 +3946,9 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     w = inlet.m_flow;
 
     // Fluid properties
-    fluid.p = inlet.p;
-    fluid.h = outlet.h_outflow;
-    Tin = fluid.T;
-    rho = fluid.d;
+    fluidState = Medium.setState_ph(inlet.p,inStream(inlet.h_outflow));
+    Tin = Medium.temperature(fluidState);
+    rho = Medium.density(fluidState);
 
     // Energy balance
     inlet.h_outflow = inStream(outlet.h_outflow);
@@ -4195,8 +4183,8 @@ li><i>1 Jul 2004</i>
     import Modelica.SIunits.Conversions.NonSIunits.*;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties inletFluid(p(start=pin_start),h(start=hstart))
-      "Fluid properties at the inlet";
+    Medium.ThermodynamicState inletFluidState(p(start=pin_start),h(start=hstart))
+      "Thermodynamic state of the fluid at the inlet";
     replaceable function flowCharacteristic = 
         Functions.PumpCharacteristics.baseFlow
       "Head vs. q_flow characteristic at nominal speed and density" 
@@ -4300,10 +4288,9 @@ li><i>1 Jul 2004</i>
     end if;
 
     // Fluid properties
-    inletFluid.p=infl.p;
-    inletFluid.h=hin;
-    rho = inletFluid.d;
-    Tin = inletFluid.T;
+    inletFluidState = Medium.setState_ph(infl.p,hin);
+    rho = Medium.density(inletFluidState);
+    Tin = Medium.temperature(inletFluidState);
 
     // Boundary conditions
     dp = outfl.p - infl.p;
@@ -4430,13 +4417,13 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
   end Pump;
 
   model PumpNPSH
-    extends Pump(redeclare replaceable package Medium = 
+    extends Pump(redeclare replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium);
     Height NPSHa "Net Positive Suction Head available";
     Medium.AbsolutePressure pv "Saturated liquid pressure";
   equation
-    pv=Medium.saturationPressure(inletFluid.T);
-    NPSHa=(infl.p-pv)/(rho*g);
+    pv = Medium.saturationPressure(Tin);
+    NPSHa = (infl.p-pv)/(rho*g);
     annotation (Documentation(info="<html>Same as Pump. Additionally, the net positive suction head available is computed. Requires a two-phase medium model to compute the saturation properties.
 </html>", revisions="<html>
 <ul>
@@ -4641,8 +4628,8 @@ Input variables changed. This function now computes the heat transfer coefficien
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
 
-    Medium.BaseProperties steam_in(p(start=pstart_in),h(start=hstartin));
-    Medium.BaseProperties steam_iso(p(start=pstart_out),h(start=hstartout));
+    Medium.ThermodynamicState steamState_in(p(start=pstart_in),h(start=hstartin));
+    Medium.ThermodynamicState steamState_iso(p(start=pstart_out),h(start=hstartout));
 
     Angle phi "shaft rotation angle";
     Torque tau "net torque acting on the turbine";
@@ -4685,17 +4672,15 @@ Input variables changed. This function now computes the heat transfer coefficien
       partialArc =1 "Default value if not connected";
     end if;
     if explicitIsentropicEnthalpy then
-      hiso=Medium.isentropicEnthalpy(outlet.p, steam_in.state)
+      hiso = Medium.isentropicEnthalpy(outlet.p, steamState_in)
         "Isentropic enthalpy";
       //dummy assignments
       sin=0;
-      steam_iso.p=1e5;
-      steam_iso.h=1e5;
+      steamState_iso = Medium.setState_ph(1e5,1e5);
     else
-       steam_iso.p = pout;
-       sin=Medium.specificEntropy(steam_in.state);
-       sin=Medium.specificEntropy(steam_iso.state);
-       hiso=steam_iso.h;
+      sin = Medium.specificEntropy(steamState_in);
+      steamState_iso = Medium.setState_ps(pout,sin);
+      hiso = Medium.specificEnthalpy(steamState_iso);
     end if;
       hin-hout=eta_iso*(hin-hiso) "Computation of outlet enthalpy";
     Pm=eta_mech*w*(hin-hout) "Mechanical power from the steam";
@@ -4708,9 +4693,8 @@ Input variables changed. This function now computes the heat transfer coefficien
     der(phi) = omega;
 
     // steam boundary conditions and inlet steam properties
-    steam_in.p = inlet.p;
-    steam_in.h = inStream(inlet.h_outflow);
-    hin = steam_in.h;
+    steamState_in = Medium.setState_ph(inlet.p,inStream(inlet.h_outflow));
+    hin = inStream(inlet.h_outflow);
     hout = outlet.h_outflow;
     pout = outlet.p;
     w = inlet.m_flow;
@@ -4770,7 +4754,7 @@ Input variables changed. This function now computes the heat transfer coefficien
     parameter Real eta_iso_nom=0.92 "Nominal isentropic efficiency";
     parameter Area Kt "Kt coefficient of Stodola's law";
   equation
-    w = Kt*partialArc*sqrt(steam_in.p*steam_in.d)*Functions.sqrtReg(1-(1/PR)^2)
+    w = Kt*partialArc*sqrt(Medium.pressure(steamState_in)*Medium.density(steamState_in))*Functions.sqrtReg(1-(1/PR)^2)
       "Stodola's law";
     eta_iso = eta_iso_nom "Constant efficiency";
    annotation (
@@ -4814,7 +4798,7 @@ Input variables changed. This function now computes the heat transfer coefficien
       annotation(Dialog(tab = "Initialization"));
     parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.steadyState
       "Initialization option" annotation(Dialog(tab = "Initialization"));
-    Medium.BaseProperties fluid_in(p(start=pstartin),h(start=hstartin));
+    Medium.ThermodynamicState fluidState_in(p(start=pstartin),h(start=hstartin));
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-120,50},{-80,
               90}}, rotation=0)));
@@ -4846,13 +4830,13 @@ Input variables changed. This function now computes the heat transfer coefficien
       partialArc =1 "Default value if not connected";
     end if;
     Kv = partialArc*wnom/pnom "Definition of Kv coefficient";
-    w=Kv*inlet.p "Flow characteristics";
-    hiso=Medium.isentropicEnthalpy(outlet.p, fluid_in.state)
+    w = Kv*inlet.p "Flow characteristics";
+    hiso = Medium.isentropicEnthalpy(outlet.p, fluidState_in)
       "Isentropic enthalpy";
-    hin-hout=eta_iso*(hin-hiso) "Computation of outlet enthalpy";
-    Pm=eta_mech*w*(hin-hout) "Mechanical power from the fluid";
-    T_HP*der(P_HP)=Pm*hpFraction-P_HP "Power output to HP turbine";
-    T_LP*der(P_LP)=Pm*(1-hpFraction)-P_LP "Power output to LP turbine";
+    hin-hout = eta_iso*(hin-hiso) "Computation of outlet enthalpy";
+    Pm = eta_mech*w*(hin-hout) "Mechanical power from the fluid";
+    T_HP*der(P_HP) = Pm*hpFraction-P_HP "Power output to HP turbine";
+    T_LP*der(P_LP) = Pm*(1-hpFraction)-P_LP "Power output to LP turbine";
     P_HP+P_LP = -tau*omega "Mechanical power balance";
 
     // Mechanical boundary conditions
@@ -4862,10 +4846,9 @@ Input variables changed. This function now computes the heat transfer coefficien
     der(phi) = omega;
 
     // Fluid boundary conditions and inlet fluid properties
-    fluid_in.p=inlet.p;
-    fluid_in.h=hin;
-    hin=inStream(inlet.h_outflow);
-    hout=outlet.h_outflow;
+    fluidState_in = Medium.setState_ph(inlet.p,hin);
+    hin = inStream(inlet.h_outflow);
+    hout = outlet.h_outflow;
     w = inlet.m_flow;
 
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
