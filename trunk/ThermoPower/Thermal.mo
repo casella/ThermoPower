@@ -647,17 +647,24 @@ This package contains models to compute the material properties needed to model 
     parameter Temperature Tstart2[N2] = ThermoPower.Thermal.linspaceExt(Tstart21,Tstart2N,N2)
       "Start value of temperature vector - side 2 (initialized by default)" 
       annotation(Dialog(tab = "Initialisation"));
+
     DHT side1(N=N1, T(start=Tstart1)) 
                    annotation (Placement(transformation(extent={{-40,20},{40,40}},
             rotation=0)));
     DHT side2(N=N2, T(start=Tstart2)) 
                    annotation (Placement(transformation(extent={{-40,-42},{40,
               -20}}, rotation=0)));
+
   protected
-    Real G1[N2, N1] "Temperature weight matrix - side 1";
-    Real G2[N1, N2] "Temperature weight matrix - side 2";
-    Real H1[min(N1,N2), N1] "Heat flux weight matrix - side 1";
-    Real H2[min(N1,N2), N2] "Heat flux weight matrix - side 2";
+    parameter Real H12[:,:] = Modelica.Math.Matrices.inv(if N1 >= N2 then H2 else H1)*(if N1 >= N2 then H1 else H2) annotation(Evaluate=true);
+    parameter Real G1[N2, N1] = compG1(N1,N2)
+      "Temperature weight matrix - side 1" annotation(Evaluate=true);
+    parameter Real G2[N1, N2] = compG2(N1,N2)
+      "Temperature weight matrix - side 2" annotation(Evaluate=true);
+    parameter Real H1[min(N1,N2), N1] = compH1(N1,N2)
+      "Heat flux weight matrix - side 1" annotation(Evaluate=true);
+    parameter Real H2[min(N1,N2), N2] = compH2(N1,N2)
+      "Heat flux weight matrix - side 2" annotation(Evaluate=true);
 
     function compHm "Computes matrix H - side with more nodes"
       input Integer Nm "Number of nodes on the side with more nodes";
@@ -797,17 +804,13 @@ This package contains models to compute the material properties needed to model 
     end compH2;
 
   equation
-    // Compute weight matrices
-    G1 = compG1(N1,N2);
-    G2 = compG2(N1,N2);
-    H1 = compH1(N1,N2);
-    H2 = compH2(N1,N2);
-
-    H1*side1.phi+H2*side2.phi = zeros(min(N1,N2)) "Energy balance";
+    // H1*side1.phi+H2*side2.phi = zeros(min(N1,N2)) "Energy balance";
     if N1 >= N2 then
       side1.phi = gamma*(side1.T - G2*side2.T) "Convective heat transfer";
+      side2.phi = -H12*side1.phi "Energy balance";
     else
       side2.phi = gamma*(side2.T - G1*side1.T) "Convective heat transfer";
+      side1.phi = -H12*side2.phi "Energy balance";
     end if;
     annotation (Icon(graphics={Text(
             extent={{-100,-44},{100,-68}},
@@ -940,8 +943,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
   model HeatFlowDistribution "Same heat flow through two different surfaces"
     extends Icons.HeatFlow;
     parameter Integer N(min=1)=2 "Number of nodes";
-    parameter Area A1 "Side 1 surface area";
-    parameter Area A2 "Side 2 surface area";
+    parameter Area A1=1 "Side 1 surface area" annotation(Evaluate=true);
+    parameter Area A2=1 "Side 2 surface area" annotation(Evaluate=true);
+
     DHT side1(N=N) "Area of side 1 surface" 
                  annotation (Placement(transformation(extent={{-40,20},{40,40}},
             rotation=0)));
