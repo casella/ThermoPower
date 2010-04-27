@@ -583,8 +583,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     // Boundary conditions
     wi = inlet.m_flow;
     wo = -outlet.m_flow;
-    hi = if not allowFlowReversal then inStream(inlet.h_outflow) else if wi >= 0 then inStream(inlet.h_outflow) else h;
-    ho = if not allowFlowReversal then h else if wo < 0 then inStream(outlet.h_outflow) else h;
+    hi = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
+    ho = if not allowFlowReversal then h else actualStream(outlet.h_outflow);
     inlet.h_outflow = h;
     outlet.h_outflow = h;
     inlet.p = p+fluid.d*Modelica.Constants.g_n*H;
@@ -739,9 +739,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     wi1 = in1.m_flow;
     wi2 = in2.m_flow;
     wo = -out.m_flow;
-    hi1 = if not allowFlowReversal then inStream(in1.h_outflow) else if wi1 >= 0 then inStream(in1.h_outflow) else h;
-    hi2 = if not allowFlowReversal then inStream(in2.h_outflow) else if wi2 >= 0 then inStream(in2.h_outflow) else h;
-    ho = if not allowFlowReversal then h else if wo < 0 then inStream(out.h_outflow) else h;
+    hi1 = if not allowFlowReversal then inStream(in1.h_outflow) else actualStream(in1.h_outflow);
+    hi2 = if not allowFlowReversal then inStream(in2.h_outflow) else actualStream(in2.h_outflow);
+    ho = if not allowFlowReversal then h else actualStream(out.h_outflow);
     in1.h_outflow = h;
     in2.h_outflow = h;
     out.h_outflow = h;
@@ -852,8 +852,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     // Boundary conditions
     win = inlet.m_flow;
     wout = -outlet.m_flow;
-    hin = if not allowFlowReversal then inStream(inlet.h_outflow) else if win >= 0 then inStream(inlet.h_outflow) else h;
-    hout = if not allowFlowReversal then h else if wout < 0 then inStream(outlet.h_outflow) else h;
+    hin = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
+    hout = if not allowFlowReversal then h else actualStream(outlet.h_outflow);
     inlet.h_outflow = h;
     outlet.h_outflow = h;
     inlet.p = p;
@@ -907,7 +907,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Length omega "Perimeter of heat transfer surface (single tube)";
     parameter Length Dhyd "Hydraulic Diameter (single tube)";
     parameter MassFlowRate wnom "Nominal mass flowrate (total)";
-    parameter FFtypes FFtype "Friction Factor Type";
+    parameter FFtypes FFtype = FFtypes.NoFriction "Friction Factor Type" annotation(Evaluate = true);
     parameter Real Kfnom(unit = "Pa.kg/(m3.kg2/s2)", min=0)=0
       "Nominal hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop (friction term only!)";
@@ -998,8 +998,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Pressure Dpfric2
       "Pressure drop due to friction (from capacitance to outlet)";
     Pressure Dpstat "Pressure drop due to static head";
-    MassFlowRate win "Flow rate at the inlet (single tube)";
-    MassFlowRate wout "Flow rate at the outlet (single tube)";
+    MassFlowRate win(start=wnom/Nt) "Flow rate at the inlet (single tube)";
+    MassFlowRate wout(start=wnom/Nt) "Flow rate at the outlet (single tube)";
     Pressure pin "Inlet pressure";
     Pressure pout "Outlet pressure";
     Real Kf "Hydraulic friction coefficient";
@@ -1284,8 +1284,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction";
     Pressure Dpstat "Pressure drop due to static head";
-    MassFlowRate win "Flow rate at the inlet (single tube)";
-    MassFlowRate wout "Flow rate at the outlet (single tube)";
+    MassFlowRate win(start=wnom/Nt) "Flow rate at the inlet (single tube)";
+    MassFlowRate wout(start=wnom/Nt) "Flow rate at the outlet (single tube)";
     Pressure pin "Inlet pressure";
     Pressure pout "Outlet pressure";
     Real Kf[N - 1] "Friction coefficient";
@@ -3135,8 +3135,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
     inlet.p = outlet.p "No pressure drop";
     // Set fluid properties
-    fluid.p=inlet.p;
-    fluid.h = actualStream(inlet.h_outflow); // if inlet.m_flow >= 0 then inStream(inlet.h_outflow) else inlet.h_outflow;
+    fluid.p = inlet.p;
+    fluid.h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
     T = fluid.T;
 
     // Boundary conditions
@@ -3509,7 +3509,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     // Boundary conditions
     p = feed.p;
     p = steam.p;
-    hf = if not allowFlowReversal then inStream(feed.h_outflow) else if feed.m_flow >= 0 then inStream(feed.h_outflow) else hl;
+    hf = if not allowFlowReversal then inStream(feed.h_outflow) else actualStream(feed.h_outflow);
     feed.m_flow = qf;
     -steam.m_flow = qs;
     feed.h_outflow = hl;
@@ -3744,7 +3744,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     feedwater.p = p;
     feedwater.m_flow = wf;
     feedwater.h_outflow = hl;
-    hf = if not allowFlowReversal then inStream(feedwater.h_outflow) else noEvent(if wf >= 0 then inStream(feedwater.h_outflow) else hl);
+    hf = if not allowFlowReversal then inStream(feedwater.h_outflow) else noEvent(actualStream(feedwater.h_outflow));
     downcomer.p = p + rhol*g*y;
     downcomer.m_flow = -wd;
     downcomer.h_outflow = hd;
@@ -3757,7 +3757,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     riser.h_outflow = hl;
     hrv = hls + xrv*(hvs - hls);
     xrv = 1 - (rhov/rhol)^avr;
-    hr= if not allowFlowReversal then inStream(riser.h_outflow) else noEvent(if wr>=0 then inStream(riser.h_outflow) else hl);
+    hr= if not allowFlowReversal then inStream(riser.h_outflow) else noEvent(actualStream(riser.h_outflow));
     xr= if not allowFlowReversal then (if hr>hls then (hr - hls)/(hvs - hls) else 0) else noEvent(if wr>=0 then (if hr>hls then (hr - hls)/(hvs - hls) else 0) else xl);
     hrl= if not allowFlowReversal then (if hr>hls then hls else hr) else noEvent(if wr>=0 then (if hr>hls then hls else hr) else hl);
     wrv= if not allowFlowReversal then xr*wr/xrv else noEvent(if wr>=0 then xr*wr/xrv else 0);
@@ -3765,7 +3765,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     steam.p = p;
     steam.m_flow = -wv;
     steam.h_outflow = hv;
-    hvout = if not allowFlowReversal then hv else noEvent(if wv >= 0 then hv else inStream(steam.h_outflow));
+    hvout = if not allowFlowReversal then hv else noEvent(actualStream(steam.h_outflow));
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -4308,13 +4308,7 @@ li><i>1 Jul 2004</i>
     // Boundary conditions
     dp = outfl.p - infl.p;
     w = infl.m_flow "Pump total flow rate";
-    if not allowFlowReversal then
-      hin = inStream(infl.h_outflow);
-    elseif w >= 0 then
-      hin = inStream(infl.h_outflow);
-    else
-      hin = inStream(outfl.h_outflow);
-    end if;
+    hin = if not allowFlowReversal then inStream(infl.h_outflow) else if w >= 0 then inStream(infl.h_outflow) else inStream(outfl.h_outflow);
     infl.h_outflow = hout;
     outfl.h_outflow = hout;
     h = hout;
@@ -4714,11 +4708,11 @@ Input variables changed. This function now computes the heat transfer coefficien
     der(phi) = omega;
 
     // steam boundary conditions and inlet steam properties
-    steam_in.p=inlet.p;
-    steam_in.h=inStream(inlet.h_outflow);
-    hin=steam_in.h;
-    hout=outlet.h_outflow;
-    pout=outlet.p;
+    steam_in.p = inlet.p;
+    steam_in.h = inStream(inlet.h_outflow);
+    hin = steam_in.h;
+    hout = outlet.h_outflow;
+    pout = outlet.p;
     w = inlet.m_flow;
 
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";

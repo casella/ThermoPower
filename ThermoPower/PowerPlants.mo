@@ -5304,9 +5304,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
         "Convective heat transfer between one source and two objects in parallel"
         import Modelica.SIunits.*;
         parameter Integer N=2 "Number of Nodes";
-        parameter Area As "Area of source";
-        parameter Area Aa "Area of object a";
-        parameter Area Ab "Area of object b";
+        parameter Area As = Aa+Ab "Area of source" annotation(Evaluate=true);
+        parameter Area Aa = 1 "Area of object a" annotation(Evaluate=true);
+        parameter Area Ab = 1 "Area of object b" annotation(Evaluate=true);
         ThermoPower.Thermal.DHT source(N=N) 
                        annotation (Placement(transformation(extent={{-40,60},{
                   40,80}}, rotation=0)));
@@ -5379,6 +5379,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean allowFlowReversal = system.allowFlowReversal
           "= true to allow flow reversal, false restricts to design direction";
         outer ThermoPower.System system "System wide properties";
+
         Water.FlangeA inlet( redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                         annotation (Placement(transformation(
                 extent={{-80,-20},{-40,20}}, rotation=0)));
@@ -5433,13 +5434,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Medium.BaseProperties fluid;
       equation
         // Set fluid properties
-        fluid.p=inlet.p;
-        fluid.h = if inlet.m_flow >= 0 then inStream(inlet.h_outflow) else inlet.h_outflow;
+        fluid.p = inlet.p;
+        fluid.h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
 
-        T=fluid.T;
-        p=fluid.p;
-        h=fluid.h;
-        w=inlet.m_flow;
+        T = fluid.T;
+        p = fluid.p;
+        h = fluid.h;
+        w = inlet.m_flow;
       end StateReader_water;
 
       model BaseReader_gas
@@ -5488,19 +5489,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
       equation
         // Set gas properties
-        inlet.p=gas.p;
-        if inlet.m_flow >= 0 then
-          gas.h = inStream(inlet.h_outflow);
-          gas.Xi = inStream(inlet.Xi_outflow);
-        else
-          gas.h = inlet.h_outflow;
-          gas.Xi = inlet.Xi_outflow;
-        end if;
+        inlet.p = gas.p;
 
-        T=gas.T;
-        p=gas.p;
-        h=gas.h;
-        w=inlet.m_flow;
+        gas.h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
+        gas.Xi = if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow);
+
+        T = gas.T;
+        p = gas.p;
+        h = gas.h;
+        w = inlet.m_flow;
       end StateReader_gas;
 
       model PrescribedSpeedPump "Prescribed speed pump"
@@ -15605,6 +15602,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           annotation(Dialog(tab = "Initialisation"));
         parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
           "Initialisation option" annotation(Dialog(tab = "Initialisation"));
+        parameter Boolean allowFlowReversal = system.allowFlowReversal
+          "= true to allow flow reversal, false restricts to design direction";
+        outer ThermoPower.System system "System wide properties";
 
         SI.Mass Ml "Liquid water mass";
         SI.Mass Mv "Steam mass";
@@ -15631,10 +15631,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Medium.Density rhol "Density of saturated liquid";
         Medium.Density rhov "Density of saturated steam";
 
-        Water.FlangeA steam(            redeclare package Medium = Medium) 
+        Water.FlangeA steam(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                         annotation (Placement(transformation(
                 extent={{-20,80},{20,120}}, rotation=0)));
-        Water.FlangeB condensate(            redeclare package Medium = Medium) 
+        Water.FlangeB condensate(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                              annotation (Placement(
               transformation(extent={{-20,-120},{20,-80}}, rotation=0)));
         ThermoPower.Thermal.DHT coolingFluid(N=Nc) annotation (Placement(
@@ -15645,11 +15645,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
               extent={{-20,-20},{20,20}},
               rotation=180)));
       equation
-        Ml=Vl*rhol "Mass of liquid";
-        Mv=Vv*rhov "Mass of vapour";
-        M=Ml+Mv "Total mass";
+        Ml = Vl*rhol "Mass of liquid";
+        Mv = Vv*rhov "Mass of vapour";
+        M = Ml+Mv "Total mass";
         V = Vl + Vv "Total volume";
-        E=Ml*hl+Mv*hv-p*V "Total liquid+steam energy";
+        E = Ml*hl+Mv*hv-p*V "Total liquid+steam energy";
         Em = Mm*cm*Tm "Metal tubes energy";
         der(M) = ws - wc "Mass balance";
         der(E) = ws*hs - wc*hl - Qcond "Energy balance (liquid+steam)";
@@ -15659,11 +15659,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
         // Boundary conditions
         p = steam.p;
         p = condensate.p;
-        ws = steam.w;
-        hs = inStream(steam.h) "Flow reversal not supported";
-        steam.h = hv;
-        wc = -condensate.w;
-        condensate.h = hl;
+        ws = steam.m_flow;
+        hs = inStream(steam.h_outflow) "Flow reversal not supported";
+        steam.h_outflow = hv;
+        wc = -condensate.m_flow;
+        condensate.h_outflow = hl;
         Qcool = -Af/Nc*sum(coolingFluid.phi);
         coolingFluid.T = ones(Nc)*Tm;
 
@@ -15674,11 +15674,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
         sat.Tsat = Medium.saturationTemperature(p);
 
         Ts = sat.Tsat;
-        rhol=Medium.bubbleDensity(sat);
-        rhov=Medium.dewDensity(sat);
-        hl=Medium.bubbleEnthalpy(sat);
-        hv=Medium.dewEnthalpy(sat);
-        ratio_VvVtot=Vv/V;
+        rhol = Medium.bubbleDensity(sat);
+        rhov = Medium.dewDensity(sat);
+        hl = Medium.bubbleEnthalpy(sat);
+        hv = Medium.dewEnthalpy(sat);
+        ratio_VvVtot = Vv/V;
       initial equation
         if initOpt == ThermoPower.Choices.Init.Options.noInit then
           // do nothing
@@ -15921,7 +15921,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         in1.h_outflow + dh= inStream(out1.h_outflow);
         inStream(in1.h_outflow) = out1.h_outflow - dh;
         annotation (Icon(graphics={Text(extent={{-100,-56},{100,-84}},
-                  textString=                         "%name")}), Diagram(graphics));
+                  textString =                        "%name")}), Diagram(graphics));
       end EffectHE;
 
       model Comp_bubble_h
@@ -16014,13 +16014,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Medium.BaseProperties fluid;
       equation
         // Set fluid properties
-        fluid.p=inlet.p;
-        fluid.h = if inlet.m_flow >= 0 then inStream(inlet.h_outflow) else inlet.h_outflow;
+        fluid.p = inlet.p;
+        fluid.h = if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow);
 
-        T=fluid.T;
-        p=fluid.p;
-        h=fluid.h;
-        w=inlet.m_flow;
+        T = fluid.T;
+        p = fluid.p;
+        h = fluid.h;
+        w = inlet.m_flow;
       end StateReader_water;
     end Components;
 
@@ -16524,7 +16524,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               points={{200,-140},{60,-140},{60,32},{100,32},{100,24}}, color={
                 213,255,170}));
         connect(ST_HP.inlet,valveHP. outlet) annotation (Line(points={{-116,16},
-                {-126.5,16},{-130,16}},             thickness=0.5,
+                {-130,16},{-130,16}},               thickness=0.5,
             color={0,0,255}));
         connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
             points={{-113.2,0},{-200,0}},
@@ -23062,13 +23062,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 </html>"),
         experimentSetupOutput(equdistant=false));
     end CCPP_Sim3;
-    annotation (Documentation(revisions="<html>
-<ul>
-<li><i>15 Apr 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
+
     model SteamPlant_Sim1_dp
       "Test total plant with levels control and ratio control on the condenser, inlet valves"
       package FlueGasMedium = ThermoPower.Media.FlueGas;
@@ -23378,12 +23372,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           points={{60,60},{46,60}},
           color={159,159,223},
           thickness=0.5));
-      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points
-            ={{159,70},{110,70},{110,-50}}, color={0,0,127}));
-      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points
-            ={{159,30},{110,30},{110,-50}}, color={0,0,127}));
-      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points
-            ={{159,-10},{110,-10},{110,-50}}, color={0,0,127}));
+      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points=
+             {{159,70},{110,70},{110,-50}}, color={0,0,127}));
+      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points=
+             {{159,30},{110,30},{110,-50}}, color={0,0,127}));
+      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points=
+             {{159,-10},{110,-10},{110,-50}}, color={0,0,127}));
       connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (Line(
             points={{159,-50},{110,-50}}, color={255,0,255}));
       connect(stateGas_out.inlet, hRSG.GasOut) annotation (Line(
@@ -23404,31 +23398,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (Line(
             points={{140,-165},{152,-165},{152,-184},{14,-184},{14,-165},{0,
               -165}}, color={213,255,170}));
-      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points
-            ={{0,-165},{14,-165},{14,95},{0,95}}, color={213,255,170}));
+      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points=
+             {{0,-165},{14,-165},{14,95},{0,95}}, color={213,255,170}));
       connect(actuators, hRSG.ActuatorsBus) annotation (Line(points={{110,-50},
               {14,-50},{14,95},{0,95}}, color={213,255,170}));
       connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(
             points={{120,130},{140,130},{140,95},{0,95}}, color={213,255,170}));
-      annotation (Diagram(coordinateSystem(
-            preserveAspectRatio=true,
-            extent={{-200,-200},{200,200}},
-            initialScale=0.1), graphics),
-                           experiment(
-          StopTime=6000,
-          NumberOfIntervals=3000,
-          Tolerance=1e-006),
-        Documentation(info="<html>
-<p>Characteristic simulations: variation of the gas flow rate.
-</html>", revisions="<html>
-<ul>
-<li><i>15 Apr 2008</i>
-    by <a>Luca Savoldelli</a>:<br>
-       First release.</li>
-</ul>
-</html>"),
-        experimentSetupOutput(equdistant=false),
-        uses(ThermoPower(version="2.1"), Modelica(version="3.1")));
       connect(hRSG.Sh_HP_Out, sTG_3LRh.From_SH_HP) annotation (Line(
           points={{-90,20},{-90,-80},{-90,-80}},
           color={0,0,255},
@@ -23454,7 +23429,33 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           color={0,0,255},
           thickness=0.5,
           smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(
+            preserveAspectRatio=true,
+            extent={{-200,-200},{200,200}},
+            initialScale=0.1), graphics),
+                           experiment(
+          StopTime=6000,
+          NumberOfIntervals=3000,
+          Tolerance=1e-006),
+        Documentation(info="<html>
+<p>Characteristic simulations: variation of the gas flow rate.
+</html>", revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+        experimentSetupOutput(equdistant=false),
+        uses(ThermoPower(version="2.1"), Modelica(version="3.1")));
     end SteamPlant_Sim1_dp;
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>15 Apr 2008</i>
+    by <a>Luca Savoldelli</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
   end Simulators;
 annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
       Documentation(revisions="<html>
