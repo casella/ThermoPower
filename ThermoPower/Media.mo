@@ -101,8 +101,12 @@ package Media "Medium models for the ThermoPower library"
                   Common.SingleGasesData.H2O,
                   Common.SingleGasesData.Ar,
                   Common.SingleGasesData.N2},
-                  substanceNames = {"Oxygen", "Water", "Argon", "Nitrogen"},
-                  reference_X={0.23,0.015,0.005,0.75});
+            fluidConstants = {Common.FluidData.O2,
+                              Common.FluidData.H2O,
+                              Common.FluidData.Ar,
+                              Common.FluidData.N2},
+            substanceNames = {"Oxygen", "Water", "Argon", "Nitrogen"},
+            reference_X={0.23,0.015,0.005,0.75});
   end Air;
 
   package NaturalGas "Mixture of N2, CO2, and CH4"
