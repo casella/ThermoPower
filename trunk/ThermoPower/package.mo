@@ -922,14 +922,14 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
         input Modelica.SIunits.Height head_nom[3]
         "Pump head for three operating points";
     protected
-        Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2}
+        parameter Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2}
         "Squared nominal flow rates";
         /* Linear system to determine the coefficients:
   head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
   head_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
   head_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
   */
-        Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],head_nom)
+        parameter Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],head_nom)
         "Coefficients of quadratic head curve";
       algorithm
         // Flow equation: head = c[1] + q_flow*c[2] + q_flow^2*c[3];
@@ -1643,7 +1643,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
       der(delta) = omega - omegaRef;
       // Power flow
       if closedInternal then
-        Pe = C*Modelica.Math.sin(delta);
+        Pe = homotopy(C*Modelica.Math.sin(delta), C*delta);
       else
         Pe = 0;
       end if;
@@ -1843,7 +1843,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       delta_ab = delta_a - delta_b;
       // Definition of power flow
       if closedInternal_gen_a and closedInternal_gen_b then
-        Pe_ab = C_ab*Modelica.Math.sin(delta_ab);
+        Pe_ab = homotopy(C_ab*Modelica.Math.sin(delta_ab), C_ab*delta_ab);
       else
         Pe_ab = 0;
       end if;
@@ -2169,12 +2169,12 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       connect(closed_grid, closedInternal_grid);
       // Coefficients of exchanged powers (power = zero if open breaker)
       if closedInternal_gen_a and closedInternal_grid then
-        Pe_ag = C_ag*Modelica.Math.sin(delta_ag);
+        Pe_ag = homotopy(C_ag*Modelica.Math.sin(delta_ag), C_ag*delta_ag);
       else
         Pe_ag = 0;
       end if;
       if closedInternal_gen_b and closedInternal_grid then
-        Pe_bg = C_bg*Modelica.Math.sin(delta_bg);
+        Pe_bg = homotopy(C_bg*Modelica.Math.sin(delta_bg), C_bg*delta_bg);
       else
         Pe_bg = 0;
       end if;
