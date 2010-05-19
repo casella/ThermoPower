@@ -459,16 +459,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   equation
     // Fluid properties
     if not allowFlowReversal then
+      state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
+    else
       state = Medium.setSmoothState(w,
                                     Medium.setState_ph(inlet.p, inStream(inlet.h_outflow)),
                                     Medium.setState_ph(outlet.p, inStream(outlet.h_outflow)),
                                     wnom*wnf);
-    else
-      state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
     end if;
     rho = Medium.density(state) "Fluid density";
-    pin - pout = homotopy(smooth(1, Kf*squareReg(w,wnom*wnf))/rho,dpnom/wnom*w)
-      "Flow characteristics";
+    pin - pout = homotopy(smooth(1, Kf*squareReg(w,wnom*wnf))/rho,
+                          dpnom/wnom*w) "Flow characteristics";
     inlet.m_flow + outlet.m_flow = 0 "Mass  balance";
     // Energy balance
     inlet.h_outflow = inStream(outlet.h_outflow);
@@ -572,8 +572,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
-    hi = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
-    ho = homotopy(if not allowFlowReversal then h else actualStream(outlet.h_outflow), h);
+    hi = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                  inStream(inlet.h_outflow));
+    ho = homotopy(if not allowFlowReversal then h else actualStream(outlet.h_outflow),
+                  h);
     inlet.h_outflow = h;
     outlet.h_outflow = h;
     inlet.p = p+Medium.density(fluidState)*Modelica.Constants.g_n*H;
@@ -719,9 +721,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
-    hi1 = homotopy(if not allowFlowReversal then inStream(in1.h_outflow) else actualStream(in1.h_outflow), inStream(in1.h_outflow));
-    hi2 = homotopy(if not allowFlowReversal then inStream(in2.h_outflow) else actualStream(in2.h_outflow), inStream(in2.h_outflow));
-    ho = homotopy(if not allowFlowReversal then h else actualStream(out.h_outflow), h);
+    hi1 = homotopy(if not allowFlowReversal then inStream(in1.h_outflow) else actualStream(in1.h_outflow),
+                   inStream(in1.h_outflow));
+    hi2 = homotopy(if not allowFlowReversal then inStream(in2.h_outflow) else actualStream(in2.h_outflow),
+                   inStream(in2.h_outflow));
+    ho = homotopy(if not allowFlowReversal then h else actualStream(out.h_outflow),
+                  h);
     in1.h_outflow = h;
     in2.h_outflow = h;
     out.h_outflow = h;
@@ -827,8 +832,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     p - pext = Medium.density(liquidState)*g*y "Stevino's law";
 
     // Boundary conditions
-    hin = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
-    hout = homotopy(if not allowFlowReversal then h else actualStream(outlet.h_outflow), h);
+    hin = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                   inStream(inlet.h_outflow));
+    hout = homotopy(if not allowFlowReversal then h else actualStream(outlet.h_outflow),
+                    h);
     inlet.h_outflow = h;
     outlet.h_outflow = h;
     inlet.p = p;
@@ -1043,16 +1050,20 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Dpfric2 = 0;
     elseif HydraulicCapacitance == HCtypes.Middle then
       //assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
-      Dpfric1 = homotopy(smooth(1, Kf*squareReg(win,wnom/Nt*wnf))*sum(vbar[1:integer((N-1)/2)])/(N-1),dpnom/2/(wnom/Nt)*win)
+      Dpfric1 = homotopy(smooth(1, Kf*squareReg(win,wnom/Nt*wnf))*sum(vbar[1:integer((N-1)/2)])/(N-1),
+                         dpnom/2/(wnom/Nt)*win)
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(smooth(1, Kf*squareReg(wout,wnom/Nt*wnf))*sum(vbar[1+integer((N-1)/2):N-1])/(N-1), dpnom/2/(wnom/Nt)*wout)
+      Dpfric2 = homotopy(smooth(1, Kf*squareReg(wout,wnom/Nt*wnf))*sum(vbar[1+integer((N-1)/2):N-1])/(N-1),
+                         dpnom/2/(wnom/Nt)*wout)
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == HCtypes.Upstream then
       Dpfric1 = 0 "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(smooth(1, Kf*squareReg(wout,wnom/Nt*wnf))*sum(vbar)/(N - 1), dpnom/(wnom/Nt)*wout)
+      Dpfric2 = homotopy(smooth(1, Kf*squareReg(wout,wnom/Nt*wnf))*sum(vbar)/(N - 1),
+                         dpnom/(wnom/Nt)*wout)
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == HCtypes.Downstream then
-      Dpfric1 = homotopy(smooth(1, Kf*squareReg(win,wnom/Nt*wnf))*sum(vbar)/(N - 1), dpnom/(wnom/Nt)*win)
+      Dpfric1 = homotopy(smooth(1, Kf*squareReg(win,wnom/Nt*wnf))*sum(vbar)/(N - 1),
+                         dpnom/(wnom/Nt)*win)
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
     else
@@ -1075,7 +1086,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       drbdp[j] = (drdp[j] + drdp[j + 1])/2;
       drbdh[j] = (drdh[j] + drdh[j + 1])/2;
       vbar[j] = 1/rhobar[j];
-      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2,
+                         wnom/Nt);
     end for;
 
     // Fluid property calculations
@@ -1355,9 +1367,11 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         "Mass balance for each volume";
       // Average volume quantities
       vbar[j] = 1/rhobar[j] "Average specific volume";
-      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2,
+                         wnom/Nt);
       dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else 
-                homotopy(smooth(1, Kf[j]*squareReg(w,wnom/Nt*wnf))*vbar[j], dpnom/(N-1)/(wnom/Nt)*w));
+                homotopy(smooth(1, Kf[j]*squareReg(w,wnom/Nt*wnf))*vbar[j],
+                         dpnom/(N-1)/(wnom/Nt)*w));
       if avoidInletEnthalpyDerivative and j == 1 then
         // first volume properties computed by the outlet properties
         rhobar[j] = rho[j+1];
@@ -2969,9 +2983,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     outer ThermoPower.System system "System wide properties";
     constant MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
-    parameter Boolean rev_in1 = true "Allow flow reversal at in1";
-    parameter Boolean rev_in2 = true "Allow flow reversal at in2";
-    parameter Boolean rev_out = true "Allow flow reversal at out";
+    parameter Boolean rev_in1 = allowFlowReversal "Allow flow reversal at in1" annotation(Evaluate=true);
+    parameter Boolean rev_in2 = allowFlowReversal "Allow flow reversal at in2" annotation(Evaluate=true);
+    parameter Boolean rev_out = allowFlowReversal "Allow flow reversal at out" annotation(Evaluate=true);
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_in1 or not rev_in2 or not rev_out));
     FlangeB out(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
@@ -2984,14 +2998,25 @@ enthalpy between the nodes; this requires the availability of the time derivativ
                 annotation (Placement(transformation(extent={{-80,-60},{-40,-20}},
             rotation=0)));
   equation
-    connect(out, in1) annotation (Line(
-        points={{60,0},{0,0},{0,40},{-60,40}},
-        color={0,0,255},
-        smooth=Smooth.None));
-    connect(in2, out) annotation (Line(
-        points={{-60,-40},{0,-40},{0,0},{60,0}},
-        color={0,0,255},
-        smooth=Smooth.None));
+    in1.m_flow + in2.m_flow + out.m_flow = 0 "Mass balance";
+    in1.p = out.p;
+    in2.p = out.p;
+
+    // Energy balance
+    out.h_outflow = homotopy(if (in2.m_flow < 0 and rev_in2) then inStream(in1.h_outflow) else if (in1.m_flow < 0 and rev_in1) then inStream(in1.h_outflow) else (
+                                 inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(in1.h_outflow)*(in2.m_flow + wzero))/(in1.m_flow + 2*wzero + in2.m_flow),
+                                (inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(in1.h_outflow)*(in2.m_flow + wzero))/(in1.m_flow + 2*wzero + in2.m_flow));
+    in1.h_outflow = homotopy(if (in2.m_flow < 0 and rev_in2) then inStream(out.h_outflow) else if (out.m_flow < 0 or not rev_out) then inStream(in1.h_outflow) else (
+                                 inStream(out.h_outflow)*(out.m_flow + wzero) + inStream(in1.h_outflow)*(in2.m_flow + wzero))/(out.m_flow + 2*wzero + in2.m_flow),
+                                inStream(out.h_outflow));
+    in2.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(out.h_outflow) else if (out.m_flow < 0 or not rev_out) then inStream(in1.h_outflow) else (
+                                 inStream(out.h_outflow)*(out.m_flow + wzero) + inStream(in1.h_outflow)*(in1.m_flow + wzero))/(out.m_flow + 2*wzero + in1.m_flow),
+                                inStream(out.h_outflow));
+    //Check flow direction
+    assert( not checkFlowDirection or ((rev_in1 or in1.m_flow >= 0) and 
+                                       (rev_in2 or in2.m_flow >= 0) and 
+                                       (rev_out or out.m_flow <= 0)),
+                                      "Flow reversal not supported");
     annotation (Icon(graphics),
                       Documentation(info="<HTML>
 <p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
@@ -3023,9 +3048,11 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     outer ThermoPower.System system "System wide properties";
     constant MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy";
-    parameter Boolean rev_in1 = true "Allow flow reversal at in1";
-    parameter Boolean rev_out1 = true "Allow flow reversal at out1";
-    parameter Boolean rev_out2 = true "Allow flow reversal at out2";
+    parameter Boolean rev_in1 = allowFlowReversal "Allow flow reversal at in1" annotation(Evaluate=true);
+    parameter Boolean rev_out1 = allowFlowReversal
+      "Allow flow reversal at out1"                                              annotation(Evaluate=true);
+    parameter Boolean rev_out2 = allowFlowReversal
+      "Allow flow reversal at out2"                                              annotation(Evaluate=true);
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_in1 or not rev_out1 or not rev_out2));
     FlangeA in1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
@@ -3044,11 +3071,14 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     out2.p = in1.p;
     // Energy balance
     out1.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(out2.h_outflow) else if (out2.m_flow < 0 or not rev_out2) then inStream(in1.h_outflow) else 
-            (inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(out2.h_outflow)*(out2.m_flow + wzero))/(in1.m_flow + 2*wzero + out2.m_flow), inStream(in1.h_outflow));
+                               (inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(out2.h_outflow)*(out2.m_flow + wzero))/(in1.m_flow + 2*wzero + out2.m_flow),
+                              inStream(in1.h_outflow));
     out2.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(out1.h_outflow) else if (out1.m_flow < 0 or not rev_out1) then inStream(in1.h_outflow) else 
-            (inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(out1.h_outflow)*(out1.m_flow + wzero))/(in1.m_flow + 2*wzero + out1.m_flow), inStream(in1.h_outflow));
+                               (inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(out1.h_outflow)*(out1.m_flow + wzero))/(in1.m_flow + 2*wzero + out1.m_flow),
+                              inStream(in1.h_outflow));
     in1.h_outflow = homotopy(if (out1.m_flow < 0 or not rev_out1) then inStream(out2.h_outflow) else if (out2.m_flow < 0 or not rev_out2) then inStream(out1.h_outflow) else 
-            (inStream(out1.h_outflow)*(out1.m_flow + wzero) + inStream(out2.h_outflow)*(out2.m_flow + wzero))/(out1.m_flow + 2*wzero + out2.m_flow), inStream(out1.h_outflow));
+                              (inStream(out1.h_outflow)*(out1.m_flow + wzero) + inStream(out2.h_outflow)*(out2.m_flow + wzero))/(out1.m_flow + 2*wzero + out2.m_flow),
+                             inStream(out1.h_outflow));
     //Check flow direction
     assert( not checkFlowDirection or ((rev_in1 or in1.m_flow >= 0) and 
                                        (rev_out1 or out1.m_flow <= 0) and 
@@ -3098,7 +3128,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
     inlet.p = outlet.p "No pressure drop";
     // Set fluid properties
-    h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
+    h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                 inStream(inlet.h_outflow));
     fluidState = Medium.setState_ph(inlet.p,h);
     T = Medium.temperature(fluidState);
 
@@ -3144,7 +3175,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   equation
     flange.m_flow = 0;
     flange.h_outflow = 0;
-    T = Medium.temperature(Medium.setState_ph(flange.p, inStream(flange.h_outflow)));
+    T = Medium.temperature(Medium.setState_ph(flange.p,inStream(flange.h_outflow)));
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(
@@ -3329,8 +3360,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     // Boundary conditions
     // (Thermal effects of the water going out of the accumulator are neglected)
-    hl_in = if not allowFlowReversal then inStream(WaterInfl.h_outflow) else if wl_in >= 0 then inStream(WaterInfl.h_outflow) else hl;
-    hl_out = if not allowFlowReversal then hl else if wl_out >= 0 then inStream(WaterOutfl.h_outflow) else hl;
+    hl_in = homotopy(if not allowFlowReversal then inStream(WaterInfl.h_outflow) else if wl_in >= 0 then inStream(WaterInfl.h_outflow) else hl,
+                     inStream(WaterInfl.h_outflow));
+    hl_out = homotopy(if not allowFlowReversal then hl else if wl_out >= 0 then inStream(WaterOutfl.h_outflow) else hl,
+                      hl);
     WaterInfl.h_outflow = inStream(WaterOutfl.h_outflow);
     WaterOutfl.h_outflow = inStream(WaterInfl.h_outflow);
     wl_in = WaterInfl.m_flow;
@@ -3473,7 +3506,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     // Boundary conditions
     p = feed.p;
     p = steam.p;
-    hf = homotopy(if not allowFlowReversal then inStream(feed.h_outflow) else actualStream(feed.h_outflow), inStream(feed.h_outflow));
+    hf = homotopy(if not allowFlowReversal then inStream(feed.h_outflow) else actualStream(feed.h_outflow),
+                  inStream(feed.h_outflow));
     feed.m_flow = qf;
     -steam.m_flow = qs;
     feed.h_outflow = hl;
@@ -3706,7 +3740,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     feedwater.p = p;
     feedwater.m_flow = wf;
     feedwater.h_outflow = hl;
-    hf = homotopy(if not allowFlowReversal then inStream(feedwater.h_outflow) else noEvent(actualStream(feedwater.h_outflow)), inStream(feedwater.h_outflow));
+    hf = homotopy(if not allowFlowReversal then inStream(feedwater.h_outflow) else noEvent(actualStream(feedwater.h_outflow)),
+                  inStream(feedwater.h_outflow));
     downcomer.p = p + rhol*g*y;
     downcomer.m_flow = -wd;
     downcomer.h_outflow = hd;
@@ -3998,9 +4033,11 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 
   equation
     if CheckValve then
-      w = homotopy(FlowChar(theta)*Av*sqrt(rho)*smooth(0,if dp>=0 then sqrtR(dp) else 0), theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
+      w = homotopy(FlowChar(theta)*Av*sqrt(rho)*smooth(0,if dp>=0 then sqrtR(dp) else 0),
+                   theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
     else
-      w = homotopy(FlowChar(theta)*Av*sqrt(rho)*sqrtR(dp), theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
+      w = homotopy(FlowChar(theta)*Av*sqrt(rho)*sqrtR(dp),
+                   theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
     end if;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
@@ -4062,16 +4099,18 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
       Y_nom = 0;
     end if;
   equation
-    p = homotopy(if not allowFlowReversal then inlet.p else noEvent(if dp>=0 then inlet.p else outlet.p), inlet.p);
+    p = homotopy(if not allowFlowReversal then inlet.p else noEvent(if dp>=0 then inlet.p else outlet.p),
+                 inlet.p);
     Fxt = Fxt_full*xtfun(theta);
     x = dp/p;
     xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
     Y = 1 - abs(xs)/(3*Fxt);
     if CheckValve then
-      w = homotopy(FlowChar(theta)*Av*Y*sqrt(rho)*
-          smooth(0,if xs>=0 then sqrtR(p*xs) else 0), theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
+      w = homotopy(FlowChar(theta)*Av*Y*sqrt(rho)*smooth(0,if xs>=0 then sqrtR(p*xs) else 0),
+                   theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
     else
-      w = homotopy(FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(p*xs), theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
+      w = homotopy(FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(p*xs),
+                   theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
     end if;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
@@ -4128,10 +4167,11 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
               Fl^2*(inlet.p - Ff*pv) else inlet.p - outlet.p
       "Effective pressure drop, accounting for possible choked conditions";
     if CheckValve then
-       w = homotopy(FlowChar(theta)*Av*sqrt(rho)*
-           (if dpEff>=0 then sqrtR(dpEff) else 0), theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
+       w = homotopy(FlowChar(theta)*Av*sqrt(rho)*(if dpEff>=0 then sqrtR(dpEff) else 0),
+                    theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
      else
-       w = homotopy(FlowChar(theta)*Av*sqrt(rho)*sqrtR(dpEff), theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
+       w = homotopy(FlowChar(theta)*Av*sqrt(rho)*sqrtR(dpEff),
+                    theta/thetanom*wnom/dpnom*(inlet.p-outlet.p));
     end if;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=

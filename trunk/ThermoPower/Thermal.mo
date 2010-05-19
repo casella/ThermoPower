@@ -619,7 +619,10 @@ This package contains models to compute the material properties needed to model 
               -20}}, rotation=0)));
 
   protected
-    parameter Real H12[:,:] = Modelica.Math.Matrices.inv(if N1 >= N2 then H2 else H1)*(if N1 >= N2 then H1 else H2) annotation(Evaluate=true);
+    parameter Real H12[:,:] = (if N1>=N2 then ones(N1,N2) else Modelica.Math.Matrices.inv(H1)*H2)
+      "Heat flux weight matrix to use if N2>N1" annotation(Evaluate=true);
+    parameter Real H21[:,:] = (if N1>=N2 then Modelica.Math.Matrices.inv(H2)*H1 else ones(N2,N1))
+      "Heat flux weight matrix to use if N1>=N2" annotation(Evaluate=true);
     parameter Real G1[N2, N1] = compG1(N1,N2)
       "Temperature weight matrix - side 1";
     parameter Real G2[N1, N2] = compG2(N1,N2)
@@ -770,7 +773,7 @@ This package contains models to compute the material properties needed to model 
     // H1*side1.phi+H2*side2.phi = zeros(min(N1,N2)) "Energy balance";
     if N1 >= N2 then
       side1.phi = gamma*(side1.T - G2*side2.T) "Convective heat transfer";
-      side2.phi = -H12*side1.phi "Energy balance";
+      side2.phi = -H21*side1.phi "Energy balance";
     else
       side2.phi = gamma*(side2.T - G1*side1.T) "Convective heat transfer";
       side1.phi = -H12*side2.phi "Energy balance";
@@ -848,7 +851,10 @@ This package contains models to compute the material properties needed to model 
                    annotation (Placement(transformation(extent={{-40,-42},{40,
               -20}}, rotation=0)));
   protected
-    parameter Real H12[:,:] = Modelica.Math.Matrices.inv(if N1 >= N2 then H2 else H1)*(if N1 >= N2 then H1 else H2) annotation(Evaluate=true);
+    parameter Real H12[:,:] = (if N1>=N2 then ones(N1,N2) else Modelica.Math.Matrices.inv(H1)*H2)
+      "Heat flux weight matrix to use if N2>N1" annotation(Evaluate=true);
+    parameter Real H21[:,:] = (if N1>=N2 then Modelica.Math.Matrices.inv(H2)*H1 else ones(N2,N1))
+      "Heat flux weight matrix to use if N1>=N2" annotation(Evaluate=true);
     parameter Real G1[N2, N1] = compG1(N1,N2)
       "Temperature weight matrix - side 1";
     parameter Real G2[N1, N2] = compG2(N1,N2)
@@ -1000,7 +1006,7 @@ This package contains models to compute the material properties needed to model 
     if N1 >= N2 then
       side1.phi = side1.gamma[1]*(side1.T - G2*side2.T)
         "Convective heat transfer";
-      side2.phi = -H12*side1.phi;
+      side2.phi = -H21*side1.phi;
     else
       side2.phi = side1.gamma[1]*(side2.T - G1*side1.T)
         "Convective heat transfer";

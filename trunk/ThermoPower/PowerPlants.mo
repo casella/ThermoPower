@@ -5435,7 +5435,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
       equation
         // Set fluid state
         p = inlet.p;
-        h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
+        h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                     inStream(inlet.h_outflow));
         fluidState = Medium.setState_ph(p,h);
         T = Medium.temperature(fluidState);
         w = inlet.m_flow;
@@ -5489,8 +5490,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
         // Set gas properties
         inlet.p = gas.p;
 
-        gas.h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),inStream(inlet.h_outflow));
-        gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow),inStream(inlet.Xi_outflow));
+        gas.h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                         inStream(inlet.h_outflow));
+        gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow),
+                          inStream(inlet.Xi_outflow));
 
         T = gas.T;
         p = gas.p;
@@ -16013,7 +16016,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       equation
         // Set fluid state
         p = inlet.p;
-        h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
+        h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                     inStream(inlet.h_outflow));
         fluidState = Medium.setState_ph(p,h);
         T = Medium.temperature(fluidState);
         w = inlet.m_flow;
