@@ -449,8 +449,6 @@ package Gas "Models of components with ideal gases as working fluid"
     InternalEnergy E "Total internal energy";
     Medium.SpecificEnthalpy hi "Inlet specific enthalpy";
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
-    MassFlowRate wi "Inlet mass flow rate";
-    MassFlowRate wo "Outlet mass flow rate";
     Medium.MassFraction Xi_i[Medium.nXi] "Inlet composition";
     Medium.MassFraction Xi_o[Medium.nXi] "Outlet composition";
     Time Tr "Residence Time";
@@ -474,10 +472,14 @@ package Gas "Models of components with ideal gases as working fluid"
     end for;
 
     // Boundary conditions
-    hi = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
-    Xi_i = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow), inStream(inlet.Xi_outflow));
-    ho = homotopy(if not allowFlowReversal then gas.h else actualStream(outlet.h_outflow), gas.h);
-    Xi_o = homotopy(if not allowFlowReversal then gas.Xi else actualStream(outlet.h_outflow), gas.Xi);
+    hi = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                  inStream(inlet.h_outflow));
+    Xi_i = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow),
+                    inStream(inlet.Xi_outflow));
+    ho = homotopy(if not allowFlowReversal then gas.h else actualStream(outlet.h_outflow),
+                  gas.h);
+    Xi_o = homotopy(if not allowFlowReversal then gas.Xi else actualStream(outlet.Xi_outflow),
+                    gas.Xi);
     inlet.h_outflow = gas.h;
     inlet.Xi_outflow = gas.Xi;
     outlet.h_outflow = gas.h;
@@ -486,7 +488,8 @@ package Gas "Models of components with ideal gases as working fluid"
     outlet.p = gas.p;
     thermalPort.T = gas.T;
 
-    Tr=noEvent(M/max(abs(-wo),Modelica.Constants.eps)) "Residence time";
+    Tr = noEvent(M/max(abs(-outlet.m_flow),Modelica.Constants.eps))
+      "Residence time";
   initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
@@ -546,8 +549,8 @@ package Gas "Models of components with ideal gases as working fluid"
       InternalEnergy E "Gas total energy";
       Medium.SpecificEnthalpy hi "Inlet specific enthalpy";
       Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
-      Medium.MassFraction Xi_i[Medium.nX] "Inlet composition";
-      Medium.MassFraction Xi_o[Medium.nX] "Outlet composition";
+      Medium.MassFraction Xi_i[Medium.nXi] "Inlet composition";
+      Medium.MassFraction Xi_o[Medium.nXi] "Outlet composition";
       AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
       Time Tr "Residence Time";
 
@@ -575,10 +578,14 @@ package Gas "Models of components with ideal gases as working fluid"
       end if;
 
       // Boundary conditions
-      hi = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
-      Xi_i = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow), inStream(inlet.Xi_outflow));
-      ho = homotopy(if not allowFlowReversal then gas.h else actualStream(outlet.h_outflow), gas.h);
-      Xi_o = homotopy(if not allowFlowReversal then gas.Xi else actualStream(outlet.h_outflow), gas.Xi);
+      hi = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                    inStream(inlet.h_outflow));
+      Xi_i = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow),
+                      inStream(inlet.Xi_outflow));
+      ho = homotopy(if not allowFlowReversal then gas.h else actualStream(outlet.h_outflow),
+                    gas.h);
+      Xi_o = homotopy(if not allowFlowReversal then gas.Xi else actualStream(outlet.Xi_outflow),
+                      gas.Xi);
       inlet.p = gas.p;
       inlet.h_outflow = gas.h;
       inlet.Xi_outflow = gas.Xi;
@@ -659,9 +666,9 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.SpecificEnthalpy hi1 "Inlet 1 specific enthalpy";
     Medium.SpecificEnthalpy hi2 "Inlet 2 specific enthalpy";
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
-    Medium.MassFraction Xi1[Medium.nX] "Inlet 1 composition";
-    Medium.MassFraction Xi2[Medium.nX] "Inlet 2 composition";
-    Medium.MassFraction Xo[Medium.nX] "Outlet composition";
+    Medium.MassFraction Xi1[Medium.nXi] "Inlet 1 composition";
+    Medium.MassFraction Xi2[Medium.nXi] "Inlet 2 composition";
+    Medium.MassFraction Xo[Medium.nXi] "Outlet composition";
     Time Tr "Residence time";
 
     FlangeA in1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
@@ -680,9 +687,9 @@ package Gas "Models of components with ideal gases as working fluid"
     der(M) = in1.m_flow + in2.m_flow + out.m_flow "Mass balance";
     der(E) = in1.m_flow*hi1 + in2.m_flow*hi2 + out.m_flow*ho - gamma*S*(gas.T - Tm)
        + thermalPort.Q_flow "Energy balance";
-    for j in 1:Medium.nX loop
-      M*der(gas.X[j]) = in1.m_flow*(Xi1[j] - gas.X[j]) + in2.m_flow*(Xi2[j] - gas.X[j])
-         + out.m_flow*(Xo[j] - gas.X[j]) "Independent component mass balance";
+    for j in 1:Medium.nXi loop
+      M*der(gas.Xi[j]) = in1.m_flow*(Xi1[j] - gas.Xi[j]) + in2.m_flow*(Xi2[j] - gas.Xi[j])
+         + out.m_flow*(Xo[j] - gas.Xi[j]) "Independent component mass balance";
     end for;
     if Cm > 0 and gamma > 0 then
       Cm*der(Tm) = gamma*S*(gas.T - Tm) "Metal wall energy balance";
@@ -691,21 +698,27 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     // Boundary conditions
-    hi1 = homotopy(if not allowFlowReversal then inStream(in1.h_outflow) else actualStream(in1.h_outflow), inStream(in1.h_outflow));
-    Xi1 = homotopy(if not allowFlowReversal then inStream(in1.Xi_outflow) else actualStream(in1.Xi_outflow), inStream(in1.Xi_outflow));
-    hi2 = homotopy(if not allowFlowReversal then inStream(in2.h_outflow) else actualStream(in2.h_outflow), inStream(in2.h_outflow));
-    Xi2 = homotopy(if not allowFlowReversal then inStream(in2.Xi_outflow) else actualStream(in2.Xi_outflow), inStream(in2.Xi_outflow));
-    ho = homotopy(if not allowFlowReversal then gas.h else actualStream(out.h_outflow), gas.h);
-    Xo = homotopy(if not allowFlowReversal then gas.X else actualStream(out.Xi_outflow), gas.X);
+    hi1 = homotopy(if not allowFlowReversal then inStream(in1.h_outflow) else actualStream(in1.h_outflow),
+                   inStream(in1.h_outflow));
+    Xi1 = homotopy(if not allowFlowReversal then inStream(in1.Xi_outflow) else actualStream(in1.Xi_outflow),
+                   inStream(in1.Xi_outflow));
+    hi2 = homotopy(if not allowFlowReversal then inStream(in2.h_outflow) else actualStream(in2.h_outflow),
+                   inStream(in2.h_outflow));
+    Xi2 = homotopy(if not allowFlowReversal then inStream(in2.Xi_outflow) else actualStream(in2.Xi_outflow),
+                   inStream(in2.Xi_outflow));
+    ho = homotopy(if not allowFlowReversal then gas.h else actualStream(out.h_outflow),
+                  gas.h);
+    Xo = homotopy(if not allowFlowReversal then gas.Xi else actualStream(out.Xi_outflow),
+                  gas.Xi);
     in1.p = gas.p;
     in1.h_outflow = gas.h;
-    in1.Xi_outflow = gas.X;
+    in1.Xi_outflow = gas.Xi;
     in2.p = gas.p;
     in2.h_outflow = gas.h;
-    in2.Xi_outflow = gas.X;
+    in2.Xi_outflow = gas.Xi;
     out.p = gas.p;
     out.h_outflow = gas.h;
-    out.Xi_outflow = gas.X;
+    out.Xi_outflow = gas.Xi;
     thermalPort.T = gas.T;
 
     Tr=noEvent(M/max(abs(-out.m_flow),Modelica.Constants.eps)) "Residence time";
@@ -759,9 +772,12 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Boolean rev_inlet1 = true "Allow flow reversal at inlet1";
-    parameter Boolean rev_inlet2 = true "Allow flow reversal at inlet2";
-    parameter Boolean rev_outlet = true "Allow flow reversal at outlet";
+    parameter Boolean rev_inlet1 = allowFlowReversal
+      "Allow flow reversal at inlet1" annotation(Evaluate=true);
+    parameter Boolean rev_inlet2 = allowFlowReversal
+      "Allow flow reversal at inlet2" annotation(Evaluate=true);
+    parameter Boolean rev_outlet = allowFlowReversal
+      "Allow flow reversal at outlet" annotation(Evaluate=true);
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_inlet1 or not rev_inlet2 or not rev_outlet));
     FlangeA inlet1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
@@ -781,20 +797,26 @@ package Gas "Models of components with ideal gases as working fluid"
     inlet2.p = outlet.p;
 
     // Energy balance
-    outlet.h_outflow = if (inlet2.m_flow < 0 and rev_inlet2) then inStream(inlet1.h_outflow) else if (inlet1.m_flow < 0 and rev_inlet1) then inStream(inlet1.h_outflow) else (
-      inStream(inlet1.h_outflow)*(inlet1.m_flow + wzero) + inStream(inlet1.h_outflow)*(inlet2.m_flow + wzero))/(inlet1.m_flow + 2*wzero + inlet2.m_flow);
-    inlet1.h_outflow = if (inlet2.m_flow < 0 and rev_inlet2) then inStream(outlet.h_outflow) else if (outlet.m_flow < 0 or not rev_outlet) then inStream(inlet1.h_outflow) else (
-      inStream(outlet.h_outflow)*(outlet.m_flow + wzero) + inStream(inlet1.h_outflow)*(inlet2.m_flow + wzero))/(outlet.m_flow + 2*wzero + inlet2.m_flow);
-    inlet2.h_outflow = if (inlet1.m_flow < 0 and rev_inlet1) then inStream(outlet.h_outflow) else if (outlet.m_flow < 0 or not rev_outlet) then inStream(inlet1.h_outflow) else (
-      inStream(outlet.h_outflow)*(outlet.m_flow + wzero) + inStream(inlet1.h_outflow)*(inlet1.m_flow + wzero))/(outlet.m_flow + 2*wzero + inlet1.m_flow);
+    outlet.h_outflow = homotopy(if (inlet2.m_flow < 0 and rev_inlet2) then inStream(inlet1.h_outflow) else if (inlet1.m_flow < 0 and rev_inlet1) then inStream(inlet1.h_outflow) else (
+                                 inStream(inlet1.h_outflow)*(inlet1.m_flow + wzero) + inStream(inlet1.h_outflow)*(inlet2.m_flow + wzero))/(inlet1.m_flow + 2*wzero + inlet2.m_flow),
+                                (inStream(inlet1.h_outflow)*(inlet1.m_flow + wzero) + inStream(inlet1.h_outflow)*(inlet2.m_flow + wzero))/(inlet1.m_flow + 2*wzero + inlet2.m_flow));
+    inlet1.h_outflow = homotopy(if (inlet2.m_flow < 0 and rev_inlet2) then inStream(outlet.h_outflow) else if (outlet.m_flow < 0 or not rev_outlet) then inStream(inlet1.h_outflow) else (
+                                 inStream(outlet.h_outflow)*(outlet.m_flow + wzero) + inStream(inlet1.h_outflow)*(inlet2.m_flow + wzero))/(outlet.m_flow + 2*wzero + inlet2.m_flow),
+                                inStream(outlet.h_outflow));
+    inlet2.h_outflow = homotopy(if (inlet1.m_flow < 0 and rev_inlet1) then inStream(outlet.h_outflow) else if (outlet.m_flow < 0 or not rev_outlet) then inStream(inlet1.h_outflow) else (
+                                 inStream(outlet.h_outflow)*(outlet.m_flow + wzero) + inStream(inlet1.h_outflow)*(inlet1.m_flow + wzero))/(outlet.m_flow + 2*wzero + inlet1.m_flow),
+                                inStream(outlet.h_outflow));
 
     // Independent component mass balances
-    outlet.Xi_outflow = if (inlet2.m_flow < 0 and rev_inlet2) then inStream(inlet1.Xi_outflow) else if (inlet1.m_flow < 0 and rev_inlet1) then inStream(inlet1.Xi_outflow) else (
-      inStream(inlet1.Xi_outflow)*(inlet1.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet2.m_flow + wzero))/(inlet1.m_flow + 2*wzero + inlet2.m_flow);
-    inlet1.Xi_outflow = if (inlet2.m_flow < 0 and rev_inlet2) then inStream(outlet.Xi_outflow) else if (outlet.m_flow < 0 or not rev_outlet) then inStream(inlet1.Xi_outflow) else (
-      inStream(outlet.Xi_outflow)*(outlet.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet2.m_flow + wzero))/(outlet.m_flow + 2*wzero + inlet2.m_flow);
-    inlet2.Xi_outflow = if (inlet1.m_flow < 0 and rev_inlet1) then inStream(outlet.Xi_outflow) else if (outlet.m_flow < 0 or not rev_outlet) then inStream(inlet1.Xi_outflow) else (
-      inStream(outlet.Xi_outflow)*(outlet.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet1.m_flow + wzero))/(outlet.m_flow + 2*wzero + inlet1.m_flow);
+    outlet.Xi_outflow = homotopy(if (inlet2.m_flow < 0 and rev_inlet2) then inStream(inlet1.Xi_outflow) else if (inlet1.m_flow < 0 and rev_inlet1) then inStream(inlet1.Xi_outflow) else (
+                                  inStream(inlet1.Xi_outflow)*(inlet1.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet2.m_flow + wzero))/(inlet1.m_flow + 2*wzero + inlet2.m_flow),
+                                 (inStream(inlet1.Xi_outflow)*(inlet1.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet2.m_flow + wzero))/(inlet1.m_flow + 2*wzero + inlet2.m_flow));
+    inlet1.Xi_outflow = homotopy(if (inlet2.m_flow < 0 and rev_inlet2) then inStream(outlet.Xi_outflow) else if (outlet.m_flow < 0 or not rev_outlet) then inStream(inlet1.Xi_outflow) else (
+                                  inStream(outlet.Xi_outflow)*(outlet.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet2.m_flow + wzero))/(outlet.m_flow + 2*wzero + inlet2.m_flow),
+                                 inStream(outlet.Xi_outflow));
+    inlet2.Xi_outflow = homotopy(if (inlet1.m_flow < 0 and rev_inlet1) then inStream(outlet.Xi_outflow) else if (outlet.m_flow < 0 or not rev_outlet) then inStream(inlet1.Xi_outflow) else (
+                                  inStream(outlet.Xi_outflow)*(outlet.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet1.m_flow + wzero))/(outlet.m_flow + 2*wzero + inlet1.m_flow),
+                                 inStream(outlet.Xi_outflow));
 
     //Check flow direction
     assert( not checkFlowDirection or ((rev_inlet1 or inlet1.m_flow >= 0) and 
@@ -831,9 +853,12 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Boolean rev_inlet = true "Allow flow reversal at inlet";
-    parameter Boolean rev_outlet1 = true "Allow flow reversal at outlet1";
-    parameter Boolean rev_outlet2 = true "Allow flow reversal at outlet2";
+    parameter Boolean rev_inlet = allowFlowReversal
+      "Allow flow reversal at inlet" annotation(Evaluate=true);
+    parameter Boolean rev_outlet1 = allowFlowReversal
+      "Allow flow reversal at outlet1" annotation(Evaluate=true);
+    parameter Boolean rev_outlet2 = allowFlowReversal
+      "Allow flow reversal at outlet2" annotation(Evaluate=true);
     parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_inlet or not rev_outlet1 or not rev_outlet2));
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
@@ -853,20 +878,26 @@ package Gas "Models of components with ideal gases as working fluid"
     outlet2.p=inlet.p;
 
     // Energy balance
-    outlet1.h_outflow= homotopy(if (inlet.m_flow<0 and rev_inlet) then inStream(outlet2.h_outflow) else if (outlet2.m_flow<0 or not rev_outlet2) then inStream(inlet.h_outflow) else 
-      (inStream(inlet.h_outflow)*(inlet.m_flow+wzero)+inStream(outlet2.h_outflow)*(outlet2.m_flow+wzero))/(inlet.m_flow+2*wzero+outlet2.m_flow), inStream(inlet.h_outflow));
-    outlet2.h_outflow= homotopy(if (inlet.m_flow<0 and rev_inlet) then inStream(outlet1.h_outflow) else if (outlet1.m_flow<0 or not rev_outlet1) then inStream(inlet.h_outflow) else 
-      (inStream(inlet.h_outflow)*(inlet.m_flow+wzero)+inStream(outlet1.h_outflow)*(outlet1.m_flow+wzero))/(inlet.m_flow+2*wzero+outlet1.m_flow), inStream(inlet.h_outflow));
-    inlet.h_outflow= homotopy(if (outlet1.m_flow<0 or not rev_outlet1) then inStream(outlet2.h_outflow) else if (outlet2.m_flow<0 or not rev_outlet2) then inStream(outlet1.h_outflow) else 
-      (inStream(outlet1.h_outflow)*(outlet1.m_flow+wzero)+inStream(outlet2.h_outflow)*(outlet2.m_flow+wzero))/(outlet1.m_flow+2*wzero+outlet2.m_flow), inStream(outlet1.h_outflow));
+    outlet1.h_outflow = homotopy(if (inlet.m_flow<0 and rev_inlet) then inStream(outlet2.h_outflow) else if (outlet2.m_flow<0 or not rev_outlet2) then inStream(inlet.h_outflow) else 
+                                  (inStream(inlet.h_outflow)*(inlet.m_flow+wzero)+inStream(outlet2.h_outflow)*(outlet2.m_flow+wzero))/(inlet.m_flow+2*wzero+outlet2.m_flow),
+                                 inStream(inlet.h_outflow));
+    outlet2.h_outflow = homotopy(if (inlet.m_flow<0 and rev_inlet) then inStream(outlet1.h_outflow) else if (outlet1.m_flow<0 or not rev_outlet1) then inStream(inlet.h_outflow) else 
+                                 (inStream(inlet.h_outflow)*(inlet.m_flow+wzero)+inStream(outlet1.h_outflow)*(outlet1.m_flow+wzero))/(inlet.m_flow+2*wzero+outlet1.m_flow),
+                                inStream(inlet.h_outflow));
+    inlet.h_outflow = homotopy(if (outlet1.m_flow<0 or not rev_outlet1) then inStream(outlet2.h_outflow) else if (outlet2.m_flow<0 or not rev_outlet2) then inStream(outlet1.h_outflow) else 
+                                (inStream(outlet1.h_outflow)*(outlet1.m_flow+wzero)+inStream(outlet2.h_outflow)*(outlet2.m_flow+wzero))/(outlet1.m_flow+2*wzero+outlet2.m_flow),
+                               inStream(outlet1.h_outflow));
 
     // Independent component mass balances
-    outlet1.Xi_outflow= homotopy(if (inlet.m_flow<0 and rev_inlet) then inStream(outlet2.Xi_outflow) else if (outlet2.m_flow<0 or not rev_outlet2) then inStream(inlet.Xi_outflow) else 
-      (inStream(inlet.Xi_outflow)*(inlet.m_flow+wzero)+inStream(outlet2.Xi_outflow)*(outlet2.m_flow+wzero))/(inlet.m_flow+2*wzero+outlet2.m_flow), inStream(inlet.Xi_outflow));
-    outlet2.Xi_outflow= homotopy(if (inlet.m_flow<0 and rev_inlet) then inStream(outlet1.Xi_outflow) else if (outlet1.m_flow<0 or not rev_outlet1) then inStream(inlet.Xi_outflow) else 
-      (inStream(inlet.Xi_outflow)*(inlet.m_flow+wzero)+inStream(outlet1.Xi_outflow)*(outlet1.m_flow+wzero))/(inlet.m_flow+2*wzero+outlet1.m_flow), inStream(inlet.Xi_outflow));
-    inlet.Xi_outflow= homotopy(if (outlet1.m_flow<0 or not rev_outlet1) then inStream(outlet2.Xi_outflow) else if (outlet2.m_flow<0 or not rev_outlet2) then inStream(outlet1.Xi_outflow) else 
-      (inStream(outlet1.Xi_outflow)*(outlet1.m_flow+wzero)+inStream(outlet2.Xi_outflow)*(outlet2.m_flow+wzero))/(outlet1.m_flow+2*wzero+outlet2.m_flow), inStream(outlet1.Xi_outflow));
+    outlet1.Xi_outflow = homotopy(if (inlet.m_flow<0 and rev_inlet) then inStream(outlet2.Xi_outflow) else if (outlet2.m_flow<0 or not rev_outlet2) then inStream(inlet.Xi_outflow) else 
+                                   (inStream(inlet.Xi_outflow)*(inlet.m_flow+wzero)+inStream(outlet2.Xi_outflow)*(outlet2.m_flow+wzero))/(inlet.m_flow+2*wzero+outlet2.m_flow),
+                                  inStream(inlet.Xi_outflow));
+    outlet2.Xi_outflow = homotopy(if (inlet.m_flow<0 and rev_inlet) then inStream(outlet1.Xi_outflow) else if (outlet1.m_flow<0 or not rev_outlet1) then inStream(inlet.Xi_outflow) else 
+                                   (inStream(inlet.Xi_outflow)*(inlet.m_flow+wzero)+inStream(outlet1.Xi_outflow)*(outlet1.m_flow+wzero))/(inlet.m_flow+2*wzero+outlet1.m_flow),
+                                  inStream(inlet.Xi_outflow));
+    inlet.Xi_outflow = homotopy(if (outlet1.m_flow<0 or not rev_outlet1) then inStream(outlet2.Xi_outflow) else if (outlet2.m_flow<0 or not rev_outlet2) then inStream(outlet1.Xi_outflow) else 
+                                 (inStream(outlet1.Xi_outflow)*(outlet1.m_flow+wzero)+inStream(outlet2.Xi_outflow)*(outlet2.m_flow+wzero))/(outlet1.m_flow+2*wzero+outlet2.m_flow),
+                                inStream(outlet1.Xi_outflow));
 
     //Check flow direction
     assert( not checkFlowDirection or ((rev_inlet or inlet.m_flow >= 0) and 
@@ -991,12 +1022,15 @@ package Gas "Models of components with ideal gases as working fluid"
     assert(Kf >= 0, "Negative friction coefficient");
   equation
     // Set fluid properties
-    gas.p = homotopy(if not allowFlowReversal then pin else if inlet.m_flow >= 0 then pin else pout, pin);
-    gas.h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
-    gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow), inStream(inlet.Xi_outflow));
+    gas.p = homotopy(if not allowFlowReversal then pin else if inlet.m_flow >= 0 then pin else pout,
+                     pin);
+    gas.h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else actualStream(inlet.h_outflow),
+                     inStream(inlet.h_outflow));
+    gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else actualStream(inlet.Xi_outflow),
+                      inStream(inlet.Xi_outflow));
 
-    pin - pout = homotopy(smooth(1, Kf*squareReg(w,wnom*wnf))/gas.d, dpnom/wnom*w)
-      "Flow characteristics";
+    pin - pout = homotopy(smooth(1, Kf*squareReg(w,wnom*wnf))/gas.d,
+                          dpnom/wnom*w) "Flow characteristics";
 
     //Boundary conditions
     w = inlet.m_flow;
@@ -1069,8 +1103,10 @@ package Gas "Models of components with ideal gases as working fluid"
 
     // Set gas properties
     inlet.p=gas.p;
-    gas.h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else inStream(inlet.h_outflow), inStream(inlet.h_outflow));
-    gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else inStream(inlet.Xi_outflow), inStream(inlet.Xi_outflow));
+    gas.h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else inStream(inlet.h_outflow),
+                     inStream(inlet.h_outflow));
+    gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else inStream(inlet.Xi_outflow),
+                      inStream(inlet.Xi_outflow));
 
     T = gas.T "Sensor output";
     annotation (Documentation(info="<html>
@@ -1244,8 +1280,10 @@ package Gas "Models of components with ideal gases as working fluid"
 
     // Gas properties
     gas.p = inlet.p;
-    gas.h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else inStream(inlet.h_outflow), inStream(inlet.h_outflow));
-    gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else inStream(inlet.Xi_outflow), inStream(inlet.Xi_outflow));
+    gas.h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else inStream(inlet.h_outflow),
+                     inStream(inlet.h_outflow));
+    gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow) else inStream(inlet.Xi_outflow),
+                      inStream(inlet.Xi_outflow));
 
     q = inlet.m_flow/gas.d "Sensor output";
     annotation (Documentation(revisions="<html>
@@ -1328,10 +1366,10 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Real Kv(unit="m3/h")=0 "Kv (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Kv)));
-    parameter Real Cv(unit="USG/min")=0 "Cv (US) flow coefficient" 
+    parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Cv)));
-    parameter Real pnom "Nominal inlet pressure" 
+    parameter Pressure pnom "Nominal inlet pressure" 
       annotation(Dialog(group="Nominal operating point"));
     parameter Pressure dpnom "Nominal pressure drop" 
       annotation(Dialog(group="Nominal operating point"));
@@ -1433,10 +1471,11 @@ package Gas "Models of components with ideal gases as working fluid"
     xs = noEvent(smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x));
     Y = noEvent(1 - abs(xs)/(3*Fxt));
     if CheckValve then
-      w = homotopy(FlowChar(theta)*Av*Y*sqrt(gas.d)*
-          noEvent(smooth(0, if xs>=0 then sqrtR(p*xs) else 0)), theta/thetanom*dpnom/wnom*dp);
+      w = homotopy(FlowChar(theta)*Av*Y*sqrt(gas.d)*noEvent(smooth(0, if xs>=0 then sqrtR(p*xs) else 0)),
+                   theta/thetanom*dpnom/wnom*dp);
     else
-      w = homotopy(FlowChar(theta)*Av*Y*sqrt(gas.d)*sqrtR(p*xs), theta/thetanom*dpnom/wnom*dp);
+      w = homotopy(FlowChar(theta)*Av*Y*sqrt(gas.d)*sqrtR(p*xs),
+                   theta/thetanom*dpnom/wnom*dp);
     end if;
 
     // Energy balance
@@ -1635,8 +1674,8 @@ package Gas "Models of components with ideal gases as working fluid"
     sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpfric = 0 "Momentum balance";
     Dpfric = (if FFtype == FFtypes.NoFriction then 0 else 
-              homotopy((smooth(1, Kf*squareReg(w,wnom/Nt*wnf))*sum(vbar)/(N - 1)), dpnom/(wnom/Nt)*w))
-      "Pressure drop due to friction";
+              homotopy((smooth(1, Kf*squareReg(w,wnom/Nt*wnf))*sum(vbar)/(N - 1)),
+                       dpnom/(wnom/Nt)*w)) "Pressure drop due to friction";
     for j in 1:N - 1 loop
       if not QuasiStatic then
         // Dynamic mass and energy balances
@@ -1671,7 +1710,8 @@ package Gas "Models of components with ideal gases as working fluid"
           drbdX2[j, :] = dddX[j+1,:]/2;
         end if;
         vbar[j] = 1/rhobar[j];
-        wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+        wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2,
+                           wnom/Nt);
         cvbar[j]=(cv[j]+cv[j+1])/2;
       else
         // Static mass and energy balances
@@ -1693,7 +1733,7 @@ package Gas "Models of components with ideal gases as working fluid"
     if Medium.fixedX then
       Xtilde = fill(Medium.reference_X, 1);
     elseif QuasiStatic then
-      Xtilde = fill(if w>=0 then inStream(infl.Xi_outflow) else inStream(outfl.Xi_outflow), size(Xtilde,1))
+      Xtilde = fill(gas[1].X, size(Xtilde,1))
         "Gas composition equal to actual inlet";
     elseif UniformComposition then
       der(Xtilde[1, :]) = homotopy(1/L*sum(u)/N*(gas[1].X - gas[N].X), 1/L*unom*(gas[1].X - gas[N].X))
@@ -1889,7 +1929,7 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab="Initialisation"));
     Exhaust.BaseProperties fluegas(p(start=pstart),T(start=Tstart),
-                                   X(start=Xstart[1:Exhaust.nXi]));
+                                   Xi(start=Xstart[1:Exhaust.nXi]));
     Mass M "Gas total mass";
     Mass MX[Exhaust.nXi] "Partial flue gas masses";
     InternalEnergy E "Gas total energy";
@@ -1932,10 +1972,10 @@ package Gas "Models of components with ideal gases as working fluid"
     // Boundary conditions
     ina.p   = fluegas.p;
     ina.h_outflow = 0;
-    ina.Xi_outflow=Air.reference_X;
+    ina.Xi_outflow = Air.reference_X[1:Air.nXi];
     inf.p   = fluegas.p;
     inf.h_outflow = 0;
-    inf.Xi_outflow=Fuel.reference_X;
+    inf.Xi_outflow = Fuel.reference_X[1:Fuel.nXi];
     assert(ina.m_flow >= 0,"The model does not support flow reversal");
      hia = inStream(ina.h_outflow);
     assert(inf.m_flow >=0, "The model does not support flow reversal");
@@ -2614,15 +2654,15 @@ This model extends the Turbine_Base model with the calculation of the performanc
     assert(Air_in.m_flow >= 0,"The model does not support flow reversal");
     wia = Air_in.m_flow;
     hia = inStream(Air_in.h_outflow);
-    Air_in.p= pin;
-    Air_in.h_outflow=0;
-    Air_in.Xi_outflow=Air.reference_X;
+    Air_in.p = pin;
+    Air_in.h_outflow = 0;
+    Air_in.Xi_outflow = Air.reference_X[1:Air.nXi];
     assert(Fuel_in.m_flow >=0, "The model does not support flow reversal");
     wif = Fuel_in.m_flow;
     hif = inStream(Fuel_in.h_outflow);
-    Fuel_in.p   = pc;
+    Fuel_in.p = pc;
     Fuel_in.h_outflow = 0;
-    Fuel_in.Xi_outflow = Fuel.reference_X;
+    Fuel_in.Xi_outflow = Fuel.reference_X[1:Fuel.nXi];
     assert(FlueGas_out.m_flow <=0, "The model does not support flow reversal");
     wout = FlueGas_out.m_flow;
     hout = FlueGas_out.h_outflow;

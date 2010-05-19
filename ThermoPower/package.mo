@@ -7,7 +7,7 @@ package ThermoPower "Open library for thermal power plant simulation"
   model System "System wide properties"
     // Assumptions
     parameter Boolean allowFlowReversal = true
-    "= false to restrict to design flow direction (flangeA -> flangeB)";
+    "= false to restrict to design flow direction (flangeA -> flangeB)"   annotation(Evaluate=true);
     parameter ThermoPower.Choices.System.Dynamics Dynamics=Choices.System.Dynamics.DynamicFreeInitial;
   annotation (
       defaultComponentName="system",
