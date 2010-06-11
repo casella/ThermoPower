@@ -3928,12 +3928,6 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     final parameter Pressure pout_start = pnom-dpnom
       "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Modelica.SIunits.Temperature Tstart = 300
-      "Temperature start value" 
-      annotation(Dialog(tab="Initialisation"));
-    parameter Modelica.SIunits.SpecificEnthalpy hstart=Medium.specificEnthalpy_pT(pnom,Tstart)
-      "Specific enthalpy start value" 
-      annotation(Dialog(tab="Initialisation"));
     MassFlowRate w "Mass flow rate";
     LiquidDensity rho "Inlet density";
     Medium.Temperature Tin;
