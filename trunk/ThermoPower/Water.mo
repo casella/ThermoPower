@@ -911,8 +911,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
                                            if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Inlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter SpecificEnthalpy hstartout=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1.1e5 else 
-                                           if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3.1e6 else 1.1e6
+    final parameter SpecificEnthalpy hstartout=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+                                           if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart[N] = linspace(hstartin, hstartout, N)
