@@ -86,11 +86,11 @@ package Media "Medium models for the ThermoPower library"
   end LiquidWaterConstant;
 
   package GenericGas
-    extends Modelica.Media.Interfaces.PartialMedium;
+    extends Modelica.Media.Interfaces.PartialMedium(nXi = 0);
     redeclare record extends ThermodynamicState
       Pressure p;
       Temperature T;
-      MassFraction X[nXi];
+      // MassFraction X[nXi];
     end ThermodynamicState;
   end GenericGas;
 
