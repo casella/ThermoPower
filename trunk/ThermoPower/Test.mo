@@ -1617,9 +1617,9 @@ Casella</a>:<br>
         redeclare function powerCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.quadraticPower (q_nom={0,
                 0.001,0.0015}, W_nom={350,500,600}),
-        pin_start=100000,
-        pout_start=400000,
-        wstart=0)           annotation (Placement(transformation(extent={{-40,
+        wstart=0,
+        w0=1,
+        dp0=300000)         annotation (Placement(transformation(extent={{-40,
                 -22},{-20,-2}}, rotation=0)));
 
       Modelica.Blocks.Sources.Ramp Ramp1(
@@ -1709,8 +1709,6 @@ Schiavo</a>:<br>
         redeclare function flowCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.linearFlow (q_nom={0.001,
                 0.0015}, head_nom={30,0}),
-        pin_start=100000,
-        pout_start=400000,
         wstart=0)           annotation (Placement(transformation(extent={{-40,
                 38},{-20,58}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp Ramp1(
@@ -1748,8 +1746,6 @@ Schiavo</a>:<br>
         redeclare function flowCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.quadraticFlow (q_nom={
                 0.0005,0.001,0.0015}, head_nom={50,30,0}),
-        pin_start=100000,
-        pout_start=400000,
         wstart=0)           annotation (Placement(transformation(extent={{-40,
                 -12},{-20,8}}, rotation=0)));
       ThermoPower.Water.SourceP Source3(
@@ -1775,8 +1771,6 @@ Schiavo</a>:<br>
         redeclare function flowCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.polynomialFlow (q_nom={
                 0.0005,0.001,0.0015}, head_nom={50,30,0}),
-        pin_start=100000,
-        pout_start=400000,
         wstart=0)           annotation (Placement(transformation(extent={{-40,
                 -62},{-20,-42}}, rotation=0)));
       inner System system 
