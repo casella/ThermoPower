@@ -530,6 +530,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
                                       if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Specific enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tmstart = 300
+      "Metal wall temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     FlangeA inlet(h_outflow(start=hstart),
@@ -551,7 +554,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Mass M "Fluid mass";
     Energy E "Fluid energy";
     AbsoluteTemperature T "Fluid temperature";
-    AbsoluteTemperature Tm "Wall temperature";
+    AbsoluteTemperature Tm(start = Tmstart) "Wall temperature";
     Time Tr "Residence time";
     replaceable Thermal.HT thermalPort "Internal surface of metal wall" 
       annotation (Dialog(enable = false), Placement(transformation(extent={{-24,
@@ -676,6 +679,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
                                       if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Specific enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter AbsoluteTemperature Tmstart = 300
+      "Metal wall temperature start value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     FlangeA in1(h_outflow(start=hstart),redeclare package Medium=Medium,
@@ -704,7 +710,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Energy E "Fluid energy";
     HeatFlowRate Q "Heat flow rate exchanged with the outside";
     Medium.Temperature T "Fluid temperature";
-    AbsoluteTemperature Tm "Wall temperature";
+    AbsoluteTemperature Tm(start = Tmstart) "Wall temperature";
     Time Tr "Residence time";
     replaceable Thermal.HT thermalPort "Internal surface of metal wall" 
       annotation (Placement(transformation(extent={{-24,66},{24,80}}, rotation=
@@ -912,6 +918,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
       "Fluid phase" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter Pressure pstart = 1e5 "Pressure start value" 
+      annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstartin=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                            if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Inlet enthalpy start value" 
@@ -994,7 +1002,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Real Kfl "Linear friction coefficient";
     Real dwdt "Dynamic momentum term";
     Real Cf "Fanning friction factor";
-    Medium.AbsolutePressure p "Fluid pressure for property calculations";
+    Medium.AbsolutePressure p(start = pstart)
+      "Fluid pressure for property calculations";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
     Velocity u[N] "Fluid velocity";
@@ -1277,7 +1286,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Real Kfl[N - 1] "Linear friction coefficient";
     Real Cf[N - 1] "Fanning friction factor";
     Real dwdt "Dynamic momentum term";
-    Medium.AbsolutePressure p(stateSelect = StateSelect.prefer)
+    Medium.AbsolutePressure p(start = pstart, stateSelect = StateSelect.prefer)
       "Fluid pressure for property calculations";
     Pressure dpf[N - 1] "Pressure drop due to friction between two nodes";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
@@ -4210,7 +4219,8 @@ li><i>1 Jul 2004</i>
     Medium.ThermodynamicState inletFluidState
       "Thermodynamic state of the fluid at the inlet";
     replaceable function flowCharacteristic = 
-        Functions.PumpCharacteristics.quadraticFlow
+        ThermoPower.Functions.PumpCharacteristics.quadraticFlow 
+        constrainedby ThermoPower.Functions.PumpCharacteristics.baseFlow
       "Head vs. q_flow characteristic at nominal speed and density" 
       annotation(Dialog(group="Characteristics"), choicesAllMatching=true);
     parameter Boolean usePowerCharacteristic = false
@@ -4218,13 +4228,13 @@ li><i>1 Jul 2004</i>
        annotation(Dialog(group="Characteristics"));
     replaceable function powerCharacteristic = 
         Functions.PumpCharacteristics.constantPower 
-      constrainedby Functions.PumpCharacteristics.basePower
+      constrainedby ThermoPower.Functions.PumpCharacteristics.basePower
       "Power consumption vs. q_flow at nominal speed and density" 
       annotation(Dialog(group="Characteristics", enable = usePowerCharacteristic),
                  choicesAllMatching=true);
     replaceable function efficiencyCharacteristic = 
       Functions.PumpCharacteristics.constantEfficiency(eta_nom = 0.8) 
-      constrainedby Functions.PumpCharacteristics.baseEfficiency
+      constrainedby ThermoPower.Functions.PumpCharacteristics.baseEfficiency
       "Efficiency vs. q_flow at nominal speed and density" 
       annotation(Dialog(group="Characteristics",enable = not usePowerCharacteristic),
                  choicesAllMatching=true);
@@ -4254,7 +4264,7 @@ li><i>1 Jul 2004</i>
     final parameter Modelica.SIunits.Height head0=dp0/(rho0*g)
       "Nominal pump head";
   protected
-    function df_dqflow = der(flowCharacteristic, q_flow) annotation(smoothOrder=2);
+    function df_dqflow = der(flowCharacteristic, q_flow);
   public
     MassFlowRate w_single(start = wstart/Np0) "Mass flow rate (single pump)";
     MassFlowRate w = Np*w_single "Mass flow rate (total)";
