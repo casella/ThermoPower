@@ -512,8 +512,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends Icons.Water.Header;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.ThermodynamicState fluidState(h(start=hstart))
-      "Thermodynamic state of the fluid";
+    Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
     parameter Volume V "Inner volume";
     parameter Area S=0 "Internal surface";
     parameter Position H=0 "Elevation of outlet over inlet" annotation (Evaluate=true);
@@ -656,8 +655,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends Icons.Water.Mixer;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.ThermodynamicState fluidState(h(start=hstart))
-      "Thermodynamic state of the fluid";
+    Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
     parameter Volume V "Internal volume";
     parameter Area S=0 "Internal surface";
     parameter CoefficientOfHeatTransfer gamma=0
