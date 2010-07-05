@@ -524,6 +524,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
       "Fluid phase" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter Pressure pstart = 1e5 "Pressure start value" 
+       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                       if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Specific enthalpy start value" 
@@ -538,8 +540,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
-    Pressure p(stateSelect=if Medium.singleState then 
-               StateSelect.avoid else StateSelect.prefer)
+    Pressure p(
+      start = pstart,
+      stateSelect=if Medium.singleState then StateSelect.avoid else StateSelect.prefer)
       "Fluid pressure at the outlet";
     SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Fluid specific enthalpy";
@@ -667,6 +670,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
       "Fluid phase" 
       annotation(Dialog(tab = "Initialisation"));
+    parameter Pressure pstart = 1e5 "Pressure start value" 
+       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                       if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Specific enthalpy start value" 
@@ -686,8 +691,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
                                                                                 annotation (Placement(transformation(extent={{80,-20},
               {120,20}},
                      rotation=0)));
-    Medium.AbsolutePressure p(stateSelect=if Medium.singleState then 
-               StateSelect.avoid else StateSelect.prefer) "Fluid pressure";
+    Pressure p(
+      start = pstart,
+      stateSelect=if Medium.singleState then StateSelect.avoid else StateSelect.prefer)
+      "Fluid pressure";
     Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hi1 "Inlet 1 specific enthalpy";
@@ -972,7 +979,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     extends Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
-    Medium.ThermodynamicState fluidState[N](h(start=hstart))
+    Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     Length omega_hyd "Wet perimeter (single tube)";
     Pressure Dpfric "Pressure drop due to friction (total)";

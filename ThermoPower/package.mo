@@ -913,6 +913,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       algorithm
         // Flow equation: head = q*c[1] + c[2];
         head :=  c[1] + q_flow*c[2];
+        annotation(smoothOrder = 2);
       end linearFlow;
 
       function quadraticFlow "Quadratic flow characteristic"
