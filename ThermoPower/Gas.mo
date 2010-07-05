@@ -1559,10 +1559,10 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter AbsoluteTemperature Tstartbar=300
       "Avarage temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter AbsoluteTemperature Tstartin=Tstartbar
+    parameter AbsoluteTemperature Tstartin=Tstartbar
       "Inlet temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter AbsoluteTemperature Tstartout=Tstartbar
+    parameter AbsoluteTemperature Tstartout=Tstartbar
       "Outlet temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstart[N]=linspace(Tstartin,Tstartout,N)

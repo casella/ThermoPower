@@ -1274,13 +1274,13 @@ The swapping is performed if the counterCurrent parameter is true (default value
     parameter Boolean WallRes=true "Wall conduction resistance accounted for";
     parameter Temperature Tstartbar=300 "Avarage temperature" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter Temperature Tstart1=Tstartbar
+    parameter Temperature Tstart1=Tstartbar
       "Temperature start value - first node" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter Temperature TstartN=Tstartbar
+    parameter Temperature TstartN=Tstartbar
       "Temperature start value - last node" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N)
+    parameter Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N)
       "Start value of temperature vector (initialized by default)" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
@@ -1369,13 +1369,13 @@ The swapping is performed if the counterCurrent parameter is true (default value
       "Specific heat capacity of metal";
       parameter Temperature Tstartbar=300 "Avarage temperature" 
         annotation(Dialog(tab = "Initialisation"));
-      final parameter Temperature Tstart1=Tstartbar
+      parameter Temperature Tstart1=Tstartbar
       "Temperature start value - first node" 
         annotation(Dialog(tab = "Initialisation"));
-      final parameter Temperature TstartN=Tstartbar
+      parameter Temperature TstartN=Tstartbar
       "Temperature start value - last node" 
         annotation(Dialog(tab = "Initialisation"));
-      final parameter Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N)
+      parameter Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N)
       "Start value of temperature vector (initialized by default)" 
         annotation(Dialog(tab = "Initialisation"));
       parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
