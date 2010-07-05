@@ -524,7 +524,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
       "Fluid phase" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+    parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                       if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Specific enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -667,7 +667,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
       "Fluid phase" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+    parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                       if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Specific enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -905,11 +905,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
       "Fluid phase" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter SpecificEnthalpy hstartin=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+    parameter SpecificEnthalpy hstartin=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                            if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Inlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
-    final parameter SpecificEnthalpy hstartout=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+    parameter SpecificEnthalpy hstartout=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                            if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
