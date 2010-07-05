@@ -4240,12 +4240,14 @@ li><i>1 Jul 2004</i>
     outer ThermoPower.System system "System wide properties";
     parameter MassFlowRate wstart=w0 "Mass Flow Rate Start Value" 
       annotation(Dialog(tab="Initialisation"));
+    parameter SpecificEnthalpy hstart=1e5 "Specific Enthalpy Start Value" 
+      annotation(Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab="Initialisation"));
     constant Acceleration g=Modelica.Constants.g_n;
     parameter Modelica.SIunits.MassFlowRate w0 "Nominal mass flow rate" 
        annotation(Dialog(group="Characteristics"));
-    parameter Modelica.SIunits.Pressure dp0 "Nominal pressure head" 
+    parameter Modelica.SIunits.Pressure dp0 "Nominal pressure increase" 
        annotation(Dialog(group="Characteristics"));
     final parameter Modelica.SIunits.VolumeFlowRate q_single0=w0/(Np0*rho0)
       "Nominal volume flow rate (single pump)";
@@ -4261,7 +4263,7 @@ li><i>1 Jul 2004</i>
     VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
     Pressure dp "Outlet pressure minus inlet pressure";
     Height head "Pump head";
-    Medium.SpecificEnthalpy h "Fluid specific enthalpy";
+    Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hin "Enthalpy of entering fluid";
     Medium.SpecificEnthalpy hout "Enthalpy of outgoing fluid";
     LiquidDensity rho "Liquid density";
