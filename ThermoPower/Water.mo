@@ -4633,7 +4633,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     Real Re;
     Real Pr;
   algorithm
-    Re := w*D/A/mu;
+    Re := abs(w)*D/A/mu;
     Pr := cp*mu/k;
     hTC := 0.023*k/D*Re^0.8*Pr^0.4;
     annotation (Documentation(info="<HTML>
