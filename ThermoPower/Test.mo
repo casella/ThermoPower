@@ -17,9 +17,9 @@ package Test "Test cases for the ThermoPower models"
       Water.Mixer mixer(
         V=1,
         Cm=0,
-        hstart=2.9e6,
         redeclare package Medium = Medium,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        FluidPhase=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                       annotation (Placement(transformation(extent={{-52,20},{
                 -32,40}}, rotation=0)));
       Water.ValveLin ValveLin1(Kv=1/1e5) 
@@ -44,7 +44,8 @@ package Test "Test cases for the ThermoPower models"
       Water.Header header(
         V=1,
         redeclare package Medium = Medium,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        FluidPhase=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
         annotation (Placement(transformation(extent={{-40,-40},{-20,-20}},
               rotation=0)));
       Water.ValveLin ValveLin2(Kv=1/1e5) 
@@ -274,9 +275,10 @@ Casella</a>:<br>
         annotation (Placement(transformation(extent={{0,60},{20,80}}, rotation=
                 0)));
       inner System system 
-        annotation (Placement(transformation(extent={{70,70},{90,90}})));
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     initial equation
-      PressDrop2a.inlet.w=1;
+      PressDrop2a.inlet.m_flow=1;
+
     equation
       connect(SourceP3.flange, PressDrop3a.inlet) 
         annotation (Line(
@@ -474,8 +476,9 @@ Casella</a>:<br>
       ThermoPower.Water.Tank Tank2(
         A=0.1,
         redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph,
+        ystart=1,
         pext=100000,
-        ystart=1) 
+        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
         annotation (Placement(transformation(extent={{20,-4},{40,16}}, rotation=
                0)));
       Water.Flow1Dfem Pipe(
@@ -492,13 +495,16 @@ Casella</a>:<br>
         redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         alpha=1,
-        dpnom=20)             annotation (Placement(transformation(extent={{-20,
+        dpnom=20,
+        initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) 
+                              annotation (Placement(transformation(extent={{-20,
                 -10},{0,10}}, rotation=0)));
       ThermoPower.Water.Tank Tank1(
         A=0.1,
         redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph,
         ystart=0.5,
-        pext=100000) 
+        pext=100000,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
         annotation (Placement(transformation(extent={{-60,-4},{-40,16}},
               rotation=0)));
       ThermoPower.Water.SourceW Plug1(w0=0) 
@@ -514,11 +520,11 @@ Casella</a>:<br>
           color={0,0,255},
           thickness=0.5));
       connect(Tank1.outlet, Pipe.infl) annotation (Line(
-          points={{-42,0},{-20,0}},
+          points={{-42,0},{-32,0},{-20,0}},
           color={0,0,255},
           thickness=0.5));
       connect(Plug1.flange, Tank1.inlet) annotation (Line(
-          points={{-80,0},{-58,0}},
+          points={{-80,0},{-70,0},{-58,0}},
           color={0,0,255},
           thickness=0.5));
       connect(Tank2.outlet, Plug2.flange) annotation (Line(
@@ -531,7 +537,10 @@ Casella</a>:<br>
       Tank2.h = 1e5;
       Tank2.y = 1;
       annotation (
-        Diagram(graphics),
+        Diagram(graphics={Text(
+              extent={{-92,-64},{78,-76}},
+              lineColor={0,0,255},
+              textString="Flow1D: not supported reversal flow")}),
         experiment(StopTime=20, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>This model tests the <tt>Tank</tt> model and the <tt>Flow1D</tt> model in reversing flow conditions.</p>
@@ -566,7 +575,7 @@ Casella</a>:<br>
         CvData=ThermoPower.Choices.Valve.CvTypes.Kv) 
                   annotation (Placement(transformation(extent={{-30,60},{-10,80}},
               rotation=0)));
-      ThermoPower.Water.ValveLiq V2(
+      Water.ValveLiq V2(
         dpnom=5e5,
         wnom=1.2,
         pnom=10e5,
@@ -1607,7 +1616,6 @@ Casella</a>:<br>
         V=0.01,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CheckValve=true,
-        initOpt=ThermoPower.Choices.Init.Options.noInit,
         Np0=2,
         usePowerCharacteristic=true,
         n0=1500,
@@ -1619,6 +1627,7 @@ Casella</a>:<br>
                 0.001,0.0015}, W_nom={350,500,600}),
         wstart=0,
         w0=1,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         dp0=300000)         annotation (Placement(transformation(extent={{-40,
                 -22},{-20,-2}}, rotation=0)));
 
@@ -1698,18 +1707,19 @@ Schiavo</a>:<br>
                0)));
       Water.PumpNPSH Pump1(
         rho0=1000,
-        hstart=1e5,
         V=0.01,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CheckValve=true,
-        initOpt=ThermoPower.Choices.Init.Options.noInit,
         Np0=2,
         usePowerCharacteristic=true,
         n0=1500,
         redeclare function flowCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.linearFlow (q_nom={0.001,
                 0.0015}, head_nom={30,0}),
-        wstart=0)           annotation (Placement(transformation(extent={{-40,
+        wstart=0,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        w0=1,
+        dp0=200000)         annotation (Placement(transformation(extent={{-40,
                 38},{-20,58}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp Ramp1(
         duration=4,
@@ -1735,18 +1745,19 @@ Schiavo</a>:<br>
               rotation=0)));
       Water.PumpNPSH Pump2(
         rho0=1000,
-        hstart=1e5,
         V=0.01,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CheckValve=true,
-        initOpt=ThermoPower.Choices.Init.Options.noInit,
         Np0=2,
         usePowerCharacteristic=true,
         n0=1500,
         redeclare function flowCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.quadraticFlow (q_nom={
                 0.0005,0.001,0.0015}, head_nom={50,30,0}),
-        wstart=0)           annotation (Placement(transformation(extent={{-40,
+        wstart=0,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        w0=1,
+        dp0=200000)         annotation (Placement(transformation(extent={{-40,
                 -12},{-20,8}}, rotation=0)));
       ThermoPower.Water.SourceP Source3(
                                        p0=1e5, h=1.5e5) 
@@ -1760,18 +1771,19 @@ Schiavo</a>:<br>
               rotation=0)));
       Water.PumpNPSH Pump3(
         rho0=1000,
-        hstart=1e5,
         V=0.01,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CheckValve=true,
-        initOpt=ThermoPower.Choices.Init.Options.noInit,
         Np0=2,
         usePowerCharacteristic=true,
         n0=1500,
         redeclare function flowCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.polynomialFlow (q_nom={
                 0.0005,0.001,0.0015}, head_nom={50,30,0}),
-        wstart=0)           annotation (Placement(transformation(extent={{-40,
+        wstart=0,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        w0=1,
+        dp0=200000)         annotation (Placement(transformation(extent={{-40,
                 -62},{-20,-42}}, rotation=0)));
       inner System system 
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -1854,7 +1866,7 @@ Algorithm Tolerance = 1e-6
 
     model WaterPumpMech "Test case for WaterPumpMech"
       package Medium=Modelica.Media.Water.WaterIF97_ph;
-      ThermoPower.Water.PumpMech Pump(
+      Water.PumpMech Pump(
         rho0=1000,
         n0=100,
         V=0.001,
@@ -1867,9 +1879,9 @@ Algorithm Tolerance = 1e-6
         redeclare function powerCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.quadraticPower (q_nom={0,
                 0.001,0.0015}, W_nom={350,500,600}),
-        pin_start=100000,
-        pout_start=400000,
-        wstart=0)             annotation (Placement(transformation(extent={{-40,
+        wstart=0,
+        w0=1,
+        dp0=20000000000)      annotation (Placement(transformation(extent={{-40,
                 -2},{-20,18}}, rotation=0)));
       ThermoPower.Water.SourceP Source annotation (Placement(transformation(
               extent={{-80,0},{-60,20}}, rotation=0)));
@@ -2067,7 +2079,7 @@ Schiavo</a>:<br>
 
     model TestAccumulator "Simple test for Water-Gas Accumulator component"
       package Medium=Modelica.Media.Water.WaterIF97_ph;
-      ThermoPower.Water.Accumulator Accumulator1(
+      Water.Accumulator Accumulator1(
         hl_start=1e5,
         Tg_start=300,
         Tgin=300,
@@ -2564,7 +2576,7 @@ Algorithm Tolerance = 1e-4
       ThermoPower.Water.ValveLin Valve(Kv=3e-6) 
         annotation (Placement(transformation(extent={{10,-10},{30,10}},
               rotation=0)));
-      ThermoPower.Water.Flow1D hex(
+      Water.Flow1D hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -2575,8 +2587,6 @@ Algorithm Tolerance = 1e-4
         DynamicMomentum=false,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
       redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
@@ -2685,7 +2695,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.Pressure phex=3e5;
       // initial inlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
-      ThermoPower.Water.Flow1D hex(
+      Water.Flow1D hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -2695,8 +2705,6 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hs,
         hstartout=hs,
-        pstartin=phex,
-        pstartout=phex,
       redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -2812,7 +2820,7 @@ Algorithm Tolerance = 1e-6
       // Time constant
       Time tau;
 
-      ThermoPower.Water.Flow1D hex(
+      Water.Flow1D hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -2820,8 +2828,6 @@ Algorithm Tolerance = 1e-6
         A=Ahex,
         wnom=whex,
         Cfnom=Cfhex,
-        pstartin=phex,
-        pstartout=phex,
         hstartin=hs,
         hstartout=hs,
         redeclare package Medium = Medium,
@@ -2941,7 +2947,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
-      ThermoPower.Water.Flow1D hexA(
+      Water.Flow1D hexA(
         N=Nnodes,
         Nt=1,
         L=Lhex,
@@ -2952,8 +2958,6 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -2976,7 +2980,7 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) 
         annotation (Placement(transformation(extent={{-30,30},{-50,50}},
               rotation=0)));
-      ThermoPower.Water.Flow1D hexB(
+      Water.Flow1D hexB(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -2986,8 +2990,6 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -3014,7 +3016,7 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.SourceW SideB_MassFlowRate(w0=whex, p0=3e5) 
         annotation (Placement(transformation(extent={{60,30},{40,50}}, rotation=
                0)));
-      ThermoPower.Thermal.ConvHT ConvExCF(N=Nnodes, gamma=400) 
+      Thermal.ConvHT ConvExCF(            N=Nnodes, gamma=400) 
         annotation (Placement(transformation(extent={{-20,-40},{0,-20}},
               rotation=0)));
       ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = 
@@ -3123,7 +3125,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
-      ThermoPower.Water.Flow1D hexA(
+      Water.Flow1D hexA(
         N=Nnodes,
         Nt=1,
         L=Lhex,
@@ -3134,18 +3136,16 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
                      annotation (Placement(transformation(extent={{-20,-60},{0,
                 -40}}, rotation=0)));
-      ThermoPower.Thermal.ConvHT ConvHTB(N=Nnodes, gamma=400) 
+      Thermal.ConvHT ConvHTB(            N=Nnodes, gamma=400) 
         annotation (Placement(transformation(extent={{-20,20},{0,40}}, rotation=
                0)));
-      ThermoPower.Thermal.ConvHT ConvHTA(N=Nnodes, gamma=400) 
+      Thermal.ConvHT ConvHTA(            N=Nnodes, gamma=400) 
         annotation (Placement(transformation(extent={{-20,-40},{0,-20}},
               rotation=0)));
       ThermoPower.Water.SinkP SideA_FluidSink 
@@ -3164,7 +3164,7 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) 
         annotation (Placement(transformation(extent={{-30,40},{-50,60}},
               rotation=0)));
-      ThermoPower.Water.Flow1D hexB(
+      Water.Flow1D hexB(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -3174,8 +3174,6 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -3476,8 +3474,6 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hs,
         hstartout=hs,
-        pstartin=phex,
-        pstartout=phex,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -3610,7 +3606,7 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.ValveLin Valve(Kv=3e-6) 
         annotation (Placement(transformation(extent={{12,-10},{32,10}},
               rotation=0)));
-      ThermoPower.Water.Flow1Dfem hex(
+      Water.Flow1Dfem hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -3621,8 +3617,6 @@ Algorithm Tolerance = 1e-6
         DynamicMomentum=false,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
       redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
@@ -3737,7 +3731,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.Pressure phex=3e5;
       // initial inlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
-      ThermoPower.Water.Flow1Dfem hex(
+      Water.Flow1Dfem hex(
         redeclare package Medium=Medium,
         N=Nnodes,
         L=Lhex,
@@ -3748,8 +3742,6 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hs,
         hstartout=hs,
-        pstartin=phex,
-        pstartout=phex,
         alpha=1,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -3861,7 +3853,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.Pressure phex=1e5;
       // initial specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
-      ThermoPower.Water.Flow1Dfem hex(
+      Water.Flow1Dfem hex(
         redeclare package Medium=Medium,
         N=Nnodes,
         L=Lhex,
@@ -3873,8 +3865,6 @@ Algorithm Tolerance = 1e-6
         hstartin=hs,
         hstartout=hs,
         DynamicMomentum=false,
-        pstartin=2*phex,
-        pstartout=2*phex,
         alpha=1,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -3997,7 +3987,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.Pressure phex=0.2e5;
       // initial specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy hs=3e6;
-      ThermoPower.Water.Flow1Dfem hex(
+      Water.Flow1Dfem hex(
         redeclare package Medium=Medium,
         N=Nnodes,
         L=Lhex,
@@ -4006,8 +3996,6 @@ Algorithm Tolerance = 1e-6
         A=Ahex,
         wnom=whex,
         Cfnom=Cfhex,
-        pstartin=phex,
-        pstartout=phex,
         alpha=1,
         hstartin=hs,
         hstartout=hs,
@@ -4126,7 +4114,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
-      ThermoPower.Water.Flow1Dfem hexA(
+      Water.Flow1Dfem hexA(
         redeclare package Medium=Medium,
         N=Nnodes,
         Nt=1,
@@ -4138,8 +4126,6 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
@@ -4161,7 +4147,7 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) 
         annotation (Placement(transformation(extent={{-30,40},{-50,60}},
               rotation=0)));
-      ThermoPower.Water.Flow1Dfem hexB(
+      Water.Flow1Dfem hexB(
         redeclare package Medium=Medium,
         N=Nnodes,
         L=Lhex,
@@ -4172,8 +4158,6 @@ Algorithm Tolerance = 1e-6
         Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
@@ -4331,7 +4315,7 @@ Casella</a>:<br>
       parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
-      ThermoPower.Water.Flow1Dfem hexA(
+      Water.Flow1Dfem hexA(
         redeclare package Medium=Medium,
         N=Nnodes,
         Nt=1,
@@ -4343,8 +4327,6 @@ Casella</a>:<br>
         Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
@@ -4372,7 +4354,7 @@ Casella</a>:<br>
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) 
         annotation (Placement(transformation(extent={{-30,40},{-50,60}},
               rotation=0)));
-      ThermoPower.Water.Flow1Dfem hexB(
+      Water.Flow1Dfem hexB(
         redeclare package Medium=Medium,
         N=Nnodes,
         L=Lhex,
@@ -4383,8 +4365,6 @@ Casella</a>:<br>
         Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
@@ -4550,7 +4530,7 @@ Casella</a>:<br>
       Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
       Modelica.SIunits.Mass Merr "Mass balance error";
 
-      ThermoPower.Water.Flow1D2ph hex(
+      Water.Flow1D2ph hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -4562,9 +4542,7 @@ Casella</a>:<br>
         wnom=1,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        redeclare package Medium = Medium,
-        pstartin=1000000,
-        pstartout=1000000) 
+        redeclare package Medium = Medium) 
                      annotation (Placement(transformation(extent={{-20,-30},{0,
                 -10}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(           redeclare package Medium = 
@@ -4622,7 +4600,7 @@ Casella</a>:<br>
           color={0,0,255},
           thickness=0.5));
       Mhex = hex.M;
-      der(Mbal) = hex.infl.w + hex.outfl.w;
+      der(Mbal) = hex.infl.m_flow + hex.outfl.m_flow;
       Merr = Mhex-Mbal;
     initial equation
       Mbal = Mhex;
@@ -4703,7 +4681,7 @@ Algorithm Tolerance = 1e-9
       Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
       Modelica.SIunits.Mass Merr "Mass balance error";
 
-      ThermoPower.Water.Flow1D2ph hex(
+      Water.Flow1D2ph hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -4717,9 +4695,7 @@ Algorithm Tolerance = 1e-9
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare package Medium = Medium,
-        avoidInletEnthalpyDerivative=true,
-        pstartin=1000000,
-        pstartout=1000000) 
+        avoidInletEnthalpyDerivative=true) 
                      annotation (Placement(transformation(extent={{-20,-30},{0,
                 -10}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(           redeclare package Medium = 
@@ -4776,10 +4752,11 @@ Algorithm Tolerance = 1e-9
           color={0,0,255},
           thickness=0.5));
       Mhex = hex.M;
-      der(Mbal) = hex.infl.w + hex.outfl.w;
+      der(Mbal) = hex.infl.m_flow + hex.outfl.m_flow;
       Merr = Mhex-Mbal;
     initial equation
       Mbal = Mhex;
+
     equation
       connect(extPower2.y, Add1.u1) annotation (Line(points={{-59,68},{-42,56}},
             color={0,0,127}));
@@ -4844,7 +4821,7 @@ Algorithm Tolerance = 1e-9
       Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
       Modelica.SIunits.Mass Merr "Mass balance error";
 
-      ThermoPower.Water.Flow1D2ph hex(
+      Water.Flow1D2ph hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -4857,9 +4834,7 @@ Algorithm Tolerance = 1e-9
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare package Medium = Medium,
         hstartin=6e5,
-        hstartout=6e5,
-        pstartin=1000000,
-        pstartout=1000000) 
+        hstartout=6e5) 
                      annotation (Placement(transformation(extent={{-10,-30},{10,
                 -10}}, rotation=0)));
       ThermoPower.Thermal.HeatSource1D heatSource(
@@ -4902,7 +4877,7 @@ Algorithm Tolerance = 1e-9
           color={0,0,255},
           thickness=0.5));
       Mhex = hex.M;
-      der(Mbal) = hex.infl.w + hex.outfl.w;
+      der(Mbal) = hex.infl.m_flow + hex.outfl.m_flow;
       Merr = Mhex-Mbal;
     initial equation
       Mbal = Mhex;
@@ -4993,8 +4968,6 @@ Algorithm Tolerance = 1e-9
         A=Ahex,
         Cfnom=0.005,
         DynamicMomentum=false,
-        pstartin=10e5,
-        pstartout=10e5,
         wnom=1,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -5059,10 +5032,11 @@ Algorithm Tolerance = 1e-9
           color={0,0,255},
           thickness=0.5));
       Mhex = hex.M;
-      der(Mbal) = hex.infl.w + hex.outfl.w;
+      der(Mbal) = hex.infl.m_flow + hex.outfl.m_flow;
       Merr = Mhex-Mbal;
     initial equation
       Mbal = Mhex;
+
     equation
       connect(extPower.y, Add1.u2) annotation (Line(points={{-59,36},{-42,44}},
             color={0,0,127}));
@@ -5344,7 +5318,7 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
       parameter Area Ahex=pi*rhex^2;
       // friction factor
       parameter Real Cfhex=0.005;
-      ThermoPower.Water.Flow1D2phDB hex(
+      Water.Flow1D2phDB hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -5353,8 +5327,6 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
         DynamicMomentum=false,
         hstartin=1e6,
         hstartout=1e6,
-        pstartin=60e5,
-        pstartout=60e5,
         gamma_b=20000,
         Dhyd=2*rhex,
         wnom=0.05,
@@ -5513,7 +5485,7 @@ Algorithm Tolerance = 1e-8
       parameter Modelica.SIunits.Area Ahex=pi*rhex^2;
       // friction factor
       parameter Real Cfhex=0.005;
-      ThermoPower.Water.Flow1D2phDB hex(
+      Water.Flow1D2phDB hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -5523,11 +5495,10 @@ Algorithm Tolerance = 1e-8
         DynamicMomentum=false,
         hstartin=6e5,
         hstartout=6e5,
-        pstartin=10e5,
-        pstartout=10e5,
       redeclare package Medium = Medium,
         wnom=0.1,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom) 
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (Placement(transformation(extent={{-30,-50},{
                 -10,-30}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(Kv=0.1/15e5) 
@@ -5668,7 +5639,7 @@ Algorithm Tolerance = 1e-7
       parameter Area Ahex=pi*rhex^2;
       // friction factor
       parameter Real Cfhex=0.005;
-      ThermoPower.Water.Flow1D2phChen hex(
+      Water.Flow1D2phChen hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -5677,8 +5648,6 @@ Algorithm Tolerance = 1e-7
         DynamicMomentum=false,
         hstartin=1e6,
         hstartout=1e6,
-        pstartin=60e5,
-        pstartout=60e5,
         Dhyd=2*rhex,
         redeclare package Medium = Medium,
         wnom=0.05,
@@ -5840,7 +5809,7 @@ Algorithm Tolerance = 1e-8
       parameter Modelica.SIunits.Area Ahex=pi*rhex^2;
       // friction factor
       parameter Real Cfhex=0.005;
-      ThermoPower.Water.Flow1D2phChen hex(
+      Water.Flow1D2phChen hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -5850,11 +5819,10 @@ Algorithm Tolerance = 1e-8
         DynamicMomentum=false,
         hstartin=6e5,
         hstartout=6e5,
-        pstartin=10e5,
-        pstartout=10e5,
       redeclare package Medium = Medium,
         wnom=0.1,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction) 
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
                      annotation (Placement(transformation(extent={{-30,-50},{
                 -10,-30}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(Kv=0.1/15e5) 
@@ -6011,11 +5979,10 @@ Algorithm Tolerance = 1e-7
         hstartin=hin,
         hstartout=hin,
         wnom=1,
-        pstartin=phex,
-        pstartout=phex,
         ML=0,
       redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom) 
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
               annotation (Placement(transformation(extent={{-30,-50},{-10,-30}},
               rotation=0)));
       Water.ValveLin valve(Kv=whex/(phex)) 
@@ -6153,10 +6120,10 @@ Algorithm Tolerance = 1e-6
       // M is computed in base class
       Mtot = M;
       Etot = sum(Evol);
-      balM = infl.w + outfl.w;
+      balM = infl.m_flow + outfl.m_flow;
 
-      balE = infl.w*(if infl.w > 0 then inStream(infl.h) else infl.h) + outfl.w*(if 
-        outfl.w > 0 then inStream(outfl.h) else outfl.h) + sum(wall.phi[1:N - 1] +
+      balE = infl.m_flow*(if infl.m_flow > 0 then inStream(infl.h_outflow) else infl.h_outflow) + outfl.m_flow*(if 
+        outfl.m_flow > 0 then inStream(outfl.h_outflow) else outfl.h_outflow) + sum(wall.phi[1:N - 1] +
         wall.phi[2:N])/2*omega*l;
       annotation (Documentation(info="<HTML>
 <p>This model extends <tt>Water.Flow1D</tt> by adding the computation of mass and energy flows and buildups. It can be used to check the correctness of the <tt>Water.Flow1D</tt> model.</p>
@@ -6285,7 +6252,7 @@ Casella</a>:<br>
       connect(Step2.y, ValveLin1.cmd) annotation (Line(points={{21,50},{30,50},
               {30,7}}, color={0,0,127}));
       Mhex = hex.M;
-      der(Mbal) = hex.infl.w + hex.outfl.w;
+      der(Mbal) = hex.infl.m_flow + hex.outfl.m_flow;
       Merr = Mhex-Mbal;
     initial equation
       Mbal = Mhex;
@@ -6444,11 +6411,10 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
                 10}}, rotation=0)));
       Gas.Plenum Plenum1(
         redeclare package Medium = Medium,
-        Tstart=400,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        inlet(w(start=1.5)),
-        pstart=4e5,
-        V=0.1) 
+        V=0.1,
+        pstart=400000,
+        Tstart=400) 
               annotation (Placement(transformation(extent={{0,-10},{20,10}},
               rotation=0)));
       Modelica.Blocks.Sources.Ramp Ramp2(
