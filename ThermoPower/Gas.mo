@@ -432,12 +432,15 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
+      p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
     parameter Volume V "Inner volume";
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
+    parameter Pressure pstart = 1e5 "Pressure start value" 
+       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
@@ -528,6 +531,7 @@ package Gas "Models of components with ideal gases as working fluid"
       extends Icons.Gas.Mixer;
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
       Medium.BaseProperties gas(
+        p(start=pstart, stateSelect=StateSelect.prefer),
         T(start=Tstart, stateSelect=StateSelect.prefer),
         Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
       parameter AbsoluteTemperature Tmstart=300 "Metal wall start temperature";
@@ -538,6 +542,8 @@ package Gas "Models of components with ideal gases as working fluid"
       parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
       outer ThermoPower.System system "System wide properties";
+      parameter Pressure pstart = 1e5 "Pressure start value" 
+         annotation(Dialog(tab = "Initialisation"));
       parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
         annotation(Dialog(tab = "Initialisation"));
       parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
@@ -642,6 +648,7 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
+      p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
     parameter Volume V "Inner volume";
@@ -651,6 +658,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
+    parameter Pressure pstart = 1e5 "Pressure start value" 
+       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstart=300 "Temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
@@ -1556,6 +1565,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
+    parameter Pressure pstart = 1e5 "Pressure start value" 
+       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tstartbar=300
       "Avarage temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
@@ -1616,7 +1627,7 @@ package Gas "Models of components with ideal gases as working fluid"
         stateSelect=StateSelect.prefer) "Composition state variables";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
     Velocity u[N] "Fluid velocity";
-    Pressure p(stateSelect=StateSelect.prefer);
+    Pressure p(start=pstart, stateSelect=StateSelect.prefer);
     Time Tr "Residence time";
     Mass M "Gas Mass";
     Real Q "Total heat flow through the wall (all Nt tubes)";
