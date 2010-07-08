@@ -524,7 +524,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
       "Fluid phase" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Pressure pstart = 1e5 "Pressure start value" 
+    parameter Pressure pstart "Pressure start value" 
        annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                       if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
@@ -673,7 +673,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
       "Fluid phase" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Pressure pstart = 1e5 "Pressure start value" 
+    parameter Pressure pstart "Pressure start value" 
        annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                       if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
