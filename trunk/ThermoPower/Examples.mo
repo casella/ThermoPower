@@ -2505,6 +2505,16 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
     equation
       connect(nPump, feedWaterPump.in_n) annotation (Line(points={{-62,70},{
               -25.2,70},{-25.2,12}}, color={0,0,127}));
+      connect(feedWaterPump.infl, inlet) annotation (Line(
+          points={{-36,0},{-100,0}},
+          color={0,0,255},
+          thickness=0.5,
+          smooth=Smooth.None));
+      connect(feedWaterPump.outfl, outlet) annotation (Line(
+          points={{-8,10},{60,10},{60,0},{100,0}},
+          color={0,0,255},
+          thickness=0.5,
+          smooth=Smooth.None));
       annotation (Icon(graphics={
             Text(
               extent={{-100,-118},{100,-144}},
@@ -2528,16 +2538,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
        First release.</li>
 </ul>
 </html>"));
-      connect(feedWaterPump.infl, inlet) annotation (Line(
-          points={{-36,0},{-100,0}},
-          color={0,0,255},
-          thickness=0.5,
-          smooth=Smooth.None));
-      connect(feedWaterPump.outfl, outlet) annotation (Line(
-          points={{-8,10},{60,10},{60,0},{100,0}},
-          color={0,0,255},
-          thickness=0.5,
-          smooth=Smooth.None));
     end PrescribedSpeedPump;
 
     model PrescribedPressureCondenser
@@ -3002,7 +3002,6 @@ This is a simple model of a steam plant.
 </html>"));
     end Plant;
 
-
     model PID "PID controller with anti-windup"
       parameter Real Kp "Proportional gain (normalised units)";
       parameter Modelica.SIunits.Time Ti "Integral time";
@@ -3103,7 +3102,6 @@ This is a simple model of a steam plant.
     end PID;
 
     package Simulators "Simulation models for the Rankine cycle example"
-
 
       model ClosedLoop
         package FlueGas = ThermoPower.Media.FlueGas "Flue gas model";
