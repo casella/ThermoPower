@@ -1538,7 +1538,7 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.Tube;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
-    replaceable package Medium=Media.GenericGas;
+    replaceable package Medium=Modelica.Media.Interfaces.PartialMedium;
     parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
     parameter Integer Nt=1 "Number of tubes in parallel";
     parameter Distance L "Tube length";
@@ -1606,10 +1606,7 @@ package Gas "Models of components with ideal gases as working fluid"
       Dialog(enable = false), Placement(transformation(extent={{-60,40},{60,60}},
             rotation=0)));
   public
-    Medium.BaseProperties gas[N](
-      T(start=Tstart),
-      state(T(start=ones(N)*Tstartin+(0:(N-1))/(N-1)*(Tstartout-Tstartin))))
-      "Gas nodal properties";
+    Medium.BaseProperties gas[N] "Gas nodal properties";
       // Xi(start=fill(Xstart[1:nXi],N)),
       // X(start=fill(Xstart,N)),
     Pressure Dpfric "Pressure drop due to friction";
