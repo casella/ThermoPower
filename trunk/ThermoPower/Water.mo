@@ -521,13 +521,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
-      "Fluid phase" 
+    parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+      "Fluid phase (only for initialization!)" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pstart "Pressure start value" 
        annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
-                                      if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
+    parameter SpecificEnthalpy hstart=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+                                      if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Specific enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tmstart = 300
@@ -670,13 +670,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
-      "Fluid phase" 
+    parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+      "Fluid phase (only for initialization!)" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pstart "Pressure start value" 
        annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstart=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
-                                      if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
+    parameter SpecificEnthalpy hstart=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+                                      if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Specific enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tmstart = 300
@@ -915,17 +915,17 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
-      "Fluid phase" 
+    parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+      "Fluid phase (only for initialization!)" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Pressure pstart = 1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstartin=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
-                                           if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
+    parameter SpecificEnthalpy hstartin=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+                                           if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Inlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstartout=if FluidPhase==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
-                                           if FluidPhase==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
+    parameter SpecificEnthalpy hstartout=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
+                                           if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
       "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart[N] = linspace(hstartin, hstartout, N)
@@ -1269,7 +1269,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   model Flow1D2ph
     "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)"
     extends Flow1DBase(redeclare replaceable package Medium = StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",FluidPhase=Choices.FluidPhase.FluidPhases.TwoPhases);
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     package SmoothMedium=Medium(final smoothModel = true);
