@@ -1619,6 +1619,7 @@ package Gas "Models of components with ideal gases as working fluid"
     AbsoluteTemperature Ttilde[N - 1](
       start=ones(N - 1)*Tstartin + (1:(N - 1))/(N - 1)*(Tstartout - Tstartin),
       stateSelect=StateSelect.prefer) "Temperature state variables";
+    AbsoluteTemperature Tin( stateSelect=StateSelect.prefer,start=Tstartin);
     Real Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
         stateSelect=StateSelect.prefer) "Composition state variables";
@@ -1814,6 +1815,7 @@ package Gas "Models of components with ideal gases as working fluid"
 */
 
     gas.T = wall.T;
+    Tin = gas[1].T;
     phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
 
     M=sum(rhobar)*A*l "Total gas mass";
@@ -2544,7 +2546,7 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     phic = w*sqrt(gas_in.T)/(gas_in.p) "Flow number definition";
 
     // phic = function(PR, K)
-    phic=K*sqrt(1-(1/PR)^2);
+    phic = K*sqrt(1-(1/PR)^2);
 
     // eta = Eta(PR, N_T)
     Eta.u1=PR;
@@ -2895,10 +2897,10 @@ The packages Medium are redeclared and a mass balance determines the composition
     import Modelica.SIunits.Conversions.NonSIunits.*;
     replaceable package Medium = Water.StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Medium.BaseProperties inletFluid(p(start=pin_start),h(start=hstart))
+    Medium.BaseProperties inletFluid(h(start=hstart))
       "Fluid properties at the inlet";
     replaceable function flowCharacteristic = 
-        Functions.FanCharacteristics.baseFlow
+        Functions.FanCharacteristics.quadraticFlow
       "Head vs. q_flow characteristic at nominal speed and density" 
       annotation(Dialog(group="Characteristics"), choicesAllMatching=true);
     parameter Boolean usePowerCharacteristic = false
@@ -2927,11 +2929,7 @@ The packages Medium are redeclared and a mass balance determines the composition
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pin_start "Inlet Pressure Start Value" 
-      annotation(Dialog(tab="Initialisation"));
-    parameter Pressure pout_start "Outlet Pressure Start Value" 
-      annotation(Dialog(tab="Initialisation"));
-    parameter VolumeFlowRate q_single_start=0
+    parameter VolumeFlowRate q_single_start=q_single0
       "Volume Flow Rate Start Value (single pump)" 
       annotation(Dialog(tab="Initialisation"));
     parameter SpecificEnthalpy hstart=1e5 "Fluid Specific Enthalpy Start Value"
@@ -2940,13 +2938,23 @@ The packages Medium are redeclared and a mass balance determines the composition
       annotation(Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab="Initialisation"));
+    parameter MassFlowRate w0 "Nominal mass flow rate" 
+       annotation(Dialog(group="Characteristics"));
+    parameter Pressure dp0 "Nominal pressure increase" 
+       annotation(Dialog(group="Characteristics"));
+    final parameter VolumeFlowRate q_single0=w0/(Np0*rho0)
+      "Nominal volume flow rate (single pump)";
+    final parameter SpecificEnergy H0=dp0/(rho0) "Nominal specific energy";
+  protected
+    function df_dqflow = der(flowCharacteristic, q_flow);
+  public
     MassFlowRate w_single(start=q_single_start*rho_start)
       "Mass flow rate (single fan)";
     MassFlowRate w = Np*w_single "Mass flow rate (total)";
     VolumeFlowRate q_single "Volume flow rate (single fan)";
     VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
     Pressure dp "Outlet pressure minus inlet pressure";
-    SpecificEnergy H = dp/rho "Specific energy";
+    SpecificEnergy H "Specific energy";
     Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";
     Medium.SpecificEnthalpy hout(start=hstart) "Enthalpy of outgoing fluid";
@@ -2963,13 +2971,11 @@ The packages Medium are redeclared and a mass balance determines the composition
     Real eta "Fan efficiency";
     Real s "Auxiliary Variable";
     FlangeA infl(
-      p(start=pin_start),
       h_outflow(start=hstart),
       redeclare package Medium = Medium,
       m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=0)));
     FlangeB outfl(
-      p(start=pout_start),
       h_outflow(start=hstart),
       redeclare package Medium = Medium,
       m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
@@ -2998,22 +3004,39 @@ The packages Medium are redeclared and a mass balance determines the composition
     end if;
 
     // Fluid properties (always uses the properties upstream of the inlet flange)
-    inletFluid.p=infl.p;
-    inletFluid.h=inStream(infl.h_outflow);
+    inletFluid.p = infl.p;
+    inletFluid.h = inStream(infl.h_outflow);
     rho = inletFluid.d;
     Tin = inletFluid.T;
 
-      // Flow equations
-    q_single = w_single/rho;
+     // Flow equations
+    q_single = w_single/homotopy(rho,rho0);
+    H = dp/(homotopy(rho,rho0));
     if noEvent(s > 0 or (not CheckValve)) then
       // Flow characteristics when check valve is open
       q_single = s;
-      H = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps),bladePos);
+      H = homotopy((n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps),bladePos),
+                   df_dqflow(q_single0)*(q_single-q_single0) + (2/n0*flowCharacteristic(q_single0)-q_single0/n0*df_dqflow(q_single0))*(n-n0)+H0);
     else
       // Flow characteristics when check valve is closed
-      H = (n/n0)^2*flowCharacteristic(0) - s;
+      H = homotopy((n/n0)^2*flowCharacteristic(0) - s,
+                   df_dqflow(q_single0)*(q_single-q_single0) + (2/n0*flowCharacteristic(q_single0)-q_single0/n0*df_dqflow(q_single0))*(n-n0)+H0);
       q_single = 0;
     end if;
+
+   /*
+  // Flow equations
+  q_single = w_single/rho;
+  if noEvent(s > 0 or (not CheckValve)) then
+    // Flow characteristics when check valve is open
+    q_single = s;
+    H = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps),bladePos);
+  else
+    // Flow characteristics when check valve is closed
+    H = (n/n0)^2*flowCharacteristic(0) - s;
+    q_single = 0;
+  end if;
+*/
 
     // Power consumption
     if usePowerCharacteristic then
@@ -3028,8 +3051,10 @@ The packages Medium are redeclared and a mass balance determines the composition
     // Boundary conditions
     dp = outfl.p - infl.p;
     w = infl.m_flow "Fan total flow rate";
-    hin = if not allowFlowReversal then inStream(infl.h_outflow) else if w >= 0 then inStream(infl.h_outflow) else h;
-    hout = if not allowFlowReversal then h else if w >= 0 then h else inStream(outfl.h_outflow);
+    hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow) else if w >= 0 then inStream(infl.h_outflow) else h,
+                   inStream(infl.h_outflow));
+    hout = homotopy(if not allowFlowReversal then h else if w >= 0 then h else inStream(outfl.h_outflow),
+                    h);
 
     // Mass balance
     infl.m_flow + outfl.m_flow = 0 "Mass balance";
@@ -3045,8 +3070,8 @@ The packages Medium are redeclared and a mass balance determines the composition
         "Energy balance for w > 0";
       infl.h_outflow = inStream(outfl.h_outflow) + W_single/w
         "Energy balance for w < 0";
-      h = if not allowFlowReversal then outfl.h_outflow else if w>=0 then outfl.h_outflow else infl.h_outflow
-        "Definition of h";
+      h = homotopy(if not allowFlowReversal then outfl.h_outflow else if w>=0 then outfl.h_outflow else infl.h_outflow,
+                   outfl.h_outflow) "Definition of h";
     end if;
 
   initial equation
