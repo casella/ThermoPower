@@ -297,49 +297,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Thermal conductivity of the metal (density by specific heat capacity)";
 
         //Start value
-        parameter Boolean use_T = true
-          "Select: -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
-
-        parameter SI.Temperature Tstart_G_In
-          "Inlet gas temperature start value"            annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_G_Out
-          "Outlet gas temperature start value"           annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_G[N_G]=linspace(Tstart_G_In,Tstart_G_Out,N_G)
-          "Start value of gas temperature vector (initialized by default)" annotation(Dialog(tab = "Initialization"));
+        parameter SI.Temperature Tstartbar_G
+          "Start value of the average gas temperature"   annotation(Dialog(tab = "Initialization"));
         parameter SI.Pressure pstart_G=gasNomPressure
           "Pressure start value, gas side" 
                                           annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M_In
-          "Inlet metal wall temperature start value"       annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M_Out
-          "Outlet metal wall temperature start value"      annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M[N_F]=linspace(Tstart_M_In,Tstart_M_Out,N_F)
-          "Start value of metal wall temperature vector (initialized by default)"
-                                                                                  annotation(Dialog(tab = "Initialization"));
-
-        parameter SI.Temperature Tstart_F_In=FluidMedium.temperature_ph(fluidNomPressure,hstart_F_In)
-          "Inlet fluid temperature start value"             annotation(Dialog(enable = use_T,
-                                                                              tab = "Initialization"));
-        parameter SI.Temperature Tstart_F_Out=FluidMedium.temperature_ph(fluidNomPressure,hstart_F_Out)
-          "Outlet fluid temperature start value"            annotation(Dialog(enable = use_T,
-                                                                              tab = "Initialization"));
-        parameter SI.Temperature Tstart_F[N_F]=linspace(Tstart_F_In,Tstart_F_Out,N_F)
-          "Start value of fluid temperature vector (initialized by default)" 
-                                                                          annotation(Dialog(tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_In)
-          "Inlet fluid specific enthalpy start value"                   annotation(Dialog(enable = not use_T,
-                                                                                          tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value"                  annotation(Dialog(enable = not use_T,
-                                                                                          tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_F[N_F]=linspace(hstart_F_In,hstart_F_Out,N_F)
-          "Start value of fluid enthalpy vector (initialized by default)" annotation(Dialog(tab = "Initialization"));
-        parameter SI.Pressure pstartin_F=fluidNomPressure
-          "Inlet fluid pressure start value"                annotation(Dialog(tab = "Initialization"));
-        parameter SI.Pressure pstartout_F=fluidNomPressure
-          "Outlet fluid pressure start value"                annotation(Dialog(tab = "Initialization"));
+        parameter SI.Temperature Tstartbar_M = Tstartbar_G-50
+          "Start value of the average metal temperature" annotation(Dialog(tab = "Initialization"));
+        parameter SI.Pressure pstart_F=50e5 "Pressure start value, fluid side" annotation(Dialog(tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
 
         Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) 
                             annotation (Placement(transformation(extent={{-120,
@@ -445,138 +411,23 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.ThermalConductivity lambda
           "Thermal conductivity of the metal (density by specific heat capacity)";
 
-        //Initialization conditions
-        parameter Boolean use_T = true
-          "Select: -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy"
-             annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
-        //Start value
-        parameter SI.Temperature Tstart_G_In
-          "Inlet gas temperature start value" 
-            annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_G_Out
-          "Outlet gas temperature start value" 
-            annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_G[N_G]=linspace(
-                  Tstart_G_In,
-                  Tstart_G_Out,
-                  N_G)
-          "Start value of gas temperature vector (initialized by default)" annotation(Dialog(tab = "Initialization"));
+        //Initialization
+        parameter SI.Temperature Tstartbar_G
+          "Start value of the average gas temperature"   annotation(Dialog(tab = "Initialization"));
         parameter SI.Pressure pstart_G=gasNomPressure
           "Pressure start value, gas side" 
             annotation(Dialog(tab = "Initialization"));
         //A
-        parameter SI.Temperature Tstart_M_A_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization",
-                              group = "side A"));
-        parameter SI.Temperature Tstart_M_A_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization",
-                              group = "side A"));
-        parameter SI.Temperature Tstart_M_A[N_F_A]=linspace(
-                  Tstart_M_A_In,
-                  Tstart_M_A_Out,
-                  N_F_A)
-          "Start value of metal wall temperature vector (initialized by default)"
-            annotation(Dialog(tab = "Initialization",
-                              group = "side A"));
-        parameter SI.Temperature Tstart_F_A_In=FluidMedium.temperature_ph(
-            fluidNomPressure_A, hstart_F_A_In)
-          "Inlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization",
-                                                                         group = "side A"));
-        parameter SI.Temperature Tstart_F_A_Out=FluidMedium.temperature_ph(
-            fluidNomPressure_A, hstart_F_A_Out)
-          "Outlet fluid temperature start value"       annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization",
-                                                                         group = "side A"));
-        parameter SI.Temperature Tstart_F_A[N_F_A]=linspace(
-                  Tstart_F_A_In,
-                  Tstart_F_A_Out,
-                  N_F_A)
-          "Start value of fluid temperature vector (initialized by default)"     annotation(Dialog(tab = "Initialization",
-                                                                                                   group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A_In=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_A, Tstart_F_A_In)
-          "Inlet fluid specific enthalpy start value"        annotation(Dialog(enable = not use_T,
-                                                                               tab = "Initialization",
-                                                                               group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A_Out=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_A, Tstart_F_A_Out)
-          "Outlet fluid specific enthalpy start value"        annotation(Dialog(enable = not use_T,
-                                                                                tab = "Initialization",
-                                                                                group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A[N_F_A]=linspace(
-                  hstart_F_A_In,
-                  hstart_F_A_Out,
-                  N_F_A)
-          "Start value of fluid enthalpy vector (initialized by default)"     annotation(Dialog(tab = "Initialization",
-                                                                                                group = "side A"));
-        parameter SI.Pressure pstartin_F_A=fluidNomPressure_A
-          "Inlet fluid pressure start value" 
-            annotation(Dialog(tab = "Initialization",
-                              group = "side A"));
-        parameter SI.Pressure pstartout_F_A=fluidNomPressure_A
-          "Outlet fluid pressure start value" 
-            annotation(Dialog(tab = "Initialization",
-                              group = "side A"));
+        parameter SI.Temperature Tstartbar_M_A = Tstartbar_G-50
+          "Start value of the average metal temperature"   annotation(Dialog(tab = "Initialization",group = "side A"));
+        parameter SI.Pressure pstart_F_A=50e5 "Pressure start value" 
+                                                                    annotation(Dialog(tab="Initialization",group="side A"));
         //B
-        parameter SI.Temperature Tstart_M_B_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization",
-                              group = "side B"));
-        parameter SI.Temperature Tstart_M_B_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization",
-                              group = "side B"));
-        parameter SI.Temperature Tstart_M_B[N_F_B]=linspace(
-                  Tstart_M_B_In,
-                  Tstart_M_B_Out,
-                  N_F_B)
-          "Start value of metal wall temperature vector (initialized by default)"
-            annotation(Dialog(tab = "Initialization",
-                              group = "side B"));
-        parameter SI.Temperature Tstart_F_B_In=FluidMedium.temperature_ph(
-            fluidNomPressure_B, hstart_F_B_In)
-          "Inlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization",
-                                                                         group = "side B"));
-        parameter SI.Temperature Tstart_F_B_Out=FluidMedium.temperature_ph(
-            fluidNomPressure_B, hstart_F_B_Out)
-          "Outlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                          tab = "Initialization",
-                                                                          group = "side B"));
-        parameter SI.Temperature Tstart_F_B[N_F_B]=linspace(
-                  Tstart_F_B_In,
-                  Tstart_F_B_Out,
-                  N_F_B)
-          "Start value of fluid temperature vector (initialized by default)"     annotation(Dialog(tab = "Initialization",
-                                                                                                   group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B_In=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_B, Tstart_F_B_In)
-          "Inlet fluid specific enthalpy start value"        annotation(Dialog(enable = not use_T,
-                                                                               tab = "Initialization",
-                                                                               group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B_Out=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_B, Tstart_F_B_Out)
-          "Outlet fluid specific enthalpy start value"        annotation(Dialog(enable = not use_T,
-                                                                                tab = "Initialization",
-                                                                                group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B[N_F_B]=linspace(
-                  hstart_F_B_In,
-                  hstart_F_B_Out,
-                  N_F_B)
-          "Start value of fluid enthalpy vector (initialized by default)"     annotation(Dialog(tab = "Initialization",
-                                                                                                group = "side B"));
-        parameter SI.Pressure pstartin_F_B=fluidNomPressure_B
-          "Inlet fluid pressure start value" 
-            annotation(Dialog(tab = "Initialization",
-                              group = "side B"));
-        parameter SI.Pressure pstartout_F_B=fluidNomPressure_B
-          "Outlet fluid pressure start value" 
-            annotation(Dialog(tab = "Initialization",
-                              group = "side B"));
+        parameter SI.Temperature Tstartbar_M_B = Tstartbar_G-50
+          "Start value of the average metal temperature"   annotation(Dialog(tab = "Initialization",group = "side B"));
+        parameter SI.Pressure pstart_F_B=50e5 "Pressure start value" 
+                                                                    annotation(Dialog(tab="Initialization",group="side B"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
 
         annotation (Diagram(graphics),
                              Icon(graphics={
@@ -756,262 +607,52 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Metal heat capacity per unit volume [J/m^3.K]"                          annotation (Dialog(tab = "pHE-2",
                                                                                                     group = "side B"));
 
-        //Initialization conditions
-        parameter Boolean use_T = true
-          "Select: -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
+        //Initialization
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
+
         //Start value pHE1
-        parameter SI.Temperature Tstart_G_In_p1
-          "Inlet gas temperature start value"    annotation(Dialog(tab = "Initialization (pHE-1)"));
-        parameter SI.Temperature Tstart_G_Out_p1
-          "Outlet gas temperature start value"    annotation(Dialog(tab = "Initialization (pHE-1)"));
-        parameter SI.Temperature Tstart_G_p1[N_G_p1]=linspace(
-                  Tstart_G_In_p1,
-                  Tstart_G_Out_p1,
-                  N_G_p1)
-          "Start value of gas temperature vector (initialized by default)" annotation(Dialog(tab = "Initialization (pHE-1)"));
+        parameter SI.Temperature Tstartbar_G_p1
+          "Start value of the averaget gas temperature" 
+                                                 annotation(Dialog(tab = "Initialization (pHE-1)"));
         parameter SI.Pressure pstart_G_p1=gasNomPressure
           "Pressure start value, gas side" annotation(Dialog(tab = "Initialization (pHE-1)"));
         //A
-        parameter SI.Temperature Tstart_M_A_In_p1
-          "Inlet metal wall temperature start value" 
+        parameter SI.Temperature Tstartbar_M_A_p1= Tstartbar_G_p1-50
+          "Start value of the averaget metal temperature" 
             annotation(Dialog(tab = "Initialization (pHE-1)",
                               group = "side A"));
-        parameter SI.Temperature Tstart_M_A_Out_p1
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (pHE-1)",
-                              group = "side A"));
-        parameter SI.Temperature Tstart_M_A_p1[N_F_A_p1]=linspace(
-                  Tstart_M_A_In_p1,
-                  Tstart_M_A_Out_p1,
-                  N_F_A_p1)
-          "Start value of metal wall temperature vector (initialized by default)"
-            annotation(Dialog(tab = "Initialization (pHE-1)",
-                              group = "side A"));
-        parameter SI.Temperature Tstart_F_A_In_p1=FluidMedium.temperature_ph(fluidNomPressure_A, hstart_F_A_In_p1)
-          "Inlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization (pHE-1)",
-                                                                         group = "side A"));
-        parameter SI.Temperature Tstart_F_A_Out_p1=FluidMedium.temperature_ph(fluidNomPressure_A, hstart_F_A_Out_p1)
-          "Outlet fluid temperature start value"       annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization (pHE-1)",
-                                                                         group = "side A"));
-        parameter SI.Temperature Tstart_F_A_p1[N_F_A_p1]=linspace(
-                  Tstart_F_A_In_p1,
-                  Tstart_F_A_Out_p1,
-                  N_F_A_p1)
-          "Start value of fluid temperature vector (initialized by default)"     annotation(Dialog(tab = "Initialization (pHE-1)",
-                                                                                                   group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A_In_p1=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_In_p1)
-          "Inlet fluid specific enthalpy start value"        annotation(Dialog(enable = not use_T,
-                                                                               tab = "Initialization (pHE-1)",
-                                                                               group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A_Out_p1=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_Out_p1)
-          "Outlet fluid specific enthalpy start value"        annotation(Dialog(enable = not use_T,
-                                                                                tab = "Initialization (pHE-1)",
-                                                                                group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A_p1[N_F_A_p1]=linspace(
-                  hstart_F_A_In_p1,
-                  hstart_F_A_Out_p1,
-                  N_F_A_p1)
-          "Start value of fluid enthalpy vector (initialized by default)"     annotation(Dialog(tab = "Initialization (pHE-1)",
-                                                                                                group = "side A"));
-        parameter SI.Pressure pstartin_F_A_p1=fluidNomPressure_A
-          "Inlet fluid pressure start value" 
-            annotation(Dialog(tab = "Initialization (pHE-1)",
-                              group = "side A"));
-        parameter SI.Pressure pstartout_F_A_p1=fluidNomPressure_A
-          "Outlet fluid pressure start value" 
+        parameter SI.Pressure pstart_F_A_p1=1e5 "Pressure start value" 
             annotation(Dialog(tab = "Initialization (pHE-1)",
                               group = "side A"));
         //B
-        parameter SI.Temperature Tstart_M_B_In_p1
-          "Inlet metal wall temperature start value" 
+        parameter SI.Temperature Tstartbar_M_B_p1=Tstartbar_G_p1-50
+          "Start value of the averaget metal temperature" 
             annotation(Dialog(tab = "Initialization (pHE-1)",
                               group = "side B"));
-        parameter SI.Temperature Tstart_M_B_Out_p1
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (pHE-1)",
-                              group = "side B"));
-        parameter SI.Temperature Tstart_M_B_p1[N_F_B_p1]=linspace(
-                  Tstart_M_B_In_p1,
-                  Tstart_M_B_Out_p1,
-                  N_F_B_p1)
-          "Start value of metal wall temperature vector (initialized by default)"
-            annotation(Dialog(tab = "Initialization (pHE-1)",
-                              group = "side B"));
-        parameter SI.Temperature Tstart_F_B_In_p1=FluidMedium.temperature_ph(
-            fluidNomPressure_B, hstart_F_B_In_p1)
-          "Inlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization (pHE-1)",
-                                                                         group = "side B"));
-        parameter SI.Temperature Tstart_F_B_Out_p1=FluidMedium.temperature_ph(
-            fluidNomPressure_B, hstart_F_B_Out_p1)
-          "Outlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                          tab = "Initialization (pHE-1)",
-                                                                          group = "side B"));
-        parameter SI.Temperature Tstart_F_B_p1[N_F_B_p1]=linspace(
-                  Tstart_F_B_In_p1,
-                  Tstart_F_B_Out_p1,
-                  N_F_B_p1)
-          "Start value of fluid temperature vector (initialized by default)"     annotation(Dialog(tab = "Initialization (pHE-1)",
-                                                                                                   group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B_In_p1=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,
-            Tstart_F_B_In_p1) "Inlet fluid specific enthalpy start value" 
-                                                             annotation(Dialog(enable = not use_T,
-                                                                               tab = "Initialization (pHE-1)",
-                                                                               group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B_Out_p1=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,
-            Tstart_F_B_Out_p1) "Outlet fluid specific enthalpy start value" 
-                                                              annotation(Dialog(enable = not use_T,
-                                                                                tab = "Initialization (pHE-1)",
-                                                                                group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B_p1[N_F_B_p1]=linspace(
-                  hstart_F_B_In_p1,
-                  hstart_F_B_Out_p1,
-                  N_F_B_p1)
-          "Start value of fluid enthalpy vector (initialized by default)"     annotation(Dialog(tab = "Initialization (pHE-1)",
-                                                                                                group = "side B"));
-        parameter SI.Pressure pstartin_F_B_p1=fluidNomPressure_B
-          "Inlet fluid pressure start value" 
-            annotation(Dialog(tab = "Initialization (pHE-1)",
-                              group = "side B"));
-        parameter SI.Pressure pstartout_F_B_p1=fluidNomPressure_B
-          "Outlet fluid pressure start value" 
+        parameter SI.Pressure pstart_F_B_p1=1e5 "Pressure start value" 
             annotation(Dialog(tab = "Initialization (pHE-1)",
                               group = "side B"));
 
         //Start value pHE2
-        parameter SI.Temperature Tstart_G_In_p2
-          "Inlet gas temperature start value"    annotation(Dialog(tab = "Initialization (pHE-2)"));
-        parameter SI.Temperature Tstart_G_Out_p2
-          "Outlet gas temperature start value"    annotation(Dialog(tab = "Initialization (pHE-2)"));
-        parameter SI.Temperature Tstart_G_p2[N_G_p2]=linspace(
-                  Tstart_G_In_p2,
-                  Tstart_G_Out_p2,
-                  N_G_p2)
-          "Start value of gas temperature vector (initialized by default)" annotation(Dialog(tab = "Initialization (pHE-2)"));
+        parameter SI.Temperature Tstartbar_G_p2
+          "Start value of the averaget gas temperature" 
+                                                 annotation(Dialog(tab = "Initialization (pHE-2)"));
         parameter SI.Pressure pstart_G_p2=gasNomPressure
           "Pressure start value, gas side" annotation(Dialog(tab = "Initialization (pHE-2)"));
         //A
-        parameter SI.Temperature Tstart_M_A_In_p2
-          "Inlet metal wall temperature start value" 
+        parameter SI.Temperature Tstartbar_M_A_p2=Tstartbar_G_p2-50
+          "Start value of the averaget metal temperature" 
             annotation(Dialog(tab = "Initialization (pHE-2)",
                               group = "side A"));
-        parameter SI.Temperature Tstart_M_A_Out_p2
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (pHE-2)",
-                              group = "side A"));
-        parameter SI.Temperature Tstart_M_A_p2[N_F_A_p2]=linspace(
-                  Tstart_M_A_In_p2,
-                  Tstart_M_A_Out_p2,
-                  N_F_A_p2)
-          "Start value of metal wall temperature vector (initialized by default)"
-            annotation(Dialog(tab = "Initialization (pHE-2)",
-                              group = "side A"));
-        parameter SI.Temperature Tstart_F_A_In_p2=FluidMedium.temperature_ph(
-            fluidNomPressure_A, hstart_F_A_In_p1)
-          "Inlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization (pHE-2)",
-                                                                         group = "side A"));
-        parameter SI.Temperature Tstart_F_A_Out_p2=FluidMedium.temperature_ph(
-            fluidNomPressure_A, hstart_F_A_Out_p2)
-          "Outlet fluid temperature start value"       annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization (pHE-2)",
-                                                                         group = "side A"));
-        parameter SI.Temperature Tstart_F_A_p2[N_F_A_p2]=linspace(
-                  Tstart_F_A_In_p2,
-                  Tstart_F_A_Out_p2,
-                  N_F_A_p2)
-          "Start value of fluid temperature vector (initialized by default)"     annotation(Dialog(tab = "Initialization (pHE-2)",
-                                                                                                   group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A_In_p2=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,
-            Tstart_F_A_In_p2) "Inlet fluid specific enthalpy start value" 
-                                                             annotation(Dialog(enable = not use_T,
-                                                                               tab = "Initialization (pHE-2)",
-                                                                               group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A_Out_p2=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,
-            Tstart_F_A_Out_p2) "Outlet fluid specific enthalpy start value" 
-                                                              annotation(Dialog(enable = not use_T,
-                                                                                tab = "Initialization (pHE-2)",
-                                                                                group = "side A"));
-        parameter SI.SpecificEnthalpy hstart_F_A_p2[N_F_A_p2]=linspace(
-                  hstart_F_A_In_p2,
-                  hstart_F_A_Out_p2,
-                  N_F_A_p2)
-          "Start value of fluid enthalpy vector (initialized by default)"     annotation(Dialog(tab = "Initialization (pHE-2)",
-                                                                                                group = "side A"));
-        parameter SI.Pressure pstartin_F_A_p2=fluidNomPressure_A
-          "Inlet fluid pressure start value" 
-            annotation(Dialog(tab = "Initialization (pHE-2)",
-                              group = "side A"));
-        parameter SI.Pressure pstartout_F_A_p2=fluidNomPressure_A
-          "Outlet fluid pressure start value" 
+        parameter SI.Pressure pstart_F_A_p2=1e5 "Pressure start value" 
             annotation(Dialog(tab = "Initialization (pHE-2)",
                               group = "side A"));
         //B
-        parameter SI.Temperature Tstart_M_B_In_p2
-          "Inlet metal wall temperature start value" 
+        parameter SI.Temperature Tstartbar_M_B_p2=Tstartbar_G_p2-50
+          "Start value of the averaget metal temperature" 
             annotation(Dialog(tab = "Initialization (pHE-2)",
                               group = "side B"));
-        parameter SI.Temperature Tstart_M_B_Out_p2
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (pHE-2)",
-                              group = "side B"));
-        parameter SI.Temperature Tstart_M_B_p2[N_F_B_p2]=linspace(
-                  Tstart_M_B_In_p2,
-                  Tstart_M_B_Out_p2,
-                  N_F_B_p2)
-          "Start value of metal wall temperature vector (initialized by default)"
-            annotation(Dialog(tab = "Initialization (pHE-2)",
-                              group = "side B"));
-        parameter SI.Temperature Tstart_F_B_In_p2=FluidMedium.temperature_ph(
-            fluidNomPressure_B, hstart_F_B_In_p2)
-          "Inlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                         tab = "Initialization (pHE-2)",
-                                                                         group = "side B"));
-        parameter SI.Temperature Tstart_F_B_Out_p2=FluidMedium.temperature_ph(
-            fluidNomPressure_B, hstart_F_B_Out_p2)
-          "Outlet fluid temperature start value"        annotation(Dialog(enable = use_T,
-                                                                          tab = "Initialization (pHE-2)",
-                                                                          group = "side B"));
-        parameter SI.Temperature Tstart_F_B_p2[N_F_B_p2]=linspace(
-                  Tstart_F_B_In_p2,
-                  Tstart_F_B_Out_p2,
-                  N_F_B_p2)
-          "Start value of fluid temperature vector (initialized by default)"     annotation(Dialog(tab = "Initialization (pHE-2)",
-                                                                                                   group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B_In_p2=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,
-            Tstart_F_B_In_p2) "Inlet fluid specific enthalpy start value" 
-                                                             annotation(Dialog(enable = not use_T,
-                                                                               tab = "Initialization (pHE-2)",
-                                                                               group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B_Out_p2=
-            FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,
-            Tstart_F_B_Out_p2) "Outlet fluid specific enthalpy start value" 
-                                                              annotation(Dialog(enable = not use_T,
-                                                                                tab = "Initialization (pHE-2)",
-                                                                                group = "side B"));
-        parameter SI.SpecificEnthalpy hstart_F_B_p2[N_F_B_p2]=linspace(
-                  hstart_F_B_In_p2,
-                  hstart_F_B_Out_p2,
-                  N_F_B_p2)
-          "Start value of fluid enthalpy vector (initialized by default)"     annotation(Dialog(tab = "Initialization (pHE-2)",
-                                                                                                group = "side B"));
-        parameter SI.Pressure pstartin_F_B_p2=fluidNomPressure_B
-          "Inlet fluid pressure start value" 
-            annotation(Dialog(tab = "Initialization (pHE-2)",
-                              group = "side B"));
-        parameter SI.Pressure pstartout_F_B_p2=fluidNomPressure_B
-          "Outlet fluid pressure start value" 
+        parameter SI.Pressure pstart_F_B_p2=1e5 "Pressure start value" 
             annotation(Dialog(tab = "Initialization (pHE-2)",
                               group = "side B"));
 
@@ -1201,181 +842,38 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Volume of the metal part in the tube" annotation (Dialog(tab = "LP", group = "Ec"));
 
         //Initialization conditions
-        parameter Boolean use_T_Sh = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Superheaters (Reheater)"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean use_T_Ev = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Evaporators"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean use_T_Ec = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Economizers"
-           annotation(Dialog(tab = "Initialization Conditions"));
         parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
 
         //Start values
         //Sh2_HP
-        parameter SI.Temperature Sh2_HP_Tstart_G_In
-          "Intlet gas temperature start value of Sh2" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_G_Out
-          "Outlet gas temperature start value of Sh2" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_M_In
-          "Inlet metal wall temperature start value of Sh2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Sh2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh2_HP_hstart_F_In)
-          "Inlet fluid temperature start value of Sh2" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh2_HP_hstart_F_Out)
-          "Outlet fluid temperature start value of Sh2" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh2_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh2_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Sh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh2_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh2_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Sh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (HP)", group = "Sh"));
+        parameter SI.Temperature Sh2_HP_Tstartbar
+          "Start value of the average gas temperature - Sh2" 
+                                                            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
+
         //Sh1_HP
-        parameter SI.Temperature Sh1_HP_Tstart_G_In
-          "Intlet gas temperature start value of Sh1" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_G_Out
-          "Outlet gas temperature start value of Sh1" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_M_In
-          "Inlet metal wall temperature start value of Sh1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Sh1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh1_HP_hstart_F_In)
-          "Inlet fluid temperature start value of Sh1" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh1_HP_hstart_F_Out)
-          "Outlet fluid temperature start value of Sh1" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh1_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh1_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Sh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh1_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh1_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Sh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (HP)", group = "Sh"));
+        parameter SI.Temperature Sh1_HP_Tstartbar
+          "Start value of the average gas temperature - Sh1" 
+                                                            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
+
         //Ev_HP
-        parameter SI.Temperature Ev_HP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,Ev_HP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                           tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,Ev_HP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                            tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ev,Ev_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ev,Ev_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (HP)", group = "Ev"));
+        parameter SI.Temperature Ev_HP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
 
         //Ec_HP
-        parameter SI.Temperature Ec_HP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec_HP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                           tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec_HP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                            tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                 tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                  tab = "Initialization (HP)", group = "Ec"));
+        parameter SI.Temperature Ec_HP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
 
         //Sh_LP
-        parameter SI.Temperature Sh_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Sh,Sh_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                           tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Sh,Sh_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                            tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Sh,Sh_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                 tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Sh,Sh_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                  tab = "Initialization (LP)", group = "Sh"));
+        parameter SI.Temperature Sh_LP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
+
         //Ev_LP
-        parameter SI.Temperature Ev_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,Ev_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                                 tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,Ev_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                            tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ev,Ev_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ev,Ev_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (LP)", group = "Ev"));
+        parameter SI.Temperature Ev_LP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
+
         //Ec_LP
-        parameter SI.Temperature Ec_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ec,Ec_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                           tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ec,Ec_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                            tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                 tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                  tab = "Initialization (LP)", group = "Ec"));
+        parameter SI.Temperature Ec_LP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
 
         Water.FlangeA Sh_HP_In(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(extent={{-294,186},{-266,214}},
@@ -1704,228 +1202,47 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Volume Ec_LP_metalVol
           "Volume of the metal part in the tube" annotation (Dialog(tab = "LP", group = "Ec"));
 
-        //Initialization conditions
-        parameter Boolean use_T_Sh = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Superheaters (Reheater)"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean use_T_Ev = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Evaporators"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean use_T_Ec = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Economizers"
-           annotation(Dialog(tab = "Initialization Conditions"));
+       //Initialization conditions
         parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
 
         //Start values
         //Sh2_HP
-        parameter SI.Temperature Sh2_HP_Tstart_G_In
-          "Intlet gas temperature start value of Sh2" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_G_Out
-          "Outlet gas temperature start value of Sh2" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_M_In
-          "Inlet metal wall temperature start value of Sh2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Sh2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh2_HP_hstart_F_In)
-          "Inlet fluid temperature start value of Sh2" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh2_HP_hstart_F_Out)
-          "Outlet fluid temperature start value of Sh2" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh2_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh2_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Sh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh2_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh2_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Sh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (HP)", group = "Sh"));
+        parameter SI.Temperature Sh2_HP_Tstartbar
+          "Start value of the average gas temperature - Sh2" 
+                                                            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
+
         //Sh1_HP
-        parameter SI.Temperature Sh1_HP_Tstart_G_In
-          "Intlet gas temperature start value of Sh1" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_G_Out
-          "Outlet gas temperature start value of Sh1" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_M_In
-          "Inlet metal wall temperature start value of Sh1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Sh1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh1_HP_hstart_F_In)
-          "Inlet fluid temperature start value of Sh1" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh1_HP_hstart_F_Out)
-          "Outlet fluid temperature start value of Sh1" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh1_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh1_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Sh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh1_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh1_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Sh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (HP)", group = "Sh"));
+        parameter SI.Temperature Sh1_HP_Tstartbar
+          "Start value of the average gas temperature - Sh1" 
+                                                            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
+
         //Ev_HP
-        parameter SI.Temperature Ev_HP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,Ev_HP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                           tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,Ev_HP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                            tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ev,Ev_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ev,Ev_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (HP)", group = "Ev"));
+        parameter SI.Temperature Ev_HP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
 
         //Ec_HP
-        parameter SI.Temperature Ec_HP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec_HP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                           tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec_HP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                            tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                 tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                  tab = "Initialization (HP)", group = "Ec"));
+        parameter SI.Temperature Ec_HP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
+
         //Rh2_IP
-        parameter SI.Temperature Rh2_IP_Tstart_G_In
-          "Intlet gas temperature start value of Rh2" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_G_Out
-          "Outlet gas temperature start value of Rh2" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_M_In
-          "Inlet metal wall temperature start value of Rh2" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Rh2" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Rh2_IP_hstart_F_In)
-          "Inlet fluid temperature start value of Rh2" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Rh2_IP_hstart_F_Out)
-          "Outlet fluid temperature start value of Rh2" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Rh2_IP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Rh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Rh2_IP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Rh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (IP)", group = "Rh"));
+        parameter SI.Temperature Rh2_IP_Tstartbar
+          "Start value of the average gas temperature - Rh2"                                      annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
+
         //Rh1_HP
-        parameter SI.Temperature Rh1_IP_Tstart_G_In
-          "Intlet gas temperature start value of Rh1" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_G_Out
-          "Outlet gas temperature start value of Rh1" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_M_In
-          "Inlet metal wall temperature start value of Rh1" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Rh1" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Rh1_IP_hstart_F_In)
-          "Inlet fluid temperature start value of Rh1" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Rh1_IP_hstart_F_Out)
-          "Outlet fluid temperature start value of Rh1" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Rh1_IP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Rh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Rh1_IP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Rh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (IP)", group = "Rh"));
+        parameter SI.Temperature Rh1_IP_Tstartbar
+          "Start value of the average gas temperature - Rh1"                                      annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
 
         //Sh_LP
-        parameter SI.Temperature Sh_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Sh,Sh_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                           tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Sh,Sh_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                            tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Sh,Sh_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                 tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Sh,Sh_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                  tab = "Initialization (LP)", group = "Sh"));
+        parameter SI.Temperature Sh_LP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
+
         //Ev_LP
-        parameter SI.Temperature Ev_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,Ev_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                                 tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,Ev_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                            tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ev,Ev_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ev,Ev_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (LP)", group = "Ev"));
+        parameter SI.Temperature Ev_LP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
+
         //Ec_LP
-        parameter SI.Temperature Ec_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ec,Ec_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                           tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ec,Ec_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                            tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                 tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                  tab = "Initialization (LP)", group = "Ec"));
+        parameter SI.Temperature Ec_LP_Tstartbar
+          "Start value of the average gas temperature"                                      annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
 
         Water.FlangeA Sh_HP_In(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(extent={{-294,186},{-266,214}},
@@ -2419,318 +1736,72 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Volume of the metal part in the tube" annotation (Dialog(tab = "LP", group = "Ec"));
 
         //Initialization conditions
-        parameter Boolean use_T_Sh = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Superheaters (Reheater)"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean use_T_Ev = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Evaporators"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean use_T_Ec = true
-          "Select -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the Economizers"
-           annotation(Dialog(tab = "Initialization Conditions"));
         parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
 
         //Start values
         //Sh2_HP
-        parameter SI.Temperature Sh2_HP_Tstart_G_In
-          "Intlet gas temperature start value of Sh2" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_G_Out
-          "Outlet gas temperature start value of Sh2" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_M_In
-          "Inlet metal wall temperature start value of Sh2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Sh2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh2_HP_hstart_F_In)
-          "Inlet fluid temperature start value of Sh2" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh2_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh2_HP_hstart_F_Out)
-          "Outlet fluid temperature start value of Sh2" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh2_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh2_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Sh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh2_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh2_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Sh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (HP)", group = "Sh"));
+        parameter SI.Temperature Sh2_HP_Tstartbar
+          "Start value of the average gas temperature - Sh2" 
+                                                            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
+
         //Sh1_HP
-        parameter SI.Temperature Sh1_HP_Tstart_G_In
-          "Intlet gas temperature start value of Sh1" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_G_Out
-          "Outlet gas temperature start value of Sh1" annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_M_In
-          "Inlet metal wall temperature start value of Sh1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Sh1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh1_HP_hstart_F_In)
-          "Inlet fluid temperature start value of Sh1" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.Temperature Sh1_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Sh,Sh1_HP_hstart_F_Out)
-          "Outlet fluid temperature start value of Sh1" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh1_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh1_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Sh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (HP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh1_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Sh,Sh1_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Sh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (HP)", group = "Sh"));
+        parameter SI.Temperature Sh1_HP_Tstartbar
+          "Start value of the average gas temperature - Sh1" 
+                                                            annotation(Dialog(tab = "Initialization (HP)", group = "Sh"));
+
         //Ev_HP
-        parameter SI.Temperature Ev_HP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,Ev_HP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                           tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.Temperature Ev_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,Ev_HP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                            tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ev,Ev_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (HP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ev,Ev_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (HP)", group = "Ev"));
+        parameter SI.Temperature Ev_HP_Tstartbar
+          "Start value of the average gas temperature" 
+                                                      annotation(Dialog(tab = "Initialization (HP)", group = "Ev"));
+
         //Ec2_HP
-        parameter SI.Temperature Ec2_HP_Tstart_G_In
-          "Intlet gas temperature start value of Ec2" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_G_Out
-          "Outlet gas temperature start value of Ec2" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_M_In
-          "Inlet metal wall temperature start value of Ec2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Ec2" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec2_HP_hstart_F_In)
-          "Inlet fluid temperature start value of Ec2" annotation(Dialog(enable = use_T_Ec,
-                                                                  tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec2_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec2_HP_hstart_F_Out)
-          "Outlet fluid temperature start value of Ec2" annotation(Dialog(enable = use_T_Ec,
-                                                                   tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec2_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec2_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Ec2" annotation(Dialog(enable = not use_T_Ec,
-                                                                        tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec2_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec2_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Ec2" annotation(Dialog(enable = not use_T_Ec,
-                                                                         tab = "Initialization (HP)", group = "Ec"));
+        parameter SI.Temperature Ec2_HP_Tstartbar
+          "Start value of the average gas temperature - Ec2" 
+                                                            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
+
         //Ec1_HP
-        parameter SI.Temperature Ec1_HP_Tstart_G_In
-          "Intlet gas temperature start value of Ec1" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_G_Out
-          "Outlet gas temperature start value of Ec1" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_M_In
-          "Inlet metal wall temperature start value of Ec1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Ec1" 
-            annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_F_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec1_HP_hstart_F_In)
-          "Inlet fluid temperature start value of Ec1" annotation(Dialog(enable = use_T_Ec,
-                                                                  tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.Temperature Ec1_HP_Tstart_F_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ec,Ec1_HP_hstart_F_Out)
-          "Outlet fluid temperature start value of Ec1" annotation(Dialog(enable = use_T_Ec,
-                                                                   tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec1_HP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec1_HP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Ec1" annotation(Dialog(enable = not use_T_Ec,
-                                                                        tab = "Initialization (HP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec1_HP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidHPNomPressure_Ec,Ec1_HP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Ec1" annotation(Dialog(enable = not use_T_Ec,
-                                                                         tab = "Initialization (HP)", group = "Ec"));
+        parameter SI.Temperature Ec1_HP_Tstartbar
+          "Start value of the average gas temperature - Ec1" annotation(Dialog(tab = "Initialization (HP)", group = "Ec"));
+
         //Rh2_IP
-        parameter SI.Temperature Rh2_IP_Tstart_G_In
-          "Intlet gas temperature start value of Rh2" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_G_Out
-          "Outlet gas temperature start value of Rh2" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_M_In
-          "Inlet metal wall temperature start value of Rh2" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Rh2" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh2_IP_hstart_F_In)
-          "Inlet fluid temperature start value of Rh2" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh2_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh2_IP_hstart_F_Out)
-          "Outlet fluid temperature start value of Rh2" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh2_IP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Rh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh2_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh2_IP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Rh2" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (IP)", group = "Rh"));
+        parameter SI.Temperature Rh2_IP_Tstartbar
+          "Start value of the average gas temperature - Rh2" 
+                                                            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
+
         //Rh1_HP
-        parameter SI.Temperature Rh1_IP_Tstart_G_In
-          "Intlet gas temperature start value of Rh1" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_G_Out
-          "Outlet gas temperature start value of Rh1" annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_M_In
-          "Inlet metal wall temperature start value of Rh1" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_M_Out
-          "Outlet metal wall temperature start value of Rh1" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh1_IP_hstart_F_In)
-          "Inlet fluid temperature start value of Rh1" annotation(Dialog(enable = use_T_Sh,
-                                                                  tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.Temperature Rh1_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Rh,Rh1_IP_hstart_F_Out)
-          "Outlet fluid temperature start value of Rh1" annotation(Dialog(enable = use_T_Sh,
-                                                                   tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh1_IP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value of Rh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                        tab = "Initialization (IP)", group = "Rh"));
-        parameter SI.SpecificEnthalpy Rh1_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Rh,Rh1_IP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value of Rh1" annotation(Dialog(enable = not use_T_Sh,
-                                                                         tab = "Initialization (IP)", group = "Rh"));
+        parameter SI.Temperature Rh1_IP_Tstartbar
+          "Start value of the average gas temperature - Rh1" 
+                                                            annotation(Dialog(tab = "Initialization (IP)", group = "Rh"));
+
         //Sh_IP
-        parameter SI.Temperature Sh_IP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Sh,Sh_IP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                           tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.Temperature Sh_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Sh,Sh_IP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                            tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Sh,Sh_IP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                 tab = "Initialization (IP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Sh,Sh_IP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                  tab = "Initialization (IP)", group = "Sh"));
+        parameter SI.Temperature Sh_IP_Tstartbar
+          "Start value of the average gas temperature" 
+                                                      annotation(Dialog(tab = "Initialization (IP)", group = "Sh"));
+
         //Ev_IP
-        parameter SI.Temperature Ev_IP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Ev,Ev_IP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                                 tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.Temperature Ev_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Ev,Ev_IP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                                  tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Ev,Ev_IP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (IP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Ev,Ev_IP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (IP)", group = "Ev"));
+        parameter SI.Temperature Ev_IP_Tstartbar
+          "Start value of the average gas temperature" 
+                                                      annotation(Dialog(tab = "Initialization (IP)", group = "Ev"));
+
         //Ec_IP
-        parameter SI.Temperature Ec_IP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_F_In=FluidMedium.temperature_ph(fluidIPNomPressure_Ec,Ec_IP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                           tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.Temperature Ec_IP_Tstart_F_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Ec,Ec_IP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                            tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_IP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Ec,Ec_IP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                 tab = "Initialization (IP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_IP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidIPNomPressure_Ec,Ec_IP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                  tab = "Initialization (IP)", group = "Ec"));
+        parameter SI.Temperature Ec_IP_Tstartbar
+          "Start value of the average gas temperature" 
+                                                      annotation(Dialog(tab = "Initialization (IP)", group = "Ec"));
 
         //Sh_LP
-        parameter SI.Temperature Sh_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Sh,Sh_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                           tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.Temperature Sh_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Sh,Sh_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Sh,
-                                                            tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Sh,Sh_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                 tab = "Initialization (LP)", group = "Sh"));
-        parameter SI.SpecificEnthalpy Sh_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Sh,Sh_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Sh,
-                                                                  tab = "Initialization (LP)", group = "Sh"));
+        parameter SI.Temperature Sh_LP_Tstartbar
+          "Start value of the average gas temperature" 
+                                                      annotation(Dialog(tab = "Initialization (LP)", group = "Sh"));
+
         //Ev_LP
-        parameter SI.Temperature Ev_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,Ev_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                                 tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.Temperature Ev_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,Ev_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ev,
-                                                            tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ev,Ev_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                 tab = "Initialization (LP)", group = "Ev"));
-        parameter SI.SpecificEnthalpy Ev_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ev,Ev_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ev,
-                                                                  tab = "Initialization (LP)", group = "Ev"));
+        parameter SI.Temperature Ev_LP_Tstartbar
+          "Start value of the average gas temperature" 
+                                                      annotation(Dialog(tab = "Initialization (LP)", group = "Ev"));
+
         //Ec_LP
-        parameter SI.Temperature Ec_LP_Tstart_G_In
-          "Intlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_G_Out
-          "Outlet gas temperature start value" annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_M_In
-          "Inlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_M_Out
-          "Outlet metal wall temperature start value" 
-            annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_F_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ec,Ec_LP_hstart_F_In)
-          "Inlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                           tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.Temperature Ec_LP_Tstart_F_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ec,Ec_LP_hstart_F_Out)
-          "Outlet fluid temperature start value" annotation(Dialog(enable = use_T_Ec,
-                                                            tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_LP_hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_In)
-          "Inlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                 tab = "Initialization (LP)", group = "Ec"));
-        parameter SI.SpecificEnthalpy Ec_LP_hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidLPNomPressure_Ec,Ec_LP_Tstart_F_Out)
-          "Outlet fluid specific enthalpy start value" annotation(Dialog(enable = not use_T_Ec,
-                                                                  tab = "Initialization (LP)", group = "Ec"));
+        parameter SI.Temperature Ec_LP_Tstartbar
+          "Start value of the average gas temperature" 
+                                                      annotation(Dialog(tab = "Initialization (LP)", group = "Ec"));
 
         annotation (Icon(coordinateSystem(
               preserveAspectRatio=false,
@@ -2915,20 +1986,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Pressure HPd_pstart=fluidHPNomPressure
           "Pressure start value" 
           annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.SpecificEnthalpy HPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.SpecificEnthalpy HPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
         parameter SI.Temperature HPd_Tmstart=300
           "Metal wall temperature start value" 
           annotation(Dialog(tab = "Initialisation", group = "HP drum"));
         //LP drum
         parameter SI.Pressure LPd_pstart=fluidLPNomPressure
           "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.SpecificEnthalpy LPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.SpecificEnthalpy LPd_hlstart "Liquid enthalpy start value"
           annotation(Dialog(tab = "Initialisation", group = "LP drum"));
         parameter SI.Temperature LPd_Tmstart=300
           "Metal wall temperature start value" 
@@ -3090,10 +2153,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Pressure HPd_pstart=fluidHPNomPressure
           "Pressure start value" 
           annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.SpecificEnthalpy HPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.SpecificEnthalpy HPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
         parameter SI.Temperature HPd_Tmstart=300
           "Metal wall temperature start value" 
           annotation(Dialog(tab = "Initialisation", group = "HP drum"));
@@ -3101,20 +2160,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Pressure IPd_pstart=fluidIPNomPressure
           "Pressure start value" 
           annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter SI.SpecificEnthalpy IPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter SI.SpecificEnthalpy IPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
         parameter SI.Temperature IPd_Tmstart=300
           "Metal wall temperature start value" 
           annotation(Dialog(tab = "Initialisation", group = "IP drum"));
         //LP drum
         parameter SI.Pressure LPd_pstart=fluidLPNomPressure
           "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.SpecificEnthalpy LPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.SpecificEnthalpy LPd_hlstart "Liquid enthalpy start value"
           annotation(Dialog(tab = "Initialisation", group = "LP drum"));
         parameter SI.Temperature LPd_Tmstart=300
           "Metal wall temperature start value" 
@@ -3337,34 +2388,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Pressure HPd_pstart=fluidHPNomPressure
           "Pressure start value" 
           annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.SpecificEnthalpy HPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.SpecificEnthalpy HPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
-        parameter SI.Temperature HPd_Tmstart=300
-          "Metal wall temperature start value" 
-          annotation(Dialog(tab = "Initialisation", group = "HP drum"));
+
         //IP drum
         parameter SI.Pressure IPd_pstart=fluidIPNomPressure
           "Pressure start value" 
           annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter SI.SpecificEnthalpy IPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter SI.SpecificEnthalpy IPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
-        parameter SI.Temperature IPd_Tmstart=300
-          "Metal wall temperature start value" 
-          annotation(Dialog(tab = "Initialisation", group = "IP drum"));
+
         //LP drum
         parameter SI.Pressure LPd_pstart=fluidLPNomPressure
           "Pressure start value" 
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.SpecificEnthalpy LPd_hvstart "Vapour enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.SpecificEnthalpy LPd_hlstart "Liquid enthalpy start value"
-          annotation(Dialog(tab = "Initialisation", group = "LP drum"));
-        parameter SI.Temperature LPd_Tmstart=300
-          "Metal wall temperature start value" 
           annotation(Dialog(tab = "Initialisation", group = "LP drum"));
 
         constant Real g=Modelica.Constants.g_n;
@@ -3842,7 +2874,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
     package Components "HRSG component models"
 
       model HE "Heat Exchanger fluid - gas"
-        extends Interfaces.HeatExchanger(pstartout_F=fluidNomPressure-dpnom_F);
+        extends Interfaces.HeatExchanger;
 
         parameter SI.CoefficientOfHeatTransfer gamma_G
           "Constant heat transfer coefficient in the gas side";
@@ -3880,26 +2912,17 @@ package PowerPlants "Models of thermoelectrical power plants components"
           A=(fluidVol*4/exchSurface_F)^2/4*pi,
           omega=fluidVol*4/exchSurface_F*pi,
           Dhyd=fluidVol*4/exchSurface_F,
-          pstartin=pstartin_F,
-          pstartout=pstartout_F,
           FFtype=FFtype_F,
           HydraulicCapacitance=HCtype_F,
-          hstart=hstart_F,
-          hstartin=hstart_F_In,
-          hstartout=hstart_F_Out,
           Kfnom=Kfnom_F,
           dpnom=dpnom_F,
           rhonom=rhonom_F,
-          Cfnom=Cfnom_F)         annotation (Placement(transformation(extent={{
+          Cfnom=Cfnom_F,
+          FluidPhaseStart=FluidPhaseStart,
+          pstart=pstart_F)       annotation (Placement(transformation(extent={{
                   -10,-60},{10,-40}}, rotation=0)));
         Thermal.ConvHT convHT(               N=N_F,
-          Tstart11=Tstart_M_In,
-          Tstart1N=Tstart_M_Out,
-          Tstart21=Tstart_F_In,
-          Tstart2N=Tstart_F_Out,
-          gamma=gamma_F,
-          Tstart1=Tstart_M,
-          Tstart2=Tstart_F) 
+          gamma=gamma_F) 
           annotation (Placement(transformation(extent={{-10,-40},{10,-20}},
                 rotation=0)));
         Thermal.MetalTube metalTube(
@@ -3909,11 +2932,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           L=exchSurface_F^2/(fluidVol*pi*4),
           rint=fluidVol*4/exchSurface_F/2,
-          Tstart1=Tstart_M_In,
-          TstartN=Tstart_M_Out,
           WallRes=false,
-          Tstart=Tstart_M,
-          rext=(metalVol + fluidVol)*4/extSurfaceTub/2) 
+          rext=(metalVol + fluidVol)*4/extSurfaceTub/2,
+          Tstartbar=Tstartbar_M) 
                  annotation (Placement(transformation(extent={{-10,-6},{10,-26}},
                 rotation=0)));
         Gas.Flow1D gasFlow(
@@ -3923,10 +2944,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
           QuasiStatic=gasQuasiStatic,
-          Tstartin=Tstart_G_In,
-          Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          Tstart=Tstart_G,
           L=L,
           A=gasVol/L,
           omega=exchSurface_G/L,
@@ -3934,7 +2952,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Kfnom=Kfnom_G,
           dpnom=dpnom_G,
           rhonom=rhonom_G,
-          Cfnom=Cfnom_G)         annotation (Placement(transformation(extent={{
+          Cfnom=Cfnom_G,
+          Tstartbar=Tstartbar_G)  annotation (Placement(transformation(extent={{
                   -12,58},{12,38}}, rotation=0)));
         Thermal.CounterCurrent cC(                                    N=N_F,
             counterCurrent=counterCurrent) 
@@ -3949,16 +2968,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Thermal.ConvHT2N convHT2N(
           N1=N_G,
           N2=N_F,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_In,
-          Tstart2N=Tstart_M_Out,
-          gamma=gamma_G,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M)    annotation (Placement(transformation(extent={{
+          gamma=gamma_G)       annotation (Placement(transformation(extent={{
                   -10,20},{10,40}}, rotation=0)));
 
         final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)" annotation(Dialog(tab="Initialization"));
       equation
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (Line(points={{0,-45},{0,
@@ -3992,8 +3007,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         annotation (Diagram(graphics));
       end HE;
 
-      model HE2ph "Heat Exchanger fluid - gas (fluid 2-phase)"
-        extends Interfaces.HeatExchanger(pstartout_F=fluidNomPressure-dpnom_F);
+      model HE2ph "Heat Exchanger fluid - gas (2phases)"
+        extends Interfaces.HeatExchanger;
 
         parameter SI.CoefficientOfHeatTransfer gamma_G
           "Constant heat transfer coefficient in the gas side";
@@ -4028,28 +3043,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FluidMedium,
           L=exchSurface_F^2/(fluidVol*pi*4),
-          A=(1/exchSurface_F*fluidVol*4)^2/4*pi,
-          omega=1/exchSurface_F*fluidVol*4*pi,
-          Dhyd=1/exchSurface_F*fluidVol*4,
-          pstartin=pstartin_F,
-          pstartout=pstartout_F,
+          A=(fluidVol*4/exchSurface_F)^2/4*pi,
+          omega=fluidVol*4/exchSurface_F*pi,
+          Dhyd=fluidVol*4/exchSurface_F,
           FFtype=FFtype_F,
           HydraulicCapacitance=HCtype_F,
-          hstart=hstart_F,
-          hstartin=hstart_F_In,
-          hstartout=hstart_F_Out,
           Kfnom=Kfnom_F,
           dpnom=dpnom_F,
           rhonom=rhonom_F,
-          Cfnom=Cfnom_F)         annotation (Placement(transformation(extent={{
-                  -10,-58},{10,-38}}, rotation=0)));
-        Thermal.ConvHT convHT(gamma=gamma_F, N=N_F,
-          Tstart11=Tstart_M_In,
-          Tstart1N=Tstart_M_Out,
-          Tstart21=Tstart_F_In,
-          Tstart2N=Tstart_F_Out,
-          Tstart1=Tstart_M,
-          Tstart2=Tstart_F) 
+          Cfnom=Cfnom_F,
+          FluidPhaseStart=FluidPhaseStart,
+          pstart=pstart_F)       annotation (Placement(transformation(extent={{
+                  -10,-60},{10,-40}}, rotation=0)));
+        Thermal.ConvHT convHT(               N=N_F,
+          gamma=gamma_F) 
           annotation (Placement(transformation(extent={{-10,-40},{10,-20}},
                 rotation=0)));
         Thermal.MetalTube metalTube(
@@ -4058,13 +3065,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
           N=N_F,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           L=exchSurface_F^2/(fluidVol*pi*4),
-          rint=1/exchSurface_F*fluidVol*4/2,
-          Tstart1=Tstart_M_In,
-          TstartN=Tstart_M_Out,
+          rint=fluidVol*4/exchSurface_F/2,
           WallRes=false,
-          Tstart=Tstart_M,
-          rext=1/extSurfaceTub*(metalVol + fluidVol)*4/2) 
-                 annotation (Placement(transformation(extent={{-10,-8},{10,-28}},
+          rext=(metalVol + fluidVol)*4/extSurfaceTub/2,
+          Tstartbar=Tstartbar_M) 
+                 annotation (Placement(transformation(extent={{-10,-6},{10,-26}},
                 rotation=0)));
         Gas.Flow1D gasFlow(
           Dhyd=1,
@@ -4072,11 +3077,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
           N=N_G,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
-          pstart=pstart_G,
-          Tstartin=Tstart_G_In,
-          Tstartout=Tstart_G_Out,
-          Tstart=Tstart_G,
           QuasiStatic=gasQuasiStatic,
+          pstart=pstart_G,
           L=L,
           A=gasVol/L,
           omega=exchSurface_G/L,
@@ -4084,33 +3086,31 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Kfnom=Kfnom_G,
           dpnom=dpnom_G,
           rhonom=rhonom_G,
-          Cfnom=Cfnom_G)         annotation (Placement(transformation(extent={{
+          Cfnom=Cfnom_G,
+          Tstartbar=Tstartbar_G)  annotation (Placement(transformation(extent={{
                   -12,58},{12,38}}, rotation=0)));
-        Thermal.CounterCurrent cC(     counterCurrent=counterCurrent, N=N_F) 
+        Thermal.CounterCurrent cC(                                    N=N_F,
+            counterCurrent=counterCurrent) 
           annotation (Placement(transformation(extent={{-10,-10},{10,10}},
                 rotation=0)));
         Thermal.HeatFlowDistribution heatFlowDistribution(
           N=N_F,
           A1=exchSurface_G,
           A2=extSurfaceTub) 
-          annotation (Placement(transformation(extent={{-10,6},{10,26}},
+          annotation (Placement(transformation(extent={{-10,4},{10,24}},
                 rotation=0)));
         Thermal.ConvHT2N convHT2N(
           N1=N_G,
           N2=N_F,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_In,
-          Tstart2N=Tstart_M_Out,
-          gamma=gamma_G,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M)    annotation (Placement(transformation(extent={{
-                  -10,22},{10,42}}, rotation=0)));
+          gamma=gamma_G)       annotation (Placement(transformation(extent={{
+                  -10,20},{10,40}}, rotation=0)));
 
         final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases
+          "Fluid phase (only for initialization!)" annotation(Dialog(tab="Initialization"));
       equation
         connect(fluidFlow.wall, convHT.side2) 
-                                           annotation (Line(points={{0,-43},{0,
+                                           annotation (Line(points={{0,-45},{0,
                 -33.1}}, color={255,127,0}));
         connect(gasFlow.infl, gasIn) annotation (Line(
             points={{-12,48},{-100,48},{-100,0}},
@@ -4121,29 +3121,28 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={159,159,223},
             thickness=0.5));
         connect(fluidFlow.outfl, waterOut) 
-                                        annotation (Line(points={{10,-48},{40,
-                -48},{40,-100},{0,-100}}, thickness=0.5,
+                                        annotation (Line(points={{10,-50},{40,
+                -50},{40,-100},{0,-100}}, thickness=0.5,
             color={0,0,255}));
         connect(fluidFlow.infl, waterIn) 
-                                      annotation (Line(points={{-10,-48},{-40,
-                -48},{-40,100},{0,100}}, thickness=0.5,
+                                      annotation (Line(points={{-10,-50},{-40,
+                -50},{-40,100},{0,100}}, thickness=0.5,
             color={0,0,255}));
-        connect(heatFlowDistribution.side2,cC. side1) annotation (Line(points={
-                {0,12.9},{0,3}}, color={255,127,0}));
-        connect(convHT2N.side1,gasFlow. wall) annotation (Line(points={{0,35},{
+        connect(heatFlowDistribution.side2, cC.side1) annotation (Line(points={
+                {0,10.9},{0,3}}, color={255,127,0}));
+        connect(convHT2N.side1, gasFlow.wall) annotation (Line(points={{0,33},{
                 0,43}}, color={255,127,0}));
-        connect(convHT2N.side2, heatFlowDistribution.side1) annotation (Line(
-              points={{0,28.9},{0,19}}, color={255,127,0}));
-        connect(metalTube.int, convHT.side1) annotation (Line(points={{0,-21},{
+        connect(heatFlowDistribution.side1, convHT2N.side2) annotation (Line(
+              points={{0,17},{0,26.9}}, color={255,127,0}));
+        connect(metalTube.int, convHT.side1) annotation (Line(points={{0,-19},{
                 0,-27}}, color={255,127,0}));
-        connect(metalTube.ext, cC.side2) annotation (Line(points={{0,-14.9},{0,
+        connect(metalTube.ext, cC.side2) annotation (Line(points={{0,-12.9},{0,
                 -3.1}}, color={255,127,0}));
         annotation (Diagram(graphics));
       end HE2ph;
 
       model ParHE "Parallel heat exchangers fluid - gas"
-        extends Interfaces.ParallelHE(pstartout_F_A=fluidNomPressure_A-dpnom_F_A,
-                                      pstartout_F_B=fluidNomPressure_B-dpnom_F_B);
+        extends Interfaces.ParallelHE;
 
         parameter SI.CoefficientOfHeatTransfer gamma_G_A
           "Constant heat transfer coefficient in the gas side"     annotation (Dialog(group = "side A"));
@@ -4206,28 +3205,19 @@ package PowerPlants "Models of thermoelectrical power plants components"
           A=(fluidVol_A*4/exchSurface_F_A)^2/4*pi,
           omega=fluidVol_A*4/exchSurface_F_A*pi,
           Dhyd=fluidVol_A*4/exchSurface_F_A,
-          pstartin=pstartin_F_A,
-          pstartout=pstartout_F_A,
-          hstart=hstart_F_A,
           wnom=fluidNomFlowRate_A,
           FFtype=FFtype_F_A,
           HydraulicCapacitance=HCtype_F_A,
-          hstartin=hstart_F_A_In,
-          hstartout=hstart_F_A_Out,
           Kfnom=Kfnom_F_A,
           dpnom=dpnom_F_A,
           rhonom=rhonom_F_A,
-          Cfnom=Cfnom_F_A)       annotation (Placement(transformation(extent={{
+          Cfnom=Cfnom_F_A,
+          FluidPhaseStart=FluidPhaseStart_A,
+          pstart=pstart_F_A)     annotation (Placement(transformation(extent={{
                   -38,-56},{-18,-36}}, rotation=0)));
         Thermal.ConvHT convHT_A(
           N=N_F_A,
-          gamma=gamma_F_A,
-          Tstart11=Tstart_M_A_In,
-          Tstart1N=Tstart_M_A_Out,
-          Tstart21=Tstart_F_A_In,
-          Tstart2N=Tstart_F_A_Out,
-          Tstart1=Tstart_M_A,
-          Tstart2=Tstart_F_A) 
+          gamma=gamma_F_A) 
           annotation (Placement(transformation(extent={{-38,-38},{-18,-18}},
                 rotation=0)));
         Thermal.MetalTube metalTube_A(
@@ -4236,12 +3226,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           N=N_F_A,
           L=exchSurface_F_A^2/(fluidVol_A*pi*4),
           rint=fluidVol_A*4/exchSurface_F_A/2,
-          Tstart1=Tstart_M_A_In,
-          TstartN=Tstart_M_A_Out,
           WallRes=false,
-          Tstart=Tstart_M_A,
           rext=(metalVol_A + fluidVol_A)*4/extSurfaceTub_A/2,
-          rhomcm=rhomcm_A) 
+          rhomcm=rhomcm_A,
+          Tstartbar=Tstartbar_M_A) 
                  annotation (Placement(transformation(extent={{-38,-6},{-18,-26}},
                 rotation=0)));
         Gas.Flow1D gasFlow(
@@ -4252,9 +3240,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           redeclare package Medium = FlueGasMedium,
           QuasiStatic=gasQuasiStatic,
           pstart=pstart_G,
-          Tstartin=Tstart_G_In,
-          Tstartout=Tstart_G_Out,
-          Tstart=Tstart_G,
           L=L,
           A=gasVol/L,
           omega=(exchSurface_G_A + exchSurface_G_B)/L,
@@ -4262,7 +3247,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Kfnom=Kfnom_G,
           dpnom=dpnom_G,
           rhonom=rhonom_G,
-          Cfnom=Cfnom_G)         annotation (Placement(transformation(extent={{
+          Cfnom=Cfnom_G,
+          Tstartbar=Tstartbar_G)  annotation (Placement(transformation(extent={{
                   -12,60},{12,40}}, rotation=0)));
       Water.Flow1D fluidBFlow(
           Nt=1,
@@ -4274,27 +3260,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
           omega=fluidVol_B*4/exchSurface_F_B*pi,
           Dhyd=fluidVol_B*4/exchSurface_F_B,
           wnom=fluidNomFlowRate_B,
-          pstartin=pstartin_F_B,
-          pstartout=pstartout_F_B,
-          hstart=hstart_F_B,
           FFtype=FFtype_F_B,
           HydraulicCapacitance=HCtype_F_B,
-          hstartin=hstart_F_B_In,
-          hstartout=hstart_F_B_Out,
           Kfnom=Kfnom_F_B,
           dpnom=dpnom_F_B,
           rhonom=rhonom_F_B,
-          Cfnom=Cfnom_F_B)       annotation (Placement(transformation(extent={{
+          Cfnom=Cfnom_F_B,
+          FluidPhaseStart=FluidPhaseStart_B,
+          pstart=pstart_F_B)     annotation (Placement(transformation(extent={{
                   38,-56},{18,-36}}, rotation=0)));
         Thermal.ConvHT convHT_B(
           N=N_F_B,
-          gamma=gamma_F_B,
-          Tstart11=Tstart_M_B_In,
-          Tstart1N=Tstart_M_B_Out,
-          Tstart21=Tstart_F_B_In,
-          Tstart2N=Tstart_F_B_Out,
-          Tstart1=Tstart_M_B,
-          Tstart2=Tstart_F_B) 
+          gamma=gamma_F_B) 
           annotation (Placement(transformation(extent={{18,-38},{38,-18}},
                 rotation=0)));
         Thermal.MetalTube metalTube_B(
@@ -4303,12 +3280,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           L=exchSurface_F_B^2/(fluidVol_B*pi*4),
           rint=fluidVol_B*4/exchSurface_F_B/2,
           N=N_F_B,
-          Tstart1=Tstart_M_B_In,
-          TstartN=Tstart_M_B_Out,
           WallRes=false,
-          Tstart=Tstart_M_B,
           rext=(metalVol_B + fluidVol_B)*4/extSurfaceTub_B/2,
-          rhomcm=rhomcm_B) 
+          rhomcm=rhomcm_B,
+          Tstartbar=Tstartbar_M_B) 
                  annotation (Placement(transformation(extent={{18,-6},{38,-26}},
                 rotation=0)));
         Thermal.CounterCurrent cC_A(N=N_F_A, counterCurrent=counterCurrent_A) 
@@ -4332,27 +3307,21 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Thermal.ConvHT2N convHT2N_A(
           N1=N_G,
           N2=N_F_A,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_A_In,
-          Tstart2N=Tstart_M_A_Out,
-          gamma=gamma_G_A,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M_A)    annotation (Placement(transformation(extent={{
+          gamma=gamma_G_A)       annotation (Placement(transformation(extent={{
                   -38,24},{-18,44}}, rotation=0)));
         Thermal.ConvHT2N convHT2N_B(
           N1=N_G,
           N2=N_F_B,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_B_In,
-          Tstart2N=Tstart_M_B_Out,
-          gamma=gamma_G_B,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M_B)    annotation (Placement(transformation(extent={{
+          gamma=gamma_G_B)       annotation (Placement(transformation(extent={{
                   18,24},{38,44}}, rotation=0)));
 
         final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart_A=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)" 
+                                                  annotation(Dialog(tab="Initialization",group = "side A"));
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart_B=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)" 
+                                                  annotation(Dialog(tab="Initialization",group = "side B"));
       equation
         connect(heatFlowDistribution_A.side2, cC_A.side1) annotation (Line(
               points={{-28,14.9},{-28,5}}, color={255,127,0}));
@@ -4495,35 +3464,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           lambda=lambda,
           extSurfaceTub_A=extSurfaceTub_A_p1,
           extSurfaceTub_B=extSurfaceTub_B_p1,
-          use_T=use_T,
           SSInit=SSInit,
-          Tstart_G_In=Tstart_G_In_p1,
-          Tstart_G_Out=Tstart_G_Out_p1,
-          Tstart_M_A_In=Tstart_M_A_In_p1,
-          Tstart_M_A_Out=Tstart_M_A_Out_p1,
-          Tstart_M_A=Tstart_M_A_p1,
-          Tstart_F_A_In=Tstart_F_A_In_p1,
-          Tstart_F_A_Out=Tstart_F_A_Out_p1,
-          Tstart_F_A=Tstart_F_A_p1,
-          hstart_F_A_In=hstart_F_A_In_p1,
-          hstart_F_A_Out=hstart_F_A_Out_p1,
-          hstart_F_A=hstart_F_A_p1,
-          Tstart_M_B_In=Tstart_M_B_In_p1,
-          Tstart_M_B_Out=Tstart_M_B_Out_p1,
-          Tstart_F_B_In=Tstart_F_B_In_p1,
-          Tstart_F_B=Tstart_F_B_p1,
-          hstart_F_B_In=hstart_F_B_In_p1,
-          hstart_F_B_Out=hstart_F_B_Out_p1,
-          hstart_F_B=hstart_F_B_p1,
           pstart_G=pstart_G_p1,
-          pstartin_F_A=pstartin_F_A_p1,
-          pstartout_F_A=pstartout_F_A_p1,
-          pstartin_F_B=pstartin_F_B_p1,
-          pstartout_F_B=pstartout_F_B_p1,
           rhomcm_A=rhomcm_A_p1,
           rhomcm_B=rhomcm_B_p1,
-          Tstart_M_B=Tstart_M_B_p1,
-          Tstart_F_B_Out=Tstart_F_B_Out_p1) 
+          FluidPhaseStart_A=FluidPhaseStart_A,
+          FluidPhaseStart_B=FluidPhaseStart_B,
+          pstart_F_A=pstart_F_A_p1,
+          pstart_F_B=pstart_F_B_p1,
+          Tstartbar_G=Tstartbar_G_p1) 
           annotation (Placement(transformation(extent={{-46,28},{-26,48}},
                 rotation=0)));
         Water.ValveLiq valveA(
@@ -4533,8 +3482,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           pnom=pnom_valA,
           dpnom=dpnom_valA,
           wnom=wnom_valA,
-          CheckValve=true,
-          hstart=hstart_valA)  annotation (Placement(transformation(
+          CheckValve=true)     annotation (Placement(transformation(
               origin={-26,-24},
               extent={{8,-8},{-8,8}},
               rotation=180)));
@@ -4545,24 +3493,22 @@ package PowerPlants "Models of thermoelectrical power plants components"
           pnom=pnom_valB,
           dpnom=dpnom_valB,
           wnom=wnom_valB,
-          CheckValve=true,
-          hstart=hstart_valB) annotation (Placement(transformation(
+          CheckValve=true)    annotation (Placement(transformation(
               origin={-26,10},
               extent={{8,-8},{-8,8}},
               rotation=180)));
         Water.Mixer flowJoinA(
           redeclare package Medium = FluidMedium,
-          V=3,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
-          pstart=pstartout_F_A_p1,
-          hstart=hstart_F_A_Out_p1) 
-                                annotation (Placement(transformation(extent={{
+          V=0.3,
+          FluidPhaseStart=FluidPhaseStart_A,
+          pstart=pstart_F_A_p1) annotation (Placement(transformation(extent={{
                   -10,-18},{10,2}}, rotation=0)));
         Water.Mixer flowJoinB(   redeclare package Medium = FluidMedium,
-          V=3,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
-          pstart=pstartout_F_B_p1,
-          hstart=hstart_F_B_Out_p1) 
+          V=0.3,
+          FluidPhaseStart=FluidPhaseStart_B,
+          pstart=pstart_F_B_p1) 
           annotation (Placement(transformation(extent={{-10,6},{10,26}},
                 rotation=0)));
         ParHE pHE2(
@@ -4598,35 +3544,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           lambda=lambda,
           extSurfaceTub_A=extSurfaceTub_A_p2,
           extSurfaceTub_B=extSurfaceTub_B_p2,
-          use_T=use_T,
           SSInit=SSInit,
-          Tstart_G_In=Tstart_G_In_p2,
-          Tstart_G_Out=Tstart_G_Out_p2,
-          Tstart_M_A_In=Tstart_M_A_In_p2,
-          Tstart_M_A_Out=Tstart_M_A_Out_p2,
-          Tstart_M_A=Tstart_M_A_p2,
-          Tstart_F_A_In=Tstart_F_A_In_p2,
-          Tstart_F_A_Out=Tstart_F_A_Out_p2,
-          Tstart_F_A=Tstart_F_A_p2,
-          hstart_F_A_In=hstart_F_A_In_p2,
-          hstart_F_A_Out=hstart_F_A_Out_p2,
-          hstart_F_A=hstart_F_A_p2,
-          Tstart_M_B_In=Tstart_M_B_In_p2,
-          Tstart_M_B_Out=Tstart_M_B_Out_p2,
-          Tstart_F_B_In=Tstart_F_B_In_p2,
-          Tstart_F_B=Tstart_F_B_p2,
-          hstart_F_B_In=hstart_F_B_In_p2,
-          hstart_F_B_Out=hstart_F_B_Out_p2,
-          hstart_F_B=hstart_F_B_p2,
           pstart_G=pstart_G_p2,
-          pstartin_F_A=pstartin_F_A_p2,
-          pstartout_F_A=pstartout_F_A_p2,
-          pstartin_F_B=pstartin_F_B_p2,
-          pstartout_F_B=pstartout_F_B_p2,
           rhomcm_A=rhomcm_A_p2,
           rhomcm_B=rhomcm_B_p2,
-          Tstart_M_B=Tstart_M_B_p2,
-          Tstart_F_B_Out=Tstart_F_B_Out_p2) 
+          FluidPhaseStart_A=FluidPhaseStart_A,
+          FluidPhaseStart_B=FluidPhaseStart_B,
+          pstart_F_A=pstart_F_A_p2,
+          pstart_F_B=pstart_F_B_p2,
+          Tstartbar_G=Tstartbar_G_p2) 
           annotation (Placement(transformation(extent={{26,-36},{46,-16}},
                 rotation=0)));
         Water.SensT intermediate_B(redeclare package Medium = FluidMedium) 
@@ -4635,6 +3561,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.SensT intermediate_A(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(extent={{16,-12},{30,2}},
                 rotation=0)));
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart_A=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart_B=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)";
       equation
         connect(pHE1.waterInB, waterInB)  annotation (Line(points={{-32,48},{
                 -32,54},{12,54},{12,100},{40,100}}, thickness=0.5,
@@ -4665,7 +3595,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 {-32,22},{-32,28}}, thickness=0.5,
             color={0,0,255}));
         connect(valveB.outlet,flowJoinB. in2) annotation (Line(points={{-18,10},
-                {-12.95,10},{-12.95,10},{-8,10}},   thickness=0.5));
+                {-12.95,10},{-8,10}},               thickness=0.5,
+            color={0,0,255}));
         connect(intermediate_A.outlet, pHE2.waterInA) 
           annotation (Line(points={{27.2,-7.8},{32,-7.8},{32,-16}}, thickness=0.5,
             color={0,0,255}));
@@ -4722,20 +3653,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           A=(fluidVol*4/exchSurface_F)^2/4*pi,
           omega=fluidVol*4/exchSurface_F*pi,
           Dhyd=fluidVol*4/exchSurface_F,
-          pstartin=pstartin_F,
-          pstartout=pstartout_F,
-          hstart=hstart_F,
-          hstartin=hstart_F_In,
-          hstartout=hstart_F_Out) 
-                                 annotation (Placement(transformation(extent={{
+          FluidPhaseStart=FluidPhaseStart,
+          pstart=pstart_F)       annotation (Placement(transformation(extent={{
                   -10,-50},{10,-30}}, rotation=0)));
-        Thermal.ConvHT convHT(gamma=gamma_F, N=N_F,
-          Tstart11=Tstart_M_In,
-          Tstart1N=Tstart_M_Out,
-          Tstart21=Tstart_F_In,
-          Tstart2N=Tstart_F_Out,
-          Tstart1=Tstart_M,
-          Tstart2=Tstart_F) 
+        Thermal.ConvHT convHT(gamma=gamma_F, N=N_F) 
           annotation (Placement(transformation(extent={{-10,-30},{10,-10}},
                 rotation=0)));
         Thermal.MetalTube metalTube(
@@ -4745,11 +3666,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           L=exchSurface_F^2/(fluidVol*pi*4),
           rint=fluidVol*4/exchSurface_F/2,
-          Tstart1=Tstart_M_In,
-          TstartN=Tstart_M_Out,
           WallRes=false,
-          Tstart=Tstart_M,
-          rext=(metalVol + fluidVol)*4/extSurfaceTub/2) 
+          rext=(metalVol + fluidVol)*4/extSurfaceTub/2,
+          Tstartbar=Tstartbar_M) 
                  annotation (Placement(transformation(extent={{-10,10},{10,-10}},
                 rotation=0)));
         Gas.Flow1D gasFlow(
@@ -4760,26 +3679,21 @@ package PowerPlants "Models of thermoelectrical power plants components"
           N=N_G,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
-          Tstartin=Tstart_G_In,
-          Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          Tstart=Tstart_G,
           L=L,
           A=gasVol/L,
-          omega=exchSurface_G/L) annotation (Placement(transformation(extent={{
+          omega=exchSurface_G/L,
+          Tstartbar=Tstartbar_G)  annotation (Placement(transformation(extent={{
                   -12,50},{12,30}}, rotation=0)));
         Thermal.ConvHT2N convHT2N(
           N1=N_G,
           N2=N_F,
-          gamma=gamma_G,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_In,
-          Tstart2N=Tstart_M_Out,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M)    annotation (Placement(transformation(extent={{
+          gamma=gamma_G)       annotation (Placement(transformation(extent={{
                   -10,10},{10,30}}, rotation=0)));
         final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)" 
+                                                  annotation(Dialog(tab="Initialization"));
       equation
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (Line(points={{0,-35},{0,
@@ -4809,7 +3723,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
         annotation (Diagram(graphics));
       end HE_simp;
 
-      model HE2ph_simp "Simplified Heat Exchanger fluid - gas (fluid 2-phase)"
+      model HE2ph_simp "Simplified Heat Exchanger fluid - gas (2phases)"
         extends Interfaces.HeatExchanger(extSurfaceTub = exchSurface_G);
 
         parameter SI.CoefficientOfHeatTransfer gamma_G
@@ -4826,23 +3740,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
           redeclare package Medium = FluidMedium,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           L=exchSurface_F^2/(fluidVol*pi*4),
-          A=(1/exchSurface_F*fluidVol*4)^2/4*pi,
-          omega=1/exchSurface_F*fluidVol*4*pi,
-          Dhyd=1/exchSurface_F*fluidVol*4,
-          pstartin=pstartin_F,
-          pstartout=pstartout_F,
-          hstart=hstart_F,
-          hstartin=hstart_F_In,
-          hstartout=hstart_F_Out) 
-                                 annotation (Placement(transformation(extent={{
+          A=(fluidVol*4/exchSurface_F)^2/4*pi,
+          omega=fluidVol*4/exchSurface_F*pi,
+          Dhyd=fluidVol*4/exchSurface_F,
+          FluidPhaseStart=FluidPhaseStart,
+          pstart=pstart_F)       annotation (Placement(transformation(extent={{
                   -10,-50},{10,-30}}, rotation=0)));
-        Thermal.ConvHT convHT(gamma=gamma_F, N=N_F,
-          Tstart11=Tstart_M_In,
-          Tstart1N=Tstart_M_Out,
-          Tstart21=Tstart_F_In,
-          Tstart2N=Tstart_F_Out,
-          Tstart1=Tstart_M,
-          Tstart2=Tstart_F) 
+        Thermal.ConvHT convHT(gamma=gamma_F, N=N_F) 
           annotation (Placement(transformation(extent={{-10,-30},{10,-10}},
                 rotation=0)));
         Thermal.MetalTube metalTube(
@@ -4851,12 +3755,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           N=N_F,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           L=exchSurface_F^2/(fluidVol*pi*4),
-          rint=1/exchSurface_F*fluidVol*4/2,
+          rint=fluidVol*4/exchSurface_F/2,
           WallRes=false,
-          Tstart1=Tstart_M_In,
-          TstartN=Tstart_M_Out,
-          Tstart=Tstart_M,
-          rext=1/extSurfaceTub*(metalVol + fluidVol)*4/2) 
+          rext=(metalVol + fluidVol)*4/extSurfaceTub/2,
+          Tstartbar=Tstartbar_M) 
                  annotation (Placement(transformation(extent={{-10,10},{10,-10}},
                 rotation=0)));
         Gas.Flow1D gasFlow(
@@ -4867,26 +3769,21 @@ package PowerPlants "Models of thermoelectrical power plants components"
           N=N_G,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
-          Tstartin=Tstart_G_In,
-          Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          Tstart=Tstart_G,
           L=L,
           A=gasVol/L,
-          omega=exchSurface_G/L) annotation (Placement(transformation(extent={{
+          omega=exchSurface_G/L,
+          Tstartbar=Tstartbar_G)  annotation (Placement(transformation(extent={{
                   -12,50},{12,30}}, rotation=0)));
         Thermal.ConvHT2N convHT2N(
           N1=N_G,
           N2=N_F,
-          gamma=gamma_G,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_In,
-          Tstart2N=Tstart_M_Out,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M)    annotation (Placement(transformation(extent={{
+          gamma=gamma_G)       annotation (Placement(transformation(extent={{
                   -10,10},{10,30}}, rotation=0)));
         final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases
+          "Fluid phase (only for initialization!)" 
+                                                  annotation(Dialog(tab="Initialization"));
       equation
         connect(fluidFlow.wall, convHT.side2) 
                                            annotation (Line(points={{0,-35},{0,
@@ -4947,23 +3844,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
           A=(fluidVol_A*4/exchSurface_F_A)^2/4*pi,
           omega=fluidVol_A*4/exchSurface_F_A*pi,
           Dhyd=fluidVol_A*4/exchSurface_F_A,
-          pstartin=pstartin_F_A,
-          pstartout=pstartout_F_A,
-          hstart=hstart_F_A,
           wnom=fluidNomFlowRate_A,
-          hstartin=hstart_F_A_In,
-          hstartout=hstart_F_A_Out) 
-                                 annotation (Placement(transformation(extent={{
+          FluidPhaseStart=FluidPhaseStart_A,
+          pstart=pstart_F_A)     annotation (Placement(transformation(extent={{
                   -38,-52},{-18,-32}}, rotation=0)));
         Thermal.ConvHT convHT_A(
           N=N_F_A,
-          gamma=gamma_F_A,
-          Tstart11=Tstart_M_A_In,
-          Tstart1N=Tstart_M_A_Out,
-          Tstart21=Tstart_F_A_In,
-          Tstart2N=Tstart_F_A_Out,
-          Tstart1=Tstart_M_A,
-          Tstart2=Tstart_F_A) 
+          gamma=gamma_F_A) 
           annotation (Placement(transformation(extent={{-38,-30},{-18,-10}},
                 rotation=0)));
         Thermal.MetalTube metalTube_A(
@@ -4973,11 +3860,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           L=exchSurface_F_A^2/(fluidVol_A*pi*4),
           rint=fluidVol_A*4/exchSurface_F_A/2,
           WallRes=false,
-          Tstart1=Tstart_M_A_In,
-          TstartN=Tstart_M_A_Out,
-          Tstart=Tstart_M_A,
           rext=(metalVol_A + fluidVol_A)*4/extSurfaceTub_A/2,
-          rhomcm=rhomcm_A) 
+          rhomcm=rhomcm_A,
+          Tstartbar=Tstartbar_M_A) 
                  annotation (Placement(transformation(extent={{-38,6},{-18,-14}},
                 rotation=0)));
         Gas.Flow1D gasFlow(
@@ -4988,14 +3873,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
           N=N_G,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
-          Tstartin=Tstart_G_In,
-          Tstartout=Tstart_G_Out,
           pstart=pstart_G,
-          Tstart=Tstart_G,
           L=L,
           A=gasVol/L,
-          omega=(exchSurface_G_A + exchSurface_G_B)/L) 
-                                 annotation (Placement(transformation(extent={{
+          omega=(exchSurface_G_A + exchSurface_G_B)/L,
+          Tstartbar=Tstartbar_G)  annotation (Placement(transformation(extent={{
                   -12,64},{12,44}}, rotation=0)));
       Water.Flow1D fluidBFlow(
           Nt=1,
@@ -5008,22 +3890,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
           omega=fluidVol_B*4/exchSurface_F_B*pi,
           Dhyd=fluidVol_B*4/exchSurface_F_B,
           wnom=fluidNomFlowRate_B,
-          pstartin=pstartin_F_B,
-          pstartout=pstartout_F_B,
-          hstart=hstart_F_B,
-          hstartin=hstart_F_B_In,
-          hstartout=hstart_F_B_Out) 
-                                 annotation (Placement(transformation(extent={{
+          FluidPhaseStart=FluidPhaseStart_B,
+          pstart=pstart_F_B)     annotation (Placement(transformation(extent={{
                   38,-52},{18,-32}}, rotation=0)));
         Thermal.ConvHT convHT_B(
           N=N_F_B,
-          gamma=gamma_F_B,
-          Tstart11=Tstart_M_B_In,
-          Tstart1N=Tstart_M_B_Out,
-          Tstart21=Tstart_F_B_In,
-          Tstart2N=Tstart_F_B_Out,
-          Tstart1=Tstart_M_B,
-          Tstart2=Tstart_F_B) 
+          gamma=gamma_F_B) 
           annotation (Placement(transformation(extent={{18,-30},{38,-10}},
                 rotation=0)));
         Thermal.MetalTube metalTube_B(
@@ -5033,36 +3905,28 @@ package PowerPlants "Models of thermoelectrical power plants components"
           rint=fluidVol_B*4/exchSurface_F_B/2,
           N=N_F_B,
           WallRes=false,
-          Tstart1=Tstart_M_B_In,
-          TstartN=Tstart_M_B_Out,
-          Tstart=Tstart_M_B,
           rext=(metalVol_B + fluidVol_B)*4/extSurfaceTub_B/2,
-          rhomcm=rhomcm_B) 
+          rhomcm=rhomcm_B,
+          Tstartbar=Tstartbar_M_B) 
                  annotation (Placement(transformation(extent={{18,6},{38,-14}},
                 rotation=0)));
         Thermal.ConvHT2N convHT2N_A(
           N1=N_G,
           N2=N_F_A,
-          gamma=gamma_G_A,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_A_In,
-          Tstart2N=Tstart_M_A_Out,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M_A)    annotation (Placement(transformation(extent={{
+          gamma=gamma_G_A)       annotation (Placement(transformation(extent={{
                   -38,10},{-18,30}}, rotation=0)));
         Thermal.ConvHT2N convHT2N_B(
           N1=N_G,
           N2=N_F_B,
-          gamma=gamma_G_B,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_B_In,
-          Tstart2N=Tstart_M_B_Out,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M_B)    annotation (Placement(transformation(extent={{
+          gamma=gamma_G_B)       annotation (Placement(transformation(extent={{
                   18,10},{38,30}}, rotation=0)));
         final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart_A=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)" 
+                                                  annotation(Dialog(tab="Initialization",group = "side A"));
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart_B=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)" 
+                                                  annotation(Dialog(tab="Initialization",group = "side B"));
       equation
         connect(convHT_A.side2, fluidAFlow.wall)    annotation (Line(points={{
                 -28,-23.1},{-28,-37}}, color={255,127,0}));
@@ -5114,12 +3978,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
         "Heat Exchanger fluid - gas, with variable heat transfer coefficient only fluid side"
         extends Interfaces.HeatExchanger;
 
-        parameter SI.CoefficientOfHeatTransfer gamma_G
-          "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_nom_F
-          "Nominal h.t.c. coefficient fluid side";
-        parameter Real kw_F
-          "Exponent of the mass flow rate in the h.t.c. correlation fluid side";
+        parameter SI.CoefficientOfHeatTransfer gamma_nom_G
+          "Nominal h.t.c. coefficient gas side";
+        parameter Real kw_G
+          "Exponent of the mass flow rate in the h.t.c. correlation gas side";
+        parameter SI.CoefficientOfHeatTransfer gamma_F
+          "Constant heat transfer coefficient in the fluid side";
         parameter Boolean gasQuasiStatic=false
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         parameter Boolean counterCurrent=true "Counter-current flow";
@@ -5133,27 +3997,26 @@ package PowerPlants "Models of thermoelectrical power plants components"
           L=exchSurface_F^2/(fluidVol*pi*4),
           rint=fluidVol*4/exchSurface_F/2,
           WallRes=false,
-          Tstart1=Tstart_M_In,
-          TstartN=Tstart_M_Out,
-          Tstart=Tstart_M,
-          rext=(metalVol + fluidVol)*4/extSurfaceTub/2) 
+          rext=(metalVol + fluidVol)*4/extSurfaceTub/2,
+          Tstartbar=Tstartbar_M) 
                  annotation (Placement(transformation(extent={{-10,-4},{10,-24}},
                 rotation=0)));
-        Gas.Flow1D gasFlow(
+        FlowGas1Dhtc gasFlow(
           Dhyd=1,
           wnom=gasNomFlowRate,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           N=N_G,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FlueGasMedium,
-          Tstartin=Tstart_G_In,
-          Tstartout=Tstart_G_Out,
           pstart=pstart_G,
           QuasiStatic=gasQuasiStatic,
           L=L,
           A=gasVol/L,
-          omega=exchSurface_G/L) annotation (Placement(transformation(extent={{
-                  -12,60},{12,40}}, rotation=0)));
+          omega=exchSurface_G/L,
+          gamma_nom=gamma_nom_G,
+          kw=kw_G,
+          Tstartbar=Tstartbar_G) annotation (Placement(transformation(extent={{-12,66},
+                  {12,46}},         rotation=0)));
         Thermal.CounterCurrent cC(counterCurrent=counterCurrent, N=N_F) 
           annotation (Placement(transformation(extent={{-10,-8},{10,12}},
                 rotation=0)));
@@ -5163,8 +4026,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           A2=extSurfaceTub) 
           annotation (Placement(transformation(extent={{-10,8},{10,28}},
                 rotation=0)));
-        ThermoPower.PowerPlants.HRSG.Components.Flow1Dhtc fluidFlow_Extension(
-                                                  Nt=1,
+        Water.Flow1D fluidFlow_Extension(         Nt=1,
           N=N_F,
           wnom=fluidNomFlowRate,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
@@ -5173,49 +4035,33 @@ package PowerPlants "Models of thermoelectrical power plants components"
           A=(fluidVol*4/exchSurface_F)^2/4*pi,
           omega=fluidVol*4/exchSurface_F*pi,
           Dhyd=fluidVol*4/exchSurface_F,
-          pstartin=pstartin_F,
-          pstartout=pstartout_F,
-          hstart=hstart_F,
-          hstartin=hstart_F_In,
-          hstartout=hstart_F_Out,
-          gamma_nom=gamma_nom_F,
-          kw=kw_F) 
+          FluidPhaseStart=FluidPhaseStart,
+          pstart=pstart_F) 
           annotation (Placement(transformation(extent={{-10,-56},{10,-36}},
                 rotation=0)));
-        Thermal.ConvHT_htc convHT_htc(
-          N=N_F,
-          TstartF1=Tstart_M_In,
-          TstartFN=Tstart_M_Out,
-          TstartO1=Tstart_F_In,
-          TstartON=Tstart_F_Out,
-          TstartF=Tstart_M,
-          TstartO=Tstart_F)    annotation (Placement(transformation(extent={{
+        Thermal.ConvHT convHT_htc(
+          N=N_F, gamma=gamma_F) 
+                               annotation (Placement(transformation(extent={{
                   -10,-20},{10,-40}}, rotation=0)));
-        Thermal.ConvHT2N convHT2N(
+        Thermal.ConvHT2N_htc convHT2N(
           N1=N_G,
-          N2=N_F,
-          gamma=gamma_G,
-          Tstart11=Tstart_G_In,
-          Tstart1N=Tstart_G_Out,
-          Tstart21=Tstart_M_In,
-          Tstart2N=Tstart_M_Out,
-          Tstart1=Tstart_G,
-          Tstart2=Tstart_M)    annotation (Placement(transformation(extent={{
+          N2=N_F)              annotation (Placement(transformation(extent={{
                   -10,24},{10,44}}, rotation=0)));
         final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)" 
+                                                  annotation(Dialog(tab="Initialization"));
       equation
         connect(gasFlow.infl, gasIn) annotation (Line(
-            points={{-12,50},{-100,50},{-100,0}},
+            points={{-12,56},{-100,56},{-100,0}},
             color={159,159,223},
             thickness=0.5));
         connect(gasFlow.outfl, gasOut) annotation (Line(
-            points={{12,50},{100,50},{100,0}},
+            points={{12,56},{100,56},{100,0}},
             color={159,159,223},
             thickness=0.5));
         connect(heatFlowDistribution.side2,cC. side1) annotation (Line(points={
                 {0,14.9},{0,5}}, color={255,127,0}));
-        connect(convHT_htc.fluidside, fluidFlow_Extension.wall)   annotation (Line(
-              points={{0,-33},{0,-41}}, color={0,0,255}));
         connect(fluidFlow_Extension.infl, waterIn)   annotation (Line(points={{
                 -10,-46},{-40,-46},{-40,100},{0,100}}, thickness=0.5,
             color={0,0,255}));
@@ -5224,12 +4070,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(convHT2N.side2, heatFlowDistribution.side1) annotation (Line(
               points={{0,30.9},{0,21}}, color={255,127,0}));
-        connect(convHT2N.side1,gasFlow. wall) annotation (Line(points={{0,37},{
-                0,45}}, color={255,127,0}));
-        connect(metalTube.int, convHT_htc.otherside) annotation (Line(points={{
-                0,-17},{0,-27}}, color={255,127,0}));
         connect(metalTube.ext, cC.side2) annotation (Line(points={{0,-10.9},{0,
                 -1.1}}, color={255,127,0}));
+        connect(convHT2N.side1, gasFlow.wall) annotation (Line(
+            points={{0,37},{0,51}},
+            color={0,0,255},
+            smooth=Smooth.None));
+        connect(convHT_htc.side2, metalTube.int) annotation (Line(
+            points={{0,-26.9},{0,-17}},
+            color={255,127,0},
+            smooth=Smooth.None));
+        connect(fluidFlow_Extension.wall, convHT_htc.side1) annotation (Line(
+            points={{0,-41},{0,-33}},
+            color={255,127,0},
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
       end HEhtc_f;
 
@@ -5506,18 +4360,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
             Modelica.Media.Interfaces.PartialTwoPhaseMedium;
         parameter SI.VolumeFlowRate q_nom[3] "Nominal volume flow rates";
         parameter SI.Height head_nom[3] "Nominal heads";
-        parameter SI.Density rho_nom "Nominal density";
+        parameter Integer Np0=1 "Nominal number of pumps in parallel";
+        parameter SI.Volume V=0 "Pump Internal Volume";
+        parameter SI.Density rho0 "Nominal density";
         parameter SI.Conversions.NonSIunits.AngularVelocity_rpm n0
           "Nominal rpm";
-        parameter SI.Pressure nominalSteamPressure
-          "Nominal live steam pressure";
-        parameter SI.Pressure nominalCondensationPressure
-          "Nominal condensation pressure";
-        parameter SI.MassFlowRate nominalSteamFlow
-          "Nominal steam mass flow rate";
-        parameter SI.SpecificEnthalpy hstart
-          "Fluid Specific Enthalpy Start Value";
-
+        parameter SI.Pressure nominalOutletPressure "Nominal outlet pressure";
+        parameter SI.Pressure nominalInletPressure "Nominal inlet pressure";
+        parameter SI.MassFlowRate nominalFlow "Nominal mass flow rate";
+        parameter SI.SpecificEnthalpy hstart=1e5
+          "Fluid Specific Enthalpy Start Value" 
+                                               annotation(Dialog(tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
         function flowCharacteristic = 
             ThermoPower.Functions.PumpCharacteristics.quadraticFlow (
               q_nom = q_nom, head_nom = head_nom);
@@ -5533,45 +4387,46 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.Pump feedWaterPump(     redeclare package Medium = 
               WaterMedium,
           redeclare function flowCharacteristic = flowCharacteristic,
-          pin_start=nominalCondensationPressure,
-          pout_start=nominalSteamPressure,
-          wstart=nominalSteamFlow,
           n0=n0,
-          hstart=hstart) 
+          hstart=hstart,
+          Np0=Np0,
+          rho0=rho0,
+          V=V,
+          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
+              ThermoPower.Choices.Init.Options.noInit,
+          dp0=nominalOutletPressure - nominalInletPressure,
+          wstart=nominalFlow,
+          w0=nominalFlow) 
           annotation (Placement(transformation(extent={{-40,-24},{0,16}},
                 rotation=0)));
         Modelica.Blocks.Interfaces.RealInput pumpSpeed_rpm 
                                          annotation (Placement(transformation(
-                extent={{-128,40},{-88,80}}, rotation=0)));
+                extent={{-92,40},{-52,80}},  rotation=0), iconTransformation(extent={{
+                  -92,40},{-52,80}})));
+
       equation
         connect(inlet, feedWaterPump.infl) 
           annotation (Line(points={{-100,0},{-67,0},{-36,0}},
               thickness=0.5,
             color={0,0,255}));
-        connect(pumpSpeed_rpm, feedWaterPump.in_n) annotation (Line(points={{
-                -108,60},{-25.2,60},{-25.2,12}}, color={0,0,127}));
+        connect(pumpSpeed_rpm, feedWaterPump.in_n) annotation (Line(points={{-72,60},{
+                -25.2,60},{-25.2,12}},           color={0,0,127}));
         connect(outlet, feedWaterPump.outfl) annotation (Line(points={{100,0},{
                 10,0},{10,10},{-8,10}},     thickness=0.5,
             color={0,0,255}));
         annotation (Icon(graphics={
-              Rectangle(
-                extent={{-100,100},{100,-100}},
-                lineColor={0,0,255},
-                fillColor={230,230,230},
-                fillPattern=FillPattern.Solid),
               Text(
                 extent={{-100,-118},{100,-144}},
                 lineColor={0,0,255},
                 textString=
                      "%name"),
               Ellipse(
-                extent={{-62,62},{58,-58}},
+                extent={{-80,80},{80,-80}},
                 lineColor={0,0,0},
                 fillPattern=FillPattern.Sphere),
               Polygon(
-                points={{-32,34},{-32,-26},{46,2},{-32,34}},
-                lineColor={0,0,0},
-                pattern=LinePattern.None,
+                points={{-40,40},{-40,-40},{50,0},{-40,40}},
+                lineColor={0,0,255},
                 fillPattern=FillPattern.HorizontalCylinder,
                 fillColor={255,255,255})}),
                                 Diagram(graphics));
@@ -5584,17 +4439,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         parameter SI.VolumeFlowRate q_nom[3] "Nominal volume flow rates";
         parameter SI.Height head_nom[3] "Nominal heads";
-        parameter SI.Density rho_nom "Nominal density";
+        parameter Integer Np0=1 "Nominal number of pumps in parallel";
+        parameter SI.Volume V=0 "Pump Internal Volume";
+        parameter SI.Density rho0 "Nominal density";
         parameter SI.Conversions.NonSIunits.AngularVelocity_rpm n0
           "Nominal rpm";
-        parameter SI.Pressure nominalWaterPressure
-          "Nominal live steam pressure";
-        parameter SI.Pressure nominalCondensationPressure
-          "Nominal condensation pressure";
-        parameter SI.MassFlowRate nominalWaterFlowRate
-          "Nominal steam mass flow rate";
-        parameter SI.SpecificEnthalpy hstart
-          "Fluid Specific Enthalpy Start Value";
+        parameter SI.Pressure nominalOutletPressure "Nominal outlet pressure";
+        parameter SI.Pressure nominalInletPressure "Nominal inlet pressure";
+        parameter SI.MassFlowRate nominalFlow "Nominal mass flow rate";
+        parameter SI.SpecificEnthalpy hstart=1e5
+          "Fluid Specific Enthalpy Start Value" 
+                                               annotation(Dialog(tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
 
         //PID for flow rate control
         parameter Real Kp=4 "Proportional gain (normalised units)" 
@@ -5623,12 +4479,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           redeclare package WaterMedium = FluidMedium,
           q_nom=q_nom,
           head_nom=head_nom,
-          rho_nom=rho_nom,
           n0=n0,
-          nominalSteamPressure=nominalWaterPressure,
-          nominalCondensationPressure=nominalCondensationPressure,
-          nominalSteamFlow=nominalWaterFlowRate,
-          hstart=hstart)        annotation (Placement(transformation(
+          hstart=hstart,
+          Np0=Np0,
+          V=V,
+          rho0=rho0,
+          nominalOutletPressure=nominalOutletPressure,
+          nominalInletPressure=nominalInletPressure,
+          nominalFlow=nominalFlow,
+          SSInit=SSInit)        annotation (Placement(transformation(
               origin={-24,0},
               extent={{16,16},{-16,-16}},
               rotation=180)));
@@ -5655,11 +4514,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
           CSmin=CSmin,
           CSmax=CSmax,
           PVstart=PVstart,
-          CSstart=CSstart) annotation (Placement(transformation(
+          CSstart=CSstart,
+          steadyStateInit=SSInit) 
+                           annotation (Placement(transformation(
               origin={0,50},
               extent={{-10,10},{10,-10}},
               rotation=180)));
-        Modelica.Blocks.Continuous.FirstOrder firstOrder(T=T_filter, y_start=n0) 
+        Modelica.Blocks.Continuous.FirstOrder firstOrder(T=T_filter, y_start=n0,
+          initType=if SSInit then Modelica.Blocks.Types.Init.SteadyState else Modelica.Blocks.Types.Init.NoInit) 
           annotation (Placement(transformation(extent={{-26,40},{-46,60}},
                 rotation=0)));
 
@@ -5668,18 +4530,17 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 10},{38,10}}, color={0,0,127}));
         connect(pID.SP, setpoint_FlowRate) annotation (Line(points={{10,54},{20,
                 54},{20,70},{-104,70}}, color={0,0,127}));
-        connect(firstOrder.u, pID.CS) annotation (Line(points={{-24,50},{-10.6,
-                50}}, color={0,0,127}));
+        connect(firstOrder.u, pID.CS) annotation (Line(points={{-24,50},{-10,50}},
+                      color={0,0,127}));
         connect(firstOrder.y, pump.pumpSpeed_rpm)          annotation (Line(
-              points={{-47,50},{-60,50},{-60,9.6},{-41.28,9.6}}, color={0,0,127}));
+              points={{-47,50},{-60,50},{-60,9.6},{-35.52,9.6}}, color={0,0,127}));
         connect(outlet, feed_w.outlet) annotation (Line(
             points={{100,0},{68,0},{68,-8.88178e-016},{36,-8.88178e-016}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
         connect(feed_w.inlet, pump.outlet) annotation (Line(
-            points={{24,8.88178e-016},{8,8.88178e-016},{8,-1.95943e-015},{-8,
-                -1.95943e-015}},
+            points={{24,8.88178e-016},{8,8.88178e-016},{8,-1.95943e-015},{-8,-1.95943e-015}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
@@ -5748,32 +4609,37 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         parameter SI.VolumeFlowRate q_nom[3] "Nominal volume flow rates";
         parameter SI.Height head_nom[3] "Nominal heads";
-        parameter SI.Density rho_nom "Nominal density";
+        parameter Integer Np0=1 "Nominal number of pumps in parallel";
+        parameter SI.Volume V=0 "Pump Internal Volume";
+        parameter SI.Density rho0 "Nominal density";
         parameter SI.Conversions.NonSIunits.AngularVelocity_rpm n0
           "Nominal rpm";
-        parameter SI.Pressure nominalWaterPressure
-          "Nominal live steam pressure";
-        parameter SI.Pressure nominalCondensationPressure
-          "Nominal condensation pressure";
-        parameter SI.MassFlowRate nominalWaterFlowRate
-          "Nominal steam mass flow rate";
-        parameter SI.SpecificEnthalpy hstart
-          "Fluid Specific Enthalpy Start Value";
-        parameter SI.Time T_filter=1 "Time Constant of the filter";
+        parameter SI.Pressure nominalOutletPressure "Nominal outlet pressure";
+        parameter SI.Pressure nominalInletPressure "Nominal inlet pressure";
+        parameter SI.MassFlowRate nominalFlow "Nominal mass flow rate";
+        parameter SI.Time T_filter=1 "Time Constant of the filter" 
+          annotation (Dialog(group="Filter"));
+        parameter SI.SpecificEnthalpy hstart=1e5
+          "Fluid Specific Enthalpy Start Value" 
+                                               annotation(Dialog(tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
 
       public
         ThermoPower.PowerPlants.HRSG.Components.PrescribedSpeedPump pump(
           redeclare package WaterMedium = FluidMedium,
           q_nom=q_nom,
           head_nom=head_nom,
-          rho_nom=rho_nom,
           n0=n0,
-          nominalSteamPressure=nominalWaterPressure,
-          nominalCondensationPressure=nominalCondensationPressure,
-          nominalSteamFlow=nominalWaterFlowRate,
-          hstart=hstart)        annotation (Placement(transformation(
-              origin={0,0},
-              extent={{20,20},{-20,-20}},
+          hstart=hstart,
+          Np0=Np0,
+          V=V,
+          rho0=rho0,
+          nominalOutletPressure=nominalOutletPressure,
+          nominalInletPressure=nominalInletPressure,
+          nominalFlow=nominalFlow,
+          SSInit=SSInit)        annotation (Placement(transformation(
+              origin={-4,0},
+              extent={{16,16},{-16,-16}},
               rotation=180)));
         ThermoPower.Water.Flange inlet( redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-120,-20},{-80,20}},
@@ -5784,21 +4650,23 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Modelica.Blocks.Interfaces.RealInput setpoint_FlowRate 
                                          annotation (Placement(transformation(
                 extent={{-120,54},{-88,86}}, rotation=0)));
-        Modelica.Blocks.Continuous.FirstOrder firstOrder(T=T_filter, y_start=n0) 
+        Modelica.Blocks.Continuous.FirstOrder firstOrder(T=T_filter, y_start=n0,
+          initType=if SSInit then Modelica.Blocks.Types.Init.SteadyState else Modelica.Blocks.Types.Init.NoInit) 
           annotation (Placement(transformation(extent={{-10,40},{-30,60}},
                 rotation=0)));
       equation
         connect(firstOrder.y, pump.pumpSpeed_rpm)          annotation (Line(
-              points={{-31,50},{-60,50},{-60,12},{-21.6,12}}, color={0,0,127}));
+              points={{-31,50},{-60,50},{-60,9.6},{-15.52,9.6}},
+                                                              color={0,0,127}));
         connect(firstOrder.u, setpoint_FlowRate) annotation (Line(points={{-8,
                 50},{20,50},{20,70},{-104,70}}, color={0,0,127}));
         connect(pump.inlet, inlet) annotation (Line(
-            points={{-20,2.44929e-015},{-59,2.44929e-015},{-59,0},{-100,0}},
+            points={{-20,1.95943e-015},{-59,1.95943e-015},{-59,0},{-100,0}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
         connect(pump.outlet, outlet) annotation (Line(
-            points={{20,-2.44929e-015},{58,-2.44929e-015},{58,0},{100,0}},
+            points={{12,-1.95943e-015},{58,-1.95943e-015},{58,0},{100,0}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
@@ -5999,18 +4867,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
               extent={{10,10},{-10,-10}},
               rotation=180)));
       equation
-        connect(SensorsBus.y_drumHP, Level_HP.PV) annotation (Line(points={{-98,
-                0},{-60,0},{-60,30},{0,30},{0,46},{20,46}}, color={255,170,213}));
+        connect(SensorsBus.y_drumHP, Level_HP.PV) annotation (Line(points={{-100,0},
+                {-60,0},{-60,30},{0,30},{0,46},{20,46}},    color={255,170,213}));
         connect(SensorsBus.y_drumIP, Level_IP.PV) annotation (Line(points={{
                 -100,0},{-60,0},{-60,-20},{0,-20},{0,-4},{20,-4}}, color={255,
                 170,213}));
-        connect(SensorsBus.y_drumLP, Level_LP.PV) annotation (Line(points={{-98,
-                0},{-60,0},{-60,-66},{0,-66},{0,-48},{20,-48}}, color={255,170,
+        connect(SensorsBus.y_drumLP, Level_LP.PV) annotation (Line(points={{-100,0},
+                {-60,0},{-60,-66},{0,-66},{0,-48},{20,-48}},    color={255,170,
                 213}));
         connect(ActuatorsBus.flowRate_feedIP, Level_IP.CS) annotation (Line(
-              points={{100,0},{40.6,0}}, color={213,255,170}));
+              points={{100,0},{40,0}},   color={213,255,170}));
         connect(ActuatorsBus.flowRate_feedHP, Level_HP.CS) annotation (Line(
-              points={{100,0},{60,0},{60,50},{40.6,50}}, color={213,255,170}));
+              points={{100,0},{60,0},{60,50},{40,50}},   color={213,255,170}));
         connect(levelHP_SP.y, Level_HP.SP) annotation (Line(points={{-19,54},{
                 20,54}}, color={0,0,127}));
         connect(levelIP_SP.y, Level_IP.SP) annotation (Line(points={{-19,4},{
@@ -6063,25 +4931,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh2_HP_fluidVol,
           metalVol=Sh2_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
-          Tstart_M_In=Sh2_HP_Tstart_M_In,
-          Tstart_M_Out=Sh2_HP_Tstart_M_Out,
-          Tstart_F_In=Sh2_HP_Tstart_F_In,
-          Tstart_F_Out=Sh2_HP_Tstart_F_Out,
-          hstart_F_In=Sh2_HP_hstart_F_In,
-          hstart_F_Out=Sh2_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Sh) 
+          Tstartbar_G=Sh2_HP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
           N_G=Sh2_HP_N_G,
           N_F=Sh2_HP_N_F,
           gasNomFlowRate=gasNomFlowRate,
-          fluidNomFlowRate=fluidHPNomFlowRate_Sh,
           gasNomPressure=gasNomPressure,
+          fluidNomFlowRate=fluidHPNomFlowRate_Sh,
           fluidNomPressure=fluidHPNomPressure_Sh,
           exchSurface_G=Sh2_HP_exchSurface_G,
           exchSurface_F=Sh2_HP_exchSurface_F,
@@ -6089,18 +4950,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasVol=Sh2_HP_gasVol,
           fluidVol=Sh2_HP_fluidVol,
           metalVol=Sh2_HP_metalVol,
-          use_T=use_T_Sh,
           SSInit=SSInit,
-          Tstart_G_In=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
-          Tstart_M_In=Sh2_HP_Tstart_M_In,
-          Tstart_M_Out=Sh2_HP_Tstart_M_Out,
-          Tstart_F_In=Sh2_HP_Tstart_F_In,
-          Tstart_F_Out=Sh2_HP_Tstart_F_Out,
-          hstart_F_In=Sh2_HP_hstart_F_In,
-          hstart_F_Out=Sh2_HP_hstart_F_Out,
           rhomcm=rhomcm,
-          lambda=lambda) 
+          lambda=lambda,
+          Tstartbar_G=Sh2_HP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
           annotation (Placement(transformation(extent={{-350,-10},{-330,10}},
                 rotation=0)));
         replaceable Components.HE Sh1_HP(
@@ -6119,17 +4973,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh1_HP_fluidVol,
           metalVol=Sh1_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
-          Tstart_M_In=Sh1_HP_Tstart_M_In,
-          Tstart_M_Out=Sh1_HP_Tstart_M_Out,
-          Tstart_F_In=Sh1_HP_Tstart_F_In,
-          Tstart_F_Out=Sh1_HP_Tstart_F_Out,
-          hstart_F_In=Sh1_HP_hstart_F_In,
-          hstart_F_Out=Sh1_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Sh) 
+          Tstartbar_G=Sh1_HP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6146,17 +4993,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh1_HP_fluidVol,
           metalVol=Sh1_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
-          Tstart_M_In=Sh1_HP_Tstart_M_In,
-          Tstart_M_Out=Sh1_HP_Tstart_M_Out,
-          Tstart_F_In=Sh1_HP_Tstart_F_In,
-          Tstart_F_Out=Sh1_HP_Tstart_F_Out,
-          hstart_F_In=Sh1_HP_hstart_F_In,
-          hstart_F_Out=Sh1_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Sh) 
+          Tstartbar_G=Sh1_HP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
           annotation (Placement(transformation(extent={{-230,-10},{-210,10}},
                 rotation=0)));
         replaceable Components.HE2ph Ev_HP(
@@ -6175,17 +5015,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_HP_fluidVol,
           metalVol=Ev_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_HP_Tstart_G_In,
-          Tstart_G_Out=Ev_HP_Tstart_G_Out,
-          Tstart_M_In=Ev_HP_Tstart_M_In,
-          Tstart_M_Out=Ev_HP_Tstart_M_Out,
-          Tstart_F_In=Ev_HP_Tstart_F_In,
-          Tstart_F_Out=Ev_HP_Tstart_F_Out,
-          hstart_F_In=Ev_HP_hstart_F_In,
-          hstart_F_Out=Ev_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ev) 
+          Tstartbar_G=Ev_HP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6202,17 +5034,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_HP_fluidVol,
           metalVol=Ev_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_HP_Tstart_G_In,
-          Tstart_G_Out=Ev_HP_Tstart_G_Out,
-          Tstart_M_In=Ev_HP_Tstart_M_In,
-          Tstart_M_Out=Ev_HP_Tstart_M_Out,
-          Tstart_F_In=Ev_HP_Tstart_F_In,
-          Tstart_F_Out=Ev_HP_Tstart_F_Out,
-          hstart_F_In=Ev_HP_hstart_F_In,
-          hstart_F_Out=Ev_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ev) 
+          Tstartbar_G=Ev_HP_Tstartbar) 
           annotation (Placement(transformation(extent={{-110,-10},{-90,10}},
                 rotation=0)));
         replaceable Components.HE Ec_HP(
@@ -6231,21 +5055,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_HP_fluidVol,
           metalVol=Ec_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_HP_Tstart_G_In,
-          Tstart_G_Out=Ec_HP_Tstart_G_Out,
-          Tstart_M_In=Ec_HP_Tstart_M_In,
-          Tstart_M_Out=Ec_HP_Tstart_M_Out,
-          Tstart_F_In=Ec_HP_Tstart_F_In,
-          Tstart_F_Out=Ec_HP_Tstart_F_Out,
-          hstart_F_In=Ec_HP_hstart_F_In,
-          hstart_F_Out=Ec_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec) 
+          Tstartbar_G=Ec_HP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
-          N_G=Ec_HP_N_G,
+           N_G=Ec_HP_N_G,
           N_F=Ec_HP_N_F,
           gasNomFlowRate=gasNomFlowRate,
           fluidNomFlowRate=fluidHPNomFlowRate_Ec,
@@ -6258,17 +5074,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_HP_fluidVol,
           metalVol=Ec_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_HP_Tstart_G_In,
-          Tstart_G_Out=Ec_HP_Tstart_G_Out,
-          Tstart_M_In=Ec_HP_Tstart_M_In,
-          Tstart_M_Out=Ec_HP_Tstart_M_Out,
-          Tstart_F_In=Ec_HP_Tstart_F_In,
-          Tstart_F_Out=Ec_HP_Tstart_F_Out,
-          hstart_F_In=Ec_HP_hstart_F_In,
-          hstart_F_Out=Ec_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec) 
+          Tstartbar_G=Ec_HP_Tstartbar) 
           annotation (Placement(transformation(extent={{30,-10},{50,10}},
                 rotation=0)));
         replaceable Components.HE Sh_LP(
@@ -6287,17 +5095,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh_LP_fluidVol,
           metalVol=Sh_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Sh_LP_Tstart_G_In,
-          Tstart_G_Out=Sh_LP_Tstart_G_Out,
-          Tstart_M_In=Sh_LP_Tstart_M_In,
-          Tstart_M_Out=Sh_LP_Tstart_M_Out,
-          Tstart_F_In=Sh_LP_Tstart_F_In,
-          Tstart_F_Out=Sh_LP_Tstart_F_Out,
-          hstart_F_In=Sh_LP_hstart_F_In,
-          hstart_F_Out=Sh_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Sh) 
+          Tstartbar_G=Sh_LP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6314,17 +5115,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh_LP_fluidVol,
           metalVol=Sh_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Sh_LP_Tstart_G_In,
-          Tstart_G_Out=Sh_LP_Tstart_G_Out,
-          Tstart_M_In=Sh_LP_Tstart_M_In,
-          Tstart_M_Out=Sh_LP_Tstart_M_Out,
-          Tstart_F_In=Sh_LP_Tstart_F_In,
-          Tstart_F_Out=Sh_LP_Tstart_F_Out,
-          hstart_F_In=Sh_LP_hstart_F_In,
-          hstart_F_Out=Sh_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Sh) 
+          Tstartbar_G=Sh_LP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
           annotation (Placement(transformation(extent={{-30,-10},{-10,10}},
                 rotation=0)));
         replaceable Components.HE2ph Ev_LP(
@@ -6343,18 +5137,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_LP_fluidVol,
           metalVol=Ev_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_LP_Tstart_G_In,
-          Tstart_G_Out=Ev_LP_Tstart_G_Out,
-          Tstart_M_In=Ev_LP_Tstart_M_In,
-          Tstart_M_Out=Ev_LP_Tstart_M_Out,
-          Tstart_F_In=Ev_LP_Tstart_F_In,
-          Tstart_F_Out=Ev_LP_Tstart_F_Out,
-          hstart_F_In=Ev_LP_hstart_F_In,
-          hstart_F_Out=Ev_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ev,
-          FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction) 
+          FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+          Tstartbar_G=Ev_LP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6371,17 +5157,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_LP_fluidVol,
           metalVol=Ev_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_LP_Tstart_G_In,
-          Tstart_G_Out=Ev_LP_Tstart_G_Out,
-          Tstart_M_In=Ev_LP_Tstart_M_In,
-          Tstart_M_Out=Ev_LP_Tstart_M_Out,
-          Tstart_F_In=Ev_LP_Tstart_F_In,
-          Tstart_F_Out=Ev_LP_Tstart_F_Out,
-          hstart_F_In=Ev_LP_hstart_F_In,
-          hstart_F_Out=Ev_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ev) 
+          FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+          Tstartbar_G=Ev_LP_Tstartbar) 
                          annotation (Placement(transformation(extent={{130,-10},
                   {150,10}}, rotation=0)));
         replaceable Components.HE Ec_LP(
@@ -6400,17 +5179,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_LP_fluidVol,
           metalVol=Ec_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_LP_Tstart_G_In,
-          Tstart_G_Out=Ec_LP_Tstart_G_Out,
-          Tstart_M_In=Ec_LP_Tstart_M_In,
-          Tstart_M_Out=Ec_LP_Tstart_M_Out,
-          Tstart_F_In=Ec_LP_Tstart_F_In,
-          Tstart_F_Out=Ec_LP_Tstart_F_Out,
-          hstart_F_In=Ec_LP_hstart_F_In,
-          hstart_F_Out=Ec_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec) 
+          Tstartbar_G=Ec_LP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6427,24 +5198,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_LP_fluidVol,
           metalVol=Ec_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_LP_Tstart_G_In,
-          Tstart_G_Out=Ec_LP_Tstart_G_Out,
-          Tstart_M_In=Ec_LP_Tstart_M_In,
-          Tstart_M_Out=Ec_LP_Tstart_M_Out,
-          Tstart_F_In=Ec_LP_Tstart_F_In,
-          Tstart_F_Out=Ec_LP_Tstart_F_Out,
-          hstart_F_In=Ec_LP_hstart_F_In,
-          hstart_F_Out=Ec_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)                annotation (Placement(transformation(
+          Tstartbar_G=Ec_LP_Tstartbar)                annotation (Placement(transformation(
                 extent={{210,-10},{230,10}}, rotation=0)));
         Water.Mixer mixAtt(
           redeclare package Medium = FluidMedium,
           V=1,
-          hstart=Sh1_HP_hstart_F_Out,
           pstart=fluidHPNomPressure_Sh,
-          initOpt=if SSInit then Options.steadyState else Options.noInit) 
+          initOpt=if SSInit then Options.steadyState else Options.noInit,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
           annotation (Placement(transformation(
               origin={-340,92},
               extent={{-10,-10},{10,10}},
@@ -6456,7 +5219,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           pnom=pnom_attShHP,
           dpnom=dpnom_attShHP,
           wnom=wnom_attShHP,
-          hstart=valShHP_hstart,
           Cv=Cv_attShHP) "valve for attemperation of the Sh" 
                                 annotation (Placement(transformation(
               origin={-346,130},
@@ -6464,12 +5226,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
               rotation=270)));
         Water.SensT Sh2HPIn_T(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={-336,40},
+              origin={-344,48},
               extent={{10,-10},{-10,10}},
               rotation=90)));
         Water.SensT Sh2HPOut_T(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={-336,-52},
+              origin={-344,-52},
               extent={{10,-10},{-10,10}},
               rotation=90)));
         Water.FlowSplit flowSplit2(           redeclare package Medium = 
@@ -6483,12 +5245,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
               rotation=270)));
       equation
         connect(SensorsBus.T_Sh2HP_In, Sh2HPIn_T.T) annotation (Line(
-            points={{400,140},{-148,140},{-148,-80},{-292,-80},{-292,16},{-342,
-                16},{-342,32}},
+            points={{400,140},{-148,140},{-148,-80},{-292,-80},{-292,16},{-350,16},{-350,
+                40}},
             color={255,170,213},
             thickness=0.25));
         connect(SensorsBus.T_Sh2HP_Out, Sh2HPOut_T.T) annotation (Line(points={{400,140},
-                {-148,140},{-148,-80},{-342,-80},{-342,-60}},           color={
+                {-148,140},{-148,-80},{-350,-80},{-350,-60}},           color={
                 255,170,213}));
         connect(ActuatorsBus.theta_attShHP, valveAttSh.theta) annotation (Line(
             points={{400,80},{-320,80},{-320,130},{-339.6,130}},
@@ -6498,15 +5260,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 {-334,110},{-300,110},{-300,-40},{-220,-40},{-220,-10}},
               thickness=0.5,
             color={0,0,255}));
-        connect(Sh2HPOut_T.inlet, Sh2_HP.waterOut) annotation (Line(points={{-332,
-                -46},{-332,-28},{-340,-28},{-340,-10}},
-                                       thickness=0.5));
-        connect(Sh2_HP.waterIn, Sh2HPIn_T.outlet) annotation (Line(points={{-340,10},
-                {-340,22},{-340,34},{-332,34}},
-                                     thickness=0.5,
+        connect(Sh2HPOut_T.inlet, Sh2_HP.waterOut) annotation (Line(points={{-340,-46},
+                {-340,-28},{-340,-10}},thickness=0.5,
             color={0,0,255}));
-        connect(Sh2HPIn_T.inlet, mixAtt.out) annotation (Line(points={{-332,46},
-                {-332,64},{-340,64},{-340,82}},
+        connect(Sh2_HP.waterIn, Sh2HPIn_T.outlet) annotation (Line(points={{-340,10},{
+                -340,42}},           thickness=0.5,
+            color={0,0,255}));
+        connect(Sh2HPIn_T.inlet, mixAtt.out) annotation (Line(points={{-340,54},{-340,
+                54},{-340,82}},
                             thickness=0.5,
             color={0,0,255}));
         connect(Sh1_HP.waterIn, Sh_HP_In) annotation (Line(points={{-220,10},{
@@ -6528,8 +5289,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(Sh_LP.waterOut, Sh_LP_Out) annotation (Line(points={{-20,-10},{
                 -20,-80},{140,-80},{140,-200}}, thickness=0.5,
             color={0,0,255}));
-        connect(Sh_HP_Out, Sh2HPOut_T.outlet) annotation (Line(points={{-200,
-                -200},{-200,-140},{-332,-140},{-332,-58}}, thickness=0.5,
+        connect(Sh_HP_Out, Sh2HPOut_T.outlet) annotation (Line(points={{-200,-200},{-200,
+                -140},{-340,-140},{-340,-58}},             thickness=0.5,
             color={0,0,255}));
         connect(Ev_LP.waterIn, Ev_LP_In) annotation (Line(points={{140,10},{140,
                 200}}, thickness=0.5,
@@ -6544,7 +5305,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 200}}, thickness=0.5,
             color={0,0,255}));
         connect(Ec_LP.gasOut, GasOut) annotation (Line(
-            points={{230,0},{185,0},{185,1.77636e-015},{400,1.77636e-015}},
+            points={{230,0},{237,0},{237,1.77636e-015},{400,1.77636e-015}},
             color={159,159,223},
             thickness=0.5));
         connect(Ec_LP.gasIn, Ev_LP.gasOut) annotation (Line(
@@ -6588,15 +5349,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(flowSplit2.out1, Ec_HP.waterIn) annotation (Line(points={{-116,
                 160},{-116,150},{40,150},{40,10}},          thickness=0.5,
             color={0,0,255}));
-        annotation (Diagram(graphics));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-400,
+                  -200},{400,200}}),
+                            graphics));
       end HEG_2L;
 
       model HEG_2LRh "Heat Exchangers Group with two pressure level and reheat"
         extends ThermoPower.PowerPlants.HRSG.Interfaces.HEG_2LRh(
-                                    Rh1_IP_Tstart_G_In = Sh1_HP_Tstart_G_In,
-                                    Rh1_IP_Tstart_G_Out = Sh1_HP_Tstart_G_Out,
-                                    Rh2_IP_Tstart_G_In = Sh2_HP_Tstart_G_In,
-                                    Rh2_IP_Tstart_G_Out = Sh2_HP_Tstart_G_Out,
+                                    Rh1_IP_Tstartbar = Sh1_HP_Tstartbar,
+                                    Rh2_IP_Tstartbar = Sh2_HP_Tstartbar,
                                     Rh2_IP_N_G = Sh2_HP_N_G,
                                     Rh1_IP_N_G = Sh1_HP_N_G,
                                     Rh2_IP_gasVol = Sh2_HP_gasVol,
@@ -6646,17 +5407,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_HP_fluidVol,
           metalVol=Ev_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_HP_Tstart_G_In,
-          Tstart_G_Out=Ev_HP_Tstart_G_Out,
-          Tstart_M_In=Ev_HP_Tstart_M_In,
-          Tstart_M_Out=Ev_HP_Tstart_M_Out,
-          Tstart_F_In=Ev_HP_Tstart_F_In,
-          Tstart_F_Out=Ev_HP_Tstart_F_Out,
-          hstart_F_In=Ev_HP_hstart_F_In,
-          hstart_F_Out=Ev_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ev) 
+          Tstartbar_G=Ev_HP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6673,17 +5426,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_HP_fluidVol,
           metalVol=Ev_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_HP_Tstart_G_In,
-          Tstart_G_Out=Ev_HP_Tstart_G_Out,
-          Tstart_M_In=Ev_HP_Tstart_M_In,
-          Tstart_M_Out=Ev_HP_Tstart_M_Out,
-          Tstart_F_In=Ev_HP_Tstart_F_In,
-          Tstart_F_Out=Ev_HP_Tstart_F_Out,
-          hstart_F_In=Ev_HP_hstart_F_In,
-          hstart_F_Out=Ev_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ev) 
+          Tstartbar_G=Ev_HP_Tstartbar) 
           annotation (Placement(transformation(extent={{-210,-10},{-190,10}},
                 rotation=0)));
         replaceable Components.HE Ec_HP(
@@ -6702,17 +5447,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_HP_fluidVol,
           metalVol=Ec_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_HP_Tstart_G_In,
-          Tstart_G_Out=Ec_HP_Tstart_G_Out,
-          Tstart_M_In=Ec_HP_Tstart_M_In,
-          Tstart_M_Out=Ec_HP_Tstart_M_Out,
-          Tstart_F_In=Ec_HP_Tstart_F_In,
-          Tstart_F_Out=Ec_HP_Tstart_F_Out,
-          hstart_F_In=Ec_HP_hstart_F_In,
-          hstart_F_Out=Ec_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec) 
+          Tstartbar_G=Ec_HP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6729,18 +5466,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_HP_fluidVol,
           metalVol=Ec_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_HP_Tstart_G_In,
-          Tstart_G_Out=Ec_HP_Tstart_G_Out,
-          Tstart_M_In=Ec_HP_Tstart_M_In,
-          Tstart_M_Out=Ec_HP_Tstart_M_Out,
-          Tstart_F_In=Ec_HP_Tstart_F_In,
-          Tstart_F_Out=Ec_HP_Tstart_F_Out,
-          hstart_F_In=Ec_HP_hstart_F_In,
-          hstart_F_Out=Ec_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)          annotation (Placement(transformation(extent=
-                  {{40,-10},{60,10}}, rotation=0)));
+          Tstartbar_G=Ec_HP_Tstartbar)          annotation (Placement(transformation(extent={{38,-10},
+                  {58,10}},           rotation=0)));
         replaceable Components.HE Sh_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6756,18 +5485,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh_LP_fluidVol,
           metalVol=Sh_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Sh_LP_Tstart_G_In,
-          Tstart_G_Out=Sh_LP_Tstart_G_Out,
-          Tstart_M_In=Sh_LP_Tstart_M_In,
-          Tstart_M_Out=Sh_LP_Tstart_M_Out,
-          Tstart_F_In=Sh_LP_Tstart_F_In,
-          Tstart_F_Out=Sh_LP_Tstart_F_Out,
-          hstart_F_In=Sh_LP_hstart_F_In,
-          hstart_F_Out=Sh_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Sh_LP_extSurfaceTub,
-          use_T=use_T_Sh) 
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh_LP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6779,22 +5501,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidNomPressure=fluidLPNomPressure_Sh,
           exchSurface_G=Sh_LP_exchSurface_G,
           exchSurface_F=Sh_LP_exchSurface_F,
-          extSurfaceTub=Sh_LP_extSurfaceTub,
           gasVol=Sh_LP_gasVol,
           fluidVol=Sh_LP_fluidVol,
           metalVol=Sh_LP_metalVol,
-          use_T=use_T,
           SSInit=SSInit,
-          Tstart_G_In=Sh_LP_Tstart_G_In,
-          Tstart_G_Out=Sh_LP_Tstart_G_Out,
-          Tstart_M_In=Sh_LP_Tstart_M_In,
-          Tstart_M_Out=Sh_LP_Tstart_M_Out,
-          Tstart_F_In=Sh_LP_Tstart_F_In,
-          Tstart_F_Out=Sh_LP_Tstart_F_Out,
-          hstart_F_In=Sh_LP_hstart_F_In,
-          hstart_F_Out=Sh_LP_hstart_F_Out,
           rhomcm=rhomcm,
-          lambda=lambda)           annotation (Placement(transformation(extent=
+          lambda=lambda,
+          extSurfaceTub=Sh_LP_extSurfaceTub,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh_LP_Tstartbar)           annotation (Placement(transformation(extent=
                   {{-30,-10},{-10,10}}, rotation=0)));
         replaceable Components.HE2ph Ev_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -6811,18 +5526,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_LP_fluidVol,
           metalVol=Ev_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_LP_Tstart_G_In,
-          Tstart_G_Out=Ev_LP_Tstart_G_Out,
-          Tstart_M_In=Ev_LP_Tstart_M_In,
-          Tstart_M_Out=Ev_LP_Tstart_M_Out,
-          Tstart_F_In=Ev_LP_Tstart_F_In,
-          Tstart_F_Out=Ev_LP_Tstart_F_Out,
-          hstart_F_In=Ev_LP_hstart_F_In,
-          hstart_F_Out=Ev_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Ev_LP_extSurfaceTub,
-          use_T=use_T_Ev) 
+          Tstartbar_G=Ev_LP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6834,22 +5541,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidNomPressure=fluidLPNomPressure_Ev,
           exchSurface_G=Ev_LP_exchSurface_G,
           exchSurface_F=Ev_LP_exchSurface_F,
-          extSurfaceTub=Ev_LP_extSurfaceTub,
           gasVol=Ev_LP_gasVol,
           fluidVol=Ev_LP_fluidVol,
           metalVol=Ev_LP_metalVol,
-          use_T=use_T,
           SSInit=SSInit,
-          Tstart_G_In=Ev_LP_Tstart_G_In,
-          Tstart_G_Out=Ev_LP_Tstart_G_Out,
-          Tstart_M_In=Ev_LP_Tstart_M_In,
-          Tstart_M_Out=Ev_LP_Tstart_M_Out,
-          Tstart_F_In=Ev_LP_Tstart_F_In,
-          Tstart_F_Out=Ev_LP_Tstart_F_Out,
-          hstart_F_In=Ev_LP_hstart_F_In,
-          hstart_F_Out=Ev_LP_hstart_F_Out,
           rhomcm=rhomcm,
-          lambda=lambda) annotation (Placement(transformation(extent={{130,-10},
+          lambda=lambda,
+          extSurfaceTub=Ev_LP_extSurfaceTub,
+          Tstartbar_G=Ev_LP_Tstartbar) annotation (Placement(transformation(extent={{130,-10},
                   {150,10}}, rotation=0)));
         replaceable Components.HE Ec_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -6867,17 +5566,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_LP_fluidVol,
           metalVol=Ec_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_LP_Tstart_G_In,
-          Tstart_G_Out=Ec_LP_Tstart_G_Out,
-          Tstart_M_In=Ec_LP_Tstart_M_In,
-          Tstart_M_Out=Ec_LP_Tstart_M_Out,
-          Tstart_F_In=Ec_LP_Tstart_F_In,
-          Tstart_F_Out=Ec_LP_Tstart_F_Out,
-          hstart_F_In=Ec_LP_hstart_F_In,
-          hstart_F_Out=Ec_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec) 
+          Tstartbar_G=Ec_LP_Tstartbar) 
                          constrainedby Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -6894,17 +5585,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_LP_fluidVol,
           metalVol=Ec_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_LP_Tstart_G_In,
-          Tstart_G_Out=Ec_LP_Tstart_G_Out,
-          Tstart_M_In=Ec_LP_Tstart_M_In,
-          Tstart_M_Out=Ec_LP_Tstart_M_Out,
-          Tstart_F_In=Ec_LP_Tstart_F_In,
-          Tstart_F_Out=Ec_LP_Tstart_F_Out,
-          hstart_F_In=Ec_LP_hstart_F_In,
-          hstart_F_Out=Ec_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)                annotation (Placement(transformation(
+          Tstartbar_G=Ec_LP_Tstartbar)                annotation (Placement(transformation(
                 extent={{210,-10},{230,10}}, rotation=0)));
         replaceable Components.ParHE Sh1HP_Rh1IP(
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -6927,27 +5610,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_B=Rh1_IP_fluidVol,
           metalVol_A=Sh1_HP_metalVol,
           metalVol_B=Rh1_IP_metalVol,
-          use_T=use_T_Sh,
-          Tstart_G_In=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           rhomcm_A=rhomcm,
           rhomcm_B=rhomcm,
           fluidNomFlowRate_B=fluidHPNomFlowRate_Sh,
-          fluidNomPressure_B=fluidHPNomPressure_Sh) 
+          fluidNomPressure_B=fluidHPNomPressure_Sh,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh1_HP_Tstartbar) 
                          constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -6970,27 +5641,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_B=Rh1_IP_fluidVol,
           metalVol_A=Sh1_HP_metalVol,
           metalVol_B=Rh1_IP_metalVol,
-          use_T=use_T_Sh,
-          Tstart_G_In=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
-          fluidNomPressure_B=fluidIPNomPressure_Rh,
           rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
+          rhomcm_B=rhomcm,
+          fluidNomFlowRate_B=fluidHPNomFlowRate_Sh,
+          fluidNomPressure_B=fluidHPNomPressure_Sh,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh1_HP_Tstartbar) 
                          annotation (Placement(transformation(extent={{-288,-12},
                   {-264,12}}, rotation=0)));
         replaceable Components.ParHE Sh2HP_Rh2IP(
@@ -7000,7 +5659,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=gasNomPressure,
           SSInit=SSInit,
           lambda=lambda,
-          use_T=use_T_Ec,
           N_G=Sh2_HP_N_G,
           N_F_A=Sh2_HP_N_F,
           N_F_B=Rh2_IP_N_F,
@@ -7014,27 +5672,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_A=Sh2_HP_fluidVol,
           fluidVol_B=Rh2_IP_fluidVol,
           metalVol_A=Sh2_HP_metalVol,
-          Tstart_G_In=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
           metalVol_B=Rh2_IP_metalVol,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           rhomcm_A=rhomcm,
           rhomcm_B=rhomcm,
           fluidNomPressure_B=fluidHPNomPressure_Sh,
-          fluidNomFlowRate_B=fluidHPNomFlowRate_Sh) 
+          fluidNomFlowRate_B=fluidHPNomFlowRate_Sh,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh2_HP_Tstartbar) 
                          constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -7043,7 +5690,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=gasNomPressure,
           SSInit=SSInit,
           lambda=lambda,
-          use_T=use_T_Ec,
           N_G=Sh2_HP_N_G,
           N_F_A=Sh2_HP_N_F,
           N_F_B=Rh2_IP_N_F,
@@ -7057,27 +5703,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_A=Sh2_HP_fluidVol,
           fluidVol_B=Rh2_IP_fluidVol,
           metalVol_A=Sh2_HP_metalVol,
-          Tstart_G_In=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
           metalVol_B=Rh2_IP_metalVol,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
-          fluidNomPressure_B=fluidIPNomPressure_Rh,
           rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
+          rhomcm_B=rhomcm,
+          fluidNomPressure_B=fluidHPNomPressure_Sh,
+          fluidNomFlowRate_B=fluidHPNomFlowRate_Sh,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh2_HP_Tstartbar) 
                          annotation (Placement(transformation(extent={{-360,-12},
                   {-336,12}}, rotation=0)));
       equation
@@ -7102,11 +5737,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={159,159,223},
             thickness=0.5));
         connect(Ev_LP.gasIn, Ec_HP.gasOut) annotation (Line(
-            points={{130,0},{60,0}},
+            points={{130,0},{58,0}},
             color={159,159,223},
             thickness=0.5));
         connect(Ec_HP.gasIn, Sh_LP.gasOut) annotation (Line(
-            points={{40,0},{-10,0}},
+            points={{38,0},{-10,0}},
             color={159,159,223},
             thickness=0.5));
         connect(Sh_LP.gasIn, Ev_HP.gasOut) annotation (Line(
@@ -7122,11 +5757,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(Sh_LP.waterIn, Sh_LP_In) annotation (Line(points={{-20,10},{-20,
                 80},{60,80},{60,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(Ec_HP.waterIn, Ec_HP_In) annotation (Line(points={{50,10},{50,
-                68},{-120,68},{-120,200}}, thickness=0.5,
+        connect(Ec_HP.waterIn, Ec_HP_In) annotation (Line(points={{48,10},{48,68},{-120,
+                68},{-120,200}},           thickness=0.5,
             color={0,0,255}));
-        connect(Ec_HP.waterOut, Ec_HP_Out) annotation (Line(points={{50,-10},{
-                50,-40},{-160,-40},{-160,200}}, thickness=0.5,
+        connect(Ec_HP.waterOut, Ec_HP_Out) annotation (Line(points={{48,-10},{48,-40},
+                {-160,-40},{-160,200}},         thickness=0.5,
             color={0,0,255}));
         connect(Sh_LP.waterOut, Sh_LP_Out) annotation (Line(points={{-20,-10},{
                 -20,-60},{140,-60},{140,-200}}, thickness=0.5,
@@ -7167,19 +5802,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
             points={{-60,-200},{-60,-120},{-343.2,-120},{-343.2,-12}},
             color={0,0,255},
             thickness=0.5));
-        annotation (Diagram(graphics),
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-400,-200},
+                  {400,200}}),
+                            graphics),
                              Icon(graphics));
       end HEG_2LRh;
 
       model HEG_3LRh
         "Heat Exchangers Group with three pressure level and reheat"
         extends ThermoPower.PowerPlants.HRSG.Interfaces.HEG_3LRh(
-                                    Ec1_HP_Tstart_G_In = Ec_IP_Tstart_G_In,
-                                    Ec1_HP_Tstart_G_Out = Ec_IP_Tstart_G_Out,
-                                    Rh1_IP_Tstart_G_In = Sh1_HP_Tstart_G_In,
-                                    Rh1_IP_Tstart_G_Out = Sh1_HP_Tstart_G_Out,
-                                    Rh2_IP_Tstart_G_In = Sh2_HP_Tstart_G_In,
-                                    Rh2_IP_Tstart_G_Out = Sh2_HP_Tstart_G_Out,
+                                    Ec_IP_Tstartbar = Ec1_HP_Tstartbar,
+                                    Rh1_IP_Tstartbar = Sh1_HP_Tstartbar,
+                                    Rh2_IP_Tstartbar = Sh2_HP_Tstartbar,
                                     Rh2_IP_N_G = Sh2_HP_N_G,
                                     Rh1_IP_N_G = Sh1_HP_N_G,
                                     Rh2_IP_gasVol = Sh2_HP_gasVol,
@@ -7216,27 +5850,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_B=Rh1_IP_fluidVol,
           metalVol_A=Sh1_HP_metalVol,
           metalVol_B=Rh1_IP_metalVol,
-          use_T=use_T_Sh,
-          Tstart_G_In=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
           fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           fluidNomPressure_B=fluidIPNomPressure_Rh,
           rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
+          rhomcm_B=rhomcm,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh1_HP_Tstartbar) 
                          constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -7259,27 +5881,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_B=Rh1_IP_fluidVol,
           metalVol_A=Sh1_HP_metalVol,
           metalVol_B=Rh1_IP_metalVol,
-          use_T=use_T_Sh,
-          Tstart_G_In=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out=Rh1_IP_hstart_F_Out,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
           fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           fluidNomPressure_B=fluidIPNomPressure_Rh,
           rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
+          rhomcm_B=rhomcm,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh1_HP_Tstartbar) 
                          annotation (Placement(transformation(extent={{-388,-12},
                   {-364,12}}, rotation=0)));
         replaceable Components.ParHE Sh2HP_Rh2IP(
@@ -7289,7 +5899,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=gasNomPressure,
           SSInit=SSInit,
           lambda=lambda,
-          use_T=use_T_Ec,
           N_G=Sh2_HP_N_G,
           N_F_A=Sh2_HP_N_F,
           N_F_B=Rh2_IP_N_F,
@@ -7303,27 +5912,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_A=Sh2_HP_fluidVol,
           fluidVol_B=Rh2_IP_fluidVol,
           metalVol_A=Sh2_HP_metalVol,
-          Tstart_G_In=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
           metalVol_B=Rh2_IP_metalVol,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
           fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           fluidNomPressure_B=fluidIPNomPressure_Rh,
           rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
+          rhomcm_B=rhomcm,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh2_HP_Tstartbar) 
                          constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -7332,7 +5930,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=gasNomPressure,
           SSInit=SSInit,
           lambda=lambda,
-          use_T=use_T_Ec,
           N_G=Sh2_HP_N_G,
           N_F_A=Sh2_HP_N_F,
           N_F_B=Rh2_IP_N_F,
@@ -7346,75 +5943,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_A=Sh2_HP_fluidVol,
           fluidVol_B=Rh2_IP_fluidVol,
           metalVol_A=Sh2_HP_metalVol,
-          Tstart_G_In=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out=Rh2_IP_hstart_F_Out,
           metalVol_B=Rh2_IP_metalVol,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Sh,
           fluidNomFlowRate_B=fluidIPNomFlowRate_Rh,
           fluidNomPressure_A=fluidHPNomPressure_Sh,
           fluidNomPressure_B=fluidIPNomPressure_Rh,
           rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
+          rhomcm_B=rhomcm,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G=Sh2_HP_Tstartbar) 
                          annotation (Placement(transformation(extent={{-460,-12},
                   {-436,12}}, rotation=0)));
-        replaceable Components.BaseReader_water stateRh1IP_out(redeclare
-            package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-400,-40},
-              extent={{-10,-10},{10,10}},
-              rotation=180)));
-        replaceable Components.BaseReader_water stateSh1HP_out(redeclare
-            package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-432,40},
-              extent={{-10,-10},{10,10}},
-              rotation=180)));
-        replaceable Components.BaseReader_water stateSh1HP_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-380,48},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateRh1IP_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-370,48},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateRh2IP_out(redeclare
-            package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-444,-52},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateSh2HP_out(redeclare
-            package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-454,-52},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
         replaceable Components.HE Ec2_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7431,17 +5971,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec2_HP_fluidVol,
           metalVol=Ec2_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec2_HP_Tstart_G_In,
-          Tstart_G_Out=Ec2_HP_Tstart_G_Out,
-          Tstart_M_In=Ec2_HP_Tstart_M_In,
-          Tstart_M_Out=Ec2_HP_Tstart_M_Out,
-          Tstart_F_In=Ec2_HP_Tstart_F_In,
-          Tstart_F_Out=Ec2_HP_Tstart_F_Out,
-          hstart_F_In=Ec2_HP_hstart_F_In,
-          hstart_F_Out=Ec2_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec) constrainedby
+          Tstartbar_G=Ec2_HP_Tstartbar) 
+                          constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7458,18 +5991,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec2_HP_fluidVol,
           metalVol=Ec2_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec2_HP_Tstart_G_In,
-          Tstart_G_Out=Ec2_HP_Tstart_G_Out,
-          Tstart_M_In=Ec2_HP_Tstart_M_In,
-          Tstart_M_Out=Ec2_HP_Tstart_M_Out,
-          Tstart_F_In=Ec2_HP_Tstart_F_In,
-          Tstart_F_Out=Ec2_HP_Tstart_F_Out,
-          hstart_F_In=Ec2_HP_hstart_F_In,
-          hstart_F_Out=Ec2_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ec)          annotation (Placement(transformation(extent=
-                  {{-92,12},{-68,-12}}, rotation=0)));
+          Tstartbar_G=Ec2_HP_Tstartbar)          annotation (Placement(transformation(extent={{-90,12},
+                  {-66,-12}},           rotation=0)));
         replaceable Components.ParHE Ec1HP_EcIP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7488,30 +6013,17 @@ package PowerPlants "Models of thermoelectrical power plants components"
           metalVol_A=Ec1_HP_metalVol,
           metalVol_B=Ec_IP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec1_HP_Tstart_G_In,
-          Tstart_G_Out=Ec1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Ec1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Ec1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Ec1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Ec1_HP_Tstart_F_Out,
-          hstart_F_A_In=Ec1_HP_hstart_F_In,
-          hstart_F_A_Out=Ec1_HP_hstart_F_Out,
-          Tstart_M_B_In=Ec_IP_Tstart_M_In,
-          Tstart_M_B_Out=Ec_IP_Tstart_M_Out,
-          Tstart_F_B_In=Ec_IP_Tstart_F_In,
-          Tstart_F_B_Out=Ec_IP_Tstart_F_Out,
-          hstart_F_B_In=Ec_IP_hstart_F_In,
-          hstart_F_B_Out=Ec_IP_hstart_F_Out,
           lambda=lambda,
           extSurfaceTub_A=Ec1_HP_extSurfaceTub,
           extSurfaceTub_B=Ec_IP_extSurfaceTub,
-          use_T=use_T_Ec,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Ec,
           fluidNomFlowRate_B=fluidIPNomFlowRate_Ec,
           fluidNomPressure_A=fluidHPNomPressure_Ec,
           fluidNomPressure_B=fluidIPNomPressure_Ec,
           rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) constrainedby
+          rhomcm_B=rhomcm,
+          Tstartbar_G=Ec1_HP_Tstartbar) 
+                           constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7530,30 +6042,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
           metalVol_A=Ec1_HP_metalVol,
           metalVol_B=Ec_IP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec1_HP_Tstart_G_In,
-          Tstart_G_Out=Ec1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Ec1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Ec1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Ec1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Ec1_HP_Tstart_F_Out,
-          hstart_F_A_In=Ec1_HP_hstart_F_In,
-          hstart_F_A_Out=Ec1_HP_hstart_F_Out,
-          Tstart_M_B_In=Ec_IP_Tstart_M_In,
-          Tstart_M_B_Out=Ec_IP_Tstart_M_Out,
-          Tstart_F_B_In=Ec_IP_Tstart_F_In,
-          Tstart_F_B_Out=Ec_IP_Tstart_F_Out,
-          hstart_F_B_In=Ec_IP_hstart_F_In,
-          hstart_F_B_Out=Ec_IP_hstart_F_Out,
           lambda=lambda,
           extSurfaceTub_A=Ec1_HP_extSurfaceTub,
           extSurfaceTub_B=Ec_IP_extSurfaceTub,
-          use_T=use_T_Ec,
           fluidNomFlowRate_A=fluidHPNomFlowRate_Ec,
           fluidNomFlowRate_B=fluidIPNomFlowRate_Ec,
           fluidNomPressure_A=fluidHPNomPressure_Ec,
           fluidNomPressure_B=fluidIPNomPressure_Ec,
           rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
+          rhomcm_B=rhomcm,
+          Tstartbar_G=Ec1_HP_Tstartbar) 
                          annotation (Placement(transformation(extent={{178,-12},
                   {202,12}}, rotation=0)));
         replaceable Components.HE Ec_LP(
@@ -7569,20 +6067,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_LP_fluidVol,
           metalVol=Ec_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_LP_Tstart_G_In,
-          Tstart_G_Out=Ec_LP_Tstart_G_Out,
-          Tstart_M_In=Ec_LP_Tstart_M_In,
-          Tstart_M_Out=Ec_LP_Tstart_M_Out,
-          Tstart_F_In=Ec_LP_Tstart_F_In,
-          Tstart_F_Out=Ec_LP_Tstart_F_Out,
-          hstart_F_In=Ec_LP_hstart_F_In,
-          hstart_F_Out=Ec_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Ec_LP_extSurfaceTub,
-          use_T=use_T_Ec,
           fluidNomFlowRate=fluidLPNomFlowRate_Ec,
-          fluidNomPressure=fluidLPNomPressure_Ec) constrainedby
+          fluidNomPressure=fluidLPNomPressure_Ec,
+          Tstartbar_G=Ec_LP_Tstartbar)              constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7596,21 +6086,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ec_LP_fluidVol,
           metalVol=Ec_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ec_LP_Tstart_G_In,
-          Tstart_G_Out=Ec_LP_Tstart_G_Out,
-          Tstart_M_In=Ec_LP_Tstart_M_In,
-          Tstart_M_Out=Ec_LP_Tstart_M_Out,
-          Tstart_F_In=Ec_LP_Tstart_F_In,
-          Tstart_F_Out=Ec_LP_Tstart_F_Out,
-          hstart_F_In=Ec_LP_hstart_F_In,
-          hstart_F_Out=Ec_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Ec_LP_extSurfaceTub,
-          use_T=use_T_Ec,
           fluidNomFlowRate=fluidLPNomFlowRate_Ec,
-          fluidNomPressure=fluidLPNomPressure_Ec) 
-                                         annotation (Placement(transformation(
+          fluidNomPressure=fluidLPNomPressure_Ec,
+          Tstartbar_G=Ec_LP_Tstartbar)       annotation (Placement(transformation(
                 extent={{368,-12},{392,12}}, rotation=0)));
         replaceable Components.HE2ph Ev_LP(
           redeclare package FlueGasMedium = FlueGasMedium,
@@ -7625,20 +6106,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_LP_fluidVol,
           metalVol=Ev_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_LP_Tstart_G_In,
-          Tstart_G_Out=Ev_LP_Tstart_G_Out,
-          Tstart_M_In=Ev_LP_Tstart_M_In,
-          Tstart_M_Out=Ev_LP_Tstart_M_Out,
-          Tstart_F_In=Ev_LP_Tstart_F_In,
-          Tstart_F_Out=Ev_LP_Tstart_F_Out,
-          hstart_F_In=Ev_LP_hstart_F_In,
-          hstart_F_Out=Ev_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Ev_LP_extSurfaceTub,
-          use_T=use_T_Ev,
           fluidNomFlowRate=fluidLPNomFlowRate_Ev,
-          fluidNomPressure=fluidLPNomPressure_Ev) constrainedby
+          fluidNomPressure=fluidLPNomPressure_Ev,
+          Tstartbar_G=Ev_LP_Tstartbar)            constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7652,23 +6125,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_LP_fluidVol,
           metalVol=Ev_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_LP_Tstart_G_In,
-          Tstart_G_Out=Ev_LP_Tstart_G_Out,
-          Tstart_M_In=Ev_LP_Tstart_M_In,
-          Tstart_M_Out=Ev_LP_Tstart_M_Out,
-          Tstart_F_In=Ev_LP_Tstart_F_In,
-          Tstart_F_Out=Ev_LP_Tstart_F_Out,
-          hstart_F_In=Ev_LP_hstart_F_In,
-          hstart_F_Out=Ev_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Ev_LP_extSurfaceTub,
-          use_T=use_T_Ev,
           fluidNomFlowRate=fluidLPNomFlowRate_Ev,
-          fluidNomPressure=fluidLPNomPressure_Ev) 
-                         annotation (Placement(transformation(extent={{288,-12},
-                  {312,12}}, rotation=0)));
-        replaceable Components.HE2ph Ev_IP(
+          fluidNomPressure=fluidLPNomPressure_Ev,
+          Tstartbar_G=Ev_LP_Tstartbar) 
+                         annotation (Placement(transformation(extent={{288,-14},{312,10}},
+                             rotation=0)));
+        replaceable Components.HE Ev_IP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
           N_G=Ev_IP_N_G,
@@ -7681,20 +6146,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_IP_fluidVol,
           metalVol=Ev_IP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_IP_Tstart_G_In,
-          Tstart_G_Out=Ev_IP_Tstart_G_Out,
-          Tstart_M_In=Ev_IP_Tstart_M_In,
-          Tstart_M_Out=Ev_IP_Tstart_M_Out,
-          Tstart_F_In=Ev_IP_Tstart_F_In,
-          Tstart_F_Out=Ev_IP_Tstart_F_Out,
-          hstart_F_In=Ev_IP_hstart_F_In,
-          hstart_F_Out=Ev_IP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Ev_IP_extSurfaceTub,
-          use_T=use_T_Ev,
           fluidNomFlowRate=fluidIPNomFlowRate_Ev,
-          fluidNomPressure=fluidIPNomPressure_Ev) constrainedby
+          fluidNomPressure=fluidIPNomPressure_Ev,
+          Tstartbar_G=Ev_IP_Tstartbar)            constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7708,20 +6165,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_IP_fluidVol,
           metalVol=Ev_IP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_IP_Tstart_G_In,
-          Tstart_G_Out=Ev_IP_Tstart_G_Out,
-          Tstart_M_In=Ev_IP_Tstart_M_In,
-          Tstart_M_Out=Ev_IP_Tstart_M_Out,
-          Tstart_F_In=Ev_IP_Tstart_F_In,
-          Tstart_F_Out=Ev_IP_Tstart_F_Out,
-          hstart_F_In=Ev_IP_hstart_F_In,
-          hstart_F_Out=Ev_IP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Ev_IP_extSurfaceTub,
-          use_T=use_T_Ev,
           fluidNomFlowRate=fluidIPNomFlowRate_Ev,
-          fluidNomPressure=fluidIPNomPressure_Ev) 
+          fluidNomPressure=fluidIPNomPressure_Ev,
+          Tstartbar_G=Ev_IP_Tstartbar) 
           annotation (Placement(transformation(extent={{-12,-12},{12,12}},
                 rotation=0)));
         replaceable Components.HE Sh_LP(
@@ -7737,20 +6186,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh_LP_fluidVol,
           metalVol=Sh_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Sh_LP_Tstart_G_In,
-          Tstart_G_Out=Sh_LP_Tstart_G_Out,
-          Tstart_M_In=Sh_LP_Tstart_M_In,
-          Tstart_M_Out=Sh_LP_Tstart_M_Out,
-          Tstart_F_In=Sh_LP_Tstart_F_In,
-          Tstart_F_Out=Sh_LP_Tstart_F_Out,
-          hstart_F_In=Sh_LP_hstart_F_In,
-          hstart_F_Out=Sh_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Sh_LP_extSurfaceTub,
-          use_T=use_T_Sh,
           fluidNomFlowRate=fluidLPNomFlowRate_Sh,
-          fluidNomPressure=fluidLPNomPressure_Sh) constrainedby
+          fluidNomPressure=fluidLPNomPressure_Sh,
+          Tstartbar_G=Sh_LP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+                                                  constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7764,22 +6207,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh_LP_fluidVol,
           metalVol=Sh_LP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Sh_LP_Tstart_G_In,
-          Tstart_G_Out=Sh_LP_Tstart_G_Out,
-          Tstart_M_In=Sh_LP_Tstart_M_In,
-          Tstart_M_Out=Sh_LP_Tstart_M_Out,
-          Tstart_F_In=Sh_LP_Tstart_F_In,
-          Tstart_F_Out=Sh_LP_Tstart_F_Out,
-          hstart_F_In=Sh_LP_hstart_F_In,
-          hstart_F_Out=Sh_LP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
           extSurfaceTub=Sh_LP_extSurfaceTub,
-          use_T=use_T_Sh,
           fluidNomFlowRate=fluidLPNomFlowRate_Sh,
-          fluidNomPressure=fluidLPNomPressure_Sh) 
-                                   annotation (Placement(transformation(extent=
-                  {{108,-12},{132,12}}, rotation=0)));
+          fluidNomPressure=fluidLPNomPressure_Sh,
+          Tstartbar_G=Sh_LP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+                                   annotation (Placement(transformation(extent={{108,-12},
+                  {132,12}},            rotation=0)));
         replaceable Components.HE2ph Ev_HP(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7796,17 +6232,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_HP_fluidVol,
           metalVol=Ev_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_HP_Tstart_G_In,
-          Tstart_G_Out=Ev_HP_Tstart_G_Out,
-          Tstart_M_In=Ev_HP_Tstart_M_In,
-          Tstart_M_Out=Ev_HP_Tstart_M_Out,
-          Tstart_F_In=Ev_HP_Tstart_F_In,
-          Tstart_F_Out=Ev_HP_Tstart_F_Out,
-          hstart_F_In=Ev_HP_hstart_F_In,
-          hstart_F_Out=Ev_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ev) constrainedby
+          Tstartbar_G=Ev_HP_Tstartbar) 
+                          constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7823,17 +6252,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Ev_HP_fluidVol,
           metalVol=Ev_HP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In=Ev_HP_Tstart_G_In,
-          Tstart_G_Out=Ev_HP_Tstart_G_Out,
-          Tstart_M_In=Ev_HP_Tstart_M_In,
-          Tstart_M_Out=Ev_HP_Tstart_M_Out,
-          Tstart_F_In=Ev_HP_Tstart_F_In,
-          Tstart_F_Out=Ev_HP_Tstart_F_Out,
-          hstart_F_In=Ev_HP_hstart_F_In,
-          hstart_F_Out=Ev_HP_hstart_F_Out,
           rhomcm=rhomcm,
           lambda=lambda,
-          use_T=use_T_Ev) 
+          Tstartbar_G=Ev_HP_Tstartbar) 
           annotation (Placement(transformation(extent={{-312,-12},{-288,12}},
                 rotation=0)));
         replaceable Components.HE Sh_IP(
@@ -7851,18 +6272,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh_IP_fluidVol,
           metalVol=Sh_IP_metalVol,
           rhomcm=rhomcm,
-          use_T=use_T_Sh,
           SSInit=SSInit,
-          Tstart_G_In=Sh_IP_Tstart_G_In,
-          Tstart_G_Out=Sh_IP_Tstart_G_Out,
-          Tstart_M_In=Sh_IP_Tstart_M_In,
-          Tstart_M_Out=Sh_IP_Tstart_M_Out,
-          Tstart_F_In=Sh_IP_Tstart_F_In,
-          Tstart_F_Out=Sh_IP_Tstart_F_Out,
-          hstart_F_In=Sh_IP_hstart_F_In,
-          hstart_F_Out=Sh_IP_hstart_F_Out,
           fluidNomPressure=fluidIPNomPressure_Sh,
-          lambda=lambda) constrainedby
+          lambda=lambda,
+          Tstartbar_G=Sh_IP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+                         constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
@@ -7871,7 +6286,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomFlowRate=gasNomFlowRate,
           fluidNomFlowRate=fluidIPNomFlowRate_Sh,
           gasNomPressure=gasNomPressure,
-          fluidNomPressure=fluidNomPressure_Sh,
           exchSurface_G=Sh_IP_exchSurface_G,
           exchSurface_F=Sh_IP_exchSurface_F,
           extSurfaceTub=Sh_IP_extSurfaceTub,
@@ -7879,303 +6293,31 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol=Sh_IP_fluidVol,
           metalVol=Sh_IP_metalVol,
           rhomcm=rhomcm,
-          lambda=lamba,
-          use_T=use_T_Sh,
           SSInit=SSInit,
-          Tstart_G_In=Sh_IP_Tstart_G_In,
-          Tstart_G_Out=Sh_IP_Tstart_G_Out,
-          Tstart_M_In=Sh_IP_Tstart_M_In,
-          Tstart_M_Out=Sh_IP_Tstart_M_Out,
-          Tstart_F_In=Sh_IP_Tstart_F_In,
-          Tstart_F_Out=Sh_IP_Tstart_F_Out,
-          hstart_F_In=Sh_IP_hstart_F_In,
-          hstart_F_Out=Sh_IP_hstart_F_Out) annotation (Placement(transformation(
+          fluidNomPressure=fluidIPNomPressure_Sh,
+          lambda=lambda,
+          Tstartbar_G=Sh_IP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) annotation (Placement(transformation(
                 extent={{-218,-12},{-194,12}}, rotation=0)));
-        replaceable Components.BaseReader_water stateEvHP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-300,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateShIP_in(
-                                                  redeclare package Medium = 
-              FluidMedium) constrainedby Components.BaseReader_water(
-                                                                redeclare
-            package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-206,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEc2HP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-80,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEvIP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={0,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateShLP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={120,50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEcIP_in(
-                                           redeclare package Medium = 
-              FluidMedium) constrainedby Components.BaseReader_water(
-                                                                redeclare
-            package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={196,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEvLP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={300,50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEcLP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={380,50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEvHP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = 
-                     FlueGasMedium) 
-                           annotation (Placement(transformation(
-              origin={-300,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateShIP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-206,-50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEc2HP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-80,28},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEvIP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={0,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateShLP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={120,-50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEcIP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={196,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEvLP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={300,-50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEcLP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(  redeclare package Medium = FluidMedium)
-                           annotation (Placement(transformation(
-              origin={380,-50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEc1HP_in(
-                                           redeclare package Medium = 
-              FluidMedium) constrainedby Components.BaseReader_water(
-                                                                redeclare
-            package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={184,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEc1HP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={184,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
         Water.Mixer mixIP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
           V=mixIP_V,
-          pstart=fluidIPNomPressure_Rh,
-          hstart=Rh1_IP_hstart_F_In) 
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          pstart=fluidIPNomPressure_Sh) 
                           annotation (Placement(transformation(
-              origin={-250,-110},
+              origin={-252,-110},
               extent={{-10,-10},{10,10}},
               rotation=180)));
       equation
-        connect(stateRh1IP_out.inlet, Sh1HP_Rh1IP.waterOutB) annotation (Line(
-              points={{-394,-40},{-371.2,-40},{-371.2,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Sh2HP_Rh2IP.waterInA, stateSh1HP_out.outlet) annotation (Line(
-              points={{-452.8,12},{-452.8,40},{-438,40}}, thickness=0.5,
-            color={0,0,255}));
 
-        connect(stateRh2IP_out.inlet, Sh2HP_Rh2IP.waterOutB) annotation (Line(
-              points={{-444,-46},{-444,-12},{-443.2,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateSh2HP_out.inlet, Sh2HP_Rh2IP.waterOutA) annotation (Line(
-              points={{-454,-46},{-454,-12},{-452.8,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateRh1IP_in.outlet, Sh1HP_Rh1IP.waterInB) annotation (Line(
-              points={{-370,42},{-370,12},{-371.2,12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateSh1HP_in.outlet, Sh1HP_Rh1IP.waterInA) annotation (Line(
-              points={{-380,42},{-380,12},{-380.8,12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateSh1HP_in.inlet, Sh_HP_In) annotation (Line(points={{-380,
-                54},{-380,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Sh_HP_Out, stateSh2HP_out.outlet) annotation (Line(points={{
-                -300,-200},{-300,-160},{-454,-160},{-454,-58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Rh_IP_Out, stateRh2IP_out.outlet) annotation (Line(points={{
-                -190,-200},{-190,-140},{-444,-140},{-444,-58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Sh1HP_Rh1IP.waterOutA, stateSh1HP_out.inlet) annotation (Line(
-              points={{-380.8,-12},{-380.8,-30},{-400,-30},{-400,40},{-426,40}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(stateRh1IP_out.outlet, Sh2HP_Rh2IP.waterInB) annotation (Line(
-              points={{-406,-40},{-420,-40},{-420,22},{-443.2,22},{-443.2,12}},
-              thickness=0.5,
-            color={0,0,255}));
         connect(Sh1HP_Rh1IP.gasIn, Sh2HP_Rh2IP.gasOut) annotation (Line(
             points={{-388,0},{-436,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(stateEcLP_in.outlet,Ec_LP. waterIn) annotation (Line(points={{
-                380,44},{380,12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvLP_in.outlet,Ev_LP. waterIn) annotation (Line(points={{
-                300,44},{300,12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Sh_LP.waterIn,stateShLP_in. outlet) annotation (Line(points={{
-                120,12},{120,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Ev_IP.waterIn,stateEvIP_in. outlet) annotation (Line(points={{0,12},{
-                0,44},{-3.67394e-016,44}},     thickness=0.5,
-            color={0,0,255}));
-        connect(Sh_IP.waterIn,stateShIP_in. outlet) annotation (Line(points={{
-                -206,12},{-206,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Ev_HP.waterIn,stateEvHP_in. outlet) annotation (Line(points={{
-                -300,12},{-300,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvIP_out.inlet,Ev_IP. waterOut) annotation (Line(points={{
-                1.10218e-015,-44},{1.10218e-015,-36.5},{0,-36.5},{0,-12}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(stateShLP_out.inlet,Sh_LP. waterOut) annotation (Line(points={{
-                120,-44},{120,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateShIP_out.inlet,Sh_IP. waterOut) annotation (Line(points={{
-                -206,-44},{-206,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcLP_out.inlet,Ec_LP. waterOut) annotation (Line(points={{
-                380,-44},{380,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvLP_out.inlet,Ev_LP. waterOut) annotation (Line(points={{
-                300,-44},{300,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvHP_out.inlet,Ev_HP. waterOut) annotation (Line(points={{
-                -300,-44},{-300,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Ec1HP_EcIP.waterInB,stateEcIP_in. outlet) annotation (Line(
-              points={{194.8,12},{196,12},{196,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc2HP_out.inlet,Ec2_HP. waterOut) annotation (Line(points=
-                {{-80,22},{-80,12}}, thickness=0.5));
-        connect(Ec2_HP.waterIn,stateEc2HP_in. outlet) annotation (Line(points={
-                {-80,-12},{-80,-44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc2HP_in.inlet,stateEc1HP_out. outlet) annotation (Line(
-              points={{-80,-56},{-80,-90},{184,-90},{184,-56}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcIP_out.inlet,Ec1HP_EcIP. waterOutB) annotation (Line(
-              points={{196,-44},{196,-12},{194.8,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc1HP_out.inlet,Ec1HP_EcIP. waterOutA) annotation (Line(
-              points={{184,-44},{184,-12},{185.2,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc1HP_in.outlet,Ec1HP_EcIP. waterInA) annotation (Line(
-              points={{184,44},{185.2,44},{185.2,12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcLP_in.inlet, Ec_LP_In) annotation (Line(points={{380,56},
-                {380,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvLP_in.inlet, Ev_LP_In) annotation (Line(points={{300,56},
-                {300,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateShLP_in.inlet, Sh_LP_In) annotation (Line(points={{120,56},
-                {120,130},{220,130},{220,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcIP_in.inlet, Ec_IP_In) annotation (Line(points={{196,56},
-                {196,120},{80,120},{80,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcIP_out.outlet, Ec_IP_Out) annotation (Line(points={{196,
-                -56},{196,-70},{40,-70},{40,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateShIP_in.inlet, Sh_IP_In) annotation (Line(points={{-206,56},
-                {-206,90},{-80,90},{-80,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvIP_in.inlet, Ev_IP_In) annotation (Line(points={{
-                3.67394e-016,56},{3.67394e-016,200},{1.77636e-015,200}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvIP_out.outlet, Ev_IP_Out) annotation (Line(points={{
-                -1.10218e-015,-56},{-1.10218e-015,-64},{0,-70},{-40,-70},{-40,
-                200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateShLP_out.outlet, Sh_LP_Out) annotation (Line(points={{120,
-                -56},{120,-110},{300,-110},{300,-198}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvHP_out.outlet, Ev_HP_Out) annotation (Line(points={{-300,
-                -56},{-300,-70},{-340,-70},{-340,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvLP_out.outlet, Ev_LP_Out) annotation (Line(points={{300,
-                -56},{300,-70},{260,-70},{260,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcLP_out.outlet, Ec_LP_Out) annotation (Line(points={{380,
-                -56},{380,-70},{340,-70},{340,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc2HP_out.outlet, Ec_HP_Out) annotation (Line(points={{-80,
-                34},{-80,60},{-260,60},{-260,200}}, thickness=0.5,
-            color={0,0,255}));
         connect(GasOut,Ec_LP. gasOut) annotation (Line(
-            points={{500,1.77636e-015},{426,1.77636e-015},{392,0}},
+            points={{500,1.77636e-015},{392,1.77636e-015},{392,0}},
             color={159,159,223},
             thickness=0.5));
         connect(Sh_IP.gasIn,Ev_HP. gasOut) annotation (Line(
@@ -8183,15 +6325,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={159,159,223},
             thickness=0.5));
         connect(Ec2_HP.gasIn,Sh_IP. gasOut) annotation (Line(
-            points={{-92,0},{-194,0}},
+            points={{-90,0},{-90,0},{-194,0}},
             color={159,159,223},
             thickness=0.5));
         connect(Ev_IP.gasIn,Ec2_HP. gasOut) annotation (Line(
-            points={{-12,0},{-68,0}},
+            points={{-12,0},{-12,0},{-66,0}},
             color={159,159,223},
             thickness=0.5));
         connect(Sh_LP.gasIn,Ev_IP. gasOut) annotation (Line(
-            points={{108,0},{12,0}},
+            points={{108,0},{84,0},{60,0},{12,0}},
             color={159,159,223},
             thickness=0.5));
         connect(Ec1HP_EcIP.gasIn,Sh_LP. gasOut) annotation (Line(
@@ -8199,31 +6341,19 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={159,159,223},
             thickness=0.5));
         connect(Ev_LP.gasIn,Ec1HP_EcIP. gasOut) annotation (Line(
-            points={{288,0},{202,0}},
+            points={{288,-2},{288,0},{202,0}},
             color={159,159,223},
             thickness=0.5));
         connect(Ec_LP.gasIn,Ev_LP. gasOut) annotation (Line(
-            points={{368,0},{312,0}},
+            points={{368,0},{368,-2},{312,-2}},
             color={159,159,223},
             thickness=0.5));
         connect(Ev_HP.gasIn, Sh1HP_Rh1IP.gasOut) annotation (Line(
             points={{-312,0},{-364,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(stateEvHP_in.inlet, Ev_HP_In) annotation (Line(points={{-300,56},
-                {-300,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Ec_HP_In, stateEc1HP_in.inlet) annotation (Line(points={{-220,
-                200},{-220,100},{184,100},{184,56}}, thickness=0.5,
-            color={0,0,255}));
-        connect(mixIP.in1, Rh_IP_In) annotation (Line(points={{-242,-116},{-130,
-                -116},{-130,-200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(mixIP.in2, stateShIP_out.outlet) annotation (Line(points={{-242,
-                -104},{-206,-104},{-206,-56}},        thickness=0.5,
-            color={0,0,255}));
-        connect(mixIP.out, stateRh1IP_in.inlet) annotation (Line(points={{-260,
-                -110},{-350,-110},{-350,86},{-370,86},{-370,54}}, thickness=0.5,
+        connect(mixIP.in1, Rh_IP_In) annotation (Line(points={{-244,-116},{-130,-116},
+                {-130,-200}},       thickness=0.5,
             color={0,0,255}));
         connect(GasIn, Sh2HP_Rh2IP.gasIn) annotation (Line(
             points={{-500,1.77636e-015},{-480,1.77636e-015},{-480,0},{-460,0}},
@@ -8231,8 +6361,125 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5,
             smooth=Smooth.None));
 
-        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
-                  {-500,-200},{500,200}}),
+        connect(Ec_LP.waterIn, Ec_LP_In) annotation (Line(
+            points={{380,12},{380,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec_LP.waterOut, Ec_LP_Out) annotation (Line(
+            points={{380,-12},{380,-42},{340,-42},{340,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_LP.waterIn, Ev_LP_In) annotation (Line(
+            points={{300,10},{300,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_LP_Out, Ev_LP.waterOut) annotation (Line(
+            points={{260,200},{260,-40},{300,-40},{300,-14}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh_LP.waterIn, Sh_LP_In) annotation (Line(
+            points={{120,12},{120,102},{220,102},{220,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh_LP.waterOut, Sh_LP_Out) annotation (Line(
+            points={{120,-12},{120,-140},{300,-140},{300,-198}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec1HP_EcIP.waterOutB, Ec_IP_Out) annotation (Line(
+            points={{194.8,-12},{194,-12},{194,-80},{40,-80},{40,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec1HP_EcIP.waterInB, Ec_IP_In) annotation (Line(
+            points={{194.8,12},{194.8,160},{80,160},{80,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec1HP_EcIP.waterInA, Ec_HP_In) annotation (Line(
+            points={{185.2,12},{184,12},{184,140},{-220,140},{-220,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec1HP_EcIP.waterOutA, Ec2_HP.waterIn) annotation (Line(
+            points={{185.2,-12},{185.2,-60},{-78,-60},{-78,-12}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_IP.waterIn, Ev_IP_In) annotation (Line(
+            points={{0,12},{0,200},{1.77636e-015,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_IP.waterOut, Ev_IP_Out) annotation (Line(
+            points={{0,-12},{0,-40},{-40,-40},{-40,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh_IP.waterIn, Sh_IP_In) annotation (Line(
+            points={{-206,12},{-206,80},{-80,80},{-80,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh_IP.waterOut, mixIP.in2) annotation (Line(
+            points={{-206,-12},{-206,-102},{-244,-102},{-244,-104}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(mixIP.out, Sh1HP_Rh1IP.waterInB) annotation (Line(
+            points={{-262,-110},{-348,-110},{-348,38},{-371.2,38},{-371.2,12}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh1HP_Rh1IP.waterOutB, Sh2HP_Rh2IP.waterInB) annotation (Line(
+            points={{-371.2,-12},{-371.2,-50},{-420,-50},{-420,30},{-443.2,30},{-443.2,
+                12}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh1HP_Rh1IP.waterOutA, Sh2HP_Rh2IP.waterInA) annotation (Line(
+            points={{-380.8,-12},{-380.8,-40},{-410,-40},{-410,40},{-452.8,40},{-452.8,
+                12}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh1HP_Rh1IP.waterInA, Sh_HP_In) annotation (Line(
+            points={{-380.8,12},{-380.8,104},{-380,104},{-380,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh2HP_Rh2IP.waterOutA, Sh_HP_Out) annotation (Line(
+            points={{-452.8,-12},{-452.8,-160},{-300,-160},{-300,-200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Rh_IP_Out, Sh2HP_Rh2IP.waterOutB) annotation (Line(
+            points={{-190,-200},{-190,-140},{-443.2,-140},{-443.2,-12}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_HP.waterIn, Ev_HP_In) annotation (Line(
+            points={{-300,12},{-300,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_HP.waterOut, Ev_HP_Out) annotation (Line(
+            points={{-300,-12},{-300,-42},{-340,-42},{-340,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec2_HP.waterOut, Ec_HP_Out) annotation (Line(
+            points={{-78,12},{-78,60},{-260,60},{-260,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-500,-200},
+                  {500,200}}),
                             graphics),
                              Icon(graphics),
           DymolaStoredErrors);
@@ -8241,12 +6488,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
       model HEG_3LRh_des
         "Heat Exchangers Group with three pressure level, reheat and desuperheater"
         extends ThermoPower.PowerPlants.HRSG.Interfaces.HEG_3LRh(
-                                    Ec1_HP_Tstart_G_In = Ec_IP_Tstart_G_In,
-                                    Ec1_HP_Tstart_G_Out = Ec_IP_Tstart_G_Out,
-                                    Rh1_IP_Tstart_G_In = Sh1_HP_Tstart_G_In,
-                                    Rh1_IP_Tstart_G_Out = Sh1_HP_Tstart_G_Out,
-                                    Rh2_IP_Tstart_G_In = Sh2_HP_Tstart_G_In,
-                                    Rh2_IP_Tstart_G_Out = Sh2_HP_Tstart_G_Out,
+                                    Ec_IP_Tstartbar = Ec1_HP_Tstartbar,
+                                    Rh1_IP_Tstartbar = Sh1_HP_Tstartbar,
+                                    Rh2_IP_Tstartbar = Sh2_HP_Tstartbar,
                                     Rh2_IP_N_G = Sh2_HP_N_G,
                                     Rh1_IP_N_G = Sh1_HP_N_G,
                                     Rh2_IP_gasVol = Sh2_HP_gasVol,
@@ -8284,7 +6528,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         parameter SI.Volume mixIP_V=3 "Internal volume of the IP mixer";
 
-        replaceable ThermoPower.PowerPlants.HRSG.Components.ParHE_Des ShHP_RhIP(
+        replaceable Components.ParHE_Des ShHP_RhIP(
           Cv_valA=Cv_attShHP,
           pnom_valA=pnom_attShHP,
           dpnom_valA=dpnom_attShHP,
@@ -8337,36 +6581,22 @@ package PowerPlants "Models of thermoelectrical power plants components"
           metalVol_A_p2=Sh2_HP_metalVol,
           metalVol_B_p2=Rh2_IP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In_p1=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out_p1=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In_p1=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out_p1=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In_p1=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out_p1=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In_p1=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out_p1=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In_p1=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out_p1=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In_p1=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out_p1=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In_p1=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out_p1=Rh1_IP_hstart_F_Out,
-          Tstart_G_In_p2=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out_p2=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In_p2=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out_p2=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In_p2=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out_p2=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In_p2=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out_p2=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In_p2=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out_p2=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In_p2=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out_p2=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In_p2=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out_p2=Rh2_IP_hstart_F_Out,
-          use_T=use_T_Sh) constrainedby
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Liquid,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_G_p1=Sh2_HP_Tstartbar,
+          Tstartbar_G_p2=Sh1_HP_Tstartbar) 
+                          constrainedby
           ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE_Des(
+                                                                     Cv_valA=Cv_attShHP,
+          pnom_valA=pnom_attShHP,
+          dpnom_valA=dpnom_attShHP,
+          wnom_valA=wnom_attShHP,
+          hstart_valA=valShHP_hstart,
+          Cv_valB=Cv_attRhIP,
+          pnom_valB=pnom_attRhIP,
+          dpnom_valB=dpnom_attRhIP,
+          wnom_valB=wnom_attRhIP,
+          hstart_valB=valRhIP_hstart,
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
           gasNomFlowRate=gasNomFlowRate,
@@ -8409,35 +6639,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
           metalVol_A_p2=Sh2_HP_metalVol,
           metalVol_B_p2=Rh2_IP_metalVol,
           SSInit=SSInit,
-          Tstart_G_In_p1=Sh1_HP_Tstart_G_In,
-          Tstart_G_Out_p1=Sh1_HP_Tstart_G_Out,
-          Tstart_M_A_In_p1=Sh1_HP_Tstart_M_In,
-          Tstart_M_A_Out_p1=Sh1_HP_Tstart_M_Out,
-          Tstart_F_A_In_p1=Sh1_HP_Tstart_F_In,
-          Tstart_F_A_Out_p1=Sh1_HP_Tstart_F_Out,
-          hstart_F_A_In_p1=Sh1_HP_hstart_F_In,
-          hstart_F_A_Out_p1=Sh1_HP_hstart_F_Out,
-          Tstart_M_B_In_p1=Rh1_IP_Tstart_M_In,
-          Tstart_M_B_Out_p1=Rh1_IP_Tstart_M_Out,
-          Tstart_F_B_In_p1=Rh1_IP_Tstart_F_In,
-          Tstart_F_B_Out_p1=Rh1_IP_Tstart_F_Out,
-          hstart_F_B_In_p1=Rh1_IP_hstart_F_In,
-          hstart_F_B_Out_p1=Rh1_IP_hstart_F_Out,
-          Tstart_G_In_p2=Sh2_HP_Tstart_G_In,
-          Tstart_G_Out_p2=Sh2_HP_Tstart_G_Out,
-          Tstart_M_A_In_p2=Sh2_HP_Tstart_M_In,
-          Tstart_M_A_Out_p2=Sh2_HP_Tstart_M_Out,
-          Tstart_F_A_In_p2=Sh2_HP_Tstart_F_In,
-          Tstart_F_A_Out_p2=Sh2_HP_Tstart_F_Out,
-          hstart_F_A_In_p2=Sh2_HP_hstart_F_In,
-          hstart_F_A_Out_p2=Sh2_HP_hstart_F_Out,
-          Tstart_M_B_In_p2=Rh2_IP_Tstart_M_In,
-          Tstart_M_B_Out_p2=Rh2_IP_Tstart_M_Out,
-          Tstart_F_B_In_p2=Rh2_IP_Tstart_F_In,
-          Tstart_F_B_Out_p2=Rh2_IP_Tstart_F_Out,
-          hstart_F_B_In_p2=Rh2_IP_hstart_F_In,
-          hstart_F_B_Out_p2=Rh2_IP_hstart_F_Out,
-          use_T=use_T_Sh)         annotation (Placement(transformation(extent={
+          Tstartbar_G_p1=Sh2_HP_Tstartbar,
+          Tstartbar_G_p2=Sh1_HP_Tstartbar,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Liquid,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam)         annotation (Placement(transformation(extent={
                   {-454,-24},{-406,24}}, rotation=0)));
         Water.SensT ShHPOut_T(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
@@ -8448,652 +6653,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
           annotation (Placement(transformation(extent={{-380,-140},{-360,-120}},
                 rotation=0)));
 
-        replaceable Components.HE Ec2_HP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ec2_HP_N_G,
-          N_F=Ec2_HP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          fluidNomFlowRate=fluidHPNomFlowRate_Ec,
-          fluidNomPressure=fluidHPNomPressure_Ec,
-          exchSurface_G=Ec2_HP_exchSurface_G,
-          exchSurface_F=Ec2_HP_exchSurface_F,
-          extSurfaceTub=Ec2_HP_extSurfaceTub,
-          gasVol=Ec2_HP_gasVol,
-          fluidVol=Ec2_HP_fluidVol,
-          metalVol=Ec2_HP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ec2_HP_Tstart_G_In,
-          Tstart_G_Out=Ec2_HP_Tstart_G_Out,
-          Tstart_M_In=Ec2_HP_Tstart_M_In,
-          Tstart_M_Out=Ec2_HP_Tstart_M_Out,
-          Tstart_F_In=Ec2_HP_Tstart_F_In,
-          Tstart_F_Out=Ec2_HP_Tstart_F_Out,
-          hstart_F_In=Ec2_HP_hstart_F_In,
-          hstart_F_Out=Ec2_HP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          use_T=use_T_Ec) constrainedby
-          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ec2_HP_N_G,
-          N_F=Ec2_HP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          fluidNomFlowRate=fluidHPNomFlowRate_Ec,
-          fluidNomPressure=fluidHPNomPressure_Ec,
-          exchSurface_G=Ec2_HP_exchSurface_G,
-          exchSurface_F=Ec2_HP_exchSurface_F,
-          extSurfaceTub=Ec2_HP_extSurfaceTub,
-          gasVol=Ec2_HP_gasVol,
-          fluidVol=Ec2_HP_fluidVol,
-          metalVol=Ec2_HP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ec2_HP_Tstart_G_In,
-          Tstart_G_Out=Ec2_HP_Tstart_G_Out,
-          Tstart_M_In=Ec2_HP_Tstart_M_In,
-          Tstart_M_Out=Ec2_HP_Tstart_M_Out,
-          Tstart_F_In=Ec2_HP_Tstart_F_In,
-          Tstart_F_Out=Ec2_HP_Tstart_F_Out,
-          hstart_F_In=Ec2_HP_hstart_F_In,
-          hstart_F_Out=Ec2_HP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          use_T=use_T_Ec)          annotation (Placement(transformation(extent=
-                  {{-92,12},{-68,-12}}, rotation=0)));
-        replaceable Components.ParHE Ec1HP_EcIP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ec1_HP_N_G,
-          N_F_A=Ec1_HP_N_F,
-          N_F_B=Ec_IP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G_A=Ec1_HP_exchSurface_G,
-          exchSurface_G_B=Ec_IP_exchSurface_G,
-          exchSurface_F_A=Ec1_HP_exchSurface_F,
-          exchSurface_F_B=Ec_IP_exchSurface_F,
-          gasVol=Ec1_HP_gasVol,
-          fluidVol_A=Ec1_HP_fluidVol,
-          fluidVol_B=Ec_IP_fluidVol,
-          metalVol_A=Ec1_HP_metalVol,
-          metalVol_B=Ec_IP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ec1_HP_Tstart_G_In,
-          Tstart_G_Out=Ec1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Ec1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Ec1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Ec1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Ec1_HP_Tstart_F_Out,
-          hstart_F_A_In=Ec1_HP_hstart_F_In,
-          hstart_F_A_Out=Ec1_HP_hstart_F_Out,
-          Tstart_M_B_In=Ec_IP_Tstart_M_In,
-          Tstart_M_B_Out=Ec_IP_Tstart_M_Out,
-          Tstart_F_B_In=Ec_IP_Tstart_F_In,
-          Tstart_F_B_Out=Ec_IP_Tstart_F_Out,
-          hstart_F_B_In=Ec_IP_hstart_F_In,
-          hstart_F_B_Out=Ec_IP_hstart_F_Out,
-          lambda=lambda,
-          extSurfaceTub_A=Ec1_HP_extSurfaceTub,
-          extSurfaceTub_B=Ec_IP_extSurfaceTub,
-          use_T=use_T_Ec,
-          fluidNomFlowRate_A=fluidHPNomFlowRate_Ec,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Ec,
-          fluidNomPressure_A=fluidHPNomPressure_Ec,
-          fluidNomPressure_B=fluidIPNomPressure_Ec,
-          rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) constrainedby
-          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ec1_HP_N_G,
-          N_F_A=Ec1_HP_N_F,
-          N_F_B=Ec_IP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G_A=Ec1_HP_exchSurface_G,
-          exchSurface_G_B=Ec_IP_exchSurface_G,
-          exchSurface_F_A=Ec1_HP_exchSurface_F,
-          exchSurface_F_B=Ec_IP_exchSurface_F,
-          gasVol=Ec1_HP_gasVol,
-          fluidVol_A=Ec1_HP_fluidVol,
-          fluidVol_B=Ec_IP_fluidVol,
-          metalVol_A=Ec1_HP_metalVol,
-          metalVol_B=Ec_IP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ec1_HP_Tstart_G_In,
-          Tstart_G_Out=Ec1_HP_Tstart_G_Out,
-          Tstart_M_A_In=Ec1_HP_Tstart_M_In,
-          Tstart_M_A_Out=Ec1_HP_Tstart_M_Out,
-          Tstart_F_A_In=Ec1_HP_Tstart_F_In,
-          Tstart_F_A_Out=Ec1_HP_Tstart_F_Out,
-          hstart_F_A_In=Ec1_HP_hstart_F_In,
-          hstart_F_A_Out=Ec1_HP_hstart_F_Out,
-          Tstart_M_B_In=Ec_IP_Tstart_M_In,
-          Tstart_M_B_Out=Ec_IP_Tstart_M_Out,
-          Tstart_F_B_In=Ec_IP_Tstart_F_In,
-          Tstart_F_B_Out=Ec_IP_Tstart_F_Out,
-          hstart_F_B_In=Ec_IP_hstart_F_In,
-          hstart_F_B_Out=Ec_IP_hstart_F_Out,
-          lambda=lambda,
-          extSurfaceTub_A=Ec1_HP_extSurfaceTub,
-          extSurfaceTub_B=Ec_IP_extSurfaceTub,
-          use_T=use_T_Ec,
-          fluidNomFlowRate_A=fluidHPNomFlowRate_Ec,
-          fluidNomFlowRate_B=fluidIPNomFlowRate_Ec,
-          fluidNomPressure_A=fluidHPNomPressure_Ec,
-          fluidNomPressure_B=fluidIPNomPressure_Ec,
-          rhomcm_A=rhomcm,
-          rhomcm_B=rhomcm) 
-                         annotation (Placement(transformation(extent={{178,-12},
-                  {202,12}}, rotation=0)));
-        replaceable Components.HE Ec_LP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ec_LP_N_G,
-          N_F=Ec_LP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Ec_LP_exchSurface_G,
-          exchSurface_F=Ec_LP_exchSurface_F,
-          gasVol=Ec_LP_gasVol,
-          fluidVol=Ec_LP_fluidVol,
-          metalVol=Ec_LP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ec_LP_Tstart_G_In,
-          Tstart_G_Out=Ec_LP_Tstart_G_Out,
-          Tstart_M_In=Ec_LP_Tstart_M_In,
-          Tstart_M_Out=Ec_LP_Tstart_M_Out,
-          Tstart_F_In=Ec_LP_Tstart_F_In,
-          Tstart_F_Out=Ec_LP_Tstart_F_Out,
-          hstart_F_In=Ec_LP_hstart_F_In,
-          hstart_F_Out=Ec_LP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          extSurfaceTub=Ec_LP_extSurfaceTub,
-          use_T=use_T_Ec,
-          fluidNomFlowRate=fluidLPNomFlowRate_Ec,
-          fluidNomPressure=fluidLPNomPressure_Ec) constrainedby
-          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ec_LP_N_G,
-          N_F=Ec_LP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Ec_LP_exchSurface_G,
-          exchSurface_F=Ec_LP_exchSurface_F,
-          gasVol=Ec_LP_gasVol,
-          fluidVol=Ec_LP_fluidVol,
-          metalVol=Ec_LP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ec_LP_Tstart_G_In,
-          Tstart_G_Out=Ec_LP_Tstart_G_Out,
-          Tstart_M_In=Ec_LP_Tstart_M_In,
-          Tstart_M_Out=Ec_LP_Tstart_M_Out,
-          Tstart_F_In=Ec_LP_Tstart_F_In,
-          Tstart_F_Out=Ec_LP_Tstart_F_Out,
-          hstart_F_In=Ec_LP_hstart_F_In,
-          hstart_F_Out=Ec_LP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          extSurfaceTub=Ec_LP_extSurfaceTub,
-          use_T=use_T_Ec,
-          fluidNomFlowRate=fluidLPNomFlowRate_Ec,
-          fluidNomPressure=fluidLPNomPressure_Ec) 
-                                         annotation (Placement(transformation(
-                extent={{368,-12},{392,12}}, rotation=0)));
-        replaceable Components.HE2ph Ev_LP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ev_LP_N_G,
-          N_F=Ev_LP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Ev_LP_exchSurface_G,
-          exchSurface_F=Ev_LP_exchSurface_F,
-          gasVol=Ev_LP_gasVol,
-          fluidVol=Ev_LP_fluidVol,
-          metalVol=Ev_LP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ev_LP_Tstart_G_In,
-          Tstart_G_Out=Ev_LP_Tstart_G_Out,
-          Tstart_M_In=Ev_LP_Tstart_M_In,
-          Tstart_M_Out=Ev_LP_Tstart_M_Out,
-          Tstart_F_In=Ev_LP_Tstart_F_In,
-          Tstart_F_Out=Ev_LP_Tstart_F_Out,
-          hstart_F_In=Ev_LP_hstart_F_In,
-          hstart_F_Out=Ev_LP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          extSurfaceTub=Ev_LP_extSurfaceTub,
-          use_T=use_T_Ev,
-          fluidNomFlowRate=fluidLPNomFlowRate_Ev,
-          fluidNomPressure=fluidLPNomPressure_Ev) constrainedby
-          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ev_LP_N_G,
-          N_F=Ev_LP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Ev_LP_exchSurface_G,
-          exchSurface_F=Ev_LP_exchSurface_F,
-          gasVol=Ev_LP_gasVol,
-          fluidVol=Ev_LP_fluidVol,
-          metalVol=Ev_LP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ev_LP_Tstart_G_In,
-          Tstart_G_Out=Ev_LP_Tstart_G_Out,
-          Tstart_M_In=Ev_LP_Tstart_M_In,
-          Tstart_M_Out=Ev_LP_Tstart_M_Out,
-          Tstart_F_In=Ev_LP_Tstart_F_In,
-          Tstart_F_Out=Ev_LP_Tstart_F_Out,
-          hstart_F_In=Ev_LP_hstart_F_In,
-          hstart_F_Out=Ev_LP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          extSurfaceTub=Ev_LP_extSurfaceTub,
-          use_T=use_T_Ev,
-          fluidNomFlowRate=fluidLPNomFlowRate_Ev,
-          fluidNomPressure=fluidLPNomPressure_Ev) 
-                         annotation (Placement(transformation(extent={{288,-12},
-                  {312,12}}, rotation=0)));
-        replaceable Components.HE2ph Ev_IP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ev_IP_N_G,
-          N_F=Ev_IP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Ev_IP_exchSurface_G,
-          exchSurface_F=Ev_IP_exchSurface_F,
-          gasVol=Ev_IP_gasVol,
-          fluidVol=Ev_IP_fluidVol,
-          metalVol=Ev_IP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ev_IP_Tstart_G_In,
-          Tstart_G_Out=Ev_IP_Tstart_G_Out,
-          Tstart_M_In=Ev_IP_Tstart_M_In,
-          Tstart_M_Out=Ev_IP_Tstart_M_Out,
-          Tstart_F_In=Ev_IP_Tstart_F_In,
-          Tstart_F_Out=Ev_IP_Tstart_F_Out,
-          hstart_F_In=Ev_IP_hstart_F_In,
-          hstart_F_Out=Ev_IP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          extSurfaceTub=Ev_IP_extSurfaceTub,
-          use_T=use_T_Ev,
-          fluidNomFlowRate=fluidIPNomFlowRate_Ev,
-          fluidNomPressure=fluidIPNomPressure_Ev) constrainedby
-          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ev_IP_N_G,
-          N_F=Ev_IP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Ev_IP_exchSurface_G,
-          exchSurface_F=Ev_IP_exchSurface_F,
-          gasVol=Ev_IP_gasVol,
-          fluidVol=Ev_IP_fluidVol,
-          metalVol=Ev_IP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ev_IP_Tstart_G_In,
-          Tstart_G_Out=Ev_IP_Tstart_G_Out,
-          Tstart_M_In=Ev_IP_Tstart_M_In,
-          Tstart_M_Out=Ev_IP_Tstart_M_Out,
-          Tstart_F_In=Ev_IP_Tstart_F_In,
-          Tstart_F_Out=Ev_IP_Tstart_F_Out,
-          hstart_F_In=Ev_IP_hstart_F_In,
-          hstart_F_Out=Ev_IP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          extSurfaceTub=Ev_IP_extSurfaceTub,
-          use_T=use_T_Ev,
-          fluidNomFlowRate=fluidIPNomFlowRate_Ev,
-          fluidNomPressure=fluidIPNomPressure_Ev) 
-          annotation (Placement(transformation(extent={{-12,-12},{12,12}},
-                rotation=0)));
-        replaceable Components.HE Sh_LP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Sh_LP_N_G,
-          N_F=Sh_LP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Sh_LP_exchSurface_G,
-          exchSurface_F=Sh_LP_exchSurface_F,
-          gasVol=Sh_LP_gasVol,
-          fluidVol=Sh_LP_fluidVol,
-          metalVol=Sh_LP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Sh_LP_Tstart_G_In,
-          Tstart_G_Out=Sh_LP_Tstart_G_Out,
-          Tstart_M_In=Sh_LP_Tstart_M_In,
-          Tstart_M_Out=Sh_LP_Tstart_M_Out,
-          Tstart_F_In=Sh_LP_Tstart_F_In,
-          Tstart_F_Out=Sh_LP_Tstart_F_Out,
-          hstart_F_In=Sh_LP_hstart_F_In,
-          hstart_F_Out=Sh_LP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          extSurfaceTub=Sh_LP_extSurfaceTub,
-          use_T=use_T_Sh,
-          fluidNomFlowRate=fluidLPNomFlowRate_Sh,
-          fluidNomPressure=fluidLPNomPressure_Sh) constrainedby
-          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Sh_LP_N_G,
-          N_F=Sh_LP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Sh_LP_exchSurface_G,
-          exchSurface_F=Sh_LP_exchSurface_F,
-          gasVol=Sh_LP_gasVol,
-          fluidVol=Sh_LP_fluidVol,
-          metalVol=Sh_LP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Sh_LP_Tstart_G_In,
-          Tstart_G_Out=Sh_LP_Tstart_G_Out,
-          Tstart_M_In=Sh_LP_Tstart_M_In,
-          Tstart_M_Out=Sh_LP_Tstart_M_Out,
-          Tstart_F_In=Sh_LP_Tstart_F_In,
-          Tstart_F_Out=Sh_LP_Tstart_F_Out,
-          hstart_F_In=Sh_LP_hstart_F_In,
-          hstart_F_Out=Sh_LP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          extSurfaceTub=Sh_LP_extSurfaceTub,
-          use_T=use_T_Sh,
-          fluidNomFlowRate=fluidLPNomFlowRate_Sh,
-          fluidNomPressure=fluidLPNomPressure_Sh) 
-                                   annotation (Placement(transformation(extent=
-                  {{108,-12},{132,12}}, rotation=0)));
-        replaceable Components.HE2ph Ev_HP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ev_HP_N_G,
-          N_F=Ev_HP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          fluidNomFlowRate=fluidHPNomFlowRate_Ev,
-          fluidNomPressure=fluidHPNomPressure_Ev,
-          exchSurface_G=Ev_HP_exchSurface_G,
-          exchSurface_F=Ev_HP_exchSurface_F,
-          extSurfaceTub=Ev_HP_extSurfaceTub,
-          gasVol=Ev_HP_gasVol,
-          fluidVol=Ev_HP_fluidVol,
-          metalVol=Ev_HP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ev_HP_Tstart_G_In,
-          Tstart_G_Out=Ev_HP_Tstart_G_Out,
-          Tstart_M_In=Ev_HP_Tstart_M_In,
-          Tstart_M_Out=Ev_HP_Tstart_M_Out,
-          Tstart_F_In=Ev_HP_Tstart_F_In,
-          Tstart_F_Out=Ev_HP_Tstart_F_Out,
-          hstart_F_In=Ev_HP_hstart_F_In,
-          hstart_F_Out=Ev_HP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          use_T=use_T_Ev) constrainedby
-          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Ev_HP_N_G,
-          N_F=Ev_HP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          gasNomPressure=gasNomPressure,
-          fluidNomFlowRate=fluidHPNomFlowRate_Ev,
-          fluidNomPressure=fluidHPNomPressure_Ev,
-          exchSurface_G=Ev_HP_exchSurface_G,
-          exchSurface_F=Ev_HP_exchSurface_F,
-          extSurfaceTub=Ev_HP_extSurfaceTub,
-          gasVol=Ev_HP_gasVol,
-          fluidVol=Ev_HP_fluidVol,
-          metalVol=Ev_HP_metalVol,
-          SSInit=SSInit,
-          Tstart_G_In=Ev_HP_Tstart_G_In,
-          Tstart_G_Out=Ev_HP_Tstart_G_Out,
-          Tstart_M_In=Ev_HP_Tstart_M_In,
-          Tstart_M_Out=Ev_HP_Tstart_M_Out,
-          Tstart_F_In=Ev_HP_Tstart_F_In,
-          Tstart_F_Out=Ev_HP_Tstart_F_Out,
-          hstart_F_In=Ev_HP_hstart_F_In,
-          hstart_F_Out=Ev_HP_hstart_F_Out,
-          rhomcm=rhomcm,
-          lambda=lambda,
-          use_T=use_T_Ev) 
-          annotation (Placement(transformation(extent={{-312,-12},{-288,12}},
-                rotation=0)));
-        replaceable Components.HE Sh_IP(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Sh_IP_N_G,
-          N_F=Sh_IP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          fluidNomFlowRate=fluidIPNomFlowRate_Sh,
-          gasNomPressure=gasNomPressure,
-          exchSurface_G=Sh_IP_exchSurface_G,
-          exchSurface_F=Sh_IP_exchSurface_F,
-          extSurfaceTub=Sh_IP_extSurfaceTub,
-          gasVol=Sh_IP_gasVol,
-          fluidVol=Sh_IP_fluidVol,
-          metalVol=Sh_IP_metalVol,
-          rhomcm=rhomcm,
-          use_T=use_T_Sh,
-          SSInit=SSInit,
-          Tstart_G_In=Sh_IP_Tstart_G_In,
-          Tstart_G_Out=Sh_IP_Tstart_G_Out,
-          Tstart_M_In=Sh_IP_Tstart_M_In,
-          Tstart_M_Out=Sh_IP_Tstart_M_Out,
-          Tstart_F_In=Sh_IP_Tstart_F_In,
-          Tstart_F_Out=Sh_IP_Tstart_F_Out,
-          hstart_F_In=Sh_IP_hstart_F_In,
-          hstart_F_Out=Sh_IP_hstart_F_Out,
-          fluidNomPressure=fluidIPNomPressure_Sh,
-          lambda=lambda) constrainedby
-          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
-          redeclare package FlueGasMedium = FlueGasMedium,
-          redeclare package FluidMedium = FluidMedium,
-          N_G=Sh_IP_N_G,
-          N_F=Sh_IP_N_F,
-          gasNomFlowRate=gasNomFlowRate,
-          fluidNomFlowRate=fluidIPNomFlowRate_Sh,
-          gasNomPressure=gasNomPressure,
-          fluidNomPressure=fluidNomPressure_Sh,
-          exchSurface_G=Sh_IP_exchSurface_G,
-          exchSurface_F=Sh_IP_exchSurface_F,
-          extSurfaceTub=Sh_IP_extSurfaceTub,
-          gasVol=Sh_IP_gasVol,
-          fluidVol=Sh_IP_fluidVol,
-          metalVol=Sh_IP_metalVol,
-          rhomcm=rhomcm,
-          lambda=lamba,
-          use_T=use_T_Sh,
-          SSInit=SSInit,
-          Tstart_G_In=Sh_IP_Tstart_G_In,
-          Tstart_G_Out=Sh_IP_Tstart_G_Out,
-          Tstart_M_In=Sh_IP_Tstart_M_In,
-          Tstart_M_Out=Sh_IP_Tstart_M_Out,
-          Tstart_F_In=Sh_IP_Tstart_F_In,
-          Tstart_F_Out=Sh_IP_Tstart_F_Out,
-          hstart_F_In=Sh_IP_hstart_F_In,
-          hstart_F_Out=Sh_IP_hstart_F_Out) annotation (Placement(transformation(
-                extent={{-218,-12},{-194,12}}, rotation=0)));
-        replaceable Components.BaseReader_water stateEvHP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-300,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateShIP_in(
-                                                  redeclare package Medium = 
-              FluidMedium) constrainedby Components.BaseReader_water(
-                                                                redeclare
-            package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-206,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEc2HP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-80,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEvIP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={0,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateShLP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={120,50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEcIP_in(
-                                           redeclare package Medium = 
-              FluidMedium) constrainedby Components.BaseReader_water(
-                                                                redeclare
-            package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={196,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEvLP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={300,50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEcLP_in(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={380,50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEvHP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = 
-                     FlueGasMedium) 
-                           annotation (Placement(transformation(
-              origin={-300,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateShIP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-206,-50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEc2HP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-80,38},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEvIP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={0,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateShLP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={120,-50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEcIP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={196,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateEvLP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={300,-50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEcLP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(  redeclare package Medium = FluidMedium)
-                           annotation (Placement(transformation(
-              origin={380,-50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEc1HP_in(
-                                           redeclare package Medium = 
-              FluidMedium) constrainedby Components.BaseReader_water(
-                                                                redeclare
-            package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={184,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateEc1HP_out(
-            redeclare package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water( redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={184,-50},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateSh1HP_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-440,70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateRh1IP_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-420,70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateRh2IP_out(redeclare
-            package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-420,-70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateSh2HP_out(redeclare
-            package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-440,-70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
         Water.Mixer mixIP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
           V=mixIP_V,
-          hstart=Rh1_IP_hstart_F_In,
-          pstart=fluidIPNomPressure_Rh) 
+          pstart=fluidIPNomPressure_Rh,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                           annotation (Placement(transformation(
               origin={-270,-110},
               extent={{-10,-10},{10,10}},
@@ -9116,6 +6682,350 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={80,160},
               extent={{-10,-10},{10,10}},
               rotation=270)));
+        replaceable Components.HE Ec2_HP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ec2_HP_N_G,
+          N_F=Ec2_HP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          fluidNomFlowRate=fluidHPNomFlowRate_Ec,
+          fluidNomPressure=fluidHPNomPressure_Ec,
+          exchSurface_G=Ec2_HP_exchSurface_G,
+          exchSurface_F=Ec2_HP_exchSurface_F,
+          extSurfaceTub=Ec2_HP_extSurfaceTub,
+          gasVol=Ec2_HP_gasVol,
+          fluidVol=Ec2_HP_fluidVol,
+          metalVol=Ec2_HP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          Tstartbar_G=Ec2_HP_Tstartbar) 
+                          constrainedby
+          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ec2_HP_N_G,
+          N_F=Ec2_HP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          fluidNomFlowRate=fluidHPNomFlowRate_Ec,
+          fluidNomPressure=fluidHPNomPressure_Ec,
+          exchSurface_G=Ec2_HP_exchSurface_G,
+          exchSurface_F=Ec2_HP_exchSurface_F,
+          extSurfaceTub=Ec2_HP_extSurfaceTub,
+          gasVol=Ec2_HP_gasVol,
+          fluidVol=Ec2_HP_fluidVol,
+          metalVol=Ec2_HP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          Tstartbar_G=Ec2_HP_Tstartbar)          annotation (Placement(transformation(extent={{-92,12},
+                  {-68,-12}},           rotation=0)));
+        replaceable Components.ParHE Ec1HP_EcIP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ec1_HP_N_G,
+          N_F_A=Ec1_HP_N_F,
+          N_F_B=Ec_IP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G_A=Ec1_HP_exchSurface_G,
+          exchSurface_G_B=Ec_IP_exchSurface_G,
+          exchSurface_F_A=Ec1_HP_exchSurface_F,
+          exchSurface_F_B=Ec_IP_exchSurface_F,
+          gasVol=Ec1_HP_gasVol,
+          fluidVol_A=Ec1_HP_fluidVol,
+          fluidVol_B=Ec_IP_fluidVol,
+          metalVol_A=Ec1_HP_metalVol,
+          metalVol_B=Ec_IP_metalVol,
+          SSInit=SSInit,
+          lambda=lambda,
+          extSurfaceTub_A=Ec1_HP_extSurfaceTub,
+          extSurfaceTub_B=Ec_IP_extSurfaceTub,
+          fluidNomFlowRate_A=fluidHPNomFlowRate_Ec,
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Ec,
+          fluidNomPressure_A=fluidHPNomPressure_Ec,
+          fluidNomPressure_B=fluidIPNomPressure_Ec,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm,
+          Tstartbar_G=Ec1_HP_Tstartbar) 
+                           constrainedby
+          ThermoPower.PowerPlants.HRSG.Interfaces.ParallelHE(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ec1_HP_N_G,
+          N_F_A=Ec1_HP_N_F,
+          N_F_B=Ec_IP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G_A=Ec1_HP_exchSurface_G,
+          exchSurface_G_B=Ec_IP_exchSurface_G,
+          exchSurface_F_A=Ec1_HP_exchSurface_F,
+          exchSurface_F_B=Ec_IP_exchSurface_F,
+          gasVol=Ec1_HP_gasVol,
+          fluidVol_A=Ec1_HP_fluidVol,
+          fluidVol_B=Ec_IP_fluidVol,
+          metalVol_A=Ec1_HP_metalVol,
+          metalVol_B=Ec_IP_metalVol,
+          SSInit=SSInit,
+          lambda=lambda,
+          extSurfaceTub_A=Ec1_HP_extSurfaceTub,
+          extSurfaceTub_B=Ec_IP_extSurfaceTub,
+          fluidNomFlowRate_A=fluidHPNomFlowRate_Ec,
+          fluidNomFlowRate_B=fluidIPNomFlowRate_Ec,
+          fluidNomPressure_A=fluidHPNomPressure_Ec,
+          fluidNomPressure_B=fluidIPNomPressure_Ec,
+          rhomcm_A=rhomcm,
+          rhomcm_B=rhomcm,
+          Tstartbar_G=Ec1_HP_Tstartbar) 
+                         annotation (Placement(transformation(extent={{178,-12},{202,12}},
+                             rotation=0)));
+        replaceable Components.HE Ec_LP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ec_LP_N_G,
+          N_F=Ec_LP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Ec_LP_exchSurface_G,
+          exchSurface_F=Ec_LP_exchSurface_F,
+          gasVol=Ec_LP_gasVol,
+          fluidVol=Ec_LP_fluidVol,
+          metalVol=Ec_LP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Ec_LP_extSurfaceTub,
+          fluidNomFlowRate=fluidLPNomFlowRate_Ec,
+          fluidNomPressure=fluidLPNomPressure_Ec,
+          Tstartbar_G=Ec_LP_Tstartbar)                constrainedby
+          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ec_LP_N_G,
+          N_F=Ec_LP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Ec_LP_exchSurface_G,
+          exchSurface_F=Ec_LP_exchSurface_F,
+          gasVol=Ec_LP_gasVol,
+          fluidVol=Ec_LP_fluidVol,
+          metalVol=Ec_LP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Ec_LP_extSurfaceTub,
+          fluidNomFlowRate=fluidLPNomFlowRate_Ec,
+          fluidNomPressure=fluidLPNomPressure_Ec,
+          Tstartbar_G=Ec_LP_Tstartbar)       annotation (Placement(transformation(
+                extent={{368,-12},{392,12}}, rotation=0)));
+        replaceable Components.HE2ph Ev_LP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ev_LP_N_G,
+          N_F=Ev_LP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Ev_LP_exchSurface_G,
+          exchSurface_F=Ev_LP_exchSurface_F,
+          gasVol=Ev_LP_gasVol,
+          fluidVol=Ev_LP_fluidVol,
+          metalVol=Ev_LP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Ev_LP_extSurfaceTub,
+          fluidNomFlowRate=fluidLPNomFlowRate_Ev,
+          fluidNomPressure=fluidLPNomPressure_Ev,
+          Tstartbar_G=Ev_LP_Tstartbar)                constrainedby
+          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ec_LP_N_G,
+          N_F=Ec_LP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Ec_LP_exchSurface_G,
+          exchSurface_F=Ec_LP_exchSurface_F,
+          gasVol=Ec_LP_gasVol,
+          fluidVol=Ec_LP_fluidVol,
+          metalVol=Ec_LP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Ec_LP_extSurfaceTub,
+          fluidNomFlowRate=fluidLPNomFlowRate_Ec,
+          fluidNomPressure=fluidLPNomPressure_Ec,
+          Tstartbar_G=Ec_LP_Tstartbar) 
+                         annotation (Placement(transformation(extent={{288,-12},{312,12}},
+                             rotation=0)));
+        replaceable Components.HE2ph Ev_IP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ev_IP_N_G,
+          N_F=Ev_IP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Ev_IP_exchSurface_G,
+          exchSurface_F=Ev_IP_exchSurface_F,
+          gasVol=Ev_IP_gasVol,
+          fluidVol=Ev_IP_fluidVol,
+          metalVol=Ev_IP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Ev_IP_extSurfaceTub,
+          fluidNomFlowRate=fluidIPNomFlowRate_Ev,
+          fluidNomPressure=fluidIPNomPressure_Ev,
+          Tstartbar_G=Ev_IP_Tstartbar)                constrainedby
+          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ev_IP_N_G,
+          N_F=Ev_IP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Ev_IP_exchSurface_G,
+          exchSurface_F=Ev_IP_exchSurface_F,
+          gasVol=Ev_IP_gasVol,
+          fluidVol=Ev_IP_fluidVol,
+          metalVol=Ev_IP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Ev_IP_extSurfaceTub,
+          fluidNomFlowRate=fluidIPNomFlowRate_Ev,
+          fluidNomPressure=fluidIPNomPressure_Ev,
+          Tstartbar_G=Ev_IP_Tstartbar) 
+          annotation (Placement(transformation(extent={{-12,-12},{12,12}},
+                rotation=0)));
+        replaceable Components.HE Sh_LP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Sh_LP_N_G,
+          N_F=Sh_LP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Sh_LP_exchSurface_G,
+          exchSurface_F=Sh_LP_exchSurface_F,
+          gasVol=Sh_LP_gasVol,
+          fluidVol=Sh_LP_fluidVol,
+          metalVol=Sh_LP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Sh_LP_extSurfaceTub,
+          fluidNomFlowRate=fluidLPNomFlowRate_Sh,
+          fluidNomPressure=fluidLPNomPressure_Sh,
+          Tstartbar_G=Sh_LP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+                                                  constrainedby
+          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Sh_LP_N_G,
+          N_F=Sh_LP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Sh_LP_exchSurface_G,
+          exchSurface_F=Sh_LP_exchSurface_F,
+          gasVol=Sh_LP_gasVol,
+          fluidVol=Sh_LP_fluidVol,
+          metalVol=Sh_LP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Sh_LP_extSurfaceTub,
+          fluidNomFlowRate=fluidLPNomFlowRate_Sh,
+          fluidNomPressure=fluidLPNomPressure_Sh,
+          Tstartbar_G=Sh_LP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+                                   annotation (Placement(transformation(extent={{108,-12},
+                  {132,12}},            rotation=0)));
+        replaceable Components.HE2ph Ev_HP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ev_HP_N_G,
+          N_F=Ev_HP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          fluidNomFlowRate=fluidHPNomFlowRate_Ev,
+          fluidNomPressure=fluidHPNomPressure_Ev,
+          exchSurface_G=Ev_HP_exchSurface_G,
+          exchSurface_F=Ev_HP_exchSurface_F,
+          extSurfaceTub=Ev_HP_extSurfaceTub,
+          gasVol=Ev_HP_gasVol,
+          fluidVol=Ev_HP_fluidVol,
+          metalVol=Ev_HP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          Tstartbar_G=Ev_HP_Tstartbar) 
+                          constrainedby
+          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Ev_HP_N_G,
+          N_F=Ev_HP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          fluidNomFlowRate=fluidHPNomFlowRate_Ev,
+          fluidNomPressure=fluidHPNomPressure_Ev,
+          exchSurface_G=Ev_HP_exchSurface_G,
+          exchSurface_F=Ev_HP_exchSurface_F,
+          extSurfaceTub=Ev_HP_extSurfaceTub,
+          gasVol=Ev_HP_gasVol,
+          fluidVol=Ev_HP_fluidVol,
+          metalVol=Ev_HP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          Tstartbar_G=Ev_HP_Tstartbar) 
+          annotation (Placement(transformation(extent={{-312,-12},{-288,12}},
+                rotation=0)));
+        replaceable Components.HE Sh_IP(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Sh_IP_N_G,
+          N_F=Sh_IP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          fluidNomFlowRate=fluidIPNomFlowRate_Sh,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Sh_IP_exchSurface_G,
+          exchSurface_F=Sh_IP_exchSurface_F,
+          extSurfaceTub=Sh_IP_extSurfaceTub,
+          gasVol=Sh_IP_gasVol,
+          fluidVol=Sh_IP_fluidVol,
+          metalVol=Sh_IP_metalVol,
+          rhomcm=rhomcm,
+          SSInit=SSInit,
+          fluidNomPressure=fluidIPNomPressure_Sh,
+          lambda=lambda,
+          Tstartbar_G=Sh_IP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+                         constrainedby
+          ThermoPower.PowerPlants.HRSG.Interfaces.HeatExchanger(
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          N_G=Sh_LP_N_G,
+          N_F=Sh_LP_N_F,
+          gasNomFlowRate=gasNomFlowRate,
+          gasNomPressure=gasNomPressure,
+          exchSurface_G=Sh_LP_exchSurface_G,
+          exchSurface_F=Sh_LP_exchSurface_F,
+          gasVol=Sh_LP_gasVol,
+          fluidVol=Sh_LP_fluidVol,
+          metalVol=Sh_LP_metalVol,
+          SSInit=SSInit,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          extSurfaceTub=Sh_LP_extSurfaceTub,
+          fluidNomFlowRate=fluidLPNomFlowRate_Sh,
+          fluidNomPressure=fluidLPNomPressure_Sh,
+          Tstartbar_G=Sh_LP_Tstartbar,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) annotation (Placement(transformation(
+                extent={{-218,-12},{-194,12}}, rotation=0)));
       equation
         connect(SensorsBus.T_Sh2HP_In, ShHP_RhIP.T_intermedA) annotation (Line(
               points={{500,140},{-360,140},{-360,14},{-382,14},{-405.76,14.16}},
@@ -9136,111 +7046,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(ActuatorsBus.theta_attRhIP, ShHP_RhIP.theta_valveB) annotation (Line(
               points={{500,80},{440,80},{440,-92},{-360,-92},{-360,-16},{-382,
                 -16},{-405.76,-15.12}}, color={213,255,170}));
-        connect(stateEcLP_in.outlet,Ec_LP. waterIn) annotation (Line(points={{
-                380,44},{380,12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvLP_in.outlet,Ev_LP. waterIn) annotation (Line(points={{
-                300,44},{300,12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Sh_LP.waterIn,stateShLP_in. outlet) annotation (Line(points={{
-                120,12},{120,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Ev_IP.waterIn,stateEvIP_in. outlet) annotation (Line(points={{0,12},{
-                0,44},{-3.67394e-016,44}},     thickness=0.5,
-            color={0,0,255}));
-        connect(Sh_IP.waterIn,stateShIP_in. outlet) annotation (Line(points={{
-                -206,12},{-206,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Ev_HP.waterIn,stateEvHP_in. outlet) annotation (Line(points={{
-                -300,12},{-300,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvIP_out.inlet,Ev_IP. waterOut) annotation (Line(points={{
-                1.10218e-015,-44},{1.10218e-015,-36.5},{0,-36.5},{0,-12}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(stateShLP_out.inlet,Sh_LP. waterOut) annotation (Line(points={{
-                120,-44},{120,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateShIP_out.inlet,Sh_IP. waterOut) annotation (Line(points={{
-                -206,-44},{-206,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcLP_out.inlet,Ec_LP. waterOut) annotation (Line(points={{
-                380,-44},{380,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvLP_out.inlet,Ev_LP. waterOut) annotation (Line(points={{
-                300,-44},{300,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvHP_out.inlet,Ev_HP. waterOut) annotation (Line(points={{
-                -300,-44},{-300,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(Ec1HP_EcIP.waterInB,stateEcIP_in. outlet) annotation (Line(
-              points={{194.8,12},{196,12},{196,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc2HP_out.inlet,Ec2_HP. waterOut) annotation (Line(points={{-80,32},
-                {-80,12}},           thickness=0.5,
-            color={0,0,255}));
-        connect(Ec2_HP.waterIn,stateEc2HP_in. outlet) annotation (Line(points={
-                {-80,-12},{-80,-44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc2HP_in.inlet,stateEc1HP_out. outlet) annotation (Line(
-              points={{-80,-56},{-80,-90},{184,-90},{184,-56}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcIP_out.inlet,Ec1HP_EcIP. waterOutB) annotation (Line(
-              points={{196,-44},{196,-12},{194.8,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc1HP_out.inlet,Ec1HP_EcIP. waterOutA) annotation (Line(
-              points={{184,-44},{184,-12},{185.2,-12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc1HP_in.outlet,Ec1HP_EcIP. waterInA) annotation (Line(
-              points={{184,44},{185.2,44},{185.2,12}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcLP_in.inlet, Ec_LP_In) annotation (Line(points={{380,56},
-                {380,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvLP_in.inlet, Ev_LP_In) annotation (Line(points={{300,56},
-                {300,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateShLP_in.inlet, Sh_LP_In) annotation (Line(points={{120,56},
-                {120,130},{220,130},{220,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcIP_out.outlet, Ec_IP_Out) annotation (Line(points={{196,
-                -56},{196,-70},{40,-70},{40,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateShIP_in.inlet, Sh_IP_In) annotation (Line(points={{-206,56},
-                {-206,90},{-80,90},{-80,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvIP_in.inlet, Ev_IP_In) annotation (Line(points={{
-                3.67394e-016,56},{1.77636e-015,56},{1.77636e-015,200}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvIP_out.outlet, Ev_IP_Out) annotation (Line(points={{
-                -1.10218e-015,-56},{0,-64},{0,-70},{-40,-70},{-40,200}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(stateShLP_out.outlet, Sh_LP_Out) annotation (Line(points={{120,
-                -56},{120,-110},{300,-110},{300,-198}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateSh1HP_in.inlet, Sh_HP_In) annotation (Line(points={{-440,
-                76},{-440,140},{-380,140},{-380,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvHP_out.outlet, Ev_HP_Out) annotation (Line(points={{-300,
-                -56},{-300,-70},{-340,-70},{-340,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvLP_out.outlet, Ev_LP_Out) annotation (Line(points={{300,
-                -56},{300,-70},{260,-70},{260,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEcLP_out.outlet, Ec_LP_Out) annotation (Line(points={{380,
-                -56},{380,-70},{340,-70},{340,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEc2HP_out.outlet, Ec_HP_Out) annotation (Line(points={{-80,44},
-                {-80,60},{-260,60},{-260,200}},     thickness=0.5,
-            color={0,0,255}));
-        connect(ShHPOut_T.inlet, stateSh2HP_out.outlet) annotation (Line(points=
-               {{-376,-160},{-440,-160},{-440,-76}}, thickness=0.5,
-            color={0,0,255}));
-        connect(RhIPOut_T.inlet, stateRh2IP_out.outlet) annotation (Line(points=
-               {{-376,-134},{-420,-134},{-420,-76}}, thickness=0.5,
-            color={0,0,255}));
         connect(RhIPOut_T.outlet, Rh_IP_Out) annotation (Line(points={{-364,
                 -134},{-190,-134},{-190,-200}}, thickness=0.5,
             color={0,0,255}));
@@ -9252,72 +7057,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={159,159,223},
             thickness=0.5));
 
-        connect(GasOut, Ec_LP.gasOut) annotation (Line(
-            points={{500,1.77636e-015},{426,0},{392,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(Ev_HP.gasIn, ShHP_RhIP.gasOut) annotation (Line(
-            points={{-312,0},{-406,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(Sh_IP.gasIn, Ev_HP.gasOut) annotation (Line(
-            points={{-218,0},{-288,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(Ec2_HP.gasIn, Sh_IP.gasOut) annotation (Line(
-            points={{-92,0},{-194,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(Ev_IP.gasIn, Ec2_HP.gasOut) annotation (Line(
-            points={{-12,0},{-68,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(Sh_LP.gasIn, Ev_IP.gasOut) annotation (Line(
-            points={{108,0},{12,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(Ec1HP_EcIP.gasIn, Sh_LP.gasOut) annotation (Line(
-            points={{178,0},{132,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(Ev_LP.gasIn, Ec1HP_EcIP.gasOut) annotation (Line(
-            points={{288,0},{202,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(Ec_LP.gasIn, Ev_LP.gasOut) annotation (Line(
-            points={{368,0},{312,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(stateRh2IP_out.inlet, ShHP_RhIP.waterOutB) annotation (Line(
-              points={{-420,-64},{-420,-24},{-420.4,-24}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateSh2HP_out.inlet, ShHP_RhIP.waterOutA) annotation (Line(
-              points={{-440,-64},{-440,-24},{-439.6,-24}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateSh1HP_in.outlet, ShHP_RhIP.waterInA) annotation (Line(
-              points={{-440,64},{-440,24},{-439.6,24}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ShHP_RhIP.waterInB, stateRh1IP_in.outlet) annotation (Line(
-              points={{-420.4,24},{-420.4,44},{-420,44},{-420,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateEvHP_in.inlet, Ev_HP_In) annotation (Line(points={{-300,56},
-                {-300,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(mixIP.out, stateRh1IP_in.inlet) annotation (Line(points={{-280,
-                -110},{-380,-110},{-380,100},{-420,100},{-420,76}}, thickness=0.5,
-            color={0,0,255}));
         connect(Rh_IP_In, mixIP.in1) annotation (Line(points={{-130,-200},{-130,
                 -116},{-262,-116}}, thickness=0.5,
             color={0,0,255}));
-        connect(mixIP.in2, stateShIP_out.outlet) annotation (Line(points={{-262,
-                -104},{-206,-104},{-206,-56}},        thickness=0.5,
-            color={0,0,255}));
         connect(flowSplit2.in1, Ec_HP_In) 
           annotation (Line(points={{-220,156},{-220,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(flowSplit2.out1, stateEc1HP_in.inlet) annotation (Line(points={{-216,
-                144},{-214,144},{-214,110},{184,110},{184,56}},
-              thickness=0.5,
             color={0,0,255}));
         connect(flowSplit2.out2, ShHP_RhIP.LiquidWaterIn_A) annotation (Line(
               points={{-224,144},{-224,110},{-472,110},{-472,-10.08},{-454,
@@ -9326,15 +7070,154 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(flowSplit1.in1, Ec_IP_In) 
           annotation (Line(points={{80,166},{80,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(flowSplit1.out1, stateEcIP_in.inlet) annotation (Line(points={{84,154},
-                {86,154},{86,120},{196,120},{196,56}},           thickness=0.5,
-            color={0,0,255}));
         connect(flowSplit1.out2, ShHP_RhIP.LiquidWaterIn_B) annotation (Line(
               points={{76,154},{76,120},{-480,120},{-480,-16.8},{-454,-16.8}},
               thickness=0.5,
             color={0,0,255}));
-        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
-                  {-500,-200},{500,200}}),
+        connect(GasOut,Ec_LP. gasOut) annotation (Line(
+            points={{500,1.77636e-015},{426,1.77636e-015},{392,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(Sh_IP.gasIn,Ev_HP. gasOut) annotation (Line(
+            points={{-218,0},{-288,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(Ec2_HP.gasIn,Sh_IP. gasOut) annotation (Line(
+            points={{-92,0},{-194,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(Ev_IP.gasIn,Ec2_HP. gasOut) annotation (Line(
+            points={{-12,0},{-68,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(Sh_LP.gasIn,Ev_IP. gasOut) annotation (Line(
+            points={{108,0},{12,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(Ec1HP_EcIP.gasIn,Sh_LP. gasOut) annotation (Line(
+            points={{178,0},{132,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(Ev_LP.gasIn,Ec1HP_EcIP. gasOut) annotation (Line(
+            points={{288,0},{202,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(Ec_LP.gasIn,Ev_LP. gasOut) annotation (Line(
+            points={{368,0},{312,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(ShHP_RhIP.gasOut, Ev_HP.gasIn) annotation (Line(
+            points={{-406,0},{-312,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_HP.waterIn, Ev_HP_In) annotation (Line(
+            points={{-300,12},{-300,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_HP.waterOut, Ev_HP_Out) annotation (Line(
+            points={{-300,-12},{-300,-40},{-340,-40},{-340,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_LP.waterIn, Ev_LP_In) annotation (Line(
+            points={{300,12},{300,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_LP.waterOut, Ev_LP_Out) annotation (Line(
+            points={{300,-12},{300,-40},{262,-40},{262,200},{260,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec_LP.waterIn, Ec_LP_In) annotation (Line(
+            points={{380,12},{380,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec_LP.waterOut, Ec_LP_Out) annotation (Line(
+            points={{380,-12},{380,-40},{340,-40},{340,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh_LP.waterIn, Sh_LP_In) annotation (Line(
+            points={{120,12},{120,80},{220,80},{220,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_IP.waterIn, Ev_IP_In) annotation (Line(
+            points={{0,12},{0,106},{0,200},{1.77636e-015,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ev_IP.waterOut, Ev_IP_Out) annotation (Line(
+            points={{0,-12},{0,-40},{-40,-40},{-40,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec_IP_Out, Ec1HP_EcIP.waterOutB) annotation (Line(
+            points={{40,200},{40,-70},{194,-70},{194,-42},{194.8,-12}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec1HP_EcIP.waterInB, flowSplit1.out1) annotation (Line(
+            points={{194.8,12},{194.8,120},{84,120},{84,154}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec1HP_EcIP.waterInA, flowSplit2.out1) annotation (Line(
+            points={{185.2,12},{185.2,100},{-216,100},{-216,144}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec1HP_EcIP.waterOutA, Ec2_HP.waterIn) annotation (Line(
+            points={{185.2,-12},{185.2,-60},{-80,-60},{-80,-12}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh_LP.waterOut, Sh_LP_Out) annotation (Line(
+            points={{120,-12},{120,-140},{300,-140},{300,-198}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Ec2_HP.waterOut, Ec_HP_Out) annotation (Line(
+            points={{-80,12},{-80,80},{-260,80},{-260,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh_IP.waterIn, Sh_IP_In) annotation (Line(
+            points={{-206,12},{-206,90},{-80,90},{-80,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(Sh_IP.waterOut, mixIP.in2) annotation (Line(
+            points={{-206,-12},{-208,-12},{-208,-104},{-262,-104}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(mixIP.out, ShHP_RhIP.waterInB) annotation (Line(
+            points={{-280,-110},{-380,-110},{-380,58},{-420.4,58},{-420.4,24}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(ShHP_RhIP.waterInA, Sh_HP_In) annotation (Line(
+            points={{-439.6,24},{-440,52},{-440,78},{-380,78},{-380,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(RhIPOut_T.inlet, ShHP_RhIP.waterOutB) annotation (Line(
+            points={{-376,-134},{-422,-134},{-422,-24},{-420.4,-24}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(ShHPOut_T.inlet, ShHP_RhIP.waterOutA) annotation (Line(
+            points={{-376,-160},{-439.6,-160},{-439.6,-24}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-500,
+                  -200},{500,200}}),
                             graphics),
                              Icon(graphics));
       end HEG_3LRh_des;
@@ -9345,7 +7228,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.SinkW blowDownHP(            redeclare package Medium = 
               FluidMedium, w0=0) 
           annotation (Placement(transformation(
-              origin={-226,-80},
+              origin={-228,-80},
               extent={{-20,-20},{20,20}},
               rotation=270)));
         Components.DrumSensors HPd(
@@ -9356,12 +7239,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
           pstart=HPd_pstart,
-          hlstart=HPd_hlstart,
-          hvstart=HPd_hvstart,
-          Tmstart=HPd_Tmstart,
           Cm=HPd_Cm) "HP drum" 
-                        annotation (Placement(transformation(extent={{-186,-20},
-                  {-266,60}}, rotation=0)));
+                        annotation (Placement(transformation(extent={{-188,-20},{-268,
+                  60}},       rotation=0)));
         Water.SensW steamHP_w(            redeclare package Medium = 
               FluidMedium) 
           annotation (Placement(transformation(
@@ -9372,7 +7252,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
               FluidMedium,
             w0=0) 
           annotation (Placement(transformation(
-              origin={92,-46},
+              origin={112,-80},
               extent={{-20,-20},{20,20}},
               rotation=270)));
         Components.DrumSensors LPd(
@@ -9383,12 +7263,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
           pstart=LPd_pstart,
-          hlstart=LPd_hlstart,
-          hvstart=LPd_hvstart,
-          Tmstart=LPd_Tmstart,
           Cm=LPd_Cm) "LP drum" 
-                        annotation (Placement(transformation(extent={{144,0},{
-                  64,80}}, rotation=0)));
+                        annotation (Placement(transformation(extent={{152,-20},{72,60}},
+                           rotation=0)));
         Water.SensW steamLP_w(            redeclare package Medium = 
               FluidMedium) 
           annotation (Placement(transformation(
@@ -9399,37 +7276,38 @@ package PowerPlants "Models of thermoelectrical power plants components"
                                 annotation (Placement(transformation(extent={{
                   -30,-188},{-70,-148}}, rotation=0)));
       equation
-        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (Line(points={{400,
-                80},{200,80},{200,120},{-60,120},{-60,50},{-211.6,50},{-211.6,
-                49.6}}, color={255,170,213}));
-        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (Line(points={{400,
-                80},{200,80},{200,120},{-60,120},{-60,36},{-198.8,36}}, color={
+        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (Line(points={{400,80},{200,
+                80},{200,120},{-60,120},{-60,50},{-213.6,50},{-213.6,49.6}},
+                        color={255,170,213}));
+        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (Line(points={{400,80},{200,
+                80},{200,120},{-60,120},{-60,36},{-200.8,36}},          color={
                 255,170,213}));
         connect(Steam_HP_Out,steamHP_w. outlet) annotation (Line(points={{-280,
                 -300},{-280,-232}}, thickness=0.5,
             color={0,0,255}));
-        connect(steamHP_w.inlet,HPd. steam) annotation (Line(points={{-280,-208},
-                {-280,80},{-244,80},{-244,48},{-249.2,48}}, thickness=0.5,
+        connect(steamHP_w.inlet,HPd. steam) annotation (Line(points={{-280,-208},{-280,
+                80},{-252,80},{-252,48},{-251.2,48}},       thickness=0.5,
             color={0,0,255}));
-        connect(Feed_HP,HPd. feedwater) annotation (Line(points={{-160,-300},{
-                -160,14},{-187.2,14}}, thickness=0.5,
+        connect(Feed_HP,HPd. feedwater) annotation (Line(points={{-160,-300},{-160,14},
+                {-189.2,14}},          thickness=0.5,
             color={0,0,255}));
-        connect(blowDownHP.flange,HPd. blowdown) annotation (Line(points={{-226,
-                -60},{-226,-19.2}}, thickness=0.5,
+        connect(blowDownHP.flange,HPd. blowdown) annotation (Line(points={{-228,-60},
+                {-228,-19.2},{-228,-19.2}},
+                                    thickness=0.5,
             color={0,0,255}));
-        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (Line(points={{400,
-                80},{140,80},{140,68},{118.4,68},{118.4,69.6}}, color={255,170,
+        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (Line(points={{400,80},{200,
+                80},{200,54},{126.4,54},{126.4,49.6}},          color={255,170,
                 213}));
-        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (Line(points={{400,
-                80},{140,80},{140,56},{131.2,56}}, color={255,170,213}));
-        connect(steamLP_w.inlet,LPd. steam) annotation (Line(points={{60,-208},
-                {60,78},{80.8,78},{80.8,68}}, thickness=0.5,
+        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (Line(points={{400,80},{300,
+                80},{200,80},{200,36},{139.2,36}}, color={255,170,213}));
+        connect(steamLP_w.inlet,LPd. steam) annotation (Line(points={{60,-208},{60,78},
+                {88.8,78},{88.8,48}},         thickness=0.5,
             color={0,0,255}));
-        connect(Feed_LP,LPd. feedwater) annotation (Line(points={{180,-300},{
-                180,34},{142.8,34}}, thickness=0.5,
+        connect(Feed_LP,LPd. feedwater) annotation (Line(points={{180,-300},{180,14},
+                {150.8,14}},         thickness=0.5,
             color={0,0,255}));
         connect(blowDownLP.flange,LPd. blowdown) 
-          annotation (Line(points={{92,-26},{92,0.8},{104,0.8}}, thickness=0.5,
+          annotation (Line(points={{112,-60},{112,-19.2}},       thickness=0.5,
             color={0,0,255}));
         connect(Steam_LP_Out, steamLP_w.outlet) annotation (Line(points={{60,
                 -300},{60,-232}}, thickness=0.5,
@@ -9440,22 +7318,22 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(WaterForHP, IPfeedPump.outlet) annotation (Line(points={{-120,
                 -300},{-120,-168},{-70,-168}}, thickness=0.5,
             color={0,0,255}));
-        connect(Downcomer_HP, HPd.downcomer) annotation (Line(points={{-200,
-                -300},{-200,-8},{-198,-8}}, thickness=0.5,
+        connect(Downcomer_HP, HPd.downcomer) annotation (Line(points={{-200,-300},{-200,
+                -8}},                       thickness=0.5,
             color={0,0,255}));
-        connect(Riser_HP, HPd.riser) annotation (Line(points={{-240,-300},{-240,
-                -120},{-257.2,-120},{-257.2,-2.8}}, thickness=0.5,
+        connect(Riser_HP, HPd.riser) annotation (Line(points={{-240,-300},{-240,-120},
+                {-259.2,-120},{-259.2,-2.8}},       thickness=0.5,
             color={0,0,255}));
-        connect(Riser_LP, LPd.riser) annotation (Line(points={{100,-300},{100,
-                -82},{72.8,-82},{72.8,17.2}}, thickness=0.5,
+        connect(Riser_LP, LPd.riser) annotation (Line(points={{100,-300},{100,-120},
+                {80.8,-120},{80.8,-2.8}},     thickness=0.5,
             color={0,0,255}));
         connect(IPfeedPump.inlet, LPd.downcomer) annotation (Line(
-            points={{-30,-168},{140,-168},{140,-20},{132,-20},{132,12}},
+            points={{-30,-168},{140,-168},{140,-8}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
         connect(Downcomer_LP, LPd.downcomer) annotation (Line(
-            points={{140,-300},{140,-20},{132,-20},{132,12}},
+            points={{140,-300},{140,-8}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
@@ -9501,7 +7379,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
               FluidMedium,
             w0=0) 
           annotation (Placement(transformation(
-              origin={264,-60},
+              origin={272,-56},
               extent={{-20,-20},{20,20}},
               rotation=270)));
         Water.SinkW blowDownIP(            redeclare package Medium = 
@@ -9519,12 +7397,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
           pstart=HPd_pstart,
-          hlstart=HPd_hlstart,
-          hvstart=HPd_hvstart,
-          Tmstart=HPd_Tmstart,
           Cm=HPd_Cm) "HP drum" 
-                        annotation (Placement(transformation(extent={{-288,0},{
-                  -368,80}}, rotation=0)));
+                        annotation (Placement(transformation(extent={{-288,-4},{-368,
+                  76}},      rotation=0)));
         Components.DrumSensors IPd(
           redeclare package Medium = FluidMedium,
           rint=IPd_rint,
@@ -9533,12 +7408,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
           pstart=IPd_pstart,
-          hlstart=IPd_hlstart,
-          hvstart=IPd_hvstart,
-          Tmstart=IPd_Tmstart,
           Cm=IPd_Cm) "IP drum" 
-                        annotation (Placement(transformation(extent={{10,0},{
-                  -70,80}}, rotation=0)));
+                        annotation (Placement(transformation(extent={{10,-4},{-70,76}},
+                            rotation=0)));
         Components.DrumSensors LPd(
           redeclare package Medium = FluidMedium,
           rint=LPd_rint,
@@ -9547,12 +7419,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
           pstart=LPd_pstart,
-          hlstart=LPd_hlstart,
-          hvstart=LPd_hvstart,
-          Tmstart=LPd_Tmstart,
           Cm=LPd_Cm) "LP drum" 
-                        annotation (Placement(transformation(extent={{304,-4},{
-                  224,76}}, rotation=0)));
+                        annotation (Placement(transformation(extent={{306,-4},{226,76}},
+                            rotation=0)));
         Water.ThroughW circulationPumpIP(            redeclare package Medium
             = FluidMedium, w0=RiserIPFlowRate) 
                                 annotation (Placement(transformation(
@@ -9583,6 +7452,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={212,-220},
               extent={{20,-20},{-20,20}},
               rotation=90)));
+        Water.FlowSplit flowSplit             annotation (Placement(
+              transformation(
+              extent={{-20,-20},{20,20}},
+              rotation=180,
+              origin={150,-134})));
+        Water.FlowSplit flowSplit1             annotation (Placement(
+              transformation(
+              extent={{-20,-20},{20,20}},
+              rotation=270,
+              origin={292,-122})));
       equation
         connect(ActuatorsBus.flowRate_feedHP,feedPumpHP. in_w0) annotation (Line(
               points={{500,20},{440,20},{440,-20},{-140,-20},{-140,-172},{-208,
@@ -9599,116 +7478,130 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(SensorsBus.w_steamLP,steamLP_w. w) annotation (Line(points={{
                 500,80},{400,80},{400,160},{180,160},{180,-260},{200,-260},{200,
                 -236}}, color={255,170,213}));
-        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (Line(points={{500,
-                80},{400,80},{400,160},{-160,160},{-160,68},{-313.6,68},{-313.6,
-                69.6}}, color={255,170,213}));
-        connect(SensorsBus.p_drumIP,IPd. p_out) annotation (Line(points={{500,
-                80},{400,80},{400,160},{40,160},{40,69.6},{-15.6,69.6}}, color=
+        connect(SensorsBus.p_drumHP,HPd. p_out) annotation (Line(points={{500,80},{400,
+                80},{400,160},{-160,160},{-160,68},{-313.6,68},{-313.6,65.6}},
+                        color={255,170,213}));
+        connect(SensorsBus.p_drumIP,IPd. p_out) annotation (Line(points={{500,80},{400,
+                80},{400,160},{40,160},{40,63.6},{-15.6,65.6}},          color=
                 {255,170,213}));
-        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (Line(points={{500,
-                80},{400,80},{400,68},{278.4,68},{278.4,65.6}}, color={255,170,
+        connect(SensorsBus.p_drumLP,LPd. p_out) annotation (Line(points={{500,80},{400,
+                80},{400,68},{280.4,68},{280.4,65.6}},          color={255,170,
                 213}));
-        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (Line(points={{500,
-                80},{380,80},{380,160},{-160,160},{-160,56},{-300.8,56}}, color=
+        connect(SensorsBus.y_drumHP,HPd. y_out) annotation (Line(points={{500,80},{400,
+                80},{400,160},{-160,160},{-160,54},{-300.8,54},{-300.8,52}},
+                                                                          color=
                {255,170,213}));
-        connect(SensorsBus.y_drumIP,IPd. y_out) annotation (Line(points={{500,80},
-                {400,80},{400,160},{40,160},{40,56},{-2.8,56}},     color={255,
+        connect(SensorsBus.y_drumIP,IPd. y_out) annotation (Line(points={{500,80},{400,
+                80},{400,160},{40,160},{40,52},{-2.8,52}},          color={255,
                 170,213}));
-        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (Line(points={{500,
-                80},{400,80},{400,52},{291.2,52}}, color={255,170,213}));
+        connect(SensorsBus.y_drumLP,LPd. y_out) annotation (Line(points={{500,80},{400,
+                80},{400,52},{293.2,52}},          color={255,170,213}));
         connect(Steam_HP_Out,steamHP_w. outlet) annotation (Line(points={{-380,
                 -300},{-380,-232}}, thickness=0.5,
             color={0,0,255}));
-        connect(steamHP_w.inlet,HPd. steam) annotation (Line(points={{-380,-208},
-                {-380,100},{-352,100},{-352,68},{-351.2,68}}, thickness=0.5,
+        connect(steamHP_w.inlet,HPd. steam) annotation (Line(points={{-380,-208},{-380,
+                100},{-352,100},{-352,64},{-351.2,64}},       thickness=0.5,
             color={0,0,255}));
-        connect(circulationPumpHP.inlet,HPd. downcomer) annotation (Line(points=
-               {{-300,-160},{-300,12}}, thickness=0.5,
+        connect(circulationPumpHP.inlet,HPd. downcomer) annotation (Line(points={{-300,
+                -160},{-300,8}},        thickness=0.5,
             color={0,0,255}));
-        connect(Feed_HP,HPd. feedwater) annotation (Line(points={{-260,-300},{
-                -260,34},{-289.2,34}}, thickness=0.5,
+        connect(Feed_HP,HPd. feedwater) annotation (Line(points={{-260,-300},{-260,30},
+                {-289.2,30}},          thickness=0.5,
             color={0,0,255}));
         connect(Steam_IP_Out,steamIP_w. outlet) annotation (Line(points={{-80,
                 -300},{-80,-232}}, thickness=0.5,
             color={0,0,255}));
-        connect(circulationPumpIP.inlet,IPd. downcomer) annotation (Line(points={{
-                3.67394e-015,-160},{0,-160},{0,12},{-2,12}},   thickness=0.5,
+        connect(circulationPumpIP.inlet,IPd. downcomer) annotation (Line(points={{3.67394e-015,
+                -160},{0,-160},{0,6},{-2,8}},                  thickness=0.5,
             color={0,0,255}));
-        connect(steamIP_w.inlet,IPd. steam) annotation (Line(points={{-80,-208},
-                {-80,80},{-38,80},{-38,68},{-53.2,68}}, thickness=0.5,
+        connect(steamIP_w.inlet,IPd. steam) annotation (Line(points={{-80,-208},{-80,
+                80},{-52,80},{-52,62},{-53.2,64}},      thickness=0.5,
             color={0,0,255}));
-        connect(Feed_IP,IPd. feedwater) annotation (Line(points={{40,-300},{40,
-                34},{8.8,34}}, thickness=0.5,
+        connect(Feed_IP,IPd. feedwater) annotation (Line(points={{40,-300},{40,30},{
+                8.8,30}},      thickness=0.5,
             color={0,0,255}));
-        connect(steamLP_w.inlet,LPd. steam) annotation (Line(points={{220,-208},
-                {220,80},{240.8,80},{240.8,64}}, thickness=0.5,
+        connect(steamLP_w.inlet,LPd. steam) annotation (Line(points={{220,-208},{220,
+                80},{242.8,80},{242.8,64}},      thickness=0.5,
             color={0,0,255}));
         connect(Steam_LP_Out,steamLP_w. outlet) annotation (Line(points={{220,
                 -300},{220,-232}}, thickness=0.5,
             color={0,0,255}));
-        connect(Feed_LP,LPd. feedwater) annotation (Line(points={{340,-300},{
-                340,30},{302.8,30}}, thickness=0.5,
+        connect(Feed_LP,LPd. feedwater) annotation (Line(points={{340,-300},{340,30},
+                {304.8,30}},         thickness=0.5,
             color={0,0,255}));
-        connect(blowDownHP.flange,HPd. blowdown) annotation (Line(points={{-328,
-                -38},{-328,0.8}}, thickness=0.5,
+        connect(blowDownHP.flange,HPd. blowdown) annotation (Line(points={{-328,-38},
+                {-328,-3.2}},     thickness=0.5,
             color={0,0,255}));
         connect(blowDownIP.flange,IPd. blowdown) 
-          annotation (Line(points={{-28,-44},{-28,0.8},{-30,0.8}}, thickness=0.5,
+          annotation (Line(points={{-28,-44},{-28,-3.2},{-30,-3.2}},
+                                                                   thickness=0.5,
             color={0,0,255}));
         connect(blowDownLP.flange,LPd. blowdown) 
-          annotation (Line(points={{264,-40},{264,-3.2}}, thickness=0.5));
+          annotation (Line(points={{272,-36},{272,-20},{272,-3.2},{266,-3.2}},
+                                                          thickness=0.5,
+            color={0,0,255}));
         connect(WaterForHP, feedPumpHP.outlet) annotation (Line(points={{-220,
                 -300},{-220,-200}}, thickness=0.5,
             color={0,0,255}));
         connect(WaterForIP, feedPumpIP.outlet) annotation (Line(points={{80,
                 -300},{80,-202}}, thickness=0.5,
             color={0,0,255}));
-        connect(Riser_LP, LPd.riser) annotation (Line(points={{260,-300},{260,
-                -100},{232.8,-100},{232.8,13.2}}, thickness=0.5,
+        connect(Riser_LP, LPd.riser) annotation (Line(points={{260,-300},{260,-100},
+                {234.8,-100},{234.8,13.2}},       thickness=0.5,
             color={0,0,255}));
         connect(Downcomer_LP, circulationPumpLP.outlet) annotation (Line(points=
                {{300,-300},{300,-300},{300,-228}}, thickness=0.5,
             color={0,0,255}));
-        connect(Downcomer_IP, circulationPumpIP.outlet) annotation (Line(points={{
-                1.77636e-015,-300},{1.77636e-015,-252},{-3.67394e-015,-252},{
-                -3.67394e-015,-200}},thickness=0.5,
+        connect(Downcomer_IP, circulationPumpIP.outlet) annotation (Line(points={{1.77636e-015,
+                -300},{1.77636e-015,-252},{-3.67394e-015,-252},{-3.67394e-015,-200}},
+                                     thickness=0.5,
             color={0,0,255}));
-        connect(Riser_IP, IPd.riser) annotation (Line(points={{-40,-300},{-40,
-                -100},{-61.2,-100},{-61.2,17.2}}, thickness=0.5,
+        connect(Riser_IP, IPd.riser) annotation (Line(points={{-40,-300},{-40,-100},
+                {-61.2,-100},{-61.2,13.2}},       thickness=0.5,
             color={0,0,255}));
         connect(Downcomer_HP, circulationPumpHP.outlet) annotation (Line(points=
                {{-300,-300},{-300,-200}}, thickness=0.5,
             color={0,0,255}));
-        connect(Riser_HP, HPd.riser) annotation (Line(points={{-340,-300},{-340,
-                -100},{-359.2,-100},{-359.2,17.2}}, thickness=0.5,
+        connect(Riser_HP, HPd.riser) annotation (Line(points={{-340,-300},{-340,-100},
+                {-359.2,-100},{-359.2,13.2}},       thickness=0.5,
             color={0,0,255}));
-        connect(circulationPumpLP.inlet, LPd.downcomer) annotation (Line(
-            points={{300,-188},{302,-188},{302,-40},{292,-40},{292,8}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(feedPumpIP.inlet, LPd.downcomer) annotation (Line(
-            points={{80,-162},{80,-140},{302,-140},{302,-40},{292,-40},{292,8}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
 
-        connect(feedPumpHP.inlet, LPd.downcomer) annotation (Line(
-            points={{-220,-160},{-220,-140},{302,-140},{302,-40},{292,-40},{292,
-                8}},
+        connect(flowSplit.out1, feedPumpIP.inlet) annotation (Line(
+            points={{138,-142},{80,-142},{80,-162}},
+            color={0,0,255},
+            smooth=Smooth.None,
+            thickness=0.5));
+        connect(flowSplit.out2, feedPumpHP.inlet) annotation (Line(
+            points={{138,-126},{-220,-126},{-220,-160}},
+            color={0,0,255},
+            smooth=Smooth.None,
+            thickness=0.5));
+        connect(flowSplit1.in1, LPd.downcomer) annotation (Line(
+            points={{292,-110},{294,-110},{294,8}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
-                  {-500,-300},{500,300}}),
+        connect(circulationPumpLP.inlet, flowSplit1.out1) annotation (Line(
+            points={{300,-188},{300,-134}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(flowSplit1.out2, flowSplit.in1) annotation (Line(
+            points={{284,-134},{162,-134}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-500,
+                  -300},{500,300}}),
                             graphics));
       end DG_3L_CC;
 
       model HRSG_3LRh
         "Heat Recovery Steam Generator with three pressure level and reheat"
         extends Interfaces.HRSG_3LRh;
+        parameter Boolean SSInit=false "Steady-state initialization";
 
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC drums(
+        DG_3L_CC drums(
           HPd_rint=1.067,
           HPd_rext=1.167,
           HPd_L=11.920,
@@ -9725,39 +7618,24 @@ package PowerPlants "Models of thermoelectrical power plants components"
           RiserIPFlowRate=67.5,
           RiserLPFlowRate=41.5,
           redeclare package FluidMedium = FluidMedium,
-          SSInit=false,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
-          IPd_hlstart=1.0265e6) annotation (Placement(transformation(extent={{
+          SSInit=SSInit,
+          fluidHPNomPressure=13060000,
+          fluidIPNomPressure=3381600,
+          fluidLPNomPressure=719048) 
+                                annotation (Placement(transformation(extent={{
                   -102,40},{98,160}}, rotation=0)));
-        ThermoPower.PowerPlants.HRSG.Examples.HEG_3LRh HeatExchangersGroup(
+        HEG_3LRh HeatExchangersGroup(
           gasNomFlowRate=585.5,
           fluidHPNomFlowRate_Sh=70.59,
-          fluidHPNomPressure_Sh=134.3e5,
           fluidHPNomFlowRate_Ev=175.5,
-          fluidHPNomPressure_Ev=137.1e5,
           fluidHPNomFlowRate_Ec=70.10,
-          fluidHPNomPressure_Ec=138.9e5,
           fluidIPNomFlowRate_Rh=81.10,
-          fluidIPNomPressure_Rh=28.4e5,
           fluidIPNomFlowRate_Sh=13.5,
-          fluidIPNomPressure_Sh=29.5e5,
           fluidIPNomFlowRate_Ev=67.5,
-          fluidIPNomPressure_Ev=37.16e5,
           fluidIPNomFlowRate_Ec=21.8,
-          fluidIPNomPressure_Ec=48.6e5,
           fluidLPNomFlowRate_Sh=6.91,
-          fluidLPNomPressure_Sh=6.6e5,
           fluidLPNomFlowRate_Ev=41.49,
-          fluidLPNomPressure_Ev=15.34e5,
           fluidLPNomFlowRate_Ec=122.4,
-          fluidLPNomPressure_Ec=19.8e5,
           Sh2_HP_N_G=3,
           Sh2_HP_N_F=5,
           Sh2_HP_exchSurface_G=3636,
@@ -9858,73 +7736,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Ec_LP_gasVol=10,
           Ec_LP_fluidVol=28.977,
           Ec_LP_metalVol=8.061,
-          use_T_Ev=false,
-          Sh2_HP_Tstart_G_In=884.65,
-          Sh2_HP_Tstart_G_Out=837.31,
-          Sh2_HP_Tstart_M_In=742.65,
-          Sh2_HP_Tstart_M_Out=823.28,
-          Sh2_HP_Tstart_F_In=742.65,
-          Sh2_HP_Tstart_F_Out=823.28,
-          Sh1_HP_Tstart_G_In=837.15,
-          Sh1_HP_Tstart_G_Out=748.60,
-          Sh1_HP_Tstart_M_In=606.59,
-          Sh1_HP_Tstart_M_Out=743.18,
-          Sh1_HP_Tstart_F_In=606.59,
-          Sh1_HP_Tstart_F_Out=743.18,
-          Ev_HP_Tstart_G_In=747.15,
-          Ev_HP_Tstart_G_Out=620.30,
-          Ev_HP_hstart_F_In=1.514e6,
-          Ev_HP_hstart_F_Out=2.002e6,
-          Ec2_HP_Tstart_G_In=614.15,
-          Ec2_HP_Tstart_G_Out=558.98,
-          Ec2_HP_Tstart_M_In=494.67,
-          Ec2_HP_Tstart_M_Out=594.14,
-          Ec2_HP_Tstart_F_In=494.67,
-          Ec2_HP_Tstart_F_Out=594.14,
-          Ec1_HP_Tstart_M_In=431.77,
-          Ec1_HP_Tstart_M_Out=494.67,
-          Ec1_HP_Tstart_F_In=431.77,
-          Ec1_HP_Tstart_F_Out=494.67,
-          Rh2_IP_Tstart_M_In=717.31,
-          Rh2_IP_Tstart_M_Out=813.09,
-          Rh2_IP_Tstart_F_In=717.31,
-          Rh2_IP_Tstart_F_Out=813.09,
-          Rh1_IP_Tstart_M_In=618.31,
-          Rh1_IP_Tstart_M_Out=717.34,
-          Rh1_IP_Tstart_F_In=618.31,
-          Rh1_IP_Tstart_F_Out=717.34,
-          Sh_IP_Tstart_G_In=620.15,
-          Sh_IP_Tstart_G_Out=614.50,
-          Sh_IP_Tstart_M_In=506.08,
-          Sh_IP_Tstart_M_Out=605.11,
-          Sh_IP_Tstart_F_In=506.08,
-          Sh_IP_Tstart_F_Out=605.11,
-          Ev_IP_Tstart_G_In=558.15,
-          Ev_IP_Tstart_G_Out=518.51,
-          Ev_IP_hstart_F_In=9.92e5,
-          Ev_IP_hstart_F_Out=1.37e6,
-          Ec_IP_Tstart_G_In=517.15,
-          Ec_IP_Tstart_G_Out=480.11,
-          Ec_IP_Tstart_M_In=430.24,
-          Ec_IP_Tstart_M_Out=493.16,
-          Ec_IP_Tstart_F_In=430.24,
-          Ec_IP_Tstart_F_Out=493.16,
-          Sh_LP_Tstart_G_In=519.15,
-          Sh_LP_Tstart_G_Out=517.44,
-          Sh_LP_Tstart_M_In=435.75,
-          Sh_LP_Tstart_M_Out=505.04,
-          Sh_LP_Tstart_F_In=435.75,
-          Sh_LP_Tstart_F_Out=505.75,
-          Ev_LP_Tstart_G_In=480.00,
-          Ev_LP_Tstart_G_Out=453.47,
-          Ev_LP_hstart_F_In=6.625e5,
-          Ev_LP_hstart_F_Out=1.065e6,
-          Ec_LP_Tstart_G_In=453.47,
-          Ec_LP_Tstart_G_Out=372.35,
-          Ec_LP_Tstart_M_In=331.05,
-          Ec_LP_Tstart_M_Out=428.09,
-          Ec_LP_Tstart_F_In=331.05,
-          Ec_LP_Tstart_F_Out=428.09,
           rhomcm=7900*578.05,
           lambda=20,
           Ec_LP(gamma_G=46.8, gamma_F=4000),
@@ -9939,7 +7750,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Ec2_HP(gamma_G=56, gamma_F=4000),
           Sh_IP(gamma_G=33, gamma_F=4000),
           Ev_HP(gamma_G=46.5, gamma_F=20000),
-          gasNomPressure=1e5,
           Sh1HP_Rh1IP(
             gamma_G_A=70,
             gamma_G_B=80,
@@ -9952,22 +7762,30 @@ package PowerPlants "Models of thermoelectrical power plants components"
             gamma_F_B=4000),
           redeclare package FlueGasMedium = FlueGasMedium,
           redeclare package FluidMedium = FluidMedium,
-          Ev_HP_Tstart_M_In=FluidMedium.temperature_ph(137.1e5, 1.514e6),
-          Ev_HP_Tstart_M_Out=FluidMedium.temperature_ph(137.1e5, 2.002e6),
-          Ev_IP_Tstart_M_In=FluidMedium.temperature_ph(37.16e5, 9.92e5),
-          Ev_IP_Tstart_M_Out=FluidMedium.temperature_ph(37.16e5, 1.37e6),
-          Ev_LP_Tstart_M_In=FluidMedium.temperature_ph(15.34e5, 6.625e5),
-          Ev_LP_Tstart_M_Out=FluidMedium.temperature_ph(15.34e5, 1.065e6)) 
+          SSInit=SSInit,
+          gasNomPressure=100000,
+          fluidHPNomPressure_Sh=13430000,
+          fluidHPNomPressure_Ev=13710000,
+          fluidHPNomPressure_Ec=13890000,
+          fluidIPNomPressure_Rh=2840000,
+          fluidIPNomPressure_Sh=2950000,
+          fluidIPNomPressure_Ev=3716000,
+          fluidIPNomPressure_Ec=4860000,
+          fluidLPNomPressure_Sh=660000,
+          fluidLPNomPressure_Ev=1534000,
+          fluidLPNomPressure_Ec=1980000,
+          Sh2_HP_Tstartbar=873.15,
+          Sh1_HP_Tstartbar=823.15,
+          Ev_HP_Tstartbar=723.15,
+          Ec2_HP_Tstartbar=573.15,
+          Ec1_HP_Tstartbar=523.15,
+          Sh_IP_Tstartbar=623.15,
+          Ev_IP_Tstartbar=553.15,
+          Sh_LP_Tstartbar=523.15,
+          Ev_LP_Tstartbar=473.15,
+          Ec_LP_Tstartbar=423.15) 
                              annotation (Placement(transformation(extent={{-102,
                   -80},{98,0}}, rotation=0)));
-        replaceable Components.BaseReader_water stateInletWater(redeclare
-            package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={160,-110},
-              extent={{-10,-10},{10,10}},
-              rotation=90)));
       equation
         connect(ActuatorsBus, drums.ActuatorsBus)           annotation (Line(
               points={{200,100},{158,100},{158,104},{98,104}}, color={213,255,
@@ -9994,13 +7812,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(Rh_IP_In, HeatExchangersGroup.Rh_IP_In) annotation (Line(points=
                {{-100,-200},{-100,-120},{-28,-120},{-28,-80}}, thickness=0.5,
             color={0,0,255}));
-        connect(WaterIn, stateInletWater.inlet) 
-          annotation (Line(points={{160,-200},{160,-116}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateInletWater.outlet, HeatExchangersGroup.Ec_LP_In) 
-          annotation (Line(points={{160,-104},{160,20},{74,20},{74,0}},
-              thickness=0.5,
-            color={0,0,255}));
         connect(HeatExchangersGroup.SensorsBus, drums.SensorsBus) annotation (Line(
               points={{98,-12},{140,-12},{140,116},{98,116}}, color={255,170,
                 213}));
@@ -10017,7 +7828,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
               points={{-62,0},{-62,40}}, thickness=0.5,
             color={0,0,255}));
         connect(HeatExchangersGroup.Ec_HP_Out, drums.Feed_HP) annotation (Line(
-              points={{-54,0},{-54,40},{-54,40}}, thickness=0.5,
+              points={{-54,0},{-54,40}},          thickness=0.5,
             color={0,0,255}));
         connect(HeatExchangersGroup.Ec_HP_In, drums.WaterForHP) annotation (Line(
               points={{-46,0},{-46,40}}, thickness=0.5,
@@ -10029,7 +7840,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
               points={{-10,0},{-10,40}}, thickness=0.5,
             color={0,0,255}));
         connect(HeatExchangersGroup.Ec_IP_Out, drums.Feed_IP) annotation (Line(
-              points={{6,0},{6,40},{6,40}}, thickness=0.5,
+              points={{6,0},{6,40}},        thickness=0.5,
             color={0,0,255}));
         connect(HeatExchangersGroup.Ec_IP_In, drums.WaterForIP) annotation (Line(
               points={{14,0},{14,40}}, thickness=0.5,
@@ -10052,8 +7863,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
-                  {-200,-200},{200,200}}),
+        connect(WaterIn, HeatExchangersGroup.Ec_LP_In) annotation (Line(
+            points={{160,-200},{160,20},{74,20},{74,0}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-200,
+                  -200},{200,200}}),
                             graphics));
       end HRSG_3LRh;
 
@@ -10088,226 +7904,449 @@ package PowerPlants "Models of thermoelectrical power plants components"
         rhol=FluidMedium.bubbleDensity(sat);
       end computation_states;
 
-      model TestHE_simp
-        package FlueGasMedium = ThermoPower.Media.FlueGas;
-        package FluidMedium = ThermoPower.Water.StandardWater;
-
-        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-              w0=70.59,
-          p0=129.6e5,
-          h=3.251e6)          annotation (Placement(transformation(
-              origin={-10,70},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-          p0=129.6e5,
-          h=3.328e6)      annotation (Placement(transformation(
-              origin={-10,-88},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=862) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
-          w0=585.5,
-          redeclare package Medium = FlueGasMedium,
-          T=884.65)          annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
-        Components.HE_simp hE(redeclare package FluidMedium = FluidMedium,
-          redeclare package FlueGasMedium = FlueGasMedium,
-          N_G=3,
-          N_F=5,
-          exchSurface_G=540.913,
-          exchSurface_F=421.844,
-          gasVol=10,
-          fluidVol=2.615,
-          metalVol=1.685,
-          rhomcm=7780*688,
-          lambda=20,
-          gasNomFlowRate=585.5,
-          gamma_G=83.97,
-          gamma_F=4000,
-          Tstart_G_In=884.65,
-          Tstart_F_In=742.65,
-          fluidNomFlowRate=70.59,
-          fluidNomPressure=129.6e5,
-          gasNomPressure=0,
-          Tstart_M_In=743,
-          Tstart_M_Out=824.28,
-          Tstart_F_Out=769.84,
-          SSInit=false,
-          Tstart_G_Out=876.35) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
-                rotation=0)));
-        Water.SensT T_waterIn(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,-52},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
-        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
-                rotation=0)));
-        inner System system 
-          annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      equation
-        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(points={{-10,-78},
-                {-10,-68},{-10,-58}},                      thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (Line(points={{-10,-46},{-10,-20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.inlet, sourseW_water.flange) annotation (Line(points={{-10,48},
-                {-10,60},{-10,60}},                    thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (Line(points={{-10,36},{-10,20}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics));
-      end TestHE_simp;
-
-      model TestEcLP
+      model TestSh2HP_Rh2IP
         package FlueGasMedium = ThermoPower.Media.FlueGas;
         package FluidMedium = ThermoPower.Water.StandardWater;
 
         //gas
-        parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
-        parameter SI.Temperature Tstart_G_In=453.47
+        parameter SI.MassFlowRate gasNomFlowRate=585.5
+          "Nominal flow rate through the gas side";
+        parameter SI.Temperature Tstart_G_In=884.65
           "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=372.35
+        parameter SI.Temperature Tstart_G_Out=823.15
           "Outlet gas temperature start value";
 
-        //fluid
-        parameter SI.MassFlowRate fluidNomFlowRate=89.82
+        //fluid A
+        parameter SI.MassFlowRate fluidNomFlowRate_A=70.59
           "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure=6e5
+        parameter SI.Pressure fluidNomPressure_A=130.5e5
           "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G=35
+        parameter SI.CoefficientOfHeatTransfer gamma_G_A(fixed=false)=40
           "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_F=4000
+        parameter SI.CoefficientOfHeatTransfer gamma_F_A=4000
           "Constant heat transfer coefficient in the fluid side";
-        parameter SI.Temperature Tstart_M_In=307.05
+        parameter SI.Temperature Tstart_M_A_In=Tstart_F_A_In
           "Inlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_M_Out=428.09
+        parameter SI.Temperature Tstart_M_A_Out=Tstart_F_A_Out
           "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_In=307.05
+        parameter SI.Temperature Tstart_F_A_In=769.486
           "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_Out=428.09
+        parameter SI.Temperature Tstart_F_A_Out=823.28
           "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_In)
+        parameter SI.SpecificEnthalpy hstart_F_A_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_In)
           "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_Out)
+        parameter SI.SpecificEnthalpy hstart_F_A_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_Out)
           "Nominal specific enthalpy";
-        parameter Boolean SSInit = false "Steady-state initialization";
 
-        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate,
-          p0=fluidNomPressure,
-          h=hstart_F_In)      annotation (Placement(transformation(
-              origin={0,60},
-              extent={{-10,-10},{10,10}},
+        //fluid B
+        parameter SI.MassFlowRate fluidNomFlowRate_B=81.1
+          "Nominal flow rate through the fluid side";
+        parameter SI.Pressure fluidNomPressure_B=28.2e5
+          "Nominal pressure in the fluid side inlet";
+        parameter SI.CoefficientOfHeatTransfer gamma_G_B(fixed=false)=40
+          "Constant heat transfer coefficient in the gas side";
+        parameter SI.CoefficientOfHeatTransfer gamma_F_B=4000
+          "Constant heat transfer coefficient in the fluid side";
+        parameter SI.Temperature Tstart_M_B_In=Tstart_F_B_In
+          "Inlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_M_B_Out=Tstart_F_B_Out
+          "Outlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_F_B_In=757.896
+          "Inlet fluid temperature start value";
+        parameter SI.Temperature Tstart_F_B_Out=813.09
+          "Outlet fluid temperature start value";
+        parameter SI.SpecificEnthalpy hstart_F_B_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,Tstart_F_B_In)
+          "Nominal specific enthalpy";
+        parameter SI.SpecificEnthalpy hstart_F_B_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,Tstart_F_B_Out)
+          "Nominal specific enthalpy";
+
+        Components.ParHE hE(redeclare package FluidMedium = FluidMedium,
+          redeclare package FlueGasMedium = FlueGasMedium,
+          N_G=3,
+          gasVol=10,
+          lambda=20,
+          gasNomPressure=0,
+          N_F_A=5,
+          exchSurface_G_A=3636,
+          exchSurface_F_A=421.844,
+          extSurfaceTub_A=540.913,
+          fluidVol_A=2.615,
+          metalVol_A=1.685,
+          rhomcm_A=7780*688.31,
+          N_F_B=7,
+          exchSurface_F_B=4630.2,
+          exchSurface_G_B=873.079,
+          extSurfaceTub_B=1009.143,
+          fluidVol_B=8.403,
+          metalVol_B=2.823,
+          rhomcm_B=7800*574.93,
+          counterCurrent_A=true,
+          gasNomFlowRate=gasNomFlowRate,
+          fluidNomFlowRate_A=fluidNomFlowRate_A,
+          fluidNomFlowRate_B=fluidNomFlowRate_B,
+          fluidNomPressure_A=fluidNomPressure_A,
+          fluidNomPressure_B=fluidNomPressure_B,
+          gamma_G_A=gamma_G_A,
+          gamma_G_B=gamma_G_B,
+          gamma_F_A=gamma_F_A,
+          gamma_F_B=gamma_F_B,
+          counterCurrent_B=true,
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M_A=Tstart_M_A,
+          Tstartbar_M_B=Tstart_M_B,
+          SSInit=SSInit,
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
+                rotation=0)));
+
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M_A = (Tstart_M_A_In+Tstart_M_A_Out)/2;
+        parameter SI.Temperature Tstart_M_B = (Tstart_M_B_In+Tstart_M_B_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SourceW sourseW_water_A(
+          redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate_A,
+          p0=fluidNomPressure_A,
+          h=hstart_F_A_In)    annotation (Placement(transformation(
+              origin={-20,68},
+              extent={{-10,10},{10,-10}},
               rotation=270)));
-        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-          p0=fluidNomPressure,
-          h=hstart_F_Out) annotation (Placement(transformation(
-              origin={0,-60},
+        Water.SinkP sinkP_water_A(
+          redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure_A,
+          h=hstart_F_A_Out) 
+                          annotation (Placement(transformation(
+              origin={-20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-10},
-                  {70,10}}, rotation=0)));
+                         annotation (Placement(transformation(extent={{60,-10},{80,10}},
+                            rotation=0)));
         Gas.SourceW sourceW_gas(
           redeclare package Medium = FlueGasMedium,
-          w0=gasNomFlowRate,
-          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-70,
-                  -10},{-50,10}}, rotation=0)));
-        Components.HE hE(redeclare package FluidMedium = FluidMedium,
+          T=Tstart_G_In,
+          w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-70,-10},{-50,
+                  10}},           rotation=0)));
+        Water.SinkP sinkP_water_B(
+          redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure_B,
+          h=hstart_F_B_Out) 
+                          annotation (Placement(transformation(
+              origin={20,-70},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SourceW sourseW_water_B(
+          redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate_B,
+          p0=fluidNomPressure_B,
+          h=hstart_F_B_In)    annotation (Placement(transformation(
+              origin={20,68},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SensT T_waterIn_A(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={-12,40},
+              extent={{-10,10},{10,-10}},
+              rotation=270)));
+        Water.SensT T_waterOut_A(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={-12,-40},
+              extent={{-10,10},{10,-10}},
+              rotation=270)));
+        Water.SensT T_waterOut_B(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={12,-40},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SensT T_waterIn_B(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={12,40},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
+                rotation=0)));
+      initial equation
+      //  hstart_F_A_Out = hE.waterOutA.h_outflow;
+      //  hstart_F_B_Out = hE.waterOutB.h_outflow;
+
+      equation
+        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
+            points={{34,0},{34,0},{20,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(T_gasOut.outlet,sinkP_gas. flange) annotation (Line(
+            points={{46,0},{60,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(T_waterOut_A.outlet,sinkP_water_A. flange) annotation (Line(
+              points={{-8,-46},{-8,-46},{-8,-60},{-20,-60}},    thickness=0.5,
+            color={0,0,255}));
+        connect(sinkP_water_B.flange,T_waterOut_B. outlet) annotation (Line(
+              points={{20,-60},{20,-60},{8,-60},{8,-46}},
+              thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterOut_B.inlet, hE.waterOutB) annotation (Line(points={{8,-34},{
+                8,-27},{8,-20}},                 thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterOut_A.inlet, hE.waterOutA) annotation (Line(points={{-8,-34},
+                {-8,-27},{-8,-20}},                  thickness=0.5,
+            color={0,0,255}));
+        connect(hE.waterInA,T_waterIn_A. outlet) annotation (Line(points={{-8,20},{-8,
+                20},{-8,24},{-8,34}},            thickness=0.5,
+            color={0,0,255}));
+        connect(hE.waterInB,T_waterIn_B. outlet) 
+          annotation (Line(points={{8,20},{8,22},{8,34}},          thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterIn_B.inlet,sourseW_water_B. flange) 
+          annotation (Line(points={{8,46},{8,58},{20,58}},
+              thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterIn_A.inlet,sourseW_water_A. flange) annotation (Line(
+              points={{-8,46},{-8,50},{-8,58},{-20,58}},    thickness=0.5,
+            color={0,0,255}));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(graphics));
+      end TestSh2HP_Rh2IP;
+
+      model TestSh1HP_Rh1IP
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
+
+        //gas
+        parameter SI.MassFlowRate gasNomFlowRate=585.5
+          "Nominal flow rate through the gas side";
+        parameter SI.Temperature Tstart_G_In=837.15
+          "Inlet gas temperature start value";
+        parameter SI.Temperature Tstart_G_Out=748.6
+          "Outlet gas temperature start value";
+
+        //fluid A
+        parameter SI.MassFlowRate fluidNomFlowRate_A=70.59
+          "Nominal flow rate through the fluid side";
+        parameter SI.Pressure fluidNomPressure_A=134.3e5
+          "Nominal pressure in the fluid side inlet";
+        parameter SI.CoefficientOfHeatTransfer gamma_G_A(fixed=false)=40
+          "Constant heat transfer coefficient in the gas side";
+        parameter SI.CoefficientOfHeatTransfer gamma_F_A=4000
+          "Constant heat transfer coefficient in the fluid side";
+        parameter SI.Temperature Tstart_M_A_In=Tstart_F_A_In
+          "Inlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_M_A_Out=Tstart_F_A_Out
+          "Outlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_F_A_In=606.59
+          "Inlet fluid temperature start value";
+        parameter SI.Temperature Tstart_F_A_Out=743.18
+          "Outlet fluid temperature start value";
+        parameter SI.SpecificEnthalpy hstart_F_A_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_In)
+          "Nominal specific enthalpy";
+        parameter SI.SpecificEnthalpy hstart_F_A_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_Out)
+          "Nominal specific enthalpy";
+
+        //fluid B
+        parameter SI.MassFlowRate fluidNomFlowRate_B=81.1
+          "Nominal flow rate through the fluid side";
+        parameter SI.Pressure fluidNomPressure_B=28.4e5
+          "Nominal pressure in the fluid side inlet";
+        parameter SI.CoefficientOfHeatTransfer gamma_G_B(fixed=false)=40
+          "Constant heat transfer coefficient in the gas side";
+        parameter SI.CoefficientOfHeatTransfer gamma_F_B=4000
+          "Constant heat transfer coefficient in the fluid side";
+        parameter SI.Temperature Tstart_M_B_In=Tstart_F_B_In
+          "Inlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_M_B_Out=Tstart_F_B_Out
+          "Outlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_F_B_In=618.31
+          "Inlet fluid temperature start value";
+        parameter SI.Temperature Tstart_F_B_Out=717.34
+          "Outlet fluid temperature start value";
+        parameter SI.SpecificEnthalpy hstart_F_B_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,Tstart_F_B_In)
+          "Nominal specific enthalpy";
+        parameter SI.SpecificEnthalpy hstart_F_B_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,Tstart_F_B_Out)
+          "Nominal specific enthalpy";
+
+        Components.ParHE hE(redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
           N_G=3,
-          N_F=6,
-          exchSurface_G=40095.9,
-          exchSurface_F=3439.389,
-          extSurfaceTub=3888.449,
           gasVol=10,
-          fluidVol=28.977,
-          metalVol=8.061,
-          rhomcm=7900*578.05,
           lambda=20,
-          gasNomFlowRate=585.5,
-          fluidNomFlowRate=fluidNomFlowRate,
-          fluidNomPressure=fluidNomPressure,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_In=Tstart_M_In,
-          Tstart_M_Out=Tstart_M_Out,
-          Tstart_F_In=Tstart_F_In,
-          Tstart_F_Out=Tstart_F_Out,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
+          gasNomPressure=0,
+          N_F_A=7,
+          exchSurface_G_A=8137.2,
+          exchSurface_F_A=612.387,
+          extSurfaceTub_A=721.256,
+          fluidVol_A=4.134,
+          metalVol_A=1.600,
+          rhomcm_A=7800*575.22,
+          N_F_B=5,
+          exchSurface_F_B=4630,
+          exchSurface_G_B=900.387,
+          extSurfaceTub_B=1009.250,
+          fluidVol_B=8.936,
+          metalVol_B=2.292,
+          rhomcm_B=7850*575.64,
+          counterCurrent_A=true,
+          gasNomFlowRate=gasNomFlowRate,
+          fluidNomFlowRate_A=fluidNomFlowRate_A,
+          fluidNomFlowRate_B=fluidNomFlowRate_B,
+          fluidNomPressure_A=fluidNomPressure_A,
+          fluidNomPressure_B=fluidNomPressure_B,
+          gamma_G_A=gamma_G_A,
+          gamma_G_B=gamma_G_B,
+          gamma_F_A=gamma_F_A,
+          gamma_F_B=gamma_F_B,
+          counterCurrent_B=true,
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M_A=Tstart_M_A,
+          Tstartbar_M_B=Tstart_M_B,
           SSInit=SSInit,
-          gasNomPressure=5e5) 
-          annotation (Placement(transformation(extent={{-30,-30},{30,30}},
+          FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
-        inner System system 
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M_A = (Tstart_M_A_In+Tstart_M_A_Out)/2;
+        parameter SI.Temperature Tstart_M_B = (Tstart_M_B_In+Tstart_M_B_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      equation
-        connect(hE.waterIn, sourseW_water.flange) annotation (Line(points={{0,30},{
-                0,50},{-1.83697e-015,50}},      thickness=0.5,
-            color={0,0,255}));
-        connect(hE.waterOut, sinkP_water.flange) annotation (Line(points={{0,-30},
-                {0,-50},{1.83697e-015,-50}},      thickness=0.5,
-            color={0,0,255}));
-        connect(hE.gasIn, sourceW_gas.flange) annotation (Line(
-            points={{-30,0},{-50,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(hE.gasOut, sinkP_gas.flange) annotation (Line(
-            points={{30,0},{50,0}},
-            color={159,159,223},
-            thickness=0.5));
-        annotation (Diagram(graphics));
-      end TestEcLP;
+        Water.SourceW sourseW_water_A(
+          redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate_A,
+          p0=fluidNomPressure_A,
+          h=hstart_F_A_In)    annotation (Placement(transformation(
+              origin={-20,68},
+              extent={{-10,10},{10,-10}},
+              rotation=270)));
+        Water.SinkP sinkP_water_A(
+          redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure_A,
+          h=hstart_F_A_Out) 
+                          annotation (Placement(transformation(
+              origin={-20,-70},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
+                         annotation (Placement(transformation(extent={{60,-10},
+                  {80,10}}, rotation=0)));
+        Gas.SourceW sourceW_gas(
+          redeclare package Medium = FlueGasMedium,
+          T=Tstart_G_In,
+          w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
+        Water.SinkP sinkP_water_B(
+          redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure_B,
+          h=hstart_F_B_Out) 
+                          annotation (Placement(transformation(
+              origin={20,-70},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SourceW sourseW_water_B(
+          redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate_B,
+          p0=fluidNomPressure_B,
+          h=hstart_F_B_In)    annotation (Placement(transformation(
+              origin={20,68},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SensT T_waterIn_A(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={-12,40},
+              extent={{-10,10},{10,-10}},
+              rotation=270)));
+        Water.SensT T_waterOut_A(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={-12,-40},
+              extent={{-10,10},{10,-10}},
+              rotation=270)));
+        Water.SensT T_waterOut_B(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={12,-40},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SensT T_waterIn_B(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={12,40},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
+                rotation=0)));
+      initial equation
+        hstart_F_A_Out = hE.waterOutA.h_outflow;
+        hstart_F_B_Out = hE.waterOutB.h_outflow;
 
-      model TestEvLP
+      equation
+        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
+            points={{34,0},{20,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(T_gasOut.outlet,sinkP_gas. flange) annotation (Line(
+            points={{46,0},{60,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(T_waterOut_A.outlet,sinkP_water_A. flange) annotation (Line(
+              points={{-8,-46},{-8,-46},{-8,-60},{-20,-60}},    thickness=0.5,
+            color={0,0,255}));
+        connect(sinkP_water_B.flange,T_waterOut_B. outlet) annotation (Line(
+              points={{20,-60},{20,-60},{8,-60},{8,-46}},
+              thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterOut_B.inlet, hE.waterOutB) annotation (Line(points={{8,-34},
+                {8,-27},{8,-20}},                thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterOut_A.inlet, hE.waterOutA) annotation (Line(points={{-8,-34},
+                {-8,-32},{-10,-32},{-10,-28},{-8,-28},{-8,-20}},
+                                                     thickness=0.5,
+            color={0,0,255}));
+        connect(hE.waterInA,T_waterIn_A. outlet) annotation (Line(points={{-8,20},
+                {-8,28},{-8,34}},                thickness=0.5,
+            color={0,0,255}));
+        connect(hE.waterInB,T_waterIn_B. outlet) 
+          annotation (Line(points={{8,20},{8,20},{8,34}},          thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterIn_B.inlet,sourseW_water_B. flange) 
+          annotation (Line(points={{8,46},{8,58},{20,58}},
+              thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterIn_A.inlet,sourseW_water_A. flange) annotation (Line(
+              points={{-8,46},{-8,50},{-8,58},{-20,58}},    thickness=0.5,
+            color={0,0,255}));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(graphics));
+      end TestSh1HP_Rh1IP;
+
+      model TestEvHP
         package FlueGasMedium = ThermoPower.Media.FlueGas;
         package FluidMedium = ThermoPower.Water.StandardWater;
 
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
-        parameter SI.Temperature Tstart_G_In=480
+        parameter SI.Temperature Tstart_G_In=747.15
           "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=453.47
+        parameter SI.Temperature Tstart_G_Out=620.3
           "Outlet gas temperature start value";
 
         //fluid
-        parameter SI.MassFlowRate fluidNomFlowRate=41.49
+        parameter SI.MassFlowRate fluidNomFlowRate=175.5
           "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure=15.34e5
+        parameter SI.Pressure fluidNomPressure=137.1e5
           "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G=40
+        parameter SI.CoefficientOfHeatTransfer gamma_G(fixed=false)=40
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F=4000
           "Constant heat transfer coefficient in the fluid side";
@@ -10319,126 +8358,119 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Inlet fluid temperature start value";
         parameter SI.Temperature Tstart_F_Out=FluidMedium.temperature_ph(fluidNomPressure,hstart_F_Out)
           "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_In=6.626e5
+        parameter SI.SpecificEnthalpy hstart_F_In=1.514e6
           "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_Out=1.065e6
+        parameter SI.SpecificEnthalpy hstart_F_Out=2.002e6
           "Nominal specific enthalpy";
 
-        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate,
-          p0=fluidNomPressure,
-          h=hstart_F_In)      annotation (Placement(transformation(
-              origin={-10,70},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-          p0=fluidNomPressure,
-          h=hstart_F_Out) annotation (Placement(transformation(
-              origin={-10,-88},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
-          redeclare package Medium = FlueGasMedium,
-          w0=gasNomFlowRate,
-          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
         Components.HE2ph hE(redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
           N_G=4,
           N_F=4,
-          exchSurface_G=24402,
-          exchSurface_F=2292.926,
-          extSurfaceTub=2592.300,
+          exchSurface_G=30501.9,
+          exchSurface_F=2296.328,
+          extSurfaceTub=2704.564,
           gasVol=10,
-          fluidVol=19.318,
-          metalVol=5.374,
-          rhomcm=7900*578.05,
+          fluidVol=15.500,
+          metalVol=6.001,
+          rhomcm=7900*612.58,
           lambda=20,
           gasNomFlowRate=585.5,
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_In=Tstart_M_In,
-          Tstart_M_Out=Tstart_M_Out,
-          Tstart_F_In=Tstart_F_In,
-          Tstart_F_Out=Tstart_F_Out,
           gamma_G=gamma_G,
           gamma_F=gamma_F,
-          SSInit=true) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M=Tstart_M,
+          SSInit=SSInit) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
-        Water.SensT T_waterIn(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,42},
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M = (Tstart_M_In+Tstart_M_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate,
+          p0=fluidNomPressure,
+          h=hstart_F_In)      annotation (Placement(transformation(
+              origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
+        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure,
+          h=hstart_F_Out) annotation (Placement(transformation(
+              origin={0,-80},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
+                         annotation (Placement(transformation(extent={{60,-10},
+                  {80,10}}, rotation=0)));
+        Gas.SourceW sourceW_gas(
+          redeclare package Medium = FlueGasMedium,
+          w0=gasNomFlowRate,
+          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
         Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={-6,-52},
+              origin={4,-50},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
                 rotation=0)));
-        inner System system 
-          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      initial equation
+        hstart_F_Out = hE.waterOut.h_outflow;
+
       equation
         connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
+            points={{34,0},{34,0},{20,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
+        connect(T_gasOut.outlet,sinkP_gas. flange) annotation (Line(
+            points={{46,0},{46,0},{60,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(points={{-10,-78},
-                {-10,-68},{-10,-58}},                      thickness=0.5,
+        connect(sinkP_water.flange,T_waterOut. outlet) annotation (Line(points={{1.83697e-015,
+                -70},{1.83697e-015,-56},{-8.88178e-016,-56}},
+                                                           thickness=0.5,
             color={0,0,255}));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (Line(points={{-10,-46},{-10,-20}}, thickness=0.5,
+          annotation (Line(points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
+                                                         thickness=0.5,
             color={0,0,255}));
-        connect(T_waterIn.inlet, sourseW_water.flange) annotation (Line(points={{-10,48},
-                {-10,60},{-10,60}},                    thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (Line(points={{-10,36},{-10,20}}, thickness=0.5,
-            color={0,0,255}));
+        connect(sourseW_water.flange, hE.waterIn) annotation (Line(
+            points={{-1.83697e-015,50},{-1.83697e-015,20},{0,20}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
-      end TestEvLP;
+      end TestEvHP;
 
-      model TestShLP
+      model TestEc2HP
         package FlueGasMedium = ThermoPower.Media.FlueGas;
         package FluidMedium = ThermoPower.Water.StandardWater;
 
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
-        parameter SI.Temperature Tstart_G_In=519.15
+        parameter SI.Temperature Tstart_G_In=614.15
           "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=517.44
+        parameter SI.Temperature Tstart_G_Out=558.98
           "Outlet gas temperature start value";
 
         //fluid
-        parameter SI.MassFlowRate fluidNomFlowRate=6.91
+        parameter SI.MassFlowRate fluidNomFlowRate=70.1
           "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure=6.6e5
+        parameter SI.Pressure fluidNomPressure=138.6e5
           "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G=50
+        parameter SI.CoefficientOfHeatTransfer gamma_G(fixed=false)=60
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F=4000
           "Constant heat transfer coefficient in the fluid side";
@@ -10446,112 +8478,354 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Inlet metal wall temperature start value";
         parameter SI.Temperature Tstart_M_Out=Tstart_F_Out
           "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_In=435.75
+        parameter SI.Temperature Tstart_F_In=484.77
           "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_Out=505.04
+        parameter SI.Temperature Tstart_F_Out=594.14
           "Outlet fluid temperature start value";
         parameter SI.SpecificEnthalpy hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_In)
           "Nominal specific enthalpy";
         parameter SI.SpecificEnthalpy hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_Out)
           "Nominal specific enthalpy";
 
-        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate,
-          p0=fluidNomPressure,
-          h=hstart_F_In)      annotation (Placement(transformation(
-              origin={-10,70},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-          p0=fluidNomPressure,
-          h=hstart_F_Out) annotation (Placement(transformation(
-              origin={-10,-88},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
-          redeclare package Medium = FlueGasMedium,
-          w0=gasNomFlowRate,
-          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
         Components.HE hE(redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
           N_G=3,
-          N_F=7,
-          exchSurface_G=1708.2,
-          exchSurface_F=225.073,
-          extSurfaceTub=252.286,
+          N_F=6,
+          exchSurface_G=20335,
+          exchSurface_F=1451.506,
+          extSurfaceTub=1803.043,
           gasVol=10,
-          fluidVol=2.234,
-          metalVol=0.573,
+          fluidVol=9.290,
+          metalVol=5.045,
           rhomcm=7900*578.05,
           lambda=20,
           gasNomFlowRate=585.5,
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_In=Tstart_M_In,
-          Tstart_M_Out=Tstart_M_Out,
-          Tstart_F_In=Tstart_F_In,
-          Tstart_F_Out=Tstart_F_Out,
           gamma_G=gamma_G,
           gamma_F=gamma_F,
-          SSInit=true) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M=Tstart_M,
+          SSInit=SSInit) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
-        Water.SensT T_waterIn(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,42},
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M = (Tstart_M_In+Tstart_M_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate,
+          p0=fluidNomPressure,
+          h=hstart_F_In)      annotation (Placement(transformation(
+              origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
+        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure,
+          h=hstart_F_Out) annotation (Placement(transformation(
+              origin={0,-80},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
+                         annotation (Placement(transformation(extent={{60,-10},
+                  {80,10}}, rotation=0)));
+        Gas.SourceW sourceW_gas(
+          redeclare package Medium = FlueGasMedium,
+          w0=gasNomFlowRate,
+          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
         Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={-6,-52},
+              origin={4,-50},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
                 rotation=0)));
-        inner System system 
-          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      initial equation
+        hstart_F_Out = hE.waterOut.h_outflow;
+
       equation
         connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
+            points={{34,0},{34,0},{20,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
+        connect(T_gasOut.outlet,sinkP_gas. flange) annotation (Line(
+            points={{46,0},{46,0},{60,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(points={{-10,-78},
-                {-10,-68},{-10,-58}},                      thickness=0.5,
+        connect(sinkP_water.flange,T_waterOut. outlet) annotation (Line(points={{
+                1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
+                                                           thickness=0.5,
             color={0,0,255}));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (Line(points={{-10,-46},{-10,-20}}, thickness=0.5,
+          annotation (Line(points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
+                                                         thickness=0.5,
             color={0,0,255}));
-        connect(T_waterIn.inlet, sourseW_water.flange) annotation (Line(points={{-10,48},
-                {-10,60},{-10,60}},                    thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (Line(points={{-10,36},{-10,20}}, thickness=0.5,
-            color={0,0,255}));
+        connect(sourseW_water.flange, hE.waterIn) annotation (Line(
+            points={{-1.83697e-015,50},{-1.83697e-015,20},{0,20}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
-      end TestShLP;
+      end TestEc2HP;
+
+      model TestShIP
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
+
+        //gas
+        parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
+        parameter SI.Temperature Tstart_G_In=620.14
+          "Inlet gas temperature start value";
+        parameter SI.Temperature Tstart_G_Out=614.5
+          "Outlet gas temperature start value";
+
+        //fluid
+        parameter SI.MassFlowRate fluidNomFlowRate=13.5
+          "Nominal flow rate through the fluid side";
+        parameter SI.Pressure fluidNomPressure=29.5e5
+          "Nominal pressure in the fluid side inlet";
+        parameter SI.CoefficientOfHeatTransfer gamma_G(fixed=false)=33
+          "Constant heat transfer coefficient in the gas side";
+        parameter SI.CoefficientOfHeatTransfer gamma_F=4000
+          "Constant heat transfer coefficient in the fluid side";
+        parameter SI.Temperature Tstart_M_In=Tstart_F_In
+          "Inlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_M_Out=Tstart_F_Out
+          "Outlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_F_In=506.08
+          "Inlet fluid temperature start value";
+        parameter SI.Temperature Tstart_F_Out=605.11
+          "Outlet fluid temperature start value";
+        parameter SI.SpecificEnthalpy hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_In)
+          "Nominal specific enthalpy";
+        parameter SI.SpecificEnthalpy hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_Out)
+          "Nominal specific enthalpy";
+
+        Components.HE hE(redeclare package FluidMedium = FluidMedium,
+          redeclare package FlueGasMedium = FlueGasMedium,
+          N_G=3,
+          N_F=7,
+          exchSurface_G=2314.8,
+          exchSurface_F=450.218,
+          extSurfaceTub=504.652,
+          gasVol=10,
+          fluidVol=4.468,
+          metalVol=1.146,
+          rhomcm=7900*578.05,
+          lambda=20,
+          gasNomFlowRate=585.5,
+          gasNomPressure=0,
+          fluidNomFlowRate=fluidNomFlowRate,
+          fluidNomPressure=fluidNomPressure,
+          gamma_G=gamma_G,
+          gamma_F=gamma_F,
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M=Tstart_M,
+          SSInit=SSInit,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
+                rotation=0)));
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M = (Tstart_M_In+Tstart_M_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate,
+          p0=fluidNomPressure,
+          h=hstart_F_In)      annotation (Placement(transformation(
+              origin={0,60},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure,
+          h=hstart_F_Out) annotation (Placement(transformation(
+              origin={0,-80},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
+                         annotation (Placement(transformation(extent={{60,-10},
+                  {80,10}}, rotation=0)));
+        Gas.SourceW sourceW_gas(
+          redeclare package Medium = FlueGasMedium,
+          w0=gasNomFlowRate,
+          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
+        Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={4,-50},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
+                rotation=0)));
+      initial equation
+        hstart_F_Out = hE.waterOut.h_outflow;
+
+      equation
+        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
+            points={{34,0},{34,0},{20,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(T_gasOut.outlet,sinkP_gas. flange) annotation (Line(
+            points={{46,0},{46,0},{60,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(sinkP_water.flange,T_waterOut. outlet) annotation (Line(points={{
+                1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
+                                                           thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterOut.inlet, hE.waterOut) 
+          annotation (Line(points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
+                                                         thickness=0.5,
+            color={0,0,255}));
+        connect(sourseW_water.flange, hE.waterIn) annotation (Line(
+            points={{-1.83697e-015,50},{-1.83697e-015,20},{0,20}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(graphics));
+      end TestShIP;
+
+      model TestEvIP
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
+
+        //gas
+        parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
+        parameter SI.Temperature Tstart_G_In=558.15
+          "Inlet gas temperature start value";
+        parameter SI.Temperature Tstart_G_Out=518.51
+          "Outlet gas temperature start value";
+
+        //fluid
+        parameter SI.MassFlowRate fluidNomFlowRate=67.5
+          "Nominal flow rate through the fluid side";
+        parameter SI.Pressure fluidNomPressure=37.16e5
+          "Nominal pressure in the fluid side inlet";
+        parameter SI.CoefficientOfHeatTransfer gamma_G(fixed=false)=40
+          "Constant heat transfer coefficient in the gas side";
+        parameter SI.CoefficientOfHeatTransfer gamma_F=4000
+          "Constant heat transfer coefficient in the fluid side";
+        parameter SI.Temperature Tstart_M_In=Tstart_F_In
+          "Inlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_M_Out=Tstart_F_Out
+          "Outlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_F_In=FluidMedium.temperature_ph(fluidNomPressure,hstart_F_In)
+          "Inlet fluid temperature start value";
+        parameter SI.Temperature Tstart_F_Out=FluidMedium.temperature_ph(fluidNomPressure,hstart_F_Out)
+          "Outlet fluid temperature start value";
+        parameter SI.SpecificEnthalpy hstart_F_In=9.920e5
+          "Nominal specific enthalpy";
+        parameter SI.SpecificEnthalpy hstart_F_Out=1.370e6
+          "Nominal specific enthalpy";
+
+        Components.HE2ph hE(redeclare package FluidMedium = FluidMedium,
+          redeclare package FlueGasMedium = FlueGasMedium,
+          N_G=4,
+          N_F=4,
+          exchSurface_G=24402,
+          exchSurface_F=1837.063,
+          extSurfaceTub=2163.652,
+          gasVol=10,
+          fluidVol=12.400,
+          metalVol=4.801,
+          rhomcm=7900*578.05,
+          lambda=20,
+          gasNomFlowRate=585.5,
+          gasNomPressure=0,
+          fluidNomFlowRate=fluidNomFlowRate,
+          fluidNomPressure=fluidNomPressure,
+          gamma_G=gamma_G,
+          gamma_F=gamma_F,
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M=Tstart_M,
+          SSInit=SSInit) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
+                rotation=0)));
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M = (Tstart_M_In+Tstart_M_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate,
+          p0=fluidNomPressure,
+          h=hstart_F_In)      annotation (Placement(transformation(
+              origin={0,60},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure,
+          h=hstart_F_Out) annotation (Placement(transformation(
+              origin={0,-80},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
+                         annotation (Placement(transformation(extent={{60,-10},
+                  {80,10}}, rotation=0)));
+        Gas.SourceW sourceW_gas(
+          redeclare package Medium = FlueGasMedium,
+          w0=gasNomFlowRate,
+          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
+        Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={4,-50},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
+                rotation=0)));
+      initial equation
+        hstart_F_Out = hE.waterOut.h_outflow;
+
+      equation
+        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
+            points={{34,0},{34,0},{20,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(T_gasOut.outlet,sinkP_gas. flange) annotation (Line(
+            points={{46,0},{46,0},{60,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(sinkP_water.flange,T_waterOut. outlet) annotation (Line(points={{
+                1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
+                                                           thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterOut.inlet, hE.waterOut) 
+          annotation (Line(points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
+                                                         thickness=0.5,
+            color={0,0,255}));
+        connect(sourseW_water.flange, hE.waterIn) annotation (Line(
+            points={{-1.83697e-015,50},{-1.83697e-015,20},{0,20}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(graphics));
+      end TestEvIP;
 
       model TestEc1HP_EcIP
         package FlueGasMedium = ThermoPower.Media.FlueGas;
@@ -10570,7 +8844,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Nominal flow rate through the fluid side";
         parameter SI.Pressure fluidNomPressure_A=138.9e5
           "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G_A=40
+        parameter SI.CoefficientOfHeatTransfer gamma_G_A(fixed=false)=40
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F_A=4000
           "Constant heat transfer coefficient in the fluid side";
@@ -10592,7 +8866,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Nominal flow rate through the fluid side";
         parameter SI.Pressure fluidNomPressure_B=48.6e5
           "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G_B=40
+        parameter SI.CoefficientOfHeatTransfer gamma_G_B(fixed=false)=40
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F_B=4000
           "Constant heat transfer coefficient in the fluid side";
@@ -10613,15 +8887,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           w0=fluidNomFlowRate_A,
           p0=fluidNomPressure_A,
           h=hstart_F_A_In)    annotation (Placement(transformation(
-              origin={-28,74},
-              extent={{-10,-10},{10,10}},
+              origin={-20,68},
+              extent={{-10,10},{10,-10}},
               rotation=270)));
         Water.SinkP sinkP_water_A(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_A,
           h=hstart_F_A_Out) 
                           annotation (Placement(transformation(
-              origin={-28,-86},
+              origin={-20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
@@ -10630,8 +8904,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Gas.SourceW sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           T=Tstart_G_In,
-          w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-94,
-                  -10},{-74,10}}, rotation=0)));
+          w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
         Components.ParHE hE(redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
           N_G=3,
@@ -10658,30 +8932,23 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidNomFlowRate_B=fluidNomFlowRate_B,
           fluidNomPressure_A=fluidNomPressure_A,
           fluidNomPressure_B=fluidNomPressure_B,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_A_In=Tstart_M_A_In,
-          Tstart_M_A_Out=Tstart_M_A_Out,
-          Tstart_F_A_In=Tstart_F_A_In,
-          Tstart_F_A_Out=Tstart_F_A_Out,
-          Tstart_M_B_In=Tstart_M_B_In,
-          Tstart_M_B_Out=Tstart_M_B_Out,
-          Tstart_F_B_In=Tstart_F_B_In,
-          Tstart_F_B_Out=Tstart_F_B_Out,
           gamma_G_A=gamma_G_A,
           gamma_G_B=gamma_G_B,
           gamma_F_A=gamma_F_A,
           gamma_F_B=gamma_F_B,
           counterCurrent_B=true,
-          gasNomPressure=1e5) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
+          gasNomPressure=100000,
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M_A=Tstart_M_A,
+          Tstartbar_M_B=Tstart_M_B) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
         Water.SinkP sinkP_water_B(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_B,
           h=hstart_F_B_Out) 
                           annotation (Placement(transformation(
-              origin={8,-86},
+              origin={20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Water.SourceW sourseW_water_B(
@@ -10689,101 +8956,229 @@ package PowerPlants "Models of thermoelectrical power plants components"
           w0=fluidNomFlowRate_B,
           p0=fluidNomPressure_B,
           h=hstart_F_B_In)    annotation (Placement(transformation(
-              origin={6,74},
+              origin={20,68},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Water.SensT T_waterIn_A(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={-24,38},
-              extent={{-10,-10},{10,10}},
+              origin={-12,40},
+              extent={{-10,10},{10,-10}},
               rotation=270)));
         Water.SensT T_waterOut_A(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={-24,-42},
-              extent={{-10,-10},{10,10}},
+              origin={-12,-40},
+              extent={{-10,10},{10,-10}},
               rotation=270)));
         Water.SensT T_waterOut_B(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={12,-42},
+              origin={12,-40},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Water.SensT T_waterIn_B(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={10,38},
+              origin={12,40},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
                 rotation=0)));
 
-        inner System system 
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M_A = (Tstart_M_A_In+Tstart_M_A_Out)/2;
+        parameter SI.Temperature Tstart_M_B = (Tstart_M_B_In+Tstart_M_B_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      initial equation
+        hstart_F_A_Out = hE.waterOutA.h_outflow;
+        hstart_F_B_Out = hE.waterOutB.h_outflow;
+
       equation
         connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
+            points={{34,0},{20,0}},
             color={159,159,223},
             thickness=0.5));
         connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{60,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-74,0}},
+            points={{46,0},{60,0}},
             color={159,159,223},
             thickness=0.5));
         connect(T_waterOut_A.outlet, sinkP_water_A.flange) annotation (Line(
-              points={{-28,-48},{-28,-62},{-28,-76},{-28,-76}}, thickness=0.5,
+              points={{-8,-46},{-8,-46},{-8,-60},{-20,-60}},    thickness=0.5,
             color={0,0,255}));
         connect(sinkP_water_B.flange, T_waterOut_B.outlet) annotation (Line(
-              points={{8,-76},{8,-69},{8,-69},{8,-62},{8,-48},{8,-48}},
+              points={{20,-60},{20,-60},{8,-60},{8,-46}},
               thickness=0.5,
             color={0,0,255}));
-        connect(T_waterOut_B.inlet, hE.waterOutB) annotation (Line(points={{8,-36},
-                {8,-26},{-2,-26},{-2,-20}},      thickness=0.5,
+        connect(T_waterOut_B.inlet, hE.waterOutB) annotation (Line(points={{8,-34},
+                {8,-26},{8,-20}},                thickness=0.5,
             color={0,0,255}));
-        connect(T_waterOut_A.inlet, hE.waterOutA) annotation (Line(points={{-28,
-                -36},{-28,-28},{-18,-28},{-18,-20}}, thickness=0.5,
+        connect(T_waterOut_A.inlet, hE.waterOutA) annotation (Line(points={{-8,-34},
+                {-8,-28},{-8,-20}},                  thickness=0.5,
             color={0,0,255}));
-        connect(hE.waterInA, T_waterIn_A.outlet) annotation (Line(points={{-18,
-                20},{-18,24},{-28,24},{-28,32}}, thickness=0.5,
+        connect(hE.waterInA, T_waterIn_A.outlet) annotation (Line(points={{-8,20},
+                {-8,34}},                        thickness=0.5,
             color={0,0,255}));
         connect(hE.waterInB, T_waterIn_B.outlet) 
-          annotation (Line(points={{-2,20},{-2,24},{6,24},{6,32}}, thickness=0.5,
+          annotation (Line(points={{8,20},{8,34}},                 thickness=0.5,
             color={0,0,255}));
         connect(T_waterIn_B.inlet, sourseW_water_B.flange) 
-          annotation (Line(points={{6,44},{6,49},{6,49},{6,54},{6,64},{6,64}},
+          annotation (Line(points={{8,46},{8,58},{20,58}},
               thickness=0.5,
             color={0,0,255}));
         connect(T_waterIn_A.inlet, sourseW_water_A.flange) annotation (Line(
-              points={{-28,44},{-28,54},{-28,64},{-28,64}}, thickness=0.5,
+              points={{-8,46},{-8,50},{-8,58},{-20,58}},    thickness=0.5,
             color={0,0,255}));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
       end TestEc1HP_EcIP;
 
-      model TestEvIP
+      model TestShLP
         package FlueGasMedium = ThermoPower.Media.FlueGas;
         package FluidMedium = ThermoPower.Water.StandardWater;
 
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
-        parameter SI.Temperature Tstart_G_In=558.15
+        parameter SI.Temperature Tstart_G_In=519.15
           "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=518.51
+        parameter SI.Temperature Tstart_G_Out=517.44
           "Outlet gas temperature start value";
 
         //fluid
-        parameter SI.MassFlowRate fluidNomFlowRate=67.5
+        parameter SI.MassFlowRate fluidNomFlowRate=6.91
           "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure=37.16e5
+        parameter SI.Pressure fluidNomPressure=6.6e5
           "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G=40
+        parameter SI.CoefficientOfHeatTransfer gamma_G(fixed=false)=50
+          "Constant heat transfer coefficient in the gas side";
+        parameter SI.CoefficientOfHeatTransfer gamma_F=4000
+          "Constant heat transfer coefficient in the fluid side";
+        parameter SI.Temperature Tstart_M_In=Tstart_F_In
+          "Inlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_M_Out=Tstart_F_Out
+          "Outlet metal wall temperature start value";
+        parameter SI.Temperature Tstart_F_In=435.75
+          "Inlet fluid temperature start value";
+        parameter SI.Temperature Tstart_F_Out=505.04
+          "Outlet fluid temperature start value";
+        parameter SI.SpecificEnthalpy hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_In)
+          "Nominal specific enthalpy";
+        parameter SI.SpecificEnthalpy hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_Out)
+          "Nominal specific enthalpy";
+
+        Components.HE hE(redeclare package FluidMedium = FluidMedium,
+          redeclare package FlueGasMedium = FlueGasMedium,
+          N_G=3,
+          N_F=7,
+          exchSurface_G=1708.2,
+          exchSurface_F=225.073,
+          extSurfaceTub=252.286,
+          gasVol=10,
+          fluidVol=2.234,
+          metalVol=0.573,
+          rhomcm=7900*578.05,
+          lambda=20,
+          gasNomFlowRate=585.5,
+          gasNomPressure=0,
+          fluidNomFlowRate=fluidNomFlowRate,
+          fluidNomPressure=fluidNomPressure,
+          gamma_G=gamma_G,
+          gamma_F=gamma_F,
+          Tstartbar_G=Tstart_G,
+          SSInit=SSInit,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Tstartbar_M=Tstart_M) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
+                rotation=0)));
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M = (Tstart_M_In+Tstart_M_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
+          w0=fluidNomFlowRate,
+          p0=fluidNomPressure,
+          h=hstart_F_In)      annotation (Placement(transformation(
+              origin={0,60},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
+          p0=fluidNomPressure,
+          h=hstart_F_Out) annotation (Placement(transformation(
+              origin={0,-80},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
+                         annotation (Placement(transformation(extent={{60,-10},
+                  {80,10}}, rotation=0)));
+        Gas.SourceW sourceW_gas(
+          redeclare package Medium = FlueGasMedium,
+          w0=gasNomFlowRate,
+          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
+        Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
+          annotation (Placement(transformation(
+              origin={4,-50},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
+                rotation=0)));
+      initial equation
+        hstart_F_Out = hE.waterOut.h_outflow;
+
+      equation
+        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
+            points={{34,0},{34,0},{20,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(T_gasOut.outlet,sinkP_gas. flange) annotation (Line(
+            points={{46,0},{46,0},{60,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(sinkP_water.flange,T_waterOut. outlet) annotation (Line(points={{
+                1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
+                                                           thickness=0.5,
+            color={0,0,255}));
+        connect(T_waterOut.inlet, hE.waterOut) 
+          annotation (Line(points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
+                                                         thickness=0.5,
+            color={0,0,255}));
+        connect(sourseW_water.flange, hE.waterIn) annotation (Line(
+            points={{-1.83697e-015,50},{-1.83697e-015,20},{0,20}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(graphics));
+      end TestShLP;
+
+      model TestEvLP
+        package FlueGasMedium = ThermoPower.Media.FlueGas;
+        package FluidMedium = ThermoPower.Water.StandardWater;
+
+        //gas
+        parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
+        parameter SI.Temperature Tstart_G_In=480
+          "Inlet gas temperature start value";
+        parameter SI.Temperature Tstart_G_Out=453.47
+          "Outlet gas temperature start value";
+
+        //fluid
+        parameter SI.MassFlowRate fluidNomFlowRate=41.49
+          "Nominal flow rate through the fluid side";
+        parameter SI.Pressure fluidNomPressure=15.34e5
+          "Nominal pressure in the fluid side inlet";
+        parameter SI.CoefficientOfHeatTransfer gamma_G(fixed=false)=40
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F=4000
           "Constant heat transfer coefficient in the fluid side";
@@ -10795,1303 +9190,225 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Inlet fluid temperature start value";
         parameter SI.Temperature Tstart_F_Out=FluidMedium.temperature_ph(fluidNomPressure,hstart_F_Out)
           "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_In=9.920e5
+        parameter SI.SpecificEnthalpy hstart_F_In=6.626e5
           "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_Out=1.370e6
+        parameter SI.SpecificEnthalpy hstart_F_Out=1.065e6
           "Nominal specific enthalpy";
 
         Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
           h=hstart_F_In)      annotation (Placement(transformation(
-              origin={-10,70},
+              origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
-              origin={-10,-88},
+              origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
+                         annotation (Placement(transformation(extent={{60,-10},
+                  {80,10}}, rotation=0)));
         Gas.SourceW sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
-          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
+          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
         Components.HE2ph hE(redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
           N_G=4,
           N_F=4,
           exchSurface_G=24402,
-          exchSurface_F=1837.063,
-          extSurfaceTub=2163.652,
+          exchSurface_F=2292.926,
+          extSurfaceTub=2592.300,
           gasVol=10,
-          fluidVol=12.400,
-          metalVol=4.801,
+          fluidVol=19.318,
+          metalVol=5.374,
           rhomcm=7900*578.05,
           lambda=20,
           gasNomFlowRate=585.5,
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_In=Tstart_M_In,
-          Tstart_M_Out=Tstart_M_Out,
-          Tstart_F_In=Tstart_F_In,
-          Tstart_F_Out=Tstart_F_Out,
           gamma_G=gamma_G,
           gamma_F=gamma_F,
-          SSInit=true) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M=Tstart_M,
+          SSInit=SSInit) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
-        Water.SensT T_waterIn(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
         Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={-6,-52},
+              origin={4,-50},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
                 rotation=0)));
-        inner System system 
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M = (Tstart_M_In+Tstart_M_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      initial equation
+        hstart_F_Out = hE.waterOut.h_outflow;
+
       equation
         connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
+            points={{34,0},{34,0},{20,0}},
             color={159,159,223},
             thickness=0.5));
         connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
+            points={{46,0},{46,0},{60,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(points={{-10,-78},
-                {-10,-68},{-10,-58}},                      thickness=0.5,
+        connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(points={{
+                1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
+                                                           thickness=0.5,
             color={0,0,255}));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (Line(points={{-10,-46},{-10,-20}}, thickness=0.5,
+          annotation (Line(points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
+                                                         thickness=0.5,
             color={0,0,255}));
-        connect(T_waterIn.inlet, sourseW_water.flange) annotation (Line(points={{-10,48},
-                {-10,60},{-10,60}},                    thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (Line(points={{-10,36},{-10,20}}, thickness=0.5,
-            color={0,0,255}));
+        connect(sourseW_water.flange, hE.waterIn) annotation (Line(
+            points={{-1.83697e-015,50},{-1.83697e-015,20},{0,20}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
-      end TestEvIP;
+      end TestEvLP;
 
-      model TestShIP
+      model TestEcLP
         package FlueGasMedium = ThermoPower.Media.FlueGas;
         package FluidMedium = ThermoPower.Water.StandardWater;
 
         //gas
         parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
-        parameter SI.Temperature Tstart_G_In=620.14
+        parameter SI.Temperature Tstart_G_In=453.47
           "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=614.5
+        parameter SI.Temperature Tstart_G_Out=372.35
           "Outlet gas temperature start value";
 
         //fluid
-        parameter SI.MassFlowRate fluidNomFlowRate=13.5
+        parameter SI.MassFlowRate fluidNomFlowRate=89.82
           "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure=29.5e5
+        parameter SI.Pressure fluidNomPressure=6e5
           "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G=33
+        parameter SI.CoefficientOfHeatTransfer gamma_G(fixed=false)=35
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F=4000
           "Constant heat transfer coefficient in the fluid side";
-        parameter SI.Temperature Tstart_M_In=Tstart_F_In
+        parameter SI.Temperature Tstart_M_In=307.05
           "Inlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_M_Out=Tstart_F_Out
+        parameter SI.Temperature Tstart_M_Out=428.09
           "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_In=506.08
+        parameter SI.Temperature Tstart_F_In=307.05
           "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_Out=605.11
+        parameter SI.Temperature Tstart_F_Out=428.09
           "Outlet fluid temperature start value";
         parameter SI.SpecificEnthalpy hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_In)
           "Nominal specific enthalpy";
         parameter SI.SpecificEnthalpy hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_Out)
           "Nominal specific enthalpy";
 
-        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate,
-          p0=fluidNomPressure,
-          h=hstart_F_In)      annotation (Placement(transformation(
-              origin={-10,70},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
-          redeclare package Medium = FlueGasMedium,
-          w0=gasNomFlowRate,
-          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
-        Components.HE hE(redeclare package FluidMedium = FluidMedium,
-          redeclare package FlueGasMedium = FlueGasMedium,
-          N_G=3,
-          N_F=7,
-          exchSurface_G=2314.8,
-          exchSurface_F=450.218,
-          extSurfaceTub=504.652,
-          gasVol=10,
-          fluidVol=4.468,
-          metalVol=1.146,
-          rhomcm=7900*578.05,
-          lambda=20,
-          gasNomFlowRate=585.5,
-          gasNomPressure=0,
-          fluidNomFlowRate=fluidNomFlowRate,
-          fluidNomPressure=fluidNomPressure,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_In=Tstart_M_In,
-          Tstart_M_Out=Tstart_M_Out,
-          Tstart_F_In=Tstart_F_In,
-          Tstart_F_Out=Tstart_F_Out,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
-          SSInit=true) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
-                rotation=0)));
-        Water.SensT T_waterIn(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,-52},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
-        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
-                rotation=0)));
-        Water.SinkP OutIP(redeclare package Medium = FluidMedium, p0=0) 
-                           annotation (Placement(transformation(extent={{-42,
-                  -88},{-54,-76}}, rotation=0)));
-        Water.ValveLin valveLinIP(redeclare package Medium = FluidMedium, Kv=
-              fluidNomFlowRate/fluidNomPressure) 
-                                 annotation (Placement(transformation(extent={{
-                  -20,-88},{-32,-76}}, rotation=0)));
-        Modelica.Blocks.Sources.Constant const 
-          annotation (Placement(transformation(extent={{-86,-50},{-76,-40}},
-                rotation=0)));
-        inner System system 
-          annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      equation
-        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (Line(points={{-10,-46},{-10,-20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.inlet, sourseW_water.flange) annotation (Line(points={{-10,48},
-                {-10,60},{-10,60}},                    thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (Line(points={{-10,36},{-10,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveLinIP.outlet,OutIP. flange) 
-          annotation (Line(points={{-32,-82},{-42,-82}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveLinIP.inlet, T_waterOut.outlet) 
-          annotation (Line(points={{-20,-82},{-10,-82},{-10,-58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(const.y, valveLinIP.cmd) annotation (Line(points={{-75.5,-45},{
-                -26,-45},{-26,-77.2}}, color={0,0,127}));
-        annotation (Diagram(graphics));
-      end TestShIP;
-
-      model TestEc2HP
-        package FlueGasMedium = ThermoPower.Media.FlueGas;
-        package FluidMedium = ThermoPower.Water.StandardWater;
-
-        //gas
-        parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
-        parameter SI.Temperature Tstart_G_In=614.15
-          "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=558.98
-          "Outlet gas temperature start value";
-
-        //fluid
-        parameter SI.MassFlowRate fluidNomFlowRate=70.1
-          "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure=138.6e5
-          "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G=60
-          "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_F=4000
-          "Constant heat transfer coefficient in the fluid side";
-        parameter SI.Temperature Tstart_M_In=Tstart_F_In
-          "Inlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_M_Out=Tstart_F_Out
-          "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_In=484.77
-          "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_Out=594.14
-          "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_In)
-          "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure,Tstart_F_Out)
-          "Nominal specific enthalpy";
-
-        Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate,
-          p0=fluidNomPressure,
-          h=hstart_F_In)      annotation (Placement(transformation(
-              origin={-10,70},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
-          p0=fluidNomPressure,
-          h=hstart_F_Out) annotation (Placement(transformation(
-              origin={-10,-88},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
-          redeclare package Medium = FlueGasMedium,
-          w0=gasNomFlowRate,
-          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
         Components.HE hE(redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
           N_G=3,
           N_F=6,
-          exchSurface_G=20335,
-          exchSurface_F=1451.506,
-          extSurfaceTub=1803.043,
+          exchSurface_G=40095.9,
+          exchSurface_F=3439.389,
+          extSurfaceTub=3888.449,
           gasVol=10,
-          fluidVol=9.290,
-          metalVol=5.045,
+          fluidVol=28.977,
+          metalVol=8.061,
           rhomcm=7900*578.05,
           lambda=20,
           gasNomFlowRate=585.5,
-          gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_In=Tstart_M_In,
-          Tstart_M_Out=Tstart_M_Out,
-          Tstart_F_In=Tstart_F_In,
-          Tstart_F_Out=Tstart_F_Out,
           gamma_G=gamma_G,
           gamma_F=gamma_F,
-          SSInit=true) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
+          SSInit=SSInit,
+          Tstartbar_G=Tstart_G,
+          Tstartbar_M=Tstart_M,
+          gasNomPressure=500000) 
+          annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
-        Water.SensT T_waterIn(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,-52},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
-        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
-                rotation=0)));
-        inner System system 
+        //Start value
+        parameter SI.Temperature Tstart_G = (Tstart_G_In+Tstart_G_Out)/2;
+        parameter SI.Temperature Tstart_M = (Tstart_M_In+Tstart_M_Out)/2;
+        parameter Boolean SSInit = true "Steady-state initialization";
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      equation
-        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(points={{-10,-78},
-                {-10,-68},{-10,-68},{-10,-58}},            thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (Line(points={{-10,-46},{-10,-20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.inlet, sourseW_water.flange) annotation (Line(points={{-10,48},
-                {-10,54},{-10,60},{-10,60}},           thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (Line(points={{-10,36},{-10,20}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics));
-      end TestEc2HP;
-
-      model TestEvHP
-        package FlueGasMedium = ThermoPower.Media.FlueGas;
-        package FluidMedium = ThermoPower.Water.StandardWater;
-
-        //gas
-        parameter SI.MassFlowRate gasNomFlowRate=585.5 "Nominal mass flowrate";
-        parameter SI.Temperature Tstart_G_In=747.15
-          "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=620.3
-          "Outlet gas temperature start value";
-
-        //fluid
-        parameter SI.MassFlowRate fluidNomFlowRate=175.5
-          "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure=137.1e5
-          "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G=40
-          "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_F=4000
-          "Constant heat transfer coefficient in the fluid side";
-        parameter SI.Temperature Tstart_M_In=Tstart_F_In
-          "Inlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_M_Out=Tstart_F_Out
-          "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_In=FluidMedium.temperature_ph(fluidNomPressure,hstart_F_In)
-          "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_Out=FluidMedium.temperature_ph(fluidNomPressure,hstart_F_Out)
-          "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_In=1.514e6
-          "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_Out=2.002e6
-          "Nominal specific enthalpy";
-
         Water.SourceW sourseW_water(redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
           h=hstart_F_In)      annotation (Placement(transformation(
-              origin={-10,70},
+              origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Water.SinkP sinkP_water(redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
-              origin={-10,-88},
+              origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
+                         annotation (Placement(transformation(extent={{60,-10},
+                  {80,10}}, rotation=0)));
         Gas.SourceW sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
-          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
-        Components.HE2ph hE(redeclare package FluidMedium = FluidMedium,
-          redeclare package FlueGasMedium = FlueGasMedium,
-          N_G=4,
-          N_F=4,
-          exchSurface_G=30501.9,
-          exchSurface_F=2296.328,
-          extSurfaceTub=2704.564,
-          gasVol=10,
-          fluidVol=15.500,
-          metalVol=6.001,
-          rhomcm=7900*612.58,
-          lambda=20,
-          gasNomFlowRate=585.5,
-          gasNomPressure=0,
-          fluidNomFlowRate=fluidNomFlowRate,
-          fluidNomPressure=fluidNomPressure,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_In=Tstart_M_In,
-          Tstart_M_Out=Tstart_M_Out,
-          Tstart_F_In=Tstart_F_In,
-          Tstart_F_Out=Tstart_F_Out,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
-          SSInit=true) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
-                rotation=0)));
-        Water.SensT T_waterIn(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-6,42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
+          T=Tstart_G_In)     annotation (Placement(transformation(extent={{-70,-10},
+                  {-50,10}},      rotation=0)));
         Water.SensT T_waterOut(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(
-              origin={-6,-52},
+              origin={4,-50},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
         Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
+          annotation (Placement(transformation(extent={{30,-6},{50,14}},
                 rotation=0)));
-        inner System system 
-          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      initial equation
+        hstart_F_Out = hE.waterOut.h_outflow;
+
       equation
         connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
+            points={{34,0},{34,0},{20,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
+        connect(T_gasOut.outlet,sinkP_gas. flange) annotation (Line(
+            points={{46,0},{46,0},{60,0}},
             color={159,159,223},
             thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(points={{-10,-78},
-                {-10,-68},{-10,-68},{-10,-58}},            thickness=0.5,
+        connect(sinkP_water.flange,T_waterOut. outlet) annotation (Line(points={{
+                1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
+                                                           thickness=0.5,
             color={0,0,255}));
         connect(T_waterOut.inlet, hE.waterOut) 
-          annotation (Line(points={{-10,-46},{-10,-20}}, thickness=0.5,
+          annotation (Line(points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
+                                                         thickness=0.5,
             color={0,0,255}));
-        connect(T_waterIn.inlet, sourseW_water.flange) annotation (Line(points={{-10,48},
-                {-10,54},{-10,60},{-10,60}},           thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn.outlet, hE.waterIn) 
-          annotation (Line(points={{-10,36},{-10,20}}, thickness=0.5,
-            color={0,0,255}));
+        connect(sourseW_water.flange, hE.waterIn) annotation (Line(
+            points={{-1.83697e-015,50},{-1.83697e-015,20},{0,20}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceW_gas.flange, hE.gasIn) annotation (Line(
+            points={{-50,0},{-20,0}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
-      end TestEvHP;
-
-      model TestSh1HP_Rh1IP
-        package FlueGasMedium = ThermoPower.Media.FlueGas;
-        package FluidMedium = ThermoPower.Water.StandardWater;
-
-        //gas
-        parameter SI.MassFlowRate gasNomFlowRate=585.5
-          "Nominal flow rate through the gas side";
-        parameter SI.Temperature Tstart_G_In=837.15
-          "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=748.6
-          "Outlet gas temperature start value";
-
-        //fluid A
-        parameter SI.MassFlowRate fluidNomFlowRate_A=70.59
-          "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure_A=134.3e5
-          "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G_A=40
-          "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_F_A=4000
-          "Constant heat transfer coefficient in the fluid side";
-        parameter SI.Temperature Tstart_M_A_In=Tstart_F_A_In
-          "Inlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_M_A_Out=Tstart_F_A_Out
-          "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_A_In=606.59
-          "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_A_Out=743.18
-          "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_A_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_In)
-          "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_A_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_Out)
-          "Nominal specific enthalpy";
-
-        //fluid B
-        parameter SI.MassFlowRate fluidNomFlowRate_B=81.1
-          "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure_B=28.4e5
-          "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G_B=40
-          "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_F_B=4000
-          "Constant heat transfer coefficient in the fluid side";
-        parameter SI.Temperature Tstart_M_B_In=Tstart_F_B_In
-          "Inlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_M_B_Out=Tstart_F_B_Out
-          "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_B_In=618.31
-          "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_B_Out=717.34
-          "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_B_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,Tstart_F_B_In)
-          "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_B_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,Tstart_F_B_Out)
-          "Nominal specific enthalpy";
-
-        Water.SourceW sourseW_water_A(
-          redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate_A,
-          p0=fluidNomPressure_A,
-          h=hstart_F_A_In)    annotation (Placement(transformation(
-              origin={-28,74},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SinkP sinkP_water_A(
-          redeclare package Medium = FluidMedium,
-          p0=fluidNomPressure_A,
-          h=hstart_F_A_Out) 
-                          annotation (Placement(transformation(
-              origin={-28,-86},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
-          redeclare package Medium = FlueGasMedium,
-          T=Tstart_G_In,
-          w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
-        Components.ParHE hE(redeclare package FluidMedium = FluidMedium,
-          redeclare package FlueGasMedium = FlueGasMedium,
-          N_G=3,
-          gasVol=10,
-          lambda=20,
-          gasNomPressure=0,
-          N_F_A=7,
-          exchSurface_G_A=8137.2,
-          exchSurface_F_A=612.387,
-          extSurfaceTub_A=721.256,
-          fluidVol_A=4.134,
-          metalVol_A=1.600,
-          rhomcm_A=7800*575.22,
-          N_F_B=5,
-          exchSurface_F_B=4630,
-          exchSurface_G_B=900.387,
-          extSurfaceTub_B=1009.250,
-          fluidVol_B=8.936,
-          metalVol_B=2.292,
-          rhomcm_B=7850*575.64,
-          SSInit=true,
-          counterCurrent_A=true,
-          gasNomFlowRate=gasNomFlowRate,
-          fluidNomFlowRate_A=fluidNomFlowRate_A,
-          fluidNomFlowRate_B=fluidNomFlowRate_B,
-          fluidNomPressure_A=fluidNomPressure_A,
-          fluidNomPressure_B=fluidNomPressure_B,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_A_In=Tstart_M_A_In,
-          Tstart_M_A_Out=Tstart_M_A_Out,
-          Tstart_F_A_In=Tstart_F_A_In,
-          Tstart_F_A_Out=Tstart_F_A_Out,
-          Tstart_M_B_In=Tstart_M_B_In,
-          Tstart_M_B_Out=Tstart_M_B_Out,
-          Tstart_F_B_In=Tstart_F_B_In,
-          Tstart_F_B_Out=Tstart_F_B_Out,
-          gamma_G_A=gamma_G_A,
-          gamma_G_B=gamma_G_B,
-          gamma_F_A=gamma_F_A,
-          gamma_F_B=gamma_F_B,
-          counterCurrent_B=true) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
-                rotation=0)));
-        Water.SinkP sinkP_water_B(
-          redeclare package Medium = FluidMedium,
-          p0=fluidNomPressure_B,
-          h=hstart_F_B_Out) 
-                          annotation (Placement(transformation(
-              origin={8,-86},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SourceW sourseW_water_B(
-          redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate_B,
-          p0=fluidNomPressure_B,
-          h=hstart_F_B_In)    annotation (Placement(transformation(
-              origin={6,74},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterIn_A(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-24,38},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterOut_A(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-24,-42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterOut_B(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={12,-42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterIn_B(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={10,38},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
-        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
-                rotation=0)));
-        inner System system 
-          annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      equation
-        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_waterOut_A.outlet, sinkP_water_A.flange) annotation (Line(
-              points={{-28,-48},{-28,-62},{-28,-76},{-28,-76}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sinkP_water_B.flange, T_waterOut_B.outlet) annotation (Line(
-              points={{8,-76},{8,-69},{8,-69},{8,-62},{8,-48},{8,-48}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterOut_B.inlet, hE.waterOutB) annotation (Line(points={{8,-36},
-                {8,-26},{-2,-26},{-2,-20}},      thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterOut_A.inlet, hE.waterOutA) annotation (Line(points={{-28,
-                -36},{-28,-28},{-18,-28},{-18,-20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hE.waterInA, T_waterIn_A.outlet) annotation (Line(points={{-18,
-                20},{-18,24},{-28,24},{-28,32}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hE.waterInB, T_waterIn_B.outlet) 
-          annotation (Line(points={{-2,20},{-2,24},{6,24},{6,32}}, thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn_B.inlet, sourseW_water_B.flange) 
-          annotation (Line(points={{6,44},{6,49},{6,49},{6,54},{6,64},{6,64}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn_A.inlet, sourseW_water_A.flange) annotation (Line(
-              points={{-28,44},{-28,54},{-28,64},{-28,64}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics));
-      end TestSh1HP_Rh1IP;
-
-      model TestSh2HP_Rh2IP
-        package FlueGasMedium = ThermoPower.Media.FlueGas;
-        package FluidMedium = ThermoPower.Water.StandardWater;
-
-        //gas
-        parameter SI.MassFlowRate gasNomFlowRate=585.5
-          "Nominal flow rate through the gas side";
-        parameter SI.Temperature Tstart_G_In=884.65
-          "Inlet gas temperature start value";
-        parameter SI.Temperature Tstart_G_Out=823.15
-          "Outlet gas temperature start value";
-
-        //fluid A
-        parameter SI.MassFlowRate fluidNomFlowRate_A=70.59
-          "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure_A=130.5e5
-          "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G_A=40
-          "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_F_A=4000
-          "Constant heat transfer coefficient in the fluid side";
-        parameter SI.Temperature Tstart_M_A_In=Tstart_F_A_In
-          "Inlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_M_A_Out=Tstart_F_A_Out
-          "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_A_In=769.486
-          "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_A_Out=823.28
-          "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_A_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_In)
-          "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_A_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure_A,Tstart_F_A_Out)
-          "Nominal specific enthalpy";
-
-        //fluid B
-        parameter SI.MassFlowRate fluidNomFlowRate_B=81.1
-          "Nominal flow rate through the fluid side";
-        parameter SI.Pressure fluidNomPressure_B=28.2e5
-          "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G_B=40
-          "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_F_B=4000
-          "Constant heat transfer coefficient in the fluid side";
-        parameter SI.Temperature Tstart_M_B_In=Tstart_F_B_In
-          "Inlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_M_B_Out=Tstart_F_B_Out
-          "Outlet metal wall temperature start value";
-        parameter SI.Temperature Tstart_F_B_In=757.896
-          "Inlet fluid temperature start value";
-        parameter SI.Temperature Tstart_F_B_Out=813.09
-          "Outlet fluid temperature start value";
-        parameter SI.SpecificEnthalpy hstart_F_B_In=FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,Tstart_F_B_In)
-          "Nominal specific enthalpy";
-        parameter SI.SpecificEnthalpy hstart_F_B_Out=FluidMedium.specificEnthalpy_pT(fluidNomPressure_B,Tstart_F_B_Out)
-          "Nominal specific enthalpy";
-
-        Water.SourceW sourseW_water_A(
-          redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate_A,
-          p0=fluidNomPressure_A,
-          h=hstart_F_A_In)    annotation (Placement(transformation(
-              origin={-28,74},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SinkP sinkP_water_A(
-          redeclare package Medium = FluidMedium,
-          p0=fluidNomPressure_A,
-          h=hstart_F_A_Out) 
-                          annotation (Placement(transformation(
-              origin={-28,-86},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=Tstart_G_Out) 
-                         annotation (Placement(transformation(extent={{50,-12},
-                  {76,12}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
-          redeclare package Medium = FlueGasMedium,
-          T=Tstart_G_In,
-          w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-90,
-                  -14},{-68,14}}, rotation=0)));
-        Components.ParHE hE(redeclare package FluidMedium = FluidMedium,
-          redeclare package FlueGasMedium = FlueGasMedium,
-          N_G=3,
-          gasVol=10,
-          lambda=20,
-          gasNomPressure=0,
-          N_F_A=5,
-          exchSurface_G_A=3636,
-          exchSurface_F_A=421.844,
-          extSurfaceTub_A=540.913,
-          fluidVol_A=2.615,
-          metalVol_A=1.685,
-          rhomcm_A=7780*688.31,
-          N_F_B=7,
-          exchSurface_F_B=4630.2,
-          exchSurface_G_B=873.079,
-          extSurfaceTub_B=1009.143,
-          fluidVol_B=8.403,
-          metalVol_B=2.823,
-          rhomcm_B=7800*574.93,
-          SSInit=true,
-          counterCurrent_A=true,
-          gasNomFlowRate=gasNomFlowRate,
-          fluidNomFlowRate_A=fluidNomFlowRate_A,
-          fluidNomFlowRate_B=fluidNomFlowRate_B,
-          fluidNomPressure_A=fluidNomPressure_A,
-          fluidNomPressure_B=fluidNomPressure_B,
-          Tstart_G_In=Tstart_G_In,
-          Tstart_G_Out=Tstart_G_Out,
-          Tstart_M_A_In=Tstart_M_A_In,
-          Tstart_M_A_Out=Tstart_M_A_Out,
-          Tstart_F_A_In=Tstart_F_A_In,
-          Tstart_F_A_Out=Tstart_F_A_Out,
-          Tstart_M_B_In=Tstart_M_B_In,
-          Tstart_M_B_Out=Tstart_M_B_Out,
-          Tstart_F_B_In=Tstart_F_B_In,
-          Tstart_F_B_Out=Tstart_F_B_Out,
-          gamma_G_A=gamma_G_A,
-          gamma_G_B=gamma_G_B,
-          gamma_F_A=gamma_F_A,
-          gamma_F_B=gamma_F_B,
-          counterCurrent_B=true) 
-          annotation (Placement(transformation(extent={{-30,-20},{10,20}},
-                rotation=0)));
-        Water.SinkP sinkP_water_B(
-          redeclare package Medium = FluidMedium,
-          p0=fluidNomPressure_B,
-          h=hstart_F_B_Out) 
-                          annotation (Placement(transformation(
-              origin={8,-86},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SourceW sourseW_water_B(
-          redeclare package Medium = FluidMedium,
-          w0=fluidNomFlowRate_B,
-          p0=fluidNomPressure_B,
-          h=hstart_F_B_In)    annotation (Placement(transformation(
-              origin={6,74},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterIn_A(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-24,38},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterOut_A(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={-24,-42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterOut_B(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={12,-42},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.SensT T_waterIn_B(redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(
-              origin={10,38},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Gas.SensT T_gasIn(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{-58,-6},{-38,14}},
-                rotation=0)));
-        Gas.SensT T_gasOut(redeclare package Medium = FlueGasMedium) 
-          annotation (Placement(transformation(extent={{20,-6},{40,14}},
-                rotation=0)));
-
-        inner System system 
-          annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      equation
-        connect(T_gasOut.inlet, hE.gasOut) annotation (Line(
-            points={{24,0},{10,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasOut.outlet, sinkP_gas.flange) annotation (Line(
-            points={{36,0},{50,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.outlet, hE.gasIn) annotation (Line(
-            points={{-42,0},{-30,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_gasIn.inlet, sourceW_gas.flange) annotation (Line(
-            points={{-54,0},{-61,0},{-61,1.77636e-015},{-68,1.77636e-015}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(T_waterOut_A.outlet, sinkP_water_A.flange) annotation (Line(
-              points={{-28,-48},{-28,-62},{-28,-76},{-28,-76}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sinkP_water_B.flange, T_waterOut_B.outlet) annotation (Line(
-              points={{8,-76},{8,-69},{8,-69},{8,-62},{8,-48},{8,-48}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterOut_B.inlet, hE.waterOutB) annotation (Line(points={{8,-36},
-                {8,-26},{-2,-26},{-2,-20}},      thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterOut_A.inlet, hE.waterOutA) annotation (Line(points={{-28,
-                -36},{-28,-28},{-18,-28},{-18,-20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hE.waterInA, T_waterIn_A.outlet) annotation (Line(points={{-18,
-                20},{-18,24},{-28,24},{-28,32}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hE.waterInB, T_waterIn_B.outlet) 
-          annotation (Line(points={{-2,20},{-2,24},{6,24},{6,32}}, thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn_B.inlet, sourseW_water_B.flange) 
-          annotation (Line(points={{6,44},{6,49},{6,49},{6,54},{6,64},{6,64}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(T_waterIn_A.inlet, sourseW_water_A.flange) annotation (Line(
-              points={{-28,44},{-28,54},{-28,64},{-28,64}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics));
-      end TestSh2HP_Rh2IP;
-
-      model TestDG_3LCC
-        package FluidMedium = ThermoPower.Water.StandardWater;
-
-        ThermoPower.PowerPlants.HRSG.Examples.DG_3L_CC Drums(
-          HPd_rint=1.067,
-          HPd_rext=1.167,
-          HPd_L=11.920,
-          HPd_Cm=0,
-          IPd_rint=0.915,
-          IPd_rext=1.015,
-          IPd_L=7,
-          IPd_Cm=0,
-          LPd_rint=1.143,
-          LPd_rext=1.243,
-          LPd_L=11.503,
-          LPd_Cm=0,
-          RiserHPFlowRate=175.5,
-          RiserIPFlowRate=67.5,
-          RiserLPFlowRate=41.5,
-          redeclare package FluidMedium = FluidMedium,
-          fluidLPNomPressure=7.19048e5,
-          LPd_hvstart=2.76051e6,
-          LPd_hlstart=6.68356e5,
-          fluidHPNomPressure=1.626e7,
-          fluidIPNomPressure=3.3816e6,
-          HPd_hvstart=2.53239e6,
-          HPd_hlstart=1.5879e6,
-          IPd_hvstart=2.794e6,
-          IPd_hlstart=1.0265e5,
-          SSInit=false)         annotation (Placement(transformation(extent={{
-                  -180,20},{20,140}}, rotation=0)));
-        Water.SourceW sourceFromEcLP_w(
-          h=6.544e5,
-          w0=89.8,
-          p0=7.19048e5) 
-                     annotation (Placement(transformation(
-              origin={-12,-24},
-              extent={{-6,6},{6,-6}},
-              rotation=90)));
-        Water.SinkP sinkToRiserLP_p(p0=1.534e6, h=1.6325e6) 
-          annotation (Placement(transformation(
-              origin={-20,-42},
-              extent={{-6,-6},{6,6}},
-              rotation=270)));
-        Water.SourceW sourceFromRiserLP_w(
-          w0=41.49,
-          h=1.065e6,
-          p0=7.19046e5) 
-                     annotation (Placement(transformation(
-              origin={-28,-24},
-              extent={{-6,6},{6,-6}},
-              rotation=90)));
-        Water.SinkP sinkToShLP_p(          h=2.760e6,
-          redeclare package Medium = FluidMedium,
-          p0=5.398e3) 
-          annotation (Placement(transformation(extent={{-2,-66},{10,-54}},
-                rotation=0)));
-        Water.SinkP sinkToEcHP_p(p0=1.389e7, h=6.775e5) 
-          annotation (Placement(transformation(
-              origin={-124,-156},
-              extent={{-6,-6},{6,6}},
-              rotation=270)));
-        Water.SourceW sourceFromEcHP_w(
-          w0=69.5,
-          h=1.463e6,
-          p0=1.626e7) 
-                     annotation (Placement(transformation(
-              origin={-132,-142},
-              extent={{-6,6},{6,-6}},
-              rotation=90)));
-        Water.SinkP sinkToRiserHP_p(p0=1.371e7, h=1.6325e6) 
-          annotation (Placement(transformation(
-              origin={-140,-156},
-              extent={{-6,-6},{6,6}},
-              rotation=270)));
-        Water.SourceW sourceFromRiserHP_w(
-          w0=175.5,
-          h=2.002e6,
-          p0=1.626e7) 
-                     annotation (Placement(transformation(
-              origin={-148,-142},
-              extent={{-6,6},{6,-6}},
-              rotation=90)));
-        Water.SinkP sinkToShHP_p(            h=2.657e6,
-          redeclare package Medium = FluidMedium,
-          p0=2.98e6) 
-          annotation (Placement(transformation(extent={{-126,-178},{-114,-166}},
-                rotation=0)));
-        Water.SinkP sinkToEcIP_p(p0=4.86e6, h=6.654e5) 
-          annotation (Placement(transformation(
-              origin={-64,-104},
-              extent={{-6,-6},{6,6}},
-              rotation=270)));
-        Water.SourceW sourceFromEcIP_w(
-          h=9.444e5,
-          w0=12.7,
-          p0=3.3816e6) 
-                     annotation (Placement(transformation(
-              origin={-72,-90},
-              extent={{-6,6},{6,-6}},
-              rotation=90)));
-        Water.SinkP sinkToRiserIP_p(p0=3.716e6, h=1.0223e6) 
-          annotation (Placement(transformation(
-              origin={-80,-104},
-              extent={{-6,-6},{6,6}},
-              rotation=270)));
-        Water.SourceW sourceFromRiserIP_w(
-          w0=67.5,
-          h=1.370e6,
-          p0=3.3816e6) 
-                     annotation (Placement(transformation(
-              origin={-88,-90},
-              extent={{-6,6},{6,-6}},
-              rotation=90)));
-        Water.SinkP sinkToShIP_p(           h=2.802e6,
-          p0=6e5,
-          redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(extent={{-62,-126},{-50,-114}},
-                rotation=0)));
-        Water.ValveLin valveLP(redeclare package Medium = FluidMedium, Kv=6.9/6.738e5) 
-          annotation (Placement(transformation(extent={{-28,-52},{-12,-68}},
-                rotation=0)));
-        Water.ValveLin valveIP(redeclare package Medium = FluidMedium, Kv=13.5/
-              2.959e6) annotation (Placement(transformation(extent={{-88,-112},
-                  {-72,-128}}, rotation=0)));
-        Water.ValveLin valveHP(redeclare package Medium = FluidMedium, Kv=70/1.344e7) 
-          annotation (Placement(transformation(extent={{-152,-164},{-136,-180}},
-                rotation=0)));
-      public
-        Modelica.Blocks.Sources.Constant com_valve(k=1) 
-          annotation (Placement(transformation(extent={{60,-196},{40,-176}},
-                rotation=0)));
-      public
-        Components.StateReader_water stateToEcHP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-124,-112},
-              extent={{6,-6},{-6,6}},
-              rotation=90)));
-        Components.StateReader_water stateReturnEcHP(
-                                               redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-132,-112},
-              extent={{-6,-6},{6,6}},
-              rotation=90)));
-        Components.StateReader_water stateToRiserHP(
-                                              redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-140,-112},
-              extent={{6,-6},{-6,6}},
-              rotation=90)));
-        Components.StateReader_water stateReturnRiserHP(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-148,-112},
-              extent={{-6,-6},{6,6}},
-              rotation=90)));
-        Components.StateReader_water stateToShHP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-156,-112},
-              extent={{6,-6},{-6,6}},
-              rotation=90)));
-        Components.StateReader_water stateToEcIP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-64,-56},
-              extent={{6,-6},{-6,6}},
-              rotation=90)));
-        Components.StateReader_water stateReturnEcIP(
-                                               redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-72,-56},
-              extent={{-6,-6},{6,6}},
-              rotation=90)));
-        Components.StateReader_water stateToRiserIP(
-                                              redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-80,-56},
-              extent={{6,-6},{-6,6}},
-              rotation=90)));
-        Components.StateReader_water stateReturnRiserIP(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-88,-56},
-              extent={{-6,-6},{6,6}},
-              rotation=90)));
-        Components.StateReader_water stateToShIP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-96,-56},
-              extent={{6,-6},{-6,6}},
-              rotation=90)));
-        Components.StateReader_water stateReturnEcLP(
-                                               redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-12,-4},
-              extent={{-6,-6},{6,6}},
-              rotation=90)));
-        Components.StateReader_water stateToRiserLP(
-                                              redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-20,-4},
-              extent={{6,-6},{-6,6}},
-              rotation=90)));
-        Components.StateReader_water stateReturnRiserLP(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-28,-4},
-              extent={{-6,-6},{6,6}},
-              rotation=90)));
-        Components.StateReader_water stateToShLP(
-                                           redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-36,-4},
-              extent={{6,-6},{-6,6}},
-              rotation=90)));
-      public
-        Modelica.Blocks.Sources.Ramp IPpump_com(
-          duration=10,
-          offset=12.7,
-          height=0) 
-          annotation (Placement(transformation(extent={{160,-114},{140,-94}},
-                rotation=0)));
-        Modelica.Blocks.Sources.Ramp HPpump_com(
-          duration=10,
-          startTime=0,
-          offset=69.5,
-          height=0) 
-          annotation (Placement(transformation(extent={{160,-154},{140,-134}},
-                rotation=0)));
-      public
-        Modelica.Blocks.Sources.Constant LPpump_com(k=89.8) 
-          annotation (Placement(transformation(extent={{160,-80},{140,-60}},
-                rotation=0)));
-      protected
-        Buses.Actuators actuators annotation (Placement(transformation(extent={
-                  {92,78},{80,90}}, rotation=0)));
-      public
-        Modelica.Blocks.Sources.Constant LPpump_com1(k=1500) 
-          annotation (Placement(transformation(extent={{160,-20},{140,0}},
-                rotation=0)));
-        inner System system 
-          annotation (Placement(transformation(extent={{180,180},{200,200}})));
-      equation
-        connect(IPpump_com.y,actuators. flowRate_feedIP) 
-                                                     annotation (Line(points={{
-                139,-104},{110,-104},{110,84},{86,84}}, color={0,0,127}));
-        connect(HPpump_com.y,actuators. flowRate_feedHP) 
-                                                     annotation (Line(points={{
-                139,-144},{100,-144},{100,84},{86,84}}, color={0,0,127}));
-        connect(stateReturnEcHP.outlet, Drums.Feed_HP) annotation (Line(points=
-                {{-132,-108.4},{-132,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateToEcHP.inlet, Drums.WaterForHP) annotation (Line(points={{
-                -124,-108.4},{-124,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateToShHP.inlet, Drums.Steam_HP_Out) annotation (Line(points=
-                {{-156,-108.4},{-156,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateReturnEcIP.outlet, Drums.Feed_IP) annotation (Line(points=
-                {{-72,-52.4},{-72,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateToEcIP.inlet, Drums.WaterForIP) annotation (Line(points={{
-                -64,-52.4},{-64,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateToShIP.inlet, Drums.Steam_IP_Out) annotation (Line(points=
-                {{-96,-52.4},{-96,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sinkToShLP_p.flange, valveLP.outlet) annotation (Line(points={{
-                -2,-60},{-12,-60}}, thickness=0.5));
-        connect(valveLP.inlet, stateToShLP.outlet) annotation (Line(points={{
-                -28,-60},{-36,-60},{-36,-7.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sinkToRiserLP_p.flange, stateToRiserLP.outlet) annotation (Line(
-              points={{-20,-36},{-20,-7.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sourceFromRiserLP_w.flange, stateReturnRiserLP.inlet) 
-          annotation (Line(points={{-28,-18},{-28,-7.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sourceFromEcLP_w.flange, stateReturnEcLP.inlet) annotation (Line(
-              points={{-12,-18},{-12,-7.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateReturnEcLP.outlet, Drums.Feed_LP) annotation (Line(points={{-12,
-                -0.4},{-12,20}},       thickness=0.5,
-            color={0,0,255}));
-        connect(stateToShLP.inlet, Drums.Steam_LP_Out) annotation (Line(points={{-36,
-                -0.4},{-36,20}},       thickness=0.5,
-            color={0,0,255}));
-        connect(actuators, Drums.ActuatorsBus) annotation (Line(points={{86,84},
-                {20,84}}, color={213,255,170}));
-        connect(sinkToEcIP_p.flange, stateToEcIP.outlet) annotation (Line(
-              points={{-64,-98},{-64,-59.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sourceFromEcIP_w.flange, stateReturnEcIP.inlet) annotation (Line(
-              points={{-72,-84},{-72,-59.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sinkToRiserIP_p.flange, stateToRiserIP.outlet) annotation (Line(
-              points={{-80,-98},{-80,-59.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sourceFromRiserIP_w.flange, stateReturnRiserIP.inlet) 
-          annotation (Line(points={{-88,-84},{-88,-59.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveIP.inlet, stateToShIP.outlet) annotation (Line(points={{
-                -88,-120},{-96,-120},{-96,-59.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sinkToShIP_p.flange, valveIP.outlet) annotation (Line(points={{
-                -62,-120},{-72,-120}}, thickness=0.5));
-        connect(sinkToEcHP_p.flange, stateToEcHP.outlet) annotation (Line(
-              points={{-124,-150},{-124,-115.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sourceFromEcHP_w.flange, stateReturnEcHP.inlet) annotation (Line(
-              points={{-132,-136},{-132,-115.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sinkToRiserHP_p.flange, stateToRiserHP.outlet) annotation (Line(
-              points={{-140,-150},{-140,-115.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sourceFromRiserHP_w.flange, stateReturnRiserHP.inlet) 
-          annotation (Line(points={{-148,-136},{-148,-115.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveHP.inlet, stateToShHP.outlet) annotation (Line(points={{
-                -152,-172},{-156,-172},{-156,-115.6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveHP.outlet, sinkToShHP_p.flange) annotation (Line(points={{
-                -136,-172},{-126,-172}}, thickness=0.5));
-        connect(com_valve.y, valveHP.cmd) annotation (Line(points={{39,-186},{
-                -144,-186},{-144,-178.4}}, color={0,0,127}));
-        connect(com_valve.y, valveIP.cmd) annotation (Line(points={{39,-186},{
-                -80,-186},{-80,-126.4}}, color={0,0,127}));
-        connect(com_valve.y, valveLP.cmd) annotation (Line(points={{39,-186},{
-                -20,-186},{-20,-66.4}}, color={0,0,127}));
-        connect(HPpump_com.y, sourceFromEcHP_w.in_w0) annotation (Line(points={
-                {139,-144},{-128.4,-144},{-128.4,-144.4}}, color={0,0,127}));
-        connect(IPpump_com.y, sourceFromEcIP_w.in_w0) annotation (Line(points={
-                {139,-104},{39.5,-104},{39.5,-92.4},{-68.4,-92.4}}, color={0,0,
-                127}));
-        connect(LPpump_com.y, sourceFromEcLP_w.in_w0) annotation (Line(points={
-                {139,-70},{72,-70},{72,-26.4},{-8.4,-26.4}}, color={0,0,127}));
-        connect(LPpump_com1.y, actuators.nPump_feedLP) annotation (Line(points=
-                {{139,-10},{110,-10},{110,84},{86,84}}, color={0,0,127}));
-        connect(stateToRiserLP.inlet, Drums.Downcomer_LP) annotation (Line(
-              points={{-20,-0.4},{-20,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateReturnRiserLP.outlet, Drums.Riser_LP) annotation (Line(
-              points={{-28,-0.4},{-28,20},{-28,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateReturnRiserIP.outlet, Drums.Riser_IP) annotation (Line(
-              points={{-88,-52.4},{-88,20},{-88,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateToRiserIP.inlet, Drums.Downcomer_IP) annotation (Line(
-              points={{-80,-52.4},{-80,20},{-80,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateToRiserHP.inlet, Drums.Downcomer_HP) annotation (Line(
-              points={{-140,-108.4},{-140,20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateReturnRiserHP.outlet, Drums.Riser_HP) annotation (Line(
-              points={{-148,-108.4},{-148,20}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(coordinateSystem(
-              preserveAspectRatio=false,
-              extent={{-200,-200},{200,200}},
-              initialScale=0.1), graphics));
-      end TestDG_3LCC;
+      end TestEcLP;
 
       model TestHEG_3LRh
         package FlueGasMedium = ThermoPower.Media.FlueGas;
@@ -12224,7 +9541,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
               rotation=90)));
         Modelica.Blocks.Sources.Constant commandValve 
           annotation (Placement(transformation(
-              origin={-45,-85},
+              origin={-1,-85},
               extent={{-5,-5},{5,5}},
               rotation=270)));
         Water.SinkP sinkEcHP(
@@ -12328,36 +9645,24 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={34,64},
               extent={{6,-6},{-6,6}},
               rotation=90)));
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
-                                               redeclare package Medium = 
-              FlueGasMedium) annotation (Placement(transformation(extent={{-84,
-                  -12},{-68,4}}, rotation=0)));
         ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
                                                 redeclare package Medium = 
               FlueGasMedium) annotation (Placement(transformation(extent={{64,
                   -12},{80,4}}, rotation=0)));
-        Examples.HEG_3LRh hEG_3LRh_simp(
+        inner System system(allowFlowReversal=false) 
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Examples.HEG_3LRh HeatExchangersGroup(
           gasNomFlowRate=585.5,
           fluidHPNomFlowRate_Sh=70.59,
-          fluidHPNomPressure_Sh=134.3e5,
           fluidHPNomFlowRate_Ev=175.5,
-          fluidHPNomPressure_Ev=137.1e5,
           fluidHPNomFlowRate_Ec=70.10,
-          fluidHPNomPressure_Ec=138.9e5,
           fluidIPNomFlowRate_Rh=81.10,
-          fluidIPNomPressure_Rh=28.4e5,
           fluidIPNomFlowRate_Sh=13.5,
-          fluidIPNomPressure_Sh=29.5e5,
           fluidIPNomFlowRate_Ev=67.5,
-          fluidIPNomPressure_Ev=37.16e5,
           fluidIPNomFlowRate_Ec=21.8,
-          fluidIPNomPressure_Ec=48.6e5,
           fluidLPNomFlowRate_Sh=6.91,
-          fluidLPNomPressure_Sh=6.6e5,
           fluidLPNomFlowRate_Ev=41.49,
-          fluidLPNomPressure_Ev=15.34e5,
           fluidLPNomFlowRate_Ec=122.4,
-          fluidLPNomPressure_Ec=19.8e5,
           Sh2_HP_N_G=3,
           Sh2_HP_N_F=5,
           Sh2_HP_exchSurface_G=3636,
@@ -12458,81 +9763,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Ec_LP_gasVol=10,
           Ec_LP_fluidVol=28.977,
           Ec_LP_metalVol=8.061,
-          use_T_Ev=false,
-          Sh2_HP_Tstart_G_In=884.65,
-          Sh2_HP_Tstart_G_Out=837.31,
-          Sh2_HP_Tstart_M_In=742.65,
-          Sh2_HP_Tstart_M_Out=823.28,
-          Sh2_HP_Tstart_F_In=742.65,
-          Sh2_HP_Tstart_F_Out=823.28,
-          Sh1_HP_Tstart_G_In=837.15,
-          Sh1_HP_Tstart_G_Out=748.60,
-          Sh1_HP_Tstart_M_In=606.59,
-          Sh1_HP_Tstart_M_Out=743.18,
-          Sh1_HP_Tstart_F_In=606.59,
-          Sh1_HP_Tstart_F_Out=743.18,
-          Ev_HP_Tstart_G_In=747.15,
-          Ev_HP_Tstart_G_Out=620.30,
-          Ev_HP_Tstart_M_In=FluidMedium.temperature_ph(fluidHPNomPressure_Ev, 1.514e6),
-          Ev_HP_Tstart_M_Out=FluidMedium.temperature_ph(fluidHPNomPressure_Ev,
-              2.002e6),
-          Ev_HP_hstart_F_In=1.514e6,
-          Ev_HP_hstart_F_Out=2.002e6,
-          Ec2_HP_Tstart_G_In=614.15,
-          Ec2_HP_Tstart_G_Out=558.98,
-          Ec2_HP_Tstart_M_In=494.67,
-          Ec2_HP_Tstart_M_Out=594.14,
-          Ec2_HP_Tstart_F_In=494.67,
-          Ec2_HP_Tstart_F_Out=594.14,
-          Ec1_HP_Tstart_M_In=431.77,
-          Ec1_HP_Tstart_M_Out=494.67,
-          Ec1_HP_Tstart_F_In=431.77,
-          Ec1_HP_Tstart_F_Out=494.67,
-          Rh2_IP_Tstart_M_In=717.31,
-          Rh2_IP_Tstart_M_Out=813.09,
-          Rh2_IP_Tstart_F_In=717.31,
-          Rh2_IP_Tstart_F_Out=813.09,
-          Rh1_IP_Tstart_M_In=618.31,
-          Rh1_IP_Tstart_M_Out=717.34,
-          Rh1_IP_Tstart_F_In=618.31,
-          Rh1_IP_Tstart_F_Out=717.34,
-          Sh_IP_Tstart_G_In=620.15,
-          Sh_IP_Tstart_G_Out=614.50,
-          Sh_IP_Tstart_M_In=506.08,
-          Sh_IP_Tstart_M_Out=605.11,
-          Sh_IP_Tstart_F_In=506.08,
-          Sh_IP_Tstart_F_Out=605.11,
-          Ev_IP_Tstart_G_In=558.15,
-          Ev_IP_Tstart_G_Out=518.51,
-          Ev_IP_Tstart_M_In=FluidMedium.temperature_ph(fluidIPNomPressure_Ev, 9.92e5),
-          Ev_IP_Tstart_M_Out=FluidMedium.temperature_ph(fluidIPNomPressure_Ev, 1.37e6),
-          Ev_IP_hstart_F_In=9.92e5,
-          Ev_IP_hstart_F_Out=1.37e6,
-          Ec_IP_Tstart_G_In=517.15,
-          Ec_IP_Tstart_G_Out=480.11,
-          Ec_IP_Tstart_M_In=430.24,
-          Ec_IP_Tstart_M_Out=493.16,
-          Ec_IP_Tstart_F_In=430.24,
-          Ec_IP_Tstart_F_Out=493.16,
-          Sh_LP_Tstart_G_In=519.15,
-          Sh_LP_Tstart_G_Out=517.44,
-          Sh_LP_Tstart_M_In=435.75,
-          Sh_LP_Tstart_M_Out=505.04,
-          Sh_LP_Tstart_F_In=435.75,
-          Sh_LP_Tstart_F_Out=505.75,
-          Ev_LP_Tstart_G_In=480.00,
-          Ev_LP_Tstart_G_Out=453.47,
-          Ev_LP_Tstart_M_In=FluidMedium.temperature_ph(fluidLPNomPressure_Ev, 6.625e5),
-          Ev_LP_Tstart_M_Out=FluidMedium.temperature_ph(fluidLPNomPressure_Ev,
-              1.065e6),
-          Ev_LP_hstart_F_In=6.625e5,
-          Ev_LP_hstart_F_Out=1.065e6,
-          Ec_LP_Tstart_G_In=453.47,
-          Ec_LP_Tstart_G_Out=372.35,
-          Ec_LP_Tstart_M_In=331.05,
-          Ec_LP_Tstart_M_Out=428.09,
-          Ec_LP_Tstart_F_In=331.05,
-          Ec_LP_Tstart_F_Out=428.09,
           rhomcm=7900*578.05,
           lambda=20,
           Ec_LP(gamma_G=46.8, gamma_F=4000),
@@ -12547,7 +9777,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Ec2_HP(gamma_G=56, gamma_F=4000),
           Sh_IP(gamma_G=33, gamma_F=4000),
           Ev_HP(gamma_G=46.5, gamma_F=20000),
-          gasNomPressure=1e5,
           Sh1HP_Rh1IP(
             gamma_G_A=70,
             gamma_G_B=80,
@@ -12558,93 +9787,170 @@ package PowerPlants "Models of thermoelectrical power plants components"
             gamma_G_B=80,
             gamma_F_A=4000,
             gamma_F_B=4000),
-          SSInit=true)       annotation (Placement(transformation(extent={{-60,
-                  -28},{50,20}}, rotation=0)));
-        inner System system 
-          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+          redeclare package FlueGasMedium = FlueGasMedium,
+          redeclare package FluidMedium = FluidMedium,
+          SSInit=true,
+          gasNomPressure=100000,
+          fluidHPNomPressure_Sh=13430000,
+          fluidHPNomPressure_Ev=13710000,
+          fluidHPNomPressure_Ec=13890000,
+          fluidIPNomPressure_Rh=2840000,
+          fluidIPNomPressure_Sh=2950000,
+          fluidIPNomPressure_Ev=3716000,
+          fluidIPNomPressure_Ec=4860000,
+          fluidLPNomPressure_Sh=660000,
+          fluidLPNomPressure_Ev=1534000,
+          fluidLPNomPressure_Ec=1980000,
+          Sh2_HP_Tstartbar=873.15,
+          Sh1_HP_Tstartbar=823.15,
+          Ev_HP_Tstartbar=723.15,
+          Ec2_HP_Tstartbar=573.15,
+          Ec1_HP_Tstartbar=523.15,
+          Sh_IP_Tstartbar=623.15,
+          Ev_IP_Tstartbar=553.15,
+          Sh_LP_Tstartbar=523.15,
+          Ev_LP_Tstartbar=473.15,
+          Ec_LP_Tstartbar=423.15) 
+                             annotation (Placement(transformation(extent={{-64,-30},
+                  {58,22}},     rotation=0)));
       equation
         connect(OutHP.flange, valveLinHP.outlet) 
           annotation (Line(points={{-88,-84},{-80,-84}}, thickness=0.5));
         connect(valveLinLP.outlet, OutLP.flange) 
           annotation (Line(points={{62,-86},{70,-86}}, thickness=0.5));
-        connect(commandValve.y, valveLinHP.cmd) annotation (Line(points={{-45,
-                -90.5},{-45,-98},{-74,-98},{-74,-88.8}}, color={0,0,127}));
-        connect(commandValve.y, valveLinLP.cmd) annotation (Line(points={{-45,
-                -90.5},{-45,-98},{56,-98},{56,-90.8}}, color={0,0,127}));
-        connect(stateGas_in.inlet, sourceGas.flange) annotation (Line(
-            points={{-80.8,-4},{-88,-4}},
-            color={159,159,223},
-            thickness=0.5));
+        connect(commandValve.y, valveLinHP.cmd) annotation (Line(points={{-1,
+                -90.5},{-1,-98},{-74,-98},{-74,-88.8}},  color={0,0,127}));
+        connect(commandValve.y, valveLinLP.cmd) annotation (Line(points={{-1,
+                -90.5},{-1,-98},{56,-98},{56,-90.8}},  color={0,0,127}));
         connect(sinkGas.flange, stateGas_out.outlet) annotation (Line(
             points={{88,-4},{76.8,-4}},
             color={159,159,223},
             thickness=0.5));
-        connect(stateGas_out.inlet, hEG_3LRh_simp.GasOut) annotation (Line(
-            points={{67.2,-4},{50,-4}},
+        connect(HeatExchangersGroup.GasOut, stateGas_out.inlet) annotation (
+            Line(
+            points={{58,-4},{62.6,-4},{62.6,-4},{67.2,-4}},
             color={159,159,223},
-            thickness=0.5));
-        connect(stateGas_in.outlet, hEG_3LRh_simp.GasIn) annotation (Line(
-            points={{-71.2,-4},{-60,-4}},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.GasIn, sourceGas.flange) annotation (Line(
+            points={{-64,-4},{-76,-4},{-76,-4},{-88,-4}},
             color={159,159,223},
-            thickness=0.5));
-        connect(sinkRhIP.flange, hEG_3LRh_simp.Rh_IP_Out) annotation (Line(
-              points={{-26,-64},{-26,-48},{-25.9,-48},{-25.9,-28}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sourceRhIP.flange, hEG_3LRh_simp.Rh_IP_In) annotation (Line(
-              points={{-19,-48},{-19,-28},{-19.3,-28}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveLinHP.inlet, hEG_3LRh_simp.Sh_HP_Out) annotation (Line(
-              points={{-68,-84},{-58,-84},{-58,-54},{-38,-54},{-38,-28}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(valveLinLP.inlet, hEG_3LRh_simp.Sh_LP_Out) annotation (Line(
-              points={{50,-86},{28,-86},{28,-27.76}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ev_IP_In, sourceEvIP.flange) annotation (Line(
-              points={{-5,20},{-5,58},{-6,58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ec_IP_Out, sinkEcIP.flange) annotation (Line(
-              points={{-0.6,20},{-0.6,52},{4,52},{4,70}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ev_IP_Out, sinkEvIP.flange) annotation (Line(
-              points={{-9.4,20},{-9.4,52},{-10,52},{-10,70}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ec_IP_In, sourceEcIP.flange) annotation (Line(
-              points={{3.8,20},{3.8,40},{10,40},{10,58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Sh_IP_In, sourceShIP.flange) annotation (Line(
-              points={{-13.8,20},{-13.8,40},{-20,40},{-20,58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Sh_HP_In, sourceShHP.flange) annotation (Line(
-              points={{-46.8,20},{-46.8,26},{-68,26},{-68,58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ev_HP_Out, sinkEvHP.flange) annotation (Line(
-              points={{-42.4,20},{-42.4,30},{-60,30},{-60,70}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ec_HP_Out, sinkEcHP.flange) annotation (Line(
-              points={{-33.6,20},{-33.6,38},{-44,38},{-44,70}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ec_LP_In, sourceEcLP.flange) annotation (Line(
-              points={{36.8,20},{36.8,26},{68,26},{68,58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ec_LP_Out, sinkEcLP.flange) annotation (Line(
-              points={{32.4,20},{32.4,30},{60,30},{60,70}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ev_LP_In, sourceEvLP.flange) annotation (Line(
-              points={{28,20},{28,34},{52,34},{52,58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ev_LP_Out, sinkEvLP.flange) annotation (Line(
-              points={{23.6,20},{23.6,38},{44,38},{44,70}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Sh_LP_In, sourceShLP.flange) annotation (Line(
-              points={{19.2,20},{19.2,42},{34,42},{34,58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ev_HP_In, sourceEvHP.flange) annotation (Line(
-              points={{-38,20},{-38,36},{-52,36},{-52,58}}, thickness=0.5,
-            color={0,0,255}));
-        connect(hEG_3LRh_simp.Ec_HP_In, sourceEcHP.flange) annotation (Line(
-              points={{-29.2,20},{-29.2,44},{-38,44},{-38,58}}, thickness=0.5,
-            color={0,0,255}));
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceRhIP.flange, HeatExchangersGroup.Rh_IP_In) annotation (
+            Line(
+            points={{-19,-48},{-18.86,-48},{-18.86,-30}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sinkRhIP.flange, HeatExchangersGroup.Rh_IP_Out) annotation (
+            Line(
+            points={{-26,-64},{-26.18,-64},{-26.18,-30}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(valveLinLP.inlet, HeatExchangersGroup.Sh_LP_Out) annotation (
+            Line(
+            points={{50,-86},{33.6,-86},{33.6,-29.74}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(valveLinHP.inlet, HeatExchangersGroup.Sh_HP_Out) annotation (
+            Line(
+            points={{-68,-84},{-39.6,-84},{-39.6,-30}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ec_IP_In, sourceEcIP.flange) annotation (
+            Line(
+            points={{6.76,22},{8,22},{8,58},{10,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ec_IP_Out, sinkEcIP.flange) annotation (
+            Line(
+            points={{1.88,22},{1.88,47},{4,47},{4,70}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ev_IP_In, sourceEvIP.flange) annotation (
+            Line(
+            points={{-3,22},{-3,48},{-6,48},{-6,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ev_IP_Out, sinkEvIP.flange) annotation (
+            Line(
+            points={{-7.88,22},{-8,22},{-8,44},{-10,44},{-10,70}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Sh_IP_In, sourceShIP.flange) annotation (
+            Line(
+            points={{-12.76,22},{-12.76,38},{-20,38},{-20,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Sh_LP_In, sourceShLP.flange) annotation (
+            Line(
+            points={{23.84,22},{23.84,52},{34,52},{34,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ev_LP_Out, sinkEvLP.flange) annotation (
+            Line(
+            points={{28.72,22},{28,22},{28,44},{44,44},{44,70}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ev_LP_In, sourceEvLP.flange) annotation (
+            Line(
+            points={{33.6,22},{34,22},{34,34},{52,34},{52,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ec_LP_Out, sinkEcLP.flange) annotation (
+            Line(
+            points={{38.48,22},{38.48,30},{60,30},{60,70}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ec_LP_In, sourceEcLP.flange) annotation (
+            Line(
+            points={{43.36,22},{43.36,28},{68,28},{68,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ec_HP_In, sourceEcHP.flange) annotation (
+            Line(
+            points={{-29.84,22},{-29.84,52},{-38,52},{-38,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ec_HP_Out, sinkEcHP.flange) annotation (
+            Line(
+            points={{-34.72,22},{-34.72,48},{-44,48},{-44,70}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ev_HP_In, sourceEvHP.flange) annotation (
+            Line(
+            points={{-39.6,22},{-39.6,42},{-52,42},{-52,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Ev_HP_Out, sinkEvHP.flange) annotation (
+            Line(
+            points={{-44.48,22},{-44.48,38},{-60,38},{-60,70}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HeatExchangersGroup.Sh_HP_In, sourceShHP.flange) annotation (
+            Line(
+            points={{-49.36,22},{-49.36,32},{-68,32},{-68,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics),
                              Icon(graphics));
       end TestHEG_3LRh;
@@ -12681,23 +9987,25 @@ package PowerPlants "Models of thermoelectrical power plants components"
           PVmax=1,
           CSmax=2500,
           Ti=200,
-          Kp=4) annotation (Placement(transformation(
+          Kp=4,
+          steadyStateInit=true) 
+                annotation (Placement(transformation(
               origin={22,36},
               extent={{-10,10},{10,-10}},
               rotation=180)));
       public
         ThermoPower.PowerPlants.HRSG.Components.PrescribedSpeedPump pump(
-          rho_nom=1000,
           redeclare package WaterMedium = FluidMedium,
           q_nom={0.0898,0,0.1},
           head_nom={72.74,130,0},
-          nominalSteamPressure=7.19048e5,
-          nominalCondensationPressure=5398.2,
-          nominalSteamFlow=89.8,
-          hstart=1.43495e5,
+          nominalFlow=89.8,
           n0=1500,
           feedWaterPump(redeclare function efficiencyCharacteristic = 
-                Functions.PumpCharacteristics.constantEfficiency (eta_nom=0.6))) 
+                Functions.PumpCharacteristics.constantEfficiency (eta_nom=0.6)),
+          SSInit=true,
+          rho0=1000,
+          nominalOutletPressure=719048,
+          nominalInletPressure=5398.2) 
                                 annotation (Placement(transformation(
               origin={-10,-10},
               extent={{10,10},{-10,-10}},
@@ -12707,19 +10015,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={26,-6},
               extent={{10,10},{-10,-10}},
               rotation=180)));
-        Modelica.Blocks.Continuous.FirstOrder firstOrder(y_start=1512, T=1) 
+        Modelica.Blocks.Continuous.FirstOrder firstOrder(y_start=1512, T=1,
+          initType=Modelica.Blocks.Types.Init.SteadyState) 
           annotation (Placement(transformation(extent={{-4,26},{-24,46}},
                 rotation=0)));
-        inner ThermoPower.System system 
+        inner ThermoPower.System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
         connect(n_pump.y, pIDController.SP) annotation (Line(points={{51.4,40},
                 {32,40}}, color={0,0,127}));
         connect(feed_w.inlet, pump.outlet)          annotation (Line(points={{20,-10},
-                {0,-10},{0,-10}},                   thickness=0.5,
+                {10,-10},{10,-10},{0,-10}},         thickness=0.5,
             color={0,0,255}));
         connect(sourceShLP.flange, pump.inlet)          annotation (Line(points={{-60,-10},
-                {-48,-10},{-20,-10},{-20,-10}},
+                {-50,-10},{-20,-10},{-20,-10}},
               thickness=0.5,
             color={0,0,255}));
         connect(feed_w.outlet, sinkToEcLP_p.flange) annotation (Line(points={{
@@ -12727,10 +10036,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(pIDController.PV, feed_w.w) annotation (Line(points={{32,32},{
                 40,32},{40,-8.88178e-016},{34,-8.88178e-016}}, color={0,0,127}));
-        connect(pIDController.CS, firstOrder.u) annotation (Line(points={{11.4,36},
-                {-2,36}},     color={0,0,127}));
+        connect(pIDController.CS, firstOrder.u) annotation (Line(points={{12,36},{-2,36}},
+                              color={0,0,127}));
         connect(firstOrder.y, pump.pumpSpeed_rpm)          annotation (Line(
-              points={{-25,36},{-40,36},{-40,-4},{-20.8,-4}}, color={0,0,127}));
+              points={{-25,36},{-40,36},{-40,-4},{-17.2,-4}}, color={0,0,127}));
         annotation (Diagram(graphics));
       end TestPumpControl;
 
@@ -12741,48 +10050,19 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Gas.SourceW sourceGas(
           redeclare package Medium = FlueGasMedium,
           w0=585.5,
-          T=884.65)          annotation (Placement(transformation(extent={{-100,
-                  18},{-84,34}}, rotation=0)));
+          T=884.65)          annotation (Placement(transformation(extent={{-88,18},
+                  {-72,34}},     rotation=0)));
         Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=379.448) 
                          annotation (Placement(transformation(extent={{74,18},{
                   90,34}}, rotation=0)));
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
-                                               redeclare package Medium = 
-              FlueGasMedium) annotation (Placement(transformation(extent={{-76,
-                  16},{-56,36}}, rotation=0)));
         ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
                                                 redeclare package Medium = 
               FlueGasMedium) annotation (Placement(transformation(extent={{42,
                   16},{62,36}}, rotation=0)));
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShHP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-40,-24},
-              extent={{8,-8},{-8,8}},
-              rotation=90)));
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateShLP_out(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={8,-24},
-              extent={{8,-8},{-8,8}},
-              rotation=90)));
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateRhIP_out(
-                                                   redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-16,-24},
-              extent={{8,-8},{-8,8}},
-              rotation=90)));
-        ThermoPower.PowerPlants.HRSG.Components.StateReader_water stateRhIP_in(
-                                                  redeclare package Medium = 
-              FluidMedium) annotation (Placement(transformation(
-              origin={-28,-24},
-              extent={{8,-8},{-8,8}},
-              rotation=270)));
         Examples.HRSG_3LRh hRSG(redeclare package FlueGasMedium = 
               FlueGasMedium,                                                     redeclare
             package FluidMedium = FluidMedium,
-          drums(SSInit=true),
-          HeatExchangersGroup(SSInit=true)) 
+          SSInit=true) 
           annotation (Placement(transformation(extent={{-48,-6},{32,74}},
                 rotation=0)));
         Water.SinkP OutLP(redeclare package Medium = FluidMedium,
@@ -12790,44 +10070,37 @@ package PowerPlants "Models of thermoelectrical power plants components"
           h=2.3854e6)      annotation (Placement(transformation(extent={{64,-80},
                   {76,-68}}, rotation=0)));
         Water.SteamTurbineStodola turbineHP(
-          pstart_in=1.28e7,
-          pstart_out=2.98e6,
           wstart=67.6,
-          hstartin=3.47e6,
-          hstartout=3.1076e6,
           wnom=67.6,
           eta_iso_nom=0.833,
-          Kt=0.0032078) 
-                      annotation (Placement(transformation(extent={{-50,-92},{
-                  -30,-72}}, rotation=0)));
+          Kt=0.0032078,
+          PRstart=4,
+          pnom=12000000) 
+                      annotation (Placement(transformation(extent={{-46,-92},{
+                  -26,-72}}, rotation=0)));
         Water.SteamTurbineStodola turbineIP(
-          pstart_in=2.68e6,
-          pstart_out=6e5,
           wstart=81.10,
-          hstartin=3.554e6,
-          hstartout=3.1281e6,
           wnom=81.10,
           eta_iso_nom=0.903,
-          Kt=0.018883)     annotation (Placement(transformation(extent={{-10,
-                  -92},{10,-72}}, rotation=0)));
+          Kt=0.018883,
+          PRstart=5,
+          pnom=3000000)    annotation (Placement(transformation(extent={{-18,-92},
+                  {2,-72}},       rotation=0)));
         Water.SteamTurbineStodola turbineLP(
-          pstart_in=6e5,
-          pstart_out=5.3982e3,
           wstart=89.82,
-          hstartin=3.109e6,
-          hstartout=2.3854e6,
           wnom=89.82,
           eta_iso_nom=0.903,
-          Kt=0.078004)     annotation (Placement(transformation(extent={{34,-92},
+          Kt=0.078004,
+          PRstart=5,
+          pnom=500000)     annotation (Placement(transformation(extent={{34,-92},
                   {54,-72}}, rotation=0)));
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           V=10,
-          pstart=7.19e5,
-          hstart=2.89295e6,
-          initOpt=ThermoPower.Choices.Init.Options.steadyState) 
-                          annotation (Placement(transformation(extent={{18,-76},
-                  {28,-66}}, rotation=0)));
+          initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          pstart=719000)  annotation (Placement(transformation(extent={{10,-76},
+                  {20,-66}}, rotation=0)));
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
                                                                   w_fixed=
               314.16/2, useSupport=false) 
@@ -12850,14 +10123,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 rotation=0)));
         Components.PrescribedSpeedPump totalFeedPump(
           redeclare package WaterMedium = FluidMedium,
-          rho_nom=1000,
+          rho0=1000,
           q_nom={0.0898,0,0.1},
           head_nom={72.74,130,0},
-          nominalCondensationPressure=5398.2,
-          nominalSteamFlow=89.8,
+          nominalFlow=89.8,
           n0=1500,
-          hstart=1.43495e5,
-          nominalSteamPressure=6e5) 
+          nominalOutletPressure=600000,
+          nominalInletPressure=5398.2) 
                                   annotation (Placement(transformation(
               origin={44,-40},
               extent={{-6,6},{6,-6}},
@@ -12866,60 +10138,31 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Buses.Actuators actuators annotation (Placement(transformation(extent={
                   {60,-20},{68,-12}}, rotation=0)));
       public
-        inner System system 
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
-        connect(stateGas_in.inlet, sourceGas.flange) annotation (Line(
-            points={{-72,26},{-84,26}},
-            color={159,159,223},
-            thickness=0.5));
         connect(sinkGas.flange, stateGas_out.outlet) annotation (Line(
             points={{74,26},{58,26}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(stateGas_in.outlet, hRSG.GasIn) annotation (Line(
-            points={{-60,26},{-48,26}},
             color={159,159,223},
             thickness=0.5));
         connect(stateGas_out.inlet, hRSG.GasOut) annotation (Line(
             points={{46,26},{32,26}},
             color={159,159,223},
             thickness=0.5));
-        connect(stateShLP_out.inlet, hRSG.Sh_LP_Out) 
-          annotation (Line(points={{8,-19.2},{8,-6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateRhIP_out.inlet, hRSG.Rh_IP_Out) 
-          annotation (Line(points={{-16,-19.2},{-16,-6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateRhIP_in.outlet, hRSG.Rh_IP_In) 
-          annotation (Line(points={{-28,-19.2},{-28,-6}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateShHP_out.inlet, hRSG.Sh_HP_Out) 
-          annotation (Line(points={{-40,-19.2},{-40,-6}}, thickness=0.5,
-            color={0,0,255}));
         connect(OutLP.flange, turbineLP.outlet) annotation (Line(points={{64,
                 -74},{52,-74}}, thickness=0.5,
             color={0,0,255}));
-        connect(turbineHP.shaft_b, turbineIP.shaft_a) annotation (Line(points={{-33.6,
-                -82},{-6.6,-82}},        color={0,0,0}));
-        connect(turbineIP.shaft_b, turbineLP.shaft_a) annotation (Line(points={
-                {6.4,-82},{37.4,-82}}, color={0,0,0}));
+        connect(turbineHP.shaft_b, turbineIP.shaft_a) annotation (Line(points={{-29.6,
+                -82},{-14.6,-82}},       color={0,0,0}));
+        connect(turbineIP.shaft_b, turbineLP.shaft_a) annotation (Line(points={{-1.6,
+                -82},{37.4,-82}},      color={0,0,0}));
         connect(mixLP.in2, turbineIP.outlet) 
-          annotation (Line(points={{19,-74},{8,-74}},    thickness=0.5,
+          annotation (Line(points={{11,-74},{0,-74}},    thickness=0.5,
             color={0,0,255}));
         connect(constantSpeed.flange, turbineLP.shaft_b) annotation (Line(
               points={{88,-83},{88,-82},{50.4,-82}}, color={0,0,0}));
         connect(turbineLP.inlet, mixLP.out) annotation (Line(points={{36,-74},{
-                36,-71},{28,-71}}, thickness=0.5,
-            color={0,0,255}));
-        connect(mixLP.in1, stateShLP_out.outlet) 
-          annotation (Line(points={{19,-68},{8,-68},{8,-28.8}}, thickness=0.5,
-            color={0,0,255}));
-        connect(turbineHP.inlet, stateShHP_out.outlet) annotation (Line(points=
-                {{-48,-74},{-48,-52.05},{-40,-52.05},{-40,-28.8}}, thickness=0.5,
-            color={0,0,255}));
-        connect(turbineIP.inlet, stateRhIP_out.outlet) annotation (Line(points=
-                {{-8,-74},{-16,-74},{-16,-28.8}}, thickness=0.5,
+                36,-71},{20,-71}}, thickness=0.5,
             color={0,0,255}));
         connect(levelsControlSimplified.SensorsBus, hRSG.SensorsBus) 
           annotation (Line(points={{60,70},{46,70},{46,66},{32,66}}, color={255,
@@ -12934,14 +10177,36 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(actuators, levelsControlSimplified.ActuatorsBus) annotation (Line(
               points={{64,-16},{92,-16},{92,70},{80,70}}, color={213,255,170}));
         connect(totalFeedPump.pumpSpeed_rpm, actuators.nPump_feedLP) 
-          annotation (Line(points={{50.48,-36.4},{64,-36.4},{64,-16}}, color={0,
+          annotation (Line(points={{48.32,-36.4},{64,-36.4},{64,-16}}, color={0,
                 0,127}));
         connect(totalFeedPump.outlet, hRSG.WaterIn) annotation (Line(points={{
                 38,-40},{24,-40},{24,-6}}, thickness=0.5,
             color={0,0,255}));
-        connect(turbineHP.outlet, stateRhIP_in.inlet) annotation (Line(points={
-                {-32,-74},{-28,-74},{-28,-28.8}}, thickness=0.5,
-            color={0,0,255}));
+        connect(sourceGas.flange, hRSG.GasIn) annotation (Line(
+            points={{-72,26},{-48,26}},
+            color={159,159,223},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(mixLP.in1, hRSG.Sh_LP_Out) annotation (Line(
+            points={{11,-68},{8,-68},{8,-6}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(turbineIP.inlet, hRSG.Rh_IP_Out) annotation (Line(
+            points={{-16,-74},{-16,-6}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(turbineHP.outlet, hRSG.Rh_IP_In) annotation (Line(
+            points={{-28,-74},{-28,-6}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(turbineHP.inlet, hRSG.Sh_HP_Out) annotation (Line(
+            points={{-44,-74},{-44,-36},{-40,-36},{-40,-6}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
       end TestHRSG_wac;
 
@@ -12996,14 +10261,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_out
-          "Outlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
         //LPT
         parameter SI.Pressure LPT_pstart_in = steamLPNomPressure
           "Inlet pressure start value" 
@@ -13015,14 +10272,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
                               group = "LP Turbine"));
         parameter SI.MassFlowRate LPT_wstart = steamLPNomFlowRate + steamHPNomFlowRate
           "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_out
-          "Outlet specific enthalpy start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "LP Turbine"));
 
@@ -13097,192 +10346,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
               initialScale=0.1), graphics));
       end ST_2L;
 
-      partial model ST_2LRh
-        "Base class for Steam Turbine with two pressure levels and reheat"
-
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater constrainedby
-          Modelica.Media.Interfaces.PartialPureSubstance;
-
-        //Turbines parameter
-        parameter SI.MassFlowRate steamHPNomFlowRate
-          "Nominal HP steam flow rate";
-        parameter SI.MassFlowRate steamIPNomFlowRate
-          "Nominal IP steam flow rate";
-        parameter SI.MassFlowRate steamLPNomFlowRate
-          "Nominal LP steam flowr rate";
-        parameter SI.Pressure steamHPNomPressure "Nominal HP steam pressure";
-        parameter SI.Pressure steamIPNomPressure
-          "Nominal IP steam pressure (pressure in the reheat)";
-        parameter SI.Pressure steamLPNomPressure "Nominal LP steam pressure";
-        parameter SI.Area HPT_Kt "Flow coefficient"           annotation (Dialog(group = "HP Turbine"));
-        parameter Real HPT_eta_mech=0.98 "Mechanical efficiency"            annotation (Dialog(group = "HP Turbine"));
-        parameter Real HPT_eta_iso_nom=0.92 "Nominal isentropic efficiency" 
-                                                     annotation (Dialog(group = "HP Turbine"));
-        parameter SI.Area IPT_Kt "Flow coefficient"           annotation (Dialog(group = "IP Turbine"));
-        parameter Real IPT_eta_mech=0.98 "Mechanical efficiency"            annotation (Dialog(group = "IP Turbine"));
-        parameter Real IPT_eta_iso_nom=0.92 "Nominal isentropic efficiency" 
-                                                     annotation (Dialog(group = "IP Turbine"));
-        parameter SI.Area LPT_Kt "Flow coefficient"           annotation (Dialog(group = "LP Turbine"));
-        parameter Real LPT_eta_mech=0.98 "Mechanical efficiency"            annotation (Dialog(group = "LP Turbine"));
-        parameter Real LPT_eta_iso_nom=0.92 "Nominal isentropic efficiency" 
-                                                     annotation (Dialog(group = "LP Turbine"));
-
-        //Start value
-        parameter Boolean SSInit=false "Steady-state initialization" 
-                                       annotation (Dialog(tab = "Initialization"));
-        //HPT
-        parameter SI.Pressure HPT_pstart_in = steamHPNomPressure
-          "Inlet pressure start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.Pressure HPT_pstart_out = steamIPNomPressure
-          "Outlet pressure start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.MassFlowRate HPT_wstart = steamHPNomFlowRate
-          "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_out
-          "Outlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        //IPT
-        parameter SI.Pressure IPT_pstart_in = steamIPNomPressure
-          "Inlet pressure start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
-        parameter SI.Pressure IPT_pstart_out = steamLPNomPressure
-          "Outlet pressure start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
-        parameter SI.MassFlowRate IPT_wstart = steamHPNomFlowRate
-          "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
-        parameter SI.SpecificEnthalpy IPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
-        parameter SI.SpecificEnthalpy IPT_hstart_out
-          "Outlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
-        //LPT
-        parameter SI.Pressure LPT_pstart_in = steamLPNomPressure
-          "Inlet pressure start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.Pressure LPT_pstart_out = pcond
-          "Outlet pressure start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.MassFlowRate LPT_wstart = steamLPNomFlowRate + steamHPNomFlowRate
-          "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_out
-          "Outlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-
-        //other parameter
-        parameter SI.Pressure pcond "Condenser pressure";
-
-        Water.FlangeA HPT_In(            redeclare package Medium = FluidMedium)
-                                         annotation (Placement(transformation(
-                extent={{-180,180},{-140,220}}, rotation=0)));
-        Water.FlangeB HPT_Out(            redeclare package Medium = 
-              FluidMedium)                annotation (Placement(transformation(
-                extent={{-120,180},{-80,220}}, rotation=0)));
-        Water.FlangeA IPT_In(            redeclare package Medium = FluidMedium)
-                                         annotation (Placement(transformation(
-                extent={{-60,180},{-20,220}}, rotation=0)));
-        Water.FlangeA LPT_In(            redeclare package Medium = FluidMedium)
-                                         annotation (Placement(transformation(
-                extent={{60,180},{100,220}}, rotation=0)));
-        Water.FlangeB LPT_Out(            redeclare package Medium = 
-              FluidMedium)                annotation (Placement(transformation(
-                extent={{60,-220},{100,-180}}, rotation=0)));
-        Modelica.Mechanics.Rotational.Interfaces.Flange_b Shaft_b 
-          annotation (Placement(transformation(extent={{180,-20},{220,20}},
-                rotation=0)));
-        Modelica.Mechanics.Rotational.Interfaces.Flange_a Shaft_a 
-          annotation (Placement(transformation(extent={{-220,-20},{-180,20}},
-                rotation=0)));
-        Buses.Sensors SensorsBus annotation (Placement(transformation(extent={{
-                  180,-100},{220,-60}}, rotation=0)));
-        Buses.Actuators ActuatorsBus annotation (Placement(transformation(
-                extent={{220,-160},{180,-120}}, rotation=0)));
-        annotation (Icon(coordinateSystem(
-              preserveAspectRatio=true,
-              extent={{-200,-200},{200,200}},
-              initialScale=0.1), graphics={
-              Rectangle(
-                extent={{-200,200},{200,-200}},
-                lineColor={170,170,255},
-                fillColor={230,230,230},
-                fillPattern=FillPattern.Solid),
-              Line(points={{-160,198},{-160,30}}, color={0,0,255}),
-              Line(points={{-100,200},{-100,88}}, color={0,0,255}),
-              Line(points={{-40,200},{-40,30}}, color={0,0,255}),
-              Rectangle(
-                extent={{-200,14},{200,-14}},
-                lineColor={0,0,0},
-                lineThickness=0.5,
-                fillPattern=FillPattern.HorizontalCylinder,
-                fillColor={135,135,135}),
-              Line(points={{20,58},{20,140},{80,140},{80,198}}, color={0,0,255}),
-              Line(points={{80,-90},{80,-198}}, color={0,0,255}),
-              Polygon(points={{-166,148},{-154,148},{-160,132},{-166,148}},
-                  lineColor={0,0,255},
-                fillPattern=FillPattern.Solid,
-                fillColor={0,0,255}),
-              Polygon(points={{-106,134},{-94,134},{-100,150},{-106,134}},
-                  lineColor={0,0,255},
-                fillPattern=FillPattern.Solid,
-                fillColor={0,0,255}),
-              Polygon(points={{-46,148},{-34,148},{-40,132},{-46,148}},
-                  lineColor={0,0,255},
-                fillPattern=FillPattern.Solid,
-                fillColor={0,0,255}),
-              Polygon(points={{14,116},{26,116},{20,100},{14,116}}, lineColor={
-                    0,0,255},
-                fillPattern=FillPattern.Solid,
-                fillColor={0,0,255}),
-              Polygon(points={{74,-132},{86,-132},{80,-148},{74,-132}},
-                  lineColor={0,0,255},
-                fillPattern=FillPattern.Solid,
-                fillColor={0,0,255}),
-              Polygon(
-                points={{-160,30},{-160,-30},{-100,-90},{-100,90},{-160,30}},
-                lineColor={0,0,0},
-                lineThickness=0.5,
-                fillColor={0,0,255},
-                fillPattern=FillPattern.Solid),
-              Polygon(
-                points={{-40,30},{-40,-30},{80,-90},{80,90},{-40,30}},
-                lineColor={0,0,0},
-                lineThickness=0.5,
-                fillColor={0,0,255},
-                fillPattern=FillPattern.Solid)}),
-                                Diagram(coordinateSystem(
-              preserveAspectRatio=false,
-              extent={{-200,-200},{200,200}},
-              initialScale=0.1), graphics));
-
-      end ST_2LRh;
-
-      partial model ST_3LRh
-        "Base class for Steam Turbine with three pressure levels and reheat"
+      partial model ST_3L
+        "Base class for Steam Turbine with three pressure levels"
 
         replaceable package FluidMedium = ThermoPower.Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance;
@@ -13326,14 +10391,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_out
-          "Outlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
+
         //IPT
         parameter SI.Pressure IPT_pstart_in = steamIPNomPressure
           "Inlet pressure start value" 
@@ -13347,14 +10405,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "IP Turbine"));
-        parameter SI.SpecificEnthalpy IPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
-        parameter SI.SpecificEnthalpy IPT_hstart_out
-          "Outlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
+
         //LPT
         parameter SI.Pressure LPT_pstart_in = steamLPNomPressure
           "Inlet pressure start value" 
@@ -13366,14 +10417,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
                               group = "LP Turbine"));
         parameter SI.MassFlowRate LPT_wstart = steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate
           "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_out
-          "Outlet specific enthalpy start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "LP Turbine"));
 
@@ -13483,7 +10526,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
               preserveAspectRatio=false,
               extent={{-200,-200},{200,200}},
               initialScale=0.1), graphics));
-      end ST_3LRh;
+      end ST_3L;
 
       partial model ST_2LHU
         "Base class for Steam Turbine with two pressure levels and with coupling Heat Usage"
@@ -13522,14 +10565,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_out
-          "Outletspecific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
+
         //LPT
         parameter SI.Pressure LPT_pstart_in = steamLPNomPressure
           "Inlet pressure start value" 
@@ -13541,14 +10577,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
                               group = "LP Turbine"));
         parameter SI.MassFlowRate LPT_wstart = steamHPNomFlowRate
           "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_out
-          "Outletspecific enthalpy start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "LP Turbine"));
 
@@ -13697,14 +10725,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_out
-          "Outletspecific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
+
         //LPT
         parameter SI.Pressure LPT_pstart_in = steamLPNomPressure
           "Inlet pressure start value" 
@@ -13716,14 +10737,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
                               group = "LP Turbine"));
         parameter SI.MassFlowRate LPT_wstart = steamLPNomFlowRate
           "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_out
-          "Outletspecific enthalpy start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "LP Turbine"));
 
@@ -13742,7 +10755,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.FlangeB HPT_Out(            redeclare package Medium = 
               FluidMedium)                annotation (Placement(transformation(
                 extent={{-120,180},{-80,220}}, rotation=0)));
-        Water.FlangeA IPT_In(            redeclare package Medium = FluidMedium)
+        Water.FlangeA LPT_In_Rh(redeclare package Medium = FluidMedium) 
                                          annotation (Placement(transformation(
                 extent={{-60,180},{-20,220}}, rotation=0)));
         Water.FlangeA LPT_In(            redeclare package Medium = FluidMedium)
@@ -13831,7 +10844,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 fillColor={0,0,255},
                 fillPattern=FillPattern.Solid)}),
                                 Diagram(coordinateSystem(
-              preserveAspectRatio=false,
+              preserveAspectRatio=true,
               extent={{-200,-200},{200,200}},
               initialScale=0.1), graphics));
       end ST_2LRhHU;
@@ -13879,14 +10892,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_out
-          "Outletspecific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
+
         //IPT
         parameter SI.Pressure IPT_pstart_in = steamIPNomPressure
           "Inlet pressure start value" 
@@ -13900,14 +10906,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "IP Turbine"));
-        parameter SI.SpecificEnthalpy IPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
-        parameter SI.SpecificEnthalpy IPT_hstart_out
-          "Outletspecific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
+
         //LPT
         parameter SI.Pressure LPT_pstart_in = steamLPNomPressure
           "Inlet pressure start value" 
@@ -13919,14 +10918,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
                               group = "LP Turbine"));
         parameter SI.MassFlowRate LPT_wstart = steamLPNomFlowRate
           "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_out
-          "Outletspecific enthalpy start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "LP Turbine"));
 
@@ -14082,14 +11073,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
-        parameter SI.SpecificEnthalpy HPT_hstart_out
-          "Outletspecific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "HP Turbine"));
+
         //IPT
         parameter SI.Pressure IPT_pstart_in = steamIPNomPressure
           "Inlet pressure start value" 
@@ -14103,14 +11087,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Mass flow rate start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "IP Turbine"));
-        parameter SI.SpecificEnthalpy IPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
-        parameter SI.SpecificEnthalpy IPT_hstart_out
-          "Outletspecific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "IP Turbine"));
+
         //LPT
         parameter SI.Pressure LPT_pstart_in = steamLPNomPressure
           "Inlet pressure start value" 
@@ -14122,14 +11099,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
                               group = "LP Turbine"));
         parameter SI.MassFlowRate LPT_wstart = steamLPNomFlowRate
           "Mass flow rate start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_in
-          "Inlet specific enthalpy start value" 
-           annotation (Dialog(tab = "Initialization",
-                              group = "LP Turbine"));
-        parameter SI.SpecificEnthalpy LPT_hstart_out
-          "Outletspecific enthalpy start value" 
            annotation (Dialog(tab = "Initialization",
                               group = "LP Turbine"));
 
@@ -14317,44 +11286,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Density rhoMetal "Density of metal";
 
         //Initialization conditions
-        parameter Boolean use_T = true
-          "Select: -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the cooling fluid side"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
-        //Start value
         parameter SI.Pressure pstart_cond = condNomPressure
           "Condensing fluid pressure start value"                annotation(Dialog(tab = "Initialization"));
         parameter SI.Volume Vlstart_cond = condVol*0.15
           "Start value of the liquid water volume, condensation side"             annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M_in
-          "Inlet metal wall temperature start value"       annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M_out
-          "Outlet metal wall temperature start value"      annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M[N_cool]=linspace(Tstart_M_in,Tstart_M_out,N_cool)
-          "Start value of metal wall temperature vector (initialized by default)"
-                                                                                  annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_cool_in=FluidMedium.temperature_ph(coolNomPressure,hstart_cool_in)
-          "Inlet cooling fluid temperature start value"     annotation(Dialog(enable = use_T,
-                                                                              tab = "Initialization"));
-        parameter SI.Temperature Tstart_cool_out=FluidMedium.temperature_ph(coolNomPressure,hstart_cool_out)
-          "Outlet cooling fluid temperature start value"    annotation(Dialog(enable = use_T,
-                                                                              tab = "Initialization"));
-        parameter SI.Temperature Tstart_cool[N_cool]=linspace(Tstart_cool_in,Tstart_cool_out,N_cool)
-          "Start value of cooling fluid temperature vector (initialized by default)"
-                                                                          annotation(Dialog(tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_cool_in=FluidMedium.specificEnthalpy_pT(coolNomPressure,Tstart_cool_in)
-          "Inlet cooling fluid specific enthalpy start value"           annotation(Dialog(enable = not use_T,
-                                                                                          tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_cool_out=FluidMedium.specificEnthalpy_pT(coolNomPressure,Tstart_cool_out)
-          "Outlet cooling fluid specific enthalpy start value"          annotation(Dialog(enable = not use_T,
-                                                                                          tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_cool[N_cool]=linspace(hstart_cool_in,hstart_cool_out,N_cool)
-          "Start value of cooling fluid enthalpy vector (initialized by default)"
-                                                                          annotation(Dialog(tab = "Initialization"));
-        parameter SI.Pressure pstartin_cool = coolNomPressure
-          "Inlet cooling fluid pressure start value"        annotation(Dialog(tab = "Initialization"));
-        parameter SI.Pressure pstartout_cool = coolNomPressure
-          "Outlet cooling fluid pressure start value"        annotation(Dialog(tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
 
         Water.FlangeB waterOut(            redeclare package Medium = 
               FluidMedium)                annotation (Placement(transformation(
@@ -14399,8 +11335,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Modelica.Media.Interfaces.PartialPureSubstance;
         parameter SI.Pressure p "Pressure of condesation";
         parameter SI.Volume Vtot "Total volume condensing fluid side";
-        parameter SI.Volume Vlstart "Start value of the liquid volume";
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
+        parameter SI.Volume Vlstart "Start value of the liquid volume" 
+                                                                      annotation(Dialog(tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
         Water.FlangeA SteamIn(            redeclare package Medium = 
               FluidMedium)                annotation (Placement(transformation(
                 extent={{-20,80},{20,120}}, rotation=0)));
@@ -14440,8 +11377,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         parameter SI.Pressure p "Pressure of condesation";
         parameter SI.Volume Vtot "Total volume condensing fluid side";
-        parameter SI.Volume Vlstart "Start value of the liquid volume";
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
+        parameter SI.Volume Vlstart "Start value of the liquid volume" 
+                                                                      annotation(Dialog(tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
         Water.FlangeA CondensatedFromHU(            redeclare package Medium = 
               FluidMedium)                  annotation (Placement(
               transformation(extent={{-70,80},{-30,120}}, rotation=0)));
@@ -14505,32 +11443,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.SpecificHeatCapacity cm "Specific heat capacity of metal";
         parameter SI.Density rhoMetal "Density of metal";
 
-        //Initialization conditions
-        parameter Boolean use_T = true
-          "Select: -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the cooling fluid side"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
-        //Start value
+        //Initialization
         parameter SI.Pressure pstart_cond = condNomPressure
           "Condensing fluid pressure start value"                annotation(Dialog(tab = "Initialization"));
         parameter SI.Volume Vlstart_cond = condVol*0.15
           "Start value of the liquid water volume, condensation side"             annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M_in
-          "Inlet metal wall temperature start value"       annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M_out
-          "Outlet metal wall temperature start value"      annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_cool_in=FluidMedium.temperature_ph(coolNomPressure,hstart_cool_in)
-          "Inlet cooling fluid temperature start value"     annotation(Dialog(enable = use_T,
-                                                                              tab = "Initialization"));
-        parameter SI.Temperature Tstart_cool_out=FluidMedium.temperature_ph(coolNomPressure,hstart_cool_out)
-          "Outlet cooling fluid temperature start value"    annotation(Dialog(enable = use_T,
-                                                                              tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_cool_in=FluidMedium.specificEnthalpy_pT(coolNomPressure,Tstart_cool_in)
-          "Inlet cooling fluid specific enthalpy start value"           annotation(Dialog(enable = not use_T,
-                                                                                          tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_cool_out=FluidMedium.specificEnthalpy_pT(coolNomPressure,Tstart_cool_out)
-          "Outlet cooling fluid specific enthalpy start value"          annotation(Dialog(enable = not use_T,
-                                                                                          tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
 
         Water.FlangeA SteamIn(            redeclare package Medium = 
               FluidMedium)                annotation (Placement(transformation(
@@ -14591,32 +11509,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.SpecificHeatCapacity cm "Specific heat capacity of metal";
         parameter SI.Density rhoMetal "Density of metal";
 
-        //Initialization conditions
-        parameter Boolean use_T = true
-          "Select: -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy of the cooling fluid side"
-           annotation(Dialog(tab = "Initialization Conditions"));
-        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
-        //Start value
+        //Initialization
         parameter SI.Pressure pstart_cond = condNomPressure
           "Condensing fluid pressure start value"                annotation(Dialog(tab = "Initialization"));
         parameter SI.Volume Vlstart_cond = condVol*0.15
           "Start value of the liquid water volume, condensation side"             annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M_in
-          "Inlet metal wall temperature start value"       annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_M_out
-          "Outlet metal wall temperature start value"      annotation(Dialog(tab = "Initialization"));
-        parameter SI.Temperature Tstart_cool_in=FluidMedium.temperature_ph(coolNomPressure,hstart_cool_in)
-          "Inlet cooling fluid temperature start value"     annotation(Dialog(enable = use_T,
-                                                                              tab = "Initialization"));
-        parameter SI.Temperature Tstart_cool_out=FluidMedium.temperature_ph(coolNomPressure,hstart_cool_out)
-          "Outlet cooling fluid temperature start value"    annotation(Dialog(enable = use_T,
-                                                                              tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_cool_in=FluidMedium.specificEnthalpy_pT(coolNomPressure,Tstart_cool_in)
-          "Inlet cooling fluid specific enthalpy start value"           annotation(Dialog(enable = not use_T,
-                                                                                          tab = "Initialization"));
-        parameter SI.SpecificEnthalpy hstart_cool_out=FluidMedium.specificEnthalpy_pT(coolNomPressure,Tstart_cool_out)
-          "Outlet cooling fluid specific enthalpy start value"          annotation(Dialog(enable = not use_T,
-                                                                                          tab = "Initialization"));
+        parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
 
         Water.FlangeA CondensatedFromHU(            redeclare package Medium = 
               FluidMedium)                  annotation (Placement(
@@ -14659,6 +11557,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         replaceable package FluidMedium = ThermoPower.Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance;
+         parameter Boolean SSInit=false "Steady-state initialization";
 
         Water.FlangeA From_SH_HP(            redeclare package Medium = 
               FluidMedium)                   annotation (Placement(
@@ -14757,7 +11656,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         replaceable package FluidMedium = ThermoPower.Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance;
-
+        parameter Boolean SSInit=false "Steady-state initialization";
         Water.FlangeA From_SH_HP(            redeclare package Medium = 
               FluidMedium)                   annotation (Placement(
               transformation(extent={{-180,180},{-140,220}}, rotation=0)));
@@ -14872,7 +11771,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         replaceable package FluidMedium = ThermoPower.Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance;
-
+        parameter Boolean SSInit=false "Steady-state initialization";
         Water.FlangeA From_SH_HP(            redeclare package Medium = 
               FluidMedium)                   annotation (Placement(
               transformation(extent={{-180,180},{-140,220}}, rotation=0)));
@@ -15009,7 +11908,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         replaceable package FluidMedium = ThermoPower.Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance;
-
+        parameter Boolean SSInit=false "Steady-state initialization";
         Water.FlangeB WaterOut(            redeclare package Medium = 
               FluidMedium)                 annotation (Placement(transformation(
                 extent={{120,180},{160,220}}, rotation=0)));
@@ -15157,7 +12056,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         replaceable package FluidMedium = ThermoPower.Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance;
-
+        parameter Boolean SSInit=false "Steady-state initialization";
         Water.FlangeB SteamForHU(            redeclare package Medium = 
               FluidMedium)                   annotation (Placement(
               transformation(extent={{-58,-220},{-18,-180}}, rotation=0)));
@@ -15311,7 +12210,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
     package Components "Component definitions"
 
       model Condenser "Condenser"
-        extends Interfaces.Condenser(pstartout_cool=coolNomPressure-dpnom_cool);
+        extends Interfaces.Condenser;
         parameter SI.CoefficientOfHeatTransfer gamma_cond
           "Coefficient of heat transfer on condensation surfaces";
         parameter SI.CoefficientOfHeatTransfer gamma_cool
@@ -15336,29 +12235,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
           omega=coolVol*4/coolExchSurface*pi,
           Dhyd=coolVol*4/coolExchSurface,
           wnom=coolNomFlowRate,
-          pstartin=pstartin_cool,
-          pstartout=pstartout_cool,
-          hstart=hstart_cool,
           N=N_cool,
           FFtype=FFtype_cool,
           dpnom=dpnom_cool,
           rhonom=rhonom_cool,
-          HydraulicCapacitance=HCtype_cool,
-          hstartin=hstart_cool_in,
-          hstartout=hstart_cool_out) 
+          HydraulicCapacitance=HCtype_cool) 
                             annotation (Placement(transformation(
               origin={20,10},
               extent={{-12,-10},{12,10}},
               rotation=90)));
         Thermal.ConvHT convHT(
-          Tstart1=Tstart_M,
           gamma=gamma_cool,
-          N=N_cool,
-          Tstart2=Tstart_cool,
-          Tstart11=Tstart_M_in,
-          Tstart1N=Tstart_M_out,
-          Tstart21=Tstart_cool_in,
-          Tstart2N=Tstart_cool_out) 
+          N=N_cool) 
           annotation (Placement(transformation(
               origin={-22,10},
               extent={{-10,-10},{10,10}},
@@ -15384,16 +12272,19 @@ package PowerPlants "Models of thermoelectrical power plants components"
               rotation=180)));
       equation
         connect(flowCooling.infl, coolingIn) 
-          annotation (Line(points={{20,-2},{20,-40},{100,-40}}, thickness=0.5));
+          annotation (Line(points={{20,-2},{20,-40},{100,-40}}, thickness=0.5,
+            color={0,0,255}));
         connect(flowCooling.outfl, coolingOut) 
-          annotation (Line(points={{20,22},{20,60},{100,60}}, thickness=0.5));
+          annotation (Line(points={{20,22},{20,60},{100,60}}, thickness=0.5,
+            color={0,0,255}));
         connect(convHT.side2,flowCooling. wall) annotation (Line(points={{-18.9,
                 10},{15,10}}, color={255,127,0}));
         connect(condenserShell.steam, steamIn) 
-          annotation (Line(points={{-50,26},{-50,100},{-10,100}}, thickness=0.5));
+          annotation (Line(points={{-50,26},{-50,100},{-10,100}}, thickness=0.5,
+            color={0,0,255}));
         connect(condenserShell.condensate, waterOut) 
-          annotation (Line(points={{-50,-6},{-50,-100},{-10,-100}}, thickness=
-                0.5));
+          annotation (Line(points={{-50,-6},{-50,-100},{-10,-100}}, thickness=0.5,
+            color={0,0,255}));
         connect(condenserShell.coolingFluid,convHT. side1) annotation (Line(
               points={{-50,10},{-46,10},{-40,10},{-25,10}},
                                           color={255,127,0}));
@@ -15757,21 +12648,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
         //Turbines parameters
         parameter SI.MassFlowRate wn "Inlet nominal flowrate";
         parameter SI.Area Kt "Coefficient of Stodola's law";
+        parameter SI.Pressure pnom_in "Nominal inlet pressure";
+        parameter SI.Pressure pnom_tap "Nominal tapping pressure";
+        parameter SI.Pressure pnom_out "Nominal outlet pressure";
 
         //Start Value
-        parameter SI.Pressure pstart_in "Inlet pressure start value" 
-            annotation (Dialog(tab= "Initialization"));
-        parameter SI.Pressure pstart_tap "Tapping pressure start value" 
-            annotation (Dialog(tab= "Initialization"));
-        parameter SI.Pressure pstart_out "Outlet pressure start value" 
-            annotation (Dialog(tab= "Initialization"));
-        parameter SI.MassFlowRate wstart "Mass flow rate start value" 
-            annotation (Dialog(tab= "Initialization"));
-        parameter SI.SpecificEnthalpy hstartin "Inlet enthalpy start value," 
-            annotation (Dialog(tab= "Initialization"));
-        parameter SI.SpecificEnthalpy hstarttap "Tapping enthalpy start value,"
-            annotation (Dialog(tab= "Initialization"));
-        parameter SI.SpecificEnthalpy hstartout "Outlet enthalpy start value" 
+        parameter SI.MassFlowRate wstart=wn "Mass flow rate start value" 
             annotation (Dialog(tab= "Initialization"));
 
         Modelica.Blocks.Interfaces.RealInput partialArc 
@@ -15788,23 +12670,21 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 extent={{-6,-88},{12,-70}}, rotation=0)));
         Water.SteamTurbineStodola ST_firstStages(
           redeclare package Medium = FluidMedium,
-          pstart_in=pstart_in,
-          pstart_out=pstart_tap,
           wstart=wstart,
-          hstartin=hstartin,
-          hstartout=hstarttap,
           wnom=wn,
-          Kt=Kt)    annotation (Placement(transformation(extent={{-44,-18},{-8,
+          Kt=Kt,
+          PRstart=pnom_in/pnom_out,
+          pnom=pnom_in) 
+                    annotation (Placement(transformation(extent={{-44,-18},{-8,
                   18}}, rotation=0)));
         Water.SteamTurbineStodola ST_secondStages(
           redeclare package Medium = FluidMedium,
-          pstart_in=pstart_tap,
-          pstart_out=pstart_out,
           wstart=wstart,
-          hstartin=hstarttap,
-          hstartout=hstartout,
           wnom=wn,
-          Kt=Kt)    annotation (Placement(transformation(extent={{18,-18},{56,
+          Kt=Kt,
+          PRstart=pnom_tap/pnom_out,
+          pnom=pnom_tap) 
+                    annotation (Placement(transformation(extent={{18,-18},{56,
                   18}}, rotation=0)));
         Water.FlangeA flangeA(redeclare package Medium = FluidMedium) 
           annotation (Placement(transformation(extent={{-90,62},{-56,96}},
@@ -15838,7 +12718,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,0},
             thickness=0.5));
         connect(ST_firstStages.outlet, ST_secondStages.inlet) annotation (Line(
-            points={{-11.6,14.4},{4.2,14.4},{4.2,14.4},{21.8,14.4}},
+            points={{-11.6,14.4},{-3.25,14.4},{-3.25,14.4},{5.1,14.4},{5.1,14.4},
+                {21.8,14.4}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
@@ -15922,7 +12803,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         in1.h_outflow + dh= inStream(out1.h_outflow);
         inStream(in1.h_outflow) = out1.h_outflow - dh;
         annotation (Icon(graphics={Text(extent={{-100,-56},{100,-84}},
-                  textString =                        "%name")}), Diagram(graphics));
+                  textString=                         "%name")}), Diagram(graphics));
       end EffectHE;
 
       model Comp_bubble_h
@@ -16026,14 +12907,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
     package Examples "Example implementations"
 
-      model ST2LRh_base "Steam turbine with two pressure levels and reheat"
-        extends Interfaces.ST_2LRh;
+      model ST3L_base "Steam turbine with three pressure levels"
+        extends ThermoPower.PowerPlants.SteamTurbineGroup.Interfaces.ST_3L;
 
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in
-          "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart = steamLPNomPressure
           "Pressure start value of the LP mixer" 
               annotation (Dialog(tab = "Initialization",
@@ -16045,45 +12923,37 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           eta_mech=HPT_eta_mech,
           eta_iso_nom=HPT_eta_iso_nom,
           Kt=HPT_Kt,
-          hstartin=HPT_hstart_in,
-          hstartout=HPT_hstart_out,
-          pstart_in=HPT_pstart_in,
-          pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (Placement(transformation(
-                extent={{-150,-20},{-110,20}}, rotation=0)));
+          wstart=HPT_wstart,
+          PRstart=steamHPNomPressure/steamIPNomPressure,
+          pnom=steamHPNomPressure)      annotation (Placement(transformation(
+                extent={{-152,-20},{-112,20}}, rotation=0)));
         Water.SteamTurbineStodola ST_IP(
           redeclare package Medium = FluidMedium,
           eta_mech=IPT_eta_mech,
           eta_iso_nom=IPT_eta_iso_nom,
           Kt=IPT_Kt,
-          hstartin=IPT_hstart_in,
-          hstartout=IPT_hstart_out,
-          pstart_in=IPT_pstart_in,
-          pstart_out=IPT_pstart_out,
           wstart=IPT_wstart,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
+          wnom=steamIPNomFlowRate + steamHPNomFlowRate,
+          PRstart=steamIPNomPressure/steamLPNomPressure,
+          pnom=steamIPNomPressure)      annotation (Placement(transformation(
                 extent={{-20,-20},{20,20}}, rotation=0)));
         Water.SteamTurbineStodola ST_LP(
           redeclare package Medium = FluidMedium,
           eta_mech=LPT_eta_mech,
           eta_iso_nom=LPT_eta_iso_nom,
           Kt=LPT_Kt,
-          hstartin=LPT_hstart_in,
-          hstartout=LPT_hstart_out,
-          pstart_in=LPT_pstart_in,
-          pstart_out=LPT_pstart_out,
           wstart=LPT_wstart,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
+          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
+          PRstart=steamLPNomPressure/pcond,
+          pnom=steamLPNomPressure)      annotation (Placement(transformation(
                 extent={{100,-20},{140,20}}, rotation=0)));
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
-          hstart=mixLP_hstart,
           V=mixLP_V,
-          pstart=mixLP_pstart) 
+          pstart=mixLP_pstart,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                           annotation (Placement(transformation(
               origin={74,90},
               extent={{-10,-10},{10,10}},
@@ -16133,7 +13003,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               rotation=90)));
       equation
         connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
-            points={{-143.2,0},{-200,0}},
+            points={{-145.2,0},{-200,0}},
             color={0,0,0},
             thickness=0.5));
         connect(Shaft_b,ST_LP. shaft_b) annotation (Line(
@@ -16145,183 +13015,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,0},
             thickness=0.5));
         connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (Line(
-            points={{-13.2,0},{-117.2,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(mixLP.in1, LPT_In) 
-          annotation (Line(points={{80,98},{80,200},{80,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_HP.inlet, stateHPT_in.outlet) annotation (Line(points={{-146,
-                16},{-160,16},{-160,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateHPT_in.inlet, HPT_In) 
-          annotation (Line(points={{-160,76},{-160,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (Line(points={{
-                -114,16},{-100,16},{-100,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateHPT_out.outlet, HPT_Out) 
-          annotation (Line(points={{-100,76},{-100,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_IP.inlet, stateIPT_in.outlet) 
-          annotation (Line(points={{-16,16},{-40,16},{-40,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateIPT_in.inlet, IPT_In) 
-          annotation (Line(points={{-40,76},{-40,200},{-40,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_IP.outlet, stateIPT_out.inlet) 
-          annotation (Line(points={{16,16},{40,16},{40,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateIPT_out.outlet, mixLP.in2) annotation (Line(points={{40,76},
-                {40,120},{68,120},{68,98}},   thickness=0.5,
-            color={0,0,255}));
-        connect(stateLPT_in.inlet, mixLP.out) 
-          annotation (Line(points={{74,56},{74,80},{74,80}}, thickness=0.5));
-        connect(stateLPT_in.outlet, ST_LP.inlet) 
-          annotation (Line(points={{74,44},{74,16},{104,16}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_LP.outlet, stateLPT_out.inlet) 
-          annotation (Line(points={{136,16},{160,16},{160,-24}}, thickness=0.5,
-            color={0,0,255}));
-        connect(LPT_Out, stateLPT_out.outlet) annotation (Line(points={{80,-200},
-                {80,-50},{160,-50},{160,-36}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics));
-      end ST2LRh_base;
-
-      model ST3LRh_base "Steam turbine with three pressure levels and reheat"
-        extends Interfaces.ST_3LRh;
-
-        //Mixers Parameters
-        parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in
-          "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "LP mixer"));
-        parameter SI.Pressure mixLP_pstart = steamLPNomPressure
-          "Pressure start value of the LP mixer" 
-              annotation (Dialog(tab = "Initialization",
-                                 group = "LP mixer"));
-
-        Water.SteamTurbineStodola ST_HP(
-          redeclare package Medium = FluidMedium,
-          wnom=steamHPNomFlowRate,
-          eta_mech=HPT_eta_mech,
-          eta_iso_nom=HPT_eta_iso_nom,
-          Kt=HPT_Kt,
-          hstartin=HPT_hstart_in,
-          hstartout=HPT_hstart_out,
-          pstart_in=HPT_pstart_in,
-          pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (Placement(transformation(
-                extent={{-154,-20},{-114,20}}, rotation=0)));
-        Water.SteamTurbineStodola ST_IP(
-          redeclare package Medium = FluidMedium,
-          eta_mech=IPT_eta_mech,
-          eta_iso_nom=IPT_eta_iso_nom,
-          Kt=IPT_Kt,
-          hstartin=IPT_hstart_in,
-          hstartout=IPT_hstart_out,
-          pstart_in=IPT_pstart_in,
-          pstart_out=IPT_pstart_out,
-          wstart=IPT_wstart,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
-                extent={{-20,-20},{20,20}}, rotation=0)));
-        Water.SteamTurbineStodola ST_LP(
-          redeclare package Medium = FluidMedium,
-          eta_mech=LPT_eta_mech,
-          eta_iso_nom=LPT_eta_iso_nom,
-          Kt=LPT_Kt,
-          hstartin=LPT_hstart_in,
-          hstartout=LPT_hstart_out,
-          pstart_in=LPT_pstart_in,
-          pstart_out=LPT_pstart_out,
-          wstart=LPT_wstart,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
-                extent={{100,-20},{140,20}}, rotation=0)));
-        Water.Mixer mixLP(
-          redeclare package Medium = FluidMedium,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          hstart=mixLP_hstart,
-          V=mixLP_V,
-          pstart=mixLP_pstart) 
-                          annotation (Placement(transformation(
-              origin={74,90},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-      protected
-        replaceable Components.BaseReader_water stateHPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-160,70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateHPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-100,70},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateIPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-40,70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateIPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={40,70},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateLPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={74,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateLPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={160,-30},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-      equation
-        connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
-            points={{-147.2,0},{-200,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(Shaft_b,ST_LP. shaft_b) annotation (Line(
-            points={{200,0},{132.8,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_LP.shaft_a,ST_IP. shaft_b) annotation (Line(
-            points={{106.8,0},{12.8,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (Line(
-            points={{-13.2,0},{-121.2,0}},
+            points={{-13.2,0},{-119.2,0}},
             color={0,0,0},
             thickness=0.5));
         connect(mixLP.in1, LPT_In) 
           annotation (Line(points={{80,98},{80,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(ST_HP.inlet, stateHPT_in.outlet) annotation (Line(points={{-150,
-                16},{-160,16},{-160,64}}, thickness=0.5,
+        connect(ST_HP.inlet, stateHPT_in.outlet) annotation (Line(points={{-148,16},{-160,
+                16},{-160,64}},           thickness=0.5,
             color={0,0,255}));
         connect(stateHPT_in.inlet, HPT_In) 
           annotation (Line(points={{-160,76},{-160,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (Line(points={{
-                -118,16},{-100,16},{-100,64}}, thickness=0.5,
+        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (Line(points={{-116,16},{
+                -100,16},{-100,64}},           thickness=0.5,
             color={0,0,255}));
         connect(ST_IP.inlet, stateIPT_in.outlet) 
           annotation (Line(points={{-16,16},{-40,16},{-40,64}}, thickness=0.5,
@@ -16351,21 +13058,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Line(points={{-100,76},{-100,200}}, thickness=0.5,
             color={0,0,255}));
         annotation (Diagram(graphics));
-      end ST3LRh_base;
+      end ST3L_base;
 
-      model ST2LRh_valve
-        "Steam turbine with two pressure levels and reheat, inlet valves"
-        extends Interfaces.ST_2LRh;
+      model ST3L_valve "Steam turbine with three pressure levels, inlet valves"
+        extends ThermoPower.PowerPlants.SteamTurbineGroup.Interfaces.ST_3L;
 
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in
-          "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "LP mixer"));
-        parameter SI.Pressure mixLP_pstart = steamLPNomPressure
-          "Pressure start value of the LP mixer" 
-              annotation (Dialog(tab = "Initialization",
-                                 group = "LP mixer"));
 
         //Valves Parameters
         parameter Real valveHP_Cv=0 "Cv (US) flow coefficient of the HP valve" annotation(Dialog(group= "HP valve"));
@@ -16384,47 +13083,39 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           eta_mech=HPT_eta_mech,
           eta_iso_nom=HPT_eta_iso_nom,
           Kt=HPT_Kt,
-          hstartin=HPT_hstart_in,
-          hstartout=HPT_hstart_out,
-          pstart_in=HPT_pstart_in,
-          pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (Placement(transformation(
+          pnom=steamHPNomPressure,
+          PRstart=steamHPNomPressure/steamIPNomPressure) 
+                                        annotation (Placement(transformation(
                 extent={{-120,-20},{-80,20}}, rotation=0)));
         Water.SteamTurbineStodola ST_IP(
           redeclare package Medium = FluidMedium,
           eta_mech=IPT_eta_mech,
           eta_iso_nom=IPT_eta_iso_nom,
           Kt=IPT_Kt,
-          hstartin=IPT_hstart_in,
-          hstartout=IPT_hstart_out,
-          pstart_in=IPT_pstart_in,
-          pstart_out=IPT_pstart_out,
-          wstart=IPT_wstart,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate) 
+          wnom=steamIPNomFlowRate + steamHPNomFlowRate,
+          pnom=steamIPNomPressure,
+          PRstart=steamIPNomPressure/steamLPNomPressure) 
                                         annotation (Placement(transformation(
-                extent={{0,-20},{40,20}}, rotation=0)));
+                extent={{2,-20},{42,20}}, rotation=0)));
         Water.SteamTurbineStodola ST_LP(
           redeclare package Medium = FluidMedium,
           eta_mech=LPT_eta_mech,
           eta_iso_nom=LPT_eta_iso_nom,
           Kt=LPT_Kt,
-          hstartin=LPT_hstart_in,
-          hstartout=LPT_hstart_out,
-          pstart_in=LPT_pstart_in,
-          pstart_out=LPT_pstart_out,
-          wstart=LPT_wstart,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
+          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
+          pnom=steamLPNomPressure,
+          PRstart=steamLPNomPressure/pcond) 
                                         annotation (Placement(transformation(
-                extent={{120,-20},{160,20}}, rotation=0)));
+                extent={{122,-20},{162,20}}, rotation=0)));
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
-          hstart=mixLP_hstart,
           V=mixLP_V,
-          pstart=mixLP_pstart) 
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          pstart=steamLPNomPressure) 
                           annotation (Placement(transformation(
-              origin={74,90},
+              origin={76,90},
               extent={{-10,-10},{10,10}},
               rotation=270)));
         Water.ValveVap valveHP(
@@ -16433,10 +13124,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pnom=steamHPNomPressure,
           wnom=steamHPNomFlowRate,
           dpnom=valveHP_dpnom,
-          redeclare package Medium = FluidMedium,
-          hstart=HPT_hstart_in) 
+          redeclare package Medium = FluidMedium) 
                                annotation (Placement(transformation(
-              origin={-140,16},
+              origin={-138,16},
               extent={{10,10},{-10,-10}},
               rotation=180)));
         Water.ValveVap valveIP(
@@ -16445,10 +13135,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pnom=steamIPNomPressure,
           dpnom=valveIP_dpnom,
           redeclare package Medium = FluidMedium,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate,
-          hstart=IPT_hstart_in) 
+          wnom=steamIPNomFlowRate + steamHPNomFlowRate) 
                                annotation (Placement(transformation(
-              origin={-20,16},
+              origin={-18,16},
               extent={{10,10},{-10,-10}},
               rotation=180)));
         Water.ValveVap valveLP(
@@ -16457,711 +13146,79 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           dpnom=valveLP_dpnom,
           redeclare package Medium = FluidMedium,
           wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
-          Cv=valveLP_Cv,
-          hstart=LPT_hstart_in) 
-                               annotation (Placement(transformation(
-              origin={100,16},
+          Cv=valveLP_Cv)       annotation (Placement(transformation(
+              origin={102,16},
               extent={{10,10},{-10,-10}},
               rotation=180)));
-      protected
-        replaceable Components.BaseReader_water stateHPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-160,70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateHPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-100,70},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateIPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-40,70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateIPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={40,70},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateLPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={74,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateLPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={180,-30},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
       equation
-        connect(Shaft_b, Shaft_b) annotation (Line(
-            points={{200,0},{200,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(valveIP.outlet,ST_IP. inlet) annotation (Line(points={{-10,16},
-                {-10,16},{4,16}}, thickness=0.5,
+        connect(valveIP.outlet,ST_IP. inlet) annotation (Line(points={{-8,16},{
+                -1,16},{6,16}},         thickness=0.5,
             color={0,0,255}));
         connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (Line(
-              points={{200,-140},{-180,-140},{-180,30},{-140,30},{-140,24}},
+              points={{200,-140},{-178,-140},{-178,40},{-138,40},{-138,24}},
               color={213,255,170}));
         connect(ActuatorsBus.Opening_valveIP,valveIP. theta) annotation (Line(
-              points={{200,-140},{-60,-140},{-60,34},{-20,34},{-20,24}}, color=
-                {213,255,170}));
-        connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (Line(
-              points={{200,-140},{60,-140},{60,32},{100,32},{100,24}}, color={
+              points={{200,-140},{-58,-140},{-58,40},{-18,40},{-18,24}}, color={
                 213,255,170}));
+        connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (Line(
+              points={{200,-140},{62,-140},{62,40},{102,40},{102,24}}, color={213,
+                255,170}));
         connect(ST_HP.inlet,valveHP. outlet) annotation (Line(points={{-116,16},
-                {-130,16},{-130,16}},               thickness=0.5,
+                {-128,16},{-128,16}},          thickness=0.5,
             color={0,0,255}));
         connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
-            points={{-113.2,0},{-200,0}},
+            points={{-113.2,0},{-165.6,0},{-200,0}},
             color={0,0,0},
             thickness=0.5));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (Line(points={{124,16},
-                {110,16},{110,16}},              thickness=0.5,
+        connect(ST_LP.inlet,valveLP. outlet) annotation (Line(points={{126,16},
+                {119,16},{119,16},{112,16}},thickness=0.5,
             color={0,0,255}));
         connect(Shaft_b,ST_LP. shaft_b) annotation (Line(
-            points={{200,0},{152.8,0}},
+            points={{200,0},{168.4,0},{154.8,0}},
             color={0,0,0},
             thickness=0.5));
         connect(ST_LP.shaft_a,ST_IP. shaft_b) annotation (Line(
-            points={{126.8,0},{32.8,0}},
+            points={{128.8,0},{34.8,0}},
             color={0,0,0},
             thickness=0.5));
         connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (Line(
-            points={{6.8,0},{-87.2,0}},
+            points={{8.8,0},{-87.2,0}},
             color={0,0,0},
             thickness=0.5));
         connect(mixLP.in1, LPT_In) 
-          annotation (Line(points={{80,98},{80,200}}, thickness=0.5,
+          annotation (Line(points={{82,98},{82,139},{82,200},{80,200}},
+                                                      thickness=0.5,
             color={0,0,255}));
-        connect(stateHPT_in.inlet, HPT_In) 
-          annotation (Line(points={{-160,76},{-160,200}}, thickness=0.5,
+        connect(valveHP.inlet, HPT_In) 
+          annotation (Line(points={{-148,16},{-160,16},{-160,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (Line(points={{-84,
-                16},{-70,16},{-70,40},{-100,40},{-100,64}}, thickness=0.5,
+        connect(ST_HP.outlet, HPT_Out) annotation (Line(points={{-84,16},{-70,16},{-70,
+                120},{-100,120},{-100,200}},      thickness=0.5,
             color={0,0,255}));
-        connect(stateHPT_out.outlet, HPT_Out) 
-          annotation (Line(points={{-100,76},{-100,200}}, thickness=0.5,
+        connect(valveIP.inlet, IPT_In) 
+          annotation (Line(points={{-28,16},{-40,16},{-40,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(stateIPT_in.inlet, IPT_In) 
-          annotation (Line(points={{-40,76},{-40,200}}, thickness=0.5,
+        connect(ST_IP.outlet,mixLP. in2) annotation (Line(points={{38,16},{50,16},{50,
+                120},{70,120},{70,98}},       thickness=0.5,
             color={0,0,255}));
-        connect(ST_IP.outlet, stateIPT_out.inlet) 
-          annotation (Line(points={{36,16},{40,16},{40,64}}, thickness=0.5,
+        connect(valveLP.inlet,mixLP. out) 
+          annotation (Line(points={{92,16},{76,16},{76,80}}, thickness=0.5,
             color={0,0,255}));
-        connect(stateIPT_out.outlet, mixLP.in2) annotation (Line(points={{40,76},
-                {40,120},{68,120},{68,98}},   thickness=0.5,
+        connect(LPT_Out,ST_LP. outlet) annotation (Line(points={{140,-200},{140,-40},{
+                182,-40},{182,16},{158,16}},       thickness=0.5,
             color={0,0,255}));
-        connect(stateLPT_in.inlet, mixLP.out) 
-          annotation (Line(points={{74,56},{74,80}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_LP.outlet, stateLPT_out.inlet) 
-          annotation (Line(points={{156,16},{180,16},{180,-24}}, thickness=0.5,
-            color={0,0,255}));
-        connect(LPT_Out, stateLPT_out.outlet) annotation (Line(points={{80,-200},
-                {80,-50},{180,-50},{180,-36}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveHP.inlet, stateHPT_in.outlet) 
-          annotation (Line(points={{-150,16},{-160,16},{-160,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveIP.inlet, stateIPT_in.outlet) 
-          annotation (Line(points={{-30,16},{-40,16},{-40,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveLP.inlet, stateLPT_in.outlet) 
-          annotation (Line(points={{90,16},{74,16},{74,44}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics),
-                             Icon(graphics));
-      end ST2LRh_valve;
-
-      model ST3LRh_valve
-        "Steam turbine with three pressure levels and reheat, inlet valves"
-        extends Interfaces.ST_3LRh;
-
-        //Mixers Parameters
-        parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in
-          "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "LP mixer"));
-        parameter SI.Pressure mixLP_pstart = steamLPNomPressure
-          "Pressure start value of the LP mixer" 
-              annotation (Dialog(tab = "Initialization",
-                                 group = "LP mixer"));
-
-        //Valves Parameters
-        parameter Real valveHP_Cv=0 "Cv (US) flow coefficient of the HP valve" annotation(Dialog(group= "HP valve"));
-        parameter SI.Pressure valveHP_dpnom
-          "Nominal pressure drop of the HP valve"                                   annotation(Dialog(group= "HP valve"));
-        parameter Real valveIP_Cv=0 "Cv (US) flow coefficient of the IP valve" annotation(Dialog(group= "IP valve"));
-        parameter SI.Pressure valveIP_dpnom
-          "Nominal pressure drop of the IP valve"                                   annotation(Dialog(group= "IP valve"));
-        parameter Real valveLP_Cv=0 "Cv (US) flow coefficient of the LP valve" annotation(Dialog(group= "LP valve"));
-        parameter SI.Pressure valveLP_dpnom
-          "Nominal pressure drop of the LP valve"                                   annotation(Dialog(group= "LP valve"));
-
-        Water.SteamTurbineStodola ST_HP(
-          redeclare package Medium = FluidMedium,
-          wnom=steamHPNomFlowRate,
-          eta_mech=HPT_eta_mech,
-          eta_iso_nom=HPT_eta_iso_nom,
-          Kt=HPT_Kt,
-          hstartin=HPT_hstart_in,
-          hstartout=HPT_hstart_out,
-          pstart_in=HPT_pstart_in,
-          pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (Placement(transformation(
-                extent={{-122,-20},{-82,20}}, rotation=0)));
-        Water.SteamTurbineStodola ST_IP(
-          redeclare package Medium = FluidMedium,
-          eta_mech=IPT_eta_mech,
-          eta_iso_nom=IPT_eta_iso_nom,
-          Kt=IPT_Kt,
-          hstartin=IPT_hstart_in,
-          hstartout=IPT_hstart_out,
-          pstart_in=IPT_pstart_in,
-          pstart_out=IPT_pstart_out,
-          wstart=IPT_wstart,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
-                extent={{0,-20},{40,20}}, rotation=0)));
-        Water.SteamTurbineStodola ST_LP(
-          redeclare package Medium = FluidMedium,
-          eta_mech=LPT_eta_mech,
-          eta_iso_nom=LPT_eta_iso_nom,
-          Kt=LPT_Kt,
-          hstartin=LPT_hstart_in,
-          hstartout=LPT_hstart_out,
-          pstart_in=LPT_pstart_in,
-          pstart_out=LPT_pstart_out,
-          wstart=LPT_wstart,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
-                extent={{120,-20},{160,20}}, rotation=0)));
-        Water.Mixer mixLP(
-          redeclare package Medium = FluidMedium,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          hstart=mixLP_hstart,
-          V=mixLP_V,
-          pstart=mixLP_pstart) 
-                          annotation (Placement(transformation(
-              origin={74,90},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.ValveVap valveHP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          Cv=valveHP_Cv,
-          pnom=steamHPNomPressure,
-          wnom=steamHPNomFlowRate,
-          dpnom=valveHP_dpnom,
-          redeclare package Medium = FluidMedium,
-          hstart=HPT_hstart_in) 
-                               annotation (Placement(transformation(
-              origin={-140,16},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-        Water.ValveVap valveIP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          Cv=valveIP_Cv,
-          pnom=steamIPNomPressure,
-          dpnom=valveIP_dpnom,
-          redeclare package Medium = FluidMedium,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate,
-          hstart=IPT_hstart_in) 
-                               annotation (Placement(transformation(
-              origin={-20,16},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-        Water.ValveVap valveLP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          pnom=steamLPNomPressure,
-          dpnom=valveLP_dpnom,
-          redeclare package Medium = FluidMedium,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
-          Cv=valveLP_Cv,
-          hstart=LPT_hstart_in) 
-                               annotation (Placement(transformation(
-              origin={100,16},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-      protected
-        replaceable Components.BaseReader_water stateHPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-160,70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateHPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-74,70},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateIPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-40,70},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateIPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={46,70},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateLPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={74,50},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateLPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={170,-30},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-      equation
-        connect(valveIP.outlet,ST_IP. inlet) annotation (Line(points={{-10,16},
-                {-10,16},{4,16}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (Line(
-              points={{200,-140},{-180,-140},{-180,30},{-140,30},{-140,24}},
-              color={213,255,170}));
-        connect(ActuatorsBus.Opening_valveIP,valveIP. theta) annotation (Line(
-              points={{200,-140},{-60,-140},{-60,34},{-20,34},{-20,24}}, color=
-                {213,255,170}));
-        connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (Line(
-              points={{200,-140},{60,-140},{60,32},{100,32},{100,24}}, color={
-                213,255,170}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (Line(points={{-118,16},
-                {-130,16},{-130,16}},           thickness=0.5,
-            color={0,0,255}));
-        connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
-            points={{-115.2,0},{-200,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (Line(points={{124,16},
-                {110,16},{110,16}},              thickness=0.5,
-            color={0,0,255}));
-        connect(Shaft_b,ST_LP. shaft_b) annotation (Line(
-            points={{200,0},{152.8,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_LP.shaft_a,ST_IP. shaft_b) annotation (Line(
-            points={{126.8,0},{32.8,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (Line(
-            points={{6.8,0},{-89.2,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(mixLP.in1, LPT_In) 
-          annotation (Line(points={{80,98},{80,200}},          thickness=0.5,
-            color={0,0,255}));
-        connect(stateHPT_in.inlet, HPT_In) 
-          annotation (Line(points={{-160,76},{-160,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateIPT_in.inlet, IPT_In) 
-          annotation (Line(points={{-40,76},{-40,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_IP.outlet, stateIPT_out.inlet) 
-          annotation (Line(points={{36,16},{46,16},{46,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateIPT_out.outlet, mixLP.in2) annotation (Line(points={{46,76},
-                {46,120},{68,120},{68,98}},   thickness=0.5,
-            color={0,0,255}));
-        connect(stateLPT_in.inlet, mixLP.out) 
-          annotation (Line(points={{74,56},{74,80}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_LP.outlet, stateLPT_out.inlet) 
-          annotation (Line(points={{156,16},{170,16},{170,-24}}, thickness=0.5,
-            color={0,0,255}));
-        connect(LPT_Out, stateLPT_out.outlet) annotation (Line(points={{140,
-                -200},{140,-50},{170,-50},{170,-36}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveIP.inlet, stateIPT_in.outlet) 
-          annotation (Line(points={{-30,16},{-40,16},{-40,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (Line(points={{-86,
-                16},{-74,16},{-74,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveHP.inlet, stateHPT_in.outlet) 
-          annotation (Line(points={{-150,16},{-160,16},{-160,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveLP.inlet, stateLPT_in.outlet) 
-          annotation (Line(points={{90,16},{74,16},{74,44}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateHPT_out.outlet, HPT_Out) annotation (Line(points={{-74,76},
-                {-74,120},{-100,120},{-100,200}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics),
-                             Icon(graphics));
-      end ST3LRh_valve;
-
-      model ST2LRh_bypass
-        "Steam turbine with two pressure levels and reheat, inlet and by-pass valves "
-        extends Interfaces.ST_2LRh;
-
-        //Mixers Parameters
-        parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in
-          "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "LP mixer"));
-        parameter SI.Pressure mixLP_pstart = steamLPNomPressure
-          "Pressure start value of the LP mixer" 
-              annotation (Dialog(tab = "Initialization",
-                                 group = "LP mixer"));
-
-        //Valves Parameters
-        parameter Real valveHP_Cv=0 "Cv (US) flow coefficient of the HP valve" annotation(Dialog(group= "HP valves"));
-        parameter Modelica.SIunits.Pressure valveHP_dpnom
-          "Nominal pressure drop of the HP valve"                                   annotation(Dialog(group= "HP valves"));
-        parameter Real bypassHP_Cv=0
-          "Cv (US) flow coefficient of the HP valve of bypass"                                 annotation(Dialog(group= "HP valves"));
-        parameter Real valveIP_Cv=0 "Cv (US) flow coefficient of the IP valve" annotation(Dialog(group= "IP valves"));
-        parameter Modelica.SIunits.Pressure valveIP_dpnom
-          "Nominal pressure drop of the IP valve"                                   annotation(Dialog(group= "IP valves"));
-        parameter Real bypassIP_Cv=0
-          "Cv (US) flow coefficient of the IP valve of bypass" annotation(Dialog(group= "IP valves"));
-        parameter Real valveLP_Cv=0 "Cv (US) flow coefficient of the LP valve" annotation(Dialog(group= "LP valves"));
-        parameter Modelica.SIunits.Pressure valveLP_dpnom
-          "Nominal pressure drop of the LP valve"                                   annotation(Dialog(group= "LP valves"));
-        parameter Real bypassLP_Cv=0
-          "Cv (US) flow coefficient of the HP valve of bypass" annotation(Dialog(group= "LP valves"));
-        parameter Real valveDrumLP_Cv=0
-          "Cv (US) flow coefficient of the valve of pressurization LP drum" 
-                                                                          annotation(Dialog(group= "LP valves"));
-
-        Water.SteamTurbineStodola ST_HP(
-          redeclare package Medium = FluidMedium,
-          wnom=steamHPNomFlowRate,
-          eta_mech=HPT_eta_mech,
-          eta_iso_nom=HPT_eta_iso_nom,
-          Kt=HPT_Kt,
-          hstartin=HPT_hstart_in,
-          hstartout=HPT_hstart_out,
-          pstart_in=HPT_pstart_in,
-          pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (Placement(transformation(
-                extent={{-120,-20},{-80,20}}, rotation=0)));
-        Water.SteamTurbineStodola ST_IP(
-          redeclare package Medium = FluidMedium,
-          eta_mech=IPT_eta_mech,
-          eta_iso_nom=IPT_eta_iso_nom,
-          Kt=IPT_Kt,
-          hstartin=IPT_hstart_in,
-          hstartout=IPT_hstart_out,
-          pstart_in=IPT_pstart_in,
-          pstart_out=IPT_pstart_out,
-          wstart=IPT_wstart,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
-                extent={{0,-20},{40,20}}, rotation=0)));
-        Water.SteamTurbineStodola ST_LP(
-          redeclare package Medium = FluidMedium,
-          eta_mech=LPT_eta_mech,
-          eta_iso_nom=LPT_eta_iso_nom,
-          Kt=LPT_Kt,
-          hstartin=LPT_hstart_in,
-          hstartout=LPT_hstart_out,
-          pstart_in=LPT_pstart_in,
-          pstart_out=LPT_pstart_out,
-          wstart=LPT_wstart,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
-                extent={{120,-20},{160,20}}, rotation=0)));
-        Water.Mixer mixLP(
-          redeclare package Medium = FluidMedium,
-          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit,
-          hstart=mixLP_hstart,
-          V=mixLP_V,
-          pstart=mixLP_pstart) 
-                          annotation (Placement(transformation(
-              origin={74,90},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Water.ValveVap valveHP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          Cv=valveHP_Cv,
-          pnom=steamHPNomPressure,
-          wnom=steamHPNomFlowRate,
-          dpnom=valveHP_dpnom,
-          redeclare package Medium = FluidMedium,
-          hstart=HPT_hstart_in) 
-                               annotation (Placement(transformation(
-              origin={-140,16},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-        Water.ValveVap valveIP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          Cv=valveIP_Cv,
-          pnom=steamIPNomPressure,
-          dpnom=valveIP_dpnom,
-          redeclare package Medium = FluidMedium,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate,
-          hstart=IPT_hstart_in) 
-                               annotation (Placement(transformation(
-              origin={-20,16},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-        Water.ValveVap valveLP(
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          pnom=steamLPNomPressure,
-          dpnom=valveLP_dpnom,
-          redeclare package Medium = FluidMedium,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
-          Cv=valveLP_Cv,
-          hstart=LPT_hstart_in) 
-                               annotation (Placement(transformation(
-              origin={100,16},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-        Water.ValveVap byPassHP(
-          redeclare package Medium = FluidMedium,
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          pnom=steamHPNomPressure,
-          wnom=steamHPNomFlowRate,
-          dpnom=steamHPNomPressure - steamIPNomPressure,
-          Cv=bypassHP_Cv,
-          hstart=HPT_hstart_in) annotation (Placement(transformation(
-              origin={-120,40},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-        Water.ValveVap byPassIP(
-          redeclare package Medium = FluidMedium,
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          pnom=steamIPNomPressure,
-          dpnom=steamIPNomPressure - steamLPNomPressure,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate,
-          Cv=bypassIP_Cv,
-          hstart=IPT_hstart_in) annotation (Placement(transformation(
-              origin={0,40},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-        Water.ValveVap byPassLP(
-          redeclare package Medium = FluidMedium,
-          CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-          pnom=steamLPNomPressure,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
-          Cv=bypassLP_Cv,
-          dpnom=steamLPNomPressure - pcond,
-          hstart=LPT_hstart_in)  annotation (Placement(transformation(
-              origin={120,40},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-        Water.SensP p_ST_LP(            redeclare package Medium = FluidMedium)
-          annotation (Placement(transformation(extent={{90,74},{110,94}},
-                rotation=0)));
-      protected
-        replaceable Components.BaseReader_water stateHPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-160,90},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateHPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-100,90},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateIPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={-40,90},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateIPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={44,90},
-              extent={{10,-10},{-10,10}},
-              rotation=270)));
-        replaceable Components.BaseReader_water stateLPT_in(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={74,66},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-        replaceable Components.BaseReader_water stateLPT_out(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={176,-20},
-              extent={{10,-10},{-10,10}},
-              rotation=90)));
-      equation
-        connect(valveIP.outlet,ST_IP. inlet) annotation (Line(points={{-10,16},
-                {-10,16},{4,16}}, thickness=0.5,
-            color={0,0,255}));
-        connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (Line(
-              points={{200,-140},{-180,-140},{-180,30},{-140,30},{-140,24}},
-              color={213,255,170}));
-        connect(ActuatorsBus.Opening_valveIP,valveIP. theta) annotation (Line(
-              points={{200,-140},{-60,-140},{-60,34},{-20,34},{-20,24}}, color=
-                {213,255,170}));
-        connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (Line(
-              points={{200,-140},{60,-140},{60,32},{100,32},{100,24}}, color={
-                213,255,170}));
-        connect(ActuatorsBus.Opening_byPassHP,byPassHP. theta) annotation (Line(
-              points={{200,-140},{-180,-140},{-180,30},{-140,30},{-140,60},{
-                -120,60},{-120,48}}, color={213,255,170}));
-        connect(ActuatorsBus.Opening_byPassIP,byPassIP. theta) annotation (Line(
-              points={{200,-140},{-60,-140},{-60,34},{-20,34},{-20,60},{
-                9.79717e-016,60},{9.79717e-016,48}}, color={213,255,170}));
-        connect(ActuatorsBus.Opening_byPassLP,byPassLP. theta) annotation (Line(
-              points={{200,-140},{60,-140},{60,32},{100,32},{100,60},{120,60},{
-                120,48}}, color={213,255,170}));
-        connect(SensorsBus.p_STLP_in,p_ST_LP. p) annotation (Line(points={{200,
-                -80},{166,-80},{166,90},{108,90}}, color={255,170,213}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (Line(points={{-116,16},
-                {-126.5,16},{-130,16}},             thickness=0.5,
-            color={0,0,255}));
-        connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
-            points={{-113.2,0},{-200,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (Line(points={{124,16},
-                {118.5,16},{110,16}},            thickness=0.5,
-            color={0,0,255}));
-        connect(p_ST_LP.flange,mixLP. out) annotation (Line(
-            points={{100,80},{74,80}},
-            color={0,0,255},
-            thickness=0.5));
-        connect(Shaft_b,ST_LP. shaft_b) annotation (Line(
-            points={{200,0},{152.8,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_LP.shaft_a,ST_IP. shaft_b) annotation (Line(
-            points={{126.8,0},{32.8,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (Line(
-            points={{6.8,0},{-87.2,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(stateHPT_in.inlet, HPT_In) 
-          annotation (Line(points={{-160,96},{-160,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateHPT_out.outlet, HPT_Out) 
-          annotation (Line(points={{-100,96},{-100,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateIPT_in.inlet, IPT_In) 
-          annotation (Line(points={{-40,96},{-40,200}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateIPT_out.outlet, mixLP.in2) annotation (Line(points={{44,96},
-                {44,140},{68,140},{68,98}},   thickness=0.5,
-            color={0,0,255}));
-        connect(stateLPT_in.inlet, mixLP.out) 
-          annotation (Line(points={{74,72},{74,80}}, thickness=0.5));
-        connect(LPT_Out, stateLPT_out.outlet) annotation (Line(points={{80,-200},
-                {80,-40},{176,-40},{176,-26}}, thickness=0.5,
-            color={0,0,255}));
-        connect(mixLP.in1, LPT_In) annotation (Line(points={{80,98},{80,200}},
-              thickness=0.5,
-            color={0,0,255}));
-        connect(byPassHP.inlet, stateHPT_in.outlet) annotation (Line(
-            points={{-130,40},{-160,40},{-160,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(valveHP.inlet, stateHPT_in.outlet) annotation (Line(
-            points={{-150,16},{-160,16},{-160,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(byPassHP.outlet, stateHPT_out.inlet) annotation (Line(
-            points={{-110,40},{-100,40},{-100,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (Line(
-            points={{-84,16},{-84,40},{-100,40},{-100,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(byPassIP.inlet, stateIPT_in.outlet) annotation (Line(
-            points={{-10,40},{-40,40},{-40,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(valveIP.inlet, stateIPT_in.outlet) annotation (Line(
-            points={{-30,16},{-40,16},{-40,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(byPassIP.outlet, stateIPT_out.inlet) annotation (Line(
-            points={{10,40},{44,40},{44,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(ST_IP.outlet, stateIPT_out.inlet) annotation (Line(
-            points={{36,16},{44,16},{44,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(byPassLP.inlet, stateLPT_in.outlet) annotation (Line(
-            points={{110,40},{74,40},{74,60}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(valveLP.inlet, stateLPT_in.outlet) annotation (Line(
-            points={{90,16},{74,16},{74,60}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(byPassLP.outlet, stateLPT_out.inlet) annotation (Line(
-            points={{130,40},{176,40},{176,-14}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(ST_LP.outlet, stateLPT_out.inlet) annotation (Line(
-            points={{156,16},{176,16},{176,-14}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
-                  {-200,-200},{200,200}}),
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-200,-200},
+                  {200,200}}),
                             graphics),
                              Icon(graphics));
-      end ST2LRh_bypass;
+      end ST3L_valve;
 
-      model ST3LRh_bypass
-        "Steam turbine with three pressure levels and reheat, inlet and by-pass valves "
-        extends Interfaces.ST_3LRh;
+      model ST3L_bypass
+        "Steam turbine with three pressure levels, inlet and by-pass valves "
+        extends ThermoPower.PowerPlants.SteamTurbineGroup.Interfaces.ST_3L;
 
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.SpecificEnthalpy mixLP_hstart = LPT_hstart_in
-          "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart = steamLPNomPressure
           "Pressure start value of the LP mixer" 
               annotation (Dialog(tab = "Initialization",
@@ -17190,51 +13247,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           "Cv (US) flow coefficient of the valve of pressurization LP drum" 
                                                                           annotation(Dialog(group= "LP valves"));
 
-        Water.SteamTurbineStodola ST_HP(
-          redeclare package Medium = FluidMedium,
-          wnom=steamHPNomFlowRate,
-          eta_mech=HPT_eta_mech,
-          eta_iso_nom=HPT_eta_iso_nom,
-          Kt=HPT_Kt,
-          hstartin=HPT_hstart_in,
-          hstartout=HPT_hstart_out,
-          pstart_in=HPT_pstart_in,
-          pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (Placement(transformation(
-                extent={{-120,-20},{-80,20}}, rotation=0)));
-        Water.SteamTurbineStodola ST_IP(
-          redeclare package Medium = FluidMedium,
-          eta_mech=IPT_eta_mech,
-          eta_iso_nom=IPT_eta_iso_nom,
-          Kt=IPT_Kt,
-          hstartin=IPT_hstart_in,
-          hstartout=IPT_hstart_out,
-          pstart_in=IPT_pstart_in,
-          pstart_out=IPT_pstart_out,
-          wstart=IPT_wstart,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
-                extent={{0,-20},{40,20}}, rotation=0)));
-        Water.SteamTurbineStodola ST_LP(
-          redeclare package Medium = FluidMedium,
-          eta_mech=LPT_eta_mech,
-          eta_iso_nom=LPT_eta_iso_nom,
-          Kt=LPT_Kt,
-          hstartin=LPT_hstart_in,
-          hstartout=LPT_hstart_out,
-          pstart_in=LPT_pstart_in,
-          pstart_out=LPT_pstart_out,
-          wstart=LPT_wstart,
-          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate) 
-                                        annotation (Placement(transformation(
-                extent={{120,-20},{160,20}}, rotation=0)));
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
                     ThermoPower.Choices.Init.Options.noInit,
-          hstart=mixLP_hstart,
           V=mixLP_V,
-          pstart=mixLP_pstart) 
+          pstart=mixLP_pstart,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                           annotation (Placement(transformation(
               origin={74,90},
               extent={{-10,-10},{10,10}},
@@ -17245,8 +13264,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pnom=steamHPNomPressure,
           wnom=steamHPNomFlowRate,
           dpnom=valveHP_dpnom,
-          redeclare package Medium = FluidMedium,
-          hstart=HPT_hstart_in) 
+          redeclare package Medium = FluidMedium) 
                                annotation (Placement(transformation(
               origin={-140,16},
               extent={{10,10},{-10,-10}},
@@ -17257,8 +13275,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pnom=steamIPNomPressure,
           dpnom=valveIP_dpnom,
           redeclare package Medium = FluidMedium,
-          wnom=steamIPNomFlowRate + steamHPNomFlowRate,
-          hstart=IPT_hstart_in) 
+          wnom=steamIPNomFlowRate + steamHPNomFlowRate) 
                                annotation (Placement(transformation(
               origin={-20,16},
               extent={{10,10},{-10,-10}},
@@ -17269,9 +13286,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           dpnom=valveLP_dpnom,
           redeclare package Medium = FluidMedium,
           wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
-          Cv=valveLP_Cv,
-          hstart=LPT_hstart_in) 
-                               annotation (Placement(transformation(
+          Cv=valveLP_Cv)       annotation (Placement(transformation(
               origin={100,16},
               extent={{10,10},{-10,-10}},
               rotation=180)));
@@ -17281,8 +13296,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pnom=steamHPNomPressure,
           wnom=steamHPNomFlowRate,
           dpnom=steamHPNomPressure - steamIPNomPressure,
-          Cv=bypassHP_Cv,
-          hstart=HPT_hstart_in) annotation (Placement(transformation(
+          Cv=bypassHP_Cv)       annotation (Placement(transformation(
               origin={-120,40},
               extent={{10,10},{-10,-10}},
               rotation=180)));
@@ -17292,8 +13306,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pnom=steamIPNomPressure,
           dpnom=steamIPNomPressure - steamLPNomPressure,
           wnom=steamIPNomFlowRate + steamHPNomFlowRate,
-          Cv=bypassIP_Cv,
-          hstart=IPT_hstart_in) annotation (Placement(transformation(
+          Cv=bypassIP_Cv)       annotation (Placement(transformation(
               origin={0,40},
               extent={{10,10},{-10,-10}},
               rotation=180)));
@@ -17303,8 +13316,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pnom=steamLPNomPressure,
           wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
           Cv=bypassLP_Cv,
-          dpnom=steamLPNomPressure - pcond,
-          hstart=LPT_hstart_in)  annotation (Placement(transformation(
+          dpnom=steamLPNomPressure - pcond) 
+                                 annotation (Placement(transformation(
               origin={120,40},
               extent={{10,10},{-10,-10}},
               rotation=180)));
@@ -17344,7 +13357,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             Medium = FluidMedium) constrainedby Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
                            annotation (Placement(transformation(
-              origin={74,66},
+              origin={74,62},
               extent={{10,-10},{-10,10}},
               rotation=90)));
         replaceable Components.BaseReader_water stateLPT_out(redeclare package
@@ -17354,10 +13367,38 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={176,-20},
               extent={{10,-10},{-10,10}},
               rotation=90)));
+      public
+        Water.SteamTurbineStodola ST_HP(
+          redeclare package Medium = FluidMedium,
+          wnom=steamHPNomFlowRate,
+          eta_mech=HPT_eta_mech,
+          eta_iso_nom=HPT_eta_iso_nom,
+          Kt=HPT_Kt,
+          wstart=HPT_wstart,
+          PRstart=steamHPNomPressure/steamIPNomPressure,
+          pnom=steamHPNomPressure)      annotation (Placement(transformation(
+                extent={{-120,-20},{-80,20}},  rotation=0)));
+        Water.SteamTurbineStodola ST_IP(
+          redeclare package Medium = FluidMedium,
+          eta_mech=IPT_eta_mech,
+          eta_iso_nom=IPT_eta_iso_nom,
+          Kt=IPT_Kt,
+          wstart=IPT_wstart,
+          wnom=steamIPNomFlowRate + steamHPNomFlowRate,
+          PRstart=steamIPNomPressure/steamLPNomPressure,
+          pnom=steamIPNomPressure)      annotation (Placement(transformation(
+                extent={{8,-20},{48,20}},   rotation=0)));
+        Water.SteamTurbineStodola ST_LP(
+          redeclare package Medium = FluidMedium,
+          eta_mech=LPT_eta_mech,
+          eta_iso_nom=LPT_eta_iso_nom,
+          Kt=LPT_Kt,
+          wstart=LPT_wstart,
+          wnom=steamLPNomFlowRate + steamIPNomFlowRate + steamHPNomFlowRate,
+          PRstart=steamLPNomPressure/pcond,
+          pnom=steamLPNomPressure)      annotation (Placement(transformation(
+                extent={{120,-20},{160,20}}, rotation=0)));
       equation
-        connect(valveIP.outlet,ST_IP. inlet) annotation (Line(points={{-10,16},
-                {-10,16},{4,16}}, thickness=0.5,
-            color={0,0,255}));
         connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (Line(
               points={{200,-140},{-180,-140},{-180,30},{-140,30},{-140,24}},
               color={213,255,170}));
@@ -17376,33 +13417,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus.Opening_byPassLP,byPassLP. theta) annotation (Line(
               points={{200,-140},{60,-140},{60,32},{100,32},{100,60},{120,60},{
                 120,48}}, color={213,255,170}));
-        connect(SensorsBus.p_STLP_in,p_ST_LP. p) annotation (Line(points={{200,
-                -80},{160,-80},{160,90},{108,90}}, color={255,170,213}));
-        connect(ST_HP.inlet,valveHP. outlet) annotation (Line(points={{-116,16},
-                {-126.5,16},{-130,16}},             thickness=0.5,
-            color={0,0,255}));
-        connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
-            points={{-113.2,0},{-200,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_LP.inlet,valveLP. outlet) annotation (Line(points={{124,16},
-                {118.5,16},{110,16}},            thickness=0.5,
-            color={0,0,255}));
+        connect(SensorsBus.p_STLP_in,p_ST_LP. p) annotation (Line(points={{200,-80},
+                {-60,-80},{-60,160},{134,160},{134,90},{108,90}},
+                                                   color={255,170,213}));
         connect(p_ST_LP.flange,mixLP. out) annotation (Line(
             points={{100,80},{74,80}},
             color={0,0,255},
-            thickness=0.5));
-        connect(Shaft_b,ST_LP. shaft_b) annotation (Line(
-            points={{200,0},{152.8,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_LP.shaft_a,ST_IP. shaft_b) annotation (Line(
-            points={{126.8,0},{32.8,0}},
-            color={0,0,0},
-            thickness=0.5));
-        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (Line(
-            points={{6.8,0},{-87.2,0}},
-            color={0,0,0},
             thickness=0.5));
         connect(stateHPT_in.inlet, HPT_In) 
           annotation (Line(points={{-160,96},{-160,200}}, thickness=0.5,
@@ -17414,7 +13434,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 {44,140},{68,140},{68,98}},   thickness=0.5,
             color={0,0,255}));
         connect(stateLPT_in.inlet, mixLP.out) 
-          annotation (Line(points={{74,72},{74,80}}, thickness=0.5));
+          annotation (Line(points={{74,68},{74,80}}, thickness=0.5));
         connect(LPT_Out, stateLPT_out.outlet) annotation (Line(points={{140,
                 -200},{140,-40},{176,-40},{176,-26}}, thickness=0.5,
             color={0,0,255}));
@@ -17429,23 +13449,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        connect(ST_LP.outlet, stateLPT_out.inlet) annotation (Line(
-            points={{156,16},{176,16},{176,-14}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
         connect(valveLP.inlet, stateLPT_in.outlet) annotation (Line(
-            points={{90,16},{74,16},{74,60}},
+            points={{90,16},{74,16},{74,56}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
         connect(byPassLP.inlet, stateLPT_in.outlet) annotation (Line(
-            points={{110,40},{74,40},{74,60}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(ST_IP.outlet, stateIPT_out.inlet) annotation (Line(
-            points={{36,16},{44,16},{44,84}},
+            points={{110,40},{74,40},{74,56}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
@@ -17469,11 +13479,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (Line(
-            points={{-84,16},{-84,40},{-100,40},{-100,84}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
         connect(byPassHP.inlet, stateHPT_in.outlet) annotation (Line(
             points={{-130,40},{-160,40},{-160,84}},
             color={0,0,255},
@@ -17484,11 +13489,57 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
-                  {-200,-200},{200,200}}),
+        connect(ST_IP.shaft_a,ST_HP. shaft_b) annotation (Line(
+            points={{14.8,0},{14.8,0},{-87.2,0}},
+            color={0,0,0},
+            thickness=0.5));
+        connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
+            points={{-113.2,0},{-200,0}},
+            color={0,0,0},
+            thickness=0.5));
+        connect(ST_LP.shaft_a,ST_IP. shaft_b) annotation (Line(
+            points={{126.8,0},{126.8,0},{40.8,0}},
+            color={0,0,0},
+            thickness=0.5));
+        connect(Shaft_b,ST_LP. shaft_b) annotation (Line(
+            points={{200,0},{200,0},{152.8,0}},
+            color={0,0,0},
+            thickness=0.5));
+        connect(ST_HP.inlet, valveHP.outlet) annotation (Line(
+            points={{-116,16},{-123,16},{-123,16},{-130,16}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(ST_HP.outlet, stateHPT_out.inlet) annotation (Line(
+            points={{-84,16},{-84,40},{-100,40},{-100,84}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(ST_IP.outlet, stateIPT_out.inlet) annotation (Line(
+            points={{44,16},{44,84}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(ST_IP.inlet, valveIP.outlet) annotation (Line(
+            points={{12,16},{1,16},{1,16},{-10,16}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(valveLP.outlet, ST_LP.inlet) annotation (Line(
+            points={{110,16},{117,16},{117,16},{124,16}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(ST_LP.outlet, stateLPT_out.inlet) annotation (Line(
+            points={{156,16},{176,16},{176,-14}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-200,
+                  -200},{200,200}}),
                             graphics),
                              Icon(graphics));
-      end ST3LRh_bypass;
+      end ST3L_bypass;
 
       model ST_2LHU
         "Steam Turbine Group (two pressure levels) with coupling Heat Usage"
@@ -17496,9 +13547,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.SpecificEnthalpy mixLP_hstart
-          "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart
           "Pressure start value of the LP mixer" 
               annotation (Dialog(tab = "Initialization",
@@ -17526,30 +13574,26 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           eta_mech=HPT_eta_mech,
           eta_iso_nom=HPT_eta_iso_nom,
           Kt=HPT_Kt,
-          hstartin=HPT_hstart_in,
-          hstartout=HPT_hstart_out,
-          pstart_in=HPT_pstart_in,
-          pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (Placement(transformation(
-                extent={{-86,-20},{-46,20}}, rotation=0)));
+          wstart=HPT_wstart,
+          PRstart=steamHPNomPressure/steamLPNomPressure,
+          pnom=steamHPNomPressure)      annotation (Placement(transformation(
+                extent={{-84,-20},{-44,20}}, rotation=0)));
         Water.SteamTurbineStodola ST_LP(
           redeclare package Medium = FluidMedium,
           eta_mech=LPT_eta_mech,
           eta_iso_nom=LPT_eta_iso_nom,
           Kt=LPT_Kt,
-          hstartin=LPT_hstart_in,
-          hstartout=LPT_hstart_out,
-          pstart_in=LPT_pstart_in,
-          pstart_out=LPT_pstart_out,
           wstart=LPT_wstart,
-          wnom=steamHPNomFlowRate)      annotation (Placement(transformation(
+          wnom=steamHPNomFlowRate,
+          PRstart=steamLPNomPressure/pcond,
+          pnom=steamLPNomPressure)      annotation (Placement(transformation(
                 extent={{94,-20},{134,20}}, rotation=0)));
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
-          hstart=mixLP_hstart,
           V=mixLP_V,
-          pstart=mixLP_pstart) 
+          pstart=mixLP_pstart,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                           annotation (Placement(transformation(
               origin={-40,-110},
               extent={{-10,-10},{10,10}},
@@ -17561,8 +13605,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Cv=valveHU_Cv,
           dpnom=valveHU_dpnom,
           pnom=steamLPNomPressure,
-          wnom=steamHPNomFlowRate,
-          hstart=HPT_hstart_out) 
+          wnom=steamHPNomFlowRate) 
                                annotation (Placement(transformation(
               origin={-19,-25},
               extent={{9,-9},{-9,9}},
@@ -17574,8 +13617,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           dpnom=valveLP_dpnom,
           redeclare package Medium = FluidMedium,
           Cv=valveLP_Cv,
-          wnom=steamHPNomFlowRate,
-          hstart=LPT_hstart_in) 
+          wnom=steamHPNomFlowRate) 
                                annotation (Placement(transformation(extent={{60,
                   6},{80,26}}, rotation=0)));
         Water.ValveVap valveHP(
@@ -17585,18 +13627,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           wnom=steamHPNomFlowRate,
           CheckValve=true,
           dpnom=valveHP_dpnom,
-          redeclare package Medium = FluidMedium,
-          hstart=HPT_hstart_in) 
-                               annotation (Placement(transformation(extent={{
-                  -118,6},{-98,26}}, rotation=0)));
+          redeclare package Medium = FluidMedium) 
+                               annotation (Placement(transformation(extent={{-114,6},{
+                  -94,26}},          rotation=0)));
         Water.ValveVap byPassHP(redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           pnom=steamHPNomPressure,
           wnom=steamHPNomFlowRate,
           CheckValve=true,
           Cv=bypassHP_Cv,
-          dpnom=steamHPNomPressure - steamLPNomPressure,
-          hstart=HPT_hstart_in) annotation (Placement(transformation(extent={{
+          dpnom=steamHPNomPressure - steamLPNomPressure) 
+                                annotation (Placement(transformation(extent={{
                   -100,40},{-80,60}}, rotation=0)));
         Water.ValveVap byPassLP(redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -17604,12 +13645,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CheckValve=true,
           Cv=bypassLP_Cv,
           dpnom=steamLPNomPressure - pcond,
-          wnom=steamHPNomFlowRate,
-          hstart=LPT_hstart_in)  annotation (Placement(transformation(extent={{
+          wnom=steamHPNomFlowRate) 
+                                 annotation (Placement(transformation(extent={{
                   80,40},{100,60}}, rotation=0)));
       equation
         connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
-            points={{-79.2,0},{-200,0}},
+            points={{-77.2,0},{-200,0}},
             color={0,0,0},
             thickness=0.5));
         connect(ST_LP.shaft_b, Shaft_b) annotation (Line(
@@ -17617,11 +13658,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,0},
             thickness=0.5));
         connect(ST_LP.shaft_a, ST_HP.shaft_b) annotation (Line(
-            points={{100.8,0},{-53.2,0}},
+            points={{100.8,0},{-51.2,0}},
             color={0,0,0},
             thickness=0.5));
         connect(valveHP.outlet, ST_HP.inlet) 
-          annotation (Line(points={{-98,16},{-82,16}}, thickness=0.5));
+          annotation (Line(points={{-94,16},{-80,16}}, thickness=0.5,
+            color={0,0,255}));
         connect(mixLP.out, SteamForHU) 
           annotation (Line(points={{-50,-110},{-60,-110},{-60,-200}}, thickness=0.5,
             color={0,0,255}));
@@ -17630,11 +13672,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,255}));
         connect(valveLP.outlet, ST_LP.inlet) 
           annotation (Line(points={{80,16},{98,16}}, thickness=0.5));
-        connect(mixLP.in2, valveHU.outlet) annotation (Line(points={{-32,-104},
-                {-19,-104},{-19,-34}}, thickness=0.5,
+        connect(mixLP.in2, valveHU.outlet) annotation (Line(points={{-32,-104},{-19,-104},
+                {-19,-34}},            thickness=0.5,
             color={0,0,255}));
         connect(ActuatorsBus.Opening_valveHP, valveHP.theta) annotation (Line(
-              points={{200,-140},{-140,-140},{-140,32},{-108,32},{-108,24}},
+              points={{200,-140},{-140,-140},{-140,32},{-104,32},{-104,24}},
               color={213,255,170}));
         connect(ActuatorsBus.Opening_valveLP, valveLP.theta) annotation (Line(
               points={{200,-140},{50,-140},{50,32},{70,32},{70,24}}, color={213,
@@ -17646,11 +13688,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               points={{200,-140},{50,-140},{50,70},{90,70},{90,58}}, color={213,
                 255,170}));
         connect(ActuatorsBus.Opening_valveHU, valveHU.theta) annotation (Line(
-              points={{200,-140},{50,-140},{50,-60},{-40,-60},{-40,-26},{-26.2,
-                -25}},
+              points={{200,-140},{50,-140},{50,-60},{-40,-60},{-40,-25},{-26.2,-25}},
               color={213,255,170}));
         connect(ST_LP.outlet, LPT_Out) annotation (Line(
-            points={{130,16},{130,50},{160,50},{160,-160},{48,-160},{48,-200}},
+            points={{130,16},{160,16},{160,-160},{48,-160},{48,-200}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
@@ -17666,32 +13707,32 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=0.5,
             smooth=Smooth.None));
         connect(valveHP.inlet, HPT_In) annotation (Line(
-            points={{-118,16},{-132,16},{-132,50},{-120,50},{-120,200}},
+            points={{-114,16},{-120,16},{-120,200}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        connect(valveHU.inlet, byPassHP.outlet) annotation (Line(
-            points={{-19,-16},{-19,50},{-80,50}},
+        connect(ST_HP.outlet, valveLP.inlet) annotation (Line(
+            points={{-48,16},{60,16}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        connect(ST_HP.outlet, valveHU.inlet) annotation (Line(
-            points={{-50,16},{-50,50},{-19,50},{-19,-16}},
+        connect(valveHU.inlet, ST_HP.outlet) annotation (Line(
+            points={{-19,-16},{-19,16},{-48,16}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(ST_HP.outlet, byPassHP.outlet) annotation (Line(
+            points={{-48,16},{-34,16},{-34,50},{-80,50}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
         connect(byPassLP.inlet, ST_HP.outlet) annotation (Line(
-            points={{80,50},{-50,50},{-50,16}},
+            points={{80,50},{40,50},{40,16},{-48,16}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        connect(valveLP.inlet, valveHU.inlet) annotation (Line(
-            points={{60,16},{-19,16},{-19,-16}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
-                  {-200,-200},{200,200}}),
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-200,-200},
+                  {200,200}}),
                             graphics));
       end ST_2LHU;
 
@@ -17701,9 +13742,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
         //Mixers Parameters
         parameter SI.Volume mixLP_V "Internal volume of the LP mixer";
-        parameter SI.SpecificEnthalpy mixLP_hstart
-          "Enthalpy start value of the LP mixer" annotation (Dialog(tab = "Initialization",
-                                                                    group = "LP mixer"));
         parameter SI.Pressure mixLP_pstart
           "Pressure start value of the LP mixer" 
               annotation (Dialog(tab = "Initialization",
@@ -17727,34 +13765,30 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           eta_mech=HPT_eta_mech,
           eta_iso_nom=HPT_eta_iso_nom,
           Kt=HPT_Kt,
-          hstartin=HPT_hstart_in,
-          hstartout=HPT_hstart_out,
-          pstart_in=HPT_pstart_in,
-          pstart_out=HPT_pstart_out,
-          wstart=HPT_wstart)            annotation (Placement(transformation(
-                extent={{-126,-20},{-86,20}}, rotation=0)));
+          wstart=HPT_wstart,
+          PRstart=steamHPNomPressure/steamLPNomPressure,
+          pnom=steamHPNomPressure)      annotation (Placement(transformation(
+                extent={{-116,-20},{-76,20}}, rotation=0)));
         Water.SteamTurbineStodola ST_LP(
           redeclare package Medium = FluidMedium,
           eta_mech=LPT_eta_mech,
           eta_iso_nom=LPT_eta_iso_nom,
           Kt=LPT_Kt,
-          hstartin=LPT_hstart_in,
-          hstartout=LPT_hstart_out,
-          pstart_in=LPT_pstart_in,
-          pstart_out=LPT_pstart_out,
           wstart=LPT_wstart,
-          wnom=steamHPNomFlowRate)      annotation (Placement(transformation(
+          wnom=steamHPNomFlowRate,
+          PRstart=steamLPNomPressure/pcond,
+          pnom=steamLPNomPressure)      annotation (Placement(transformation(
                 extent={{54,-20},{94,20}}, rotation=0)));
         Water.Mixer mixLP(
           redeclare package Medium = FluidMedium,
           initOpt=if SSInit then Options.steadyState else Options.noInit,
-          hstart=mixLP_hstart,
           V=mixLP_V,
-          pstart=mixLP_pstart) 
+          pstart=mixLP_pstart,
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                           annotation (Placement(transformation(
-              origin={-40,-84},
+              origin={-60,56},
               extent={{-10,-10},{10,10}},
-              rotation=270)));
+              rotation=0)));
         Water.ValveVap valveLP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           pnom=steamLPNomPressure,
@@ -17762,8 +13796,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           dpnom=valveLP_dpnom,
           redeclare package Medium = FluidMedium,
           Cv=valveLP_Cv,
-          wnom=steamHPNomFlowRate,
-          hstart=LPT_hstart_in) 
+          wnom=steamHPNomFlowRate) 
                                annotation (Placement(transformation(extent={{20,
                   6},{40,26}}, rotation=0)));
         Water.ValveVap valveHP(
@@ -17773,18 +13806,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           wnom=steamHPNomFlowRate,
           CheckValve=true,
           dpnom=valveHP_dpnom,
-          redeclare package Medium = FluidMedium,
-          hstart=HPT_hstart_in) 
-                               annotation (Placement(transformation(extent={{
-                  -158,6},{-138,26}}, rotation=0)));
+          redeclare package Medium = FluidMedium) 
+                               annotation (Placement(transformation(extent={{-150,6},{
+                  -130,26}},          rotation=0)));
         Water.ValveVap byPassHP(redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           pnom=steamHPNomPressure,
           wnom=steamHPNomFlowRate,
           CheckValve=true,
           Cv=bypassHP_Cv,
-          dpnom=steamHPNomPressure - steamLPNomPressure,
-          hstart=HPT_hstart_in) annotation (Placement(transformation(extent={{
+          dpnom=steamHPNomPressure - steamLPNomPressure) 
+                                annotation (Placement(transformation(extent={{
                   -140,40},{-120,60}}, rotation=0)));
         Water.ValveVap byPassLP(redeclare package Medium = FluidMedium,
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -17792,28 +13824,30 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CheckValve=true,
           Cv=bypassLP_Cv,
           dpnom=steamLPNomPressure - pcond,
-          wnom=steamHPNomFlowRate,
-          hstart=LPT_hstart_in)  annotation (Placement(transformation(extent={{
+          wnom=steamHPNomFlowRate) 
+                                 annotation (Placement(transformation(extent={{
                   40,40},{60,60}}, rotation=0)));
       equation
         connect(ST_HP.shaft_a, Shaft_a) annotation (Line(
-            points={{-119.2,0},{-200,0}},
+            points={{-109.2,0},{-200,0}},
             color={0,0,0},
             thickness=0.5));
         connect(ST_LP.shaft_b, Shaft_b) annotation (Line(
-            points={{86.8,0},{200,0}},
+            points={{86.8,0},{144,0},{200,0}},
             color={0,0,0},
             thickness=0.5));
         connect(ST_LP.shaft_a,ST_HP. shaft_b) annotation (Line(
-            points={{60.8,0},{-93.2,0}},
+            points={{60.8,0},{-12,0},{-83.2,0}},
             color={0,0,0},
             thickness=0.5));
         connect(valveHP.outlet,ST_HP. inlet) 
-          annotation (Line(points={{-138,16},{-122,16}}, thickness=0.5));
+          annotation (Line(points={{-130,16},{-112,16}}, thickness=0.5,
+            color={0,0,255}));
         connect(valveLP.outlet,ST_LP. inlet) 
-          annotation (Line(points={{40,16},{58,16}}, thickness=0.5));
+          annotation (Line(points={{40,16},{50,16},{58,16}},
+                                                     thickness=0.5));
         connect(ActuatorsBus.Opening_valveHP,valveHP. theta) annotation (Line(
-              points={{200,-140},{-180,-140},{-180,32},{-148,32},{-148,24}},
+              points={{200,-140},{-180,-140},{-180,32},{-140,32},{-140,24}},
               color={213,255,170}));
         connect(ActuatorsBus.Opening_valveLP,valveLP. theta) annotation (Line(
               points={{200,-140},{10,-140},{10,32},{30,32},{30,24}}, color={213,
@@ -17825,48 +13859,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               points={{200,-140},{10,-140},{10,70},{50,70},{50,58}}, color={213,
                 255,170}));
         connect(valveHP.inlet, HPT_In) annotation (Line(
-            points={{-158,16},{-174,16},{-174,80},{-160,80},{-160,200}},
+            points={{-150,16},{-160,16},{-160,200}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
         connect(byPassHP.inlet, HPT_In) annotation (Line(
             points={{-140,50},{-160,50},{-160,200}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(byPassHP.outlet, mixLP.in2) annotation (Line(
-            points={{-120,50},{-70,50},{-70,10},{-46,10},{-46,-76}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(ST_HP.outlet, mixLP.in2) annotation (Line(
-            points={{-90,16},{-70,16},{-70,10},{-46,10},{-46,-76}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(SteamForHU, mixLP.out) annotation (Line(
-            points={{-40,-200},{-40,-94}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(mixLP.out, HPT_Out) annotation (Line(
-            points={{-40,-94},{-40,-120},{-60,-120},{-60,140},{-100,140},{-100,
-                200}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(byPassLP.inlet, IPT_In) annotation (Line(
-            points={{40,50},{-40,50},{-40,200}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(valveLP.inlet, IPT_In) annotation (Line(
-            points={{20,16},{0,16},{0,50},{-40,50},{-40,200}},
-            color={0,0,255},
-            thickness=0.5,
-            smooth=Smooth.None));
-        connect(mixLP.in1, LPT_In) annotation (Line(
-            points={{-34,-76},{-32,-76},{-32,120},{80,120},{80,200}},
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
@@ -17880,8 +13878,43 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
-        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
-                  {-200,-200},{200,200}}),
+        connect(byPassHP.outlet, mixLP.in2) annotation (Line(
+            points={{-120,50},{-68,50}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(ST_HP.outlet, mixLP.in2) annotation (Line(
+            points={{-80,16},{-80,50},{-68,50}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(LPT_In, mixLP.in1) annotation (Line(
+            points={{80,200},{80,80},{-80,80},{-80,62},{-68,62}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(mixLP.out, SteamForHU) annotation (Line(
+            points={{-50,56},{-40,56},{-40,-200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(HPT_Out, SteamForHU) annotation (Line(
+            points={{-100,200},{-100,110},{-40,110},{-40,-200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(valveLP.inlet, LPT_In_Rh) annotation (Line(
+            points={{20,16},{0,16},{0,138},{-40,138},{-40,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(byPassLP.inlet, LPT_In_Rh) annotation (Line(
+            points={{40,50},{0,50},{0,138},{-40,138},{-40,200}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={{-200,
+                  -200},{200,200}}),
                             graphics));
       end ST_2LRhHU;
 
@@ -17901,15 +13934,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           metalVol=metalVol,
           cm=cm,
           rhoMetal=rhoMetal,
-          use_T=use_T,
           SSInit=SSInit,
-          pstart_cond=pstart_cond,
-          Tstart_M_in=Tstart_M_in,
-          Tstart_M_out=Tstart_M_out,
-          Tstart_cool_in=Tstart_cool_in,
-          Tstart_cool_out=Tstart_cool_out,
-          hstart_cool_in=hstart_cool_in,
-          hstart_cool_out=hstart_cool_out)       constrainedby
+          pstart_cond=pstart_cond)               constrainedby
           Interfaces.Condenser(
           redeclare package FluidMedium = FluidMedium,
           N_cool=N_cool,
@@ -17924,46 +13950,30 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           metalVol=metalVol,
           cm=cm,
           rhoMetal=rhoMetal,
-          use_T=use_T,
           SSInit=SSInit,
-          pstart_cond=pstart_cond,
-          Tstart_M_in=Tstart_M_in,
-          Tstart_M_out=Tstart_M_out,
-          Tstart_cool_in=Tstart_cool_in,
-          Tstart_cool_out=Tstart_cool_out,
-          hstart_cool_in=hstart_cool_in,
-          hstart_cool_out=hstart_cool_out) 
-                                       annotation (Placement(transformation(
+          pstart_cond=pstart_cond)     annotation (Placement(transformation(
                 extent={{-18,-22},{22,18}}, rotation=0)));
         Water.SourceW coolingIn(redeclare package Medium = FluidMedium,
           p0=coolNomPressure,
           w0=coolNomFlowRate,
-          h=hstart_cool_in)   annotation (Placement(transformation(extent={{90,
-                  -24},{70,-4}}, rotation=0)));
+          h=h_cool_in)        annotation (Placement(transformation(extent={{90,-20},{70,
+                  0}},           rotation=0)));
         Water.SinkP coolingOut(redeclare package Medium = FluidMedium,
-          p0=coolNomPressure,
-          h=hstart_cool_out) 
-                          annotation (Placement(transformation(extent={{70,30},
-                  {90,50}}, rotation=0)));
+          p0=coolNomPressure) 
+                          annotation (Placement(transformation(extent={{70,0},{90,20}},
+                            rotation=0)));
         replaceable Components.BaseReader_water stateCoolingOut(redeclare
             package Medium = FluidMedium) constrainedby
           Components.BaseReader_water(
             redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(extent={{40,30},
-                  {60,50}}, rotation=0)));
-        replaceable Components.BaseReader_water stateCoolingIn(redeclare
-            package Medium = FluidMedium) constrainedby
-          Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(
-              origin={50,-14},
-              extent={{-10,-10},{10,10}},
-              rotation=180)));
+                           annotation (Placement(transformation(extent={{36,0},{56,20}},
+                            rotation=0)));
         Modelica.Blocks.Interfaces.RealOutput ratio_VvonVtot 
           annotation (Placement(transformation(
               origin={-106,0},
               extent={{-10,-10},{10,10}},
               rotation=180)));
+        parameter SI.SpecificEnthalpy h_cool_in=1e5 "Nominal specific enthalpy";
       equation
         connect(condenser.steamIn, SteamIn) 
           annotation (Line(points={{0,18},{0,100}}, thickness=0.5,
@@ -17972,21 +13982,59 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Line(points={{0,-22},{0,-100}}, thickness=0.5,
             color={0,0,255}));
         connect(stateCoolingOut.outlet, coolingOut.flange) annotation (Line(
-              points={{56,40},{70,40}}, thickness=0.5,
+              points={{52,10},{64,10},{70,10}},
+                                        thickness=0.5,
             color={0,0,255}));
         connect(stateCoolingOut.inlet, condenser.coolingOut) annotation (Line(
-              points={{44,40},{34,40},{34,10},{22,10}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateCoolingIn.inlet, coolingIn.flange) annotation (Line(points=
-               {{56,-14},{70,-14}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateCoolingIn.outlet, condenser.coolingIn) annotation (Line(
-              points={{44,-14},{34,-14},{34,-10},{22,-10}}, thickness=0.5,
+              points={{40,10},{34,10},{22,10}},         thickness=0.5,
             color={0,0,255}));
         connect(condenser.ratio_VvonVtot, ratio_VvonVtot) annotation (Line(
               points={{-18,0},{-106,0}}, color={0,0,127}));
+        connect(coolingIn.flange, condenser.coolingIn) annotation (Line(
+            points={{70,-10},{22,-10}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
       end CondPlant;
+
+      model CondPlant_open
+        "Condensation plant with condenser ratio control (type ImpPressureCondenser_tap)"
+        extends Interfaces.CondPlant_base;
+        parameter Real setPoint_ratio
+          "SetPoint ratio Steam Volume / Total Volume";
+
+        ThermoPower.PowerPlants.SteamTurbineGroup.Components.Comp_bubble_h
+          BubbleEnthalpy(redeclare package FluidMedium = FluidMedium, p=p) 
+                                annotation (Placement(transformation(extent={{68,-54},
+                  {38,-34}},          rotation=0)));
+
+        Water.SinkP sinkP(p0=p) annotation (Placement(transformation(
+              extent={{-10,-10},{10,10}},
+              rotation=270,
+              origin={0,30})));
+        Water.SourceP sourceP(p0=p) annotation (Placement(transformation(
+              extent={{-10,-10},{10,10}},
+              rotation=270,
+              origin={0,-40})));
+      equation
+
+        connect(sinkP.flange, SteamIn) annotation (Line(
+            points={{1.83697e-015,40},{0,40},{0,100}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(WaterOut, sourceP.flange) annotation (Line(
+            points={{0,-100},{0,-50},{-1.83697e-015,-50}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(BubbleEnthalpy.h, sourceP.in_h) annotation (Line(
+            points={{39.5,-44},{9,-44}},
+            color={0,0,127},
+            smooth=Smooth.None));
+        annotation (Diagram(graphics));
+      end CondPlant_open;
 
       model CondPlant_cc
         "Condensation plant with condenser ratio control (type ImpPressureCondenser_tap)"
@@ -18000,13 +14048,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CSmin=-0.6,
           CSmax=0.6,
           Ti=2000,
-          Kp=-3)      annotation (Placement(transformation(extent={{-40,34},{
+          Kp=-3,
+          steadyStateInit=SSInit) 
+                      annotation (Placement(transformation(extent={{-40,34},{
                   -60,54}}, rotation=0)));
         Modelica.Blocks.Sources.Constant setPoint(k=setPoint_ratio) 
                     annotation (Placement(transformation(extent={{-6,42},{-18,
                   54}}, rotation=0)));
-        ThermoPower.PowerPlants.SteamTurbineGroup.Components.CondenserPreP_tap
-          condenserIdeal_tap(                            redeclare package
+        Components.CondenserPreP_tap condenserIdeal_tap( redeclare package
             Medium = FluidMedium,
           p=p,
           Vtot=Vtot,
@@ -18014,25 +14063,22 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               transformation(extent={{16,-26},{76,34}}, rotation=0)));
         Water.SourceW sourceTap(
           redeclare package Medium = FluidMedium,
-          p0=p)       annotation (Placement(transformation(extent={{-80,-30},{
+          p0=p,
+          allowFlowReversal=true) 
+                      annotation (Placement(transformation(extent={{-80,-30},{
                   -60,-10}}, rotation=0)));
         ThermoPower.PowerPlants.SteamTurbineGroup.Components.Comp_bubble_h
           BubbleEnthalpy(redeclare package FluidMedium = FluidMedium, p=p) 
                                 annotation (Placement(transformation(extent={{
                   -30,-10},{-60,10}}, rotation=0)));
-      protected
-        replaceable Components.BaseReader_water stateTappings(redeclare package
-            Medium = FluidMedium) constrainedby Components.BaseReader_water(
-            redeclare package Medium = FluidMedium) 
-                           annotation (Placement(transformation(extent={{-40,
-                  -10},{-20,-30}}, rotation=0)));
+        parameter Boolean SSInit=false "Initialize in steady state";
       equation
 
         connect(setPoint.y, pID.SP) 
                                  annotation (Line(points={{-18.6,48},{-40,48}},
               color={0,0,127}));
-        connect(pID.CS,sourceTap. in_w0) annotation (Line(points={{-60.6,44},{
-                -74,44},{-74,-14}}, color={0,0,127}));
+        connect(pID.CS,sourceTap. in_w0) annotation (Line(points={{-60,44},{-74,44},{-74,
+                -14}},              color={0,0,127}));
         connect(pID.PV,condenserIdeal_tap. ratio_Vv_Vtot) annotation (Line(
               points={{-40,40},{-28,40},{-28,-2},{16,-2}}, color={0,0,127}));
         connect(condenserIdeal_tap.steamIn, SteamIn) 
@@ -18048,12 +14094,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 255,170,213}));
         connect(SensorsBus.Cond_Q, condenserIdeal_tap.Qcond) annotation (Line(
               points={{98,-40},{-8,-40},{-8,16},{16,16}}, color={255,170,213}));
-        connect(stateTappings.inlet, sourceTap.flange) 
-          annotation (Line(points={{-36,-20},{-60,-20}}, thickness=0.5,
-            color={0,0,255}));
-        connect(condenserIdeal_tap.tapWater, stateTappings.outlet) 
-          annotation (Line(points={{22,-20},{-24,-20}}, thickness=0.5,
-            color={0,0,255}));
+        connect(sourceTap.flange, condenserIdeal_tap.tapWater) annotation (Line(
+            points={{-60,-20},{22,-20}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
       end CondPlant_cc;
 
@@ -18069,14 +14114,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           p=p,
           Vtot=Vtot,
           Vlstart=Vlstart,
-          setPoint_ratio=0.8)     annotation (Placement(transformation(extent={
+          setPoint_ratio=0.8,
+          SSInit=SSInit)          annotation (Placement(transformation(extent={
                   {20,0},{80,60}}, rotation=0)));
         Water.Mixer mixCondenser(
           initOpt=if SSInit then Options.steadyState else Options.noInit,
           redeclare package Medium = FluidMedium,
           V=mixCondenser_V,
-          pstart=mixCondenser_pstart,
-          hstart=mixCondenser_hstart) 
+          pstart=mixCondenser_pstart) 
                           annotation (Placement(transformation(
               origin={0,-50},
               extent={{-10,-10},{10,10}},
@@ -18105,49 +14150,47 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       model STG_3LRh "Steam turbine group (three pressure levels, reheat)"
         extends Interfaces.STGroup3LRh;
-        ST3LRh_base steamTurbines(
+        ST3L_base steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
-          steamHPNomPressure=1.28e7,
-          steamIPNomPressure=2.68e6,
-          steamLPNomPressure=6e5,
-          pcond=5.3982e3,
-          HPT_hstart_in=3.47e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
           LPT_Kt=0.078004,
-          HPT_hstart_out=3.10745e6,
-          IPT_hstart_in=3.54348e6,
-          IPT_hstart_out=3.12011e6,
-          LPT_hstart_in=3.11911e6,
-          LPT_hstart_out=2.39102e6,
-          mixLP_hstart=3.11911e6,
           mixLP_V=5,
           steamIPNomFlowRate=81.3524 - 67.6,
-          steamLPNomFlowRate=89.438 - 81.3524) 
+          steamLPNomFlowRate=89.438 - 81.3524,
+          steamHPNomPressure=12800000,
+          steamIPNomPressure=2680000,
+          steamLPNomPressure=600000,
+          SSInit=SSInit,
+          pcond=5398.2) 
                        annotation (Placement(transformation(extent={{-80,-50},{
                   20,50}}, rotation=0)));
-        ThermoPower.PowerPlants.SteamTurbineGroup.Components.CondenserPreP
-          condenserIdeal(redeclare package Medium = FluidMedium, p=5389.2) 
-          annotation (Placement(transformation(extent={{26,-140},{-14,-100}},
-                rotation=0)));
         HRSG.Components.PrescribedSpeedPump totalFeedPump(
           redeclare package WaterMedium = FluidMedium,
-          rho_nom=1000,
+          rho0=1000,
           q_nom={0.0898,0,0.1},
           head_nom={72.74,130,0},
-          nominalCondensationPressure=5398.2,
-          nominalSteamFlow=89.8,
+          nominalFlow=89.8,
           n0=1500,
-          hstart=1.43495e5,
-          nominalSteamPressure=6e5) 
+          nominalOutletPressure=600000,
+          nominalInletPressure=5398.2) 
                                   annotation (Placement(transformation(
               origin={76,-164},
               extent={{16,16},{-16,-16}},
               rotation=180)));
+
+        CondPlant_open controlledCondeser(
+          redeclare package FluidMedium = FluidMedium,
+          Vlstart=1.5,
+          SSInit=SSInit,
+          p=5398.2,
+          Vtot=1,
+          setPoint_ratio=1)    annotation (Placement(transformation(extent={{-24,
+                  -140},{36,-80}},     rotation=0)));
       equation
         connect(steamTurbines.Shaft_b, Shaft_b) annotation (Line(
             points={{20,0},{200,0}},
@@ -18157,15 +14200,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             points={{-80,0},{-200,0}},
             color={0,0,0},
             thickness=0.5));
-        connect(SensorsBus.ratioVvVtot, condenserIdeal.ratio_Vv_Vtot) 
-          annotation (Line(points={{200,-80},{76,-80},{76,-124},{26,-124}},
-              color={255,170,213}));
-        connect(SensorsBus.Qout_condenser, condenserIdeal.Qcond) annotation (Line(
-              points={{200,-80},{76,-80},{76,-112},{26,-112}}, color={255,170,
-                213}));
-        connect(condenserIdeal.steamIn, steamTurbines.LPT_Out) annotation (Line(
-              points={{6,-100},{6,-50},{5,-50}}, thickness=0.5,
-            color={0,0,255}));
         connect(steamTurbines.IPT_In, From_RH_IP) annotation (Line(points={{-40,
                 50},{-40,200}}, thickness=0.5,
             color={0,0,255}));
@@ -18183,39 +14217,35 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 170}));
         connect(SensorsBus, steamTurbines.SensorsBus) annotation (Line(points={
                 {200,-80},{76,-80},{76,-20},{20,-20}}, color={255,170,213}));
-        connect(totalFeedPump.inlet, condenserIdeal.waterOut) annotation (Line(
-              points={{60,-164},{6,-164},{6,-140}}, thickness=0.5,
-            color={0,0,255}));
         connect(totalFeedPump.outlet, WaterOut) annotation (Line(points={{92,
                 -164},{160,-164},{160,200}}, thickness=0.5,
             color={0,0,255}));
         connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
-          annotation (Line(points={{200,-140},{40,-140},{40,-154.4},{58.72,
-                -154.4}}, color={213,255,170}));
+          annotation (Line(points={{200,-140},{40,-140},{40,-154.4},{64.48,-154.4}},
+                          color={213,255,170}));
+        connect(controlledCondeser.SteamIn, steamTurbines.LPT_Out) annotation (
+            Line(
+            points={{6,-80},{6,-50},{5,-50}},
+            color={0,0,255},
+            smooth=Smooth.None,
+            thickness=0.5));
+        connect(controlledCondeser.WaterOut, totalFeedPump.inlet) annotation (
+            Line(
+            points={{6,-140},{6,-164},{60,-164}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
       end STG_3LRh;
 
       model STG_3LRh_valve
         "Steam turbine group (three pressure levels, reheat) with inlet valves"
         extends Interfaces.STGroup3LRh;
-        ST3LRh_valve steamTurbines(
+        ST3L_valve steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
-          steamHPNomPressure=1.28e7,
           steamIPNomFlowRate=81.10 - 67.5,
-          steamIPNomPressure=2.68e6,
-          steamLPNomPressure=6e5,
-          pcond=5.3982e3,
           steamLPNomFlowRate=89.82 - 81.10,
-          HPT_hstart_in=3.47e6,
-          HPT_hstart_out=3.1076e6,
-          IPT_hstart_in=3.554e6,
-          IPT_hstart_out=3.12810e6,
-          LPT_hstart_in=3.109e6,
-          LPT_hstart_out=2.3854e6,
-          valveHP_dpnom=1.6e5,
-          valveIP_dpnom=5e4,
-          mixLP_hstart=3.109e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
@@ -18223,31 +14253,40 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           valveHP_Cv=1165,
           valveIP_Cv=5625,
           valveLP_Cv=14733,
-          valveLP_dpnom=2.964e4,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
-          LPT_Kt=0.078004) 
+          LPT_Kt=0.078004,
+          steamHPNomPressure=12800000,
+          steamIPNomPressure=2680000,
+          steamLPNomPressure=600000,
+          SSInit=SSInit,
+          pcond=5398.2,
+          valveHP_dpnom=160000,
+          valveIP_dpnom=50000,
+          valveLP_dpnom=29640) 
                        annotation (Placement(transformation(extent={{-80,-50},{
                   20,50}}, rotation=0)));
-        ThermoPower.PowerPlants.SteamTurbineGroup.Components.CondenserPreP
-          condenserIdeal(                        p=5398.2,
-          redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(extent={{26,-140},{-14,-100}},
-                rotation=0)));
         HRSG.Components.PrescribedSpeedPump totalFeedPump(
           redeclare package WaterMedium = FluidMedium,
-          rho_nom=1000,
+          rho0=1000,
           q_nom={0.0898,0,0.1},
           head_nom={72.74,130,0},
-          nominalCondensationPressure=5398.2,
-          nominalSteamFlow=89.8,
+          nominalFlow=89.8,
           n0=1500,
-          hstart=1.43495e5,
-          nominalSteamPressure=6e5) 
+          nominalOutletPressure=600000,
+          nominalInletPressure=5398.2) 
                                   annotation (Placement(transformation(
-              origin={76,-164},
+              origin={98,-180},
               extent={{16,16},{-16,-16}},
               rotation=180)));
+        CondPlant_open controlledCondeser(
+          redeclare package FluidMedium = FluidMedium,
+          Vlstart=1.5,
+          SSInit=SSInit,
+          p=5398.2,
+          Vtot=1,
+          setPoint_ratio=1)    annotation (Placement(transformation(extent={{-24,
+                  -150},{36,-90}},     rotation=0)));
       equation
         connect(steamTurbines.Shaft_a, Shaft_a) annotation (Line(
             points={{-80,0},{-200,0}},
@@ -18260,15 +14299,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus, steamTurbines.ActuatorsBus) annotation (Line(
               points={{200,-140},{60,-140},{60,-35},{20,-35}}, color={213,255,
                 170}));
-        connect(SensorsBus.ratioVvVtot, condenserIdeal.ratio_Vv_Vtot) annotation (Line(
-              points={{200,-80},{66,-80},{66,-124},{26,-124}}, color={255,170,
-                213}));
-        connect(SensorsBus.Qout_condenser, condenserIdeal.Qcond) annotation (Line(
-              points={{200,-80},{66,-80},{66,-112},{26,-112}}, color={255,170,
-                213}));
-        connect(condenserIdeal.steamIn, steamTurbines.LPT_Out) annotation (Line(
-              points={{6,-100},{6,-50},{5,-50}}, thickness=0.5,
-            color={0,0,255}));
         connect(steamTurbines.IPT_In, From_RH_IP) annotation (Line(points={{-40,
                 50},{-40,200}}, thickness=0.5,
             color={0,0,255}));
@@ -18283,66 +14313,71 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,255}));
         connect(SensorsBus, steamTurbines.SensorsBus) annotation (Line(points={
                 {200,-80},{66,-80},{66,-20},{20,-20}}, color={255,170,213}));
+        connect(totalFeedPump.outlet, WaterOut) annotation (Line(points={{114,
+                -180},{160,-180},{160,200}}, thickness=0.5,
+            color={0,0,255}));
+        connect(controlledCondeser.SteamIn, steamTurbines.LPT_Out) annotation (
+            Line(
+            points={{6,-90},{6,-50},{5,-50}},
+            color={0,0,255},
+            smooth=Smooth.None,
+            thickness=0.5));
+        connect(controlledCondeser.WaterOut, totalFeedPump.inlet) annotation (
+            Line(
+            points={{6,-150},{6,-180},{82,-180}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
-          annotation (Line(points={{200,-140},{40,-140},{40,-154.4},{58.72,
-                -154.4}}, color={213,255,170}));
-        connect(totalFeedPump.inlet, condenserIdeal.waterOut) annotation (Line(
-              points={{60,-164},{6,-164},{6,-140}}, thickness=0.5,
-            color={0,0,255}));
-        connect(totalFeedPump.outlet, WaterOut) annotation (Line(points={{92,
-                -164},{160,-164},{160,200}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics));
+          annotation (Line(points={{200,-140},{60,-140},{60,-170.4},{86.48,
+                -170.4}}, color={213,255,170}));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
+                  {-200,-200},{200,200}}),
+                            graphics));
       end STG_3LRh_valve;
 
       model STG_3LRh_cc
         "Steam turbine group (three pressure levels, reheat) and controlled condenser"
         extends Interfaces.STGroup3LRh;
-        ST3LRh_base steamTurbines(
+        ST3L_base steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
-          steamHPNomPressure=1.28e7,
-          steamIPNomPressure=2.68e6,
-          steamLPNomPressure=6e5,
-          pcond=5.3982e3,
-          HPT_hstart_in=3.47e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
           LPT_Kt=0.078004,
-          HPT_hstart_out=3.10745e6,
-          IPT_hstart_in=3.54348e6,
-          IPT_hstart_out=3.12011e6,
-          LPT_hstart_in=3.11911e6,
-          LPT_hstart_out=2.39102e6,
-          mixLP_hstart=3.11911e6,
           mixLP_V=5,
           steamIPNomFlowRate=81.3524 - 67.6,
-          steamLPNomFlowRate=89.438 - 81.3524) 
+          steamLPNomFlowRate=89.438 - 81.3524,
+          steamHPNomPressure=12800000,
+          steamIPNomPressure=2680000,
+          steamLPNomPressure=600000,
+          SSInit=SSInit,
+          pcond=5398.2) 
                        annotation (Placement(transformation(extent={{-80,-50},{
                   20,50}}, rotation=0)));
         ThermoPower.PowerPlants.SteamTurbineGroup.Examples.CondPlant_cc
           controlledCondeser(
           redeclare package FluidMedium = FluidMedium,
-          p=5398.2,
           Vtot=10,
           Vlstart=1.5,
-          setPoint_ratio=0.85) annotation (Placement(transformation(extent={{
+          setPoint_ratio=0.85,
+          p=5398.2,
+          SSInit=SSInit)       annotation (Placement(transformation(extent={{
                   -26,-140},{34,-80}}, rotation=0)));
         HRSG.Components.PrescribedSpeedPump totalFeedPump(
           redeclare package WaterMedium = FluidMedium,
-          rho_nom=1000,
+          rho0=1000,
           q_nom={0.0898,0,0.1},
           head_nom={72.74,130,0},
-          nominalCondensationPressure=5398.2,
-          nominalSteamFlow=89.8,
+          nominalFlow=89.8,
           n0=1500,
-          hstart=1.43495e5,
-          nominalSteamPressure=6e5) 
+          nominalOutletPressure=600000,
+          nominalInletPressure=5398.2) 
                                   annotation (Placement(transformation(
-              origin={96,-170},
+              origin={84,-180},
               extent={{16,16},{-16,-16}},
               rotation=180)));
       equation
@@ -18380,72 +14415,71 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus, controlledCondeser.ActuatorsBus) annotation (Line(
               points={{200,-140},{100,-140},{100,-131.6},{33.4,-131.6}}, color=
                 {213,255,170}));
-        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
-          annotation (Line(points={{200,-140},{60,-140},{60,-160.4},{78.72,
-                -160.4}}, color={213,255,170}));
-        connect(totalFeedPump.inlet, controlledCondeser.WaterOut) annotation (Line(
-              points={{80,-170},{4,-170},{4,-140}}, thickness=0.5,
+        connect(totalFeedPump.outlet, WaterOut) annotation (Line(points={{100,
+                -180},{160,-180},{160,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(totalFeedPump.outlet, WaterOut) annotation (Line(points={{112,
-                -170},{160,-170},{160,200}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics));
+        connect(ActuatorsBus.nPump_feedLP,totalFeedPump. pumpSpeed_rpm) 
+          annotation (Line(points={{200,-140},{48,-140},{48,-170.4},{72.48,
+                -170.4}}, color={213,255,170}));
+        connect(controlledCondeser.WaterOut, totalFeedPump.inlet) annotation (
+            Line(
+            points={{4,-140},{4,-180},{68,-180}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
+                  {-200,-200},{200,200}}),
+                            graphics));
       end STG_3LRh_cc;
 
       model STG_3LRh_valve_cc
         "Steam turbine group (three pressure levels, reheat) with inlet valves and controlled condenser"
         extends Interfaces.STGroup3LRh;
-        ST3LRh_valve steamTurbines(
+        ST3L_valve steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
-          steamHPNomPressure=1.28e7,
-          steamIPNomPressure=2.68e6,
-          steamLPNomPressure=6e5,
-          pcond=5.3982e3,
-          HPT_hstart_in=3.47e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
           LPT_Kt=0.078004,
-          HPT_hstart_out=3.10745e6,
-          IPT_hstart_in=3.54348e6,
-          IPT_hstart_out=3.12011e6,
-          LPT_hstart_in=3.11911e6,
-          LPT_hstart_out=2.39102e6,
-          mixLP_hstart=3.11911e6,
           mixLP_V=5,
           steamIPNomFlowRate=81.3524 - 67.6,
           steamLPNomFlowRate=89.438 - 81.3524,
           valveHP_Cv=1165,
-          valveHP_dpnom=1.6e5,
           valveIP_Cv=5625,
-          valveIP_dpnom=5e4,
           valveLP_Cv=14733,
-          valveLP_dpnom=2.964e4) 
+          steamHPNomPressure=12800000,
+          steamIPNomPressure=2680000,
+          steamLPNomPressure=600000,
+          SSInit=SSInit,
+          pcond=5398.2,
+          valveHP_dpnom=160000,
+          valveIP_dpnom=50000,
+          valveLP_dpnom=29640) 
                        annotation (Placement(transformation(extent={{-80,-50},{
                   20,50}}, rotation=0)));
         ThermoPower.PowerPlants.SteamTurbineGroup.Examples.CondPlant_cc
           controlledCondeser(
           redeclare package FluidMedium = FluidMedium,
-          p=5398.2,
           Vtot=10,
           Vlstart=1.5,
-          setPoint_ratio=0.85) annotation (Placement(transformation(extent={{
+          setPoint_ratio=0.85,
+          p=5398.2,
+          SSInit=SSInit)       annotation (Placement(transformation(extent={{
                   -24,-140},{36,-80}}, rotation=0)));
         HRSG.Components.PrescribedSpeedPump totalFeedPump(
           redeclare package WaterMedium = FluidMedium,
-          rho_nom=1000,
+          rho0=1000,
           q_nom={0.0898,0,0.1},
           head_nom={72.74,130,0},
-          nominalCondensationPressure=5398.2,
-          nominalSteamFlow=89.8,
+          nominalFlow=89.8,
           n0=1500,
-          hstart=1.43495e5,
-          nominalSteamPressure=6e5) 
+          nominalOutletPressure=600000,
+          nominalInletPressure=5398.2) 
                                   annotation (Placement(transformation(
-              origin={96,-174},
+              origin={94,-182},
               extent={{16,16},{-16,-16}},
               rotation=180)));
       equation
@@ -18483,75 +14517,74 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(ActuatorsBus, controlledCondeser.ActuatorsBus) annotation (Line(
               points={{200,-140},{100,-140},{100,-131.6},{35.4,-131.6}}, color=
                 {213,255,170}));
-        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
-          annotation (Line(points={{200,-140},{60,-140},{60,-164.4},{78.72,
-                -164.4}}, color={213,255,170}));
-        connect(totalFeedPump.inlet, controlledCondeser.WaterOut) annotation (Line(
-              points={{80,-174},{6,-174},{6,-140}}, thickness=0.5,
+        connect(totalFeedPump.outlet, WaterOut) annotation (Line(points={{110,
+                -182},{160,-182},{160,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(totalFeedPump.outlet, WaterOut) annotation (Line(points={{112,
-                -174},{160,-174},{160,200}}, thickness=0.5,
-            color={0,0,255}));
-        annotation (Diagram(graphics));
+        connect(ActuatorsBus.nPump_feedLP,totalFeedPump. pumpSpeed_rpm) 
+          annotation (Line(points={{200,-140},{58,-140},{58,-172.4},{82.48,
+                -172.4}}, color={213,255,170}));
+        connect(controlledCondeser.WaterOut, totalFeedPump.inlet) annotation (
+            Line(
+            points={{6,-140},{6,-182},{78,-182}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
+                  {-200,-200},{200,200}}),
+                            graphics));
       end STG_3LRh_valve_cc;
 
       model STG_3LRh_bypass_cc
         "Steam turbine group (three pressure levels, reheat) with inlet and bypass valves and controlled condenser"
         extends Interfaces.STGroup3LRh;
-        ST3LRh_bypass steamTurbines(
+        ST3L_bypass steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
-          steamHPNomPressure=1.28e7,
-          steamIPNomPressure=2.68e6,
-          steamLPNomPressure=6e5,
-          pcond=5.3982e3,
-          HPT_hstart_in=3.47e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
           LPT_Kt=0.078004,
-          HPT_hstart_out=3.10745e6,
-          IPT_hstart_in=3.54348e6,
-          IPT_hstart_out=3.12011e6,
-          LPT_hstart_in=3.11911e6,
-          LPT_hstart_out=2.39102e6,
-          mixLP_hstart=3.11911e6,
           mixLP_V=5,
           steamIPNomFlowRate=81.3524 - 67.6,
           steamLPNomFlowRate=89.438 - 81.3524,
           valveHP_Cv=1165,
-          valveHP_dpnom=1.6e5,
           valveIP_Cv=5625,
-          valveIP_dpnom=5e4,
           valveLP_Cv=14733,
-          valveLP_dpnom=2.964e4,
           bypassHP_Cv=272,
           bypassIP_Cv=1595,
-          bypassLP_Cv=7540) 
+          bypassLP_Cv=7540,
+          steamHPNomPressure=12800000,
+          steamIPNomPressure=2680000,
+          steamLPNomPressure=600000,
+          SSInit=SSInit,
+          pcond=5398.2,
+          valveHP_dpnom=160000,
+          valveIP_dpnom=50000,
+          valveLP_dpnom=29640) 
                        annotation (Placement(transformation(extent={{-80,-50},{
                   20,50}}, rotation=0)));
         ThermoPower.PowerPlants.SteamTurbineGroup.Examples.CondPlant_cc
           controlledCondeser(
           redeclare package FluidMedium = FluidMedium,
-          p=5398.2,
           Vtot=10,
           Vlstart=1.5,
-          setPoint_ratio=0.85) annotation (Placement(transformation(extent={{
+          setPoint_ratio=0.85,
+          p=5398.2,
+          SSInit=SSInit)       annotation (Placement(transformation(extent={{
                   -26,-140},{34,-80}}, rotation=0)));
         HRSG.Components.PrescribedSpeedPump totalFeedPump(
           redeclare package WaterMedium = FluidMedium,
-          rho_nom=1000,
+          rho0=1000,
           q_nom={0.0898,0,0.1},
           head_nom={72.74,130,0},
-          nominalCondensationPressure=5398.2,
-          nominalSteamFlow=89.8,
+          nominalFlow=89.8,
           n0=1500,
-          hstart=1.43495e5,
-          nominalSteamPressure=6e5) 
+          nominalOutletPressure=600000,
+          nominalInletPressure=5398.2) 
                                   annotation (Placement(transformation(
-              origin={88,-176},
+              origin={88,-180},
               extent={{16,16},{-16,-16}},
               rotation=180)));
       equation
@@ -18589,16 +14622,21 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(steamTurbines.HPT_In, From_SH_HP) annotation (Line(points={{-70,
                 50},{-70,100},{-160,100},{-160,200}}, thickness=0.5,
             color={0,0,255}));
-        connect(ActuatorsBus.nPump_feedLP, totalFeedPump.pumpSpeed_rpm) 
-          annotation (Line(points={{200,-140},{52,-140},{52,-166.4},{70.72,
-                -166.4}}, color={213,255,170}));
-        connect(totalFeedPump.inlet, controlledCondeser.WaterOut) annotation (Line(
-              points={{72,-176},{4,-176},{4,-140}}, thickness=0.5,
-            color={0,0,255}));
         connect(totalFeedPump.outlet, WaterOut) annotation (Line(points={{104,
-                -176},{160,-176},{160,200}}, thickness=0.5,
+                -180},{160,-180},{160,200}}, thickness=0.5,
             color={0,0,255}));
-        annotation (Diagram(graphics));
+        connect(ActuatorsBus.nPump_feedLP,totalFeedPump. pumpSpeed_rpm) 
+          annotation (Line(points={{200,-140},{52,-140},{52,-170.4},{76.48,
+                -170.4}}, color={213,255,170}));
+        connect(controlledCondeser.WaterOut, totalFeedPump.inlet) annotation (
+            Line(
+            points={{4,-140},{4,-180},{72,-180}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=true, extent={
+                  {-200,-200},{200,200}}),
+                            graphics));
       end STG_3LRh_bypass_cc;
     end Examples;
 
@@ -18633,17 +14671,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       model TestSettingTurbineHP
         Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=1.28e7,
-          pstart_out=2.98e6,
           wstart=67.6,
-          hstartin=3.47e6,
-          hstartout=3.1076e6,
           wnom=67.6,
           eta_iso_nom=0.833,
-          Kt=0.0032078) 
+          Kt=0.0032078,
+          PRstart=130/30,
+          pnom=13000000) 
                       annotation (Placement(transformation(extent={{-40,-40},{
                   20,20}}, rotation=0)));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
+        Water.SinkP sinkP(           h=3.1076e6, p0=2980000) 
           annotation (Placement(transformation(extent={{30,60},{50,80}},
                 rotation=0)));
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
@@ -18651,7 +14687,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               314.16/2, useSupport=false) 
                       annotation (Placement(transformation(extent={{70,-20},{50,
                   0}}, rotation=0)));
-        Water.SourceP sourceP(h=3.47e6, p0=1.28e7) 
+        Water.SourceP sourceP(h=3.47e6, p0=12800000) 
           annotation (Placement(transformation(extent={{-80,60},{-60,80}},
                 rotation=0)));
         inner System system 
@@ -18674,19 +14710,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       model TestSettingTurbineIP
         Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=2.68e6,
-          pstart_out=6e5,
           wstart=81.10,
-          hstartin=3.554e6,
-          hstartout=3.1281e6,
           wnom=81.10,
           eta_iso_nom=0.903,
-          Kt=0.018883)     annotation (Placement(transformation(extent={{-40,
+          Kt=0.018883,
+          PRstart=27/6,
+          pnom=2700000)    annotation (Placement(transformation(extent={{-40,
                   -40},{20,20}}, rotation=0)));
-        Water.SinkP sinkP(p0=6e5, h=3.1281e6) 
+        Water.SinkP sinkP(        h=3.1281e6, p0=600000) 
           annotation (Placement(transformation(extent={{30,60},{50,80}},
                 rotation=0)));
-        Water.SourceP sourceP(            h=3.554e6, p0=2.68e6) 
+        Water.SourceP sourceP(            h=3.554e6, p0=2680000) 
           annotation (Placement(transformation(extent={{-80,60},{-60,80}},
                 rotation=0)));
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
@@ -18714,16 +14748,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       model TestSettingTurbineLP
         Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=6e5,
-          pstart_out=5.3982e3,
           wstart=89.82,
-          hstartin=3.109e6,
-          hstartout=2.3854e6,
           wnom=89.82,
           eta_iso_nom=0.903,
-          Kt=0.078004)     annotation (Placement(transformation(extent={{-40,
+          Kt=0.078004,
+          PRstart=6,
+          pnom=600000)     annotation (Placement(transformation(extent={{-40,
                   -40},{20,20}}, rotation=0)));
-        Water.SinkP sinkP(p0=5.3982e3, h=2.3854e6) 
+        Water.SinkP sinkP(             h=2.3854e6, p0=5398.2) 
           annotation (Placement(transformation(extent={{30,60},{50,80}},
                 rotation=0)));
         Water.SourceP sourceP(        h=3.109e6, p0=6e5) 
@@ -18745,7 +14777,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,255}));
         connect(steamTurbineStodola.shaft_b, constantSpeed.flange) annotation (
             Line(
-            points={{9.2,-10},{30,-10},{30,-10},{50,-10}},
+            points={{9.2,-10},{50,-10}},
             color={0,0,0},
             thickness=0.5,
             smooth=Smooth.None));
@@ -18753,17 +14785,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestSettingTurbineLP;
 
       model TestValveTurbineHP
-        Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=1.28e7,
-          pstart_out=2.98e6,
-          wstart=67.6,
-          hstartin=3.47e6,
-          hstartout=3.1076e6,
-          wnom=67.6,
-          eta_iso_nom=0.833,
-          Kt=0.0032078) 
-                      annotation (Placement(transformation(extent={{-42,-40},{
-                  18,20}}, rotation=0)));
         Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
           annotation (Placement(transformation(extent={{30,60},{50,80}},
                 rotation=0)));
@@ -18771,11 +14792,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           CheckValve=true,
           wnom=67.6,
-          hstart=3.47e6,
-          pnom=1.296e7,
-          dpnom=1.6e5,
-          Cv=1165)             annotation (Placement(transformation(
-              origin={-34,50},
+          Cv=1165,
+          pnom=12960000,
+          dpnom=160000,
+          thetanom=0.7)        annotation (Placement(transformation(
+              origin={-32,50},
               extent={{10,10},{-10,-10}},
               rotation=90)));
         Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
@@ -18783,7 +14804,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 rotation=0)));
       public
         Modelica.Blocks.Sources.Constant com_valveHP(k=0.7) 
-          annotation (Placement(transformation(extent={{4,40},{-16,60}},
+          annotation (Placement(transformation(extent={{6,40},{-14,60}},
                 rotation=0)));
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
                                                                   w_fixed=
@@ -18792,38 +14813,41 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                   0}}, rotation=0)));
         inner System system 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SteamTurbineStodola steamTurbineStodola(
+          wstart=67.6,
+          wnom=67.6,
+          eta_iso_nom=0.833,
+          Kt=0.0032078,
+          PRstart=130/30,
+          pnom=13000000) 
+                      annotation (Placement(transformation(extent={{-38,-40},{
+                  22,20}}, rotation=0)));
       equation
-        connect(sinkP.flange, steamTurbineStodola.outlet) annotation (Line(
-              points={{30,70},{12,70},{12,14}}, thickness=0.5,
-            color={0,0,255}));
-        connect(valveHP.outlet, steamTurbineStodola.inlet) annotation (Line(
-              points={{-34,40},{-34,14},{-36,14}}, thickness=0.5,
-            color={0,0,255}));
         connect(sourceP.flange, valveHP.inlet) 
-          annotation (Line(points={{-60,70},{-34,70},{-34,60}}, thickness=0.5,
+          annotation (Line(points={{-60,70},{-32,70},{-32,60}}, thickness=0.5,
             color={0,0,255}));
-        connect(com_valveHP.y, valveHP.theta) annotation (Line(points={{-17,50},
-                {-26,50}}, color={0,0,127}));
+        connect(com_valveHP.y, valveHP.theta) annotation (Line(points={{-15,50},
+                {-24,50}}, color={0,0,127}));
         connect(steamTurbineStodola.shaft_b, constantSpeed.flange) annotation (
             Line(
-            points={{7.2,-10},{50,-10}},
+            points={{11.2,-10},{50,-10}},
             color={0,0,0},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(steamTurbineStodola.outlet, sinkP.flange) annotation (Line(
+            points={{16,14},{16,70},{30,70}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(steamTurbineStodola.inlet, valveHP.outlet) annotation (Line(
+            points={{-32,14},{-32,40}},
+            color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
         annotation (Diagram(graphics));
       end TestValveTurbineHP;
 
       model TestValveTurbineIP
-        Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=2.68e6,
-          pstart_out=6e5,
-          wstart=81.10,
-          hstartin=3.554e6,
-          hstartout=3.1281e6,
-          wnom=81.10,
-          eta_iso_nom=0.903,
-          Kt=0.018883)     annotation (Placement(transformation(extent={{-42,
-                  -40},{18,20}}, rotation=0)));
         Water.SinkP sinkP(p0=6e5, h=3.1281e6) 
           annotation (Placement(transformation(extent={{30,60},{50,80}},
                 rotation=0)));
@@ -18831,14 +14855,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           CheckValve=true,
           wnom=81.1,
-          hstart=3.554e6,
-          dpnom=5e4,
-          pnom=2.73e6,
-          Cv=5625)             annotation (Placement(transformation(
-              origin={-34,50},
+          Cv=5625,
+          pnom=2730000,
+          dpnom=50000)         annotation (Placement(transformation(
+              origin={-36,50},
               extent={{10,10},{-10,-10}},
               rotation=90)));
-        Water.SourceP sourceP(            h=3.554e6, p0=2.73e6) 
+        Water.SourceP sourceP(            h=3.554e6, p0=2730000) 
           annotation (Placement(transformation(extent={{-80,60},{-60,80}},
                 rotation=0)));
       public
@@ -18852,38 +14875,40 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                   0}}, rotation=0)));
         inner System system 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SteamTurbineStodola steamTurbineStodola(
+          wstart=81.10,
+          wnom=81.10,
+          eta_iso_nom=0.903,
+          Kt=0.018883,
+          PRstart=27/6,
+          pnom=2700000)    annotation (Placement(transformation(extent={{-42,-40},
+                  {18,20}},      rotation=0)));
       equation
-        connect(sinkP.flange, steamTurbineStodola.outlet) annotation (Line(
+        connect(sourceP.flange,valveIP. inlet) 
+          annotation (Line(points={{-60,70},{-36,70},{-36,60}}, thickness=0.5,
+            color={0,0,255}));
+        connect(com_valveHP.y, valveIP.theta) annotation (Line(
+            points={{-17,50},{-28,50}},
+            color={0,0,127},
+            smooth=Smooth.None));
+        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (Line(
               points={{30,70},{12,70},{12,14}}, thickness=0.5,
             color={0,0,255}));
-        connect(valveIP.outlet, steamTurbineStodola.inlet) annotation (Line(
-              points={{-34,40},{-34,14},{-36,14}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sourceP.flange,valveIP. inlet) 
-          annotation (Line(points={{-60,70},{-34,70},{-34,60}}, thickness=0.5,
-            color={0,0,255}));
-        connect(constantSpeed.flange, steamTurbineStodola.shaft_b) annotation (Line(
-            points={{50,-10},{7.2,-10}},
+        connect(steamTurbineStodola.shaft_b, constantSpeed.flange) annotation (
+            Line(
+            points={{7.2,-10},{50,-10}},
             color={0,0,0},
-            thickness=0.5));
-        connect(com_valveHP.y, valveIP.theta) annotation (Line(
-            points={{-17,50},{-26,50}},
-            color={0,0,127},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(steamTurbineStodola.inlet, valveIP.outlet) annotation (Line(
+            points={{-36,14},{-36,40}},
+            color={0,0,255},
+            thickness=0.5,
             smooth=Smooth.None));
         annotation (Diagram(graphics));
       end TestValveTurbineIP;
 
       model TestValveTurbineLP
-        Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=6e5,
-          pstart_out=5.3982e3,
-          wstart=89.82,
-          hstartin=3.109e6,
-          hstartout=2.3854e6,
-          wnom=89.82,
-          eta_iso_nom=0.903,
-          Kt=0.078004)     annotation (Placement(transformation(extent={{-42,
-                  -40},{18,20}}, rotation=0)));
         Water.SinkP sinkP(p0=5.3982e3, h=2.3854e6) 
           annotation (Placement(transformation(extent={{30,60},{50,80}},
                 rotation=0)));
@@ -18891,7 +14916,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           CheckValve=true,
           wnom=89.82,
-          hstart=3.109e6,
           pnom=6.296e5,
           dpnom=2.964e4,
           Cv=14733)            annotation (Placement(transformation(
@@ -18912,56 +14936,66 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                   0}}, rotation=0)));
         inner System system 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SteamTurbineStodola steamTurbineStodola(
+          wstart=89.82,
+          wnom=89.82,
+          eta_iso_nom=0.903,
+          Kt=0.078004,
+          PRstart=6,
+          pnom=600000)     annotation (Placement(transformation(extent={{-40,-40},
+                  {20,20}},      rotation=0)));
       equation
-        connect(sinkP.flange, steamTurbineStodola.outlet) annotation (Line(
-              points={{30,70},{12,70},{12,14}}, thickness=0.5,
-            color={0,0,255}));
         connect(valveLP.inlet, sourceP.flange) annotation (Line(
             points={{-34,60},{-34,70},{-60,70}},
             color={0,0,255},
             thickness=0.5));
-        connect(valveLP.outlet, steamTurbineStodola.inlet) annotation (Line(
-              points={{-34,40},{-34,14},{-36,14}}, thickness=0.5,
-            color={0,0,255}));
         connect(com_valveHP.y, valveLP.theta) annotation (Line(points={{-17,50},
                 {-26,50}}, color={0,0,127}));
-        connect(constantSpeed.flange, steamTurbineStodola.shaft_b) annotation (Line(
-            points={{50,-10},{7.2,-10}},
+        connect(sinkP.flange,steamTurbineStodola. outlet) annotation (Line(
+              points={{30,70},{14,70},{14,14}}, thickness=0.5,
+            color={0,0,255}));
+        connect(steamTurbineStodola.shaft_b, constantSpeed.flange) annotation (
+            Line(
+            points={{9.2,-10},{50,-10}},
             color={0,0,0},
-            thickness=0.5));
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(steamTurbineStodola.inlet, valveLP.outlet) annotation (Line(
+            points={{-34,14},{-34,40}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics));
       end TestValveTurbineLP;
 
       model TestTurbineHPefficiency
 
         Components.SteamTurbineVarEta steamTurbineVarEta(
-          pstart_in=1.28e7,
-          pstart_out=2.98e6,
           wstart=67.6,
-          hstartin=3.47e6,
-          hstartout=3.1076e6,
           wnom=67.6,
           eta_iso_nom=0.833,
           Kt=0.0032078,
           n=20,
-          Rm=0.936)   annotation (Placement(transformation(extent={{-58,-88},{2,
-                  -28}}, rotation=0)));
+          Rm=0.936,
+          PRstart=128/28,
+          pnom=12800000) 
+                      annotation (Placement(transformation(extent={{-58,-90},{2,
+                  -30}}, rotation=0)));
         Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
-          annotation (Placement(transformation(extent={{14,12},{34,32}},
+          annotation (Placement(transformation(extent={{10,10},{30,30}},
                 rotation=0)));
         Water.ValveVap valveHP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           CheckValve=true,
           wnom=67.6,
-          hstart=3.47e6,
           pnom=1.296e7,
           dpnom=1.6e5,
           Cv=1165)             annotation (Placement(transformation(
-              origin={-50,2},
+              origin={-52,0},
               extent={{10,10},{-10,-10}},
               rotation=90)));
         Water.SourceP sourceP(h=3.47e6, p0=1.296e7) 
-          annotation (Placement(transformation(extent={{-96,12},{-76,32}},
+          annotation (Placement(transformation(extent={{-90,10},{-70,30}},
                 rotation=0)));
       public
         Modelica.Blocks.Sources.Ramp com_valveHP(
@@ -18969,11 +15003,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           height=-0.9,
           duration=50,
           startTime=1000) 
-          annotation (Placement(transformation(extent={{14,74},{-6,94}},
+          annotation (Placement(transformation(extent={{20,70},{0,90}},
                 rotation=0)));
         ThermoPower.PowerPlants.SteamTurbineGroup.Components.PrescribedSpeed
           constantSpeed 
-          annotation (Placement(transformation(extent={{54,-68},{34,-48}},
+          annotation (Placement(transformation(extent={{40,-70},{20,-50}},
                 rotation=0)));
       public
         Modelica.Blocks.Sources.Ramp rif_velocity(
@@ -18981,17 +15015,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           offset=314.16/2,
           duration=50,
           startTime=10) 
-          annotation (Placement(transformation(extent={{100,36},{80,56}},
+          annotation (Placement(transformation(extent={{100,-50},{80,-30}},
                 rotation=0)));
         Modelica.Blocks.Math.Add add 
           annotation (Placement(transformation(
-              origin={-30,60},
+              origin={-28,64},
               extent={{-6,-6},{6,6}},
               rotation=180)));
         Modelica.Blocks.Math.Add add1 
           annotation (Placement(transformation(
-              origin={66,8},
-              extent={{-6,-6},{6,6}},
+              origin={56,-54},
+              extent={{-8,-8},{8,8}},
               rotation=180)));
       public
         Modelica.Blocks.Sources.Ramp com_valveHP1(
@@ -18999,7 +15033,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           height=0.2,
           duration=50,
           startTime=80000) 
-          annotation (Placement(transformation(extent={{14,40},{-6,60}},
+          annotation (Placement(transformation(extent={{20,40},{0,60}},
                 rotation=0)));
       public
         Modelica.Blocks.Sources.Ramp rif_velocity1(
@@ -19007,37 +15041,41 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           offset=0,
           duration=50,
           startTime=80) 
-          annotation (Placement(transformation(extent={{100,-40},{80,-20}},
+          annotation (Placement(transformation(extent={{100,-90},{80,-70}},
                 rotation=0)));
         inner System system 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
         connect(sinkP.flange, steamTurbineVarEta.outlet)  annotation (Line(
-              points={{14,22},{-4,22},{-4,-34}}, thickness=0.5,
+              points={{10,20},{-4,20},{-4,-36}}, thickness=0.5,
             color={0,0,255}));
         connect(valveHP.outlet, steamTurbineVarEta.inlet)  annotation (Line(
-              points={{-50,-8},{-50,-34},{-52,-34}}, thickness=0.5,
+              points={{-52,-10},{-52,-36}},          thickness=0.5,
             color={0,0,255}));
         connect(sourceP.flange, valveHP.inlet) 
-          annotation (Line(points={{-76,22},{-50,22},{-50,12}}, thickness=0.5,
+          annotation (Line(points={{-70,20},{-52,20},{-52,10}}, thickness=0.5,
             color={0,0,255}));
-        connect(com_valveHP1.y, add.u1) annotation (Line(points={{-7,50},{-14,
-                50},{-14,56.4},{-22.8,56.4}}, color={0,0,127}));
-        connect(com_valveHP.y, add.u2) annotation (Line(points={{-7,84},{-14,84},
-                {-14,64},{-22,64},{-22.8,63.6}}, color={0,0,127}));
-        connect(add.y, valveHP.theta) annotation (Line(points={{-36.6,60},{-48,
-                60},{-48,28},{-24,28},{-24,2},{-42,2}}, color={0,0,127}));
-        connect(rif_velocity.y, add1.u2) annotation (Line(points={{79,46},{70,
-                46},{70,24},{88,24},{88,11.6},{73.2,11.6}}, color={0,0,127}));
-        connect(rif_velocity1.y, add1.u1) annotation (Line(points={{79,-30},{70,
-                -30},{70,-8},{88,-8},{88,4.4},{73.2,4.4}}, color={0,0,127}));
-        connect(add1.y, constantSpeed.w_fixed) annotation (Line(points={{59.4,8},
-                {50,8},{50,-38},{66,-38},{66,-52},{54,-52}}, color={0,0,127}));
+        connect(com_valveHP1.y, add.u1) annotation (Line(points={{-1,50},{-14,
+                50},{-14,60.4},{-20.8,60.4}}, color={0,0,127}));
+        connect(com_valveHP.y, add.u2) annotation (Line(points={{-1,80},{-14,80},
+                {-14,68},{-20.8,68},{-20.8,67.6}},
+                                                 color={0,0,127}));
+        connect(add.y, valveHP.theta) annotation (Line(points={{-34.6,64},{-40,
+                64},{-40,40},{-30,40},{-30,-4.89859e-016},{-44,-4.89859e-016}},
+                                                        color={0,0,127}));
+        connect(rif_velocity.y, add1.u2) annotation (Line(points={{79,-40},{72,
+                -40},{72,-49.2},{65.6,-49.2}},              color={0,0,127}));
+        connect(add1.y, constantSpeed.w_fixed) annotation (Line(points={{47.2,
+                -54},{46,-54},{40,-54}},                     color={0,0,127}));
         connect(steamTurbineVarEta.shaft_b, constantSpeed.flange) annotation (
             Line(
-            points={{-8.8,-58},{34,-58}},
+            points={{-8.8,-60},{20,-60}},
             color={0,0,0},
             thickness=0.5,
+            smooth=Smooth.None));
+        connect(add1.u1, rif_velocity1.y) annotation (Line(
+            points={{65.6,-58.8},{71.6,-58.8},{71.6,-80},{79,-80}},
+            color={0,0,127},
             smooth=Smooth.None));
         annotation (Diagram(graphics),
           experiment(StopTime=1000),
@@ -19047,29 +15085,23 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       model TestST3LRh_base
         package FluidMedium = ThermoPower.Water.StandardWater;
 
-        Examples.ST3LRh_base steamTurbines(
+        Examples.ST3L_base steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
-          steamHPNomPressure=1.28e7,
           steamIPNomFlowRate=81.10 - 67.5,
-          steamIPNomPressure=2.68e6,
-          steamLPNomPressure=6e5,
-          pcond=5.3982e3,
           steamLPNomFlowRate=89.82 - 81.10,
-          HPT_hstart_in=3.47e6,
-          HPT_hstart_out=3.1076e6,
-          IPT_hstart_in=3.554e6,
-          IPT_hstart_out=3.12810e6,
-          LPT_hstart_in=3.109e6,
-          LPT_hstart_out=2.3854e6,
-          mixLP_hstart=3.109e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
           HPT_Kt=0.0032078,
           IPT_Kt=0.018883,
           LPT_Kt=0.078004,
-          mixLP_V=10)  annotation (Placement(transformation(extent={{-80,-40},{
+          mixLP_V=10,
+          steamHPNomPressure=12800000,
+          steamIPNomPressure=2680000,
+          steamLPNomPressure=600000,
+          pcond=5398.2) 
+                       annotation (Placement(transformation(extent={{-80,-40},{
                   0,40}}, rotation=0)));
         Water.SinkP sinkLPT(
           redeclare package Medium = FluidMedium,
@@ -19083,7 +15115,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 rotation=0)));
         Water.SourceP sourceHPT(h=3.47e6, p0=1.28e7) 
           annotation (Placement(transformation(
-              origin={-72,74},
+              origin={-72,66},
               extent={{-6,-6},{6,6}},
               rotation=270)));
         Water.SourceP sourceLPT(h=3.109e6, p0=6e5) 
@@ -19091,13 +15123,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-24,60},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.68e6) 
-          annotation (Placement(transformation(
-              origin={-54,60},
-              extent={{6,-6},{-6,6}},
-              rotation=180)));
-        inner System system 
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SinkP sinkP(           h=3.1076e6, p0=2980000) 
+          annotation (Placement(transformation(extent={{-6,-6},{6,6}},
+                rotation=90,
+              origin={-60,84})));
+        Water.SourceP sourceP(            h=3.554e6, p0=2680000) 
+          annotation (Placement(transformation(extent={{-6,-6},{6,6}},
+                rotation=270,
+              origin={-48,66})));
       equation
         connect(constantSpeed.flange, steamTurbines.Shaft_b) 
                                                            annotation (Line(
@@ -19111,14 +15146,19 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Line(points={{-24,40},{-24,54}}, thickness=0.5,
             color={0,0,255}));
         connect(steamTurbines.HPT_In, sourceHPT.flange) 
-          annotation (Line(points={{-72,40},{-72,68}}, thickness=0.5,
+          annotation (Line(points={{-72,40},{-72,54},{-72,60}},
+                                                       thickness=0.5,
             color={0,0,255}));
-        connect(steamTurbines.IPT_In, Rh.out1) 
-          annotation (Line(points={{-48,40},{-48,60}}, thickness=0.5,
-            color={0,0,255}));
-        connect(steamTurbines.HPT_Out, Rh.in1) annotation (Line(points={{-60,40},
-                {-60,60},{-60.06,60}}, thickness=0.5,
-            color={0,0,255}));
+        connect(steamTurbines.HPT_Out, sinkP.flange) annotation (Line(
+            points={{-60,40},{-60,78}},
+            color={0,0,255},
+            smooth=Smooth.None,
+            thickness=0.5));
+        connect(steamTurbines.IPT_In, sourceP.flange) annotation (Line(
+            points={{-48,40},{-48,60}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics),
           experiment(StopTime=1000),
           experimentSetupOutput(equdistant=false));
@@ -19127,7 +15167,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       model TestST3LRh_valve
         package FluidMedium = ThermoPower.Water.StandardWater;
 
-        Examples.ST3LRh_valve steamTurbines(
+        Examples.ST3L_valve steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
           steamHPNomPressure=1.28e7,
@@ -19136,15 +15176,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamLPNomPressure=6e5,
           pcond=5.3982e3,
           steamLPNomFlowRate=89.82 - 81.10,
-          HPT_hstart_in=3.47e6,
-          HPT_hstart_out=3.1076e6,
-          IPT_hstart_in=3.554e6,
-          IPT_hstart_out=3.12810e6,
-          LPT_hstart_in=3.109e6,
-          LPT_hstart_out=2.3854e6,
           valveHP_dpnom=1.6e5,
           valveIP_dpnom=5e4,
-          mixLP_hstart=3.109e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
@@ -19183,12 +15216,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 rotation=0)));
         Water.SourceP sourceHPT_p(h=3.47e6, p0=1.296e7) 
           annotation (Placement(transformation(
-              origin={-72,74},
+              origin={-72,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
         Water.SourceP sourceLPT(h=3.109e6, p0=6.296e5) 
           annotation (Placement(transformation(
-              origin={-24,60},
+              origin={-24,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
         Modelica.Blocks.Sources.Ramp com_valveIP(
@@ -19197,13 +15230,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           startTime=40,
           height=-0.5)  annotation (Placement(transformation(extent={{92,-50},{
                   72,-30}}, rotation=0)));
-        Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.73e6) 
-          annotation (Placement(transformation(
-              origin={-54,60},
-              extent={{6,-6},{-6,6}},
-              rotation=180)));
         inner System system 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
+          annotation (Placement(transformation(extent={{-6,-6},{6,6}},
+                rotation=90,
+              origin={-60,78})));
+        Water.SourceP sourceP(            h=3.554e6, p0=2730000) 
+          annotation (Placement(transformation(extent={{-6,-6},{6,6}},
+                rotation=270,
+              origin={-48,64})));
       equation
         connect(actuators, steamTurbines.ActuatorsBus)   annotation (Line(
               points={{37,-40},{10,-40},{10,-28},{0,-28}}, color={213,255,170}));
@@ -19215,10 +15251,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Line(points={{-26,-58},{-12,-58},{-12,-40}}, thickness=0.5,
             color={0,0,255}));
         connect(steamTurbines.LPT_In, sourceLPT.flange) 
-          annotation (Line(points={{-24,40},{-24,54}}, thickness=0.5,
+          annotation (Line(points={{-24,40},{-24,58}}, thickness=0.5,
             color={0,0,255}));
         connect(steamTurbines.HPT_In, sourceHPT_p.flange) 
-          annotation (Line(points={{-72,40},{-72,68}}, thickness=0.5,
+          annotation (Line(points={{-72,40},{-72,58}}, thickness=0.5,
             color={0,0,255}));
         connect(com_valveHP.y, actuators.Opening_valveHP) annotation (Line(
               points={{71,0},{54,0},{54,-40},{37,-40},{37,-40}}, color={0,0,127}));
@@ -19226,12 +15262,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               points={{71,-40},{37,-40}}, color={0,0,127}));
         connect(com_valveLP.y, actuators.Opening_valveLP) annotation (Line(
               points={{71,-80},{54,-80},{54,-40},{37,-40}}, color={0,0,127}));
-        connect(steamTurbines.IPT_In, Rh.out1) 
-          annotation (Line(points={{-48,40},{-48,60}}, thickness=0.5,
-            color={0,0,255}));
-        connect(steamTurbines.HPT_Out, Rh.in1) 
-          annotation (Line(points={{-60,40},{-60,60},{-60.06,60}}, thickness=0.5,
-            color={0,0,255}));
+        connect(steamTurbines.HPT_Out, sinkP.flange) annotation (Line(
+            points={{-60,40},{-60,72}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(steamTurbines.IPT_In, sourceP.flange) annotation (Line(
+            points={{-48,40},{-48,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics),
           experiment(StopTime=1000),
           experimentSetupOutput(equdistant=false));
@@ -19240,7 +15280,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       model TestST3LRh_bypass
         package FluidMedium = ThermoPower.Water.StandardWater;
 
-        Examples.ST3LRh_bypass steamTurbines(
+        Examples.ST3L_bypass steamTurbines(
           redeclare package FluidMedium = FluidMedium,
           steamHPNomFlowRate=67.6,
           steamHPNomPressure=1.28e7,
@@ -19250,16 +15290,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           pcond=5.3982e3,
           mixLP_V=50,
           steamLPNomFlowRate=89.82 - 81.10,
-          HPT_hstart_in=3.47e6,
-          HPT_hstart_out=3.1076e6,
-          IPT_hstart_in=3.554e6,
-          IPT_hstart_out=3.12810e6,
-          LPT_hstart_in=3.109e6,
-          LPT_hstart_out=2.3854e6,
           valveHP_dpnom=1.6e5,
           valveIP_dpnom=5e4,
           valveLP_dpnom=2.64e4,
-          mixLP_hstart=3.109e6,
           HPT_eta_iso_nom=0.833,
           IPT_eta_iso_nom=0.903,
           LPT_eta_iso_nom=0.876,
@@ -19317,21 +15350,24 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                   -66},{-46,-54}}, rotation=0)));
         Water.SourceP sourceHPT_p(h=3.47e6, p0=1.296e7) 
           annotation (Placement(transformation(
-              origin={-86,74},
+              origin={-86,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
         Water.SourceP sourceLPT(h=3.109e6, p0=6.296e5) 
           annotation (Placement(transformation(
-              origin={-38,60},
+              origin={-38,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.73e6) 
-          annotation (Placement(transformation(
-              origin={-68,60},
-              extent={{6,-6},{-6,6}},
-              rotation=180)));
-        inner System system 
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
+          annotation (Placement(transformation(extent={{-6,-6},{6,6}},
+                rotation=90,
+              origin={-74,80})));
+        Water.SourceP sourceP(            h=3.554e6, p0=2730000) 
+          annotation (Placement(transformation(extent={{-6,-6},{6,6}},
+                rotation=270,
+              origin={-62,64})));
       equation
         connect(com_valveHP.y, actuators.Opening_valveHP) 
                                                       annotation (Line(points={
@@ -19361,17 +15397,22 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Line(points={{-34,-60},{-26,-60},{-26,-40}}, thickness=0.5,
             color={0,0,255}));
         connect(steamTurbines.LPT_In,sourceLPT. flange) 
-          annotation (Line(points={{-38,40},{-38,54}}, thickness=0.5,
+          annotation (Line(points={{-38,40},{-38,58}}, thickness=0.5,
             color={0,0,255}));
         connect(steamTurbines.HPT_In,sourceHPT_p. flange) 
-          annotation (Line(points={{-86,40},{-86,68}}, thickness=0.5,
+          annotation (Line(points={{-86,40},{-86,50},{-86,58}},
+                                                       thickness=0.5,
             color={0,0,255}));
-        connect(steamTurbines.IPT_In, Rh.out1) 
-          annotation (Line(points={{-62,40},{-62,60}}, thickness=0.5,
-            color={0,0,255}));
-        connect(steamTurbines.HPT_Out, Rh.in1) annotation (Line(points={{-74,40},
-                {-74,60},{-74.06,60}}, thickness=0.5,
-            color={0,0,255}));
+        connect(steamTurbines.HPT_Out, sinkP.flange) annotation (Line(
+            points={{-74,40},{-74,74}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(steamTurbines.IPT_In, sourceP.flange) annotation (Line(
+            points={{-62,40},{-62,58}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics),
           experiment(StopTime=1000),
           experimentSetupOutput(equdistant=false));
@@ -19380,34 +15421,22 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       model TestCondenserControl
         package FluidMedium = ThermoPower.Water.StandardWater;
 
-        Components.StateReader_water stateTapping(
-                       redeclare package Medium = FluidMedium) 
-          annotation (Placement(transformation(extent={{-30,-6},{-10,14}},
-                rotation=0)));
         Control.PID pID(
           PVmax=1,
           PVmin=0.1,
           CSmin=-0.6,
           CSmax=0.6,
           Ti=2000,
-          Kp=-3)      annotation (Placement(transformation(extent={{-20,-80},{0,
+          Kp=-3,
+          steadyStateInit=true) 
+                      annotation (Placement(transformation(extent={{-18,-80},{2,
                   -60}}, rotation=0)));
         Water.SourceW sourceSteam(
           redeclare package Medium = FluidMedium,
           w0=89.8,
-          p0=5389.2,
-          h=2.3854e6) annotation (Placement(transformation(extent={{-76,50},{
+          h=2.3854e6,
+          p0=5389.2)  annotation (Placement(transformation(extent={{-76,50},{
                   -56,70}}, rotation=0)));
-        Components.StateReader_water stateCondIn(
-                                           redeclare package Medium = 
-              FluidMedium) 
-          annotation (Placement(transformation(extent={{-10,50},{10,70}},
-                rotation=0)));
-        Components.StateReader_water stateCondOut(
-                                           redeclare package Medium = 
-              FluidMedium) 
-          annotation (Placement(transformation(extent={{34,-20},{54,0}},
-                rotation=0)));
         Modelica.Blocks.Sources.Ramp const(
           offset=0.85,
           duration=500,
@@ -19427,40 +15456,38 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 rotation=0)));
         Water.SourceW sourceTap(
           redeclare package Medium = FluidMedium,
+          h=1.43495e5,
           p0=5389.2,
-          h=1.43495e5) 
+          allowFlowReversal=true) 
                       annotation (Placement(transformation(extent={{-60,-6},{
                   -40,14}}, rotation=0)));
-        inner System system 
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
-        connect(stateCondIn.inlet, sourceSteam.flange) 
-          annotation (Line(points={{-6,60},{-56,60}}, thickness=0.5,
-            color={0,0,255}));
         connect(const.y, pID.SP) annotation (Line(points={{-47.4,-60},{-34,-60},
-                {-34,-66},{-20,-66}}, color={0,0,127}));
-        connect(stateCondOut.inlet, condenserIdeal_tap.waterOut) 
-          annotation (Line(points={{38,-10},{20,-10},{20,0}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateCondIn.outlet, condenserIdeal_tap.steamIn) 
-          annotation (Line(points={{6,60},{20,60},{20,40}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sinkWater.flange, stateCondOut.outlet) 
-          annotation (Line(points={{70,-10},{50,-10}}, thickness=0.5,
-            color={0,0,255}));
-        connect(stateTapping.outlet, condenserIdeal_tap.tapWater) 
-          annotation (Line(points={{-14,4},{-14,4},{4,4}},       thickness=0.5,
-            color={0,0,255}));
-        connect(sourceTap.flange, stateTapping.inlet) 
-          annotation (Line(points={{-40,4},{-34,4},{-26,4}},
-                                                     thickness=0.5,
-            color={0,0,255}));
-        connect(pID.CS, sourceTap.in_w0) annotation (Line(points={{0.6,-70},{20,
+                {-34,-66},{-18,-66}}, color={0,0,127}));
+        connect(pID.CS, sourceTap.in_w0) annotation (Line(points={{2,-70},{20,
                 -70},{20,-20},{-70,-20},{-70,20},{-54,20},{-54,10}}, color={0,0,
                 127}));
         connect(pID.PV, condenserIdeal_tap.ratio_Vv_Vtot) annotation (Line(
-              points={{-20,-74},{-80,-74},{-80,24},{-20,24},{-20,16},{0,16}},
+              points={{-18,-74},{-80,-74},{-80,24},{-20,24},{-20,16},{0,16}},
               color={0,0,127}));
+        connect(sourceTap.flange, condenserIdeal_tap.tapWater) annotation (Line(
+            points={{-40,4},{4,4}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(condenserIdeal_tap.waterOut, sinkWater.flange) annotation (Line(
+            points={{20,0},{20,-10},{70,-10}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(condenserIdeal_tap.steamIn, sourceSteam.flange) annotation (
+            Line(
+            points={{20,40},{20,60},{-56,60}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics),
           experiment,
           experimentSetupOutput(equdistant=false));
@@ -19486,10 +15513,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-34,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Components.EffectHE Rh(dh=3.544e6 - 3.108e6, dp=2.98e6 - 2.68e6) 
-          annotation (Placement(transformation(extent={{-70,70},{-58,58}},
-                rotation=0)));
-        Examples.STG_3LRh_bypass_cc sTG_3LRh(
+        Examples.STG_3LRh_valve_cc sTG_3LRh(
                                    redeclare package FluidMedium = FluidMedium,
             steamTurbines(SSInit=true)) 
                                    annotation (Placement(transformation(extent=
@@ -19513,18 +15537,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Modelica.Blocks.Sources.Constant com_valveLP(k=1) 
           annotation (Placement(transformation(extent={{100,-50},{80,-30}},
                 rotation=0)));
-      public
-        Modelica.Blocks.Sources.Constant com_bypassHP(k=0) 
-          annotation (Placement(transformation(extent={{40,30},{60,50}},
-                rotation=0)));
-      public
-        Modelica.Blocks.Sources.Constant com_bypassIP(k=0) 
-          annotation (Placement(transformation(extent={{40,-10},{60,10}},
-                rotation=0)));
-      public
-        Modelica.Blocks.Sources.Constant com_bypassLP(k=0) 
-          annotation (Placement(transformation(extent={{40,-50},{60,-30}},
-                rotation=0)));
       protected
         Buses.Actuators actuators annotation (Placement(transformation(
               origin={70,-74},
@@ -19532,10 +15544,18 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               rotation=180)));
       public
         Modelica.Blocks.Sources.Constant n_pump(k=1425) 
-          annotation (Placement(transformation(extent={{40,66},{60,86}},
+          annotation (Placement(transformation(extent={{40,30},{60,50}},
                 rotation=0)));
-        inner System system 
+        inner System system(allowFlowReversal=false) 
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
+          annotation (Placement(transformation(extent={{-6,-6},{6,6}},
+                rotation=90,
+              origin={-70,66})));
+        Water.SourceP sourceP(            h=3.554e6, p0=2730000) 
+          annotation (Placement(transformation(extent={{-6,-6},{6,6}},
+                rotation=270,
+              origin={-58,52})));
       equation
         connect(constantSpeed.flange, sTG_3LRh.Shaft_b) annotation (Line(
             points={{10,-16},{-10,-16}},
@@ -19550,15 +15570,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(com_valveLP.y,actuators. Opening_valveLP) 
                                                       annotation (Line(points={
                 {79,-40},{70,-40},{70,-74}}, color={0,0,127}));
-        connect(com_bypassHP.y,actuators. Opening_byPassHP) 
-                                                        annotation (Line(points=
-               {{61,40},{70,40},{70,-74}}, color={0,0,127}));
-        connect(com_bypassIP.y,actuators. Opening_byPassIP) 
-                                                        annotation (Line(points=
-               {{61,0},{70,0},{70,-74}}, color={0,0,127}));
-        connect(com_bypassLP.y,actuators. Opening_byPassLP) 
-                                                        annotation (Line(points=
-               {{61,-40},{70,-40},{70,-74}}, color={0,0,127}));
         connect(actuators, sTG_3LRh.ActuatorsBus) annotation (Line(points={{70,
                 -74},{6,-74},{6,-44},{-10,-44}}, color={213,255,170}));
         connect(sTG_3LRh.WaterOut, sinkWater.flange) 
@@ -19567,17 +15578,21 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(sTG_3LRh.From_SH_LP, sourceLPT.flange) 
           annotation (Line(points={{-34,24},{-34,58}}, thickness=0.5,
             color={0,0,255}));
-        connect(sTG_3LRh.From_RH_IP, Rh.out1) 
-          annotation (Line(points={{-58,24},{-58,64}}, thickness=0.5,
-            color={0,0,255}));
-        connect(sTG_3LRh.To_RH_IP, Rh.in1) annotation (Line(points={{-70,24},{
-                -70,64},{-70.06,64}}, thickness=0.5,
-            color={0,0,255}));
         connect(sTG_3LRh.From_SH_HP, sourceHPT.flange) 
           annotation (Line(points={{-82,24},{-82,72}}, thickness=0.5,
             color={0,0,255}));
-        connect(n_pump.y, actuators.nPump_feedLP) annotation (Line(points={{61,
-                76},{70,76},{70,-74}}, color={0,0,127}));
+        connect(n_pump.y, actuators.nPump_feedLP) annotation (Line(points={{61,40},
+                {70,40},{70,-74}},     color={0,0,127}));
+        connect(sinkP.flange, sTG_3LRh.To_RH_IP) annotation (Line(
+            points={{-70,60},{-70,24}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
+        connect(sourceP.flange, sTG_3LRh.From_RH_IP) annotation (Line(
+            points={{-58,46},{-58,24},{-58,24}},
+            color={0,0,255},
+            thickness=0.5,
+            smooth=Smooth.None));
         annotation (Diagram(graphics),
                              experiment(StopTime=20000, NumberOfIntervals=10000),
           experimentSetupOutput(equdistant=false));
@@ -19621,7 +15636,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         parameter Real d_shaft=0 "Damping constant of the shaft";
         parameter SI.AngularVelocity omega_nom=2*Modelica.Constants.pi*fn/2
           "Nominal angular velocity of the shaft";
-
+        parameter Boolean SSInit=false "Steady-state initialization" annotation(Dialog(tab="Initialization"));
         Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
           annotation (Placement(transformation(extent={{-220,-20},{-180,20}},
                 rotation=0)));
@@ -19742,7 +15757,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         parameter Real d_shaft_B=0 "Damping constant of the shaft" annotation (Dialog(group = "Generator-Shaft B"));
         parameter SI.AngularVelocity omega_nom_B=2*Modelica.Constants.pi*fn/2
           "Nominal angular velocity of the shaft"                                  annotation (Dialog(group = "Generator-Shaft B"));
-
+        parameter Boolean SSInit=false "Steady-state initialization" 
+                                                                    annotation(Dialog(tab="Initialization"));
         Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_B 
           annotation (Placement(transformation(extent={{-220,-120},{-180,-80}},
                 rotation=0)));
@@ -19935,7 +15951,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         parameter Real d_shaft_C=0 "Damping constant of the shaft" annotation (Dialog(group = "Generator-Shaft C"));
         parameter SI.AngularVelocity omega_nom_C=2*Modelica.Constants.pi*fn/2
           "Nominal angular velocity of the shaft"                                  annotation (Dialog(group = "Generator-Shaft C"));
-
+        parameter Boolean SSInit=false "Steady-state initialization" 
+                                                                    annotation(Dialog(tab="Initialization"));
         Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_B 
           annotation (Placement(transformation(extent={{-220,-20},{-180,20}},
                 rotation=0)));
@@ -20672,7 +16689,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
         Electrical.Grid grid(fn=fn, Pn=Pn) annotation (Placement(transformation(
                 extent={{100,-20},{140,20}}, rotation=0)));
-        Electrical.Generator generator(eta=eta) 
+        Electrical.Generator generator(eta=eta, initOpt=if SSInit then 
+              ThermoPower.Choices.Init.Options.steadyState else ThermoPower.Choices.Init.Options.noInit) 
                  annotation (Placement(transformation(extent={{-78,-30},{-18,30}},
                 rotation=0)));
         Components.PowerSensor powerSensor annotation (Placement(transformation(
@@ -20754,7 +16772,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         "Alternator group in configuration double-shaft (two generator)"
         extends
           ThermoPower.PowerPlants.ElectricGeneratorGroup.Interfaces.DoubleShaft;
-        Electrical.Generator generator_A(eta=eta_A) 
+        Electrical.Generator generator_A(eta=eta_A, initOpt=if SSInit then 
+              ThermoPower.Choices.Init.Options.steadyState else ThermoPower.Choices.Init.Options.noInit) 
                                        annotation (Placement(transformation(
                 extent={{-80,70},{-20,130}}, rotation=0)));
         Modelica.Mechanics.Rotational.Components.Inertia inertia_A(
@@ -20772,7 +16791,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Electrical.Breaker breaker_A 
                                    annotation (Placement(transformation(extent=
                   {{60,120},{100,80}}, rotation=0)));
-        Electrical.Generator generator_B(eta=eta_B) 
+        Electrical.Generator generator_B(eta=eta_B, initOpt=if SSInit then 
+              ThermoPower.Choices.Init.Options.steadyState else ThermoPower.Choices.Init.Options.noInit) 
                                         annotation (Placement(transformation(
                 extent={{-80,-130},{-20,-70}}, rotation=0)));
         Modelica.Mechanics.Rotational.Components.Inertia inertia_B(
@@ -20899,7 +16919,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         "Alternator group in configuration triple-shaft (three generator)"
         extends
           ThermoPower.PowerPlants.ElectricGeneratorGroup.Interfaces.TripleShaft;
-        Electrical.Generator generator_A(eta=eta_A) 
+        Electrical.Generator generator_A(eta=eta_A, initOpt=if SSInit then 
+              ThermoPower.Choices.Init.Options.steadyState else ThermoPower.Choices.Init.Options.noInit) 
                                        annotation (Placement(transformation(
                 extent={{-80,90},{-20,150}}, rotation=0)));
         Components.PowerSensor powerSensor_A 
@@ -20920,7 +16941,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Electrical.Breaker breaker_A 
                                    annotation (Placement(transformation(extent=
                   {{60,100},{100,140}}, rotation=0)));
-        Electrical.Generator generator_B(eta=eta_B) 
+        Electrical.Generator generator_B(eta=eta_B, initOpt=if SSInit then 
+              ThermoPower.Choices.Init.Options.steadyState else ThermoPower.Choices.Init.Options.noInit) 
                                         annotation (Placement(transformation(
                 extent={{-80,-30},{-20,30}}, rotation=0)));
         Components.PowerSensor powerSensor_B 
@@ -20944,7 +16966,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Electrical.Breaker breaker_B 
                                     annotation (Placement(transformation(extent=
                  {{60,-20},{100,20}}, rotation=0)));
-        Electrical.Generator generator_C(eta=eta_C) 
+        Electrical.Generator generator_C(eta=eta_C, initOpt=if SSInit then 
+              ThermoPower.Choices.Init.Options.steadyState else ThermoPower.Choices.Init.Options.noInit) 
                                         annotation (Placement(transformation(
                 extent={{-80,-150},{-20,-90}}, rotation=0)));
         Components.PowerSensor powerSensor_C 
@@ -21117,7 +17140,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         ThermoPower.Electrical.FrequencySensor frequencySensor 
           annotation (Placement(transformation(extent={{20,40},{40,60}},
                 rotation=0)));
-        ThermoPower.Electrical.Generator generator(eta=eta, J=J_shaft) 
+        ThermoPower.Electrical.Generator generator(eta=eta, J=J_shaft,
+          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
+                    ThermoPower.Choices.Init.Options.noInit) 
                                   annotation (Placement(transformation(extent={
                   {-100,-30},{-40,30}}, rotation=0)));
         ThermoPower.Electrical.NetworkGrid_Pmax network(
@@ -21126,7 +17151,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           J=J_shaft,
           deltaStart=delta_start,
           fnom=fn,
-          r=r_electrical) 
+          r=r_electrical,
+          initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
+                    ThermoPower.Choices.Init.Options.noInit) 
                annotation (Placement(transformation(extent={{80,-20},{120,20}},
                 rotation=0)));
         Modelica.Mechanics.Rotational.Components.Damper damper(
@@ -21465,14 +17492,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       model Test_Generator_SE
         Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=1.28e7,
-          pstart_out=2.98e6,
           wstart=67.6,
-          hstartin=3.47e6,
-          hstartout=3.1076e6,
           wnom=67.6,
           eta_iso_nom=0.833,
-          Kt=0.0032078) 
+          Kt=0.0032078,
+          PRstart=5,
+          pnom=12800000) 
                       annotation (Placement(transformation(extent={{-80,-24},{
                   -48,8}}, rotation=0)));
         Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
@@ -21482,10 +17507,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           CheckValve=true,
           wnom=67.6,
-          hstart=3.47e6,
-          pnom=1.296e7,
-          dpnom=1.6e5,
-          Cv=1165)             annotation (Placement(transformation(
+          Cv=1165,
+          pnom=12960000,
+          dpnom=160000)        annotation (Placement(transformation(
               origin={-76,24},
               extent={{6,6},{-6,-6}},
               rotation=90)));
@@ -21559,14 +17583,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       model Test_Generator_SE_com
         Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=1.28e7,
-          pstart_out=2.98e6,
           wstart=67.6,
-          hstartin=3.47e6,
-          hstartout=3.1076e6,
           wnom=67.6,
           eta_iso_nom=0.833,
-          Kt=0.0032078) 
+          Kt=0.0032078,
+          PRstart=5,
+          pnom=12800000) 
                       annotation (Placement(transformation(extent={{-80,-24},{
                   -48,8}}, rotation=0)));
         Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
@@ -21576,7 +17598,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           CheckValve=true,
           wnom=67.6,
-          hstart=3.47e6,
           pnom=1.296e7,
           dpnom=1.6e5,
           Cv=1165)             annotation (Placement(transformation(
@@ -21650,14 +17671,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       model Test_Generator_SE_breaker
         Water.SteamTurbineStodola steamTurbineStodola(
-          pstart_in=1.28e7,
-          pstart_out=2.98e6,
           wstart=67.6,
-          hstartin=3.47e6,
-          hstartout=3.1076e6,
           wnom=67.6,
           eta_iso_nom=0.833,
-          Kt=0.0032078) 
+          Kt=0.0032078,
+          PRstart=5,
+          pnom=12800000) 
                       annotation (Placement(transformation(extent={{-80,-24},{
                   -48,8}}, rotation=0)));
         Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) 
@@ -21667,7 +17686,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
           CheckValve=true,
           wnom=67.6,
-          hstart=3.47e6,
           pnom=1.296e7,
           dpnom=1.6e5,
           Cv=1165)             annotation (Placement(transformation(
@@ -21704,9 +17722,10 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           omega_nom=157.08,
           eta=0.96,
           J=15000,
-          delta_start=0.5073,
           omega_start=157.08,
-          r=0.2)     annotation (Placement(transformation(extent={{-30,-48},{50,
+          r=0.2,
+          delta_start=0.5073) 
+                     annotation (Placement(transformation(extent={{-30,-48},{50,
                   32}}, rotation=0)));
         Electrical.Grid grid(Pn=50e8, droop=0) 
           annotation (Placement(transformation(extent={{66,-18},{86,2}},
@@ -21739,7 +17758,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             color={0,0,0},
             thickness=0.5));
         connect(grid.connection, generator_SE.powerConnection) annotation (Line(
-            points={{67.4,-8},{53.1,-8},{53.1,-8},{38.8,-8}},
+            points={{67.4,-8},{38.8,-8},{38.8,-8}},
             pattern=LinePattern.None,
             thickness=0.5));
         connect(booleanConstant.y, generator_SE.closed) annotation (Line(points={{59,56},
@@ -21755,17 +17774,17 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           omega_nom=314.16/2,
           eta=0.9,
           J_shaft=100,
-          d_shaft=0)  annotation (Placement(transformation(extent={{0,-40},{80,
+          d_shaft=0,
+          SSInit=true) 
+                      annotation (Placement(transformation(extent={{0,-40},{80,
                   40}}, rotation=0)));
         Water.SteamTurbineStodola steamTurbineStodola(
-          hstartin=3.47e6,
-          pstart_in=128e5,
-          pstart_out=29.8e5,
           wstart=67.6,
-          hstartout=3.1076e6,
           wnom=67.6,
           eta_iso_nom=0.83387,
-          Kt=0.00307) 
+          Kt=0.00307,
+          PRstart=5,
+          pnom=12800000) 
                    annotation (Placement(transformation(extent={{-80,-20},{-40,
                   20}}, rotation=0)));
         Water.SourceW sourceW(
@@ -21812,14 +17831,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       model TestDoubleShaft
         Water.SteamTurbineStodola Turbine1(
-          pstart_in=130e5,
-          pstart_out=28.5e5,
           wstart=70.59,
-          hstartout=3.11e6,
           wnom=70.59,
-          hstartin=3.47e6,
           Kt=0.00307,
-          eta_iso_nom=0.83) 
+          eta_iso_nom=0.83,
+          PRstart=5,
+          pnom=12800000) 
                      annotation (Placement(transformation(extent={{-76,8},{-36,
                   48}}, rotation=0)));
         Water.SourceW sourceW1(
@@ -21848,17 +17865,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           J_shaft_A=2000,
           omega_nom_A=314.16/2,
           J_shaft_B=2000,
-          omega_nom_B=314.16/2) annotation (Placement(transformation(extent={{
+          omega_nom_B=314.16/2,
+          SSInit=true)          annotation (Placement(transformation(extent={{
                   20,-20},{80,40}}, rotation=0)));
         Water.SteamTurbineStodola Turbine2(
-          hstartin=3.55e6,
           eta_iso_nom=0.9,
           Kt=0.01478,
-          pstart_in=26.8e5,
-          pstart_out=6e5,
           wstart=81.1,
-          hstartout=3.128e6,
-          wnom=81.1) 
+          wnom=81.1,
+          PRstart=5,
+          pnom=2800000) 
                    annotation (Placement(transformation(extent={{-76,-50},{-36,
                   -10}}, rotation=0)));
         Water.SourceW sourceW2(
@@ -21924,17 +17940,16 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           J_shaft_C=2000,
           omega_nom_A=314.16/2,
           omega_nom_B=314.16/2,
-          omega_nom_C=314.16/2) annotation (Placement(transformation(extent={{0,
+          omega_nom_C=314.16/2,
+          SSInit=true)          annotation (Placement(transformation(extent={{0,
                   -40},{80,40}}, rotation=0)));
         Water.SteamTurbineStodola Turbine1(
-          pstart_in=130e5,
-          pstart_out=28.5e5,
           wstart=70.59,
-          hstartout=3.11e6,
           wnom=70.59,
-          hstartin=3.47e6,
           Kt=0.00307,
-          eta_iso_nom=0.83) 
+          eta_iso_nom=0.83,
+          PRstart=5,
+          pnom=12800000) 
                      annotation (Placement(transformation(extent={{-84,40},{-44,
                   80}}, rotation=0)));
         Water.SourceW sourceW1(
@@ -21946,14 +17961,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Placement(transformation(extent={{-40,82},{-28,94}},
                 rotation=0)));
         Water.SteamTurbineStodola Turbine2(
-          hstartin=3.55e6,
           eta_iso_nom=0.9,
           Kt=0.01478,
-          pstart_in=26.8e5,
-          pstart_out=6e5,
           wstart=81.1,
-          hstartout=3.128e6,
-          wnom=81.1)       annotation (Placement(transformation(extent={{-84,
+          wnom=81.1,
+          PRstart=5,
+          pnom=2700000)    annotation (Placement(transformation(extent={{-84,
                   -20},{-44,20}}, rotation=0)));
         Water.SourceW sourceW2(
           w0=81.1,
@@ -21964,13 +17977,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Placement(transformation(extent={{-40,26},{-28,38}},
                 rotation=0)));
         Water.SteamTurbineStodola Turbine3(
-          pstart_in=6e5,
-          pstart_out=5.3982e3,
           wstart=89.82,
-          hstartin=3.109e6,
-          hstartout=2.3854e6,
           wnom=89.82,
-          Kt=0.0769)       annotation (Placement(transformation(extent={{-84,
+          Kt=0.0769,
+          PRstart=5,
+          pnom=600000)     annotation (Placement(transformation(extent={{-84,
                   -78},{-44,-38}}, rotation=0)));
         Water.SourceW sourceW3(
           w0=89.82,
@@ -22036,10 +18047,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
   end ElectricGeneratorGroup;
 
   package Control "Models of the common control elements"
-    model PID "ISA PID controller with anti-windup"
+
+    model PID "PID controller with anti-windup"
       parameter Real Kp "Proportional gain (normalised units)";
-      parameter Time Ti "Integral time";
-      parameter Time Td = 0 "Derivative time";
+      parameter Modelica.SIunits.Time Ti "Integral time";
+      parameter Modelica.SIunits.Time Td=0 "Derivative time";
       parameter Real Nd = 1 "Derivative action up to Nd / Td rad/s";
       parameter Real Ni = 1
         "Ni*Ti is the time constant of anti-windup compensation";
@@ -22051,7 +18063,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       parameter Real CSmax "Maximum value of control signal for scaling";
       parameter Real PVstart = 0.5 "Start value of PV (scaled)";
       parameter Real CSstart = 0.5 "Start value of CS (scaled)";
-      parameter Boolean steadyStateInit = false;
+      parameter Boolean holdWhenSimplified = false
+        "Hold CSs at start value when homotopy=simplified";
+      parameter Boolean steadyStateInit = false "Initialize in steady state";
+      Real CSs_hom
+        "Control signal scaled in per units, used when homotopy=simplified";
 
       Real P "Proportional action / Kp";
       Real I(start = CSstart/Kp) "Integral action / Kp";
@@ -22068,12 +18084,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                     annotation (Placement(transformation(extent={{-112,-52},{
                 -88,-28}}, rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput CS "Control signal" 
-        annotation (Placement(transformation(extent={{94,-12},{118,12}},
+        annotation (Placement(transformation(extent={{88,-12},{112,12}},
               rotation=0)));
       Modelica.Blocks.Interfaces.RealInput SP "Set point signal" 
-                    annotation (Placement(transformation(extent={{-112,28},{-88,
-                52}}, rotation=0)));
-
+                    annotation (Placement(transformation(extent={{-112,28},{
+                -88,52}}, rotation=0)));
     equation
       // Scaling
       SPs=(SP-PVmin)/(PVmax-PVmin);
@@ -22094,9 +18109,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Dx = 0;
         D = 0;
       end if;
+      if holdWhenSimplified then
+        CSs_hom = CSstart;
+      else
+        CSs_hom = CSbs;
+      end if;
       CSbs = Kp*(P+I+D) "Control signal before saturation";
-      CSs = smooth(0, if CSbs > 1 then 1 else if CSbs < 0 then 0 else CSbs)
-        "Saturated control signal";
+      CSs = homotopy(smooth(0, if CSbs > 1 then 1 else if CSbs < 0 then 0 else CSbs),
+                     CSs_hom) "Saturated control signal";
       track = (CSs-CSbs)/(Kp*Ni);
     initial equation
       if steadyStateInit then
@@ -22111,12 +18131,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                            Icon(graphics={
             Rectangle(
               extent={{-100,100},{100,-100}},
-              lineColor={0,0,0},
-              fillColor={240,240,240},
+              lineColor={0,0,255},
+              fillColor={255,255,255},
               fillPattern=FillPattern.Solid),
             Text(
               extent={{-54,40},{52,-34}},
-              lineColor={0,0,0},
+              lineColor={0,0,255},
               textString=
                    "PID"),
             Text(
@@ -22219,18 +18239,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       "Test total plant with levels control and ratio control on the condenser, inlet valves"
       package FlueGasMedium = ThermoPower.Media.FlueGas;
       package FluidMedium = ThermoPower.Water.StandardWater;
+    public
+      Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
+        annotation (Placement(transformation(extent={{160,-60},{140,-40}},
+              rotation=0)));
+    public
+      inner System system(allowFlowReversal=false) 
+        annotation (Placement(transformation(extent={{180,180},{200,200}})));
       HRSG.Examples.HRSG_3LRh hRSG(
-                                  HeatExchangersGroup(
-          fluidHPNomPressure_Sh=1.22116e7,
-          fluidHPNomPressure_Ev=1.22116e7,
-          fluidHPNomPressure_Ec=1.22116e7,
-          fluidIPNomPressure_Rh=2.63694e6,
-          fluidIPNomPressure_Sh=2.63694e6,
-          fluidIPNomPressure_Ev=2.63694e6,
-          fluidIPNomPressure_Ec=2.63694e6,
-          fluidLPNomPressure_Sh=6.0474e5,
-          fluidLPNomPressure_Ev=6.0474e5,
-          fluidLPNomPressure_Ec=6.0474e5,
+        SSInit=true,
+        drums(
+          fluidHPNomPressure=12211600,
+          fluidIPNomPressure=2636940,
+          fluidLPNomPressure=604700),
+        HeatExchangersGroup(
           fluidHPNomFlowRate_Sh=62.8,
           fluidHPNomFlowRate_Ec=64.5,
           fluidIPNomFlowRate_Rh=77.36,
@@ -22238,117 +18260,61 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fluidIPNomFlowRate_Ec=13.5,
           fluidLPNomFlowRate_Sh=10.95,
           fluidLPNomFlowRate_Ec=89.8,
-          Ec2_HP_Tstart_G_In=605.074,
-          Ec2_HP_Tstart_G_Out=548.522,
-          Ec2_HP_Tstart_M_In=488.443,
-          Ec2_HP_Tstart_M_Out=588.719,
-          Ec2_HP_Tstart_F_In=476.660,
-          Ec2_HP_Tstart_F_Out=585.495,
-          Ec1_HP_Tstart_M_In=426.384,
-          Ec1_HP_Tstart_M_Out=479.885,
-          Ec1_HP_Tstart_F_In=420.129,
-          Ec1_HP_Tstart_F_Out=476.660,
-          Ec_IP_Tstart_G_In=501.802,
-          Ec_IP_Tstart_G_Out=468.900,
-          Ec_IP_Tstart_M_In=427.707,
-          Ec_IP_Tstart_M_Out=490.160,
-          Ec_IP_Tstart_F_In=421.552,
-          Ec_IP_Tstart_F_Out=488.422,
-          Ec_LP_Tstart_G_In=427.671,
-          Ec_LP_Tstart_M_In=336.404,
-          Ec_LP_Tstart_M_Out=419.330,
-          Ec_LP_Tstart_F_In=331.506,
-          Ec_LP_Tstart_F_Out=418.193,
-          Ev_HP_Tstart_G_In=732.000,
-          Ev_HP_Tstart_G_Out=611.190,
-          Ev_HP_Tstart_M_In=594.933,
-          Ev_HP_Tstart_M_Out=603.160,
-          Ev_HP_hstart_F_In=1.46797e6,
-          Ev_HP_hstart_F_Out=1.90129e6,
-          Ev_IP_Tstart_G_In=548.522,
-          Ev_IP_Tstart_G_Out=503.810,
-          Ev_IP_Tstart_M_In=497.865,
-          Ev_IP_Tstart_M_Out=501.763,
-          Ev_IP_hstart_F_In=9.64527e5,
-          Ev_IP_hstart_F_Out=1.36736e6,
-          Ev_LP_Tstart_G_In=468.900,
-          Ev_LP_Tstart_G_Out=427.671,
-          Ev_LP_Tstart_M_In=422.216,
-          Ev_LP_Tstart_M_Out=434.622,
-          Ev_LP_hstart_F_In=6.26623e5,
-          Ev_LP_hstart_F_Out=1.22154e6,
-          Sh2_HP_Tstart_G_In=884.650,
-          Sh2_HP_Tstart_G_Out=849.290,
-          Sh2_HP_Tstart_M_In=801.698,
-          Sh2_HP_Tstart_M_Out=861.343,
-          Sh2_HP_Tstart_F_In=792.680,
-          Sh2_HP_Tstart_F_Out=857.106,
-          Sh1_HP_Tstart_G_In=849.290,
-          Sh1_HP_Tstart_G_Out=732.000,
-          Sh1_HP_Tstart_M_In=624.205,
-          Sh1_HP_Tstart_M_Out=803.585,
-          Sh1_HP_Tstart_F_In=599.180,
-          Sh1_HP_Tstart_F_Out=792.680,
-          Rh2_IP_Tstart_M_In=793.962,
-          Rh2_IP_Tstart_M_Out=863.890,
-          Rh2_IP_Tstart_F_In=787.973,
-          Rh2_IP_Tstart_F_Out=861.625,
-          Rh1_IP_Tstart_M_In=641.307,
-          Rh1_IP_Tstart_M_Out=793.753,
-          Rh1_IP_Tstart_F_In=631.882,
-          Rh1_IP_Tstart_F_Out=787.973,
-          Sh_IP_Tstart_G_In=611.19,
-          Sh_IP_Tstart_G_Out=605.074,
-          Sh_IP_Tstart_M_In=504.237,
-          Sh_IP_Tstart_M_Out=594.703,
-          Sh_IP_Tstart_F_Out=594.001,
           Sh_LP(gamma_G=30, gamma_F=4000),
           Sh_LP_N_F=4,
-          Ec_LP_Tstart_G_Out=372.309,
           Ec_LP(gamma_G=35, gamma_F=3000),
           Ev_LP(gamma_G=60, gamma_F=20000),
           Sh1HP_Rh1IP(
             gamma_G_A=70,
-            gamma_G_B=70,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh2HP_Rh2IP(
+            gamma_G_B=80,
             gamma_F_A=4000,
             gamma_F_B=4000,
-            gamma_G_A=70,
-            gamma_G_B=70),
-          Sh_IP_Tstart_F_In=499.962,
-          SSInit=true),                drums(
-          fluidHPNomPressure=1.22116e7,
-          fluidIPNomPressure=2.63694e6,
-          fluidLPNomPressure=6.047e5,
-          HPd_hvstart=2.61182e6,
-          HPd_hlstart=1.411212e6,
-          IPd_hvstart=2.79542e6,
-          IPd_hlstart=9.22034e5,
-          LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5,
-          SSInit=true))       annotation (Placement(transformation(extent={{
-                -100,20},{0,120}}, rotation=0)));
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+            Kfnom_F_B=150,
+            dpnom_F_B=0.3e5),
+          Sh2HP_Rh2IP(
+            gamma_G_A=83.97,
+            gamma_G_B=80,
+            gamma_F_A=4000,
+            gamma_F_B=4000,
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+            Kfnom_F_B=150,
+            dpnom_F_B=0.3e5),
+          fluidHPNomPressure_Sh=12211600,
+          fluidHPNomPressure_Ev=12211600,
+          fluidHPNomPressure_Ec=12211600,
+          fluidIPNomPressure_Rh=2636940,
+          fluidIPNomPressure_Sh=2636940,
+          fluidIPNomPressure_Ev=2636940,
+          fluidIPNomPressure_Ec=2636940,
+          fluidLPNomPressure_Sh=604740,
+          fluidLPNomPressure_Ev=604740,
+          fluidLPNomPressure_Ec=604740,
+          Sh2_HP_Tstartbar=800,
+          Sh1_HP_Tstartbar=800,
+          Ev_HP_Tstartbar=700,
+          Ec2_HP_Tstartbar=600,
+          Sh_IP_Tstartbar=600,
+          Ev_IP_Tstartbar=550,
+          Ec_IP_Tstartbar=500,
+          Sh_LP_Tstartbar=550,
+          Ev_LP_Tstartbar=500,
+          Ec_LP_Tstartbar=450)) 
+                              annotation (Placement(transformation(extent={{-120,20},
+                {-20,120}},   rotation=0)));
       SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
-                                    controlledCondeser(Vlstart=5,
-            setPoint_ratio=0.5,
-          SSInit=true), steamTurbines(
-          steamHPNomPressure=1.2202e7,
-          steamIPNomPressure=2.63681e6,
-          steamLPNomPressure=6.047e5,
-          HPT_hstart_in=3.56678e6,
-          HPT_hstart_out=3.16451e6,
-          IPT_hstart_in=3.65985e6,
-          IPT_hstart_out=3.21285e6,
-          LPT_hstart_in=3.16961e6,
-          LPT_hstart_out=2.41849e6,
-          mixLP_hstart=3.16953e6,
+                              steamTurbines(
           steamHPNomFlowRate=62.8,
           steamIPNomFlowRate=14.5,
           steamLPNomFlowRate=10.9,
-          SSInit=true)) 
-        annotation (Placement(transformation(extent={{-100,-180},{0,-80}},
+          ST_HP(pnom=120e5),
+          ST_IP(pnom=28e5),
+          ST_LP(pnom=6.5e5),
+          steamHPNomPressure=12202000,
+          steamIPNomPressure=2636810,
+          steamLPNomPressure=604700,
+          SSInit=true), totalFeedPump(SSInit=true, nominalOutletPressure=604700)) 
+        annotation (Placement(transformation(extent={{-120,-180},{-20,-80}},
               rotation=0)));
     public
       HRSG.Control.levelsControl levelsControl(
@@ -22356,128 +18322,122 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         CSmax_levelHP=96,
         CSmin_levelIP=5,
         CSmax_levelIP=25,
-        CSmax_levelLP=2400,
         Level_HP(steadyStateInit=true),
         Level_IP(steadyStateInit=true),
-        Level_LP(steadyStateInit=true)) 
-        annotation (Placement(transformation(extent={{60,100},{120,160}},
+        Level_LP(steadyStateInit=true),
+        CSmax_levelLP=2400) 
+        annotation (Placement(transformation(extent={{40,100},{100,160}},
               rotation=0)));
+      Gas.SourceW sourceGas(
+        redeclare package Medium = FlueGasMedium,
+        w0=585.5,
+        T=884.65)          annotation (Placement(transformation(extent={{-160,50},{-140,
+                70}},       rotation=0)));
+      Modelica.Blocks.Sources.Ramp ramp(
+        duration=500,
+        offset=585.5,
+        startTime=10,
+        height=-50)     annotation (Placement(transformation(extent={{-190,90},{-170,
+                110}},      rotation=0)));
+      Gas.SinkP sinkGas(            redeclare package Medium = 
+            FlueGasMedium, T=362.309) 
+                       annotation (Placement(transformation(extent={{40,50},{60,70}},
+                      rotation=0)));
+    public
+      Modelica.Blocks.Sources.Ramp valveHP_com(height=0, offset=1,
+          duration=2) 
+        annotation (Placement(transformation(extent={{160,60},{140,80}}, rotation=
+               0)));
+      Modelica.Blocks.Sources.Ramp valveIP_com(height=0, offset=1,
+          duration=2) 
+        annotation (Placement(transformation(extent={{160,20},{140,40}}, rotation=
+               0)));
+      Modelica.Blocks.Sources.Ramp valveLP_com(height=0, offset=1,
+          duration=2) 
+        annotation (Placement(transformation(extent={{160,-20},{140,0}}, rotation=
+               0)));
+    protected
+      Buses.Actuators actuators1 
+                                annotation (Placement(transformation(extent={{100,-60},
+                {80,-40}},       rotation=0)));
+    public
       ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
         eta=0.9,
         J_shaft=15000,
         d_shaft=25,
         Pmax=150e6,
-        delta_start=0.7,
-        generator(initOpt=ThermoPower.Choices.Init.Options.steadyState),
-        network(initOpt=ThermoPower.Choices.Init.Options.steadyState)) 
+        SSInit=true,
+        delta_start=0.7) 
                     annotation (Placement(transformation(extent={{40,-180},{140,
                 -80}}, rotation=0)));
-      Gas.SourceW sourceGas(
-        redeclare package Medium = FlueGasMedium,
-        w0=585.5,
-        T=884.65)          annotation (Placement(transformation(extent={{-160,
-                50},{-140,70}}, rotation=0)));
-      HRSG.Components.StateReader_gas stateGas_in(
-                                             redeclare package Medium = 
-            FlueGasMedium) annotation (Placement(transformation(extent={{-130,
-                50},{-110,70}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp ramp(
-        height=-50,
-        duration=500,
-        offset=585.5,
-        startTime=50)   annotation (Placement(transformation(extent={{-190,100},
-                {-170,120}}, rotation=0)));
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309) 
-                       annotation (Placement(transformation(extent={{60,50},{80,
-                70}}, rotation=0)));
-      HRSG.Components.StateReader_gas stateGas_out(
-                                              redeclare package Medium = 
-            FlueGasMedium) annotation (Placement(transformation(extent={{30,50},
-                {50,70}}, rotation=0)));
-    public
-      Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
-        annotation (Placement(transformation(extent={{180,-60},{160,-40}},
-              rotation=0)));
-    public
-      Modelica.Blocks.Sources.Ramp valveHP_com(height=0, offset=1) 
-        annotation (Placement(transformation(extent={{180,60},{160,80}},
-              rotation=0)));
-      Modelica.Blocks.Sources.Ramp valveIP_com(height=0, offset=1) 
-        annotation (Placement(transformation(extent={{180,20},{160,40}},
-              rotation=0)));
-      Modelica.Blocks.Sources.Ramp valveLP_com(height=0, offset=1) 
-        annotation (Placement(transformation(extent={{180,-20},{160,0}},
-              rotation=0)));
-    protected
-      Buses.Actuators actuators annotation (Placement(transformation(extent={{
-                120,-60},{100,-40}}, rotation=0)));
-    public
-      inner System system 
-        annotation (Placement(transformation(extent={{180,180},{200,200}})));
     equation
-      connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (Line(
-          points={{40,-130},{0,-130}},
+      connect(sTG_3LRh.WaterOut,hRSG. WaterIn) annotation (Line(points={{-30,-80},
+              {-30,-32},{-30,20}},
+                         thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.From_SH_LP,hRSG. Sh_LP_Out) annotation (Line(points={{-50,-80},
+              {-50,-32},{-50,20}},
+                              thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.From_RH_IP,hRSG. Rh_IP_Out) annotation (Line(points={{-80,-80},
+              {-80,-32},{-80,20}},
+                              thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.From_SH_HP,hRSG. Sh_HP_Out) annotation (Line(points={{-110,
+              -80},{-110,-32},{-110,20}},
+                              thickness=0.5,
+          color={0,0,255}));
+      connect(ramp.y,sourceGas. in_w0) annotation (Line(points={{-169,100},{-156,100},
+              {-156,65}},      color={0,0,127}));
+      connect(valveHP_com.y, actuators1.Opening_valveHP) 
+                                                        annotation (Line(points={{139,70},
+              {90,70},{90,-50}},            color={0,0,127}));
+      connect(valveIP_com.y, actuators1.Opening_valveIP) 
+                                                        annotation (Line(points={{139,30},
+              {90,30},{90,-50}},            color={0,0,127}));
+      connect(valveLP_com.y, actuators1.Opening_valveLP) 
+                                                        annotation (Line(points={{139,-10},
+              {90,-10},{90,-50}},             color={0,0,127}));
+      connect(sTG_3LRh.To_RH_IP,hRSG. Rh_IP_In) annotation (Line(points={{-95,-80},
+              {-94,-30},{-94,20},{-95,20}}, thickness=0.5,
+          color={0,0,255}));
+      connect(levelsControl.SensorsBus,hRSG. SensorsBus) annotation (Line(points={{40,130},
+              {0,130},{0,110},{-20,110}},           color={255,170,213}));
+      connect(hRSG.SensorsBus,sTG_3LRh. SensorsBus) annotation (Line(points={{-20,110},
+              {0,110},{0,-150},{-20,-150}},      color={255,170,213}));
+      connect(sTG_3LRh.ActuatorsBus,hRSG. ActuatorsBus) annotation (Line(points={{-20,
+              -165},{-6,-165},{-6,95},{-20,95}},  color={213,255,170}));
+      connect(actuators1, hRSG.ActuatorsBus) 
+                                            annotation (Line(points={{90,-50},{
+              -6,-50},{-6,95},{-20,95}},
+                                       color={213,255,170}));
+      connect(levelsControl.ActuatorsBus,hRSG. ActuatorsBus) annotation (Line(
+            points={{100,130},{120,130},{120,95},{-20,95}},
+                                                          color={213,255,170}));
+      connect(sinkGas.flange,hRSG. GasOut) annotation (Line(
+          points={{40,60},{10,60},{-20,60}},
+          color={159,159,223},
+          thickness=0.5));
+      connect(hRSG.GasIn,sourceGas. flange) annotation (Line(
+          points={{-120,60},{-130,60},{-140,60}},
+          color={159,159,223},
+          thickness=0.5));
+      connect(booleanConstant.y, actuators1.ConnectedGenerator) annotation (Line(
+          points={{139,-50},{90,-50}},
+          color={255,0,255},
+          smooth=Smooth.None));
+      connect(singleShaft.shaft,sTG_3LRh. Shaft_b) annotation (Line(
+          points={{40,-130},{-20,-130}},
           color={0,0,0},
           thickness=0.5));
-      connect(sTG_3LRh.WaterOut, hRSG.WaterIn) annotation (Line(points={{-10,
-              -80},{-10,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_SH_LP, hRSG.Sh_LP_Out) annotation (Line(points={{
-              -30,-80},{-30,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_RH_IP, hRSG.Rh_IP_Out) annotation (Line(points={{
-              -60,-80},{-60,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_SH_HP, hRSG.Sh_HP_Out) annotation (Line(points={{
-              -90,-80},{-90,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(ramp.y,sourceGas. in_w0) annotation (Line(points={{-169,110},{
-              -156,110},{-156,65}}, color={0,0,127}));
-      connect(stateGas_in.inlet,sourceGas. flange) annotation (Line(
-          points={{-126,60},{-140,60}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(sinkGas.flange,stateGas_out. outlet) annotation (Line(
-          points={{60,60},{46,60}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points=
-             {{159,70},{110,70},{110,-50}}, color={0,0,127}));
-      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points=
-             {{159,30},{110,30},{110,-50}}, color={0,0,127}));
-      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points=
-             {{159,-10},{110,-10},{110,-50}}, color={0,0,127}));
-      connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (Line(
-            points={{159,-50},{110,-50}}, color={255,0,255}));
-      connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (Line(points={{-75,
-              -80},{-75,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(stateGas_out.inlet, hRSG.GasOut) annotation (Line(
-          points={{34,60},{0,60}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(hRSG.GasIn, stateGas_in.outlet) annotation (Line(
-          points={{-100,60},{-114,60}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (Line(
-            points={{60,130},{20,130},{20,110},{0,110}}, color={255,170,213}));
-      connect(hRSG.SensorsBus, sTG_3LRh.SensorsBus) annotation (Line(points={{0,
-              110},{20,110},{20,-150},{0,-150}}, color={255,170,213}));
-      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (Line(
-            points={{0,-150},{20,-150},{20,-190},{160,-190},{160,-150},{140,
+      connect(sTG_3LRh.SensorsBus,singleShaft. SensorsBus) annotation (Line(
+            points={{-20,-150},{20,-150},{20,-190},{160,-190},{160,-150},{140,
               -150}}, color={255,170,213}));
-      connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (Line(
-            points={{140,-165},{152,-165},{152,-184},{14,-184},{14,-165},{0,
+      connect(singleShaft.ActuatorsBus,sTG_3LRh. ActuatorsBus) annotation (Line(
+            points={{140,-165},{152,-165},{152,-184},{14,-184},{14,-165},{-20,
               -165}}, color={213,255,170}));
-      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points=
-             {{0,-165},{14,-165},{14,95},{0,95}}, color={213,255,170}));
-      connect(actuators, hRSG.ActuatorsBus) annotation (Line(points={{110,-50},
-              {14,-50},{14,95},{0,95}}, color={213,255,170}));
-      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(
-            points={{120,130},{140,130},{140,95},{0,95}}, color={213,255,170}));
       annotation (Diagram(coordinateSystem(
-            preserveAspectRatio=false,
+            preserveAspectRatio=true,
             extent={{-200,-200},{200,200}},
             initialScale=0.1), graphics),
                            experiment(
@@ -22500,181 +18460,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       "Test total plant with levels control and ratio control on the condenser, inlet valves"
       package FlueGasMedium = ThermoPower.Media.FlueGas;
       package FluidMedium = ThermoPower.Water.StandardWater;
-      HRSG.Examples.HRSG_3LRh hRSG(
-                                  HeatExchangersGroup(
-          fluidHPNomPressure_Sh=1.22116e7,
-          fluidHPNomPressure_Ev=1.22116e7,
-          fluidHPNomPressure_Ec=1.22116e7,
-          fluidIPNomPressure_Rh=2.63694e6,
-          fluidIPNomPressure_Sh=2.63694e6,
-          fluidIPNomPressure_Ev=2.63694e6,
-          fluidIPNomPressure_Ec=2.63694e6,
-          fluidLPNomPressure_Sh=6.0474e5,
-          fluidLPNomPressure_Ev=6.0474e5,
-          fluidLPNomPressure_Ec=6.0474e5,
-          fluidHPNomFlowRate_Sh=62.8,
-          fluidHPNomFlowRate_Ec=64.5,
-          fluidIPNomFlowRate_Rh=77.36,
-          fluidIPNomFlowRate_Sh=14.5,
-          fluidIPNomFlowRate_Ec=13.5,
-          fluidLPNomFlowRate_Sh=10.95,
-          fluidLPNomFlowRate_Ec=89.8,
-          Ec2_HP_Tstart_G_In=605.074,
-          Ec2_HP_Tstart_G_Out=548.522,
-          Ec2_HP_Tstart_M_In=488.443,
-          Ec2_HP_Tstart_M_Out=588.719,
-          Ec2_HP_Tstart_F_In=476.660,
-          Ec2_HP_Tstart_F_Out=585.495,
-          Ec1_HP_Tstart_M_In=426.384,
-          Ec1_HP_Tstart_M_Out=479.885,
-          Ec1_HP_Tstart_F_In=420.129,
-          Ec1_HP_Tstart_F_Out=476.660,
-          Ec_IP_Tstart_G_In=501.802,
-          Ec_IP_Tstart_G_Out=468.900,
-          Ec_IP_Tstart_M_In=427.707,
-          Ec_IP_Tstart_M_Out=490.160,
-          Ec_IP_Tstart_F_In=421.552,
-          Ec_IP_Tstart_F_Out=488.422,
-          Ec_LP_Tstart_G_In=427.671,
-          Ec_LP_Tstart_M_In=336.404,
-          Ec_LP_Tstart_M_Out=419.330,
-          Ec_LP_Tstart_F_In=331.506,
-          Ec_LP_Tstart_F_Out=418.193,
-          Ev_HP_Tstart_G_In=732.000,
-          Ev_HP_Tstart_G_Out=611.190,
-          Ev_HP_Tstart_M_In=594.933,
-          Ev_HP_Tstart_M_Out=603.160,
-          Ev_HP_hstart_F_In=1.46797e6,
-          Ev_HP_hstart_F_Out=1.90129e6,
-          Ev_IP_Tstart_G_In=548.522,
-          Ev_IP_Tstart_G_Out=503.810,
-          Ev_IP_Tstart_M_In=497.865,
-          Ev_IP_Tstart_M_Out=501.763,
-          Ev_IP_hstart_F_In=9.64527e5,
-          Ev_IP_hstart_F_Out=1.36736e6,
-          Ev_LP_Tstart_G_In=468.900,
-          Ev_LP_Tstart_G_Out=427.671,
-          Ev_LP_Tstart_M_In=422.216,
-          Ev_LP_Tstart_M_Out=434.622,
-          Ev_LP_hstart_F_In=6.26623e5,
-          Ev_LP_hstart_F_Out=1.22154e6,
-          Sh2_HP_Tstart_G_In=884.650,
-          Sh2_HP_Tstart_G_Out=849.290,
-          Sh2_HP_Tstart_M_In=801.698,
-          Sh2_HP_Tstart_M_Out=861.343,
-          Sh2_HP_Tstart_F_In=792.680,
-          Sh2_HP_Tstart_F_Out=857.106,
-          Sh1_HP_Tstart_G_In=849.290,
-          Sh1_HP_Tstart_G_Out=732.000,
-          Sh1_HP_Tstart_M_In=624.205,
-          Sh1_HP_Tstart_M_Out=803.585,
-          Sh1_HP_Tstart_F_In=599.180,
-          Sh1_HP_Tstart_F_Out=792.680,
-          Rh2_IP_Tstart_M_In=793.962,
-          Rh2_IP_Tstart_M_Out=863.890,
-          Rh2_IP_Tstart_F_In=787.973,
-          Rh2_IP_Tstart_F_Out=861.625,
-          Rh1_IP_Tstart_M_In=641.307,
-          Rh1_IP_Tstart_M_Out=793.753,
-          Rh1_IP_Tstart_F_In=631.882,
-          Rh1_IP_Tstart_F_Out=787.973,
-          Sh_IP_Tstart_G_In=611.19,
-          Sh_IP_Tstart_G_Out=605.074,
-          Sh_IP_Tstart_M_In=504.237,
-          Sh_IP_Tstart_M_Out=594.703,
-          Sh_IP_Tstart_F_Out=594.001,
-          Sh_LP(gamma_G=30, gamma_F=4000),
-          Sh_LP_N_F=4,
-          Ec_LP_Tstart_G_Out=372.309,
-          Ec_LP(gamma_G=35, gamma_F=3000),
-          Ev_LP(gamma_G=60, gamma_F=20000),
-          Sh1HP_Rh1IP(
-            gamma_G_A=70,
-            gamma_G_B=70,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh2HP_Rh2IP(
-            gamma_F_A=4000,
-            gamma_F_B=4000,
-            gamma_G_A=70,
-            gamma_G_B=70),
-          Sh_IP_Tstart_F_In=499.962,
-          SSInit=true),                drums(
-          fluidHPNomPressure=1.22116e7,
-          fluidIPNomPressure=2.63694e6,
-          fluidLPNomPressure=6.047e5,
-          HPd_hvstart=2.61182e6,
-          HPd_hlstart=1.411212e6,
-          IPd_hvstart=2.79542e6,
-          IPd_hlstart=9.22034e5,
-          LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5,
-          SSInit=true))       annotation (Placement(transformation(extent={{
-                -100,20},{0,120}}, rotation=0)));
-      SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
-                                    controlledCondeser(Vlstart=5,
-            setPoint_ratio=0.5,
-          SSInit=true), steamTurbines(
-          steamHPNomPressure=1.2202e7,
-          steamIPNomPressure=2.63681e6,
-          steamLPNomPressure=6.047e5,
-          HPT_hstart_in=3.56678e6,
-          HPT_hstart_out=3.16451e6,
-          IPT_hstart_in=3.65985e6,
-          IPT_hstart_out=3.21285e6,
-          LPT_hstart_in=3.16961e6,
-          LPT_hstart_out=2.41849e6,
-          mixLP_hstart=3.16953e6,
-          steamHPNomFlowRate=62.8,
-          steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9,
-          SSInit=true)) 
-        annotation (Placement(transformation(extent={{-100,-180},{0,-80}},
-              rotation=0)));
-    public
-      HRSG.Control.levelsControl levelsControl(
-        CSmin_levelHP=30,
-        CSmax_levelHP=96,
-        CSmin_levelIP=5,
-        CSmax_levelIP=25,
-        CSmax_levelLP=2400,
-        Level_HP(steadyStateInit=true),
-        Level_IP(steadyStateInit=true),
-        Level_LP(steadyStateInit=true)) 
-        annotation (Placement(transformation(extent={{60,100},{120,160}},
-              rotation=0)));
-      ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
-        eta=0.9,
-        J_shaft=15000,
-        d_shaft=25,
-        Pmax=150e6,
-        delta_start=0.7,
-        generator(initOpt=ThermoPower.Choices.Init.Options.steadyState),
-        network(initOpt=ThermoPower.Choices.Init.Options.steadyState)) 
-                    annotation (Placement(transformation(extent={{40,-180},{140,
-                -80}}, rotation=0)));
-      Gas.SourceW sourceGas(
-        redeclare package Medium = FlueGasMedium,
-        w0=585.5,
-        T=884.65)          annotation (Placement(transformation(extent={{-160,
-                50},{-140,70}}, rotation=0)));
-      HRSG.Components.StateReader_gas stateGas_in(
-                                             redeclare package Medium = 
-            FlueGasMedium) annotation (Placement(transformation(extent={{-130,
-                50},{-110,70}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp ramp(
-        duration=500,
-        offset=585.5,
-        height=0,
-        startTime=0)    annotation (Placement(transformation(extent={{-190,100},
-                {-170,120}}, rotation=0)));
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309) 
-                       annotation (Placement(transformation(extent={{60,50},{80,
-                70}}, rotation=0)));
-      HRSG.Components.StateReader_gas stateGas_out(
-                                              redeclare package Medium = 
-            FlueGasMedium) annotation (Placement(transformation(extent={{30,50},
-                {50,70}}, rotation=0)));
     public
       Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
         annotation (Placement(transformation(extent={{180,-60},{160,-40}},
@@ -22698,33 +18483,114 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
     public
       inner System system(allowFlowReversal=false) 
         annotation (Placement(transformation(extent={{180,180},{200,200}})));
+      HRSG.Examples.HRSG_3LRh hRSG(
+        SSInit=true,
+        drums(
+          fluidHPNomPressure=12211600,
+          fluidIPNomPressure=2636940,
+          fluidLPNomPressure=604700),
+        HeatExchangersGroup(
+          fluidHPNomFlowRate_Sh=62.8,
+          fluidHPNomFlowRate_Ec=64.5,
+          fluidIPNomFlowRate_Rh=77.36,
+          fluidIPNomFlowRate_Sh=14.5,
+          fluidIPNomFlowRate_Ec=13.5,
+          fluidLPNomFlowRate_Sh=10.95,
+          fluidLPNomFlowRate_Ec=89.8,
+          Sh_LP(gamma_G=30, gamma_F=4000),
+          Sh_LP_N_F=4,
+          Ec_LP(gamma_G=35, gamma_F=3000),
+          Ev_LP(gamma_G=60, gamma_F=20000),
+          Sh1HP_Rh1IP(
+            gamma_G_A=70,
+            gamma_G_B=80,
+            gamma_F_A=4000,
+            gamma_F_B=4000,
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+            Kfnom_F_B=150,
+            dpnom_F_B=0.3e5),
+          Sh2HP_Rh2IP(
+            gamma_G_A=83.97,
+            gamma_G_B=80,
+            gamma_F_A=4000,
+            gamma_F_B=4000,
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+            Kfnom_F_B=150,
+            dpnom_F_B=0.3e5),
+          fluidHPNomPressure_Sh=12211600,
+          fluidHPNomPressure_Ev=12211600,
+          fluidHPNomPressure_Ec=12211600,
+          fluidIPNomPressure_Rh=2636940,
+          fluidIPNomPressure_Sh=2636940,
+          fluidIPNomPressure_Ev=2636940,
+          fluidIPNomPressure_Ec=2636940,
+          fluidLPNomPressure_Sh=604740,
+          fluidLPNomPressure_Ev=604740,
+          fluidLPNomPressure_Ec=604740,
+          Sh2_HP_Tstartbar=800,
+          Sh1_HP_Tstartbar=800,
+          Ev_HP_Tstartbar=700,
+          Ec2_HP_Tstartbar=600,
+          Sh_IP_Tstartbar=600,
+          Ev_IP_Tstartbar=550,
+          Ec_IP_Tstartbar=500,
+          Sh_LP_Tstartbar=550,
+          Ev_LP_Tstartbar=500,
+          Ec_LP_Tstartbar=450)) 
+                              annotation (Placement(transformation(extent={{-120,20},
+                {-20,120}},   rotation=0)));
+      SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
+        SSInit=true,
+        steamTurbines(
+          steamHPNomFlowRate=62.8,
+          steamIPNomFlowRate=14.5,
+          steamLPNomFlowRate=10.9,
+          ST_HP(pnom=120e5),
+          ST_IP(pnom=28e5),
+          ST_LP(pnom=6.5e5),
+          steamHPNomPressure=12202000,
+          steamIPNomPressure=2636810,
+          steamLPNomPressure=604700),
+        totalFeedPump(nominalOutletPressure=604700)) 
+        annotation (Placement(transformation(extent={{-120,-180},{-20,-80}},
+              rotation=0)));
+    public
+      HRSG.Control.levelsControl levelsControl(
+        CSmin_levelHP=30,
+        CSmax_levelHP=96,
+        CSmin_levelIP=5,
+        CSmax_levelIP=25,
+        Level_HP(steadyStateInit=true),
+        Level_IP(steadyStateInit=true),
+        Level_LP(steadyStateInit=true),
+        CSmax_levelLP=2400) 
+        annotation (Placement(transformation(extent={{40,100},{100,160}},
+              rotation=0)));
+      Gas.SourceW sourceGas(
+        redeclare package Medium = FlueGasMedium,
+        w0=585.5,
+        T=884.65)          annotation (Placement(transformation(extent={{-160,50},
+                {-140,70}}, rotation=0)));
+      Modelica.Blocks.Sources.Ramp ramp(
+        duration=500,
+        offset=585.5,
+        height=0,
+        startTime=10)   annotation (Placement(transformation(extent={{-190,90},
+                {-170,110}},rotation=0)));
+      Gas.SinkP sinkGas(            redeclare package Medium = 
+            FlueGasMedium, T=362.309) 
+                       annotation (Placement(transformation(extent={{40,50},{60,
+                70}}, rotation=0)));
+      ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
+        eta=0.9,
+        J_shaft=15000,
+        d_shaft=25,
+        Pmax=150e6,
+        SSInit=true,
+        delta_start=0.7) 
+                    annotation (Placement(transformation(extent={{40,-180},{140,
+                -80}}, rotation=0)));
     equation
-      connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (Line(
-          points={{40,-130},{0,-130}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(sTG_3LRh.WaterOut, hRSG.WaterIn) annotation (Line(points={{-10,
-              -80},{-10,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_SH_LP, hRSG.Sh_LP_Out) annotation (Line(points={{
-              -30,-80},{-30,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_RH_IP, hRSG.Rh_IP_Out) annotation (Line(points={{
-              -60,-80},{-60,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_SH_HP, hRSG.Sh_HP_Out) annotation (Line(points={{
-              -90,-80},{-90,20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(ramp.y,sourceGas. in_w0) annotation (Line(points={{-169,110},{
-              -156,110},{-156,65}}, color={0,0,127}));
-      connect(stateGas_in.inlet,sourceGas. flange) annotation (Line(
-          points={{-126,60},{-140,60}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(sinkGas.flange,stateGas_out. outlet) annotation (Line(
-          points={{60,60},{46,60}},
-          color={159,159,223},
-          thickness=0.5));
       connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points=
              {{159,70},{110,70},{110,-50}}, color={0,0,127}));
       connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points=
@@ -22733,35 +18599,57 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
              {{159,-10},{110,-10},{110,-50}}, color={0,0,127}));
       connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (Line(
             points={{159,-50},{110,-50}}, color={255,0,255}));
-      connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (Line(points={{-75,
-              -80},{-75,20}}, thickness=0.5,
+      connect(sTG_3LRh.WaterOut,hRSG. WaterIn) annotation (Line(points={{-30,-80},
+              {-30,20}}, thickness=0.5,
           color={0,0,255}));
-      connect(stateGas_out.inlet, hRSG.GasOut) annotation (Line(
-          points={{34,60},{0,60}},
+      connect(sTG_3LRh.From_SH_LP,hRSG. Sh_LP_Out) annotation (Line(points={{-50,-80},
+              {-50,20}},      thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.From_RH_IP,hRSG. Rh_IP_Out) annotation (Line(points={{-80,-80},
+              {-80,20}},      thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.From_SH_HP,hRSG. Sh_HP_Out) annotation (Line(points={{-110,
+              -80},{-110,20}},thickness=0.5,
+          color={0,0,255}));
+      connect(ramp.y,sourceGas. in_w0) annotation (Line(points={{-169,100},{
+              -156,100},{-156,65}},
+                               color={0,0,127}));
+      connect(sTG_3LRh.To_RH_IP,hRSG. Rh_IP_In) annotation (Line(points={{-95,-80},
+              {-94,-30},{-94,20},{-95,20}}, thickness=0.5,
+          color={0,0,255}));
+      connect(levelsControl.SensorsBus,hRSG. SensorsBus) annotation (Line(points={{40,130},
+              {0,130},{0,110},{-20,110}},           color={255,170,213}));
+      connect(hRSG.SensorsBus,sTG_3LRh. SensorsBus) annotation (Line(points={{-20,110},
+              {0,110},{0,-150},{-20,-150}},      color={255,170,213}));
+      connect(sTG_3LRh.ActuatorsBus,hRSG. ActuatorsBus) annotation (Line(points={{-20,
+              -165},{-6,-165},{-6,95},{-20,95}},  color={213,255,170}));
+      connect(levelsControl.ActuatorsBus,hRSG. ActuatorsBus) annotation (Line(
+            points={{100,130},{120,130},{120,95},{-20,95}},
+                                                          color={213,255,170}));
+      connect(sinkGas.flange,hRSG. GasOut) annotation (Line(
+          points={{40,60},{-20,60}},
           color={159,159,223},
           thickness=0.5));
-      connect(hRSG.GasIn, stateGas_in.outlet) annotation (Line(
-          points={{-100,60},{-114,60}},
+      connect(hRSG.GasIn,sourceGas. flange) annotation (Line(
+          points={{-120,60},{-140,60}},
           color={159,159,223},
           thickness=0.5));
-      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (Line(
-            points={{60,130},{20,130},{20,110},{0,110}}, color={255,170,213}));
-      connect(hRSG.SensorsBus, sTG_3LRh.SensorsBus) annotation (Line(points={{0,
-              110},{20,110},{20,-150},{0,-150}}, color={255,170,213}));
-      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (Line(
-            points={{0,-150},{20,-150},{20,-190},{160,-190},{160,-150},{140,
+      connect(singleShaft.shaft,sTG_3LRh. Shaft_b) annotation (Line(
+          points={{40,-130},{-20,-130}},
+          color={0,0,0},
+          thickness=0.5));
+      connect(sTG_3LRh.SensorsBus,singleShaft. SensorsBus) annotation (Line(
+            points={{-20,-150},{20,-150},{20,-190},{160,-190},{160,-150},{140,
               -150}}, color={255,170,213}));
-      connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (Line(
-            points={{140,-165},{152,-165},{152,-184},{14,-184},{14,-165},{0,
+      connect(singleShaft.ActuatorsBus,sTG_3LRh. ActuatorsBus) annotation (Line(
+            points={{140,-165},{152,-165},{152,-184},{14,-184},{14,-165},{-20,
               -165}}, color={213,255,170}));
-      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points=
-             {{0,-165},{14,-165},{14,95},{0,95}}, color={213,255,170}));
-      connect(actuators, hRSG.ActuatorsBus) annotation (Line(points={{110,-50},
-              {14,-50},{14,95},{0,95}}, color={213,255,170}));
-      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(
-            points={{120,130},{140,130},{140,95},{0,95}}, color={213,255,170}));
+      connect(actuators, hRSG.ActuatorsBus) annotation (Line(
+          points={{110,-50},{-6,-50},{-6,95},{-20,95}},
+          color={213,255,170},
+          smooth=Smooth.None));
       annotation (Diagram(coordinateSystem(
-            preserveAspectRatio=false,
+            preserveAspectRatio=true,
             extent={{-200,-200},{200,200}},
             initialScale=0.1), graphics),
                            experiment(
@@ -22784,181 +18672,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       "Test total plant with levels control and ratio control on the condenser, inlet valves"
       package FlueGasMedium = ThermoPower.Media.FlueGas;
       package FluidMedium = ThermoPower.Water.StandardWater;
-      HRSG.Examples.HRSG_3LRh hRSG(
-                                  HeatExchangersGroup(
-          fluidHPNomPressure_Sh=1.22116e7,
-          fluidHPNomPressure_Ev=1.22116e7,
-          fluidHPNomPressure_Ec=1.22116e7,
-          fluidIPNomPressure_Rh=2.63694e6,
-          fluidIPNomPressure_Sh=2.63694e6,
-          fluidIPNomPressure_Ev=2.63694e6,
-          fluidIPNomPressure_Ec=2.63694e6,
-          fluidLPNomPressure_Sh=6.0474e5,
-          fluidLPNomPressure_Ev=6.0474e5,
-          fluidLPNomPressure_Ec=6.0474e5,
-          fluidHPNomFlowRate_Sh=62.8,
-          fluidHPNomFlowRate_Ec=64.5,
-          fluidIPNomFlowRate_Rh=77.36,
-          fluidIPNomFlowRate_Sh=14.5,
-          fluidIPNomFlowRate_Ec=13.5,
-          fluidLPNomFlowRate_Sh=10.95,
-          fluidLPNomFlowRate_Ec=89.8,
-          Ec2_HP_Tstart_G_In=605.074,
-          Ec2_HP_Tstart_G_Out=548.522,
-          Ec2_HP_Tstart_M_In=488.443,
-          Ec2_HP_Tstart_M_Out=588.719,
-          Ec2_HP_Tstart_F_In=476.660,
-          Ec2_HP_Tstart_F_Out=585.495,
-          Ec1_HP_Tstart_M_In=426.384,
-          Ec1_HP_Tstart_M_Out=479.885,
-          Ec1_HP_Tstart_F_In=420.129,
-          Ec1_HP_Tstart_F_Out=476.660,
-          Ec_IP_Tstart_G_In=501.802,
-          Ec_IP_Tstart_G_Out=468.900,
-          Ec_IP_Tstart_M_In=427.707,
-          Ec_IP_Tstart_M_Out=490.160,
-          Ec_IP_Tstart_F_In=421.552,
-          Ec_IP_Tstart_F_Out=488.422,
-          Ec_LP_Tstart_G_In=427.671,
-          Ec_LP_Tstart_M_In=336.404,
-          Ec_LP_Tstart_M_Out=419.330,
-          Ec_LP_Tstart_F_In=331.506,
-          Ec_LP_Tstart_F_Out=418.193,
-          Ev_HP_Tstart_G_In=732.000,
-          Ev_HP_Tstart_G_Out=611.190,
-          Ev_HP_Tstart_M_In=594.933,
-          Ev_HP_Tstart_M_Out=603.160,
-          Ev_HP_hstart_F_In=1.46797e6,
-          Ev_HP_hstart_F_Out=1.90129e6,
-          Ev_IP_Tstart_G_In=548.522,
-          Ev_IP_Tstart_G_Out=503.810,
-          Ev_IP_Tstart_M_In=497.865,
-          Ev_IP_Tstart_M_Out=501.763,
-          Ev_IP_hstart_F_In=9.64527e5,
-          Ev_IP_hstart_F_Out=1.36736e6,
-          Ev_LP_Tstart_G_In=468.900,
-          Ev_LP_Tstart_G_Out=427.671,
-          Ev_LP_Tstart_M_In=422.216,
-          Ev_LP_Tstart_M_Out=434.622,
-          Ev_LP_hstart_F_In=6.26623e5,
-          Ev_LP_hstart_F_Out=1.22154e6,
-          Sh2_HP_Tstart_G_In=884.650,
-          Sh2_HP_Tstart_G_Out=849.290,
-          Sh2_HP_Tstart_M_In=801.698,
-          Sh2_HP_Tstart_M_Out=861.343,
-          Sh2_HP_Tstart_F_In=792.680,
-          Sh2_HP_Tstart_F_Out=857.106,
-          Sh1_HP_Tstart_G_In=849.290,
-          Sh1_HP_Tstart_G_Out=732.000,
-          Sh1_HP_Tstart_M_In=624.205,
-          Sh1_HP_Tstart_M_Out=803.585,
-          Sh1_HP_Tstart_F_In=599.180,
-          Sh1_HP_Tstart_F_Out=792.680,
-          Rh2_IP_Tstart_M_In=793.962,
-          Rh2_IP_Tstart_M_Out=863.890,
-          Rh2_IP_Tstart_F_In=787.973,
-          Rh2_IP_Tstart_F_Out=861.625,
-          Rh1_IP_Tstart_M_In=641.307,
-          Rh1_IP_Tstart_M_Out=793.753,
-          Rh1_IP_Tstart_F_In=631.882,
-          Rh1_IP_Tstart_F_Out=787.973,
-          Sh_IP_Tstart_G_In=611.19,
-          Sh_IP_Tstart_G_Out=605.074,
-          Sh_IP_Tstart_M_In=504.237,
-          Sh_IP_Tstart_M_Out=594.703,
-          Sh_IP_Tstart_F_Out=594.001,
-          Sh_LP(gamma_G=30, gamma_F=4000),
-          Sh_LP_N_F=4,
-          Ec_LP_Tstart_G_Out=372.309,
-          Ec_LP(gamma_G=35, gamma_F=3000),
-          Ev_LP(gamma_G=60, gamma_F=20000),
-          Sh1HP_Rh1IP(
-            gamma_G_A=70,
-            gamma_G_B=70,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh2HP_Rh2IP(
-            gamma_F_A=4000,
-            gamma_F_B=4000,
-            gamma_G_A=70,
-            gamma_G_B=70),
-          Sh_IP_Tstart_F_In=499.962,
-          SSInit=true),                drums(
-          fluidHPNomPressure=1.22116e7,
-          fluidIPNomPressure=2.63694e6,
-          fluidLPNomPressure=6.047e5,
-          HPd_hvstart=2.61182e6,
-          HPd_hlstart=1.411212e6,
-          IPd_hvstart=2.79542e6,
-          IPd_hlstart=9.22034e5,
-          LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5,
-          SSInit=true),
-        redeclare package FlueGasMedium = FlueGasMedium,
-        redeclare package FluidMedium = FluidMedium) 
-                              annotation (Placement(transformation(extent={{-20,
-                -20},{60,60}}, rotation=0)));
-      SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
-                                    controlledCondeser(Vlstart=5,
-            setPoint_ratio=0.5,
-          SSInit=true),
-        redeclare package FluidMedium = FluidMedium,
-        steamTurbines(
-          steamHPNomPressure=1.2202e7,
-          steamIPNomPressure=2.63681e6,
-          steamLPNomPressure=6.047e5,
-          HPT_hstart_in=3.56678e6,
-          HPT_hstart_out=3.16451e6,
-          IPT_hstart_in=3.65985e6,
-          IPT_hstart_out=3.21285e6,
-          LPT_hstart_in=3.16961e6,
-          LPT_hstart_out=2.41849e6,
-          mixLP_hstart=3.16953e6,
-          steamHPNomFlowRate=62.8,
-          steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9,
-          SSInit=true)) 
-        annotation (Placement(transformation(extent={{-20,-160},{60,-80}},
-              rotation=0)));
-    public
-      HRSG.Control.levelsControl levelsControl(
-        CSmin_levelHP=30,
-        CSmax_levelHP=96,
-        CSmin_levelIP=5,
-        CSmax_levelIP=25,
-        CSmax_levelLP=2400,
-        Level_HP(steadyStateInit=true),
-        Level_IP(steadyStateInit=true),
-        Level_LP(steadyStateInit=true)) 
-        annotation (Placement(transformation(extent={{100,60},{160,120}},
-              rotation=0)));
-      ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
-        eta=0.9,
-        J_shaft=15000,
-        d_shaft=25,
-        Pmax=150e6,
-        delta_start=0.7,
-        generator(initOpt=ThermoPower.Choices.Init.Options.steadyState),
-        network(initOpt=ThermoPower.Choices.Init.Options.steadyState)) 
-                    annotation (Placement(transformation(extent={{100,-160},{
-                180,-80}}, rotation=0)));
-      HRSG.Components.StateReader_gas stateGas_in(
-                                             redeclare package Medium = 
-            FlueGasMedium) annotation (Placement(transformation(extent={{-50,2},
-                {-30,22}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp ramp(
         duration=500,
         offset=1,
         height=-0.1,
         startTime=50)   annotation (Placement(transformation(extent={{-180,-30},
                 {-160,-10}}, rotation=0)));
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309) 
-                       annotation (Placement(transformation(extent={{120,2},{
-                140,22}}, rotation=0)));
-      HRSG.Components.StateReader_gas stateGas_out(
-                                              redeclare package Medium = 
-            FlueGasMedium) annotation (Placement(transformation(extent={{90,2},
-                {110,22}}, rotation=0)));
     public
       Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
         annotation (Placement(transformation(extent={{-180,40},{-160,60}},
@@ -22974,79 +18693,192 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         annotation (Placement(transformation(extent={{-180,80},{-160,100}},
               rotation=0)));
     protected
-      Buses.Actuators actuators annotation (Placement(transformation(extent={{
-                -60,100},{-80,120}}, rotation=0)));
+      Buses.Actuators actuators annotation (Placement(transformation(extent={{-70,100},
+                {-90,120}},          rotation=0)));
     public
       ThermoPower.PowerPlants.GasTurbine.Examples.GasTurbineSimplified
         gasTurbine(redeclare package FlueGasMedium = FlueGasMedium) 
         annotation (Placement(transformation(extent={{-140,-60},{-60,20}},
               rotation=0)));
-      inner System system 
-        annotation (Placement(transformation(extent={{160,160},{180,180}})));
+      inner System system(allowFlowReversal=false) 
+        annotation (Placement(transformation(extent={{180,180},{200,200}})));
+      HRSG.Examples.HRSG_3LRh hRSG(
+        drums(
+          fluidHPNomPressure=12211600,
+          fluidIPNomPressure=2636940,
+          fluidLPNomPressure=604700),
+        HeatExchangersGroup(
+          fluidHPNomFlowRate_Sh=62.8,
+          fluidHPNomFlowRate_Ec=64.5,
+          fluidIPNomFlowRate_Rh=77.36,
+          fluidIPNomFlowRate_Sh=14.5,
+          fluidIPNomFlowRate_Ec=13.5,
+          fluidLPNomFlowRate_Sh=10.95,
+          fluidLPNomFlowRate_Ec=89.8,
+          Sh_LP(gamma_G=30, gamma_F=4000),
+          Sh_LP_N_F=4,
+          Ec_LP(gamma_G=35, gamma_F=3000),
+          Ev_LP(gamma_G=60, gamma_F=20000),
+          Sh1HP_Rh1IP(
+            gamma_G_A=70,
+            gamma_G_B=80,
+            gamma_F_A=4000,
+            gamma_F_B=4000,
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+            Kfnom_F_B=150,
+            dpnom_F_B=0.3e5),
+          Sh2HP_Rh2IP(
+            gamma_G_A=83.97,
+            gamma_G_B=80,
+            gamma_F_A=4000,
+            gamma_F_B=4000,
+            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+            Kfnom_F_B=150,
+            dpnom_F_B=0.3e5),
+          fluidHPNomPressure_Sh=12211600,
+          fluidHPNomPressure_Ev=12211600,
+          fluidHPNomPressure_Ec=12211600,
+          fluidIPNomPressure_Rh=2636940,
+          fluidIPNomPressure_Sh=2636940,
+          fluidIPNomPressure_Ev=2636940,
+          fluidIPNomPressure_Ec=2636940,
+          fluidLPNomPressure_Sh=604740,
+          fluidLPNomPressure_Ev=604740,
+          fluidLPNomPressure_Ec=604740,
+          Sh2_HP_Tstartbar=800,
+          Sh1_HP_Tstartbar=800,
+          Ev_HP_Tstartbar=700,
+          Ec2_HP_Tstartbar=600,
+          Sh_IP_Tstartbar=600,
+          Ev_IP_Tstartbar=550,
+          Ec_IP_Tstartbar=500,
+          Sh_LP_Tstartbar=550,
+          Ev_LP_Tstartbar=500,
+          Ec_LP_Tstartbar=450),
+        SSInit=true)          annotation (Placement(transformation(extent={{-20,-20},
+                {60,60}},     rotation=0)));
+      Gas.SinkP sinkGas(            redeclare package Medium = 
+            FlueGasMedium, T=362.309) 
+                       annotation (Placement(transformation(extent={{96,2},{116,
+                22}}, rotation=0)));
+      ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
+        eta=0.9,
+        J_shaft=15000,
+        d_shaft=25,
+        Pmax=150e6,
+        SSInit=true,
+        delta_start=0.7) 
+                    annotation (Placement(transformation(extent={{100,-160},{
+                180,-80}},
+                       rotation=0)));
+      SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
+        steamTurbines(
+          steamHPNomFlowRate=62.8,
+          steamIPNomFlowRate=14.5,
+          steamLPNomFlowRate=10.9,
+          ST_HP(pnom=120e5),
+          ST_IP(pnom=28e5),
+          ST_LP(pnom=6.5e5),
+          steamHPNomPressure=12202000,
+          steamIPNomPressure=2636810,
+          steamLPNomPressure=604700),
+        totalFeedPump(nominalOutletPressure=604700),
+        SSInit=true) 
+        annotation (Placement(transformation(extent={{-20,-160},{60,-80}},
+              rotation=0)));
+    public
+      HRSG.Control.levelsControl levelsControl(
+        CSmin_levelHP=30,
+        CSmax_levelHP=96,
+        CSmin_levelIP=5,
+        CSmax_levelIP=25,
+        Level_HP(steadyStateInit=true),
+        Level_IP(steadyStateInit=true),
+        Level_LP(steadyStateInit=true),
+        CSmax_levelLP=2400) 
+        annotation (Placement(transformation(extent={{100,60},{160,120}},
+              rotation=0)));
     equation
-      connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (Line(
-          points={{100,-120},{60,-120}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(sTG_3LRh.WaterOut, hRSG.WaterIn) annotation (Line(points={{52,-80},
-              {52,-20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_SH_LP, hRSG.Sh_LP_Out) annotation (Line(points={{36,
-              -80},{36,-20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_RH_IP, hRSG.Rh_IP_Out) annotation (Line(points={{12,
-              -80},{12,-20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sTG_3LRh.From_SH_HP, hRSG.Sh_HP_Out) annotation (Line(points={{
-              -12,-80},{-12,-20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(sinkGas.flange,stateGas_out. outlet) annotation (Line(
-          points={{120,12},{106,12}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points=
-             {{-159,170},{-70,170},{-70,110}}, color={0,0,127}));
-      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points=
-             {{-159,130},{-70,130},{-70,110}}, color={0,0,127}));
-      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points=
-             {{-159,90},{-70,90},{-70,110}}, color={0,0,127}));
+      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points={{-159,
+              170},{-80,170},{-80,110}},       color={0,0,127}));
+      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points={{-159,
+              130},{-80,130},{-80,110}},       color={0,0,127}));
+      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points={{-159,90},
+              {-80,90},{-80,110}},           color={0,0,127}));
       connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (Line(
-            points={{-159,50},{-70,50},{-70,110}}, color={255,0,255}));
-      connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (Line(points={{0,-80},
-              {0,-20}}, thickness=0.5,
-          color={0,0,255}));
-      connect(stateGas_out.inlet, hRSG.GasOut) annotation (Line(
-          points={{94,12},{60,12}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(hRSG.GasIn, stateGas_in.outlet) annotation (Line(
-          points={{-20,12},{-34,12}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(stateGas_in.inlet, gasTurbine.flueGasOut) annotation (Line(
-          points={{-46,12},{-60,12}},
-          color={159,159,223},
-          thickness=0.5));
+            points={{-159,50},{-80,50},{-80,110}}, color={255,0,255}));
       connect(gasTurbine.GTLoad, ramp.y) annotation (Line(points={{-140,-20},{
               -159,-20}}, color={0,0,127}));
-      connect(hRSG.ActuatorsBus, levelsControl.ActuatorsBus) annotation (Line(
-            points={{60,40},{180,40},{180,90},{160,90}}, color={213,255,170}));
+      connect(hRSG.GasIn, gasTurbine.flueGasOut) annotation (Line(
+          points={{-20,12},{-60,12}},
+          color={159,159,223},
+          smooth=Smooth.None,
+          thickness=0.5));
+      connect(hRSG.GasOut, sinkGas.flange) annotation (Line(
+          points={{60,12},{96,12}},
+          color={159,159,223},
+          thickness=0.5,
+          smooth=Smooth.None));
+      connect(singleShaft.shaft,sTG_3LRh. Shaft_b) annotation (Line(
+          points={{100,-120},{100,-120},{60,-120}},
+          color={0,0,0},
+          thickness=0.5));
+      connect(sTG_3LRh.WaterOut, hRSG.WaterIn) annotation (Line(
+          points={{52,-80},{52,-20}},
+          color={0,0,255},
+          smooth=Smooth.None,
+          thickness=0.5));
+      connect(sTG_3LRh.From_SH_LP, hRSG.Sh_LP_Out) annotation (Line(
+          points={{36,-80},{36,-20}},
+          color={0,0,255},
+          thickness=0.5,
+          smooth=Smooth.None));
+      connect(sTG_3LRh.From_RH_IP, hRSG.Rh_IP_Out) annotation (Line(
+          points={{12,-80},{12,-20}},
+          color={0,0,255},
+          thickness=0.5,
+          smooth=Smooth.None));
+      connect(sTG_3LRh.To_RH_IP, hRSG.Rh_IP_In) annotation (Line(
+          points={{0,-80},{0,-20}},
+          color={0,0,255},
+          thickness=0.5,
+          smooth=Smooth.None));
+      connect(sTG_3LRh.From_SH_HP, hRSG.Sh_HP_Out) annotation (Line(
+          points={{-12,-80},{-12,-20}},
+          color={0,0,255},
+          thickness=0.5,
+          smooth=Smooth.None));
       connect(hRSG.SensorsBus, levelsControl.SensorsBus) annotation (Line(
-            points={{60,52},{80,52},{80,90},{100,90}}, color={255,170,213}));
-      connect(actuators, hRSG.ActuatorsBus) annotation (Line(points={{-70,110},
-              {72,110},{72,40},{60,40}}, color={213,255,170}));
-      connect(hRSG.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (Line(points=
-             {{60,40},{72,40},{72,-148},{60,-148}}, color={213,255,170}));
-      connect(sTG_3LRh.SensorsBus, hRSG.SensorsBus) annotation (Line(points={{
-              60,-136},{80,-136},{80,52},{60,52}}, color={255,170,213}));
-      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (Line(
-            points={{60,-136},{80,-136},{80,-180},{194,-180},{194,-136},{180,
-              -136}}, color={255,170,213}));
-      connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (Line(
-            points={{180,-148},{190,-148},{190,-172},{72,-172},{72,-148},{60,
-              -148}}, color={213,255,170}));
+          points={{60,52},{80,52},{80,90},{100,90}},
+          color={255,170,213},
+          smooth=Smooth.None));
+      connect(sTG_3LRh.SensorsBus, hRSG.SensorsBus) annotation (Line(
+          points={{60,-136},{80,-136},{80,52},{60,52}},
+          color={255,170,213},
+          smooth=Smooth.None));
+      connect(singleShaft.SensorsBus, hRSG.SensorsBus) annotation (Line(
+          points={{180,-136},{200,-136},{200,-40},{80,-40},{80,52},{60,52}},
+          color={255,170,213},
+          smooth=Smooth.None));
+      connect(hRSG.ActuatorsBus, levelsControl.ActuatorsBus) annotation (Line(
+          points={{60,40},{180,40},{180,90},{160,90}},
+          color={213,255,170},
+          smooth=Smooth.None));
+      connect(levelsControl.ActuatorsBus, actuators) annotation (Line(
+          points={{160,90},{180,90},{180,140},{-40,140},{-40,110},{-80,110}},
+          color={213,255,170},
+          smooth=Smooth.None));
+      connect(sTG_3LRh.ActuatorsBus, singleShaft.ActuatorsBus) annotation (Line(
+          points={{60,-148},{72,-148},{72,-178},{190,-178},{190,-148},{180,-148}},
+          color={213,255,170},
+          smooth=Smooth.None));
+
+      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(
+          points={{60,-148},{70,-148},{70,40},{60,40}},
+          color={213,255,170},
+          smooth=Smooth.None));
       annotation (Diagram(coordinateSystem(
-            preserveAspectRatio=false,
+            preserveAspectRatio=true,
             extent={{-200,-200},{200,200}},
             initialScale=0.1), graphics),
                            experiment(
@@ -23068,18 +18900,35 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       package FlueGasMedium = ThermoPower.Media.FlueGas;
       package FluidMedium = ThermoPower.Water.StandardWater;
 
-      parameter Boolean SSInit=false "Steady-state initialization";
-      ThermoPower.PowerPlants.HRSG.Examples.HRSG_3LRh hRSG(drums(
-          HPd_hvstart=2.61182e6,
-          HPd_hlstart=1.411212e6,
-          IPd_hvstart=2.79542e6,
-          IPd_hlstart=9.22034e5,
-          LPd_hvstart=2.75273e6,
-          LPd_hlstart=6.10909e5,
-          fluidHPNomPressure=12211600,
-          fluidIPNomPressure=2636940,
-          fluidLPNomPressure=604700,
-          SSInit=SSInit), HeatExchangersGroup(
+      parameter Boolean SSInit=true "Steady-state initialization";
+
+      ThermoPower.Gas.SourceW sourceGas(
+        redeclare package Medium = FlueGasMedium,
+        w0=585.5,
+        T=884.65)          annotation (Placement(transformation(extent={{-160,
+                50},{-140,70}}, rotation=0)));
+      Modelica.Blocks.Sources.Ramp ramp(
+        height=-50,
+        duration=500,
+        offset=585.5,
+      startTime=4000)   annotation (Placement(transformation(extent={{-190,100},
+                {-170,120}}, rotation=0)));
+    public
+      inner System system(allowFlowReversal=false) 
+        annotation (Placement(transformation(extent={{180,180},{200,200}})));
+      HRSG.Examples.HRSG_3LRh hRSG(
+        SSInit=true,
+        HeatExchangersGroup(
+          fluidHPNomPressure_Sh=1.22116e7,
+          fluidHPNomPressure_Ev=1.22116e7,
+          fluidHPNomPressure_Ec=1.22116e7,
+          fluidIPNomPressure_Rh=2.63694e6,
+          fluidIPNomPressure_Sh=2.63694e6,
+          fluidIPNomPressure_Ev=2.63694e6,
+          fluidIPNomPressure_Ec=2.63694e6,
+          fluidLPNomPressure_Sh=6.0474e5,
+          fluidLPNomPressure_Ev=6.0474e5,
+          fluidLPNomPressure_Ec=6.0474e5,
           fluidHPNomFlowRate_Sh=62.8,
           fluidHPNomFlowRate_Ec=64.5,
           fluidIPNomFlowRate_Rh=77.36,
@@ -23087,348 +18936,153 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fluidIPNomFlowRate_Ec=13.5,
           fluidLPNomFlowRate_Sh=10.95,
           fluidLPNomFlowRate_Ec=89.8,
-          Ev_HP_hstart_F_In=1.46797e6,
-          Ev_HP_hstart_F_Out=1.90129e6,
-          Ev_IP_hstart_F_In=9.64527e5,
-          Ev_IP_hstart_F_Out=1.36736e6,
-          Ev_LP_hstart_F_In=6.26623e5,
-          Ev_LP_hstart_F_Out=1.22154e6,
-          Sh_LP(
-            gamma_G=30,
-            gamma_F=4000,
-            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F=3.2,
-          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000,
-            dpnom_F=20000),
+          Sh_LP(gamma_G=30, gamma_F=4000),
           Sh_LP_N_F=4,
-          Ec_LP(
-            gamma_G=35,
-            gamma_F=3000,
-            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F=990,
-          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000,
-            dpnom_F=50000),
-          Ev_LP(
-            gamma_G=60,
-            gamma_F=20000,
-            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
-            Kfnom_F=2000,
-          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000),
+          Ec_LP(gamma_G=35, gamma_F=3000),
+          Ev_LP(gamma_G=60, gamma_F=20000),
           Sh1HP_Rh1IP(
             gamma_G_A=70,
             gamma_G_B=70,
             gamma_F_A=4000,
-            gamma_F_B=4000,
-            FFtype_F_A=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F_A=70,
-            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F_B=9.5,
-          HCtype_F_A=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-          HCtype_F_B=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000,
-            dpnom_F_A=30000,
-            dpnom_F_B=50000),
+            gamma_F_B=4000),
           Sh2HP_Rh2IP(
             gamma_F_A=4000,
             gamma_F_B=4000,
             gamma_G_A=70,
-            gamma_G_B=70,
-            FFtype_F_A=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F_A=35,
-            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F_B=7.5,
-          HCtype_F_A=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-          HCtype_F_B=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000,
-            dpnom_F_A=30000,
-            dpnom_F_B=50000),
-          Sh_IP(
-            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F=13,
-          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000,
-            dpnom_F=20000),
-          Ec2_HP(
-            FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F=860,
-          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000,
-            dpnom_F=20000),
-          Ec1HP_EcIP(
-            FFtype_F_A=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F_A=925,
-            FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_F_B=920,
-          HCtype_F_A=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-          HCtype_F_B=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000,
-            dpnom_F_A=20000,
-            dpnom_F_B=20000),
-          Ev_HP(FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom_F=2000,
-          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000),
-          Ev_IP(FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom_F=2000,
-          HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Middle,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-            rhonom_G=1,
-            dpnom_G=1000),
-          SSInit=SSInit,
-          fluidHPNomPressure_Sh=12211600,
-          fluidHPNomPressure_Ev=12211600,
-          fluidHPNomPressure_Ec=12211600,
-          fluidIPNomPressure_Rh=2636940,
-          fluidIPNomPressure_Sh=2636940,
-          fluidIPNomPressure_Ev=2636940,
-          fluidIPNomPressure_Ec=2636940,
-          fluidLPNomPressure_Sh=604740,
-          fluidLPNomPressure_Ev=604740,
-          fluidLPNomPressure_Ec=604740,
-          Sh2_HP_Tstart_G_In=884.65,
-          Sh2_HP_Tstart_G_Out=849.29,
-          Sh2_HP_Tstart_M_In=801.698,
-          Sh2_HP_Tstart_M_Out=861.343,
-          Sh2_HP_Tstart_F_In=792.68,
-          Sh2_HP_Tstart_F_Out=857.106,
-          Sh1_HP_Tstart_G_In=849.29,
-          Sh1_HP_Tstart_G_Out=732,
-          Sh1_HP_Tstart_M_In=624.205,
-          Sh1_HP_Tstart_M_Out=803.585,
-          Sh1_HP_Tstart_F_In=599.18,
-          Sh1_HP_Tstart_F_Out=792.68,
-          Ev_HP_Tstart_G_In=732,
-          Ev_HP_Tstart_G_Out=611.19,
-          Ev_HP_Tstart_M_In=594.933,
-          Ev_HP_Tstart_M_Out=603.16,
-          Ec2_HP_Tstart_G_In=605.074,
-          Ec2_HP_Tstart_G_Out=548.522,
-          Ec2_HP_Tstart_M_In=488.443,
-          Ec2_HP_Tstart_M_Out=588.719,
-          Ec2_HP_Tstart_F_In=476.66,
-          Ec2_HP_Tstart_F_Out=585.495,
-          Ec1_HP_Tstart_M_In=426.384,
-          Ec1_HP_Tstart_M_Out=479.885,
-          Ec1_HP_Tstart_F_In=420.129,
-          Ec1_HP_Tstart_F_Out=476.66,
-          Rh2_IP_Tstart_M_In=793.962,
-          Rh2_IP_Tstart_M_Out=863.89,
-          Rh2_IP_Tstart_F_In=787.973,
-          Rh2_IP_Tstart_F_Out=861.625,
-          Rh1_IP_Tstart_M_In=641.307,
-          Rh1_IP_Tstart_M_Out=793.753,
-          Rh1_IP_Tstart_F_In=631.882,
-          Rh1_IP_Tstart_F_Out=787.973,
-          Sh_IP_Tstart_G_In=611.19,
-          Sh_IP_Tstart_G_Out=605.074,
-          Sh_IP_Tstart_M_In=504.237,
-          Sh_IP_Tstart_M_Out=594.703,
-          Sh_IP_Tstart_F_In=499.962,
-          Sh_IP_Tstart_F_Out=594.001,
-          Ev_IP_Tstart_G_In=548.522,
-          Ev_IP_Tstart_G_Out=503.81,
-          Ev_IP_Tstart_M_In=497.865,
-          Ev_IP_Tstart_M_Out=501.763,
-          Ec_IP_Tstart_G_In=501.802,
-          Ec_IP_Tstart_G_Out=468.9,
-          Ec_IP_Tstart_M_In=427.707,
-          Ec_IP_Tstart_M_Out=490.16,
-          Ec_IP_Tstart_F_In=421.552,
-          Ec_IP_Tstart_F_Out=488.422,
-          Ev_LP_Tstart_G_In=468.9,
-          Ev_LP_Tstart_G_Out=427.671,
-          Ev_LP_Tstart_M_In=422.216,
-          Ev_LP_Tstart_M_Out=434.622,
-          Ec_LP_Tstart_G_In=427.671,
-          Ec_LP_Tstart_G_Out=372.309,
-          Ec_LP_Tstart_M_In=336.404,
-          Ec_LP_Tstart_M_Out=419.33,
-          Ec_LP_Tstart_F_In=331.506,
-          Ec_LP_Tstart_F_Out=418.193)) 
-                              annotation (Placement(transformation(extent={{
-                -100,20},{0,120}}, rotation=0)));
-
-      ThermoPower.PowerPlants.SteamTurbineGroup.Examples.STG_3LRh_valve_cc
-        sTG_3LRh(
-          steamTurbines(
-          HPT_hstart_in=3.56678e6,
-          HPT_hstart_out=3.16451e6,
-          IPT_hstart_in=3.65985e6,
-          IPT_hstart_out=3.21285e6,
-          LPT_hstart_in=3.16961e6,
-          LPT_hstart_out=2.41849e6,
-          mixLP_hstart=3.16953e6,
-          steamHPNomFlowRate=62.8,
-          steamIPNomFlowRate=14.5,
-          steamLPNomFlowRate=10.9,
-          steamHPNomPressure=12202000,
-          steamIPNomPressure=2636810,
-          steamLPNomPressure=604700,
-          SSInit=SSInit), controlledCondeser(
-          Vlstart=5,
-          setPoint_ratio=0.5,
-          SSInit=SSInit)) 
-        annotation (Placement(transformation(extent={{-100,-180},{0,-80}},
-              rotation=0)));
-    public
-      ThermoPower.PowerPlants.HRSG.Control.levelsControl levelsControl(
-        CSmin_levelHP=30,
-        CSmax_levelHP=96,
-        CSmin_levelIP=5,
-        CSmax_levelIP=25,
-        CSmax_levelLP=2400,
-        Level_HP(steadyStateInit=SSInit),
-        Level_IP(steadyStateInit=SSInit),
-        Level_LP(steadyStateInit=SSInit)) 
-        annotation (Placement(transformation(extent={{60,100},{120,160}},
-              rotation=0)));
-      ThermoPower.PowerPlants.ElectricGeneratorGroup.Examples.GeneratorGroup
-        singleShaft(
-        eta=0.9,
-        J_shaft=15000,
-        d_shaft=25,
-        Pmax=150e6,
-        delta_start=0.7,
-        generator(initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit),
-        network(initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState else 
-                    ThermoPower.Choices.Init.Options.noInit)) 
-                    annotation (Placement(transformation(extent={{40,-180},{140,
-                -80}}, rotation=0)));
-      ThermoPower.Gas.SourceW sourceGas(
-        redeclare package Medium = FlueGasMedium,
-        w0=585.5,
-        T=884.65)          annotation (Placement(transformation(extent={{-160,
-                50},{-140,70}}, rotation=0)));
-      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_in(
-          redeclare package Medium = FlueGasMedium) 
-                           annotation (Placement(transformation(extent={{-130,
-                50},{-110,70}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp ramp(
-        height=-50,
-        duration=500,
-        offset=585.5,
-      startTime=4000)   annotation (Placement(transformation(extent={{-190,100},
-                {-170,120}}, rotation=0)));
-      ThermoPower.Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=
-            362.309)   annotation (Placement(transformation(extent={{60,50},{80,
-                70}}, rotation=0)));
-      ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
-          redeclare package Medium = FlueGasMedium) 
-                           annotation (Placement(transformation(extent={{30,50},
-                {50,70}}, rotation=0)));
+            gamma_G_B=70)),
+        drums(
+          fluidHPNomPressure=12211600,
+          fluidIPNomPressure=2636940,
+          fluidLPNomPressure=604700)) 
+                              annotation (Placement(transformation(extent={{-100,20},
+                {0,120}},          rotation=0)));
     public
       Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true) 
         annotation (Placement(transformation(extent={{180,-60},{160,-40}},
               rotation=0)));
     public
-      Modelica.Blocks.Sources.Ramp valveHP_com(height=0, offset=1) 
-        annotation (Placement(transformation(extent={{180,60},{160,80}},
+      HRSG.Control.levelsControl levelsControl(
+        CSmin_levelHP=30,
+        CSmax_levelHP=96,
+        CSmin_levelIP=5,
+        CSmax_levelIP=25,
+        Level_HP(steadyStateInit=true),
+        Level_IP(steadyStateInit=true),
+        Level_LP(steadyStateInit=true),
+        CSmax_levelLP=2400) 
+        annotation (Placement(transformation(extent={{60,100},{120,160}},
               rotation=0)));
-      Modelica.Blocks.Sources.Ramp valveIP_com(height=0, offset=1) 
-        annotation (Placement(transformation(extent={{180,20},{160,40}},
-              rotation=0)));
-      Modelica.Blocks.Sources.Ramp valveLP_com(height=0, offset=1) 
-        annotation (Placement(transformation(extent={{180,-20},{160,0}},
-              rotation=0)));
-    protected
-      ThermoPower.PowerPlants.Buses.Actuators actuators 
-                                annotation (Placement(transformation(extent={{
-                120,-60},{100,-40}}, rotation=0)));
+      Gas.SinkP sinkGas(            redeclare package Medium = 
+            FlueGasMedium, T=362.309) 
+                       annotation (Placement(transformation(extent={{60,50},{80,
+                70}}, rotation=0)));
     public
-      inner System system 
-        annotation (Placement(transformation(extent={{180,180},{200,200}})));
+      Modelica.Blocks.Sources.Ramp valveHP_com(height=0, offset=1,
+          duration=2) 
+        annotation (Placement(transformation(extent={{180,60},{160,80}}, rotation=
+               0)));
+      Modelica.Blocks.Sources.Ramp valveIP_com(height=0, offset=1,
+          duration=2) 
+        annotation (Placement(transformation(extent={{180,20},{160,40}}, rotation=
+               0)));
+      Modelica.Blocks.Sources.Ramp valveLP_com(height=0, offset=1,
+          duration=2) 
+        annotation (Placement(transformation(extent={{180,-20},{160,0}}, rotation=
+               0)));
+      ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
+        eta=0.9,
+        J_shaft=15000,
+        d_shaft=25,
+        Pmax=150e6,
+        SSInit=true,
+        delta_start=0.7) 
+                    annotation (Placement(transformation(extent={{60,-180},{160,
+                -80}}, rotation=0)));
+    protected
+      Buses.Actuators actuators1 
+                                annotation (Placement(transformation(extent={{120,-60},
+                {100,-40}},      rotation=0)));
+    public
+      SteamTurbineGroup.Examples.STG_3LRh_valve_cc sTG_3LRh(
+        SSInit=true,
+        steamTurbines(
+          steamHPNomFlowRate=62.8,
+          steamIPNomFlowRate=14.5,
+          steamLPNomFlowRate=10.9,
+          ST_HP(pnom=120e5),
+          ST_IP(pnom=28e5),
+          ST_LP(pnom=6.5e5),
+          steamHPNomPressure=12202000,
+          steamIPNomPressure=2636810,
+          steamLPNomPressure=604700),
+        totalFeedPump(nominalOutletPressure=604700)) 
+        annotation (Placement(transformation(extent={{-100,-180},{0,-80}},
+              rotation=0)));
     equation
-      connect(singleShaft.shaft, sTG_3LRh.Shaft_b) annotation (Line(
-          points={{40,-130},{0,-130}},
-          color={0,0,0},
-          thickness=0.5));
       connect(ramp.y,sourceGas. in_w0) annotation (Line(points={{-169,110},{
               -156,110},{-156,65}}, color={0,0,127}));
-      connect(stateGas_in.inlet,sourceGas. flange) annotation (Line(
-          points={{-126,60},{-140,60}},
+      connect(sourceGas.flange, hRSG.GasIn) annotation (Line(
+          points={{-140,60},{-100,60}},
           color={159,159,223},
-          thickness=0.5));
-      connect(sinkGas.flange,stateGas_out. outlet) annotation (Line(
-          points={{60,60},{46,60}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points=
-             {{159,70},{110,70},{110,-50}}, color={0,0,127}));
-      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points=
-             {{159,30},{110,30},{110,-50}}, color={0,0,127}));
-      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points=
-             {{159,-10},{110,-10},{110,-50}}, color={0,0,127}));
-      connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (Line(
-            points={{159,-50},{110,-50}}, color={255,0,255}));
-      connect(stateGas_out.inlet, hRSG.GasOut) annotation (Line(
-          points={{34,60},{0,60}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(hRSG.GasIn, stateGas_in.outlet) annotation (Line(
-          points={{-100,60},{-114,60}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(levelsControl.SensorsBus, hRSG.SensorsBus) annotation (Line(
-            points={{60,130},{20,130},{20,110},{0,110}}, color={255,170,213}));
-      connect(hRSG.SensorsBus, sTG_3LRh.SensorsBus) annotation (Line(points={{0,
-              110},{20,110},{20,-150},{0,-150}}, color={255,170,213}));
-      connect(sTG_3LRh.SensorsBus, singleShaft.SensorsBus) annotation (Line(
-            points={{0,-150},{20,-150},{20,-190},{160,-190},{160,-150},{140,
-              -150}}, color={255,170,213}));
-      connect(singleShaft.ActuatorsBus, sTG_3LRh.ActuatorsBus) annotation (Line(
-            points={{140,-165},{152,-165},{152,-184},{14,-184},{14,-165},{0,
-              -165}}, color={213,255,170}));
-      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points=
-             {{0,-165},{14,-165},{14,95},{0,95}}, color={213,255,170}));
-      connect(actuators, hRSG.ActuatorsBus) annotation (Line(points={{110,-50},
-              {14,-50},{14,95},{0,95}}, color={213,255,170}));
-      connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(
+          thickness=0.5,
+          smooth=Smooth.None));
+      connect(valveHP_com.y,actuators1. Opening_valveHP) 
+                                                        annotation (Line(points={{159,70},
+              {110,70},{110,-50}},          color={0,0,127}));
+      connect(valveIP_com.y,actuators1. Opening_valveIP) 
+                                                        annotation (Line(points={{159,30},
+              {110,30},{110,-50}},          color={0,0,127}));
+      connect(valveLP_com.y,actuators1. Opening_valveLP) 
+                                                        annotation (Line(points={{159,-10},
+              {110,-10},{110,-50}},           color={0,0,127}));
+      connect(levelsControl.SensorsBus,hRSG. SensorsBus) annotation (Line(points={{60,130},
+              {20,130},{20,110},{0,110}},           color={255,170,213}));
+      connect(hRSG.SensorsBus,sTG_3LRh. SensorsBus) annotation (Line(points={{0,110},
+              {20,110},{20,-150},{0,-150}},      color={255,170,213}));
+      connect(sTG_3LRh.ActuatorsBus,hRSG. ActuatorsBus) annotation (Line(points={{0,-165},
+              {14,-165},{14,95},{0,95}},          color={213,255,170}));
+      connect(actuators1, hRSG.ActuatorsBus) 
+                                            annotation (Line(points={{110,-50},
+              {14,-50},{14,95},{0,95}},color={213,255,170}));
+      connect(levelsControl.ActuatorsBus,hRSG. ActuatorsBus) annotation (Line(
             points={{120,130},{140,130},{140,95},{0,95}}, color={213,255,170}));
-      connect(hRSG.Sh_HP_Out, sTG_3LRh.From_SH_HP) annotation (Line(
-          points={{-90,20},{-90,-80},{-90,-80}},
-          color={0,0,255},
-          thickness=0.5,
+      connect(sinkGas.flange,hRSG. GasOut) annotation (Line(
+          points={{60,60},{22,60},{0,60}},
+          color={159,159,223},
+          thickness=0.5));
+      connect(booleanConstant.y,actuators1. ConnectedGenerator) annotation (Line(
+          points={{159,-50},{110,-50}},
+          color={255,0,255},
           smooth=Smooth.None));
-      connect(hRSG.Rh_IP_In, sTG_3LRh.To_RH_IP) annotation (Line(
-          points={{-75,20},{-75,-29},{-75,-29},{-75,-80}},
-          color={0,0,255},
-          thickness=0.5,
-          smooth=Smooth.None));
-      connect(hRSG.Rh_IP_Out, sTG_3LRh.From_RH_IP) annotation (Line(
-          points={{-60,20},{-60,-80}},
-          color={0,0,255},
-          thickness=0.5,
-          smooth=Smooth.None));
-      connect(hRSG.Sh_LP_Out, sTG_3LRh.From_SH_LP) annotation (Line(
-          points={{-30,20},{-30,-80},{-30,-80}},
-          color={0,0,255},
-          thickness=0.5,
-          smooth=Smooth.None));
-      connect(hRSG.WaterIn, sTG_3LRh.WaterOut) annotation (Line(
-          points={{-10,20},{-10,-80}},
-          color={0,0,255},
-          thickness=0.5,
-          smooth=Smooth.None));
+      connect(singleShaft.shaft,sTG_3LRh. Shaft_b) annotation (Line(
+          points={{60,-130},{0,-130}},
+          color={0,0,0},
+          thickness=0.5));
+      connect(sTG_3LRh.SensorsBus,singleShaft. SensorsBus) annotation (Line(
+            points={{0,-150},{40,-150},{40,-190},{180,-190},{180,-150},{160,
+              -150}}, color={255,170,213}));
+      connect(singleShaft.ActuatorsBus,sTG_3LRh. ActuatorsBus) annotation (Line(
+            points={{160,-165},{172,-165},{172,-184},{34,-184},{34,-165},{0,
+              -165}}, color={213,255,170}));
+      connect(sTG_3LRh.WaterOut,hRSG. WaterIn) annotation (Line(points={{-10,-80},
+              {-10,-36},{-10,20}},
+                         thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.From_SH_LP,hRSG. Sh_LP_Out) annotation (Line(points={{-30,-80},
+              {-30,-36},{-30,20}},
+                              thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.From_RH_IP,hRSG. Rh_IP_Out) annotation (Line(points={{-60,-80},
+              {-60,-36},{-60,20}},
+                              thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.From_SH_HP,hRSG. Sh_HP_Out) annotation (Line(points={{-90,-80},
+              {-90,-36},{-90,20}},
+                              thickness=0.5,
+          color={0,0,255}));
+      connect(sTG_3LRh.To_RH_IP,hRSG. Rh_IP_In) annotation (Line(points={{-75,-80},
+              {-74,-30},{-75,20}},          thickness=0.5,
+          color={0,0,255}));
       annotation (Diagram(coordinateSystem(
             preserveAspectRatio=true,
             extent={{-200,-200},{200,200}},
