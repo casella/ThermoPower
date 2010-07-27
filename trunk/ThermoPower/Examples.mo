@@ -2141,42 +2141,43 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
       parameter Modelica.SIunits.ThermalConductivity lambda
         "Thermal conductivity of the metal (density by specific heat capacity)";
 
-      //Start value
-      parameter Boolean use_T = true
-        "Select: -true- to insert the initial temperature or -false- to insert the initial specifc enthalpy"
-         annotation(Dialog(tab = "Initialization Conditions"));
-      parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
+      //Start values
 
       parameter Modelica.SIunits.Temperature Tstart_G
-        "Average gas temperature start value"            annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Temperature Tstart_G_In
-        "Inlet gas temperature start value"            annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Temperature Tstart_G_Out
-        "Outlet gas temperature start value"           annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Pressure pstart_G=gasNomPressure
-        "Pressure start value, gas side" 
-                                        annotation(Dialog(tab = "Initialization"));
+        "Average gas temperature start value" 
+                                             annotation(Dialog(tab = "Initialization"));
       parameter Modelica.SIunits.Temperature Tstart_M
-        "Average metal wall temperature start value"            annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Temperature Tstart_M_In
-        "Inlet metal wall temperature start value"       annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Temperature Tstart_M_Out
-        "Outlet metal wall temperature start value"      annotation(Dialog(tab = "Initialization"));
+        "Average metal wall temperature start value" 
+                                                    annotation(Dialog(tab = "Initialization"));
+      parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+        "Initialization fluid phase" 
+                                    annotation(Dialog(tab = "Initialization"));
+      parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
       parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_G
         "Constant heat transfer coefficient in the gas side";
       parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_F
         "Constant heat transfer coefficient in the fluid side";
+      parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
+        "Friction Factor Type, gas side";
+      parameter Real Kfnom_G=0
+        "Nominal hydraulic resistance coefficient, gas side";
+      parameter Modelica.SIunits.Pressure dpnom_G=0
+        "Nominal pressure drop, gas side (friction term only!)";
+      parameter Modelica.SIunits.Density rhonom_G=0
+        "Nominal inlet density, gas side";
+      parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
       parameter Choices.Flow1D.FFtypes FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type, fluid side";
-      parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient";
-      parameter Real Cfnom=0 "Nominal Fanning friction factor";
+      parameter Real Kfnom_F=0
+        "Nominal hydraulic resistance coefficient, fluid side";
+      parameter Modelica.SIunits.Pressure dpnom_F=0
+        "Nominal pressure drop, fluid side (friction term only!)";
+      parameter Modelica.SIunits.Density rhonom_F=0
+        "Nominal inlet density, fluid side";
+      parameter Real Cfnom_F=0 "Nominal Fanning friction factor, fluid side";
       parameter Choices.Flow1D.HCtypes HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream
         "Location of the hydraulic capacitance, fluid side";
       parameter Boolean counterCurrent=true "Counter-current flow";
-      parameter Modelica.SIunits.Pressure dpnom=0
-        "Nominal pressure drop fluid side (friction term only!)";
-      parameter Modelica.SIunits.Density rhonom=0
-        "Nominal inlet density fluid side";
       parameter Boolean gasQuasiStatic=false
         "Quasi-static model of the flue gas (mass, energy and momentum static balances";
       constant Real pi=Modelica.Constants.pi;
@@ -2203,12 +2204,13 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         omega=fluidVol*4/exchSurface_F*pi,
         Dhyd=fluidVol*4/exchSurface_F,
         FFtype=FFtype_F,
-        dpnom=dpnom,
-        rhonom=rhonom,
+        dpnom=dpnom_F,
+        rhonom=rhonom_F,
         HydraulicCapacitance=HCtype_F,
-        Kfnom=Kfnom,
-        Cfnom=Cfnom,
-        FluidPhase=FluidPhase) annotation (Placement(transformation(extent={{
+        Kfnom=Kfnom_F,
+        Cfnom=Cfnom_F,
+        FluidPhaseStart=FluidPhaseStart) 
+                               annotation (Placement(transformation(extent={{
                 -10,-60},{10,-40}}, rotation=0)));
       Thermal.ConvHT convHT(               N=N_F,
         gamma=gamma_F) 
@@ -2229,17 +2231,20 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
       Gas.Flow1D gasFlow(
         Dhyd=1,
         wnom=gasNomFlowRate,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         N=N_G,
         initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
         redeclare package Medium = FlueGasMedium,
         QuasiStatic=gasQuasiStatic,
-        pstart=pstart_G,
         L=L,
         A=gasVol/L,
         omega=exchSurface_G/L,
-        Tstartbar=Tstart_G)    annotation (Placement(transformation(extent={{
-                -12,58},{12,38}}, rotation=0)));
+        Tstartbar=Tstart_G,
+        dpnom=dpnom_G,
+        rhonom=rhonom_G,
+        Kfnom=Kfnom_G,
+        Cfnom=Cfnom_G,
+        FFtype=FFtype_G)  annotation (Placement(transformation(extent={{-10,60},
+                {10,40}},         rotation=0)));
       Thermal.CounterCurrent cC(                                    N=N_F,
           counterCurrent=counterCurrent) 
         annotation (Placement(transformation(extent={{-10,-10},{10,10}},
@@ -2257,18 +2262,16 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
                 20},{10,40}}, rotation=0)));
 
       final parameter Modelica.SIunits.Distance L=1 "Tube length";
-      parameter Choices.FluidPhase.FluidPhases FluidPhase=Choices.FluidPhase.FluidPhases.Liquid
-        "Fluid phase";
     equation
       connect(fluidFlow.wall, convHT.side2) 
                                          annotation (Line(points={{0,-45},{0,
               -33.1}}, color={255,127,0}));
       connect(gasFlow.infl, gasIn) annotation (Line(
-          points={{-12,48},{-100,48},{-100,0}},
+          points={{-10,50},{-100,50},{-100,0}},
           color={159,159,223},
           thickness=0.5));
       connect(gasFlow.outfl, gasOut) annotation (Line(
-          points={{12,48},{100,48},{100,0}},
+          points={{10,50},{100,50},{100,0}},
           color={159,159,223},
           thickness=0.5));
       connect(fluidFlow.outfl, waterOut) 
@@ -2281,8 +2284,9 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           color={0,0,255}));
       connect(heatFlowDistribution.side2, cC.side1) annotation (Line(points={{0,
               10.9},{0,3}}, color={255,127,0}));
-      connect(convHT2N.side1, gasFlow.wall) annotation (Line(points={{0,33},{0,
-              43}}, color={255,127,0}));
+      connect(convHT2N.side1, gasFlow.wall) annotation (Line(points={{0,33},{0,40},{
+              0,45}},
+                    color={255,127,0}));
       connect(heatFlowDistribution.side1, convHT2N.side2) annotation (Line(
             points={{0,17},{0,26.9}}, color={255,127,0}));
       connect(metalTube.int, convHT.side1) annotation (Line(points={{0,-19},{0,
@@ -2347,19 +2351,20 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         "Specific heat capacity of the metal";
 
       //Start value
-      parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization Conditions"));
-
       parameter Modelica.SIunits.Temperature Tstart
         "Average gas temperature start value"            annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Temperature Tstart_In
-        "Inlet gas temperature start value"            annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Temperature Tstart_Out
-        "Outlet gas temperature start value"           annotation(Dialog(tab = "Initialization"));
-      parameter Modelica.SIunits.Pressure pstart=gasNomPressure
-        "Pressure start value, gas side" 
-                                        annotation(Dialog(tab = "Initialization"));
+      parameter Boolean SSInit = false "Steady-state initialization" annotation(Dialog(tab = "Initialization"));
       parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma
         "Constant heat transfer coefficient in the gas side";
+      parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
+        "Friction Factor Type, gas side";
+      parameter Real Kfnom_G=0
+        "Nominal hydraulic resistance coefficient, gas side";
+      parameter Modelica.SIunits.Pressure dpnom_G=0
+        "Nominal pressure drop, gas side (friction term only!)";
+      parameter Modelica.SIunits.Density rhonom_G=0
+        "Nominal inlet density, gas side";
+      parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
       parameter Boolean gasQuasiStatic=false
         "Quasi-static model of the flue gas (mass, energy and momentum static balances";
       constant Real pi=Modelica.Constants.pi;
@@ -2404,7 +2409,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         redeclare package Medium = FlueGasMedium,
         QuasiStatic=gasQuasiStatic,
         N=N,
-        pstart=pstart,
         initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
         L=L,
         A=gasVol/L,
@@ -2474,7 +2478,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         "Nominal condensation pressure";
       parameter Modelica.SIunits.MassFlowRate nominalMassFlowRate
         "Nominal steam mass flow rate";
-      parameter Modelica.SIunits.SpecificEnthalpy hstart
+      parameter Modelica.SIunits.SpecificEnthalpy hstart=1e5
         "Fluid Specific Enthalpy Start Value";
       parameter Boolean SSInit = false "Steady-state initialization";
 
@@ -2496,7 +2500,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         wstart=nominalMassFlowRate,
         w0=nominalMassFlowRate,
         dp0=nominalOutletPressure - nominalInletPressure,
-        rho0=rho0) 
+        rho0=rho0,
+        hstart=hstart) 
         annotation (Placement(transformation(extent={{-40,-24},{0,16}},
               rotation=0)));
       Modelica.Blocks.Interfaces.RealInput nPump 
@@ -2641,7 +2646,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         n0=1500,
         nominalMassFlowRate=55,
         q_nom={0,0.055,0.1},
-        hstart=1.48e5,
         redeclare package FluidMedium = Water,
         SSInit=SSInit,
         head_nom={450,300,0},
@@ -2741,25 +2745,21 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         metalVol=8.061,
         rhomcm=7900*578.05,
         lambda=20,
-        fluidFlow(FFtype=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom=150),
         gasNomFlowRate=500,
         fluidNomFlowRate=55,
         gamma_G=30,
         gamma_F=3000,
         SSInit=SSInit,
-        gasFlow(
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
-          dpnom=1000,
-          rhonom=1),
+        rhonom_G=1,
+        Kfnom_F=150,
         gasNomPressure=101325,
         fluidNomPressure=3000000,
         Tstart_G=473.15,
-        Tstart_G_In=500,
-        Tstart_G_Out=417,
         Tstart_M=423.15,
-        Tstart_M_In=307,
-        Tstart_M_Out=488,
-        dpnom=20000) 
+        FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        dpnom_G=1000,
+        FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+        dpnom_F=20000) 
         annotation (Placement(transformation(extent={{-120,-80},{-80,-120}},
               rotation=0)));
       ThermoPower.Examples.RankineCycle.Evaporator evaporator(
@@ -2779,8 +2779,9 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         gasNomPressure=101325,
         fluidNomPressure=3000000,
         Tstart=623.15,
-        Tstart_In=700,
-        Tstart_Out=500) 
+        FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        dpnom_G=1000,
+        rhonom_G=1) 
         annotation (Placement(transformation(extent={{-120,0},{-80,-40}},
               rotation=0)));
       ThermoPower.Examples.RankineCycle.HE superheater(
@@ -2796,25 +2797,22 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         metalVol=1.146,
         rhomcm=7900*578.05,
         lambda=20,
-        fluidFlow(FFtype=ThermoPower.Choices.Flow1D.FFtypes.Kfnom, Kfnom=150),
         gasNomFlowRate=500,
         gamma_G=90,
         gamma_F=6000,
         fluidNomFlowRate=55,
         SSInit=SSInit,
-        gasFlow(
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
-          dpnom=1000,
-          rhonom=1),
+        rhonom_G=1,
+        Kfnom_F=150,
         gasNomPressure=101325,
         fluidNomPressure=3000000,
         Tstart_G=723.15,
-        Tstart_G_In=750,
-        Tstart_G_Out=700,
         Tstart_M=573.15,
-        Tstart_M_In=513,
-        Tstart_M_Out=690,
-        dpnom=20000) 
+        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+        FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        dpnom_G=1000,
+        FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+        dpnom_F=20000) 
         annotation (Placement(transformation(extent={{-120,80},{-80,40}},
               rotation=0)));
       ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGasInlet(
@@ -2958,7 +2956,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
             points={{-100,108},{-100,120},{32,120},{32,82}}, thickness=0.5,
           color={0,0,255}));
       connect(superheater.gasIn, stateGasInlet.outlet) annotation (Line(
-          points={{-120,60},{-134,60}},
+          points={{-120,60},{-128,60},{-134,60}},
           color={159,159,223},
           thickness=0.5));
       connect(powerSensor.u, powerSensor1.power) annotation (Line(points={{238,
