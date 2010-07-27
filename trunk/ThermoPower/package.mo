@@ -1103,7 +1103,7 @@ This characteristic is such that the relative change of the flow coefficient is 
   H_nom[2] = c[1] + q_nom[2]*c[2];
   */
     protected
-        Real c[2] = Modelica.Math.Matrices.solve([ones(2),q_nom],H_nom)
+        parameter Real c[2] = Modelica.Math.Matrices.solve([ones(2),q_nom],H_nom)
         "Coefficients of linear head curve";
       algorithm
         // Flow equation: head = q*c[1] + c[2];
@@ -1117,14 +1117,14 @@ This characteristic is such that the relative change of the flow coefficient is 
         input Modelica.SIunits.Height H_nom[3]
         "Specific work for three operating points";
     protected
-        Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2}
+        parameter Real q_nom2[3] = {q_nom[1]^2,q_nom[2]^2, q_nom[3]^2}
         "Squared nominal flow rates";
         /* Linear system to determine the coefficients:
   H_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
   H_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
   H_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
   */
-        Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],H_nom)
+        parameter Real c[3] = Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],H_nom)
         "Coefficients of quadratic specific work characteristic";
       algorithm
         // Flow equation: H = c[1] + q_flow*c[2] + q_flow^2*c[3];
@@ -1153,15 +1153,16 @@ This characteristic is such that the relative change of the flow coefficient is 
         input Modelica.SIunits.Height H_nom[:]
         "Specific work for N operating points";
     protected
-        Integer N = size(q_nom,1) "Number of nominal operating points";
-        Real q_nom_pow[N,N] = {{q_nom[j]^(i-1) for j in 1:N} for i in 1:N}
+        parameter Integer N = size(q_nom,1)
+        "Number of nominal operating points";
+        parameter Real q_nom_pow[N,N] = {{q_nom[j]^(i-1) for j in 1:N} for i in 1:N}
         "Rows: different operating points; columns: increasing powers";
         /* Linear system to determine the coefficients (example N=3):
   H_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
   H_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
   H_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
   */
-        Real c[N] = Modelica.Math.Matrices.solve(q_nom_pow,H_nom)
+        parameter Real c[N] = Modelica.Math.Matrices.solve(q_nom_pow,H_nom)
         "Coefficients of polynomial specific work curve";
       algorithm
         // Flow equation (example N=3): H = c[1] + q_flow*c[2] + q_flow^2*c[3];
