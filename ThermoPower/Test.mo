@@ -19,7 +19,7 @@ package Test "Test cases for the ThermoPower models"
         Cm=0,
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        FluidPhase=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
                       annotation (Placement(transformation(extent={{-52,20},{
                 -32,40}}, rotation=0)));
       Water.ValveLin ValveLin1(Kv=1/1e5) 
@@ -45,7 +45,7 @@ package Test "Test cases for the ThermoPower models"
         V=1,
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        FluidPhase=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
+        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam) 
         annotation (Placement(transformation(extent={{-40,-40},{-20,-20}},
               rotation=0)));
       Water.ValveLin ValveLin2(Kv=1/1e5) 
@@ -78,11 +78,11 @@ package Test "Test cases for the ThermoPower models"
           color={0,0,255},
           thickness=0.5));
       connect(SourceW3.flange, header.inlet) 
-        annotation (Line(points={{-70,-30},{-40.1,-30}},
+        annotation (Line(points={{-70,-30},{-56,-30},{-40.1,-30}},
           color={0,0,255},
           thickness=0.5));
       connect(header.outlet, ValveLin2.inlet) 
-        annotation (Line(points={{-20,-30},{-2,-30}},
+        annotation (Line(points={{-20,-30},{-12,-30},{-2,-30}},
           color={0,0,255},
           thickness=0.5));
       connect(ValveLin2.outlet, SinkP2.flange) 
@@ -2623,10 +2623,12 @@ Algorithm Tolerance = 1e-4
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       tau = sum(hex.rho)/Nnodes*Lhex*Ahex/whex;
-      connect(hex.outfl, Valve.inlet) annotation (Line(points={{0,0},{10,0}},
+      connect(hex.outfl, Valve.inlet) annotation (Line(points={{0,0},{6,0},{10,
+              0}},
             thickness=0.5,
           color={0,0,255}));
-      connect(T_in.outlet, hex.infl) annotation (Line(points={{-34,0},{-20,0}},
+      connect(T_in.outlet, hex.infl) annotation (Line(points={{-34,0},{-28,0},{
+              -20,0}},
             thickness=0.5,
           color={0,0,255}));
       connect(Fluid_Source.flange, T_in.inlet) 
@@ -3343,7 +3345,7 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.ValveLin Valve(Kv=3e-6, redeclare package Medium = Medium) 
         annotation (Placement(transformation(extent={{10,-10},{30,10}},
               rotation=0)));
-      ThermoPower.Water.Flow1D hex(
+      Water.Flow1D hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -3353,8 +3355,6 @@ Algorithm Tolerance = 1e-6
         DynamicMomentum=false,
         hstartin=hinhex,
         hstartout=houthex,
-        pstartin=phex,
-        pstartout=phex,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) 
@@ -3441,6 +3441,7 @@ Algorithm Tolerance = 1e-6
 </ul>
 </html>"));
     end TestFlow1DSlowFast;
+
 
     model TestFlow1DDB "Test case for Flow1D"
       package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
