@@ -4789,9 +4789,11 @@ Input variables changed. This function now computes the heat transfer coefficien
     extends SteamTurbineBase;
     parameter Real eta_iso_nom=0.92 "Nominal isentropic efficiency";
     parameter Area Kt "Kt coefficient of Stodola's law";
+    parameter Real partialArc_nom=1 "Nominal partial arc";
   equation
     w = homotopy(Kt*partialArc*sqrt(Medium.pressure(steamState_in)*Medium.density(steamState_in))*Functions.sqrtReg(1-(1/PR)^2),
-                 wnom/pnom*Medium.pressure(steamState_in)) "Stodola's law";
+                 partialArc/partialArc_nom*wnom/pnom*Medium.pressure(steamState_in))
+      "Stodola's law";
     eta_iso = eta_iso_nom "Constant efficiency";
    annotation (
       Documentation(info="<html>
