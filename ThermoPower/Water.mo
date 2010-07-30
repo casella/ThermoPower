@@ -457,6 +457,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
     Kfl = wnom*wnf*Kf "Linear friction factor";
   equation
+    assert( dpnom>0, "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     // Fluid properties
     if not allowFlowReversal then
       state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
@@ -1026,6 +1027,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
   equation
+    assert( FFtype == FFtypes.NoFriction or dpnom>0, "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
   //All equations are referred to a single tube
     // Friction factor selection
     omega_hyd = 4*A/Dhyd;
@@ -1329,6 +1331,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Real AA1;
     Real dMdt[N - 1] "Derivative of fluid mass in each volume";
   equation
+    assert( FFtype == FFtypes.NoFriction or dpnom>0, "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
     omega_hyd = 4*A/Dhyd;
     // Friction factor selection

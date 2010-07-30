@@ -1030,6 +1030,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Kfl = wnom*wnf*Kf "Linear friction factor";
     assert(Kf >= 0, "Negative friction coefficient");
   equation
+    assert(dpnom>0, "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     // Set fluid properties
     gas.p = homotopy(if not allowFlowReversal then pin else if inlet.m_flow >= 0 then pin else pout,
                      pin);
@@ -1619,7 +1620,7 @@ package Gas "Models of components with ideal gases as working fluid"
     AbsoluteTemperature Ttilde[N - 1](
       start=ones(N - 1)*Tstartin + (1:(N - 1))/(N - 1)*(Tstartout - Tstartin),
       stateSelect=StateSelect.prefer) "Temperature state variables";
-    AbsoluteTemperature Tin( stateSelect=StateSelect.prefer,start=Tstartin);
+    AbsoluteTemperature Tin(start=Tstartin);
     Real Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
         stateSelect=StateSelect.prefer) "Composition state variables";
@@ -1653,6 +1654,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.DerDensityByPressure dddp[N] "Derivative of density by pressure";
     Real dddX[N,nX](unit="kg/m3") "Derivative of density by composition";
   equation
+    assert( FFtype == FFtypes.NoFriction or dpnom>0, "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
   //All equations are referred to a single tube
     // Friction factor selection
     omega_hyd = 4*A/Dhyd;

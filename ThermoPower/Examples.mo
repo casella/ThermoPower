@@ -47,6 +47,7 @@ package Examples "Application examples"
         DynamicMomentum=false,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
+        dpnom=1000,
         pstart=6000000)   annotation (Placement(transformation(
             origin={-167,-67},
             extent={{-15,-15},{15,15}},
@@ -70,6 +71,7 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=3000,
         pstart=6118000) 
                   annotation (Placement(transformation(
             origin={-19,-125},
@@ -93,6 +95,7 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
+        dpnom=17000,
         pstart=6000000)  annotation (Placement(transformation(
             origin={-19,-17},
             extent={{-15,15},{15,-15}},
@@ -116,6 +119,7 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        dpnom=2000,
         pstart=6000000) 
                      annotation (Placement(transformation(extent={{-54,80},{-24,
                 110}}, rotation=0)));
@@ -136,6 +140,7 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=170000,
         pstart=5900000) 
                   annotation (Placement(transformation(extent={{-6,80},{24,110}},
               rotation=0)));
@@ -157,6 +162,7 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
+        dpnom=1000,
         pstart=5600000) 
                      annotation (Placement(transformation(extent={{44,80},{74,
                 110}}, rotation=0)));
@@ -333,8 +339,9 @@ package Examples "Application examples"
         Kf=1e8,
         A=5.62e-5,
         Kfc=2,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint) 
-               annotation (Placement(transformation(extent={{-80,-180},{-50,
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
+        dpnom=1) 
+               annotation (Placement(transformation(extent={{-76,-180},{-46,
                 -150}}, rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput DrumPressure 
         annotation (Placement(transformation(extent={{200,20},{220,40}},
@@ -389,12 +396,12 @@ package Examples "Application examples"
           thickness=0.5));
       connect(HeaderLower.outlet, PressDrop.inlet) 
         annotation (Line(
-          points={{-110,-165},{-80,-165}},
+          points={{-110,-165},{-76,-165}},
           color={0,0,255},
           thickness=0.5));
       connect(PressDrop.outlet, Risers.infl) 
         annotation (Line(
-          points={{-50,-165},{-19,-165},{-19,-140}},
+          points={{-46,-165},{-19,-165},{-19,-140}},
           color={0,0,255},
           thickness=0.5));
       connect(Pipe2Drum.wall, Pipe2DrumExchange.side1) 
@@ -845,6 +852,7 @@ Casella</a>:<br>
         N=2,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=1000,
         pstart=6000000) 
                      annotation (Placement(transformation(extent={{-38,20},{-18,
                 40}}, rotation=0)));
@@ -866,6 +874,7 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=170000,
         pstart=5900000) 
                   annotation (Placement(transformation(extent={{-8,20},{12,40}},
               rotation=0)));
@@ -887,6 +896,7 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
+        dpnom=10000,
         pstart=5600000) 
                      annotation (Placement(transformation(extent={{22,20},{42,
                 40}}, rotation=0)));
@@ -1349,8 +1359,8 @@ Casella</a>:<br>
         hstartin=1e5,
         hstartout=2.7e5,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom) 
-                         constrainedby Water.Flow1D 
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        dpnom=1000)      constrainedby Water.Flow1D 
                                annotation (Placement(transformation(extent={{
                 -10,-60},{10,-40}}, rotation=0)));
       Thermal.ConvHT_htc WaterMetalHT(N=Nr + 1) 
@@ -1483,8 +1493,8 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
       Water.ValveLin Valve(Kv=20/4e5, redeclare package Medium = WaterMedium) 
                                           annotation (Placement(transformation(
               extent={{36,-50},{56,-70}}, rotation=0)));
-      Water.SinkP SinkP1(p0=1e5, redeclare package Medium = WaterMedium) 
-                         annotation (Placement(transformation(extent={{70,-70},
+      Water.SinkP SinkP1(        redeclare package Medium = WaterMedium, p0=
+            100000)      annotation (Placement(transformation(extent={{70,-70},
                 {90,-50}}, rotation=0)));
       Gas.SourceW SourceW2(       redeclare package Medium = GasMedium,
         p0=1e5,
@@ -1509,8 +1519,8 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
       Gas.SensT GasIn(redeclare package Medium = GasMedium) 
         annotation (Placement(transformation(extent={{-60,-6},{-40,14}},
               rotation=0)));
-      Water.SourceP SourceP1(p0=5e5, redeclare package Medium = WaterMedium) 
-                                     annotation (Placement(transformation(
+      Water.SourceP SourceP1(        redeclare package Medium = WaterMedium, p0
+          =500000)                   annotation (Placement(transformation(
               extent={{-80,40},{-60,60}}, rotation=0)));
       Modelica.Blocks.Interfaces.RealInput ValveOpening 
         annotation (Placement(transformation(extent={{-170,-90},{-150,-70}},
@@ -1630,7 +1640,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
       connect(ValveOpeningActuator.u, ValveOpening) annotation (Line(points={{
               -132,-80},{-160,-80}}, color={0,0,127}));
       annotation (Diagram(coordinateSystem(
-            preserveAspectRatio=false,
+            preserveAspectRatio=true,
             extent={{-160,-160},{160,160}},
             initialScale=0.1), graphics),
                            Documentation(revisions="<html>

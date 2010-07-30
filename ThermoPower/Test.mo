@@ -198,9 +198,11 @@ Casella</a>:<br>
 
     model TestPressDrop
       package Medium=Modelica.Media.Water.StandardWater;
-      Water.SourceP SourceP1(p0=3e5) annotation (Placement(transformation(
+      Water.SourceP SourceP1(p0=300000) 
+                                     annotation (Placement(transformation(
               extent={{-78,60},{-58,80}}, rotation=0)));
-      Water.SinkP SinkP1(p0=1e5) annotation (Placement(transformation(extent={{
+      Water.SinkP SinkP1(p0=100000) 
+                                 annotation (Placement(transformation(extent={{
                 40,60},{60,80}}, rotation=0)));
       parameter Real Kf_unknown(fixed=false);
       Water.SourceP SourceP3(p0=3e5) annotation (Placement(transformation(
@@ -232,16 +234,16 @@ Casella</a>:<br>
         K=1,
         A=1e-4,
         wnom=1,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic) 
-                                           annotation (Placement(transformation(
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic,
+        dpnom=100000)                      annotation (Placement(transformation(
               extent={{-40,-60},{-20,-40}}, rotation=0)));
       Water.PressDrop PressDrop4b(
         redeclare package Medium = Medium,
         wnom=1,
         K=1,
         A=1e-4,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic) 
-                                           annotation (Placement(transformation(
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic,
+        dpnom=100000)                      annotation (Placement(transformation(
               extent={{0,-60},{20,-40}}, rotation=0)));
       Water.SourceP SourceP2(p0=3e5) annotation (Placement(transformation(
               extent={{-80,20},{-60,40}}, rotation=0)));
@@ -251,27 +253,30 @@ Casella</a>:<br>
         redeclare package Medium = Medium,
         wnom=1,
         Kf=Kf_unknown,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf) 
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
+        dpnom=100000) 
                    annotation (Placement(transformation(extent={{-40,20},{-20,
                 40}}, rotation=0)));
       Water.PressDrop PressDrop2b(
         redeclare package Medium = Medium,
         wnom=1,
         Kf=Kf_unknown,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf) 
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
+        dpnom=100000) 
                    annotation (Placement(transformation(extent={{0,20},{20,40}},
               rotation=0)));
       Water.PressDrop PressDrop1a(
         wnom=1,
         Kf=1e8,
         redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf) 
-                                           annotation (Placement(transformation(
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
+        dpnom=100000)                      annotation (Placement(transformation(
               extent={{-40,60},{-20,80}}, rotation=0)));
       Water.PressDrop PressDrop1b(redeclare package Medium = Medium,
         wnom=1,
         Kf=1e8,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf) 
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
+        dpnom=100000) 
         annotation (Placement(transformation(extent={{0,60},{20,80}}, rotation=
                 0)));
       inner System system 
@@ -362,9 +367,9 @@ This test model demonstrate four possible ways of setting the friction coefficie
       Water.PressDrop pressDrop(
         wnom=1,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
-        rhonom=1000,
         wnf=0.02,
-        dpnom=5000) annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
+        rhonom=1000,
+        dpnom=1000) annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
       ThermoPower.Water.SinkP sinkP(p0=300000) 
         annotation (Placement(transformation(extent={{30,-10},{50,10}})));
       ThermoPower.Water.SourceW sourceW 
@@ -2589,8 +2594,8 @@ Algorithm Tolerance = 1e-4
         hstartout=houthex,
       redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
-                     annotation (Placement(transformation(extent={{-20,-10},{0,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
       ThermoPower.Water.SensT T_in(
       redeclare package Medium = Medium) 
@@ -2710,8 +2715,8 @@ Algorithm Tolerance = 1e-6
       redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
-                     annotation (Placement(transformation(extent={{-26,-10},{-6,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-26,-10},{-6,
                 10}}, rotation=0)));
       ThermoPower.Thermal.TempSource1D TempSource(N=Nnodes) 
         annotation (Placement(transformation(extent={{-26,40},{-6,60}},
@@ -2835,8 +2840,8 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
-                      annotation (Placement(transformation(extent={{-20,-10},{0,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=1000)   annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
       ThermoPower.Water.SourceW MassFlowRateSource(
         w0=whex,
@@ -2963,8 +2968,8 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
-                     annotation (Placement(transformation(extent={{-20,-70},{0,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-20,-70},{0,
                 -50}}, rotation=0)));
       ThermoPower.Water.SinkP SideA_FluidSink 
         annotation (Placement(transformation(extent={{70,-70},{90,-50}},
@@ -2995,8 +3000,8 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
-                     annotation (Placement(transformation(extent={{0,50},{-20,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=1000)  annotation (Placement(transformation(extent={{0,50},{-20,
                 30}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = 
             Medium)                      annotation (Placement(transformation(
@@ -3141,8 +3146,8 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
-                     annotation (Placement(transformation(extent={{-20,-60},{0,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-20,-60},{0,
                 -40}}, rotation=0)));
       Thermal.ConvHT ConvHTB(            N=Nnodes, gamma=400) 
         annotation (Placement(transformation(extent={{-20,20},{0,40}}, rotation=
@@ -3179,8 +3184,8 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
-                     annotation (Placement(transformation(extent={{0,60},{-20,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=1000)  annotation (Placement(transformation(extent={{0,60},{-20,
                 40}}, rotation=0)));
       ThermoPower.Thermal.MetalTube MetalWall(
         N=Nnodes,
@@ -3442,7 +3447,6 @@ Algorithm Tolerance = 1e-6
 </html>"));
     end TestFlow1DSlowFast;
 
-
     model TestFlow1DDB "Test case for Flow1D"
       package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
@@ -3478,8 +3482,8 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream) 
-                                                                       annotation (Placement(
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        dpnom=1000)                                                    annotation (Placement(
             transformation(extent={{-20,-10},{0,10}}, rotation=0)));
       Thermal.TempSource1D TempSource(N=Nnodes) 
         annotation (Placement(transformation(extent={{-20,40},{0,60}}, rotation=
@@ -4543,8 +4547,8 @@ Casella</a>:<br>
         wnom=1,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        redeclare package Medium = Medium) 
-                     annotation (Placement(transformation(extent={{-20,-30},{0,
+        redeclare package Medium = Medium,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-20,-30},{0,
                 -10}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(           redeclare package Medium = 
             Medium, Kv=0.4/10e5) 
@@ -4555,8 +4559,8 @@ Casella</a>:<br>
         L=Lhex,
         omega=omegahex) annotation (Placement(transformation(extent={{-20,0},{0,
                 20}}, rotation=0)));
-      ThermoPower.Water.SinkP Sink(p0=1e5, redeclare package Medium = Medium) 
-                                           annotation (Placement(transformation(
+      ThermoPower.Water.SinkP Sink(        redeclare package Medium = Medium, p0
+          =100000)                         annotation (Placement(transformation(
               extent={{60,-30},{80,-10}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp hIn(
         height=1e5,
@@ -4696,8 +4700,8 @@ Algorithm Tolerance = 1e-9
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare package Medium = Medium,
-        avoidInletEnthalpyDerivative=true) 
-                     annotation (Placement(transformation(extent={{-20,-30},{0,
+        avoidInletEnthalpyDerivative=true,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-20,-30},{0,
                 -10}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(           redeclare package Medium = 
             Medium, Kv=0.4/10e5) 
@@ -4835,8 +4839,8 @@ Algorithm Tolerance = 1e-9
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare package Medium = Medium,
         hstartin=6e5,
-        hstartout=6e5) 
-                     annotation (Placement(transformation(extent={{-10,-30},{10,
+        hstartout=6e5,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-10,-30},{10,
                 -10}}, rotation=0)));
       ThermoPower.Thermal.HeatSource1D heatSource(
         N=Nnodes,
@@ -4974,8 +4978,8 @@ Algorithm Tolerance = 1e-9
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare package Medium = Medium,
         hstartin=3.2e6,
-        hstartout=3.26e6) 
-                     annotation (Placement(transformation(extent={{-20,-30},{0,
+        hstartout=3.26e6,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-20,-30},{0,
                 -10}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(           redeclare package Medium = 
             Medium, Kv=0.2/10e5) 
@@ -5333,7 +5337,8 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
         wnom=0.05,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        dpnom=1000) 
                   annotation (Placement(transformation(extent={{-20,-70},{0,-50}},
               rotation=0)));
       ThermoPower.Water.ValveLin valve(Kv=0.05/60e5) 
@@ -5499,8 +5504,8 @@ Algorithm Tolerance = 1e-8
       redeclare package Medium = Medium,
         wnom=0.1,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
-                     annotation (Placement(transformation(extent={{-30,-50},{
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        dpnom=1000)  annotation (Placement(transformation(extent={{-30,-50},{
                 -10,-30}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(Kv=0.1/15e5) 
         annotation (Placement(transformation(extent={{20,-50},{40,-30}},
@@ -5559,7 +5564,8 @@ Algorithm Tolerance = 1e-8
       der(hex.htilde) = zeros(Nnodes - 1);
     equation
       connect(heatSource.wall, hex.wall) 
-        annotation (Line(points={{-20,-21},{-20,-35}}, color={255,127,0}));
+        annotation (Line(points={{-20,-21},{-20,-28},{-20,-35}},
+                                                       color={255,127,0}));
       connect(hex.outfl, valve.inlet) annotation (Line(
           points={{-10,-40},{20,-40}},
           color={0,0,255},
@@ -5983,7 +5989,8 @@ Algorithm Tolerance = 1e-7
         ML=0,
       redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        dpnom=1000) 
               annotation (Placement(transformation(extent={{-30,-50},{-10,-30}},
               rotation=0)));
       Water.ValveLin valve(Kv=whex/(phex)) 
@@ -6192,8 +6199,8 @@ Casella</a>:<br>
         Tstartout=Touthex,
         pstart=phex,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) 
-                      annotation (Placement(transformation(extent={{-20,-10},{0,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        dpnom=1000)   annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
       Gas.ValveLin ValveLin1(redeclare package Medium = Medium, Kv=whex/phex) 
         annotation (Placement(transformation(extent={{20,-10},{40,10}},
@@ -6772,12 +6779,12 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
               rotation=0)));
       Gas.PressDrop PressDrop1(
         redeclare package Medium = Medium,
-        dpnom=2e5,
-        pstart=5e5,
-        Tstart=400,
         rhonom=3,
         wnom=1,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint) 
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
+        dpnom=200000,
+        pstart=500000,
+        Tstart=400) 
                    annotation (Placement(transformation(extent={{-30,10},{-10,
                 30}}, rotation=0)));
       Gas.Valve Valve1(
@@ -6817,13 +6824,13 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
                 -40}}, rotation=0)));
       Gas.PressDrop PressDrop2(
         redeclare package Medium = Medium,
-        dpnom=2e5,
-        pstart=5e5,
-        Tstart=400,
         rhonom=3,
         wnom=1,
         Kf=8e5,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf) 
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
+        dpnom=200000,
+        pstart=500000,
+        Tstart=400) 
                    annotation (Placement(transformation(extent={{-30,-60},{-10,
                 -40}}, rotation=0)));
       Gas.Valve Valve2(
@@ -7613,31 +7620,32 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
         redeclare package Medium = Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
-        pstart=8.11e5,
-        dpnom=0.26e5,
         wnom=102,
-        Tstart=1370,
-        rhonom=2)   annotation (Placement(transformation(extent={{34,0},{54,20}},
+        rhonom=2,
+        dpnom=26000,
+        pstart=811000,
+        Tstart=1370) 
+                    annotation (Placement(transformation(extent={{34,0},{54,20}},
               rotation=0)));
       Gas.PressDrop PressDrop2(
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
         redeclare package Medium = Media.Air,
         wnom=100,
-        Tstart=600,
-        pstart=8.29e5,
-        dpnom=0.18e5,
-        rhonom=4.7) annotation (Placement(transformation(extent={{-20,0},{0,20}},
+        rhonom=4.7,
+        dpnom=18000,
+        pstart=829000,
+        Tstart=600) annotation (Placement(transformation(extent={{-20,0},{0,20}},
               rotation=0)));
       Gas.PressDrop PressDrop3(
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
         redeclare package Medium = Media.Air,
         wnom=100,
-        pstart=0.3447e5,
-        Tstart=244.4,
+        rhonom=0.48,
         dpnom=170,
-        rhonom=0.48) 
+        pstart=34470,
+        Tstart=244.4) 
                     annotation (Placement(transformation(extent={{-72,-16},{-52,
                 4}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step1(
@@ -7800,20 +7808,21 @@ This is the full model of a turbojet-type engine at 11.000m [1].
         redeclare package Medium = Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
-        pstart=8.11e5,
-        dpnom=0.26e5,
         wnom=102,
-        Tstart=1370,
-        rhonom=2)   annotation (Placement(transformation(extent={{28,0},{48,20}},
+        rhonom=2,
+        dpnom=26000,
+        pstart=811000,
+        Tstart=1370) 
+                    annotation (Placement(transformation(extent={{28,0},{48,20}},
               rotation=0)));
       Gas.PressDrop PressDrop2(
-        pstart=8.3e5,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
         redeclare package Medium = Media.Air,
-        dpnom=0.19e5,
         wnom=100,
         rhonom=4.7,
+        dpnom=19000,
+        pstart=830000,
         Tstart=600) annotation (Placement(transformation(extent={{-36,0},{-16,
                 20}}, rotation=0)));
       Modelica.Mechanics.Rotational.Sources.ConstantSpeed ConstantSpeed1(
@@ -7920,12 +7929,13 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
               rotation=0)));
       Gas.PressDrop PressDrop1(
         redeclare package Medium = ThermoPower.Media.Air,
-        pstart=1.011e5,
-        Tstart=288.15,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
-        dpnom=0.0375e5,
         rhonom=1.2,
-        wnom=18.6) annotation (Placement(transformation(extent={{-60,-4},{-40,
+        wnom=18.6,
+        dpnom=3750,
+        pstart=101100,
+        Tstart=288.15) 
+                   annotation (Placement(transformation(extent={{-60,-4},{-40,
                 16}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step1(
         height=-0.1,
@@ -8118,12 +8128,11 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
             Modelica.Media.Air.SimpleAir,
         rho0=1.23,
         n0=590,
-        pin_start=1e5,
         bladePos0=0.8,
-        pout_start=1e5 + 5000,
         redeclare function flowCharacteristic = flowChar,
-        q_single_start=144) 
-                          annotation (Placement(transformation(extent={{-70,-24},
+        q_single_start=144,
+        w0=144,
+        dp0=6000)         annotation (Placement(transformation(extent={{-70,-24},
                 {-30,16}}, rotation=0)));
       Gas.SinkP SinkP1(redeclare package Medium = Modelica.Media.Air.SimpleAir)
         annotation (Placement(transformation(extent={{0,20},{20,40}}, rotation=
@@ -8162,9 +8171,9 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       Gas.PressDrop PressDrop1(
         wnom=2000*1.229,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
-        dpnom=6000,
         rhonom=1.229,
-        redeclare package Medium = Modelica.Media.Air.SimpleAir) 
+        redeclare package Medium = Modelica.Media.Air.SimpleAir,
+        dpnom=6000) 
         annotation (Placement(transformation(extent={{-30,20},{-10,40}},
               rotation=0)));
       Modelica.Mechanics.Rotational.Components.Clutch Clutch1(
