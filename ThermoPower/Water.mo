@@ -557,6 +557,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     AbsoluteTemperature T "Fluid temperature";
     AbsoluteTemperature Tm(start = Tmstart) "Wall temperature";
     Time Tr "Residence time";
+    Real dM_dt;
+    Real dE_dt;
     replaceable Thermal.HT thermalPort "Internal surface of metal wall"
       annotation (Dialog(enable = false), Placement(transformation(extent={{-24,
               50},{24,64}}, rotation=0)));
@@ -566,9 +568,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     T = Medium.temperature(fluidState);
 
     M = V*Medium.density(fluidState) "Fluid mass";
-    E = M*Medium.specificInternalEnergy(fluidState) "Fluid energy";
-    der(M) = inlet.m_flow + outlet.m_flow "Fluid mass balance";
-    der(E) = inlet.m_flow*hi + outlet.m_flow*ho + gamma*S*(Tm - T) +
+    E = M*h-p*V "Fluid energy";
+    dM_dt = V*(Medium.density_derp_h(fluidState)*der(p) + Medium.density_derh_p(fluidState)*der(h));
+    dE_dt = h*dM_dt + M*der(h) - V*der(p);
+    dM_dt = inlet.m_flow + outlet.m_flow "Fluid mass balance";
+    dE_dt = inlet.m_flow*hi + outlet.m_flow*ho + gamma*S*(Tm - T) +
             thermalPort.Q_flow "Fluid energy balance";
     if Cm > 0 and gamma >0 then
       Cm*der(Tm) =  gamma*S*(T - Tm)
