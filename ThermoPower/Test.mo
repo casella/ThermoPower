@@ -4559,8 +4559,8 @@ Casella</a>:<br>
         L=Lhex,
         omega=omegahex) annotation (Placement(transformation(extent={{-20,0},{0,
                 20}}, rotation=0)));
-      ThermoPower.Water.SinkP Sink(        redeclare package Medium = Medium, p0
-          =100000)                         annotation (Placement(transformation(
+      ThermoPower.Water.SinkP Sink(        redeclare package Medium = Medium, p0=
+           100000)                         annotation (Placement(transformation(
               extent={{60,-30},{80,-10}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp hIn(
         height=1e5,
@@ -6396,6 +6396,125 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 24
 The moving boundary evaporator model is still incomplete, and it fails at t = 12.
 </html>"));
     end TestEvaporatorFlux;
+
+    model TestFlow1DfemG "Test case for Flow1Dfem"
+      package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
+      // number of Nodes
+      parameter Integer Nnodes=6;
+      // total length
+      parameter Modelica.SIunits.Length Lhex=10;
+      // internal diameter
+      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      // internal radius
+      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      // internal perimeter
+      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex=0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.SIunits.MassFlowRate whex=0.3;
+      // initial pressure
+      parameter Modelica.SIunits.Pressure phex=2e5;
+      // initial inlet specific enthalpy
+      parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
+      // initial outlet specific enthalpy
+      parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
+
+      //height of enthalpy step
+      parameter Modelica.SIunits.SpecificEnthalpy deltah=41800;
+
+      //height of power step
+      parameter Modelica.SIunits.EnergyFlowRate W=41800*whex;
+
+      ThermoPower.Water.SourceW Fluid_Source(
+        p0=phex,
+        w0=whex,
+        h=hinhex + deltah) 
+                 annotation (Placement(transformation(extent={{-76,-10},{-56,10}},
+              rotation=0)));
+      ThermoPower.Water.SinkP Fluid_Sink(p0=phex/2, h=hinhex) 
+        annotation (Placement(transformation(extent={{64,-10},{84,10}},
+              rotation=0)));
+      Water.Flow1Dfem hex(
+        N=Nnodes,
+        L=Lhex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        A=Ahex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        DynamicMomentum=false,
+        hstartin=hinhex,
+        hstartout=houthex,
+      redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.noInit,
+        ML=0.5)      annotation (Placement(transformation(extent={{-8,-10},{12,10}},
+                      rotation=0)));
+      ThermoPower.Water.SensT T_in(
+      redeclare package Medium = Medium) 
+                                   annotation (Placement(transformation(extent=
+                {{-48,-6},{-28,14}}, rotation=0)));
+      Modelica.Blocks.Sources.TimeTable MassFlowRate(
+        offset=0,
+        startTime=0,
+        table=[0,whex; 19.5,whex; 20.5,-whex; 40,-whex; 41,0; 100,0]) 
+                        annotation (Placement(transformation(extent={{-94,20},{
+                -74,40}}, rotation=0)));
+      ThermoPower.Water.SensT T_out(
+      redeclare package Medium = Medium) 
+                                    annotation (Placement(transformation(extent=
+               {{38,-6},{58,14}}, rotation=0)));
+      inner System system 
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+    equation
+      connect(T_in.outlet, hex.infl) annotation (Line(
+          points={{-32,0},{-20,0},{-8,0}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(Fluid_Source.flange, T_in.inlet) 
+        annotation (Line(
+          points={{-56,0},{-44,0}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(T_out.outlet, Fluid_Sink.flange) 
+        annotation (Line(
+          points={{54,0},{64,0}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(MassFlowRate.y, Fluid_Source.in_w0) annotation (Line(points={{-73,
+              30},{-70,30},{-70,6}}, color={0,0,127}));
+      annotation (
+        Diagram(graphics),
+        experiment(StopTime=100, Tolerance=1e-006),
+        Documentation(info="<HTML>
+<p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
+<ul>
+    <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+</ul>
+<p>
+Simulation Interval = [0...80] sec <br> 
+Integration Algorithm = DASSL <br>
+Algorithm Tolerance = 1e-6 
+</p>
+</HTML>",   revisions="<html>
+<ul>
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    First release.</li>
+</ul>
+</html>"),
+        experimentSetupOutput);
+      connect(hex.outfl, T_out.inlet) annotation (Line(
+          points={{12,0},{42,0}},
+          color={0,0,255},
+          smooth=Smooth.None));
+    end TestFlow1DfemG;
   end ThermoHydraulicElements;
 
   package GasElements "Test for Gas package elements except Flow1D models"
