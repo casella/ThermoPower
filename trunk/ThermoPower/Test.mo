@@ -6486,6 +6486,10 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
           thickness=0.5));
       connect(MassFlowRate.y, Fluid_Source.in_w0) annotation (Line(points={{-73,
               30},{-70,30},{-70,6}}, color={0,0,127}));
+      connect(hex.outfl, T_out.inlet) annotation (Line(
+          points={{12,0},{42,0}},
+          color={0,0,255},
+          smooth=Smooth.None));
       annotation (
         Diagram(graphics),
         experiment(StopTime=100, Tolerance=1e-006),
@@ -6510,10 +6514,6 @@ Algorithm Tolerance = 1e-6
 </ul>
 </html>"),
         experimentSetupOutput);
-      connect(hex.outfl, T_out.inlet) annotation (Line(
-          points={{12,0},{42,0}},
-          color={0,0,255},
-          smooth=Smooth.None));
     end TestFlow1DfemG;
   end ThermoHydraulicElements;
 
