@@ -64,15 +64,15 @@ package Water "Models of components with water/steam as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     Pressure p "Actual pressure";
-    FlangeB flange(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB flange(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_p0
+    Modelica.Blocks.Interfaces.RealInput in_p0 
       annotation (Placement(transformation(
           origin={-40,92},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_h
+    Modelica.Blocks.Interfaces.RealInput in_h 
       annotation (Placement(transformation(
           origin={40,90},
           extent={{-20,-20},{20,20}},
@@ -131,15 +131,15 @@ package Water "Models of components with water/steam as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     Pressure p;
-    FlangeA flange(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA flange(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_p0
+    Modelica.Blocks.Interfaces.RealInput in_p0 
       annotation (Placement(transformation(
           origin={-40,88},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_h
+    Modelica.Blocks.Interfaces.RealInput in_h 
       annotation (Placement(transformation(
           origin={40,88},
           extent={{-20,-20},{20,20}},
@@ -199,15 +199,15 @@ package Water "Models of components with water/steam as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
-    FlangeB flange(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB flange(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_w0
+    Modelica.Blocks.Interfaces.RealInput in_w0 
       annotation (Placement(transformation(
           origin={-40,60},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_h
+    Modelica.Blocks.Interfaces.RealInput in_h 
       annotation (Placement(transformation(
           origin={40,60},
           extent={{-20,-20},{20,20}},
@@ -267,15 +267,15 @@ package Water "Models of components with water/steam as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
-    FlangeA flange(      redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA flange(      redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                          annotation (Placement(transformation(extent={{-120,-20},
               {-80,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_w0
+    Modelica.Blocks.Interfaces.RealInput in_w0 
       annotation (Placement(transformation(
           origin={-40,60},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_h
+    Modelica.Blocks.Interfaces.RealInput in_h 
       annotation (Placement(transformation(
           origin={40,60},
           extent={{-20,-20},{20,20}},
@@ -336,7 +336,7 @@ package Water "Models of components with water/steam as working fluid"
           transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (Placement(
           transformation(extent={{80,-20},{120,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_w0
+    Modelica.Blocks.Interfaces.RealInput in_w0 
       annotation (Placement(transformation(
           origin={-40,60},
           extent={{-20,-20},{20,20}},
@@ -381,10 +381,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    FlangeA inlet(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA inlet(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB outlet(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
   equation
@@ -441,11 +441,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Pressure pout "Outlet pressure";
     Pressure dp "Pressure drop";
     FlangeA inlet(m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0),
-                  redeclare package Medium=Medium)
+                  redeclare package Medium=Medium) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
     FlangeB outlet(m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0),
-                   redeclare package Medium=Medium)
+                   redeclare package Medium=Medium) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
   initial equation
@@ -523,25 +523,25 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
-      "Fluid phase (only for initialization!)"
+      "Fluid phase (only for initialization!)" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Pressure pstart "Pressure start value"
+    parameter Pressure pstart "Pressure start value" 
        annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstart=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else
+    parameter SpecificEnthalpy hstart=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                       if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
-      "Specific enthalpy start value"
+      "Specific enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tmstart = 300
-      "Metal wall temperature start value"
+      "Metal wall temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     FlangeA inlet(h_outflow(start=hstart),
-      redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-122,-20},{-80,
               20}}, rotation=0)));
     FlangeB outlet(h_outflow(start=hstart),
-      redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
     Pressure p(
@@ -559,7 +559,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Time Tr "Residence time";
     Real dM_dt;
     Real dE_dt;
-    replaceable Thermal.HT thermalPort "Internal surface of metal wall"
+    replaceable Thermal.HT thermalPort "Internal surface of metal wall" 
       annotation (Dialog(enable = false), Placement(transformation(extent={{-24,
               50},{24,64}}, rotation=0)));
   equation
@@ -676,29 +676,29 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
-      "Fluid phase (only for initialization!)"
+      "Fluid phase (only for initialization!)" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Pressure pstart "Pressure start value"
+    parameter Pressure pstart "Pressure start value" 
        annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstart=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else
+    parameter SpecificEnthalpy hstart=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                       if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
-      "Specific enthalpy start value"
+      "Specific enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter AbsoluteTemperature Tmstart = 300
-      "Metal wall temperature start value"
+      "Metal wall temperature start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     FlangeA in1(h_outflow(start=hstart),redeclare package Medium=Medium,
-                m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+                m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{-100,40},{-60,80}},
             rotation=0)));
     FlangeA in2(h_outflow(start=hstart),redeclare package Medium=Medium,
-                m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+                m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{-100,-80},{-60,
               -40}}, rotation=0)));
     FlangeB out(h_outflow(start=hstart),redeclare package Medium=Medium,
-                m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+                m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                                                                 annotation (Placement(transformation(extent={{80,-20},
               {120,20}},
                      rotation=0)));
@@ -717,7 +717,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Temperature T "Fluid temperature";
     AbsoluteTemperature Tm(start = Tmstart) "Wall temperature";
     Time Tr "Residence time";
-    replaceable Thermal.HT thermalPort "Internal surface of metal wall"
+    replaceable Thermal.HT thermalPort "Internal surface of metal wall" 
       annotation (Placement(transformation(extent={{-24,66},{24,80}}, rotation=
               0)));
   equation
@@ -814,9 +814,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Length ystart "Start level"
+    parameter Length ystart "Start level" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstart=1e5
+    parameter SpecificEnthalpy hstart=1e5 
       annotation(Dialog(tab = "Initialisation"));
     Length y(start=ystart, stateSelect=StateSelect.prefer) "Level";
     Volume V "Liquid volume";
@@ -828,10 +828,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.SpecificEnthalpy hout "Outlet specific enthalpy";
     Medium.AbsolutePressure p(start=pext) "Bottom pressure";
     constant Real g=Modelica.Constants.g_n;
-    FlangeA inlet(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA inlet(redeclare package Medium=Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-100,-80},{-60,
               -40}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB outlet(redeclare package Medium=Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{60,-80},{100,
               -40}}, rotation=0)));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
@@ -921,20 +921,20 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
-      "Fluid phase (only for initialization!)"
+      "Fluid phase (only for initialization!)" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Pressure pstart = 1e5 "Pressure start value"
+    parameter Pressure pstart = 1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstartin=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else
+    parameter SpecificEnthalpy hstartin=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                            if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
-      "Inlet enthalpy start value"
+      "Inlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter SpecificEnthalpy hstartout=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else
+    parameter SpecificEnthalpy hstartout=if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Liquid then 1e5 else 
                                            if FluidPhaseStart==Choices.FluidPhase.FluidPhases.Steam then 3e6 else 1e6
-      "Outlet enthalpy start value"
+      "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hstart[N] = linspace(hstartin, hstartout, N)
-      "Start value of enthalpy vector (initialized by default)"
+      "Start value of enthalpy vector (initialized by default)" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Real wnf=0.02
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
@@ -945,14 +945,14 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     function squareReg = ThermoPower.Functions.squareReg;
 
     FlangeA infl(h_outflow(start=hstartin),
-      redeclare package Medium = Medium, m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                  annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
     FlangeB outfl(h_outflow(start=hstartout),
-      redeclare package Medium = Medium, m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{80,-20},{120,20}},
             rotation=0)));
-    replaceable ThermoPower.Thermal.DHT wall(N=N)
+    replaceable ThermoPower.Thermal.DHT wall(N=N) 
       annotation (Dialog(enable = false), Placement(transformation(extent={{-40,
               40},{40,60}}, rotation=0)));
     Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
@@ -1115,7 +1115,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       fluidState[j] = Medium.setState_ph(p,h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
-      drdp[j] = if Medium.singleState then 0 else
+      drdp[j] = if Medium.singleState then 0 else 
                 Medium.density_derp_h(fluidState[j]);
       drdh[j] = Medium.density_derh_p(fluidState[j]);
       u[j] = w/(rho[j]*A);
@@ -1350,9 +1350,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         Kf[j] = Cfnom*omega_hyd*l/(2*A^3)*Kfc;
         Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
       elseif FFtype == FFtypes.Colebrook then
-        Cf[j]=if noEvent(htilde[j] < hl or htilde[j] > hv) then
+        Cf[j]=if noEvent(htilde[j] < hl or htilde[j] > hv) then 
           f_colebrook(w, Dhyd/A, e,
-            Medium.dynamicViscosity(fluidState[j]))*Kfc else
+            Medium.dynamicViscosity(fluidState[j]))*Kfc else 
           f_colebrook_2ph(w, Dhyd/A, e,
             Medium.dynamicViscosity(Medium.setBubbleState(sat,1)),
             Medium.dynamicViscosity(Medium.setDewState(sat,1)),x[j])*Kfc;
@@ -1390,7 +1390,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       vbar[j] = 1/rhobar[j] "Average specific volume";
       wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2,
                          wnom/Nt);
-      dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else
+      dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else 
                 homotopy(smooth(1, Kf[j]*squareReg(w,wnom/Nt*wnf))*vbar[j],
                          dpnom/(N-1)/(wnom/Nt)*w));
       if avoidInletEnthalpyDerivative and j == 1 then
@@ -1500,7 +1500,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       drdp[j] = Medium.density_derp_h(fluidState[j]);
       drdh[j] = Medium.density_derh_p(fluidState[j]);
       u[j] = w/(rho[j]*A);
-      x[j] = noEvent(if h[j]<=hl then 0 else
+      x[j] = noEvent(if h[j]<=hl then 0 else 
                 if h[j]>=hv then 1 else (h[j]-hl)/(hv-hl));
     end for;
 
@@ -1653,13 +1653,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         // b) Wet steam after dryout: Dittus-Boelter's correlation considering
         //    only the vapour phase
         // c) Nucleate boiling: constant h.t.c.
-      gamma[j] = noEvent(if h[j] < hl or h[j] > hv then
+      gamma[j] = noEvent(if h[j] < hl or h[j] > hv then 
         f_dittus_boelter(w, Dhyd, A,
         Medium.dynamicViscosity(fluidState[j]),
         Medium.thermalConductivity(fluidState[j]),
-        Medium.heatCapacity_cp(fluidState[j])) else
-      if h[j] > hCHF then
-        f_dittus_boelter(w*x[j], Dhyd, A, mu_vs, k_vs, cp_vs) else
+        Medium.heatCapacity_cp(fluidState[j])) else 
+      if h[j] > hCHF then 
+        f_dittus_boelter(w*x[j], Dhyd, A, mu_vs, k_vs, cp_vs) else 
         gamma_b);
     end for;
 
@@ -1668,22 +1668,22 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     gamma_corr_left[1]=0;
     for j in 2:N loop
       gamma_corr_left[j] = noEvent(
-      if h[j] < hl then
-        (if (h[j-1]+h[j])/2 > hl then
+      if h[j] < hl then 
+        (if (h[j-1]+h[j])/2 > hl then 
           ((h[j-1]-hl)/(h[j-1]-h[j])-0.5)*(gamma_b-gamma_ls)*
-            (if j==N then 2 else 1) else
-            0) else
-      if h[j] > hCHF then
-        (if (h[j-1]+h[j])/2 < hCHF then
+            (if j==N then 2 else 1) else 
+            0) else 
+      if h[j] > hCHF then 
+        (if (h[j-1]+h[j])/2 < hCHF then 
           ((hCHF-h[j-1])/(h[j]-h[j-1])-0.5)*(gamma_b-gamma_chf)*
-            (if j==N then 2 else 1) else
-               0) else
-        if (h[j-1]+h[j])/2 < hl then
+            (if j==N then 2 else 1) else 
+               0) else 
+        if (h[j-1]+h[j])/2 < hl then 
             ((hl-h[j-1])/(h[j]-h[j-1])-0.5)*(gamma_ls-gamma_b)*
-              (if j==N then 2 else 1) else
-        if (h[j-1]+h[j])/2 > hCHF then
+              (if j==N then 2 else 1) else 
+        if (h[j-1]+h[j])/2 > hCHF then 
             ((h[j-1]-hCHF)/(h[j-1]-h[j])-0.5)*(gamma_chf-gamma_b)*
-              (if j==N then 2 else 1) else
+              (if j==N then 2 else 1) else 
             0);
     end for;
 
@@ -1692,22 +1692,22 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     gamma_corr_right[N]=0;
     for j in 1:N-1 loop
       gamma_corr_right[j] = noEvent(
-      if h[j] < hl then
-        (if (h[j+1]+h[j])/2 > hl then
+      if h[j] < hl then 
+        (if (h[j+1]+h[j])/2 > hl then 
           ((h[j+1]-hl)/(h[j+1]-h[j])-0.5)*(gamma_b-gamma_ls)*
-            (if j==1 then 2 else 1) else
-           0) else
-      if h[j] > hCHF then
-        (if (h[j+1]+h[j])/2 < hCHF then
+            (if j==1 then 2 else 1) else 
+           0) else 
+      if h[j] > hCHF then 
+        (if (h[j+1]+h[j])/2 < hCHF then 
           ((hCHF-h[j+1])/(h[j]-h[j+1])-0.5)*(gamma_b-gamma_chf)*
-            (if j==1 then 2 else 1) else
-           0) else
-        if (h[j+1]+h[j])/2 < hl then
+            (if j==1 then 2 else 1) else 
+           0) else 
+        if (h[j+1]+h[j])/2 < hl then 
           ((hl-h[j+1])/(h[j]-h[j+1])-0.5)*(gamma_ls-gamma_b)*
-            (if j==1 then 2 else 1) else
-        if (h[j+1]+h[j])/2 > hCHF then
+            (if j==1 then 2 else 1) else 
+        if (h[j+1]+h[j])/2 > hCHF then 
           ((h[j+1]-hCHF)/(h[j+1]-h[j])-0.5)*(gamma_chf-gamma_b)*
-            (if j==1 then 2 else 1) else
+            (if j==1 then 2 else 1) else 
           0);
     end for;
 
@@ -1796,13 +1796,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         // b) Wet steam after dryout: Dittus-Boelter's correlation considering
         //    only the vapour phase
         // c) Nucleate boiling: constant h.t.c.
-      gamma[j] = noEvent(if h[j] < hl or h[j] > hv then
+      gamma[j] = noEvent(if h[j] < hl or h[j] > hv then 
         f_dittus_boelter(w, Dhyd, A,
         Medium.dynamicViscosity(fluidState[j]),
         Medium.thermalConductivity(fluidState[j]),
-        Medium.heatCapacity_cp(fluidState[j])) else
-      if h[j] > hCHF then
-        f_dittus_boelter(w*x[j], Dhyd, A, mu_vs, k_vs, cp_vs) else
+        Medium.heatCapacity_cp(fluidState[j])) else 
+      if h[j] > hCHF then 
+        f_dittus_boelter(w*x[j], Dhyd, A, mu_vs, k_vs, cp_vs) else 
         f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
           sigma, rhov, mu_vs,
           wall.T[j] - Medium.saturationTemperature(p),
@@ -1815,42 +1815,42 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     gamma_corr_left[1]=0;
     for j in 2:N loop
       gamma_corr_left[j] = noEvent(
-      if h[j] < hl then
-        (if (h[j-1]+h[j])/2 > hl then
+      if h[j] < hl then 
+        (if (h[j-1]+h[j])/2 > hl then 
           ((h[j-1]-hl)/(h[j-1]-h[j])-0.5)*
             (f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
                     sigma, rhov, mu_vs,
                     wall.T[j] - Medium.saturationTemperature(p),
                     Medium.saturationPressure(wall.T[j]) - p,
                     hv - hl, 0) - gamma_ls)*
-            (if j==N then 2 else 1) else
-            0) else
-      if h[j] > hCHF then
-        (if (h[j-1]+h[j])/2 < hCHF then
+            (if j==N then 2 else 1) else 
+            0) else 
+      if h[j] > hCHF then 
+        (if (h[j-1]+h[j])/2 < hCHF then 
           ((hCHF-h[j-1])/(h[j]-h[j-1])-0.5)*
             (f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
                     sigma, rhov, mu_vs,
                     wall.T[j] - Medium.saturationTemperature(p),
                     Medium.saturationPressure(wall.T[j]) - p,
                     hv - hl, xCHF) - gamma_chf)*
-            (if j==N then 2 else 1) else
-               0) else
-        if (h[j-1]+h[j])/2 < hl then
+            (if j==N then 2 else 1) else 
+               0) else 
+        if (h[j-1]+h[j])/2 < hl then 
             ((hl-h[j-1])/(h[j]-h[j-1])-0.5)*
               (gamma_ls - f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
                                  sigma, rhov, mu_vs,
                                  wall.T[j] - Medium.saturationTemperature(p),
                                  Medium.saturationPressure(wall.T[j]) - p,
                                  hv - hl, 0))*
-              (if j==N then 2 else 1) else
-        if (h[j-1]+h[j])/2 > hCHF then
+              (if j==N then 2 else 1) else 
+        if (h[j-1]+h[j])/2 > hCHF then 
             ((h[j-1]-hCHF)/(h[j-1]-h[j])-0.5)*
               (gamma_chf - f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
                                   sigma, rhov, mu_vs,
                                   wall.T[j] - Medium.saturationTemperature(p),
                                   Medium.saturationPressure(wall.T[j]) - p,
                                   hv - hl, xCHF))*
-              (if j==N then 2 else 1) else
+              (if j==N then 2 else 1) else 
             0);
     end for;
 
@@ -1859,42 +1859,42 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     gamma_corr_right[N]=0;
     for j in 1:N-1 loop
       gamma_corr_right[j] = noEvent(
-      if h[j] < hl then
-        (if (h[j+1]+h[j])/2 > hl then
+      if h[j] < hl then 
+        (if (h[j+1]+h[j])/2 > hl then 
           ((h[j+1]-hl)/(h[j+1]-h[j])-0.5)*
            (f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
                     sigma, rhov, mu_vs,
                     wall.T[j] - Medium.saturationTemperature(p),
                     Medium.saturationPressure(wall.T[j]) - p,
                     hv - hl, 0) - gamma_ls)*
-           (if j==1 then 2 else 1) else
-         0) else
-      if h[j] > hCHF then
-        (if (h[j+1]+h[j])/2 < hCHF then
+           (if j==1 then 2 else 1) else 
+         0) else 
+      if h[j] > hCHF then 
+        (if (h[j+1]+h[j])/2 < hCHF then 
           ((hCHF-h[j+1])/(h[j]-h[j+1])-0.5)*
            (f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
                     sigma, rhov, mu_vs,
                     wall.T[j] - Medium.saturationTemperature(p),
                     Medium.saturationPressure(wall.T[j]) - p,
                     hv - hl, xCHF) - gamma_chf)*
-           (if j==1 then 2 else 1) else
-          0) else
-        if (h[j+1]+h[j])/2 < hl then
+           (if j==1 then 2 else 1) else 
+          0) else 
+        if (h[j+1]+h[j])/2 < hl then 
           ((hl-h[j+1])/(h[j]-h[j+1])-0.5)*
            (gamma_ls - f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
                           sigma, rhov, mu_vs,
                           wall.T[j] - Medium.saturationTemperature(p),
                           Medium.saturationPressure(wall.T[j]) - p,
                           hv - hl, 0))*
-           (if j==1 then 2 else 1) else
-        if (h[j+1]+h[j])/2 > hCHF then
+           (if j==1 then 2 else 1) else 
+        if (h[j+1]+h[j])/2 > hCHF then 
           ((h[j+1]-hCHF)/(h[j+1]-h[j])-0.5)*
             (gamma_chf - f_chen(w, Dhyd, A, mu_ls, k_ls, cp_ls, rhol,
                                sigma, rhov, mu_vs,
                                wall.T[j] - Medium.saturationTemperature(p),
                                Medium.saturationPressure(wall.T[j]) - p,
                                hv - hl, xCHF))*
-             (if j==1 then 2 else 1) else
+             (if j==1 then 2 else 1) else 
          0);
     end for;
 
@@ -1944,8 +1944,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     import Modelica.Math.*;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
-    Medium.BaseProperties fluid[N](h(start=hstart))
-      "Properties of the fluid at the nodes";
+   Medium.ThermodynamicState fluidState[N]
+      "Thermodynamic state of the fluid at the nodes";
     parameter Real alpha(
       min=0,
       max=1) = 1 "Numerical stabilization coefficient";
@@ -2008,7 +2008,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         Cf[i] = Cfnom*Kfc;
       elseif FFtype == FFtypes.Colebrook then
         Cf[i] = f_colebrook(w[i], Dhyd/A, e,
-          Medium.dynamicViscosity(fluid[i].state))*Kfc;
+          Medium.dynamicViscosity(fluidState[i]))*Kfc;
         Kf[i] = Cf[i]*omega_hyd*L/(2*A^3);
       elseif FFtype == FFtypes.NoFriction then
         Cf[i] = 0;
@@ -2035,7 +2035,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     w[1] = infl.m_flow/Nt "Inlet flow rate - single tube";
     w[N] = -outfl.m_flow/Nt "Outlet flow rate - single tube";
 
-    Dpfric = if FFtype == FFtypes.NoFriction then 0 else
+    Dpfric = if FFtype == FFtypes.NoFriction then 0 else 
       noEvent(sign(infl.m_flow))*sum((Kf[i]*w[i]^2/rho[i] + Kfl[i]*w[i]/
       rho[i])*D[i] for i in 1:N)/L "Pressure drop due to friction";
     Dpstat = if abs(dzdx)<1e-6 then 0 else g*dzdx*rho*D
@@ -2043,17 +2043,16 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     ((1 - ML)*Y + ML*YY)*der(h) + B/A*h + C*h/A = der(p)*G + M*(omega/A)*phi
        + K*w/A "Energy balance equation";
 
-    //Computation of fluid properties
-    for i in 1:N loop
-      fluid[i].p=p;
-      fluid[i].h=h[i];
-      T[i]=fluid[i].T;
-      rho[i]=fluid[i].d;
-      drdp[i]= if Medium.singleState then 0 else
-              Medium.density_derp_h(fluid[i].state);
-      drdh[i]=Medium.density_derh_p(fluid[i].state);
-      v[i] = 1/rho[i];
-      u[i] = w[i]/(rho[i]*A);
+    // Fluid property calculations
+    for j in 1:N loop
+      fluidState[j] = Medium.setState_ph(p,h[j]);
+      T[j] = Medium.temperature(fluidState[j]);
+      rho[j] = Medium.density(fluidState[j]);
+      drdp[j] = if Medium.singleState then 0 else 
+                Medium.density_derp_h(fluidState[j]);
+      drdh[j] = Medium.density_derh_p(fluidState[j]);
+      v[j] = 1/rho[j];
+      u[j] = w[j]/(rho[j]*A);
     end for;
 
     //Wall energy flux and  temperature
@@ -2176,7 +2175,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     K[1, 1] = if noEvent(infl.m_flow >= 0) then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0;
-    K[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else
+    K[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 
             0;
     K[N, 1] = 0;
     K[1, N] = 0;
@@ -2438,7 +2437,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     w[1] = infl.m_flow/Nt;
     w[N] = -outfl.m_flow/Nt;
 
-    Dpfric = if FFtype == FFtypes.NoFriction then 0 else
+    Dpfric = if FFtype == FFtypes.NoFriction then 0 else 
       sum((Kf[i]*w[i]*noEvent(abs(w[i]))/rho[i] + Kfl[i]*w[i]/rho[i])*
       D[i] for i in 1:N)/L;
     Dpstat = if abs(dzdx)<1e-6 then 0 else g*dzdx*rho*D
@@ -2491,7 +2490,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       drdh[i]=Medium.density_derh_p(fluid[i].state);
       v[i] = 1/rho[i];
       u[i] = w[i]/(rho[i]*A);
-      x[i]=noEvent(if h[i]<=hl then 0 else
+      x[i]=noEvent(if h[i]<=hl then 0 else 
                 if h[i]>=hv then 1 else (h[i]-hl)/(hv-hl));
     end for;
 
@@ -2647,7 +2646,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
           ee[i] = (der(h[i + 1]) - der(h[i]))/(h[i + 1] - h[i]);
           f[i] = (der(h[i])*h[i + 1] - der(h[i + 1])*h[i])/(h[i + 1] - h[i]);
 
-        elseif noEvent(((h[i] < hl) and (h[i + 1] < hl)) or ((h[i] > hv) and
+        elseif noEvent(((h[i] < hl) and (h[i + 1] < hl)) or ((h[i] > hv) and 
             (h[i + 1] > hv))) then
 
           //single-phase
@@ -2783,7 +2782,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     K[1, 1] = if noEvent(infl.m_flow >= 0) then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0;
-    K[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else
+    K[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 
             0;
     K[N, 1] = 0;
     K[1, N] = 0;
@@ -3007,15 +3006,15 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean rev_in1 = allowFlowReversal "Allow flow reversal at in1" annotation(Evaluate=true);
     parameter Boolean rev_in2 = allowFlowReversal "Allow flow reversal at in2" annotation(Evaluate=true);
     parameter Boolean rev_out = allowFlowReversal "Allow flow reversal at out" annotation(Evaluate=true);
-    parameter Boolean checkFlowDirection = false "Check flow direction"
+    parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_in1 or not rev_in2 or not rev_out));
-    FlangeB out(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB out(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{40,-20},{80,20}},
             rotation=0)));
-    FlangeA in1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA in1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{-80,20},{-40,60}},
             rotation=0)));
-    FlangeA in2(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA in2(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                 annotation (Placement(transformation(extent={{-80,-60},{-40,-20}},
             rotation=0)));
   equation
@@ -3034,8 +3033,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
                                  inStream(out.h_outflow)*(out.m_flow + wzero) + inStream(in1.h_outflow)*(in1.m_flow + wzero))/(out.m_flow + 2*wzero + in1.m_flow),
                                 inStream(out.h_outflow));
     //Check flow direction
-    assert( not checkFlowDirection or ((rev_in1 or in1.m_flow >= 0) and
-                                       (rev_in2 or in2.m_flow >= 0) and
+    assert( not checkFlowDirection or ((rev_in1 or in1.m_flow >= 0) and 
+                                       (rev_in2 or in2.m_flow >= 0) and 
                                        (rev_out or out.m_flow <= 0)),
                                       "Flow reversal not supported");
     annotation (Icon(graphics),
@@ -3074,16 +3073,16 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       "Allow flow reversal at out1"                                              annotation(Evaluate=true);
     parameter Boolean rev_out2 = allowFlowReversal
       "Allow flow reversal at out2"                                              annotation(Evaluate=true);
-    parameter Boolean checkFlowDirection = false "Check flow direction"
+    parameter Boolean checkFlowDirection = false "Check flow direction" 
                                                  annotation (Dialog(enable = not rev_in1 or not rev_out1 or not rev_out2));
-    FlangeA in1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA in1(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                   annotation (Placement(transformation(extent={
               {-80,-20},{-40,20}}, rotation=0)));
-    FlangeB out1(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB out1(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                    annotation (Placement(transformation(extent={{40,20},
               {80,60}},          rotation=0), iconTransformation(extent={{40,20},{
               80,60}})));
-    FlangeB out2(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB out2(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                    annotation (Placement(transformation(extent=
               {{40,-60},{80,-20}}, rotation=0)));
   equation
@@ -3091,18 +3090,18 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     out1.p = in1.p;
     out2.p = in1.p;
     // Energy balance
-    out1.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(out2.h_outflow) else if (out2.m_flow < 0 or not rev_out2) then inStream(in1.h_outflow) else
+    out1.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(out2.h_outflow) else if (out2.m_flow < 0 or not rev_out2) then inStream(in1.h_outflow) else 
                                (inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(out2.h_outflow)*(out2.m_flow + wzero))/(in1.m_flow + 2*wzero + out2.m_flow),
                               inStream(in1.h_outflow));
-    out2.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(out1.h_outflow) else if (out1.m_flow < 0 or not rev_out1) then inStream(in1.h_outflow) else
+    out2.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(out1.h_outflow) else if (out1.m_flow < 0 or not rev_out1) then inStream(in1.h_outflow) else 
                                (inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(out1.h_outflow)*(out1.m_flow + wzero))/(in1.m_flow + 2*wzero + out1.m_flow),
                               inStream(in1.h_outflow));
-    in1.h_outflow = homotopy(if (out1.m_flow < 0 or not rev_out1) then inStream(out2.h_outflow) else if (out2.m_flow < 0 or not rev_out2) then inStream(out1.h_outflow) else
+    in1.h_outflow = homotopy(if (out1.m_flow < 0 or not rev_out1) then inStream(out2.h_outflow) else if (out2.m_flow < 0 or not rev_out2) then inStream(out1.h_outflow) else 
                               (inStream(out1.h_outflow)*(out1.m_flow + wzero) + inStream(out2.h_outflow)*(out2.m_flow + wzero))/(out1.m_flow + 2*wzero + out2.m_flow),
                              inStream(out1.h_outflow));
     //Check flow direction
-    assert( not checkFlowDirection or ((rev_in1 or in1.m_flow >= 0) and
-                                       (rev_out1 or out1.m_flow <= 0) and
+    assert( not checkFlowDirection or ((rev_in1 or in1.m_flow >= 0) and 
+                                       (rev_out1 or out1.m_flow <= 0) and 
                                        (rev_out2 or out2.m_flow <= 0)),
                                       "Flow reversal not supported");
     annotation (Icon(graphics),
@@ -3136,13 +3135,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     outer ThermoPower.System system "System wide properties";
     SpecificEnthalpy h "Specific enthalpy of the fluid";
     Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
-    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                     annotation (Placement(transformation(extent=
              {{-80,-60},{-40,-20}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                      annotation (Placement(transformation(
             extent={{40,-60},{80,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealOutput T
+    Modelica.Blocks.Interfaces.RealOutput T 
       annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
               0)));
   equation
@@ -3187,10 +3186,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     extends ThermoPower.Icons.Water.SensP;
     replaceable package Medium = ThermoPower.Water.StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Modelica.Blocks.Interfaces.RealOutput T
+    Modelica.Blocks.Interfaces.RealOutput T 
       annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
               0)));
-    FlangeA flange(redeclare package Medium = Medium, m_flow(min=0))
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=0)) 
       annotation (Placement(transformation(extent=
              {{-20,-60},{20,-20}}, rotation=0)));
   equation
@@ -3225,13 +3224,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                                     annotation (Placement(transformation(extent=
              {{-80,-60},{-40,-20}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                                      annotation (Placement(transformation(
             extent={{40,-60},{80,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealOutput w
+    Modelica.Blocks.Interfaces.RealOutput w 
       annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
               0)));
   equation
@@ -3270,10 +3269,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     extends Icons.Water.SensP;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
-    Modelica.Blocks.Interfaces.RealOutput p
+    Modelica.Blocks.Interfaces.RealOutput p 
       annotation (Placement(transformation(extent={{60,40},{100,80}}, rotation=
               0)));
-    FlangeA flange(redeclare package Medium = Medium, m_flow(min=0))
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=0)) 
                                     annotation (Placement(transformation(extent=
              {{-20,-60},{20,-20}}, rotation=0)));
   equation
@@ -3358,16 +3357,16 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Volume Vg "Volume occupied by gas";
     Medium.AbsolutePressure pg(start=pg_start) "Gas pressure";
     Density rho "Density of tue water";
-    Modelica.Blocks.Interfaces.RealInput GasInfl
+    Modelica.Blocks.Interfaces.RealInput GasInfl 
       annotation (Placement(transformation(extent={{-84,80},{-64,100}},
             rotation=0)));
-    FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-44,-100},{-24,-80}},
             rotation=0)));
-    FlangeB WaterOutfl(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB WaterOutfl(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{24,-100},{44,-80}},
             rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput OutletValveOpening
+    Modelica.Blocks.Interfaces.RealInput OutletValveOpening 
       annotation (Placement(transformation(
           origin={44,90},
           extent={{-10,-10},{10,10}},
@@ -3474,22 +3473,22 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart "Pressure start value"
+    parameter Pressure pstart "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Volume Vldstart "Start value of drum water volume"
+    parameter Volume Vldstart "Start value of drum water volume" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
 
     Medium.SaturationProperties sat "Saturation conditions";
-    FlangeA feed(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA feed(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                  annotation (Placement(transformation(extent={{-110,-64},{-70,
               -24}}, rotation=0)));
-    FlangeB steam(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB steam(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{48,52},{88,92}},
             rotation=0)));
     Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
-      "Metal wall thermal port"
+      "Metal wall thermal port" 
       annotation (Placement(transformation(extent={{-28,-100},{28,-80}},
             rotation=0)));
     Mass Ml "Liquid water mass";
@@ -3604,15 +3603,15 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart=1e5 "Pressure start value"
+    parameter Pressure pstart=1e5 "Pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hlstart=Medium.bubbleEnthalpy(Medium.setSat_p(pstart))
-      "Liquid enthalpy start value"
+      "Liquid enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter SpecificEnthalpy hvstart=Medium.dewEnthalpy(Medium.setSat_p(pstart))
-      "Vapour enthalpy start value"
+      "Vapour enthalpy start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Length ystart=0 "Start level value"
+    parameter Length ystart=0 "Start level value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
@@ -3675,23 +3674,23 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     Area Asup "Surface of the liquid-vapour interface";
     Area Aext "External drum surface";
     FlangeA feedwater(p(start=pstart), h_outflow(start=hlstart),
-      redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                       annotation (Placement(transformation(extent={{-114,-32},{
               -80,2}}, rotation=0)));
     FlangeA riser(p(start=pstart), h_outflow(start=hlstart),
-      redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{60,-74},{96,-40}},
             rotation=0)));
     FlangeB downcomer(p(start=pstart), h_outflow(start=hlstart),
-      redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                       annotation (Placement(transformation(extent={{-88,-88},{
               -52,-52}}, rotation=0)));
     FlangeB blowdown(p(start=pstart), h_outflow(start=hlstart),
-      redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                      annotation (Placement(transformation(extent={{-18,-116},{
               18,-80}}, rotation=0)));
     FlangeB steam(p(start=pstart), h_outflow(start=hvstart),
-      redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+      redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{40,52},{76,88}},
             rotation=0)));
   equation
@@ -3866,13 +3865,13 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
-    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput cmd
+    Modelica.Blocks.Interfaces.RealInput cmd 
       annotation (Placement(transformation(
           origin={0,80},
           extent={{-20,-20},{20,20}},
@@ -3914,40 +3913,40 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     parameter CvTypes CvData = CvTypes.Av "Selection of flow coefficient";
     parameter Area Av(fixed = if CvData==CvTypes.Av then true else false,
       start = wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))=0
-      "Av (metric) flow coefficient"
+      "Av (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Av)));
-    parameter Real Kv(unit="m3/h")=0 "Kv (metric) flow coefficient"
+    parameter Real Kv(unit="m3/h")=0 "Kv (metric) flow coefficient" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Kv)));
-    parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]"
+    parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]" 
       annotation(Dialog(group = "Flow Coefficient",
                         enable = (CvData==CvTypes.Cv)));
-    parameter Pressure pnom "Nominal inlet pressure"
+    parameter Pressure pnom "Nominal inlet pressure" 
       annotation(Dialog(group="Nominal operating point"));
-    parameter Pressure dpnom "Nominal pressure drop"
+    parameter Pressure dpnom "Nominal pressure drop" 
       annotation(Dialog(group="Nominal operating point"));
-    parameter MassFlowRate wnom "Nominal mass flowrate"
+    parameter MassFlowRate wnom "Nominal mass flowrate" 
       annotation(Dialog(group="Nominal operating point"));
-    parameter Density rhonom = 1000 "Nominal density"
+    parameter Density rhonom = 1000 "Nominal density" 
       annotation(Dialog(group="Nominal operating point",
                         enable = (CvData==CvTypes.OpPoint)));
-    parameter Real thetanom = 1 "Nominal valve opening"
+    parameter Real thetanom = 1 "Nominal valve opening" 
       annotation(Dialog(group="Nominal operating point",
                         enable = (CvData==CvTypes.OpPoint)));
     parameter Boolean CheckValve=false "Reverse flow stopped";
     parameter Real b=0.01 "Regularisation factor";
-    replaceable function FlowChar = Functions.ValveCharacteristics.linear
+    replaceable function FlowChar = Functions.ValveCharacteristics.linear 
       constrainedby Functions.ValveCharacteristics.baseFun
-      "Flow characteristic"
+      "Flow characteristic" 
       annotation(choicesAllMatching=true);
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    final parameter Pressure pin_start = pnom "Inlet pressure start value"
+    final parameter Pressure pin_start = pnom "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     final parameter Pressure pout_start = pnom-dpnom
-      "Inlet pressure start value"
+      "Inlet pressure start value" 
       annotation(Dialog(tab = "Initialisation"));
     MassFlowRate w "Mass flow rate";
     LiquidDensity rho "Inlet density";
@@ -3957,14 +3956,14 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     function sqrtR = Functions.sqrtReg(delta = b*dpnom);
   public
     FlangeA inlet(m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf else 0),
-                  p(start=pin_start),redeclare package Medium = Medium)
+                  p(start=pin_start),redeclare package Medium = Medium) 
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
     FlangeB outlet(m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf else 0),
-                   p(start=pout_start),redeclare package Medium = Medium)
+                   p(start=pout_start),redeclare package Medium = Medium) 
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput theta "Valve opening in per unit"
+    Modelica.Blocks.Interfaces.RealInput theta "Valve opening in per unit" 
       annotation (Placement(transformation(
           origin={0,80},
           extent={{-20,-20},{20,20}},
@@ -4085,7 +4084,7 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     extends ValveBase;
     import ThermoPower.Choices.Valve.CvTypes;
     parameter Real Fxt_full=0.5 "Fk*xt critical ratio at full opening";
-    replaceable function xtfun = Functions.ValveCharacteristics.one
+    replaceable function xtfun = Functions.ValveCharacteristics.one 
       constrainedby Functions.ValveCharacteristics.baseFun
       "Critical ratio characteristic";
     Real x "Pressure drop ratio";
@@ -4161,7 +4160,7 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
         Modelica.Media.Interfaces.PartialTwoPhaseMedium);
     import ThermoPower.Choices.Valve.CvTypes;
     parameter Real Flnom=0.9 "Liquid pressure recovery factor";
-    replaceable function Flfun = Functions.ValveCharacteristics.one
+    replaceable function Flfun = Functions.ValveCharacteristics.one 
       constrainedby Functions.ValveCharacteristics.baseFun
       "Pressure recovery characteristic";
     MassFlowRate w "Mass flowrate";
@@ -4178,7 +4177,7 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     pv = Medium.saturationPressure(Tin);
     Ff = 0.96 - 0.28*sqrt(pv/Medium.fluidConstants[1].criticalPressure);
     Fl = Flnom*Flfun(theta);
-    dpEff = if outlet.p < (1 - Fl^2)*inlet.p + Ff*Fl^2*pv then
+    dpEff = if outlet.p < (1 - Fl^2)*inlet.p + Ff*Fl^2*pv then 
               Fl^2*(inlet.p - Ff*pv) else inlet.p - outlet.p
       "Effective pressure drop, accounting for possible choked conditions";
     if CheckValve then
@@ -4225,46 +4224,46 @@ li><i>1 Jul 2004</i>
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     Medium.ThermodynamicState inletFluidState
       "Thermodynamic state of the fluid at the inlet";
-    replaceable function flowCharacteristic =
-        ThermoPower.Functions.PumpCharacteristics.quadraticFlow
+    replaceable function flowCharacteristic = 
+        ThermoPower.Functions.PumpCharacteristics.quadraticFlow 
         constrainedby ThermoPower.Functions.PumpCharacteristics.baseFlow
-      "Head vs. q_flow characteristic at nominal speed and density"
+      "Head vs. q_flow characteristic at nominal speed and density" 
       annotation(Dialog(group="Characteristics"), choicesAllMatching=true);
     parameter Boolean usePowerCharacteristic = false
-      "Use powerCharacteristic (vs. efficiencyCharacteristic)"
+      "Use powerCharacteristic (vs. efficiencyCharacteristic)" 
        annotation(Dialog(group="Characteristics"));
-    replaceable function powerCharacteristic =
-        Functions.PumpCharacteristics.constantPower
+    replaceable function powerCharacteristic = 
+        Functions.PumpCharacteristics.constantPower 
       constrainedby ThermoPower.Functions.PumpCharacteristics.basePower
-      "Power consumption vs. q_flow at nominal speed and density"
+      "Power consumption vs. q_flow at nominal speed and density" 
       annotation(Dialog(group="Characteristics", enable = usePowerCharacteristic),
                  choicesAllMatching=true);
-    replaceable function efficiencyCharacteristic =
-      Functions.PumpCharacteristics.constantEfficiency(eta_nom = 0.8)
+    replaceable function efficiencyCharacteristic = 
+      Functions.PumpCharacteristics.constantEfficiency(eta_nom = 0.8) 
       constrainedby ThermoPower.Functions.PumpCharacteristics.baseEfficiency
-      "Efficiency vs. q_flow at nominal speed and density"
+      "Efficiency vs. q_flow at nominal speed and density" 
       annotation(Dialog(group="Characteristics",enable = not usePowerCharacteristic),
                  choicesAllMatching=true);
     parameter Integer Np0(min=1) = 1 "Nominal number of pumps in parallel";
-    parameter Density rho0=1000 "Nominal Liquid Density"
+    parameter Density rho0=1000 "Nominal Liquid Density" 
        annotation(Dialog(group="Characteristics"));
-    parameter AngularVelocity_rpm n0 "Nominal rotational speed"
+    parameter AngularVelocity_rpm n0 "Nominal rotational speed" 
        annotation(Dialog(group="Characteristics"));
     parameter Volume V=0 "Pump Internal Volume" annotation(Evaluate=true);
     parameter Boolean CheckValve=false "Reverse flow stopped";
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter MassFlowRate wstart=w0 "Mass Flow Rate Start Value"
+    parameter MassFlowRate wstart=w0 "Mass Flow Rate Start Value" 
       annotation(Dialog(tab="Initialisation"));
-    parameter SpecificEnthalpy hstart=1e5 "Specific Enthalpy Start Value"
+    parameter SpecificEnthalpy hstart=1e5 "Specific Enthalpy Start Value" 
       annotation(Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab="Initialisation"));
     constant Acceleration g=Modelica.Constants.g_n;
-    parameter Modelica.SIunits.MassFlowRate w0 "Nominal mass flow rate"
+    parameter Modelica.SIunits.MassFlowRate w0 "Nominal mass flow rate" 
        annotation(Dialog(group="Characteristics"));
-    parameter Modelica.SIunits.Pressure dp0 "Nominal pressure increase"
+    parameter Modelica.SIunits.Pressure dp0 "Nominal pressure increase" 
        annotation(Dialog(group="Characteristics"));
     final parameter Modelica.SIunits.VolumeFlowRate q_single0=w0/(Np0*rho0)
       "Nominal volume flow rate (single pump)";
@@ -4294,12 +4293,12 @@ li><i>1 Jul 2004</i>
     constant AngularVelocity_rpm n_eps=1e-6;
     Real eta "Pump efficiency";
     Real s "Auxiliary Variable";
-    FlangeA infl(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA infl(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,0},{-60,40}}, rotation=
              0)));
-    FlangeB outfl(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB outfl(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{40,50},{80,90}}, rotation=0)));
-    Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps"
+    Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps" 
       annotation (Placement(transformation(
           origin={28,80},
           extent={{-10,-10},{10,10}},
@@ -4431,7 +4430,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     extends PumpBase;
     import Modelica.SIunits.Conversions.NonSIunits.*;
     parameter AngularVelocity_rpm n_const=n0 "Constant rotational speed";
-    Modelica.Blocks.Interfaces.RealInput in_n "RPM"
+    Modelica.Blocks.Interfaces.RealInput in_n "RPM" 
       annotation (Placement(transformation(
           origin={-26,80},
           extent={{-10,-10},{10,10}},
@@ -4489,7 +4488,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     extends Icons.Water.PumpMech;
     Angle phi "Shaft angle";
     AngularVelocity omega "Shaft angular velocity";
-    Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort
+    Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort 
       annotation (Placement(transformation(extent={{76,6},{106,36}}, rotation=0)));
   equation
     // Mechanical boundary condition
@@ -4662,9 +4661,9 @@ Input variables changed. This function now computes the heat transfer coefficien
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter Boolean explicitIsentropicEnthalpy=true
       "Outlet enthalpy computed by isentropicEnthalpy function";
-    parameter MassFlowRate wstart=wnom "Mass flow rate start value"
+    parameter MassFlowRate wstart=wnom "Mass flow rate start value" 
       annotation(Dialog(tab = "Initialisation"));
-    parameter Real PRstart "Pressure ratio start value"
+    parameter Real PRstart "Pressure ratio start value" 
       annotation(Dialog(tab = "Initialisation"));
     parameter MassFlowRate wnom "Inlet nominal flowrate";
     parameter Pressure pnom "Nominal inlet pressure";
@@ -4689,23 +4688,23 @@ Input variables changed. This function now computes the heat transfer coefficien
     Power Pm "Mechanical power input";
     Real eta_iso "Isentropic efficiency";
 
-    Modelica.Blocks.Interfaces.RealInput partialArc
+    Modelica.Blocks.Interfaces.RealInput partialArc 
       annotation (Placement(transformation(extent={{-60,-50},{-40,-30}},
             rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a
+    Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
       annotation (Placement(transformation(extent={{-76,-10},{-56,10}},
             rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b
+    Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
       annotation (Placement(transformation(extent={{54,-10},{74,10}}, rotation=
               0)));
     FlangeA inlet(
       redeclare package Medium = Medium,
-      m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+      m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{-100,60},{-60,100}},
             rotation=0)));
     FlangeB outlet(
       redeclare package Medium = Medium,
-      m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+      m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
       annotation (Placement(transformation(extent={{60,60},{100,100}}, rotation=
              0)));
 
@@ -4835,25 +4834,25 @@ Input variables changed. This function now computes the heat transfer coefficien
     parameter Boolean allowFlowReversal = system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstartin = pnom "Inlet start pressure"
+    parameter Pressure pstartin = pnom "Inlet start pressure" 
       annotation(Dialog(tab = "Initialization"));
-    parameter SpecificEnthalpy hstartin "Inlet enthalpy start value"
+    parameter SpecificEnthalpy hstartin "Inlet enthalpy start value" 
       annotation(Dialog(tab = "Initialization"));
-    parameter SpecificEnthalpy hstartout "Outlet enthalpy start value"
+    parameter SpecificEnthalpy hstartout "Outlet enthalpy start value" 
       annotation(Dialog(tab = "Initialization"));
     parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.steadyState
       "Initialization option" annotation(Dialog(tab = "Initialization"));
     Medium.ThermodynamicState fluidState_in(p(start=pstartin),h(start=hstartin));
-    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0)) 
                   annotation (Placement(transformation(extent={{-120,50},{-80,
               90}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0)) 
                    annotation (Placement(transformation(extent={{80,-90},{120,
               -50}}, rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a
+    Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a 
       annotation (Placement(transformation(extent={{-110,-14},{-84,14}},
             rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b
+    Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b 
       annotation (Placement(transformation(extent={{86,-14},{112,14}}, rotation=
              0)));
     MassFlowRate w "Mass flowrate";
@@ -4867,7 +4866,7 @@ Input variables changed. This function now computes the heat transfer coefficien
     Power Pm "Mechanical power input";
     Power P_HP "Mechanical power produced by the HP turbine";
     Power P_LP "Mechanical power produced by the LP turbine";
-    Modelica.Blocks.Interfaces.RealInput partialArc
+    Modelica.Blocks.Interfaces.RealInput partialArc 
       annotation (Placement(transformation(extent={{-110,-88},{-74,-52}},
             rotation=0)));
   equation
@@ -5027,18 +5026,18 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     Vv=A*(L-csiv) "Volume of superheated vapour";
     Ml=(rhoin+(if hout>hls then rhols else rhoout))/2*Vl
       "Mass of subcooled liquid";
-    Mb=(if (hout > hvs) then
-        rhols*rhovs/(rhols-rhovs)*log(rhols/rhovs) else
-             if (hout>hls+1e-3) then
-        rhols*rhoout/(rhols-rhoout)*log(rhols/rhoout) else
+    Mb=(if (hout > hvs) then 
+        rhols*rhovs/(rhols-rhovs)*log(rhols/rhovs) else 
+             if (hout>hls+1e-3) then 
+        rhols*rhoout/(rhols-rhoout)*log(rhols/rhoout) else 
         rhols)
           * Vb "Mass of boiling liquid";
-    Mbv=(if (hout > hvs) then
-           rhols*rhovs/(rhols-rhovs)*(1-rhovs/(rhols-rhovs)*log(rhols/rhovs)) else
-               if (hout>hls+1e-3) then
-           rhols*rhovs/(rhols-rhovs)*(1-rhoout/(rhols-rhoout)*log(rhols/rhoout)) else
-               if (hout>hls) then
-           rhovs/(rhols-rhovs)*(rhols-rhoout)/2 else
+    Mbv=(if (hout > hvs) then 
+           rhols*rhovs/(rhols-rhovs)*(1-rhovs/(rhols-rhovs)*log(rhols/rhovs)) else 
+               if (hout>hls+1e-3) then 
+           rhols*rhovs/(rhols-rhovs)*(1-rhoout/(rhols-rhoout)*log(rhols/rhoout)) else 
+               if (hout>hls) then 
+           rhovs/(rhols-rhovs)*(rhols-rhoout)/2 else 
            0)
            * Vb "Mass of vapour in boiling liquid";
     Mbl=Mb-Mbv "Mass of liquid in boiling liquid";
