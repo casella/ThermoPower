@@ -6571,6 +6571,15 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
       Water.SourceP source1(p0=110000) 
         annotation (Placement(transformation(extent={{-72,-10},{-52,10}})));
+    equation
+      connect(source1.flange, pipe1.infl) annotation (Line(
+          points={{-52,0},{-12,0}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(pipe1.outfl, sink1.flange) annotation (Line(
+          points={{8,0},{66,0}},
+          color={0,0,255},
+          smooth=Smooth.None));
       annotation (
         Diagram(graphics),
         experiment(StopTime=100, Tolerance=1e-006),
@@ -6595,15 +6604,6 @@ Algorithm Tolerance = 1e-6
 </ul>
 </html>"),
         experimentSetupOutput);
-    equation
-      connect(source1.flange, pipe1.infl) annotation (Line(
-          points={{-52,0},{-12,0}},
-          color={0,0,255},
-          smooth=Smooth.None));
-      connect(pipe1.outfl, sink1.flange) annotation (Line(
-          points={{8,0},{66,0}},
-          color={0,0,255},
-          smooth=Smooth.None));
     end TestFlow1DfemH;
   end ThermoHydraulicElements;
 
