@@ -957,9 +957,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
               40},{40,60}}, rotation=0)));
     Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
     Time Tr "Residence time";
-  protected
-    parameter Real dzdx = H/L "Slope" annotation(Evaluate=true);
-    parameter Length l = L/(N - 1) "Length of a single volume" annotation(Evaluate = true);
+    final parameter Real dzdx = H/L "Slope" annotation(Evaluate=true);
+    final parameter Length l = L/(N - 1) "Length of a single volume" annotation(Evaluate = true);
     annotation (Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
 </HTML>
@@ -1004,7 +1003,6 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     MassFlowRate win "Flow rate at the inlet (single tube)";
     MassFlowRate wout "Flow rate at the outlet (single tube)";
     Real Kf "Hydraulic friction coefficient";
-    Real Kfl "Linear friction coefficient";
     Real dwdt "Dynamic momentum term";
     Real Cf "Fanning friction factor";
     Medium.AbsolutePressure p(start = pstart)
@@ -1037,23 +1035,19 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     omega_hyd = 4*A/Dhyd;
     if FFtype == FFtypes.Kfnom then
       Kf = Kfnom*Kfc;
-      Cf = 2*Kf*A^3/(omega_hyd*L);
     elseif FFtype == FFtypes.OpPoint then
       Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-      Cf = 2*Kf*A^3/(omega_hyd*L);
     elseif FFtype == FFtypes.Cfnom then
-      Kf = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
       Cf = Cfnom*Kfc;
     elseif FFtype == FFtypes.Colebrook then
       Cf = f_colebrook(w, Dhyd/A, e,
            Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
-      Kf = Cf*omega_hyd*L/(2*A^3);
     elseif FFtype == FFtypes.NoFriction then
       Cf = 0;
-      Kf = 0;
     end if;
+    Kf = Cf*omega_hyd*L/(2*A^3)
+      "Relationship between friction coefficient and Fanning friction factor";
     assert(Kf>=0, "Negative friction coefficient");
-    Kfl = wnom/Nt*wnf*Kf "Linear friction factor";
 
     // Dynamic momentum term
     if DynamicMomentum then
@@ -1070,19 +1064,19 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Dpfric2 = 0;
     elseif HydraulicCapacitance == HCtypes.Middle then
       //assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
-      Dpfric1 = homotopy(smooth(1, Kf*squareReg(win,wnom/Nt*wnf))*sum(vbar[1:integer((N-1)/2)])/(N-1),
+      Dpfric1 = homotopy(Kf*squareReg(win,wnom/Nt*wnf)*sum(vbar[1:integer((N-1)/2)])/(N-1),
                          dpnom/2/(wnom/Nt)*win)
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(smooth(1, Kf*squareReg(wout,wnom/Nt*wnf))*sum(vbar[1+integer((N-1)/2):N-1])/(N-1),
+      Dpfric2 = homotopy(Kf*squareReg(wout,wnom/Nt*wnf)*sum(vbar[1+integer((N-1)/2):N-1])/(N-1),
                          dpnom/2/(wnom/Nt)*wout)
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == HCtypes.Upstream then
       Dpfric1 = 0 "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(smooth(1, Kf*squareReg(wout,wnom/Nt*wnf))*sum(vbar)/(N - 1),
+      Dpfric2 = homotopy(Kf*squareReg(wout,wnom/Nt*wnf)*sum(vbar)/(N - 1),
                          dpnom/(wnom/Nt)*wout)
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == HCtypes.Downstream then
-      Dpfric1 = homotopy(smooth(1, Kf*squareReg(win,wnom/Nt*wnf))*sum(vbar)/(N - 1),
+      Dpfric1 = homotopy(Kf*squareReg(win,wnom/Nt*wnf)*sum(vbar)/(N - 1),
                          dpnom/(wnom/Nt)*win)
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
@@ -1953,13 +1947,18 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       min=0,
       max=1) = 0 "Mass Lumping Coefficient";
     constant Real g=Modelica.Constants.g_n;
+    final parameter Boolean evenN = (div(N,2)*2 == N)
+      "The number of nodes is even";
     Length omega_hyd "Hydraulic perimeter (single tube)";
-    Real Kf[N] "Friction coefficient";
-    Real Kfl[N] "Linear friction coefficient";
-    Real Cf[N] "Fanning friction factor";
+    Real Kf[N] "Friction coefficients";
+    Real Cf[N] "Fanning friction factors";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p "Fluid pressure";
-    Pressure Dpfric "Pressure drop due to friction";
+    Pressure Dpfric "Pressure drop due to friction (total)";
+    Pressure Dpfric1
+      "Pressure drop due to friction (from inlet to capacitance)";
+    Pressure Dpfric2
+      "Pressure drop due to friction (from capacitance to outlet)";
     Pressure Dpstat "Pressure drop due to static head";
     MassFlowRate w[N](each start=wnom/Nt) "Mass flowrate (single tube)";
     Velocity u[N] "Fluid velocity";
@@ -1975,6 +1974,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real Y[N, N];
     Real M[N, N];
     Real D[N];
+    Real D1[N];
+    Real D2[N];
     Real G[N];
     Real B[N, N];
     Real C[N, N];
@@ -1985,13 +1986,18 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real YY[N, N];
 
   equation
+    assert( FFtype == FFtypes.NoFriction or dpnom>0, "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
 
-    // Selection of representative pressure and flow rate variables
-    if HydraulicCapacitance == HCtypes.Upstream then
+    // Selection of representative pressure variable
+    if HydraulicCapacitance == HCtypes.Middle then
+      p = infl.p - Dpfric1 - Dpstat/2;
+    elseif HydraulicCapacitance == HCtypes.Upstream then
       p = infl.p;
-    else
+    elseif HydraulicCapacitance == HCtypes.Downstream then
       p = outfl.p;
+    else
+      assert(false, "Unsupported HydraulicCapacitance option");
     end if;
 
     //Friction factor selection
@@ -1999,31 +2005,29 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     for i in 1:N loop
       if FFtype == FFtypes.Kfnom then
         Kf[i] = Kfnom*Kfc;
-        Cf[i] = 2*Kf[i]*A^3/(omega_hyd*L);
       elseif FFtype == FFtypes.OpPoint then
         Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-        Cf[i] = 2*Kf[i]*A^3/(omega_hyd*L);
       elseif FFtype == FFtypes.Cfnom then
-        Kf[i] = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
         Cf[i] = Cfnom*Kfc;
       elseif FFtype == FFtypes.Colebrook then
         Cf[i] = f_colebrook(w[i], Dhyd/A, e,
           Medium.dynamicViscosity(fluidState[i]))*Kfc;
-        Kf[i] = Cf[i]*omega_hyd*L/(2*A^3);
       elseif FFtype == FFtypes.NoFriction then
         Cf[i] = 0;
-        Kf[i] = 0;
       end if;
       assert(Kf[i]>=0, "Negative friction coefficient");
-      Kfl[i] = wnom/Nt*wnf*Kf[i];
+      Kf[i] = Cf[i]*omega_hyd*L/(2*A^3)
+        "Relationship between friction coefficient and Fanning friction factor";
     end for;
 
     //Dynamic Momentum [not] accounted for
     if DynamicMomentum then
       if HydraulicCapacitance == HCtypes.Upstream then
-        dwdt = -der(outfl.m_flow)/Nt;
+        dwdt = der(w[N]);
+      elseif HydraulicCapacitance == HCtypes.Downstream then
+        dwdt = der(w[1]);
       else
-        dwdt = der(infl.m_flow)/Nt;
+        assert(false, "DynamicMomentum == true requires either Upstream or Downstream capacitance");
       end if;
     else
       dwdt = 0;
@@ -2035,9 +2039,20 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     w[1] = infl.m_flow/Nt "Inlet flow rate - single tube";
     w[N] = -outfl.m_flow/Nt "Outlet flow rate - single tube";
 
-    Dpfric = if FFtype == FFtypes.NoFriction then 0 else 
-      noEvent(sign(infl.m_flow))*sum((Kf[i]*w[i]^2/rho[i] + Kfl[i]*w[i]/
-      rho[i])*D[i] for i in 1:N)/L "Pressure drop due to friction";
+    Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
+
+    if FFtype == FFtypes.NoFriction then
+      Dpfric1 = 0;
+      Dpfric2 = 0;
+    else
+      Dpfric1 = homotopy(sum(Kf[i]/L*squareReg(w[i],wnom/Nt*wnf)*D1[i]/rho[i] for i in 1:N),
+                         dpnom/2/(wnom/Nt)*w[1])
+        "Pressure drop from inlet to capacitance";
+      Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i],wnom/Nt*wnf)*D2[i]/rho[i] for i in 1:N),
+                         dpnom/2/(wnom/Nt)*w[N])
+        "Pressure drop from capacitance to outlet";
+    end if "Pressure drop due to friction";
+
     Dpstat = if abs(dzdx)<1e-6 then 0 else g*dzdx*rho*D
       "Pressure drop due to static head";
     ((1 - ML)*Y + ML*YY)*der(h) + B/A*h + C*h/A = der(p)*G + M*(omega/A)*phi
@@ -2192,14 +2207,28 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     // Momentum and Mass balance equation matrices
     D[1] = l/2;
     D[N] = l/2;
-    if N > 2 then
-      for i in 2:N - 1 loop
+    for i in 2:N - 1 loop
         D[i] = l;
-      end for;
+    end for;
+    if HydraulicCapacitance == HCtypes.Middle then
+        D1 = l*(if N == 2 then {3/8, 1/8} else 
+                if evenN then cat(1, {1/2}, ones(max(0,div(N,2)-2)), {7/8, 1/8}, zeros(div(N,2)-1)) else 
+                              cat(1, {1/2}, ones(div(N,2)-1), {1/2}, zeros(div(N,2))));
+        D2 = l*(if N == 2 then {1/8, 3/8} else 
+                if evenN then cat(1, zeros(div(N,2)-1), {1/8, 7/8}, ones(max(div(N,2)-2,0)), {1/2}) else 
+                              cat(1, zeros(div(N,2)), {1/2}, ones(div(N,2)-1), {1/2}));
+    elseif HydraulicCapacitance == HCtypes.Upstream then
+      D1 = zeros(N);
+      D2 = D;
+    elseif HydraulicCapacitance == HCtypes.Downstream then
+      D1 = D;
+      D2 = zeros(N);
+    else
+      assert(false, "Unsupported HydraulicCapacitance option");
     end if;
 
     Q = Nt*l*omega*D*phi "Total heat flow through lateral boundary";
-    Tr=noEvent(sum(rho)*A*l/max(infl.m_flow/Nt,Modelica.Constants.eps))
+    Tr=noEvent(D*rho*A/max(infl.m_flow/Nt,Modelica.Constants.eps))
       "Residence time";
   initial equation
     if initOpt == Choices.Init.Options.noInit then
