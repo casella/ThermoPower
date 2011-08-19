@@ -6451,7 +6451,9 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
       redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.noInit,
-        ML=0.5)      annotation (Placement(transformation(extent={{-8,-10},{12,10}},
+        ML=0.5,
+        dpnom=100000) 
+                     annotation (Placement(transformation(extent={{-8,-10},{12,10}},
                       rotation=0)));
       ThermoPower.Water.SensT T_in(
       redeclare package Medium = Medium) 
