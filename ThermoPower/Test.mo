@@ -6607,6 +6607,230 @@ Algorithm Tolerance = 1e-6
 </html>"),
         experimentSetupOutput);
     end TestFlow1DfemH;
+
+    model TestFlow1DfemK "Test case for Flow1Dfem"
+      package Medium=Modelica.Media.Water.StandardWater;
+      // number of Nodes
+      parameter Integer Nnodes=11;
+      // total length
+      parameter Modelica.SIunits.Length Lhex=10;
+      // internal diameter
+      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      // internal radius
+      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      // internal perimeter
+      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex=0.05;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.SIunits.MassFlowRate whex=0.3;
+      // initial pressure
+      parameter Modelica.SIunits.Pressure phex=30e5;
+      // initial temperature
+      parameter Modelica.SIunits.Temperature Thex=700;
+      // initial specific enthalpy
+      final parameter Modelica.SIunits.SpecificEnthalpy hhex=Medium.specificEnthalpy_pT(phex, Thex);
+      // initial density
+      final parameter Modelica.SIunits.Density rhohex=Medium.density_pT(phex, Thex);
+      // Cv of fluid
+      final parameter Modelica.SIunits.SpecificHeatCapacity cv = Medium.specificHeatCapacityCv(Medium.setState_pT(phex, Thex));
+      //height of power step
+      parameter Modelica.SIunits.EnergyFlowRate W=100;
+      // approx. prediction of flow rate from the outlet (neglects heat carried out by flow rate -> overestimate)
+      final parameter Modelica.SIunits.MassFlowRate wout = 0.5*rhohex/Thex * Ahex*Lhex*W/(rhohex*Ahex*Lhex*cv);
+
+      ThermoPower.Water.SinkP sink1(p0=phex, h=hhex) 
+        annotation (Placement(transformation(extent={{66,-10},{86,10}},
+              rotation=0)));
+      Water.Flow1Dfem pipe1(
+        N=Nnodes,
+        L=Lhex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        A=Ahex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        DynamicMomentum=false,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+        hstartin=hhex,
+        hstartout=hhex,
+        initOpt=ThermoPower.Choices.Init.Options.noInit,
+        alpha=0,
+        pstart=phex,
+        dpnom=10000,
+        wnf=1)       annotation (Placement(transformation(extent={{-12,-10},{8,10}},
+                      rotation=0)));
+      inner System system 
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Water.SourceP source1(         h=hhex, p0=phex) 
+        annotation (Placement(transformation(extent={{-72,-10},{-52,10}})));
+      Thermal.HeatSource1D heatSource1D(
+        L=Lhex,
+        omega=Dihex*3.14159,
+        N=Nnodes) annotation (Placement(transformation(extent={{-12,12},{8,32}})));
+      Modelica.Blocks.Sources.Step step(height=W) 
+        annotation (Placement(transformation(extent={{-38,30},{-18,50}})));
+    equation
+      connect(source1.flange, pipe1.infl) annotation (Line(
+          points={{-52,0},{-12,0}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(pipe1.outfl, sink1.flange) annotation (Line(
+          points={{8,0},{66,0}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      annotation (
+        Diagram(graphics),
+        experiment(
+          StartTime=-10,
+          StopTime=10,
+          Tolerance=1e-006),
+        Documentation(info="<HTML>
+<p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
+<ul>
+    <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+</ul>
+<p>
+Simulation Interval = [0...80] sec <br> 
+Integration Algorithm = DASSL <br>
+Algorithm Tolerance = 1e-6 
+</p>
+</HTML>",   revisions="<html>
+<ul>
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    First release.</li>
+</ul>
+</html>"),
+        experimentSetupOutput(doublePrecision=true, equdistant=false));
+      connect(heatSource1D.wall, pipe1.wall) annotation (Line(
+          points={{-2,19},{-2,5}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(step.y, heatSource1D.power) annotation (Line(
+          points={{-17,40},{-2,40},{-2,26}},
+          color={0,0,127},
+          smooth=Smooth.None));
+    end TestFlow1DfemK;
+
+    model TestFlow1DfemJ "Test case for Flow1Dfem"
+      package Medium=Modelica.Media.Water.StandardWater;
+      // number of Nodes
+      parameter Integer Nnodes=11;
+      // total length
+      parameter Modelica.SIunits.Length Lhex=10;
+      // internal diameter
+      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      // internal radius
+      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      // internal perimeter
+      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex=0.05;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.SIunits.MassFlowRate whex=0.03;
+      // initial pressure
+      parameter Modelica.SIunits.Pressure phex=30e5;
+      // initial temperature
+      parameter Modelica.SIunits.Temperature Thex=700;
+      // initial specific enthalpy
+      final parameter Modelica.SIunits.SpecificEnthalpy hhex=Medium.specificEnthalpy_pT(phex, Thex);
+      // initial density
+      final parameter Modelica.SIunits.Density rhohex=Medium.density_pT(phex, Thex);
+      // Cv of fluid
+      final parameter Modelica.SIunits.SpecificHeatCapacity cv = Medium.specificHeatCapacityCv(Medium.setState_pT(phex, Thex));
+      //height of power step
+      parameter Modelica.SIunits.EnergyFlowRate W=100;
+      // approx. prediction of flow rate from the outlet (neglects heat carried out by flow rate -> overestimate)
+      final parameter Modelica.SIunits.MassFlowRate wout = 0.5*rhohex/Thex * Ahex*Lhex*W/(rhohex*Ahex*Lhex*cv);
+
+      ThermoPower.Water.SinkP sink1(p0=phex, h=hhex) 
+        annotation (Placement(transformation(extent={{66,-10},{86,10}},
+              rotation=0)));
+      Water.Flow1Dfem pipe1(
+        N=Nnodes,
+        L=Lhex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        A=Ahex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        DynamicMomentum=false,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Middle,
+        hstartin=hhex,
+        hstartout=hhex,
+        initOpt=ThermoPower.Choices.Init.Options.noInit,
+        alpha=0,
+        pstart=phex,
+        dpnom=10000,
+        wnf=1)       annotation (Placement(transformation(extent={{-12,-10},{8,10}},
+                      rotation=0)));
+      inner System system 
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Water.SourceP source1(         h=hhex, p0=phex + 150) 
+        annotation (Placement(transformation(extent={{-72,-10},{-52,10}})));
+      Modelica.Blocks.Sources.Ramp ramp(
+        height=phex,
+        duration=10,
+        offset=phex) 
+        annotation (Placement(transformation(extent={{-94,28},{-74,48}})));
+    equation
+      connect(source1.flange, pipe1.infl) annotation (Line(
+          points={{-52,0},{-12,0}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(pipe1.outfl, sink1.flange) annotation (Line(
+          points={{8,0},{66,0}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      annotation (
+        Diagram(graphics),
+        experiment(
+          StartTime=-10,
+          StopTime=10,
+          NumberOfIntervals=10000,
+          Tolerance=1e-007),
+        Documentation(info="<HTML>
+<p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
+<ul>
+    <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+</ul>
+<p>
+Simulation Interval = [0...80] sec <br> 
+Integration Algorithm = DASSL <br>
+Algorithm Tolerance = 1e-6 
+</p>
+</HTML>",   revisions="<html>
+<ul>
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    First release.</li>
+</ul>
+</html>"),
+        experimentSetupOutput(doublePrecision=true, equdistant=false));
+      connect(ramp.y, source1.in_p0) annotation (Line(
+          points={{-73,38},{-66,38},{-66,9.2}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(ramp.y, sink1.in_p0) annotation (Line(
+          points={{-73,38},{72,38},{72,8.8}},
+          color={0,0,127},
+          smooth=Smooth.None));
+    end TestFlow1DfemJ;
   end ThermoHydraulicElements;
 
   package GasElements "Test for Gas package elements except Flow1D models"
