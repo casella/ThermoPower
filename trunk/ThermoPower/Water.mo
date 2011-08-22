@@ -1946,6 +1946,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Real ML(
       min=0,
       max=1) = 0 "Mass Lumping Coefficient";
+    parameter Real wnf_bc = 0.01
+      "Fraction of the nominal total mass flow rate for FEM regularization";
     constant Real g=Modelica.Constants.g_n;
     final parameter Boolean evenN = (div(N,2)*2 == N)
       "The number of nodes is even";
@@ -1953,7 +1955,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real Kf[N] "Friction coefficients";
     Real Cf[N] "Fanning friction factors";
     Real dwdt "Dynamic momentum term";
-    Medium.AbsolutePressure p "Fluid pressure";
+    Medium.AbsolutePressure p(start = pstart) "Fluid pressure";
     Pressure Dpfric "Pressure drop due to friction (total)";
     Pressure Dpfric1
       "Pressure drop due to friction (from inlet to capacitance)";
@@ -1967,6 +1969,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
     Medium.Density rho[N] "Fluid density";
     SpecificVolume v[N] "Fluid specific volume";
+    Mass Mtot "Total mass of fluid";
   protected
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     DerDensityByPressure drdp[N] "Derivative of density by pressure";
@@ -2175,8 +2178,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     //boundary condition matrices
-    C[1, 1] = if noEvent(infl.m_flow >= 0) then (1 - alpha_sgn/2)*w[1] else 0;
-    C[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*w[N] else 0;
+    C[1, 1] = Functions.stepReg(infl.m_flow,   (1 - alpha_sgn/2)*w[1], 0, wnom*wnf_bc);
+    C[N, N] = Functions.stepReg(outfl.m_flow, -(1 + alpha_sgn/2)*w[N], 0, wnom*wnf_bc);
+  //  C[1, 1] = if noEvent(infl.m_flow >= 0) then (1 - alpha_sgn/2)*w[1] else 0;
+  //  C[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*w[N] else 0;
     C[N, 1] = 0;
     C[1, N] = 0;
     if (N > 2) then
@@ -2189,9 +2194,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end for;
     end if;
 
-    K[1, 1] = if noEvent(infl.m_flow >= 0) then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0;
-    K[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 
-            0;
+    K[1, 1] = Functions.stepReg(infl.m_flow,   (1 - alpha_sgn/2)*inStream(infl.h_outflow), 0,  wnom*wnf_bc);
+    K[N, N] = Functions.stepReg(outfl.m_flow, -(1 + alpha_sgn/2)*inStream(outfl.h_outflow), 0, wnom*wnf_bc);
+  //  K[1, 1] = if noEvent(infl.m_flow >= 0) then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0;
+  //  K[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else
     K[N, 1] = 0;
     K[1, N] = 0;
     if (N > 2) then
@@ -2227,8 +2233,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
 
-    Q = Nt*l*omega*D*phi "Total heat flow through lateral boundary";
-    Tr=noEvent(D*rho*A/max(infl.m_flow/Nt,Modelica.Constants.eps))
+    Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
+    Mtot = Nt*D*rho*A "Total mass of fluid";
+    Tr=noEvent(Mtot/max(abs(infl.m_flow),Modelica.Constants.eps))
       "Residence time";
   initial equation
     if initOpt == Choices.Init.Options.noInit then
