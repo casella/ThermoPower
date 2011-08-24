@@ -6683,6 +6683,14 @@ Algorithm Tolerance = 1e-6
           points={{8,0},{66,0}},
           color={0,0,255},
           smooth=Smooth.None));
+      connect(heatSource1D.wall, pipe1.wall) annotation (Line(
+          points={{-2,19},{-2,5}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(step.y, heatSource1D.power) annotation (Line(
+          points={{-17,40},{-2,40},{-2,26}},
+          color={0,0,127},
+          smooth=Smooth.None));
       annotation (
         Diagram(graphics),
         experiment(
@@ -6710,14 +6718,6 @@ Algorithm Tolerance = 1e-6
 </ul>
 </html>"),
         experimentSetupOutput(doublePrecision=true, equdistant=false));
-      connect(heatSource1D.wall, pipe1.wall) annotation (Line(
-          points={{-2,19},{-2,5}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      connect(step.y, heatSource1D.power) annotation (Line(
-          points={{-17,40},{-2,40},{-2,26}},
-          color={0,0,127},
-          smooth=Smooth.None));
     end TestFlow1DfemK;
 
     model TestFlow1DfemJ "Test case for Flow1Dfem"
@@ -6794,6 +6794,14 @@ Algorithm Tolerance = 1e-6
           points={{8,0},{66,0}},
           color={0,0,255},
           smooth=Smooth.None));
+      connect(ramp.y, source1.in_p0) annotation (Line(
+          points={{-73,38},{-66,38},{-66,9.2}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(ramp.y, sink1.in_p0) annotation (Line(
+          points={{-73,38},{72,38},{72,8.8}},
+          color={0,0,127},
+          smooth=Smooth.None));
       annotation (
         Diagram(graphics),
         experiment(
@@ -6822,14 +6830,6 @@ Algorithm Tolerance = 1e-6
 </ul>
 </html>"),
         experimentSetupOutput(doublePrecision=true, equdistant=false));
-      connect(ramp.y, source1.in_p0) annotation (Line(
-          points={{-73,38},{-66,38},{-66,9.2}},
-          color={0,0,127},
-          smooth=Smooth.None));
-      connect(ramp.y, sink1.in_p0) annotation (Line(
-          points={{-73,38},{72,38},{72,8.8}},
-          color={0,0,127},
-          smooth=Smooth.None));
     end TestFlow1DfemJ;
   end ThermoHydraulicElements;
 
