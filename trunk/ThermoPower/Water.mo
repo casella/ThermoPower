@@ -592,7 +592,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     outlet.p = p;
     thermalPort.T = T;
 
-    Tr=noEvent(M/max(inlet.m_flow,Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(abs(inlet.m_flow),Modelica.Constants.eps))
+      "Residence time";
   initial equation
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
@@ -752,7 +753,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     thermalPort.Q_flow = Q;
     thermalPort.T = T;
 
-    Tr=noEvent(M/max(-out.m_flow,Modelica.Constants.eps)) "Residence time";
+    Tr=noEvent(M/max(abs(out.m_flow),Modelica.Constants.eps)) "Residence time";
 
   initial equation
     if initOpt == Choices.Init.Options.noInit then
