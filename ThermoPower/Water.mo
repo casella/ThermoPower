@@ -1277,7 +1277,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     constant Pressure pzero=10 "Small deltap for calculations";
     constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SpecificEnthalpy hzero=1e-3 "Small value for deltah";
-    SmoothMedium.ThermodynamicState fluidState[N](h(start=hstart))
+    SmoothMedium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Length omega_hyd "Wet perimeter (single tube)";
