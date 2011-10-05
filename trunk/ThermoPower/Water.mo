@@ -4710,8 +4710,8 @@ Input variables changed. This function now computes the heat transfer coefficien
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
 
-    Medium.ThermodynamicState steamState_in(p(start=pnom));
-    Medium.ThermodynamicState steamState_iso(p(start=pnom/PRstart));
+    Medium.ThermodynamicState steamState_in;
+    Medium.ThermodynamicState steamState_iso;
 
     Angle phi "shaft rotation angle";
     Torque tau "net torque acting on the turbine";
@@ -4721,6 +4721,7 @@ Input variables changed. This function now computes the heat transfer coefficien
     Medium.SpecificEnthalpy hout "Outlet enthalpy";
     Medium.SpecificEnthalpy hiso "Isentropic outlet enthalpy";
     Medium.SpecificEntropy sin "Inlet entropy";
+    Medium.AbsolutePressure pin(start=pnom) "Outlet pressure";
     Medium.AbsolutePressure pout(start=pnom/PRstart) "Outlet pressure";
     Real PR "pressure ratio";
     Power Pm "Mechanical power input";
@@ -4747,12 +4748,12 @@ Input variables changed. This function now computes the heat transfer coefficien
              0)));
 
   equation
-    PR=inlet.p/outlet.p "Pressure ratio";
+    PR=pin/pout "Pressure ratio";
     if cardinality(partialArc)==0 then
       partialArc =1 "Default value if not connected";
     end if;
     if explicitIsentropicEnthalpy then
-      hiso = Medium.isentropicEnthalpy(outlet.p, steamState_in)
+      hiso = Medium.isentropicEnthalpy(pout, steamState_in)
         "Isentropic enthalpy";
       //dummy assignments
       sin=0;
@@ -4766,6 +4767,9 @@ Input variables changed. This function now computes the heat transfer coefficien
     Pm=eta_mech*w*(hin-hout) "Mechanical power from the steam";
     Pm = -tau*omega "Mechanical power balance";
 
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+    // assert(w >= -wnom/100, "The turbine model does not support flow reversal");
+
     // Mechanical boundary conditions
     shaft_a.phi = phi;
     shaft_b.phi = phi;
@@ -4773,15 +4777,12 @@ Input variables changed. This function now computes the heat transfer coefficien
     der(phi) = omega;
 
     // steam boundary conditions and inlet steam properties
-    steamState_in = Medium.setState_ph(inlet.p,inStream(inlet.h_outflow));
+    steamState_in = Medium.setState_ph(pin,inStream(inlet.h_outflow));
     hin = inStream(inlet.h_outflow);
     hout = outlet.h_outflow;
+    pin = inlet.p;
     pout = outlet.p;
     w = inlet.m_flow;
-
-    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
-    // assert(w >= -wnom/100, "The turbine model does not support flow reversal");
-
     // The next equation is provided to close the balance but never actually used
     inlet.h_outflow = outlet.h_outflow;
 
@@ -4824,6 +4825,9 @@ Input variables changed. This function now computes the heat transfer coefficien
 <li><i>20 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
+<li><i>5 Oct 2011</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Small changes in alias variables.</li>
 </ul>
 </html>"),
       uses(ThermoPower(version="2"), Modelica(version="2.2")));
