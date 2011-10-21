@@ -2431,34 +2431,33 @@ Algorithm Tolerance = 1e-4
     end TestST2;
 
     model TestTurbine "Test turbine with prescribed pressure conditions"
-      Water.SourceP source(p0=15000000, h=3.3e6)
+      Water.SourceP source(p0=15000000, h=3.3e6) 
         annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
-      Water.SinkP sink(p0=8000, h=2e6)
+      Water.SinkP sink(p0=8000, h=2e6) 
         annotation (Placement(transformation(extent={{20,20},{40,40}})));
       Water.SteamTurbineStodola steamTurbineStodola(
         wnom=70,
         PRstart=1500,
         pnom=15000000,
-        Kt=0.0025)
+        Kt=0.0025) 
         annotation (Placement(transformation(extent={{-22,-2},{-2,18}})));
-      Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(w_fixed
-          =3000/60*3.14159)
+      Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(w_fixed=
+           3000/60*3.14159) 
         annotation (Placement(transformation(extent={{24,-2},{4,18}})));
-      inner System system
+      inner System system 
         annotation (Placement(transformation(extent={{60,60},{80,80}})));
       Modelica.Blocks.Sources.Ramp ramp(
         height=-70e5,
         duration=1,
         offset=150e5,
-        startTime=1)
+        startTime=1) 
         annotation (Placement(transformation(extent={{-96,58},{-76,78}})));
       Modelica.Blocks.Sources.Ramp ramp1(
         duration=1,
         height=+79e5,
         offset=1e5,
-        startTime=3)
+        startTime=3) 
         annotation (Placement(transformation(extent={{-6,54},{14,74}})));
-      annotation (Diagram(graphics));
     equation
       connect(steamTurbineStodola.shaft_b, constantSpeed.flange) annotation (
           Line(
@@ -2481,6 +2480,7 @@ Algorithm Tolerance = 1e-4
           points={{15,64},{26,64},{26,38.8}},
           color={0,0,127},
           smooth=Smooth.None));
+      annotation (Diagram(graphics));
     end TestTurbine;
   end WaterElements;
 
