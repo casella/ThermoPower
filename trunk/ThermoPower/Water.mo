@@ -1153,6 +1153,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(htilde) = zeros(N-1);
+    elseif initOpt == Choices.Init.Options.steadyStateNoT and 
+           not Medium.singleState then
+        der(p) = 0;
     else
       assert(false, "Unsupported initialisation option");
     end if;
@@ -1530,6 +1533,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(htilde) = zeros(N-1);
+    elseif initOpt == Choices.Init.Options.steadyStateNoT and 
+           not Medium.singleState then
+        der(p) = 0;
     else
       assert(false, "Unsupported initialisation option");
     end if;
@@ -2249,6 +2255,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(h) = zeros(N);
+    elseif initOpt == Choices.Init.Options.steadyStateNoT and 
+           not Medium.singleState then
+        der(p) = 0;
     else
       assert(false, "Unsupported initialisation option");
     end if;
