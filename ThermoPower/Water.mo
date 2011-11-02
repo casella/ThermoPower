@@ -2965,7 +2965,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         end for;
       end for;
     end if;
-    Q = Nt*l*omega*D*phi "Total heat flow through lateral boundary";
+    Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
     Tr=noEvent(sum(rho)*A*l/max(infl.m_flow/Nt,Modelica.Constants.eps));
   initial equation
     if initOpt == Choices.Init.Options.noInit then
