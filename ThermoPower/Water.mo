@@ -2341,9 +2341,12 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       min=0,
       max=1) = 0.2 "Mass Lumping Coefficient";
     constant Real g=Modelica.Constants.g_n;
+    final parameter Boolean evenN = (div(N,2)*2 == N)
+      "The number of nodes is even";
     constant Pressure pzero=10 "Small deltap for calculations";
     constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SpecificEnthalpy hzero=1e-3;
+
     SmoothMedium.BaseProperties fluid[N] "Properties of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
@@ -2352,6 +2355,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p "Fluid pressure";
     Pressure Dpfric "Pressure drop due to friction";
+    Pressure Dpfric1
+      "Pressure drop due to friction (from inlet to capacitance)";
+    Pressure Dpfric2
+      "Pressure drop due to friction (from capacitance to outlet)";
     Pressure Dpstat "Pressure drop due to static head";
     MassFlowRate w[N](start=wnom*ones(N)) "Mass flowrate (single tube)";
     Velocity u[N] "Fluid velocity";
@@ -2367,13 +2374,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real x[N] "Steam quality";
     LiquidDensity rhol "Saturated liquid density";
     GasDensity rhov "Saturated vapour density";
+
+    Real Kf[N] "Friction coefficient";
+    Real Cf[N] "Fanning friction factor";
+    Real Phi[N] "Two-phase friction multiplier";
   protected
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     DerDensityByPressure drdp[N] "Derivative of density by pressure";
-
-    Real Kf[N] "Friction coefficient";
-    Real Kfl[N] "Linear friction coefficient";
-    Real Cf[N] "Fanning friction factor";
 
     DerDensityByPressure drl_dp
       "Derivative of liquid density by pressure just before saturation";
@@ -2400,6 +2407,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real Y2ph[N, N];
     Real M[N, N];
     Real D[N];
+    Real D1[N];
+    Real D2[N];
     Real G[N];
     Real B[N, N];
     Real B2ph[N, N];
@@ -2429,41 +2438,29 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   equation
     //All equations are referred to a single tube
 
-    // Selection of representative pressure and flow rate variables
-    if HydraulicCapacitance == HCtypes.Upstream then
+    // Selection of representative pressure variable
+    if HydraulicCapacitance == HCtypes.Middle then
+      p = infl.p - Dpfric1 - Dpstat/2;
+    elseif HydraulicCapacitance == HCtypes.Upstream then
       p = infl.p;
-    else
+    elseif HydraulicCapacitance == HCtypes.Downstream then
       p = outfl.p;
+    else
+      assert(false, "Unsupported HydraulicCapacitance option");
     end if;
 
     //Friction factor calculation
     omega_hyd = 4*A/Dhyd;
     for i in 1:N loop
-      if FFtype == FFtypes.Kfnom then
-        Kf[i] = Kfnom*Kfc;
-        Cf[i] = 2*Kf[i]*A^3/(omega_hyd*L);
-      elseif FFtype == FFtypes.OpPoint then
-        Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-        Cf[i] = 2*Kf[i]*A^3/(omega_hyd*L);
-      elseif FFtype == FFtypes.Cfnom then
-        Kf[i] = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
-        Cf[i] = Cfnom*Kfc;
-      elseif FFtype == FFtypes.Colebrook then
-        if noEvent(h[i] < hl or h[i] > hv) then
-          Cf[i] = f_colebrook(w[i], Dhyd/A, e,
-            Medium.dynamicViscosity(fluid[i].state))*Kfc;
-        else
-          Cf[i] = f_colebrook_2ph(w[i], Dhyd/A, e,
-            Medium.dynamicViscosity(bubble),
-            Medium.dynamicViscosity(dew), x[i])*Kfc;
-        end if;
-        Kf[i] = Cf[i]*omega_hyd*L/(2*A^3);
-      elseif FFtype == FFtypes.NoFriction then
+      if FFtype == FFtypes.NoFriction then
         Cf[i] = 0;
-        Kf[i] = 0;
+      elseif FFtype == FFtypes.Cfnom then
+        Cf[i] = Cfnom*Kfc;
+      else
+        assert(true, "Unsupported friction factor selection");
       end if;
-      assert(Kf[i]>=0, "Negative friction coefficient");
-      Kfl[i] = wnom/Nt*wnf*Kf[i];
+      Kf[i] = Cf[i]*omega_hyd*L/(2*A^3)
+        "Relationship between friction coefficient and Fanning friction factor";
     end for;
 
     //Dynamic Momentum [not] accounted for
@@ -2484,9 +2481,31 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     w[1] = infl.m_flow/Nt;
     w[N] = -outfl.m_flow/Nt;
 
-    Dpfric = if FFtype == FFtypes.NoFriction then 0 else 
-      sum((Kf[i]*w[i]*noEvent(abs(w[i]))/rho[i] + Kfl[i]*w[i]/rho[i])*
-      D[i] for i in 1:N)/L;
+    Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
+
+    if FFtype == FFtypes.NoFriction then
+      Dpfric1 = 0;
+      Dpfric2 = 0;
+    else
+      Dpfric1 = homotopy(sum(Kf[i]/L*squareReg(w[i],wnom/Nt*wnf)*D1[i]/rho[i]*Phi[i] for i in 1:N),
+                         dpnom/2/(wnom/Nt)*w[1])
+        "Pressure drop from inlet to capacitance";
+      Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i],wnom/Nt*wnf)*D2[i]/rho[i]*Phi[i] for i in 1:N),
+                         dpnom/2/(wnom/Nt)*w[N])
+        "Pressure drop from capacitance to outlet";
+    end if "Pressure drop due to friction";
+
+    for i in 1:N loop
+      if FFtype == FFtypes.NoFriction or h[i] <= hl or h[i] >= hv then
+        Phi[i] = 1;
+      else
+        // Chisholm-Laird formulation of Martinelli-Lockhart correlation for turbulent-turbulent flow
+        // Phi_l^2 = 1 + 20/Xtt + 1/Xtt^2
+        // same fixed Fanning friction factor Cfnom is assumed for liquid and vapour, so Xtt = (rhov/rhol)^0.5 * (1-x)/x
+        Phi[i] = rho[i]/rhol*((1-x[i])^2 + 20*sqrt(rhol/rhov)*x[i]*(1-x[i]) + rhol/rhov*x[i]^2);
+      end if;
+    end for;
+
     Dpstat = if abs(dzdx)<1e-6 then 0 else g*dzdx*rho*D
       "Pressure drop due to static head";
 
@@ -2846,10 +2865,24 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     // Momentum and Mass balance equation matrices
     D[1] = l/2;
     D[N] = l/2;
-    if N > 2 then
-      for i in 2:N - 1 loop
+    for i in 2:N - 1 loop
         D[i] = l;
-      end for;
+    end for;
+    if HydraulicCapacitance == HCtypes.Middle then
+        D1 = l*(if N == 2 then {3/8, 1/8} else 
+                if evenN then cat(1, {1/2}, ones(max(0,div(N,2)-2)), {7/8, 1/8}, zeros(div(N,2)-1)) else 
+                              cat(1, {1/2}, ones(div(N,2)-1), {1/2}, zeros(div(N,2))));
+        D2 = l*(if N == 2 then {1/8, 3/8} else 
+                if evenN then cat(1, zeros(div(N,2)-1), {1/8, 7/8}, ones(max(div(N,2)-2,0)), {1/2}) else 
+                              cat(1, zeros(div(N,2)), {1/2}, ones(div(N,2)-1), {1/2}));
+    elseif HydraulicCapacitance == HCtypes.Upstream then
+      D1 = zeros(N);
+      D2 = D;
+    elseif HydraulicCapacitance == HCtypes.Downstream then
+      D1 = D;
+      D2 = zeros(N);
+    else
+      assert(false, "Unsupported HydraulicCapacitance option");
     end if;
 
     by[1, 1] = 0;

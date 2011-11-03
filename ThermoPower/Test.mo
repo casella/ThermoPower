@@ -6012,7 +6012,7 @@ Algorithm Tolerance = 1e-7
       // total length
       parameter Modelica.SIunits.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dhex=0.02;
+      parameter Modelica.SIunits.Diameter Dhex=0.03;
       // wall thickness
       parameter Modelica.SIunits.Thickness thhex=1e-3;
       // internal radius
