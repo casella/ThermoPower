@@ -2369,8 +2369,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     SpecificVolume v[N] "Fluid specific volume";
 
     Medium.Temperature Ts "Saturation temperature";
-    Medium.SpecificEnthalpy hl "Saturated liquid specific enthalpy";
-    Medium.SpecificEnthalpy hv "Saturated vapour specific enthalpy";
+    Medium.SpecificEnthalpy hl(start=Medium.bubbleEnthalpy(Medium.setSat_p(pstart)))
+      "Saturated liquid specific enthalpy";
+    Medium.SpecificEnthalpy hv(start=Medium.dewEnthalpy(Medium.setSat_p(pstart)))
+      "Saturated vapour specific enthalpy";
     Real x[N] "Steam quality";
     LiquidDensity rhol "Saturated liquid density";
     GasDensity rhov "Saturated vapour density";
@@ -2398,7 +2400,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real drv "Derivative of saturated vapour density by pressure";
 
     Density rhos[N - 1];
-    MassFlowRate ws[N - 1];
+    MassFlowRate ws[N-1];
     Real rs[N - 1];
 
     Real Y[N, N];
@@ -2496,7 +2498,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if "Pressure drop due to friction";
 
     for i in 1:N loop
-      if FFtype == FFtypes.NoFriction or h[i] <= hl or h[i] >= hv then
+      if FFtype == FFtypes.NoFriction or noEvent(h[i] <= hl or h[i] >= hv) then
         Phi[i] = 1;
       else
         // Chisholm-Laird formulation of Martinelli-Lockhart correlation for turbulent-turbulent flow
@@ -2588,10 +2590,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         ee[i] = 0;
         f[i] = 0;
 
-      elseif noEvent((h[i] < hl) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
+      elseif noEvent((h[i] < hl) and (h[i+1] >= hl) and (h[i+1] <= hv)) then
         //liquid - two phase
 
-        rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
+        rs[i] = (hl - h[i])/(h[i+1] - h[i]);
         rhos[i] = rhol;
         gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i+1]*rs[i]);
 
@@ -2615,7 +2617,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         f[i] = ((der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i+1] - der(h[i + 1])*hl) /
                (h[i + 1] - hl);
 
-      elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] < hl)) then
+      elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i+1] < hl)) then
         //two phase-liquid
 
         rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
@@ -2643,7 +2645,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         f[i] = (der(h[i])*hl - (der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i]) /
                (hl - h[i]);
 
-        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] > hv)) then
+        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i+1] > hv)) then
           //two phase - vapour
 
         rs[i] = (hv - h[i])/(h[i+1] - h[i]);
@@ -2719,7 +2721,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         ee[i] = (der(h[i+1]) - der(h[i]))/(h[i+1] - h[i]);
         f[i] = (der(h[i])*h[i+1] - der(h[i+1])*h[i])/(h[i+1] - h[i]);
 
-      elseif noEvent(((h[i] < hl) and (h[i + 1] < hl)) or ((h[i] > hv) and (h[i+1] > hv))) then
+      elseif noEvent(((h[i] < hl) and (h[i+1] < hl)) or ((h[i] > hv) and (h[i+1] > hv))) then
         //single-phase
 
         rs[i] = 0;
