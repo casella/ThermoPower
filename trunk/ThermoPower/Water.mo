@@ -1945,7 +1945,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     import Modelica.Math.*;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
-   Medium.ThermodynamicState fluidState[N]
+    Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     parameter Real alpha(
       min=0,
@@ -2333,7 +2333,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     import ThermoPower.Choices.Flow1D.HCtypes;
     extends Flow1DBase(redeclare replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
-    package SmoothMedium=Medium(final smoothModel = true);
     parameter Real alpha(
       min=0,
       max=2) = 1 "Numerical stabilization coefficient";
@@ -2347,7 +2346,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SpecificEnthalpy hzero=1e-3;
 
-    SmoothMedium.BaseProperties fluid[N] "Properties of the fluid at the nodes";
+    Medium.ThermodynamicState fluidState[N]
+      "Thermodynamic state of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
     Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
@@ -2543,17 +2543,16 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     d = -rhol*rhov*(hv - hl)/(rhol - rhov);
 
     //Computation of fluid properties
-    for i in 1:N loop
-      fluid[i].p=p;
-      fluid[i].h=h[i];
-      T[i]=fluid[i].T;
-      rho[i]=fluid[i].d;
-      drdp[i]=Medium.density_derp_h(fluid[i].state);
-      drdh[i]=Medium.density_derh_p(fluid[i].state);
-      v[i] = 1/rho[i];
-      u[i] = w[i]/(rho[i]*A);
-      x[i]=noEvent(if h[i]<=hl then 0 else 
-                if h[i]>=hv then 1 else (h[i]-hl)/(hv-hl));
+    for j in 1:N loop
+      fluidState[j] = Medium.setState_ph(p,h[j]);
+      T[j] = Medium.temperature(fluidState[j]);
+      rho[j] = Medium.density(fluidState[j]);
+      drdp[j] = if Medium.singleState then 0 else 
+                Medium.density_derp_h(fluidState[j]);
+      drdh[j] = Medium.density_derh_p(fluidState[j]);
+      v[j] = 1/rho[j];
+      u[j] = w[j]/(rho[j]*A);
+      x[j]=noEvent(min(max((h[j]-hl)/(hv-hl), 0), 1));
     end for;
 
     //Wall energy flux and  temperature
