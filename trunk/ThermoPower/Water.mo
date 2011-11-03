@@ -2534,16 +2534,12 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     drl_dh=Medium.density_derh_p(bubble);
     drv_dh=Medium.density_derh_p(dew);
 
-    a = ((hv - hl)*(rhol^2*drv + rhov^2*drl) + rhov*rhol*(rhol - rhov)*(dhv
-       - dhl))/(rhol - rhov)^2;
-
-    betap = ((rhol - rhov)*(rhov*dhv - rhol*dhl) + (hv - hl)*(rhol*drv - rhov
-      *drl))/(rhol - rhov)^2;
-
+    a = ((hv - hl)*(rhol^2*drv + rhov^2*drl) +
+        rhov*rhol*(rhol - rhov)*(dhv - dhl))/(rhol - rhov)^2;
+    betap = ((rhol - rhov)*(rhov*dhv - rhol*dhl) +
+            (hv - hl)*(rhol*drv - rhov*drl))/(rhol - rhov)^2;
     b = a*c + d*betap;
-
     c = (rhov*hv - rhol*hl)/(rhol - rhov);
-
     d = -rhol*rhov*(hv - hl)/(rhol - rhov);
 
     //Computation of fluid properties
@@ -2583,170 +2579,181 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         gamma_w[i] = 0;
         ws[i] = 0;
 
-        dMmono[i] = A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[i])*
-          (2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i + 1])));
+        dMmono[i] = A*l*
+          (der(p)*1/2*(drdp[i+1] + drdp[i]) +
+           1/6*(der(h[i])  * (2*drdh[i] +   drdh[i+1]) +
+                der(h[i+1])* (  drdh[i] + 2*drdh[i+1])));
+
+        dMbif[i] = 0;
+
+        ee[i] = 0;
+        f[i] = 0;
+
+      elseif noEvent((h[i] < hl) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
+        //liquid - two phase
+
+        rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
+        rhos[i] = rhol;
+        gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i+1]*rs[i]);
+
+        gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i+1]*rs[i]);
+
+        (w[i] - ws[i]) = dMmono[i];
+
+        dMmono[i] = A*rs[i]*l*
+          (der(p)*1/2*(drl_dp + drdp[i]) +
+           1/6*(der(h[i])*(2*drdh[i] + drl_dh) +
+                (der(h[i])*(1 - rs[i]) + der(h[i+1])*rs[i])*(drdh[i] + 2*drl_dh)));
+
+        dMbif[i] = A*(1 - rs[i])*l/(h[i+1] - hl)*
+          (der(p)*((b - a*c)*(h[i+1] - hl)/((c + h[i+1])*(c + hl)) +
+                    a*log((c + h[i + 1])/(c + hl))) +
+           ((d*f[i] - d*c*ee[i])*(h[i + 1] - hl)/((c + h[i + 1])*(c + hl)) +
+            d*ee[i]*log((c + h[i + 1])/(c + hl))));
+
+        ee[i] = (der(h[i+1]) - (der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))) /
+                (h[i + 1] - hl);
+        f[i] = ((der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i+1] - der(h[i + 1])*hl) /
+               (h[i + 1] - hl);
+
+      elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] < hl)) then
+        //two phase-liquid
+
+        rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
+        rhos[i] = rhol;
+        gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
+
+        gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
+
+        (w[i] - ws[i]) = dMbif[i];
+
+        dMmono[i] = A*(1 - rs[i])*l*
+          (der(p)*1/2*(drdp[i+1] + drl_dp) +
+           1/6*(der(h[i])*(2*drl_dh + drdh[i+1]) +
+                (der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))*
+                (drl_dh + 2*drdh[i + 1])));
+
+        dMbif[i] = A*rs[i]*l/(hl - h[i])*
+          (der(p)*((b - a*c)*(hl - h[i])/((c + hl)*(c + h[i])) +
+                    a*log((c + hl)/(c + h[i]))) +
+           ((d*f[i] - d*c*ee[i])*(hl - h[i])/((c + hl)*(c + h[i])) +
+            d*ee[i]*log((c + hl)/(c + h[i]))));
+
+        ee[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) - der(h[i])) /
+                (hl - h[i]);
+        f[i] = (der(h[i])*hl - (der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i]) /
+               (hl - h[i]);
+
+        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] > hv)) then
+          //two phase - vapour
+
+        rs[i] = (hv - h[i])/(h[i+1] - h[i]);
+        rhos[i] = rhov;
+        gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i+1]*rs[i]);
+
+        gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i+1]*rs[i]);
+        (w[i] - ws[i]) = dMbif[i];
+
+        dMmono[i] = A*(1 - rs[i])*l*
+          (der(p)*1/2*(drdp[i+1] + drv_dp) +
+           1/6*(der(h[i])*(2*drv_dh + drdh[i+1]) +
+                (der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))*
+                (drv_dh + 2*drdh[i + 1])));
+
+        dMbif[i] = A*rs[i]*l/(hv - h[i])*
+         (der(p)*((b - a*c)*(hv - h[i])/((c + hv)*(c + h[i])) +
+                   a*log((c + hv)/(c + h[i]))) +
+          ((d*f[i] - d*c*ee[i])*(hv - h[i])/((c + hv)*(c + h[i])) +
+           d*ee[i]*log((c + hv)/(c + h[i]))));
+
+        ee[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) - der(h[i])) /
+                (hv - h[i]);
+        f[i] = (der(h[i])*hv - (der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i]) /
+               (hv - h[i]);
+
+      elseif noEvent((h[i] > hv) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
+        // vapour - two phase
+
+        rs[i] = (hv - h[i])/(h[i+1] - h[i]);
+        rhos[i] = rhov;
+        gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i+1]*rs[i]);
+
+        gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i+1]*rs[i]);
+        (w[i] - ws[i]) = dMmono[i];
+
+        dMmono[i] = A*rs[i]*l*
+          (der(p)*1/2*(drv_dp + drdp[i]) +
+           1/6*(der(h[i])*(2*drdh[i] + drv_dh) +
+                (der(h[i])*(1 - rs[i]) + der(h[i+1])*rs[i])*
+                (drdh[i] + 2*drv_dh)));
+
+        dMbif[i] = A*(1 - rs[i])*
+          (der(p)*((b - a*c)*(h[i + 1] - hv)/((c + h[i+1])*(c + hv)) +
+                   a*log((c + h[i + 1])/(c + hv))) +
+           ((d*f[i] - d*c*ee[i])*(h[i+1] - hv)/((c + h[i+1])*(c + hv)) +
+            d*ee[i]*log((c + h[i + 1])/(c + hv))));
+
+        ee[i] = (der(h[i+1]) - (der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))) /
+                (h[i + 1] - hv);
+        f[i] = ((der(h[i+1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i+1] - der(h[i+1])*hv) /
+               (h[i + 1] - hv);
+
+      elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i+1] >= hl) and (h[i+1] <= hv)) then
+        //two phase
+
+        rs[i] = 0;
+        rhos[i] = 0;
+        gamma_rho[i] = 0;
+
+        gamma_w[i] = 0;
+
+        ws[i] = 0;
+
+        dMmono[i] = 0;
+
+        dMbif[i] = A*l/(h[i+1] - h[i])*
+          (der(p)*((b - a*c)*(h[i+1] - h[i])/((c + h[i + 1])*(c + h[i])) +
+                   a*log((c + h[i+1])/(c + h[i]))) +
+           ((d*f[i] - d*c*ee[i])*(h[i+1] - h[i])/((c + h[i+1])*(c + h[i])) +
+            d*ee[i]*log((c + h[i+1])/(c + h[i]))));
+
+        ee[i] = (der(h[i+1]) - der(h[i]))/(h[i+1] - h[i]);
+        f[i] = (der(h[i])*h[i+1] - der(h[i+1])*h[i])/(h[i+1] - h[i]);
+
+      elseif noEvent(((h[i] < hl) and (h[i + 1] < hl)) or ((h[i] > hv) and (h[i+1] > hv))) then
+        //single-phase
+
+        rs[i] = 0;
+        rhos[i] = 0;
+        gamma_rho[i] = 0;
+
+        gamma_w[i] = 0;
+        ws[i] = 0;
+
+        dMmono[i] = A*l*
+          (der(p)*1/2*(drdp[i + 1] + drdp[i]) +
+           1/6*(der(h[i])  *(2*drdh[i] +   drdh[i+1]) +
+                der(h[i+1])*(  drdh[i] + 2*drdh[i+1])));
         dMbif[i] = 0;
 
         ee[i] = 0;
         f[i] = 0;
       else
-
-        if noEvent((h[i] < hl) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
-          //liquid - two phase
-
-          rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
-          rhos[i] = rhol;
-          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
-
-          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
-
-          (w[i] - ws[i]) = dMmono[i];
-
-          dMmono[i] = A*rs[i]*l*(der(p)*1/2*(drl_dp + drdp[i]) + 1/6*(der(h[i])
-            *(2*drdh[i] + drl_dh) + (der(h[i])*(1 - rs[i]) + der(h[i + 1])*rs[
-            i])*(drdh[i] + 2*drl_dh)));
-
-          dMbif[i] = A*(1 - rs[i])*l/(h[i + 1] - hl)*(der(p)*((b - a*c)*(h[i
-             + 1] - hl)/((c + h[i + 1])*(c + hl)) + a*log((c + h[i + 1])/(c
-             + hl))) + ((d*f[i] - d*c*ee[i])*(h[i + 1] - hl)/((c + h[i + 1])*
-            (c + hl)) + d*ee[i]*log((c + h[i + 1])/(c + hl))));
-
-          //(der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) = 0;
-
-          ee[i] = (der(h[i + 1]) - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])))
-            /(h[i + 1] - hl);
-          f[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i + 1] -
-            der(h[i + 1])*hl)/(h[i + 1] - hl);
-
-        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] < hl)) then
-          //two phase-liquid
-
-          rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
-          rhos[i] = rhol;
-          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
-
-          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
-
-          (w[i] - ws[i]) = dMbif[i];
-
-          dMmono[i] = A*(1 - rs[i])*l*(der(p)*1/2*(drdp[i + 1] + drl_dp) + 1/
-            6*(der(h[i])*(2*drl_dh + drdh[i + 1]) + (der(h[i + 1])*rs[i] +
-            der(h[i])*(1 - rs[i]))*(drl_dh + 2*drdh[i + 1])));
-
-          dMbif[i] = A*rs[i]*l/(hl - h[i])*(der(p)*((b - a*c)*(hl - h[i])/((c
-             + hl)*(c + h[i])) + a*log((c + hl)/(c + h[i]))) + ((d*f[i] - d*c
-            *ee[i])*(hl - h[i])/((c + hl)*(c + h[i])) + d*ee[i]*log((c + hl)/
-            (c + h[i]))));
-
-          ee[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) - der(h[i]))
-            /(hl - h[i]);
-          f[i] = (der(h[i])*hl - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))
-            *h[i])/(hl - h[i]);
-
-        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] > hv)) then
-          //two phase - vapour
-
-          rs[i] = (hv - h[i])/(h[i + 1] - h[i]);
-          rhos[i] = rhov;
-          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
-
-          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
-          (w[i] - ws[i]) = dMbif[i];
-
-          dMmono[i] = A*(1 - rs[i])*l*(der(p)*1/2*(drdp[i + 1] + drv_dp) + 1/
-            6*(der(h[i])*(2*drv_dh + drdh[i + 1]) + (der(h[i + 1])*rs[i] +
-            der(h[i])*(1 - rs[i]))*(drv_dh + 2*drdh[i + 1])));
-
-          dMbif[i] = A*rs[i]*l/(hv - h[i])*(der(p)*((b - a*c)*(hv - h[i])/((c
-             + hv)*(c + h[i])) + a*log((c + hv)/(c + h[i]))) + ((d*f[i] - d*c
-            *ee[i])*(hv - h[i])/((c + hv)*(c + h[i])) + d*ee[i]*log((c + hv)/
-            (c + h[i]))));
-
-          ee[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])) - der(h[i]))
-            /(hv - h[i]);
-          f[i] = (der(h[i])*hv - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))
-            *h[i])/(hv - h[i]);
-
-        elseif noEvent((h[i] > hv) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
-          // vapour - two phase
-
-          rs[i] = (hv - h[i])/(h[i + 1] - h[i]);
-          rhos[i] = rhov;
-          gamma_rho[i] = (rhos[i] - rho[i]*(1 - rs[i]) - rho[i + 1]*rs[i]);
-
-          gamma_w[i] = (ws[i] - w[i]*(1 - rs[i]) - w[i + 1]*rs[i]);
-          (w[i] - ws[i]) = dMmono[i];
-
-          dMmono[i] = A*rs[i]*l*(der(p)*1/2*(drv_dp + drdp[i]) + 1/6*(der(h[i])
-            *(2*drdh[i] + drv_dh) + (der(h[i])*(1 - rs[i]) + der(h[i + 1])*rs[
-            i])*(drdh[i] + 2*drv_dh)));
-
-          dMbif[i] = A*(1 - rs[i])*(der(p)*((b - a*c)*(h[i + 1] - hv)/((c + h[
-            i + 1])*(c + hv)) + a*log((c + h[i + 1])/(c + hv))) + ((d*f[i] -
-            d*c*ee[i])*(h[i + 1] - hv)/((c + h[i + 1])*(c + hv)) + d*ee[i]*
-            log((c + h[i + 1])/(c + hv))));
-
-          ee[i] = (der(h[i + 1]) - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i])))
-            /(h[i + 1] - hv);
-          f[i] = ((der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))*h[i + 1] -
-            der(h[i + 1])*hv)/(h[i + 1] - hv);
-
-        elseif noEvent((h[i] >= hl) and (h[i] <= hv) and (h[i + 1] >= hl)
-             and (h[i + 1] <= hv)) then
-          //two phase
-          rs[i] = 0;
-          rhos[i] = 0;
-          gamma_rho[i] = 0;
-
-          gamma_w[i] = 0;
-
-          ws[i] = 0;
-
-          dMmono[i] = 0;
-
-          dMbif[i] = A*l/(h[i + 1] - h[i])*(der(p)*((b - a*c)*(h[i + 1] - h[i])
-            /((c + h[i + 1])*(c + h[i])) + a*log((c + h[i + 1])/(c + h[i])))
-             + ((d*f[i] - d*c*ee[i])*(h[i + 1] - h[i])/((c + h[i + 1])*(c + h[
-            i])) + d*ee[i]*log((c + h[i + 1])/(c + h[i]))));
-
-          ee[i] = (der(h[i + 1]) - der(h[i]))/(h[i + 1] - h[i]);
-          f[i] = (der(h[i])*h[i + 1] - der(h[i + 1])*h[i])/(h[i + 1] - h[i]);
-
-        elseif noEvent(((h[i] < hl) and (h[i + 1] < hl)) or ((h[i] > hv) and 
-            (h[i + 1] > hv))) then
-
-          //single-phase
-          rs[i] = 0;
-          rhos[i] = 0;
-          gamma_rho[i] = 0;
-
-          gamma_w[i] = 0;
-          ws[i] = 0;
-
-          dMmono[i] = A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[i])
-            *(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i +
-            1])));
-          dMbif[i] = 0;
-
-          ee[i] = 0;
-          f[i] = 0;
-        else
           //double transition (not supported!)
           assert(0 > 1,
-            "Error: two phase trasitions between two adiacent nodes. Try increasing the number of nodes");
-          rs[i] = 0;
-          rhos[i] = 0;
-          gamma_rho[i] = 0;
+            "Error: two phase transitions between two adiacent nodes. Try increasing the number of nodes");
+        rs[i] = 0;
+        rhos[i] = 0;
+        gamma_rho[i] = 0;
 
-          gamma_w[i] = 0;
-          ws[i] = 0;
+        gamma_w[i] = 0;
+        ws[i] = 0;
 
-          dMmono[i] = 0;
-          dMbif[i] = 0;
+        dMmono[i] = 0;
+        dMbif[i] = 0;
 
-          ee[i] = 0;
-          f[i] = 0;
-        end if;
+        ee[i] = 0;
+        f[i] = 0;
       end if;
     end for;
 
@@ -2758,12 +2765,11 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Y[N, N - 1] = rho[N - 1]*(1 + 2*alpha_sgn) + rho[N]*(1 + alpha_sgn);
     if N > 2 then
       for i in 2:N - 1 loop
-        Y[i, i - 1] = rho[i - 1]*(1 + 2*alpha_sgn) + rho[i]*(1 + alpha_sgn);
-        Y[i, i] = rho[i - 1]*(1 + alpha_sgn) + rho[i]*6 + rho[i + 1]*(1 -
-          alpha_sgn);
-        Y[i, i + 1] = rho[i]*(1 - alpha_sgn) + rho[i + 1]*(1 - 2*alpha_sgn);
-        Y[1, i + 1] = 0;
-        Y[N, i - 1] = 0;
+        Y[i, i-1] = rho[i-1]*(1 + 2*alpha_sgn) + rho[i]*(1 + alpha_sgn);
+        Y[i, i] =   rho[i-1]*(1 +   alpha_sgn) + rho[i]*6 + rho[i+1]*(1 - alpha_sgn);
+        Y[i, i+1] = rho[i]*(1 - alpha_sgn) + rho[i+1]*(1 - 2*alpha_sgn);
+        Y[1, i+1] = 0;
+        Y[N, i-1] = 0;
         for j in 1:(i - 2) loop
           Y[i, j] = 0;
         end for;
@@ -2799,21 +2805,18 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end for;
     end if;
 
-    B[1, 1] = (-1/(3) + alpha_sgn/4)*w[1] + (-1/(6) + alpha_sgn/4)*w[2];
-    B[1, 2] = (1/(3) - alpha_sgn/4)*w[1] + (1/(6) - alpha_sgn/4)*w[2];
-    B[N, N] = (1/(6) + alpha_sgn/4)*w[N - 1] + (1/(3) + alpha_sgn/4)*w[N];
-    B[N, N - 1] = (-1/(6) - alpha_sgn/4)*w[N - 1] + (-1/(3) - alpha_sgn/4)*w[
-      N];
+    B[1, 1] =   (-1/3 + alpha_sgn/4)*w[1] +   (-1/6 + alpha_sgn/4)*w[2];
+    B[1, 2] =   ( 1/3 - alpha_sgn/4)*w[1] +   ( 1/6 - alpha_sgn/4)*w[2];
+    B[N, N] =   ( 1/6 + alpha_sgn/4)*w[N-1] + ( 1/3 + alpha_sgn/4)*w[N];
+    B[N, N-1] = (-1/6 - alpha_sgn/4)*w[N-1] + (-1/3 - alpha_sgn/4)*w[N];
     if N > 2 then
       for i in 2:N - 1 loop
-        B[i, i - 1] = (-1/(6) - alpha_sgn/4)*w[i - 1] + (-1/(3) - alpha_sgn/4)
-          *w[i];
-        B[i, i] = (1/(6) + alpha_sgn/4)*w[i - 1] + (alpha_sgn/2)*w[i] + (-1/(
-          6) + alpha_sgn/4)*w[i + 1];
-        B[i, i + 1] = (1/(3) - alpha_sgn/4)*w[i] + (1/(6) - alpha_sgn/4)*w[i
-           + 1];
-        B[1, i + 1] = 0;
-        B[N, i - 1] = 0;
+        B[i, i-1] = (-1/6 - alpha_sgn/4)*w[i-1] + (-1/3 - alpha_sgn/4)*w[i];
+        B[i, i] =   ( 1/6 + alpha_sgn/4)*w[i-1] + (alpha_sgn/2)*w[i] +
+                    (-1/6 + alpha_sgn/4)*w[i+1];
+        B[i, i+1] = ( 1/3 - alpha_sgn/4)*w[i] + (1/6 - alpha_sgn/4)*w[i+1];
+        B[1, i+1] = 0;
+        B[N, i-1] = 0;
         for j in 1:(i - 2) loop
           B[i, j] = 0;
         end for;
@@ -2847,9 +2850,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end for;
     end if;
 
-    K[1, 1] = if noEvent(infl.m_flow >= 0) then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0;
-    K[N, N] = if noEvent(outfl.m_flow >= 0) then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 
-            0;
+    K[1, 1] = if noEvent(infl.m_flow >= 0) then 
+                   (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0;
+    K[N, N] = if noEvent(outfl.m_flow >= 0) then 
+                  -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 0;
     K[N, 1] = 0;
     K[1, N] = 0;
     if (N > 2) then
@@ -2890,53 +2894,49 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     by[3, 1] = l/12*rs[1]*(6 - 8*rs[1] + 3*rs[1]^2 + alpha_sgn*(2*rs[1] - 3));
     by[4, 1] = -l/12*(1 - rs[1])^2*(2*alpha_sgn + 3*rs[1] - 3);
     by[5, 1] = -l/12*rs[1]^2*(2*alpha_sgn + 3*rs[1] - 4);
-    by[6, 1] = -l/12*(1 - rs[1])*(3*rs[1]^2 - 2*rs[1] + 2*alpha_sgn*rs[1] +
-      alpha_sgn - 1);
+    by[6, 1] = -l/12*(1 - rs[1])*
+                      (3*rs[1]^2 - 2*rs[1] + 2*alpha_sgn*rs[1] + alpha_sgn - 1);
     by[7, 1] = 0;
     by[8, 1] = 0;
     by[1, N] = l/12*rs[N - 1]^2*(2*alpha_sgn + 3*rs[N - 1]);
-    by[2, N] = l/12*(1 - rs[N - 1])*(1 + alpha_sgn + 2*rs[N - 1] + 2*
-      alpha_sgn*rs[N - 1] + 3*rs[N - 1]^2);
+    by[2, N] = l/12*(1 - rs[N-1])*
+               (1 + alpha_sgn + 2*rs[N-1] + 2*alpha_sgn*rs[N-1] + 3*rs[N-1]^2);
     by[3, N] = 0;
     by[4, N] = 0;
     by[5, N] = 0;
     by[6, N] = 0;
-    by[7, N] = l/12*rs[N - 1]*(alpha_sgn*(3 - 2*rs[N - 1]) + rs[N - 1]*(4 - 3
-      *rs[N - 1]));
+    by[7, N] = l/12*rs[N - 1]*
+               (alpha_sgn*(3 - 2*rs[N-1]) + rs[N-1]*(4 - 3*rs[N-1]));
     by[8, N] = l/12*(1 - rs[N - 1])^2*(2*alpha_sgn + 3*rs[N - 1] + 1);
     if N > 2 then
       for i in 2:N - 1 loop
-        by[1, i] = l/12*rs[i - 1]^2*(2*alpha_sgn + 3*rs[i - 1]);
-        by[2, i] = l/12*(1 - rs[i - 1])*(1 + alpha_sgn + 2*rs[i - 1] + 2*
-          alpha_sgn*rs[i - 1] + 3*rs[i - 1]^2);
-
-        by[3, i] = l/12*rs[i]*(6 - 8*rs[i] + 3*rs[i]^2 + alpha_sgn*(2*rs[i]
-           - 3));
+        by[1, i] = l/12*rs[i-1]^2*(2*alpha_sgn + 3*rs[i-1]);
+        by[2, i] = l/12*(1 - rs[i-1])*
+                   (1 + alpha_sgn + 2*rs[i-1] + 2*alpha_sgn*rs[i-1] + 3*rs[i-1]^2);
+        by[3, i] = l/12*rs[i]*(6 - 8*rs[i] + 3*rs[i]^2 + alpha_sgn*(2*rs[i] - 3));
         by[4, i] = -l/12*(1 - rs[i])^2*(2*alpha_sgn + 3*rs[i] - 3);
-
         by[5, i] = -l/12*rs[i]^2*(2*alpha_sgn + 3*rs[i] - 4);
-        by[6, i] = -l/12*(1 - rs[i])*(3*rs[i]^2 - 2*rs[i] + 2*alpha_sgn*rs[i]
-           + alpha_sgn - 1);
-        by[7, i] = l/12*rs[i - 1]*(alpha_sgn*(3 - 2*rs[i - 1]) + rs[i - 1]*(4
-           - 3*rs[i - 1]));
-        by[8, i] = l/12*(1 - rs[i - 1])^2*(2*alpha_sgn + 3*rs[i - 1] + 1);
+        by[6, i] = -l/12*(1 - rs[i])*
+                   (3*rs[i]^2 - 2*rs[i] + 2*alpha_sgn*rs[i] + alpha_sgn - 1);
+        by[7, i] = l/12*rs[i - 1]*
+                   (alpha_sgn*(3 - 2*rs[i - 1]) + rs[i - 1]*(4 - 3*rs[i - 1]));
+        by[8, i] = l/12*(1 - rs[i-1])^2*(2*alpha_sgn + 3*rs[i-1] + 1);
       end for;
     end if;
 
     //additional 2 phases Y-matrix
-    Y2ph[1, 1] = (gamma_rho[1]*by[3, 1] + gamma_rho[1]*by[4, 1]);
-    Y2ph[1, 2] = (gamma_rho[1]*by[5, 1] + gamma_rho[1]*by[6, 1]);
-    Y2ph[N, N] = (gamma_rho[N - 1]*by[1, N] + gamma_rho[N - 1]*by[2, N]);
-    Y2ph[N, N - 1] = (gamma_rho[N - 1]*by[7, N] + gamma_rho[N - 1]*by[8, N]);
+    Y2ph[1, 1] =   (gamma_rho[1]*by[3, 1]   + gamma_rho[1]*by[4, 1]);
+    Y2ph[1, 2] =   (gamma_rho[1]*by[5, 1]   + gamma_rho[1]*by[6, 1]);
+    Y2ph[N, N] =   (gamma_rho[N-1]*by[1, N] + gamma_rho[N-1]*by[2, N]);
+    Y2ph[N, N-1] = (gamma_rho[N-1]*by[7, N] + gamma_rho[N-1]*by[8, N]);
     if N > 2 then
       for i in 2:N - 1 loop
-        Y2ph[i, i - 1] = (gamma_rho[i - 1]*by[7, i] + gamma_rho[i - 1]*by[8,
-          i]);
-        Y2ph[i, i] = (gamma_rho[i - 1]*by[1, i] + gamma_rho[i - 1]*by[2, i])
-           + (gamma_rho[i]*by[3, i] + gamma_rho[i]*by[4, i]);
-        Y2ph[i, i + 1] = (gamma_rho[i]*by[5, i] + gamma_rho[i]*by[6, i]);
-        Y2ph[1, i + 1] = 0;
-        Y2ph[N, i - 1] = 0;
+        Y2ph[i, i-1] = (gamma_rho[i-1]*by[7, i] + gamma_rho[i-1]*by[8, i]);
+        Y2ph[i, i] =   (gamma_rho[i-1]*by[1, i] + gamma_rho[i-1]*by[2, i]) +
+                       (gamma_rho[i]  *by[3, i] + gamma_rho[i]  *by[4, i]);
+        Y2ph[i, i+1] = (gamma_rho[i]  *by[5, i] + gamma_rho[i]  *by[6, i]);
+        Y2ph[1, i+1] = 0;
+        Y2ph[N, i-1] = 0;
         for j in 1:(i - 2) loop
           Y2ph[i, j] = 0;
         end for;
@@ -2949,14 +2949,14 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     //computation of beta functions for additional matrices
     beta[1, 1] = 0;
     beta[2, 1] = 0;
-    beta[3, 1] = 1/12*rs[1]*(3*alpha_sgn + 4*rs[1] - 6);
+    beta[3, 1] = 1/12*rs[1]      *(3*alpha_sgn + 4*rs[1] - 6);
     beta[4, 1] = 1/12*(1 - rs[1])*(3*alpha_sgn + 4*rs[1] - 4);
     beta[5, 1] = -beta[3, 1];
     beta[6, 1] = -beta[4, 1];
     beta[7, 1] = 0;
     beta[8, 1] = 0;
-    beta[1, N] = 1/12*rs[N - 1]*(3*alpha_sgn + 4*rs[N - 1]);
-    beta[2, N] = 1/12*(1 - rs[N - 1])*(3*alpha_sgn + 4*rs[N - 1] + 2);
+    beta[1, N] = 1/12*rs[N - 1]*      (3*alpha_sgn + 4*rs[N-1]);
+    beta[2, N] = 1/12*(1 - rs[N - 1])*(3*alpha_sgn + 4*rs[N-1] + 2);
     beta[3, N] = 0;
     beta[4, N] = 0;
     beta[5, N] = 0;
@@ -2965,10 +2965,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     beta[8, N] = -beta[2, N];
     if N > 2 then
       for i in 2:N - 1 loop
-        beta[1, i] = 1/12*rs[i - 1]*(3*alpha_sgn + 4*rs[i - 1]);
-        beta[2, i] = 1/12*(1 - rs[i - 1])*(3*alpha_sgn + 4*rs[i - 1] + 2);
-        beta[3, i] = 1/12*rs[i]*(3*alpha_sgn + 4*rs[i] - 6);
-        beta[4, i] = 1/12*(1 - rs[i])*(3*alpha_sgn + 4*rs[i] - 4);
+        beta[1, i] = 1/12*rs[i-1]      *(3*alpha_sgn + 4*rs[i-1]);
+        beta[2, i] = 1/12*(1 - rs[i-1])*(3*alpha_sgn + 4*rs[i-1] + 2);
+        beta[3, i] = 1/12*rs[i]        *(3*alpha_sgn + 4*rs[i] - 6);
+        beta[4, i] = 1/12*(1 - rs[i])  *(3*alpha_sgn + 4*rs[i] - 4);
         beta[5, i] = -beta[3, i];
         beta[6, i] = -beta[4, i];
         beta[7, i] = -beta[1, i];
@@ -2977,19 +2977,18 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     //additional 2 phases B-matrix
-    B2ph[1, 1] = (gamma_w[1]*beta[3, 1] + gamma_w[1]*beta[4, 1]);
-    B2ph[1, 2] = (gamma_w[1]*beta[5, 1] + gamma_w[1]*beta[6, 1]);
-    B2ph[N, N] = (gamma_w[N - 1]*beta[1, N] + gamma_w[N - 1]*beta[2, N]);
-    B2ph[N, N - 1] = (gamma_w[N - 1]*beta[7, N] + gamma_w[N - 1]*beta[8, N]);
+    B2ph[1, 1] =   (gamma_w[1]  *beta[3, 1] + gamma_w[1]  *beta[4, 1]);
+    B2ph[1, 2] =   (gamma_w[1]  *beta[5, 1] + gamma_w[1]  *beta[6, 1]);
+    B2ph[N, N] =   (gamma_w[N-1]*beta[1, N] + gamma_w[N-1]*beta[2, N]);
+    B2ph[N, N-1] = (gamma_w[N-1]*beta[7, N] + gamma_w[N-1]*beta[8, N]);
     if N > 2 then
       for i in 2:N - 1 loop
-        B2ph[i, i - 1] = (gamma_w[i - 1]*beta[7, i] + gamma_w[i - 1]*beta[8,
-          i]);
-        B2ph[i, i] = (gamma_w[i - 1]*beta[1, i] + gamma_w[i - 1]*beta[2, i])
-           + (gamma_w[i]*beta[3, i] + gamma_w[i]*beta[4, i]);
-        B2ph[i, i + 1] = (gamma_w[i]*beta[5, i] + gamma_w[i]*beta[6, i]);
-        B2ph[1, i + 1] = 0;
-        B2ph[N, i - 1] = 0;
+        B2ph[i, i-1] = (gamma_w[i-1]*beta[7, i] + gamma_w[i-1]*beta[8, i]);
+        B2ph[i, i] =   (gamma_w[i-1]*beta[1, i] + gamma_w[i-1]*beta[2, i]) +
+                       (gamma_w[i]  *beta[3, i] + gamma_w[i]  *beta[4, i]);
+        B2ph[i, i+1] = (gamma_w[i]  *beta[5, i] + gamma_w[i]*beta[6, i]);
+        B2ph[1, i+1] = 0;
+        B2ph[N, i-1] = 0;
         for j in 1:(i - 2) loop
           B2ph[i, j] = 0;
         end for;
