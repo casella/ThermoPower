@@ -6043,6 +6043,7 @@ Algorithm Tolerance = 1e-7
       redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=1000) 
               annotation (Placement(transformation(extent={{-30,-50},{-10,-30}},
               rotation=0)));
@@ -6135,7 +6136,7 @@ Algorithm Tolerance = 1e-7
           width=0.59,
           height=0.55),
         Diagram(coordinateSystem(
-            preserveAspectRatio=false,
+            preserveAspectRatio=true,
             extent={{-100,-100},{100,100}},
             grid={2,2}), graphics),
         experiment(StopTime=100, Tolerance=1e-008),
