@@ -702,7 +702,7 @@ package ThermoPower "Open library for thermal power plant simulation"
     algorithm
       y := x/sqrt(sqrt(x*x+delta*delta));
 
-      annotation(derivative(zeroDerivative=delta)=Functions.sqrtReg_der,
+      annotation(derivative(zeroDerivative=delta)=ThermoPower.Functions.sqrtReg_der,
         Documentation(info="<html>
 This function approximates sqrt(x)*sign(x), such that the derivative is finite and smooth in x=0. 
 </p>
