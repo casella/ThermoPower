@@ -7695,7 +7695,7 @@ This models tests the Valve model in different operating conditions. The valve f
           points={{-70,-50},{-50,-50}},
           color={159,159,223},
           thickness=0.5));
-      annotation (experiment(StopTime=10)),
+      annotation (experiment(StopTime=10),
         Documentation(info="<html>
 This model tests the <tt>Valve</tt> model, in each possible configuration, i.e. with all the <tt>CvData</tt> options except <tt>OpPoint</tt>, as well as <tt>CheckValve</tt>.
 
