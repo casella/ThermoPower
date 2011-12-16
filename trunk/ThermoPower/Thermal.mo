@@ -319,7 +319,7 @@ This model computes the thermal and mechanical properties of a generic material.
       end TestMaterial;
     end Test;
 
-    annotation (uses(Modelica(version="2.2")), Documentation(revisions="<html>
+    annotation (Documentation(revisions="<html>
 <ul>
 <li><i>8 June 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -1037,10 +1037,7 @@ This package contains models to compute the material properties needed to model 
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),
-      DymolaStoredErrors,
-      Diagram(graphics),
-      uses(Modelica(version="3.1")));
+</html>"));
   end ConvHT2N_htc;
 
   model CounterCurrent
@@ -1555,9 +1552,7 @@ initial equation
   else
     assert(false, "Unsupported initialisation option");
   end if;
-  annotation (uses(                         ThermoPower(version="2"), Modelica(
-          version="2.2")),                                             Diagram(graphics),
-    Icon(graphics={
+  annotation (Icon(graphics={
           Text(
             extent={{-94,52},{-42,24}},
             lineColor={0,0,0},

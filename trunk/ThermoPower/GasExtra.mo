@@ -62,9 +62,7 @@ package GasExtra
     PressRatio_low.u1 = beta;
     PressRatio_low.u2 = N_T;
     PR_low = PressRatio_low.y;
-    annotation (uses(                         ThermoPower(version="2"), Modelica(
-            version="2.2")),                   Diagram(graphics),
-      Documentation(info="<html>
+    annotation (Documentation(info="<html>
 This model adds the performance characteristics to the Compressor_Base model, at low speed.</p>
 <p>In the low speed region, it is not possible to use the standard definitio of efficiency <tt>eta</tt>, because efficiency becomes negative and/or singular. The referred speed <tt>N_T</tt> and beta lines <tt>beta</tt> are still employed, but the flow number, the pressure ratio and the efficiency are replaced with <tt>phic_low</tt>, <tt>PR_low</tt> and <tt>eta_low</tt> respectively [2].</p>
 <p>The performance maps are thus tabulated into three differents tables, <tt>tablePhic_low</tt>,  <tt>tablePR_low</tt> and <tt>tableEta_low</tt>, which express <tt>phic_low</tt>, <tt>PR_low</tt> and <tt>eta_low</tt> as a function of <tt>N_T</tt> and <tt>beta</tt>, respectively, where <tt>N_T</tt> is the first row while <tt>beta</tt> is the first column. The referred speed <tt>N_T</tt> is defined as a percentage of the design referred speed and <tt>beta</tt> are arbitrary lines, drawn parallel to the surge-line on the performance maps.
@@ -162,9 +160,7 @@ This model adds the performance characteristics to the Turbine_Base model at low
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),   uses(                         ThermoPower(version="2"), Modelica(
-            version="2.2")),
-      Diagram(graphics));
+</html>"));
   end Turbine_low;
 
   model Compressor_M "Gas compressor"
@@ -221,9 +217,7 @@ This model adds the performance characteristics to the Turbine_Base model at low
     PressRatio.u1 = beta;
     PressRatio.u2 = N_T;
     PressRatio.y = PR;
-    annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")),
-                                               Diagram(graphics),
-      Documentation(info="<html>
+    annotation (Documentation(info="<html>
 This model adds the performance characteristics to the Compressor_Base model, by means of 2D interpolation tables.</p>
 <p>Theoretically speaking, the perfomance characteristics are specified by two characteristic equations: the first relates the flow number <tt>phic</tt>, the pressure ratio <tt>PR</tt> and the referred speed <tt>N_T</tt>; the second relates the efficiency <tt>eta</tt>, the flow number <tt>phic</tt>, and the referred speed <tt>N_T</tt> [1]. In order to avoid singularities at low speed, one possible solution is the use of the corrected torque <tt>torque</tt> instead of the efficiency <tt>eta</tt> [2]. To avoid singularities, the two characteristic equations are expressed in parametric form by adding a further variable <tt>beta</tt> (method of beta lines [3]). 
 <p>The performance maps are thus tabulated into three differents tables, <tt>tablePhic</tt>,  <tt>tablePR</tt> and <tt>tableM</tt>, which express <tt>phic</tt>, <tt>PR</tt> and <tt>torque</tt> as a function of <tt>N_T</tt> and <tt>beta</tt>, respectively, where <tt>N_T</tt> is the first row while <tt>beta</tt> is the first column. The referred speed <tt>N_T</tt> is defined as a percentage of the design referred speed and <tt>beta</tt> are arbitrary lines, drawn parallel to the surge-line on the performance maps.
@@ -302,7 +296,6 @@ This model adds the performance characteristics to the Compressor_Base model, by
               {-60,22},{-60,7.6},{-40.8,7.6}}, color={159,159,223}));
       connect(GTunit1.FlueGas_out, SinkP1.flange) annotation (Line(points={{
               16.8,7.6},{40.4,7.6},{40.4,12},{66,12}}, color={159,159,223}));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics));
     end GTprova_ISO;
 
     model TestGT
@@ -419,8 +412,7 @@ double tabHI(12,4)   # table for HI_iso=h(ZLPout_iso,Tsync)
       Inertia.phi = 0;
       der(Inertia.w) = 0;
 
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics),
-        experiment(StopTime=2),
+      annotation (experiment(StopTime=2),
         Documentation(info="<html>
 This model tests a simple power plant based on a <tt>GTunit</tt>.
 <p>Simulate for 2 s. The plant starts at steady states, and produces approximately 5 MW of power. At time t=1 the breaker opens, and the GT unit starts accelerating, with a time constant of 10 seconds.
@@ -520,7 +512,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
               {{-32,30},{-28,30},{-28,32},{-22,32}}, color={159,159,223}));
       connect(PressDrop3.outlet, Turbine_low1.inlet) annotation (Line(points={{
               -2,32},{4,32},{4,30},{8.2,30}}, color={159,159,223}));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics));
     end Test_low;
 
     model Test_low1
@@ -624,7 +615,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         annotation (Line(points={{-60,2},{-60,-4}}, color={0,0,0}));
     initial equation
     Inertia1.w=5;
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics));
     end Test_low1;
 
     model GTprova
@@ -675,7 +665,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
               {-60,22},{-60,7.6},{-40.8,7.6}}, color={159,159,223}));
       connect(GTunit1.FlueGas_out, SinkP1.flange) annotation (Line(points={{
               16.8,7.6},{40.4,7.6},{40.4,12},{66,12}}, color={159,159,223}));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics));
     end GTprova;
 
     model TestCompressorInertia_ESTR
@@ -746,8 +735,7 @@ public */
               {-6,22},{4,22},{4,36},{16,36}}, color={159,159,223}));
       connect(PressDropLin1.outlet, SinkP1.flange) annotation (Line(points={{36,
               36},{62,36}}, color={159,159,223}));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.1")), Diagram(graphics),
-        experiment(StopTime=2),
+      annotation (experiment(StopTime=2),
         experimentSetupOutput,
         Documentation(info="<html>
 This model test the <tt>Compressor</tt> model with an inertial load. Boundary conditions and data refer to an turbojet engine at 11.000 m.
@@ -814,7 +802,6 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
               16},{34,16}}, color={159,159,223}));
       connect(GTunit1.Air_in, SourceP1.flange) annotation (Line(points={{-35.7,
               16},{-80,16}}, color={159,159,223}));
-     annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics));
     end GTprova_ISO11;
 
     model TestCompressor
@@ -856,8 +843,7 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
             points={{-7.6,13.9},{-7.6,13.95},{12,13.95},{12,14}}, color={0,0,0}));
       connect(Compressor.outlet, SinkP1.flange) annotation (Line(points={{-6,22},
               {-6,31},{10,31},{10,40}}, color={159,159,223}));
-    annotation (uses(ThermoPower(version="2"), Modelica(version="2.1")), Diagram(graphics),
-        experiment(StopTime=2),
+    annotation (experiment(StopTime=2),
         experimentSetupOutput,
         Documentation(info="<html>
 This model test the <tt>Compressor</tt> model with an inertial load. Boundary conditions and data refer to an turbojet engine at 11.000 m.
