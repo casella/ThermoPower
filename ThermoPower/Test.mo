@@ -2287,7 +2287,6 @@ Algorithm Tolerance = 1e-6
       connect(TorqueLoad.y, Load.tau) annotation (Line(points={{81,30},{94,30},
               {94,0},{82,0}}, color={0,0,127}));
       annotation (Diagram(graphics),
-                           uses(Modelica(version="1.6")),
         experiment(
           StopTime=5,
           fixedstepsize=1e-005,
@@ -2403,7 +2402,6 @@ Algorithm Tolerance = 1e-4
       connect(Constant1.y, Speed1.w_ref) annotation (Line(points={{81,30},{90,
               30},{90,0},{82,0}}, color={0,0,127}));
       annotation (Diagram(graphics),
-                           uses(Modelica(version="1.6")),
         experiment(
           StopTime=10,
           fixedstepsize=1e-005,
@@ -5676,8 +5674,7 @@ Algorithm Tolerance = 1e-7
     First release.</li>
 </ul>
 </HTML>"),
-        experimentSetupOutput(equdistant=false),
-        uses(Modelica(version="1.6")));
+        experimentSetupOutput(equdistant=false));
     end TestFlow1D2phDB_hf;
 
     model TestFlow1D2phChen "Test case for Flow1D2phChen"
@@ -6001,8 +5998,7 @@ Algorithm Tolerance = 1e-7
     First release.</li>
 </ul>
 </HTML>"),
-        experimentSetupOutput(equdistant=false),
-        uses(Modelica(version="1.6")));
+        experimentSetupOutput(equdistant=false));
     end TestFlow1D2phChen_hf;
 
     model TestFlow1Dfem2ph "Test case for Flow1D2ph"
@@ -7040,7 +7036,6 @@ This model tests the <tt>Plenum</tt> model.
       annotation (
         Icon(graphics),
         Diagram(graphics),
-        uses(Modelica(version="2.1")),
         Documentation(info="<html>
 This model tests the <tt>Header</tt> model.
 
@@ -7237,8 +7232,7 @@ Simulate for 20 s. At time t=1 the first inlet flow rate is reduced. At time t=8
           thickness=0.5));
       connect(Constant1.y, ValveLin1.cmd) annotation (Line(points={{43,38},{64,
               38},{64,7}}, color={0,0,127}));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics),
-        Documentation(info="<html>
+      annotation (Documentation(info="<html>
 This model tests the <tt>CombustionChamber</tt> model. The model start at steady state. At time t = 0.5, the fuel flow rate is reduced by 10%.
 
 <p>Simulate for 5s. 
@@ -7385,7 +7379,6 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
       connect(Sine2.y, SourceP2.in_p)    annotation (Line(points={{-75,-22},{
               -66,-22},{-66,-43.6}}, color={0,0,127}));
      annotation (Diagram(graphics),
-                          uses(Modelica(version="2.1")),
         Documentation(info="<html>
 This model tests the <tt>PressDrop</tt>, <tt>PressDropLin</tt> and <tt>Valve</tt> models, testing various conditions, such as different friction coefficients in <tt>PressDrop</tt> and different flow coefficients in <tt>Valve</tt>, by setting the <tt>FFtype</tt> and <tt>CvData</tt> respectively on different value. Reverse flow conditions are also tested.
 <p>Simulate for 10 seconds. At time t=2 the valve is partially closed.
@@ -7702,13 +7695,7 @@ This models tests the Valve model in different operating conditions. The valve f
           points={{-70,-50},{-50,-50}},
           color={159,159,223},
           thickness=0.5));
-      annotation (Diagram(graphics),
-        experiment(StopTime=10),
-        experimentSetupOutput,
-        uses(
-          ThermoPower(version="2"),
-          Modelica(version="2.1",
-          Media(         version="0.900"))),
+      annotation (experiment(StopTime=10)),
         Documentation(info="<html>
 This model tests the <tt>Valve</tt> model, in each possible configuration, i.e. with all the <tt>CvData</tt> options except <tt>OpPoint</tt>, as well as <tt>CheckValve</tt>.
 
@@ -7784,8 +7771,7 @@ This model tests the <tt>Valve</tt> model, in each possible configuration, i.e. 
           points={{-30,0},{-30,0},{-26,-0.2},{-12,0}},
           color={0,0,0},
           thickness=0.5));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.1")), Diagram(graphics),
-        experiment(StopTime=2),
+      annotation (experiment(StopTime=2),
         experimentSetupOutput,
         Documentation(info="<html>
 This model test the <tt>Compressor</tt> model at constant speed.
@@ -7866,8 +7852,7 @@ This model test the <tt>Compressor</tt> model at constant speed.
           points={{-8,0},{-8,-0.05},{10,-0.05},{10,0}},
           color={0,0,0},
           thickness=0.5));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.1")), Diagram(graphics),
-        experiment(StopTime=2),
+      annotation (experiment(StopTime=2),
         experimentSetupOutput,
         Documentation(info="<html>
 This model test the <tt>Compressor</tt> model with an inertial load. Boundary conditions and data refer to an turbojet engine at 11.000 m.
@@ -7936,8 +7921,7 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
           points={{-8,0},{-4,0},{-4,0},{10,0}},
           color={0,0,0},
           thickness=0.5));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.1")), Diagram(graphics),
-        experiment(StopTime=10),
+      annotation (experiment(StopTime=10),
         experimentSetupOutput,
         Documentation(info="<html>
 This model test the Turbine model with an inertial load. Boundary conditions and data refer to an turbojet engine at 11.000 m. 
@@ -8191,8 +8175,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
     equation
       connect(Step1.y, SourceW1.in_w0) annotation (Line(points={{-39,60},{-16,
               60},{-16,49}}, color={0,0,127}));
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.1")), Diagram(graphics),
-        Documentation(info="<html>
+      annotation (Documentation(info="<html>
 This is the full model of a turbojet-type engine at 11.000m [1].
 
 <p>Simulate the model for 20s. At time t = 1 the fuel flow rate is reduced by 10%; the engine slows down accordingly.
@@ -8362,8 +8345,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
           points={{-78,-20},{-62,-20},{-62,-20}},
           color={0,0,0},
           thickness=0.5));
-     annotation (uses(ThermoPower(version="2"), Modelica(version="2.1")), Diagram(graphics),
-        experiment(StopTime=5),
+     annotation (experiment(StopTime=5),
         Documentation(info="<html>
 This is a simplified model of a turbojet-type engine at 11.000m [1], at costant speed. 
 <p>Simulate the model for 20s. At time t = 1 the fuel flow rate is reduced by 10%; the engine slows down accordingly.  
@@ -8456,8 +8438,7 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
           thickness=0.5));
       connect(Step1.y, SourceW1.in_w0) annotation (Line(points={{-49,60},{-36,
               60},{-36,39}}, color={0,0,127}));
-     annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics),
-        experiment(StopTime=2),
+     annotation (experiment(StopTime=2),
         Documentation(info="<html>
 This model tests <tt>GTunit_ISO</tt>.
 
@@ -8601,8 +8582,7 @@ This model tests <tt>GTunit_ISO</tt>.
       Inertia.phi = 0;
       der(Inertia.w) = 0;
 
-      annotation (uses(ThermoPower(version="2"), Modelica(version="2.2")), Diagram(graphics),
-        experiment(StopTime=2),
+      annotation (experiment(StopTime=2),
         Documentation(info="<html>
 This model tests a simple power plant based on a <tt>GTunit</tt>.
 
@@ -9241,7 +9221,5 @@ Algorithm Tolerance = 1e-6
 
   annotation (Documentation(info="<HTML>
 This package contains test cases for the ThermoPower library.
-</HTML>"),    uses(ThermoPower(version="2"), Modelica(version="2.2"),
-      UserInteraction(version="0.52")),                                version=
-        "1");
+</HTML>"));
 end Test;

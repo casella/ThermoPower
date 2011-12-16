@@ -19100,8 +19100,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
        First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false),
-        uses(ThermoPower(version="2.1"), Modelica(version="3.1")));
+        experimentSetupOutput(equdistant=false));
     end SteamPlant_Sim1_dp;
     annotation (Documentation(revisions="<html>
 <ul>
@@ -19111,7 +19110,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 </ul>
 </html>"));
   end Simulators;
-annotation (uses(ThermoPower(version="2"), Modelica(version="3.0-development")),
-      Documentation(revisions="<html>
+annotation (Documentation(revisions="<html>
 </html>"));
 end PowerPlants;

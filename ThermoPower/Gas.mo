@@ -182,10 +182,7 @@ package Gas "Models of components with ideal gases as working fluid"
     flange.h_outflow = gas.h;
     flange.Xi_outflow = gas.Xi;
 
-    annotation (uses(Modelica(version="1.6")), Icon(graphics),
-      DymolaStoredErrors,
-      Diagram(graphics),
-      Documentation(info="<html>
+    annotation (Documentation(info="<html>
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>, whose default value is <tt>Medium.reference_X</tt> .
 <p>If <tt>R</tt> is set to zero, the pressure sink is ideal; otherwise, the inlet pressure increases proportionally to the outgoing flowrate.</p>
@@ -266,9 +263,7 @@ package Gas "Models of components with ideal gases as working fluid"
     flange.h_outflow = gas.h;
     flange.Xi_outflow = gas.Xi;
 
-    annotation (Icon(graphics),
-                      uses(Modelica(version="1.6")),
-      Documentation(info="<html>
+    annotation (Documentation(info="<html>
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>,whose default value is <tt>Medium.reference_X</tt> .
 <p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the outgoing flowrate decreases proportionally to the outlet pressure.</p>
@@ -406,9 +401,7 @@ package Gas "Models of components with ideal gases as working fluid"
     inlet.Xi_outflow = inStream(outlet.Xi_outflow);
     inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
 
-    annotation (Icon(graphics),
-                      uses(Modelica(version="1.6")),
-      Documentation(info="<html>
+    annotation (Documentation(info="<html>
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>,whose default value is <tt>Medium.reference_X</tt> .
 <p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the outgoing flowrate decreases proportionally to the outlet pressure.</p>
@@ -2017,9 +2010,7 @@ package Gas "Models of components with ideal gases as working fluid"
       assert(false, "Unsupported initialisation option");
     end if;
 
-    annotation (Icon(graphics),
-                      uses(ThermoPower(version="2"), Modelica(version="2.1")),
-      Documentation(info="<html>
+    annotation (Documentation(info="<html>
 This is the model-base of a Combustion Chamber, with a constant volume. 
 <p>The metal wall temperature and the heat transfer coefficient between the wall and the fluid are uniform. The wall is thermally insulated from the outside. It has been assumed that inlet gases are premixed before entering in the volume.
 <p><b>Modelling options</b></p>
@@ -2214,8 +2205,7 @@ This model extends the CombustionChamber Base model, with the definition of the 
             extent={{-128,-60},{128,-100}},
             lineColor={0,0,255},
             textString=
-                 "%name")}),
-      uses(ThermoPower(version="2"), Modelica(version="2.2")));
+                 "%name")}));
   end CompressorBase;
 
   model Compressor "Gas compressor"
@@ -2269,8 +2259,7 @@ This model extends the CombustionChamber Base model, with the definition of the 
     PressRatio.u1=beta;
     PressRatio.u2=N_T;
     PR=PressRatio.y;
-    annotation (uses(Modelica(version="2.1")), Diagram(graphics),
-      Documentation(info="<html>
+    annotation (Documentation(info="<html>
 This model adds the performance characteristics to the Compressor_Base model, by means of 2D interpolation tables.</p>
 <p>The perfomance characteristics are specified by two characteristic equations: the first relates the flow number <tt>phic</tt>, the pressure ratio <tt>PR</tt> and the referred speed <tt>N_T</tt>; the second relates the efficiency <tt>eta</tt>, the flow number <tt>phic</tt>, and the referred speed <tt>N_T</tt> [1]. To avoid singularities, the two characteristic equations are expressed in parametric form by adding a further variable <tt>beta</tt> (method of beta lines [2]). 
 <p>The performance maps are thus tabulated into three differents tables, <tt>tablePhic</tt>,  <tt>tablePR</tt> and <tt>tableEta</tt>, which express <tt>phic</tt>, <tt>PR</tt> and <tt>eta</tt> as a function of <tt>N_T</tt> and <tt>beta</tt>, respectively, where <tt>N_T</tt> is the first row while <tt>beta</tt> is the first column. The referred speed <tt>N_T</tt> is defined as a percentage of the design referred speed and <tt>beta</tt> are arbitrary lines, usually drawn parallel to the surge-line on the performance maps.
@@ -2503,7 +2492,7 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),   uses(Modelica(version="2.1")),
+</html>"),  
       Diagram(graphics));
   end Turbine;
 
@@ -2581,7 +2570,7 @@ This model extends the Turbine_Base model with the calculation of the performanc
        Turbine model restructured using inheritance.<br>
        First release.</li>
 </ul>
-</html>"),   uses(Modelica(version="2.1")),
+</html>"),
       Diagram(graphics),
       Icon(graphics));
   end TurbineStodola;
@@ -3159,5 +3148,5 @@ This package contains models of physical processes and components using ideal ga
 <li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
 </ul>
 The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
-</HTML>"),    uses(Modelica(version="2.1")));
+</HTML>"));
 end Gas;

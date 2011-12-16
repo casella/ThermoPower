@@ -4871,8 +4871,7 @@ Input variables changed. This function now computes the heat transfer coefficien
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Small changes in alias variables.</li>
 </ul>
-</html>"),
-      uses(ThermoPower(version="2"), Modelica(version="2.2")));
+</html>"));
   end SteamTurbineBase;
 
   model SteamTurbineStodola "Steam turbine"
@@ -4899,8 +4898,7 @@ Input variables changed. This function now computes the heat transfer coefficien
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),
-      uses(ThermoPower(version="2"), Modelica(version="2.2")));
+</html>"));
   end SteamTurbineStodola;
 
   model SteamTurbineUnit "Turbine for steam flows"
