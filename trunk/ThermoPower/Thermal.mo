@@ -1450,7 +1450,8 @@ model CylinderFourier
   replaceable model MaterialModel = MaterialProperties.Metals.StandardSteel constrainedby
       MaterialProperties.Interfaces.PartialMaterial "Metal model";
   parameter Integer Nr=2 "Number of radial nodes";
-  parameter NodeDistribution nodeDistribution "Node distribution";
+  parameter NodeDistribution nodeDistribution = ThermoPower.Choices.CylinderFourier.NodeDistribution.uniform
+      "Node distribution";
   parameter Length rint "Internal radius";
   parameter Length rext "External radius";
   parameter Temperature Tstartint=300
