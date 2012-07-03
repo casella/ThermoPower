@@ -65,42 +65,42 @@ package Thermal "Thermal models of heat transfer"
         constant Integer npol=2 "degree of polynomial used for fitting";
       protected
         final constant ModulusOfElasticity poly_youngModulus[:]=
-                                             if size(tableYoungModulus,1)>1 then 
-                                               Poly.fitting(tableYoungModulus[:,1],tableYoungModulus[:,2],npol) else 
-                                             if size(tableYoungModulus,1)==1 then 
-                                               array(0,0,tableYoungModulus[1,2]) else 
+                                             if size(tableYoungModulus,1)>1 then
+                                               Poly.fitting(tableYoungModulus[:,1],tableYoungModulus[:,2],npol) else
+                                             if size(tableYoungModulus,1)==1 then
+                                               array(0,0,tableYoungModulus[1,2]) else
                                              zeros(npol+1)   annotation (
             keepConstant =                                                              true);
         final constant Real poly_yieldStress[:]=
-                                             if size(tableYieldStress,1)>1 then 
-                                               Poly.fitting(tableYieldStress[:,1],tableYieldStress[:,2],npol) else 
-                                             if size(tableYieldStress,1)==1 then 
-                                               array(0,0,tableYieldStress[1,2]) else 
+                                             if size(tableYieldStress,1)>1 then
+                                               Poly.fitting(tableYieldStress[:,1],tableYieldStress[:,2],npol) else
+                                             if size(tableYieldStress,1)==1 then
+                                               array(0,0,tableYieldStress[1,2]) else
                                              zeros(npol+1)   annotation (
             keepConstant =                                                              true);
         final constant Real poly_ultimateStress[:]=
-                                             if size(tableUltimateStress,1)>1 then 
-                                               Poly.fitting(tableUltimateStress[:,1],tableUltimateStress[:,2],npol) else 
-                                             if size(tableUltimateStress,1)==1 then 
-                                               array(0,0,tableUltimateStress[1,2]) else 
+                                             if size(tableUltimateStress,1)>1 then
+                                               Poly.fitting(tableUltimateStress[:,1],tableUltimateStress[:,2],npol) else
+                                             if size(tableUltimateStress,1)==1 then
+                                               array(0,0,tableUltimateStress[1,2]) else
                                              zeros(npol+1)   annotation (
             keepConstant =                                                              true);
-        final constant Real poly_cp[:] =     if size(tableSpecificHeatCapacity,1)>1 then 
-                                               Poly.fitting(tableSpecificHeatCapacity[:,1],tableSpecificHeatCapacity[:,2],npol) else 
-                                             if size(tableSpecificHeatCapacity,1)==1 then 
-                                               array(0,0,tableSpecificHeatCapacity[1,2]) else 
+        final constant Real poly_cp[:] =     if size(tableSpecificHeatCapacity,1)>1 then
+                                               Poly.fitting(tableSpecificHeatCapacity[:,1],tableSpecificHeatCapacity[:,2],npol) else
+                                             if size(tableSpecificHeatCapacity,1)==1 then
+                                               array(0,0,tableSpecificHeatCapacity[1,2]) else
                                              zeros(npol+1)   annotation (
             keepConstant =                                                              true);
-        final constant Real poly_alfa[:] =   if size(tableLinearExpansionCoefficient,1)>1 then 
-                                               Poly.fitting(tableLinearExpansionCoefficient[:,1],tableLinearExpansionCoefficient[:,2],npol) else 
-                                             if size(tableLinearExpansionCoefficient,1)==1 then 
-                                               array(0,0,tableLinearExpansionCoefficient[1,2]) else 
+        final constant Real poly_alfa[:] =   if size(tableLinearExpansionCoefficient,1)>1 then
+                                               Poly.fitting(tableLinearExpansionCoefficient[:,1],tableLinearExpansionCoefficient[:,2],npol) else
+                                             if size(tableLinearExpansionCoefficient,1)==1 then
+                                               array(0,0,tableLinearExpansionCoefficient[1,2]) else
                                              zeros(npol+1)   annotation (
             keepConstant =                                                              true);
-        final constant Real poly_kappa[:] =  if size(tableThermalConductivity,1)>1 then 
-                                               Poly.fitting(tableThermalConductivity[:,1],tableThermalConductivity[:,2],npol) else 
-                                             if size(tableThermalConductivity,1)==1 then 
-                                               array(0,0,tableThermalConductivity[1,2]) else 
+        final constant Real poly_kappa[:] =  if size(tableThermalConductivity,1)>1 then
+                                               Poly.fitting(tableThermalConductivity[:,1],tableThermalConductivity[:,2],npol) else
+                                             if size(tableThermalConductivity,1)==1 then
+                                               array(0,0,tableThermalConductivity[1,2]) else
                                              zeros(npol+1)   annotation (
             keepConstant =                                                              true);
 
@@ -371,10 +371,10 @@ This package contains models to compute the material properties needed to model 
   end DHThtc_in;
 
   model HThtc_HT "HThtc to HT adaptor"
-    HT HT_port 
+    HT HT_port
              annotation (Placement(transformation(extent={{100,-20},{140,20}},
             rotation=0)));
-    HThtc_in HThtc_port 
+    HThtc_in HThtc_port
                   annotation (Placement(transformation(extent={{-140,-20},{-100,
               20}}, rotation=0)));
   equation
@@ -399,11 +399,11 @@ This package contains models to compute the material properties needed to model 
 
   model DHThtc_DHT "DHThtc to DHT adapter"
 
-    DHT DHT_port(N=N) 
+    DHT DHT_port(N=N)
                     annotation (Placement(transformation(extent={{100,40},{120,
               -40}}, rotation=0)));
     DHThtc_in DHThtc_port(
-                        N=N) 
+                        N=N)
                          annotation (Placement(transformation(
           origin={-110,0},
           extent={{40,-10},{-40,10}},
@@ -611,10 +611,10 @@ This package contains models to compute the material properties needed to model 
     parameter CoefficientOfHeatTransfer gamma
       "Constant heat transfer coefficient";
 
-    DHT side1(N=N1) 
+    DHT side1(N=N1)
                    annotation (Placement(transformation(extent={{-40,20},{40,40}},
             rotation=0)));
-    DHT side2(N=N2) 
+    DHT side2(N=N2)
                    annotation (Placement(transformation(extent={{-40,-42},{40,
               -20}}, rotation=0)));
 
@@ -734,8 +734,8 @@ This package contains models to compute the material properties needed to model 
       input Integer N2;
       output Real G1[N2,N1];
     algorithm
-      G1 := if N1 == N2 then identity(N1) else 
-            if N1 > N2 then  zeros(N2,N1) else 
+      G1 := if N1 == N2 then identity(N1) else
+            if N1 > N2 then  zeros(N2,N1) else
             compG(max(N1,N2),min(N1,N2));
     end compG1;
 
@@ -744,8 +744,8 @@ This package contains models to compute the material properties needed to model 
       input Integer N2;
       output Real G2[N1,N2];
     algorithm
-      G2 := if N1 == N2 then identity(N1) else 
-            if N1 > N2 then compG(max(N1,N2),min(N1,N2)) else 
+      G2 := if N1 == N2 then identity(N1) else
+            if N1 > N2 then compG(max(N1,N2),min(N1,N2)) else
             zeros(N1,N2);
     end compG2;
 
@@ -754,8 +754,8 @@ This package contains models to compute the material properties needed to model 
       input Integer N2;
       output Real H1[min(N1,N2),N1];
     algorithm
-      H1 := if N1 == N2 then identity(N1) else 
-            if N1 > N2 then  compHm(max(N1,N2),min(N1,N2)) else 
+      H1 := if N1 == N2 then identity(N1) else
+            if N1 > N2 then  compHm(max(N1,N2),min(N1,N2)) else
             compHf(min(N1,N2));
     end compH1;
 
@@ -764,8 +764,8 @@ This package contains models to compute the material properties needed to model 
       input Integer N2;
       output Real H2[min(N1,N2),N2];
     algorithm
-      H2 := if N1 == N2 then identity(N2) else 
-            if N1 > N2 then compHf(min(N1,N2)) else 
+      H2 := if N1 == N2 then identity(N2) else
+            if N1 > N2 then compHf(min(N1,N2)) else
             compHm(max(N1,N2), min(N1,N2));
     end compH2;
 
@@ -844,10 +844,10 @@ This package contains models to compute the material properties needed to model 
     extends ThermoPower.Icons.HeatFlow;
     parameter Integer N1(min=1)=2 "Number of nodes on side 1";
     parameter Integer N2(min=1)=2 "Number of nodes on side 2";
-    ThermoPower.Thermal.DHThtc_in side1(N=N1) 
+    ThermoPower.Thermal.DHThtc_in side1(N=N1)
                    annotation (Placement(transformation(extent={{-40,20},{40,
               40}}, rotation=0)));
-    ThermoPower.Thermal.DHT side2(N=N2) 
+    ThermoPower.Thermal.DHT side2(N=N2)
                    annotation (Placement(transformation(extent={{-40,-42},{40,
               -20}}, rotation=0)));
   protected
@@ -966,8 +966,8 @@ This package contains models to compute the material properties needed to model 
       input Integer N2;
       output Real G1[N2,N1];
     algorithm
-      G1 := if N1 == N2 then identity(N1) else 
-            if N1 > N2 then  zeros(N2,N1) else 
+      G1 := if N1 == N2 then identity(N1) else
+            if N1 > N2 then  zeros(N2,N1) else
             compG(max(N1,N2),min(N1,N2));
     end compG1;
 
@@ -976,8 +976,8 @@ This package contains models to compute the material properties needed to model 
       input Integer N2;
       output Real G2[N1,N2];
     algorithm
-      G2 := if N1 == N2 then identity(N1) else 
-            if N1 > N2 then compG(max(N1,N2),min(N1,N2)) else 
+      G2 := if N1 == N2 then identity(N1) else
+            if N1 > N2 then compG(max(N1,N2),min(N1,N2)) else
             zeros(N1,N2);
     end compG2;
 
@@ -986,8 +986,8 @@ This package contains models to compute the material properties needed to model 
       input Integer N2;
       output Real H1[min(N1,N2),N1];
     algorithm
-      H1 := if N1 == N2 then identity(N1) else 
-            if N1 > N2 then  compHm(max(N1,N2),min(N1,N2)) else 
+      H1 := if N1 == N2 then identity(N1) else
+            if N1 > N2 then  compHm(max(N1,N2),min(N1,N2)) else
             compHf(min(N1,N2));
     end compH1;
 
@@ -996,8 +996,8 @@ This package contains models to compute the material properties needed to model 
       input Integer N2;
       output Real H2[min(N1,N2),N2];
     algorithm
-      H2 := if N1 == N2 then identity(N2) else 
-            if N1 > N2 then compHf(min(N1,N2)) else 
+      H2 := if N1 == N2 then identity(N2) else
+            if N1 > N2 then compHf(min(N1,N2)) else
             compHm(max(N1,N2), min(N1,N2));
     end compH2;
 
@@ -1098,10 +1098,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
     parameter Area A1=1 "Side 1 surface area" annotation(Evaluate=true);
     parameter Area A2=1 "Side 2 surface area" annotation(Evaluate=true);
 
-    DHT side1(N=N) "Area of side 1 surface" 
+    DHT side1(N=N) "Area of side 1 surface"
                  annotation (Placement(transformation(extent={{-40,20},{40,40}},
             rotation=0)));
-    DHT side2(N=N) "Area of side 2 surface" 
+    DHT side2(N=N) "Area of side 2 surface"
                  annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
             rotation=0)));
   equation
@@ -1146,7 +1146,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
     parameter Length omega "Source perimeter (single tube)";
     replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput power 
+    Modelica.Blocks.Interfaces.RealInput power
       annotation (Placement(transformation(
           origin={0,40},
           extent={{-20,-20},{20,20}},
@@ -1179,7 +1179,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
     parameter Integer N=2 "Number of nodes";
     replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput temperature 
+    Modelica.Blocks.Interfaces.RealInput temperature
       annotation (Placement(transformation(
           origin={0,40},
           extent={{-20,-20},{20,20}},
@@ -1212,12 +1212,12 @@ The swapping is performed if the counterCurrent parameter is true (default value
     parameter Integer N=2 "Number of nodes";
     replaceable Thermal.DHT wall(N=N)             annotation (Placement(
           transformation(extent={{-40,-40},{40,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput temperature_node1 
+    Modelica.Blocks.Interfaces.RealInput temperature_node1
       annotation (Placement(transformation(
           origin={-40,30},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput temperature_nodeN 
+    Modelica.Blocks.Interfaces.RealInput temperature_nodeN
       annotation (Placement(transformation(
           origin={40,28},
           extent={{-20,-20},{20,20}},
@@ -1269,26 +1269,26 @@ The swapping is performed if the counterCurrent parameter is true (default value
     parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
     parameter ThermalConductivity lambda "Thermal conductivity";
     parameter Boolean WallRes=true "Wall conduction resistance accounted for";
-    parameter Temperature Tstartbar=300 "Avarage temperature" 
+    parameter Temperature Tstartbar=300 "Avarage temperature"
       annotation(Dialog(tab = "Initialisation"));
     parameter Temperature Tstart1=Tstartbar
-      "Temperature start value - first node" 
+      "Temperature start value - first node"
       annotation(Dialog(tab = "Initialisation"));
     parameter Temperature TstartN=Tstartbar
-      "Temperature start value - last node" 
+      "Temperature start value - last node"
       annotation(Dialog(tab = "Initialisation"));
     parameter Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N)
-      "Start value of temperature vector (initialized by default)" 
+      "Start value of temperature vector (initialized by default)"
       annotation(Dialog(tab = "Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation(Dialog(tab = "Initialisation"));
     constant Real pi=Modelica.Constants.pi;
     AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
     Area Am "Area of the metal tube cross-section";
-    DHT int(N=N, T(start = Tstart)) "Internal surface" 
+    DHT int(N=N, T(start = Tstart)) "Internal surface"
                  annotation (Placement(transformation(extent={{-40,20},{40,40}},
             rotation=0)));
-    DHT ext(N=N, T(start = Tstart)) "External surface" 
+    DHT ext(N=N, T(start = Tstart)) "External surface"
                  annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
             rotation=0)));
   equation
@@ -1364,25 +1364,25 @@ The swapping is performed if the counterCurrent parameter is true (default value
       parameter Modelica.SIunits.Area Sext "External surface";
       parameter Modelica.SIunits.SpecificHeatCapacity cm
       "Specific heat capacity of metal";
-      parameter Temperature Tstartbar=300 "Avarage temperature" 
+      parameter Temperature Tstartbar=300 "Avarage temperature"
         annotation(Dialog(tab = "Initialisation"));
       parameter Temperature Tstart1=Tstartbar
-      "Temperature start value - first node" 
+      "Temperature start value - first node"
         annotation(Dialog(tab = "Initialisation"));
       parameter Temperature TstartN=Tstartbar
-      "Temperature start value - last node" 
+      "Temperature start value - last node"
         annotation(Dialog(tab = "Initialisation"));
       parameter Temperature Tstart[N] = ThermoPower.Thermal.linspaceExt(Tstart1,TstartN,N)
-      "Start value of temperature vector (initialized by default)" 
+      "Start value of temperature vector (initialized by default)"
         annotation(Dialog(tab = "Initialisation"));
       parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
       "Initialisation option"   annotation(Dialog(tab = "Initialisation"));
       constant Real pi=Modelica.Constants.pi;
       ThermoPower.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
-      ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface" 
+      ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface"
                    annotation (Placement(transformation(extent={{-40,20},{40,40}},
             rotation=0)));
-      ThermoPower.Thermal.DHT ext(N=N, T(start=Tstart)) "External surface" 
+      ThermoPower.Thermal.DHT ext(N=N, T(start=Tstart)) "External surface"
                    annotation (Placement(transformation(extent={{-40,-42},{40,
               -20}}, rotation=0)));
     equation
@@ -1454,13 +1454,13 @@ model CylinderFourier
   parameter Length rint "Internal radius";
   parameter Length rext "External radius";
   parameter Temperature Tstartint=300
-      "Temperature start value at rint (first node)" 
+      "Temperature start value at rint (first node)"
     annotation(Dialog(tab = "Initialisation"));
   parameter Temperature Tstartext=300
-      "Temperature start value at rext (last node)" 
+      "Temperature start value at rext (last node)"
     annotation(Dialog(tab = "Initialisation"));
   parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" 
+      "Initialisation option"
                             annotation(Dialog(tab = "Initialisation"));
 
   Length r[Nr](fixed=false) "Node radii";
@@ -1477,9 +1477,9 @@ model CylinderFourier
   Temperature Tm "Mean temperature";
   MaterialModel metal[Nr] "Metal properties at the nodes";
 
-  ThermoPower.Thermal.DHT internalBoundary(final N=1) 
+  ThermoPower.Thermal.DHT internalBoundary(final N=1)
     annotation (Placement(transformation(extent={{-20,20},{20,40}}, rotation=0)));
-  ThermoPower.Thermal.DHT externalBoundary(final N=1) 
+  ThermoPower.Thermal.DHT externalBoundary(final N=1)
     annotation (Placement(transformation(extent={{-20,-40},{20,-20}}, rotation=
               0)));
 
@@ -1504,6 +1504,7 @@ equation
             "Quadratically distributed node radii - thickest at rext";
       end if;
     else
+      r[i] = 0;
       assert(true,"Unsupported NodeDistribution type");
     end if;
   end for;
