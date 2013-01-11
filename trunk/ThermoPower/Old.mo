@@ -28,14 +28,12 @@ package Old "Old models"
     LiquidDensity rho "Inlet density";
     AbsoluteTemperature Tin;
     AbsolutePressure pv "Saturation pressure";
-    ThermoPower.Water.FlangeAOld inlet
-                  annotation (Placement(transformation(extent={{-120,-20},{-80,
-              20}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld outlet
-                   annotation (Placement(transformation(extent={{80,-20},{120,
-              20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput theta
-      annotation (Placement(transformation(
+    ThermoPower.Water.FlangeAOld inlet annotation (Placement(transformation(
+            extent={{-120,-20},{-80,20}}, rotation=0)));
+    ThermoPower.Water.FlangeBOld outlet annotation (Placement(transformation(
+            extent={{80,-20},{120,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput theta annotation (Placement(
+          transformation(
           origin={0,80},
           extent={{-20,-20},{20,20}},
           rotation=270)));
@@ -53,10 +51,10 @@ package Old "Old models"
     w = inlet.w;
     inlet.hAB = outlet.hAB;
     inlet.hBA = outlet.hBA;
-    fluid.p=inlet.p;
-    fluid.h=inlet.hBA;
-    Tin=fluid.T;
-    rho=fluid.d;
+    fluid.p = inlet.p;
+    fluid.h = inlet.hBA;
+    Tin = fluid.T;
+    rho = fluid.d;
     if CheckValve then
       sqrtz = (if z >= 0 then z/sqrt(z + b) else 0);
     else
@@ -77,11 +75,11 @@ package Old "Old models"
         z = Fl^2*(inlet.p - Ff*pv)/dpnom;
       end if;
     end if;
-    w = FlowChar(theta)          *Av*sqrt(rho*dpnom)*sqrtz;
+    w = FlowChar(theta)*Av*sqrt(rho*dpnom)*sqrtz;
 
     annotation (
-      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
-                                                     "%name")}),
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
+
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>This model is based on the IEC 534/ISA S.75 standards for valve sizing, incompressible fluid.
@@ -132,14 +130,12 @@ package Old "Old models"
     Real z "Normalized x";
     Real sqrtz;
     GasDensity rho "Inlet density";
-    ThermoPower.Water.FlangeAOld inlet
-                  annotation (Placement(transformation(extent={{-120,-20},{-80,
-              20}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld outlet
-                   annotation (Placement(transformation(extent={{80,-20},{120,
-              20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput theta
-      annotation (Placement(transformation(
+    ThermoPower.Water.FlangeAOld inlet annotation (Placement(transformation(
+            extent={{-120,-20},{-80,20}}, rotation=0)));
+    ThermoPower.Water.FlangeBOld outlet annotation (Placement(transformation(
+            extent={{80,-20},{120,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput theta annotation (Placement(
+          transformation(
           origin={0,80},
           extent={{-20,-20},{20,20}},
           rotation=270)));
@@ -168,10 +164,10 @@ package Old "Old models"
     else
       sqrtz = noEvent(z/sqrt(abs(z) + b));
     end if;
-    w = FlowChar(theta)          *Av*Y*sqrt(dpnom/pnom*inlet.p*rho)*sqrtz;
+    w = FlowChar(theta)*Av*Y*sqrt(dpnom/pnom*inlet.p*rho)*sqrtz;
     annotation (
-      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString=
-                                                     "%name")}),
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
+
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>This model is based on the IEC 534/ISA S.75 standards for valve sizing, compressible fluid.
@@ -255,15 +251,12 @@ package Old "Old models"
     Real D;
     Real E;
     Real F;
-    ThermoPower.Water.FlangeAOld infl(
-                                   p(start=pin_start))
-      annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=
-             0)));
-    ThermoPower.Water.FlangeBOld outfl(
-                                    p(start=pout_start))
-      annotation (Placement(transformation(extent={{60,2},{100,42}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_n "RPM"
-      annotation (Placement(transformation(
+    ThermoPower.Water.FlangeAOld infl(p(start=pin_start)) annotation (Placement(
+          transformation(extent={{-100,2},{-60,42}}, rotation=0)));
+    ThermoPower.Water.FlangeBOld outfl(p(start=pout_start)) annotation (
+        Placement(transformation(extent={{60,2},{100,42}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_n "RPM" annotation (Placement(
+          transformation(
           origin={-26,80},
           extent={{-10,-10},{10,10}},
           rotation=270)));
@@ -275,16 +268,16 @@ package Old "Old models"
   equation
     if nFix then
       n = nAct;
-      in_n           = 0;
+      in_n = 0;
     else
-      n =in_n;
+      n = in_n;
     end if;
 
     if NpFix then
       Np = Np0;
-      in_Np           = 0;
+      in_Np = 0;
     else
-      Np =in_Np;
+      Np = in_Np;
     end if;
 
     if CharData == 0 then
@@ -427,15 +420,12 @@ package Old "Old models"
     Real D;
     Real E;
     Real F;
-    ThermoPower.Water.FlangeAOld infl(
-                                   p(start=pin_start))
-      annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=
-             0)));
-    ThermoPower.Water.FlangeBOld outfl(
-                                    p(start=pout_start))
-      annotation (Placement(transformation(extent={{36,56},{76,96}}, rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort
-      annotation (Placement(transformation(extent={{56,6},{86,34}}, rotation=0)));
+    ThermoPower.Water.FlangeAOld infl(p(start=pin_start)) annotation (Placement(
+          transformation(extent={{-100,2},{-60,42}}, rotation=0)));
+    ThermoPower.Water.FlangeBOld outfl(p(start=pout_start)) annotation (
+        Placement(transformation(extent={{36,56},{76,96}}, rotation=0)));
+    Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort annotation (
+        Placement(transformation(extent={{56,6},{86,34}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_Np "Number of  parallel pumps"
       annotation (Placement(transformation(
           origin={0,88},
@@ -444,9 +434,9 @@ package Old "Old models"
   equation
     if NpFix then
       Np = Np0;
-      in_Np           = 0;
+      in_Np = 0;
     else
-      Np =in_Np;
+      Np = in_Np;
     end if;
 
     if CharData == 0 then
@@ -587,43 +577,87 @@ package Old "Old models"
       if (min(h) <= hvs and max(h) >= hls) then
         // Two-phase heat transfer takes place: compute properties
         // of saturated water and steam
-        prop_ls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hls
-           - 1e-5, 0);
-        mu_ls := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(
-          prop_ls.d, prop_ls.T);
+        prop_ls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+              p,
+              hls - 1e-5,
+              0);
+        mu_ls := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(prop_ls.d,
+          prop_ls.T);
         k_ls := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
-          prop_ls.d, prop_ls.T, p, 1);
-        prop_vs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hvs
-           + 1e-5, 1);
-        mu_vs := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(
-          prop_vs.d, prop_vs.T);
+              prop_ls.d,
+              prop_ls.T,
+              p,
+              1);
+        prop_vs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+              p,
+              hvs + 1e-5,
+              1);
+        mu_vs := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(prop_vs.d,
+          prop_vs.T);
         k_vs := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
-          prop_vs.d, prop_vs.T, p, 2);
+              prop_vs.d,
+              prop_vs.T,
+              p,
+              2);
 
-          // Compute the h.t.c. immediately before and after the onset of nucleate boiling
-        gamma_ls := Water.f_dittus_boelter(w, D, A, mu_ls, k_ls, prop_ls.cp);
-        gamma_chf := Water.f_dittus_boelter(w*xCHF, D, A, mu_vs, k_vs, prop_vs.cp);
+        // Compute the h.t.c. immediately before and after the onset of nucleate boiling
+        gamma_ls := Water.f_dittus_boelter(
+              w,
+              D,
+              A,
+              mu_ls,
+              k_ls,
+              prop_ls.cp);
+        gamma_chf := Water.f_dittus_boelter(
+              w*xCHF,
+              D,
+              A,
+              mu_vs,
+              k_vs,
+              prop_vs.cp);
       end if;
 
       for j in 1:size(h, 1) loop
         if h[j] < hls then
           // Liquid phase: Dittus-Boelter's correlation
-          prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, h[j],
-             0);
+          prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+                p,
+                h[j],
+                0);
           mu := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(prop.d,
-             prop.T);
-          k := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(prop.d,
-             prop.T, p, 1);
-          gamma[j] := Water.f_dittus_boelter(w, D, A, mu, k, prop.cp);
+            prop.T);
+          k := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
+                prop.d,
+                prop.T,
+                p,
+                1);
+          gamma[j] := Water.f_dittus_boelter(
+                w,
+                D,
+                A,
+                mu,
+                k,
+                prop.cp);
         elseif h[j] > hvs then
           // Vapour phase: Dittus-Boelter's correlation
-          prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, h[j],
-             1);
+          prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+                p,
+                h[j],
+                1);
           mu := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(prop.d,
-             prop.T);
-          k := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(prop.d,
-             prop.T, p, 2);
-          gamma[j] := Water.f_dittus_boelter(w, D, A, mu, k, prop.cp);
+            prop.T);
+          k := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
+                prop.d,
+                prop.T,
+                p,
+                2);
+          gamma[j] := Water.f_dittus_boelter(
+                w,
+                D,
+                A,
+                mu,
+                k,
+                prop.cp);
         elseif h[j] > hCHF then
           // Wet steam after dryout: Dittus-Boelter's correlation considering
           // only the vapour phase
@@ -631,14 +665,20 @@ package Old "Old models"
           prop := prop_vs;
           mu := mu_vs;
           k := k_vs;
-          gamma[j] := Water.f_dittus_boelter(w*x, D, A, mu, k, prop.cp);
+          gamma[j] := Water.f_dittus_boelter(
+                w*x,
+                D,
+                A,
+                mu,
+                k,
+                prop.cp);
         else
           // Nucleate boiling: constant h.t.c.
           gamma[j] := gamma_b;
         end if;
       end for;
 
-        // Smoothing of heat transfer coefficients if there are boiling boundaries is
+      // Smoothing of heat transfer coefficients if there are boiling boundaries is
       // in a neighbourhood of radius l/2 of each node with boiling condition
       gcorr := zeros(size(gamma, 1));
       n_B := 0;
@@ -696,7 +736,17 @@ package Old "Old models"
       gamma := gamma + gcorr;
     end calc_gamma;
   equation
-    wall.gamma = calc_gamma(w, Dhyd, A, p, wall.T, h, hl, hv, gamma_b, xCHF);
+    wall.gamma = calc_gamma(
+        w,
+        Dhyd,
+        A,
+        p,
+        wall.T,
+        h,
+        hl,
+        hv,
+        gamma_b,
+        xCHF);
     hCHF = hl + xCHF*(hv - hl);
     annotation (Documentation(info="<HTML>
 <p>This model extends <tt>Flow1D2ph</tt> by computing the distribution of the heat transfer coefficient <tt>gamma</tt> and making it available through an extended version of the <tt>wall</tt> connector.
@@ -711,8 +761,7 @@ package Old "Old models"
 <ol>
 <li>J. C. Collier: <i>Convective Boiling and Condensation</i>, 2nd ed.,McGraw Hill, 1981, pp. 146.
 </ol>
-</HTML>",
-        revisions="<html>
+</HTML>", revisions="<html>
 <ul>
 <li><i>24 Sep 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -782,45 +831,88 @@ package Old "Old models"
       if (min(h) <= hvs and max(h) >= hls) then
         // Two-phase heat transfer takes place: compute properties
         // of saturated water and steam
-        prop_ls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hls
-           - 1e-5, 0);
-        mu_ls := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(
-          prop_ls.d, prop_ls.T);
-        k_ls := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
-          prop_ls.d, prop_ls.T, p, 1);
-        sigma :=
-          ThermoFluid.BaseClasses.MediumModels.SteamIF97.surfaceTension(
+        prop_ls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+              p,
+              hls - 1e-5,
+              0);
+        mu_ls := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(prop_ls.d,
           prop_ls.T);
-        prop_vs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hvs
-           + 1e-5, 1);
-        mu_vs := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(
-          prop_vs.d, prop_vs.T);
+        k_ls := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
+              prop_ls.d,
+              prop_ls.T,
+              p,
+              1);
+        sigma := ThermoFluid.BaseClasses.MediumModels.SteamIF97.surfaceTension(
+          prop_ls.T);
+        prop_vs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+              p,
+              hvs + 1e-5,
+              1);
+        mu_vs := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(prop_vs.d,
+          prop_vs.T);
         k_vs := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
-          prop_vs.d, prop_vs.T, p, 2);
+              prop_vs.d,
+              prop_vs.T,
+              p,
+              2);
 
-          // Compute the h.t.c. immediately before and after the onset of nucleate boiling
-        gamma_ls := Water.f_dittus_boelter(w, D, A, mu_ls, k_ls, prop_ls.cp);
-        gamma_chf := Water.f_dittus_boelter(w*xCHF, D, A, mu_vs, k_vs, prop_vs.cp);
+        // Compute the h.t.c. immediately before and after the onset of nucleate boiling
+        gamma_ls := Water.f_dittus_boelter(
+              w,
+              D,
+              A,
+              mu_ls,
+              k_ls,
+              prop_ls.cp);
+        gamma_chf := Water.f_dittus_boelter(
+              w*xCHF,
+              D,
+              A,
+              mu_vs,
+              k_vs,
+              prop_vs.cp);
       end if;
       for j in 1:size(h, 1) loop
         if h[j] < hls then
           // Liquid phase: Dittus-Boelter's correlation
-          prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, h[j],
-             0);
+          prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+                p,
+                h[j],
+                0);
           mu := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(prop.d,
-             prop.T);
-          k := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(prop.d,
-             prop.T, p, 1);
-          gamma[j] := Water.f_dittus_boelter(w, D, A, mu, k, prop.cp);
+            prop.T);
+          k := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
+                prop.d,
+                prop.T,
+                p,
+                1);
+          gamma[j] := Water.f_dittus_boelter(
+                w,
+                D,
+                A,
+                mu,
+                k,
+                prop.cp);
         elseif h[j] > hvs then
           // Vapour phase: Dittus-Boelter's correlation
-          prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, h[j],
-             1);
+          prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+                p,
+                h[j],
+                1);
           mu := ThermoFluid.BaseClasses.MediumModels.SteamIF97.visc_dt(prop.d,
-             prop.T);
-          k := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(prop.d,
-             prop.T, p, 2);
-          gamma[j] := Water.f_dittus_boelter(w, D, A, mu, k, prop.cp);
+            prop.T);
+          k := ThermoFluid.BaseClasses.MediumModels.SteamIF97.cond_dt(
+                prop.d,
+                prop.T,
+                p,
+                2);
+          gamma[j] := Water.f_dittus_boelter(
+                w,
+                D,
+                A,
+                mu,
+                k,
+                prop.cp);
         elseif h[j] > hCHF then
           // Wet steam after dryout: Dittus-Boelter's correlation considering
           // only the vapour phase
@@ -828,19 +920,38 @@ package Old "Old models"
           prop := prop_vs;
           mu := mu_vs;
           k := k_vs;
-          gamma[j] := Water.f_dittus_boelter(w*x, D, A, mu, k, prop.cp);
+          gamma[j] := Water.f_dittus_boelter(
+                w*x,
+                D,
+                A,
+                mu,
+                k,
+                prop.cp);
         else
           // Nucleate boiling: Chen's correlation
           DTsat := Twall[j] - prop_vs.T;
-          Dpsat := ThermoFluid.BaseClasses.MediumModels.SteamIF97.satp(Twall[
-            j]) - p;
+          Dpsat := ThermoFluid.BaseClasses.MediumModels.SteamIF97.satp(Twall[j])
+             - p;
           x := (h[j] - hls)/(hvs - hls);
-          gamma[j] := Water.f_chen(w, D, A, mu_ls, k_ls, prop_ls.cp, prop_ls.
-            d, sigma, prop_vs.d, mu_vs, DTsat, Dpsat, hvs - hls, x);
+          gamma[j] := Water.f_chen(
+                w,
+                D,
+                A,
+                mu_ls,
+                k_ls,
+                prop_ls.cp,
+                prop_ls.d,
+                sigma,
+                prop_vs.d,
+                mu_vs,
+                DTsat,
+                Dpsat,
+                hvs - hls,
+                x);
         end if;
       end for;
 
-        // Smoothing of heat transfer coefficients if there are boiling boundaries is
+      // Smoothing of heat transfer coefficients if there are boiling boundaries is
       // in a neighbourhood of radius l/2 of each node with boiling condition
       gcorr := zeros(size(gamma, 1));
       n_B := 0;
@@ -891,8 +1002,21 @@ package Old "Old models"
         DTsat := Twall[n] - prop_vs.T;
         Dpsat := ThermoFluid.BaseClasses.MediumModels.SteamIF97.satp(Twall[n])
            - p;
-        gamma_b := Water.f_chen(w, D, A, mu_ls, k_ls, prop_ls.cp, prop_ls.d,
-          sigma, prop_vs.d, mu_vs, DTsat, Dpsat, hvs - hls, x);
+        gamma_b := Water.f_chen(
+              w,
+              D,
+              A,
+              mu_ls,
+              k_ls,
+              prop_ls.cp,
+              prop_ls.d,
+              sigma,
+              prop_vs.d,
+              mu_vs,
+              DTsat,
+              Dpsat,
+              hvs - hls,
+              x);
         csi := if pos_B[j] < 0 then 0.5 + pos_B[j] else pos_B[j] - 0.5;
         if type_B[j] == 1 or type_B[j] == 4 then
           csi := -csi;
@@ -905,7 +1029,16 @@ package Old "Old models"
       gamma := gamma + gcorr;
     end calc_gamma;
   equation
-    wall.gamma = calc_gamma(w, Dhyd, A, p, wall.T, h, hl, hv, xCHF);
+    wall.gamma = calc_gamma(
+        w,
+        Dhyd,
+        A,
+        p,
+        wall.T,
+        h,
+        hl,
+        hv,
+        xCHF);
     hCHF = hl + xCHF*(hv - hl);
 
     annotation (Documentation(info="<HTML>
@@ -948,15 +1081,18 @@ package Old "Old models"
     ThermoFluid.BaseClasses.CommonRecords.ThermoProperties_ph prop;
   algorithm
 
-    prop := Water.water_ph(p, h, 0);
+    prop := Water.water_ph(
+        p,
+        h,
+        0);
     T := prop.T;
     rho := prop.d;
 
     drdp := prop.ddph;
     drdh := prop.ddhp;
-     annotation (Documentation(info="<HTML>
+    annotation (Documentation(info="<HTML>
 <p>Based on the water medium model in the ThermoFluid library.
-</HTML>",   revisions="<html>
+</HTML>", revisions="<html>
 <ul>
 <li><i>1Jun 2004</i>
     by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
@@ -990,12 +1126,19 @@ package Old "Old models"
   algorithm
     (Ts,hvs,hls,rhov,rhol) :=
       ThermoFluid.BaseClasses.MediumModels.SteamIF97.boundaryvals_p(p);
-    prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, h, 0);
+    prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+        p,
+        h,
+        0);
     if h >= hls and h <= hvs then
-      propls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hls -
-        1e-5, 0);
-      propvs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hvs +
-        1e-5, 1);
+      propls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+          p,
+          hls - 1e-5,
+          0);
+      propvs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+          p,
+          hvs + 1e-5,
+          1);
       x := (h - hls)/(hvs - hls);
       rho := 1/(x/propvs.d + (1 - x)/propls.d);
       T := propvs.T*x + (1 - x)*propls.T;
@@ -1028,7 +1171,10 @@ density and temperature computations across the saturation boundaries, which in 
   protected
     ThermoFluid.BaseClasses.CommonRecords.ThermoProperties_ph prop;
   algorithm
-    prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, h, 0);
+    prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+        p,
+        h,
+        0);
     T := prop.T;
     rho := prop.d;
     annotation (Documentation(info="<HTML>
@@ -1051,7 +1197,10 @@ density and temperature computations across the saturation boundaries, which in 
   protected
     ThermoFluid.BaseClasses.CommonRecords.ThermoProperties_ph prop;
   algorithm
-    prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, h, 0);
+    prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+        p,
+        h,
+        0);
     T := prop.T;
     annotation (Documentation(info="<HTML>
 <p>Based on the water medium model in the ThermoFluid library.
@@ -1073,7 +1222,10 @@ density and temperature computations across the saturation boundaries, which in 
   protected
     ThermoFluid.BaseClasses.CommonRecords.ThermoProperties_ph prop;
   algorithm
-    prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, h, 0);
+    prop := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+        p,
+        h,
+        0);
     rho := prop.d;
     annotation (Documentation(info="<HTML>
 <p>Based on the water medium model in the ThermoFluid library.
@@ -1136,12 +1288,16 @@ density and temperature computations across the saturation boundaries, which in 
       ThermoFluid.BaseClasses.MediumModels.SteamIF97.boundaryvals_p(p);
     (dTdp,dhvdp,dhldp,drvdp,drldp) :=
       ThermoFluid.BaseClasses.MediumModels.SteamIF97.boundaryderiv_p(p, 1);
-    propls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hl -
-      1e-5, 0);
-    propvs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hv +
-      1e-5, 1);
+    propls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+        p,
+        hl - 1e-5,
+        0);
+    propvs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+        p,
+        hv + 1e-5,
+        1);
 
-      // the limit densities of the one-phase fluid are used instead of the values
+    // the limit densities of the one-phase fluid are used instead of the values
     // provided by boundaryvals_p() to avoid discontinuities
     rhol := propls.d;
     rhov := propvs.d;
@@ -1205,12 +1361,16 @@ density and temperature computations across the saturation boundaries, which in 
       ThermoFluid.BaseClasses.MediumModels.SteamIF97.boundaryvals_p(p);
     (dTdp,dhvdp,dhldp,drvdp,drldp) :=
       ThermoFluid.BaseClasses.MediumModels.SteamIF97.boundaryderiv_p(p, 1);
-    propls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hl -
-      1e-5, 0);
-    propvs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(p, hv +
-      1e-5, 1);
+    propls := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+        p,
+        hl - 1e-5,
+        0);
+    propvs := ThermoFluid.BaseClasses.MediumModels.Water.water_ph(
+        p,
+        hv + 1e-5,
+        1);
 
-      // the limit densities of the one-phase fluid are used instead of the values
+    // the limit densities of the one-phase fluid are used instead of the values
     // provided by boundaryvals_p() to avoid discontinuities
     rhol := propls.d;
     rhov := propvs.d;
@@ -1232,10 +1392,8 @@ density and temperature computations across the saturation boundaries, which in 
     output ThermoFluid.BaseClasses.CommonRecords.ThermoProperties_ph pro;
   protected
     constant Modelica.SIunits.Temperature TLIMIT1=623.15;
-    ThermoFluid.BaseClasses.MediumModels.Common.HelmholtzData dTR(R=
-          ThermoFluid.BaseClasses.MediumModels.SteamIF97.data.RH2O);
-    ThermoFluid.BaseClasses.MediumModels.Common.GibbsData pTR(R=ThermoFluid.
-          BaseClasses.MediumModels.SteamIF97.data.RH2O);
+    ThermoFluid.BaseClasses.MediumModels.Common.HelmholtzData dTR(R=ThermoFluid.BaseClasses.MediumModels.SteamIF97.data.RH2O);
+    ThermoFluid.BaseClasses.MediumModels.Common.GibbsData pTR(R=ThermoFluid.BaseClasses.MediumModels.SteamIF97.data.RH2O);
     ThermoFluid.BaseClasses.MediumModels.Common.GibbsDerivs g;
     ThermoFluid.BaseClasses.MediumModels.Common.HelmholtzDerivs f;
     Integer error;
@@ -1244,8 +1402,11 @@ density and temperature computations across the saturation boundaries, which in 
   algorithm
     pTR.p := p;
     if phase == 0 then
-      region := ThermoFluid.BaseClasses.MediumModels.SteamIF97.region_ph(p, h,
-         0, 0);
+      region := ThermoFluid.BaseClasses.MediumModels.SteamIF97.region_ph(
+          p,
+          h,
+          0,
+          0);
     elseif phase == 1 then
       if h < ThermoFluid.BaseClasses.MediumModels.SteamIF97.hupperofp1(p) then
         region := 1;
@@ -1260,28 +1421,30 @@ density and temperature computations across the saturation boundaries, which in 
     if (region == 1) then
       pTR.T := ThermoFluid.BaseClasses.MediumModels.SteamIF97.tph1(p, h);
       g := ThermoFluid.BaseClasses.MediumModels.SteamIF97.g1(p, pTR.T);
-      pro := ThermoFluid.BaseClasses.MediumModels.Common.gibbsToProps_ph(g,
-        pTR);
+      pro := ThermoFluid.BaseClasses.MediumModels.Common.gibbsToProps_ph(g, pTR);
     elseif (region == 2) then
       pTR.T := ThermoFluid.BaseClasses.MediumModels.SteamIF97.tph2(p, h);
       g := ThermoFluid.BaseClasses.MediumModels.SteamIF97.g2(p, pTR.T);
-      pro := ThermoFluid.BaseClasses.MediumModels.Common.gibbsToProps_ph(g,
-        pTR);
+      pro := ThermoFluid.BaseClasses.MediumModels.Common.gibbsToProps_ph(g, pTR);
     elseif (region == 3) then
       (dTR.d,dTR.T,error) :=
-        ThermoFluid.BaseClasses.MediumModels.SteamIF97.dtofph3(p=p, h=h, delp=
-         1.0e-7, delh=1.0e-6);
+        ThermoFluid.BaseClasses.MediumModels.SteamIF97.dtofph3(
+          p=p,
+          h=h,
+          delp=1.0e-7,
+          delh=1.0e-6);
       f := ThermoFluid.BaseClasses.MediumModels.SteamIF97.f3(dTR.d, dTR.T);
-      pro := ThermoFluid.BaseClasses.MediumModels.Common.helmholtzToProps_ph(
-        f, dTR);
+      pro := ThermoFluid.BaseClasses.MediumModels.Common.helmholtzToProps_ph(f,
+        dTR);
     elseif (region == 4) then
       pro := ThermoFluid.BaseClasses.MediumModels.SteamIF97.water_ph_r4(p, h);
     elseif (region == 5) then
       (pTR.T,error) := ThermoFluid.BaseClasses.MediumModels.SteamIF97.tofph5(
-        p=p, h=h, reldh=1.0e-7);
+          p=p,
+          h=h,
+          reldh=1.0e-7);
       g := ThermoFluid.BaseClasses.MediumModels.SteamIF97.g5(p, pTR.T);
-      pro := ThermoFluid.BaseClasses.MediumModels.Common.gibbsToProps_ph(g,
-        pTR);
+      pro := ThermoFluid.BaseClasses.MediumModels.Common.gibbsToProps_ph(g, pTR);
     end if;
   end water_ph;
 
@@ -1326,8 +1489,14 @@ density and temperature computations across the saturation boundaries, which in 
       ThermoFluid.BaseClasses.MediumModels.SteamIF97.boundaryderiv_p(p, 1);
 
     //fuori campana
-    prop_ls := water_ph(p, hl, 1);
-    prop_vs := water_ph(p, hv, 3);
+    prop_ls := water_ph(
+        p,
+        hl,
+        1);
+    prop_vs := water_ph(
+        p,
+        hv,
+        3);
 
     drl_dp := prop_ls.ddph;
     drv_dp := prop_vs.ddph;
@@ -1336,7 +1505,7 @@ density and temperature computations across the saturation boundaries, which in 
 
     annotation (Documentation(info="<HTML>
 <p>Based on the water medium model in the ThermoFluid library.
-</HTML>",   revisions="<html>
+</HTML>", revisions="<html>
 <ul>
 <li><i>1 Jun 2004</i>
     by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
@@ -1416,38 +1585,32 @@ density and temperature computations across the saturation boundaries, which in 
     Area Asurf "Surface of the liquid-vapour interface";
     Real dVvdy;
     Real dVldy;
-    ThermoPower.Water.FlangeAOld feedwater
-                                        annotation (Placement(transformation(
+    ThermoPower.Water.FlangeAOld feedwater annotation (Placement(transformation(
             extent={{-60,-34},{-26,0}}, rotation=0)));
-    ThermoPower.Water.FlangeAOld riser
-                                    annotation (Placement(transformation(extent=
-             {{26,-36},{62,-2}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld downcomer
-      annotation (Placement(transformation(extent={{-62,-80},{-26,-44}},
-            rotation=0)));
-    ThermoPower.Water.FlangeBOld blowdown
-                                       annotation (Placement(transformation(
+    ThermoPower.Water.FlangeAOld riser annotation (Placement(transformation(
+            extent={{26,-36},{62,-2}}, rotation=0)));
+    ThermoPower.Water.FlangeBOld downcomer annotation (Placement(transformation(
+            extent={{-62,-80},{-26,-44}}, rotation=0)));
+    ThermoPower.Water.FlangeBOld blowdown annotation (Placement(transformation(
             extent={{26,-80},{62,-44}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld steam
-                                    annotation (Placement(transformation(extent=
-             {{32,40},{68,76}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput HeatingPower
-      annotation (Placement(transformation(extent={{-76,10},{-56,30}}, rotation=
-             0)));
+    ThermoPower.Water.FlangeBOld steam annotation (Placement(transformation(
+            extent={{32,40},{68,76}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput HeatingPower annotation (Placement(
+          transformation(extent={{-76,10},{-56,30}}, rotation=0)));
   equation
-    Vv*(drvdp*der(p) + drvdh*der(hv)) + rhov*dVvdy*der(y) = wev - wv - wc -
-      wcs + wh;
-    Vl*(drldp*der(p) + drldh*der(hl)) + rhol*dVldy*der(y) = wf + wr + wc +
-      wcs - wd - wb - wev - wh;
-    rhov*Vv*(der(hv) - der(p)/rhov) = (wev - wcs)*(hvs - hv) - wc*(hls - hv)
-       - wv*(hvout - hv) + Qmv - Qvl + wh*(hvs - hv);
-    rhol*Vl*(der(hl) - der(p)/rhol) = wf*(hf - hl) + wr*(hr - hl) + wc*(hls
-       - hl) + (wcs - wev)*(hvs - hl) - wd*(hd - hl) + Qvl - Qml;
+    Vv*(drvdp*der(p) + drvdh*der(hv)) + rhov*dVvdy*der(y) = wev - wv - wc - wcs
+       + wh;
+    Vl*(drldp*der(p) + drldh*der(hl)) + rhol*dVldy*der(y) = wf + wr + wc + wcs
+       - wd - wb - wev - wh;
+    rhov*Vv*(der(hv) - der(p)/rhov) = (wev - wcs)*(hvs - hv) - wc*(hls - hv) -
+      wv*(hvout - hv) + Qmv - Qvl + wh*(hvs - hv);
+    rhol*Vl*(der(hl) - der(p)/rhol) = wf*(hf - hl) + wr*(hr - hl) + wc*(hls -
+      hl) + (wcs - wev)*(hvs - hl) - wd*(hd - hl) + Qvl - Qml;
     Cm*der(Tm) = -Qmv - Qml;
     wev = xl*rhol*Vl/tauev;
     wc = (1 - xv)*rhov*Vv/tauc;
     wcs = Kcs*Asurf*(Ts - Tl);
-    wh =HeatingPower           /(hvs - hl);
+    wh = HeatingPower/(hvs - hl);
     Qmv = gmv*Amv*(Tm - Tv);
     Qml = gml*Aml*(Tm - Tl);
     Qvl = Ks*Asurf*(Tv - Ts);
@@ -1498,32 +1661,23 @@ density and temperature computations across the saturation boundaries, which in 
     steam.hBA = hv;
     hvout = if wv >= 0 then hv else steam.hAB;
     annotation (
-      Icon(graphics={
-          Text(extent={{-110,2},{-64,-26}}, textString=
-                                                "Feed"),
-          Text(extent={{-192,-40},{-62,-82}}, textString=
-                                                  "Downcomer"),
-          Text(extent={{28,-80},{92,-120}}, textString=
-                                                "Blowdown"),
-          Text(extent={{76,20},{138,-6}}, textString=
-                                              "Riser"),
-          Text(extent={{16,104},{78,78}}, textString=
-                                              "Steam"),
-          Text(extent={{-144,56},{-46,28}}, textString=
-                                                "Heating Power"),
-          Polygon(
-            points={{-60,0},{-58,16},{-50,34},{-36,48},{-26,54},{-16,58},{-6,60},
-                {0,60},{10,60},{20,56},{30,52},{36,48},{46,40},{52,30},{56,22},
-                {58,14},{60,6},{60,0},{-60,0}},
-            lineColor={128,128,128},
-            fillColor={159,191,223},
-            fillPattern=FillPattern.Solid),
-          Rectangle(
-            extent={{-26,0},{26,-16}},
-            lineColor={159,191,223},
-            fillColor={159,191,223},
-            fillPattern=FillPattern.Solid),
-          Rectangle(extent={{-26,-16},{26,-70}}, lineColor={0,0,255})}),
+      Icon(graphics={Text(extent={{-110,2},{-64,-26}}, textString="Feed"),Text(
+            extent={{-192,-40},{-62,-82}}, textString="Downcomer"),Text(extent=
+            {{28,-80},{92,-120}}, textString="Blowdown"),Text(extent={{76,20},{
+            138,-6}}, textString="Riser"),Text(extent={{16,104},{78,78}},
+            textString="Steam"),Text(extent={{-144,56},{-46,28}}, textString=
+            "Heating Power"),Polygon(
+              points={{-60,0},{-58,16},{-50,34},{-36,48},{-26,54},{-16,58},{-6,
+              60},{0,60},{10,60},{20,56},{30,52},{36,48},{46,40},{52,30},{56,22},
+              {58,14},{60,6},{60,0},{-60,0}},
+              lineColor={128,128,128},
+              fillColor={159,191,223},
+              fillPattern=FillPattern.Solid),Rectangle(
+              extent={{-26,0},{26,-16}},
+              lineColor={159,191,223},
+              fillColor={159,191,223},
+              fillPattern=FillPattern.Solid),Rectangle(extent={{-26,-16},{26,-70}},
+            lineColor={0,0,255})}),
       Documentation(info="<HTML>
 <p>This model describes the pressuriser for a nuclear reactor, and is very similar to the <tt>Drum</tt> model. The fluid properties in the liquid and steam volumes are homogeneous, but are not assumed at thermodynamic equilibrium. Connectors are provided for feedwater inlet, steam outlet, downcomer outlet, riser inlet, blowdown outlet and heating power inlet. Unused inlets and/or outlets can be \"plugged\" with a flowrate source or sink with zero flowrate.
 <p>The model is based on dynamic mass and energy balance equations of the liquid volume and vapour volume inside the drum. Mass and energy tranfer between the two phases is provided by bulk condensation and surface condensation of the vapour phase, and by bulk boiling of the liquid phase. Additional energy transfer can take place at the surface if the steam is superheated. 
@@ -1581,39 +1735,61 @@ density and temperature computations across the saturation boundaries, which in 
     if noEvent(min(h) < hv and max(h) > hl) then
       // Two-phase heat transfer takes place: compute properties
       // of saturated water and steam
-      mu_ls =  Medium.dynamicViscosity(bubble);
-      k_ls =  Medium.thermalConductivity(bubble);
+      mu_ls = Medium.dynamicViscosity(bubble);
+      k_ls = Medium.thermalConductivity(bubble);
       cp_ls = Medium.cp(bubble);
-      mu_vs =  Medium.dynamicViscosity(dew);
-      k_vs =  Medium.thermalConductivity(dew);
+      mu_vs = Medium.dynamicViscosity(dew);
+      k_vs = Medium.thermalConductivity(dew);
       cp_vs = Medium.cp(dew);
       // Compute the h.t.c. just outside the nucleate boiling region
-      gamma_ls = Water.f_dittus_boelter(w, Dhyd, A, mu_ls, k_ls, cp_ls);
-      gamma_chf = Water.f_dittus_boelter(w*xCHF, Dhyd, A, mu_vs, k_vs, cp_vs);
+      gamma_ls = Water.f_dittus_boelter(
+          w,
+          Dhyd,
+          A,
+          mu_ls,
+          k_ls,
+          cp_ls);
+      gamma_chf = Water.f_dittus_boelter(
+          w*xCHF,
+          Dhyd,
+          A,
+          mu_vs,
+          k_vs,
+          cp_vs);
     else
       // dummy values
       mu_ls = 0;
-      k_ls =  0;
+      k_ls = 0;
       cp_ls = 0;
       mu_vs = 0;
-      k_vs =  0;
+      k_vs = 0;
       cp_vs = 0;
       gamma_ls = 0;
-      gamma_chf =0;
+      gamma_chf = 0;
     end if;
     for j in 1:N loop
       if noEvent(h[j] < hl or h[j] > hv) then
         // Subcooled liquid or superheated steam: Dittus-Boelter's correlation
-        gamma[j] = Water.f_dittus_boelter(w, Dhyd, A, Medium.dynamicViscosity(fluid[j].
-          state, 1), Medium.thermalConductivity(fluid[j].state, 1), Medium.cp(
-          fluid[j].state));
+        gamma[j] = Water.f_dittus_boelter(
+            w,
+            Dhyd,
+            A,
+            Medium.dynamicViscosity(fluid[j].state, 1),
+            Medium.thermalConductivity(fluid[j].state, 1),
+            Medium.cp(fluid[j].state));
       elseif noEvent(h[j] > hCHF) then
         // Wet steam after dryout: Dittus-Boelter's correlation considering
         // only the vapour phase
-        gamma[j] = Water.f_dittus_boelter(w*x[j], Dhyd, A, mu_vs, k_vs, cp_vs);
+        gamma[j] = Water.f_dittus_boelter(
+            w*x[j],
+            Dhyd,
+            A,
+            mu_vs,
+            k_vs,
+            cp_vs);
       else
         // Nucleate boiling: constant h.t.c.
-        gamma[j]= gamma_b;
+        gamma[j] = gamma_b;
       end if;
     end for;
   algorithm
@@ -1623,7 +1799,7 @@ density and temperature computations across the saturation boundaries, which in 
     n_B := 0;
     // compute boundary types and positions
     for j in 1:(N - 1) loop
-      hasBoundary :=false;
+      hasBoundary := false;
       if (h[j] <= hl and h[j + 1] >= hl) then
         hasBoundary := true;
         h_B := hl;
@@ -1658,18 +1834,18 @@ density and temperature computations across the saturation boundaries, which in 
     for j in 1:n_B loop
       n := node_B[j];
       if type_B[j] == 1 or type_B[j] == 2 then
-        gamma_nb :=gamma_ls;
+        gamma_nb := gamma_ls;
       else
-        gamma_nb :=gamma_chf;
+        gamma_nb := gamma_chf;
       end if;
-      csi :=if pos_B[j] < 0 then 0.5 + pos_B[j] else pos_B[j] - 0.5;
+      csi := if pos_B[j] < 0 then 0.5 + pos_B[j] else pos_B[j] - 0.5;
       if type_B[j] == 1 or type_B[j] == 4 then
-        csi :=-csi;
+        csi := -csi;
       end if;
       if n == 1 or n == N then
-        csi :=2*csi;
+        csi := 2*csi;
       end if;
-      gamma_corr[n] :=gamma_corr[n] + csi*(gamma_b - gamma_nb);
+      gamma_corr[n] := gamma_corr[n] + csi*(gamma_b - gamma_nb);
     end for;
   equation
     wall.gamma = gamma + gamma_corr;
@@ -1706,15 +1882,12 @@ density and temperature computations across the saturation boundaries, which in 
     replaceable package Medium =
         Modelica.Media.Interfaces.PartialTwoPhaseMedium;
     Medium.SaturationProperties sat;
-    ThermoPower.Water.FlangeAOld feed
-                 annotation (Placement(transformation(extent={{-110,-64},{-70,
-              -24}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld steam
-                  annotation (Placement(transformation(extent={{48,52},{88,92}},
-            rotation=0)));
-    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
-      annotation (Placement(transformation(extent={{-28,-100},{28,-80}},
-            rotation=0)));
+    ThermoPower.Water.FlangeAOld feed annotation (Placement(transformation(
+            extent={{-110,-64},{-70,-24}}, rotation=0)));
+    ThermoPower.Water.FlangeBOld steam annotation (Placement(transformation(
+            extent={{48,52},{88,92}}, rotation=0)));
+    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat annotation (
+        Placement(transformation(extent={{-28,-100},{28,-80}}, rotation=0)));
     parameter Volume Vd "Drum volume";
     parameter Volume Vr "Riser volume";
     parameter Volume Vdc "Downcomer volume";
@@ -1746,24 +1919,25 @@ density and temperature computations across the saturation boundaries, which in 
     Real dhsdp;
     Real dTdp;
   equation
-    sat.psat=p;
-    sat.Tsat=Medium.saturationTemperature(p);
-    rhow=Medium.bubbleDensity(sat);
-    rhos=Medium.dewDensity(sat);
-    hw=Medium.bubbleEnthalpy(sat);
-    hs=Medium.dewEnthalpy(sat);
-    drwdp=Medium.dBubbleDensity_dPressure(sat);
-    drsdp=Medium.dDewDensity_dPressure(sat);
-    dhwdp=Medium.dBubbleEnthalpy_dPressure(sat);
-    dhsdp=Medium.dDewEnthalpy_dPressure(sat);
-    dTdp=0; //Needs to be fixed!!! XXXXXXXXX
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    rhow = Medium.bubbleDensity(sat);
+    rhos = Medium.dewDensity(sat);
+    hw = Medium.bubbleEnthalpy(sat);
+    hs = Medium.dewEnthalpy(sat);
+    drwdp = Medium.dBubbleDensity_dPressure(sat);
+    drsdp = Medium.dDewDensity_dPressure(sat);
+    dhwdp = Medium.dBubbleEnthalpy_dPressure(sat);
+    dhsdp = Medium.dDewEnthalpy_dPressure(sat);
+    dTdp = 0;
+    //Needs to be fixed!!! XXXXXXXXX
     e11*der(Vwt) + e12*der(p) = qf - qs;
     e21*der(Vwt) + e22*der(p) = Q + qf*hf - qs*hs;
     e11 = rhow - rhos;
     e12 = Vwt*drwdp + Vst*drsdp;
     e21 = rhow*hw - rhos*hs;
-    e22 = Vwt*(hw*drwdp + rhow*dhwdp) + Vst*(hs*drsdp + rhos*dhsdp) - Vt + Mt
-      *Cp*dTdp;
+    e22 = Vwt*(hw*drwdp + rhow*dhwdp) + Vst*(hs*drsdp + rhos*dhsdp) - Vt + Mt*
+      Cp*dTdp;
     Vt = Vd + Vr + Vdc;
     Vt = Vwt + Vst;
     p = feed.p;
@@ -1773,13 +1947,13 @@ density and temperature computations across the saturation boundaries, which in 
     -steam.w = qs;
     feed.hAB = hw;
     steam.hBA = hs;
-    Q =heat.Q_flow;
+    Q = heat.Q_flow;
     heat.T = Ts;
-    annotation (Diagram(graphics),
+    annotation (
+      Diagram(graphics),
       Documentation(info="<HTML>
 <p>Simplified model of a drum for drum boilers. This model assumes thermodynamic equilibrium between the liquid and vapour volumes. The model has two state variables (i.e., pressure and liquid volume).
-</HTML>",
-        revisions="<html>
+</HTML>", revisions="<html>
 <ul>
 <li><i>24 Sep 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -1812,14 +1986,10 @@ density and temperature computations across the saturation boundaries, which in 
     Real Kf;
     Real Kfl;
     Density rho "Fluid density";
-    ThermoPower.Water.FlangeAOld inlet(
-                        w(start=wnom))
-                  annotation (Placement(transformation(extent={{-120,-20},{-80,
-              20}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld outlet(
-                         w(start=-wnom))
-                   annotation (Placement(transformation(extent={{80,-20},{120,
-              20}}, rotation=0)));
+    ThermoPower.Water.FlangeAOld inlet(w(start=wnom)) annotation (Placement(
+          transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+    ThermoPower.Water.FlangeBOld outlet(w(start=-wnom)) annotation (Placement(
+          transformation(extent={{80,-20},{120,20}}, rotation=0)));
   equation
     if FFtype == 0 then
       Kf = Kfnom*Kfc;
@@ -1828,12 +1998,12 @@ density and temperature computations across the saturation boundaries, which in 
     elseif FFtype == 2 then
       Kf = K/(2*A^2)*Kfc;
     end if;
-    if inlet.w>=0 then
-      fluid.p=inlet.p;
-      fluid.h=inlet.hBA;
+    if inlet.w >= 0 then
+      fluid.p = inlet.p;
+      fluid.h = inlet.hBA;
     else
-      fluid.p=outlet.p;
-      fluid.h=outlet.hAB;
+      fluid.p = outlet.p;
+      fluid.h = outlet.hAB;
     end if;
     rho = fluid.d;
     Kfl = wnom*wnf*Kf;
@@ -1842,8 +2012,7 @@ density and temperature computations across the saturation boundaries, which in 
     inlet.hAB = outlet.hAB;
     inlet.hBA = outlet.hBA;
     annotation (Icon(graphics={Text(extent={{-100,-50},{100,-82}}, textString=
-                                                               "%name")}),
-        Documentation(info="<HTML>
+            "%name")}), Documentation(info="<HTML>
 <p>The pressure drop across the inlet and outlet connectors is computed according to a turbulent friction model, i.e. is proportional to the squared velocity of the fluid. The friction coefficient can be specified directly, or by giving an operating point, or as a multiple of the kinetic pressure. The correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit some experimental operating point.</p>
 <p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified; the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate).
 <p><b>Modelling options</b></p>
@@ -1851,8 +2020,7 @@ density and temperature computations across the saturation boundaries, which in 
 <ul><li><tt>FFtype = 0</tt>: the hydraulic friction coefficient <tt>Kfnom</tt> is used directly.</li>
 <li><tt>FFtype = 1</tt>: the hydraulic friction coefficient is specified by the nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).</li>
 <li><tt>FFtype = 2</tt>: the pressure drop is <tt>K</tt> times the kinetic pressure.</li></ul>
-</HTML>",
-        revisions="<html>
+</HTML>", revisions="<html>
 <ul>
 <li><i>18 Jun 2003</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -1952,36 +2120,32 @@ density and temperature computations across the saturation boundaries, which in 
     Area Amv "Surface of the wall-vapour interface";
     Area Asup "Surface of the liquid-vapour interface";
     Area Aext "External drum surface";
-    ThermoPower.Water.FlangeAOld feedwater(
-                            redeclare package Medium = Medium)
-                      annotation (Placement(transformation(extent={{-114,-32},{
-              -80,2}}, rotation=0)));
-    ThermoPower.Water.FlangeAOld riser(
-                        redeclare package Medium = Medium)
-                  annotation (Placement(transformation(extent={{60,-74},{96,-40}},
+    ThermoPower.Water.FlangeAOld feedwater(redeclare package Medium = Medium)
+      annotation (Placement(transformation(extent={{-114,-32},{-80,2}},
             rotation=0)));
-    ThermoPower.Water.FlangeBOld downcomer(
-                            redeclare package Medium = Medium)
-                      annotation (Placement(transformation(extent={{-88,-88},{
-              -52,-52}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld blowdown(
-                           redeclare package Medium = Medium)
-                     annotation (Placement(transformation(extent={{-18,-116},{
-              18,-80}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld steam(
-                        redeclare package Medium = Medium)
-                  annotation (Placement(transformation(extent={{40,52},{76,88}},
+    ThermoPower.Water.FlangeAOld riser(redeclare package Medium = Medium)
+      annotation (Placement(transformation(extent={{60,-74},{96,-40}}, rotation
+            =0)));
+    ThermoPower.Water.FlangeBOld downcomer(redeclare package Medium = Medium)
+      annotation (Placement(transformation(extent={{-88,-88},{-52,-52}},
             rotation=0)));
+    ThermoPower.Water.FlangeBOld blowdown(redeclare package Medium = Medium)
+      annotation (Placement(transformation(extent={{-18,-116},{18,-80}},
+            rotation=0)));
+    ThermoPower.Water.FlangeBOld steam(redeclare package Medium = Medium)
+      annotation (Placement(transformation(extent={{40,52},{76,88}}, rotation=0)));
   equation
-    der(Mv)= wrv + wev - wv - wc - wcs;
-    der(Ml)= wf + wrl + wc +  wcs - wd - wb - wev;
-    Mv*der(hv) - der(p)*Vv = wrv*(hrv-hv) + (wev - wcs)*(hvs-hv) - wc*(hls-hv) - wv*(hvout-hv) + Qmv - Qvl;
-    Ml*der(hl) - der(p)*Vl = wf*(hf-hl) + wrl*(hrl-hl) + wc*(hls-hl) + (wcs - wev)*(hvs-hl) - wd*(hd-hl) -wb*(hl-hl) + Qml + Qvl;
+    der(Mv) = wrv + wev - wv - wc - wcs;
+    der(Ml) = wf + wrl + wc + wcs - wd - wb - wev;
+    Mv*der(hv) - der(p)*Vv = wrv*(hrv - hv) + (wev - wcs)*(hvs - hv) - wc*(hls
+       - hv) - wv*(hvout - hv) + Qmv - Qvl;
+    Ml*der(hl) - der(p)*Vl = wf*(hf - hl) + wrl*(hrl - hl) + wc*(hls - hl) + (
+      wcs - wev)*(hvs - hl) - wd*(hd - hl) - wb*(hl - hl) + Qml + Qvl;
     Cm*der(Tm) = -Qml - Qmv - Qme;
-    Mv=Vv*rhov;
-    Ml=Vl*rhol;
-    Ev=Mv*vapour.u;
-    El=Ml*liquid.u;
+    Mv = Vv*rhov;
+    Ml = Vl*rhol;
+    Ev = Mv*vapour.u;
+    El = Ml*liquid.u;
     wev = xl*rhol*Vl/tauev;
     wc = (1 - xv)*rhov*Vv/tauc;
     wcs = Kcs*Asup*(Ts - Tl);
@@ -2009,19 +2173,19 @@ density and temperature computations across the saturation boundaries, which in 
     end if;
     Vv = pi*rint^2*L - Vl;
     Amv = 2*pi*rint*L + 2*pi*rint^2 - Aml;
-    liquid.p=p;
-    liquid.h=hl;
-    Tl=liquid.T;
-    rhol=liquid.d;
-    vapour.p=p;
-    vapour.h=hv;
-    Tv=vapour.T;
-    rhov=vapour.d;
-    sat.psat=p;
-    sat.Tsat=Medium.saturationTemperature(p);
-    hls= Medium.bubbleEnthalpy(sat);
-    hvs= Medium.dewEnthalpy(sat);
-    Ts=sat.Tsat;
+    liquid.p = p;
+    liquid.h = hl;
+    Tl = liquid.T;
+    rhol = liquid.d;
+    vapour.p = p;
+    vapour.h = hv;
+    Tv = vapour.T;
+    rhov = vapour.d;
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    hls = Medium.bubbleEnthalpy(sat);
+    hvs = Medium.dewEnthalpy(sat);
+    Ts = sat.Tsat;
     feedwater.p = p;
     feedwater.w = wf;
     feedwater.hAB = hl;
@@ -2061,17 +2225,11 @@ density and temperature computations across the saturation boundaries, which in 
     steam.hBA = hv;
     hvout = if wv >= 0 then hv else steam.hAB;
     Aext = 2*pi*rext^2 + 2*pi*rext*L;
-    annotation (Icon(graphics={
-          Text(extent={{-150,26},{-78,0}}, textString=
-                                               "Feed"),
-          Text(extent={{-180,-34},{-66,-58}}, textString=
-                                                  "Downcomer"),
-          Text(extent={{-38,-102},{46,-142}}, textString=
-                                                  "Blowdown"),
-          Text(extent={{52,-22},{146,-40}}, textString=
-                                                "Risers"),
-          Text(extent={{-22,100},{50,80}}, textString=
-                                               "Steam")}),Documentation(info="<HTML>
+    annotation (Icon(graphics={Text(extent={{-150,26},{-78,0}}, textString=
+            "Feed"),Text(extent={{-180,-34},{-66,-58}}, textString="Downcomer"),
+            Text(extent={{-38,-102},{46,-142}}, textString="Blowdown"),Text(
+            extent={{52,-22},{146,-40}}, textString="Risers"),Text(extent={{-22,
+            100},{50,80}}, textString="Steam")}), Documentation(info="<HTML>
 <p>This model describes the cylindrical drum of a drum boiler, without assuming thermodynamic equilibrium between the liquid and vapour holdups. Connectors are provided for feedwater inlet, steam outlet, downcomer outlet, riser inlet, and blowdown outlet.
 <p>The model is based on dynamic mass and energy balance equations of the liquid volume and vapour volume inside the drum. Mass and energy tranfer between the two phases is provided by bulk condensation and surface condensation of the vapour phase, and by bulk boiling of the liquid phase. Additional energy transfer can take place at the surface if the steam is superheated.
 <p>The riser flowrate is separated before entering the drum, at the vapour pressure. The (saturated) liquid fraction goes into the liquid volume; the (wet) vapour fraction goes into the vapour volume, vith a steam quality depending on the liquid/vapour density ratio and on the <tt>avr</tt> parameter.
@@ -2084,8 +2242,7 @@ density and temperature computations across the saturation boundaries, which in 
 <ul><li><tt>DrumOrientation = 0</tt>: horizontal axis.
 <li><tt>DrumOrientation = 1</tt>: vertical axis.
 </ul>
-</HTML>",
-        revisions="<html>
+</HTML>", revisions="<html>
 <ul>
 <li><i>16 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -2110,7 +2267,8 @@ density and temperature computations across the saturation boundaries, which in 
     Medium.BaseProperties fluid(p(start=pstartout),h(start=hstart));
     parameter Volume V "Inner volume";
     parameter Area S=0 "Inner surface";
-    parameter Position H=0 "Elevation of outlet over inlet" annotation (Evaluate=true);
+    parameter Position H=0 "Elevation of outlet over inlet"
+      annotation (Evaluate=true);
     parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient";
     parameter HeatCapacity Cm=0 "Metal Heat Capacity";
     parameter Pressure pstartin=1.01325e5 "Inlet pressure start value";
@@ -2120,17 +2278,15 @@ density and temperature computations across the saturation boundaries, which in 
     ThermoPower.Water.FlangeAOld inlet(
       p(start=pstartin),
       hAB(start=hstart),
-      redeclare package Medium = Medium)
-                  annotation (Placement(transformation(extent={{-122,-20},{-80,
-              20}}, rotation=0)));
+      redeclare package Medium = Medium) annotation (Placement(transformation(
+            extent={{-122,-20},{-80,20}}, rotation=0)));
     ThermoPower.Water.FlangeBOld outlet(
       p(start=pstartout),
       hBA(start=hstart),
-      redeclare package Medium = Medium)
-                   annotation (Placement(transformation(extent={{80,-20},{120,
-              20}}, rotation=0)));
-    Medium.AbsolutePressure p(start=pstartout, stateSelect=if Medium.singleState then
-               StateSelect.avoid else StateSelect.prefer)
+      redeclare package Medium = Medium) annotation (Placement(transformation(
+            extent={{80,-20},{120,20}}, rotation=0)));
+    Medium.AbsolutePressure p(start=pstartout, stateSelect=if Medium.singleState
+           then StateSelect.avoid else StateSelect.prefer)
       "Fluid pressure at the outlet";
     Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Fluid specific enthalpy";
@@ -2142,13 +2298,14 @@ density and temperature computations across the saturation boundaries, which in 
     AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
     Time Tr "Residence time";
   equation
-    fluid.p=p;
-    fluid.h=h;
-    fluid.T=T;
-    M=fluid.d*V;
-    E=M*fluid.u;
+    fluid.p = p;
+    fluid.h = h;
+    fluid.T = T;
+    M = fluid.d*V;
+    E = M*fluid.u;
     der(M) = inlet.w + outlet.w;
-    M*der(h)-der(p)*V = inlet.w*(hi-h) + outlet.w*(ho-h) - gamma*S*(T - Tm);
+    M*der(h) - der(p)*V = inlet.w*(hi - h) + outlet.w*(ho - h) - gamma*S*(T -
+      Tm);
     if Cm > 0 then
       Cm*der(Tm) = gamma*S*(T - Tm);
     else
@@ -2158,15 +2315,13 @@ density and temperature computations across the saturation boundaries, which in 
     ho = if outlet.w >= 0 then outlet.hAB else h;
     inlet.hAB = h;
     outlet.hBA = h;
-    inlet.p = p+fluid.d*Modelica.Constants.g_n*H;
+    inlet.p = p + fluid.d*Modelica.Constants.g_n*H;
     outlet.p = p;
-    Tr=noEvent(M/max(inlet.w,Modelica.Constants.eps));
-    annotation (Icon(graphics),
-                      Documentation(info="<HTML>
+    Tr = noEvent(M/max(inlet.w, Modelica.Constants.eps));
+    annotation (Icon(graphics), Documentation(info="<HTML>
 <p>This model describes a constant volume header with metal walls. The fluid can be water, steam, or a two-phase mixture. The metal wall temperature and the heat transfer coefficient between the wall and the fluid are uniform. The wall is thermally insulated from the outside.</p>
 <p>If the inlet or the outlet are connected to a bank of tubes, the model can actually represent a collector or a distributor (or both).</p>
-</HTML>",
-        revisions="<html>
+</HTML>", revisions="<html>
 <ul>
 <li><i>16 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -2191,7 +2346,7 @@ density and temperature computations across the saturation boundaries, which in 
   package HRB_Old "Heat recovery boiler models"
     model HRB "Heat recovery boiler model"
       constant Real pi=Modelica.Constants.pi;
-      replaceable package WaterMedium=Water.StandardWater constrainedby
+      replaceable package WaterMedium = Water.StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium;
       replaceable package GasMedium =
           Modelica.Media.Interfaces.PartialMixtureMedium;
@@ -2206,9 +2361,11 @@ density and temperature computations across the saturation boundaries, which in 
         "Specific heat capacity of the tube metal walls";
       parameter Area Sb "Cross-section of the boiler";
       parameter Length Lb "Length of the boiler";
-      parameter Area St= Dext*pi*Lt*Nt*Nr
+      parameter Area St=Dext*pi*Lt*Nt*Nr
         "Total area of the heat exchange surface";
-      Water.Flow1DDB WaterSide(redeclare package Medium=WaterMedium,       Nt=Nt,
+      Water.Flow1DDB WaterSide(
+        redeclare package Medium = WaterMedium,
+        Nt=Nt,
         A=pi*Dint^2/4,
         omega=pi*Dint,
         Dhyd=Dint,
@@ -2216,20 +2373,20 @@ density and temperature computations across the saturation boundaries, which in 
         FFtype=2,
         Cfnom=0.005,
         L=Lt*Nr,
-        N=Nr + 1)              annotation (Placement(transformation(extent={{
-                -12,-40},{8,-20}}, rotation=0)));
-      Thermal.ConvHT_htc WaterMetalHT(N=Nr + 1)
-                                       annotation (Placement(transformation(
-              extent={{-12,-2},{8,-22}}, rotation=0)));
+        N=Nr + 1) annotation (Placement(transformation(extent={{-12,-40},{8,-20}},
+              rotation=0)));
+      Thermal.ConvHT_htc WaterMetalHT(N=Nr + 1) annotation (Placement(
+            transformation(extent={{-12,-2},{8,-22}}, rotation=0)));
       Thermal.MetalTube TubeWalls(
         rint=Dint/2,
         rext=Dext/2,
         rhomcm=rhom*cm,
         lambda=20,
         L=Lt*Nr,
-        N=Nr + 1) "Tube"                  annotation (Placement(transformation(
-              extent={{-12,16},{8,-4}}, rotation=0)));
-      Flow1DGasHT GasSide(redeclare package Medium = GasMedium,
+        N=Nr + 1) "Tube" annotation (Placement(transformation(extent={{-12,16},
+                {8,-4}}, rotation=0)));
+      Flow1DGasHT GasSide(
+        redeclare package Medium = GasMedium,
         L=Lb,
         omega=St/Lb,
         wnom=10,
@@ -2238,37 +2395,31 @@ density and temperature computations across the saturation boundaries, which in 
         Khtc=100,
         A=Sb,
         Dhyd=St/Lb,
-        N=Nr + 1)              annotation (Placement(transformation(extent={{8,
-                64},{-14,44}}, rotation=0)));
-      ThermoPower.Gas.FlangeAOld gasInlet(
-                           redeclare package Medium=GasMedium)
+        N=Nr + 1) annotation (Placement(transformation(extent={{8,64},{-14,44}},
+              rotation=0)));
+      ThermoPower.Gas.FlangeAOld gasInlet(redeclare package Medium = GasMedium)
         annotation (Placement(transformation(extent={{80,40},{100,60}},
               rotation=0)));
-      ThermoPower.Gas.FlangeBOld gasOutlet(
-                            redeclare package Medium=GasMedium)
+      ThermoPower.Gas.FlangeBOld gasOutlet(redeclare package Medium = GasMedium)
         annotation (Placement(transformation(extent={{-100,40},{-80,60}},
               rotation=0)));
-      ThermoPower.Water.FlangeAOld waterInlet(
-                               redeclare package Medium=WaterMedium)
-        annotation (Placement(transformation(extent={{-100,-60},{-80,-40}},
-              rotation=0)));
-      ThermoPower.Water.FlangeBOld waterOutlet(
-                                redeclare package Medium=WaterMedium)
-        annotation (Placement(transformation(extent={{80,-60},{100,-40}},
-              rotation=0)));
-      Thermal.CounterCurrent CounterCurrent1(N=Nr + 1)
-        annotation (Placement(transformation(extent={{-12,16},{8,36}}, rotation=
-               0)));
-      Thermal.ConvHT_htc ConvHT_htc1(N=Nr + 1)
-        annotation (Placement(transformation(extent={{-12,30},{8,50}}, rotation=
-               0)));
+      ThermoPower.Water.FlangeAOld waterInlet(redeclare package Medium =
+            WaterMedium) annotation (Placement(transformation(extent={{-100,-60},
+                {-80,-40}}, rotation=0)));
+      ThermoPower.Water.FlangeBOld waterOutlet(redeclare package Medium =
+            WaterMedium) annotation (Placement(transformation(extent={{80,-60},
+                {100,-40}}, rotation=0)));
+      Thermal.CounterCurrent CounterCurrent1(N=Nr + 1) annotation (Placement(
+            transformation(extent={{-12,16},{8,36}}, rotation=0)));
+      Thermal.ConvHT_htc ConvHT_htc1(N=Nr + 1) annotation (Placement(
+            transformation(extent={{-12,30},{8,50}}, rotation=0)));
     equation
-      connect(WaterMetalHT.fluidside, WaterSide.wall) annotation (Line(points={
-              {-2,-15},{-2,-25}}, color={0,0,255}));
-      connect(TubeWalls.int, WaterMetalHT.otherside)  annotation (Line(points={
-              {-2,3},{-2,-8.9}}, color={255,127,0}));
-      connect(TubeWalls.ext, TubeWalls.int)   annotation (Line(points={{-2,9.1},
-              {-2,8},{0,8},{2,6},{-2,6},{-2,3}}, color={255,127,0}));
+      connect(WaterMetalHT.fluidside, WaterSide.wall)
+        annotation (Line(points={{-2,-15},{-2,-25}}, color={0,0,255}));
+      connect(TubeWalls.int, WaterMetalHT.otherside)
+        annotation (Line(points={{-2,3},{-2,-8.9}}, color={255,127,0}));
+      connect(TubeWalls.ext, TubeWalls.int) annotation (Line(points={{-2,9.1},{
+              -2,8},{0,8},{2,6},{-2,6},{-2,3}}, color={255,127,0}));
       connect(waterInlet, WaterSide.infl)
         annotation (Line(points={{-90,-50},{-56,-50},{-56,-30},{-12,-30}}));
       connect(WaterSide.outfl, waterOutlet)
@@ -2277,28 +2428,26 @@ density and temperature computations across the saturation boundaries, which in 
               50},{-58,54},{-14,54}}, color={159,159,223}));
       connect(GasSide.infl, gasInlet) annotation (Line(points={{8,54},{52,54},{
               52,50},{90,50}}, color={159,159,223}));
-      connect(CounterCurrent1.side2, TubeWalls.ext) annotation (Line(points={{
-              -2,22.9},{-2,9.1}}, color={255,127,0}));
-      connect(CounterCurrent1.side1, ConvHT_htc1.otherside) annotation (Line(
-            points={{-2,29},{-2,36.9}}, color={255,127,0}));
+      connect(CounterCurrent1.side2, TubeWalls.ext)
+        annotation (Line(points={{-2,22.9},{-2,9.1}}, color={255,127,0}));
+      connect(CounterCurrent1.side1, ConvHT_htc1.otherside)
+        annotation (Line(points={{-2,29},{-2,36.9}}, color={255,127,0}));
       connect(ConvHT_htc1.fluidside, GasSide.wall) annotation (Line(points={{-2,
               43},{-2,46.5},{-3,46.5},{-3,49}}, color={0,0,255}));
-      annotation (Diagram(graphics),
-                           Icon(graphics={
-            Rectangle(
-              extent={{-80,80},{80,-80}},
-              lineColor={255,0,0},
-              lineThickness=0.5,
-              fillColor={255,128,0},
-              fillPattern=FillPattern.Solid),
-            Line(
-              points={{-60,62},{62,-60},{62,-60}},
-              color={255,0,0},
-              thickness=1),
-            Line(
-              points={{62,60},{-60,-60}},
-              color={255,0,0},
-              thickness=1)}),
+      annotation (
+        Diagram(graphics),
+        Icon(graphics={Rectangle(
+                  extent={{-80,80},{80,-80}},
+                  lineColor={255,0,0},
+                  lineThickness=0.5,
+                  fillColor={255,128,0},
+                  fillPattern=FillPattern.Solid),Line(
+                  points={{-60,62},{62,-60},{62,-60}},
+                  color={255,0,0},
+                  thickness=1),Line(
+                  points={{62,60},{-60,-60}},
+                  color={255,0,0},
+                  thickness=1)}),
         Documentation(revisions="<html>
 <ul>
 <li><i>20 Dec 2004</i>
@@ -2324,11 +2473,11 @@ This is the model of a very simple heat recovery boiler. The modelling assumptio
     end HRB;
 
     model Flow1DGasHT "Gas flow model with h.t.c. computation"
-      extends Gas.Flow1D(redeclare Thermal.DHThtc wall);
-      parameter CoefficientOfHeatTransfer Khtc(fixed=false)=100;
+      extends Gas.Flow1Dfv(redeclare Thermal.DHThtc wall);
+      parameter CoefficientOfHeatTransfer Khtc(fixed=false) = 100;
     equation
       for i in 1:N loop
-        wall.gamma[i]= Khtc*(w/wnom)^0.6;
+        wall.gamma[i] = Khtc*(w/wnom)^0.6;
       end for;
       annotation (Documentation(revisions="<html>
 <ul>
@@ -2338,13 +2487,13 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-",   info="<html>
+", info="<html>
 This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat transfer coefficient, which is proportional to the mass flow rate, raised to the power of 0.6.
 </html>"));
     end Flow1DGasHT;
 
     model Plant "Simple plant model with HRB"
-      package GasMedium=Modelica.Media.IdealGases.MixtureGases.CombustionAir;
+      package GasMedium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
       parameter GasMedium.MassFraction Xnom[GasMedium.nX]={0.75,0.25};
       HRB Boiler(
         redeclare package GasMedium = GasMedium,
@@ -2357,22 +2506,24 @@ This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat tra
         rhom=7800,
         cm=650,
         Sb=8,
-        Lb=2)  annotation (Placement(transformation(extent={{-18,14},{18,50}},
+        Lb=2) annotation (Placement(transformation(extent={{-18,14},{18,50}},
               rotation=0)));
       Water.ValveLin ValveLin1(Kv=20/4e5) annotation (Placement(transformation(
               extent={{52,20},{72,0}}, rotation=0)));
-      Water.SinkP SinkP1(p0=1e5)
-                         annotation (Placement(transformation(extent={{82,0},{
-                102,20}}, rotation=0)));
-      Gas.SourceW SourceW2(w0=10, redeclare package Medium = GasMedium,
+      Water.SinkP SinkP1(p0=1e5) annotation (Placement(transformation(extent={{
+                82,0},{102,20}}, rotation=0)));
+      Gas.SourceW SourceW2(
+        w0=10,
+        redeclare package Medium = GasMedium,
         Xnom=Xnom,
         p0=1e5,
-        T=670)                    annotation (Placement(transformation(extent={
-                {102,52},{82,72}}, rotation=0)));
-      Gas.SinkP SinkP2(redeclare package Medium = GasMedium,
+        T=670) annotation (Placement(transformation(extent={{102,52},{82,72}},
+              rotation=0)));
+      Gas.SinkP SinkP2(
+        redeclare package Medium = GasMedium,
         T=300,
-        Xnom=Xnom)     annotation (Placement(transformation(extent={{-78,44},{
-                -98,64}}, rotation=0)));
+        Xnom=Xnom) annotation (Placement(transformation(extent={{-78,44},{-98,
+                64}}, rotation=0)));
       Modelica.Blocks.Sources.Step ValveWaterOpening(
         offset=1,
         startTime=1,
@@ -2385,37 +2536,36 @@ This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat tra
                 {-46,22}}, rotation=0)));
       Water.SensT ToutWater annotation (Placement(transformation(extent={{28,4},
                 {48,24}}, rotation=0)));
-      Gas.SensT ToutGas(redeclare package Medium = GasMedium)
-        annotation (Placement(transformation(extent={{-20,48},{-40,68}},
-              rotation=0)));
-      Gas.SensT TinGas(redeclare package Medium = GasMedium)
-        annotation (Placement(transformation(extent={{70,56},{50,76}}, rotation=
-               0)));
+      Gas.SensT ToutGas(redeclare package Medium = GasMedium) annotation (
+          Placement(transformation(extent={{-20,48},{-40,68}}, rotation=0)));
+      Gas.SensT TinGas(redeclare package Medium = GasMedium) annotation (
+          Placement(transformation(extent={{70,56},{50,76}}, rotation=0)));
       Water.SourceP SourceP1(p0=5e5) annotation (Placement(transformation(
               extent={{-100,-2},{-80,18}}, rotation=0)));
     equation
-      connect(ValveLin1.outlet, SinkP1.flange) annotation (Line(points={{72,10},
-              {82,10}}));
-      connect(ValveWaterOpening.y, ValveLin1.cmd) annotation (Line(points={{1,
-              -30},{62,-30},{62,2}}, color={0,0,127}));
-      connect(SinkP2.flange, PressDropLin1.outlet) annotation (Line(points={{
-              -78,54},{-68,54}}, color={159,159,223}));
+      connect(ValveLin1.outlet, SinkP1.flange)
+        annotation (Line(points={{72,10},{82,10}}));
+      connect(ValveWaterOpening.y, ValveLin1.cmd)
+        annotation (Line(points={{1,-30},{62,-30},{62,2}}, color={0,0,127}));
+      connect(SinkP2.flange, PressDropLin1.outlet)
+        annotation (Line(points={{-78,54},{-68,54}}, color={159,159,223}));
     initial equation
       // Boiler.GasSide.Khtc=250;
-      ToutGas.T=330;
-      der(Boiler.GasSide.p)=0;
-      der(Boiler.GasSide.Ttilde)=zeros(size(Boiler.GasSide.Ttilde,1));
-      der(Boiler.GasSide.Xtilde)=zeros(size(Boiler.GasSide.Xtilde,1),size(Boiler.GasSide.Xtilde,2));
-      der(Boiler.TubeWalls.T)=zeros(size(Boiler.TubeWalls.T,1));
-      der(Boiler.WaterSide.htilde)=zeros(size(Boiler.WaterSide.htilde,1));
-      der(Boiler.WaterSide.p)=0;
+      ToutGas.T = 330;
+      der(Boiler.GasSide.p) = 0;
+      der(Boiler.GasSide.Ttilde) = zeros(size(Boiler.GasSide.Ttilde, 1));
+      der(Boiler.GasSide.Xtilde) = zeros(size(Boiler.GasSide.Xtilde, 1), size(
+        Boiler.GasSide.Xtilde, 2));
+      der(Boiler.TubeWalls.T) = zeros(size(Boiler.TubeWalls.T, 1));
+      der(Boiler.WaterSide.htilde) = zeros(size(Boiler.WaterSide.htilde, 1));
+      der(Boiler.WaterSide.p) = 0;
     equation
-      connect(TinGas.inlet, SourceW2.flange) annotation (Line(points={{66,62},{
-              82,62}}, color={159,159,223}));
+      connect(TinGas.inlet, SourceW2.flange)
+        annotation (Line(points={{66,62},{82,62}}, color={159,159,223}));
       connect(TinGas.outlet, Boiler.gasInlet) annotation (Line(points={{54,62},
               {42,62},{42,41},{16.2,41}}, color={159,159,223}));
-      connect(PressDropLin1.inlet, ToutGas.outlet) annotation (Line(points={{
-              -48,54},{-36,54}}, color={159,159,223}));
+      connect(PressDropLin1.inlet, ToutGas.outlet)
+        annotation (Line(points={{-48,54},{-36,54}}, color={159,159,223}));
       connect(ToutGas.inlet, Boiler.gasOutlet) annotation (Line(points={{-24,54},
               {-20,54},{-20,41},{-16.2,41}}, color={159,159,223}));
       connect(TinWater.outlet, Boiler.waterInlet)
@@ -2426,8 +2576,9 @@ This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat tra
         annotation (Line(points={{16.2,23},{23.1,23},{23.1,10},{32,10}}));
       connect(SourceP1.flange, TinWater.inlet)
         annotation (Line(points={{-80,8},{-62,8}}));
-      annotation (Diagram(graphics),
-                           Documentation(revisions="<html>
+      annotation (
+        Diagram(graphics),
+        Documentation(revisions="<html>
 <ul>
 <li><i>20 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
