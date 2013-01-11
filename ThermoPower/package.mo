@@ -2412,8 +2412,8 @@ most user-developed models.</li>
 </ul>
 <h2>License agreement</h2></p>
 <p>The ThermoPower package is licensed by Politecnico di Milano under the  <a href=\"http://www.modelica.org/licenses/ModelicaLicense2\"><b>Modelica License 2</b></a>.</p> 
-<p><b>Copyright &copy; 2002-2009, Politecnico di Milano.</b></p>
+<p><b>Copyright &copy; 2002-2013, Politecnico di Milano.</b></p>
 </HTML>"),
 uses(Modelica(version="3.2")),
-version="3.0");
+version="3.1");
 end ThermoPower;
