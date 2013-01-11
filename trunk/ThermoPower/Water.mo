@@ -4530,7 +4530,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     annotation (
       Icon(graphics={Text(extent={{-58,94},{-30,74}}, textString=
                                              "n"), Text(extent={{-10,102},{18,
-                82}}, textString =           "Np")}),
+                82}}, textString=            "Np")}),
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>This model describes a centrifugal pump (or a group of <tt>Np</tt> pumps in parallel) with controlled speed, either fixed or provided by an external signal.

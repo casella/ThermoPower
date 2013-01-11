@@ -25,34 +25,6 @@ package ThermoPower "Open library for thermal power plant simulation"
   end System;
 
 
-  type HydraulicConductance = Real (final quantity="HydraulicConductance",
-        final unit="(kg/s)/Pa");
-
-
-  type HydraulicResistance = Real (final quantity="HydraulicResistance", final unit
-      =      "Pa/(kg/s)");
-
-
-  type PerUnit = Real (
-                     final quantity="PerUnit",final unit="pu");
-
-
-  type Density = Modelica.SIunits.Density (start=40) "generic start value";
-
-
-  type LiquidDensity = Density (start=1000) "start value for liquids";
-
-
-  type GasDensity = Density (start=5) "start value for gases/vapours";
-
-
-  type AbsoluteTemperature = Temperature (start=300, nominal = 500)
-  "generic temperature";
-
-
-  type AbsolutePressure = Pressure (start=1e5) "generic pressure";
-
-
   package Icons "Icons for ThermoPower library"
     extends Modelica.Icons.Library;
     package Water "Icons for component using water/steam as working fluid"
@@ -810,7 +782,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     end squareReg;
 
     function stepReg =  Modelica.Fluid.Utilities.regStep
-    "Regularized step function" 
+    "Regularized step function"
       annotation (
       smoothOrder = 1,
       Documentation(info="<html>
@@ -858,17 +830,17 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       Real error;
       Real integralError;
   public
-      Modelica.Blocks.Interfaces.RealInput deltaCO 
+      Modelica.Blocks.Interfaces.RealInput deltaCO
         annotation (Placement(transformation(extent={{-140,62},{-100,100}},
             rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput PV 
+      Modelica.Blocks.Interfaces.RealInput PV
         annotation (Placement(transformation(extent={{-140,-100},{-100,-60}},
             rotation=0)));
-      Modelica.Blocks.Interfaces.RealOutput CO 
+      Modelica.Blocks.Interfaces.RealOutput CO
         annotation (Placement(transformation(extent={{100,-20},{140,20}},
             rotation=0)));
     equation
-      SP = if time <= Tstart then SP0 else if time >= Tend then SP0 + deltaSP else 
+      SP = if time <= Tstart then SP0 else if time >= Tend then SP0 + deltaSP else
               SP0 + (time - Tstart)/(Tend - Tstart)*deltaSP;
       error = (SP -PV)           *steadyStateGain;
       der(integralError) = error;
@@ -1077,7 +1049,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
         input Real rangeability = 20 "Rangeability";
         input Real delta = 0.01;
       algorithm
-        rc := if pos > delta then rangeability^(pos-1) else 
+        rc := if pos > delta then rangeability^(pos-1) else
                 pos/delta*rangeability^(delta-1);
         annotation (Documentation(info="<html>
 This characteristic is such that the relative change of the flow coefficient is proportional to the change in the stem position:
@@ -1262,10 +1234,10 @@ This characteristic is such that the relative change of the flow coefficient is 
           alpha := (bladePos-bladePos_nom[i])/(bladePos_nom[i+1]-bladePos_nom[i]);
           q_s :=(slope_s-((1 - alpha)*c[2, i] + alpha*c[2, i + 1]))/
                 (2*((1 - alpha)*c[3, i] + alpha*c[3, i + 1]));
-          H:= if q_flow > q_s then 
+          H:= if q_flow > q_s then
                ((1-alpha)*c[1,i] + alpha*c[1,i+1]) +
                ((1-alpha)*c[2,i] + alpha*c[2,i+1])*q_flow +
-               ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_flow^2 else 
+               ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_flow^2 else
                ((1-alpha)*c[1,i] + alpha*c[1,i+1]) +
                ((1-alpha)*c[2,i] + alpha*c[2,i+1])*q_s +
                ((1-alpha)*c[3,i] + alpha*c[3,i+1])*q_s^2 +
@@ -1401,7 +1373,7 @@ This package contains general-purpose functions and models
       Modelica.SIunits.Frequency f "Electrical frequency";
       PowerConnection powerConnection annotation (Placement(transformation(
             extent={{72,-14},{100,14}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft 
+      Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft
         annotation (Placement(transformation(extent={{-100,-14},{-72,14}},
             rotation=0)));
     equation
@@ -1461,7 +1433,7 @@ The frequency in the electrical connector is the e.m.f. of generator.
               {-100,-14},{-72,14}}, rotation=0)));
       PowerConnection connection2 annotation (Placement(transformation(extent={
               {72,-14},{100,14}}, rotation=0)));
-      Modelica.Blocks.Interfaces.BooleanInput closed 
+      Modelica.Blocks.Interfaces.BooleanInput closed
         annotation (Placement(transformation(
           origin={0,80},
           extent={{-20,-20},{20,20}},
@@ -1508,7 +1480,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
               -14,72},{14,100}}, rotation=0)));
       Power W "Actual power consumption";
       Frequency f "Frequency";
-      Modelica.Blocks.Interfaces.RealInput powerConsumption 
+      Modelica.Blocks.Interfaces.RealInput powerConsumption
         annotation (Placement(transformation(
           origin={-33,0},
           extent={{13,12},{-13,-12}},
@@ -1551,7 +1523,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
       PowerConnection port_b annotation (Placement(transformation(extent={{90,
               -12},{110,8}}, rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput W
-      "Power flowing from port_a to port_b" 
+      "Power flowing from port_a to port_b"
           annotation (Placement(transformation(
           origin={0,-94},
           extent={{-10,-10},{10,10}},
@@ -1598,7 +1570,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
     model FrequencySensor "Measures the frequency at the connector"
       PowerConnection port annotation (Placement(transformation(extent={{-110,
               -10},{-90,10}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealOutput f "Frequency at the connector" 
+      Modelica.Blocks.Interfaces.RealOutput f "Frequency at the connector"
           annotation (Placement(transformation(extent={{92,-10},{112,10}},
             rotation=0)));
     equation
@@ -1655,19 +1627,19 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
 
       PowerConnection powerConnection   annotation (Placement(transformation(
             extent={{-114,-14},{-86,14}}, rotation=0)));
-      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker 
+      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker
         annotation (Placement(transformation(
           origin={0,97},
           extent={{-15,-16},{15,16}},
           rotation=270)));
   protected
-      Modelica.Blocks.Interfaces.BooleanInput closedInternal 
+      Modelica.Blocks.Interfaces.BooleanInput closedInternal
         annotation (Placement(transformation(
           origin={0,49},
           extent={{-9,-8},{9,8}},
           rotation=270)));
   public
-      Modelica.Blocks.Interfaces.RealOutput delta_out 
+      Modelica.Blocks.Interfaces.RealOutput delta_out
         annotation (Placement(transformation(
           origin={0,-90},
           extent={{-10,-10},{10,10}},
@@ -1735,9 +1707,9 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       parameter Modelica.SIunits.MomentOfInertia J=0
       "Moment of inertia of the generator/shaft system (for damping term calculation only)"
            annotation(Dialog(group="Generator"));
-      parameter Real r=0.2 "Damping coefficient of the swing equation" 
+      parameter Real r=0.2 "Damping coefficient of the swing equation"
                              annotation(dialog(enable=if J>0 then true else false, group="Generator"));
-      parameter Integer Np=2 "Number of electrical poles" 
+      parameter Integer Np=2 "Number of electrical poles"
                                annotation(dialog(enable=if J>0 then true else false, group="Generator"));
       Real D "Electrical damping coefficient";
     equation
@@ -1789,9 +1761,9 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       parameter Modelica.SIunits.MomentOfInertia J=0
       "Moment of inertia of the generator/shaft system (for damping term calculation)"
            annotation(Dialog(group="Generator"));
-      parameter Real r=0.2 "Electrical damping of generator/shaft system" 
+      parameter Real r=0.2 "Electrical damping of generator/shaft system"
                              annotation(dialog(enable=if J>0 then true else false, group="Generator"));
-      parameter Integer Np=2 "Number of electrical poles" 
+      parameter Integer Np=2 "Number of electrical poles"
                                annotation(dialog(enable=if J>0 then true else false, group="Generator"));
       Real D "Electrical damping coefficient";
     equation
@@ -1853,19 +1825,19 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
   protected
       parameter Real deltaStart = 0;
   public
-      PowerConnection powerConnection_a "A" 
+      PowerConnection powerConnection_a "A"
                                         annotation (Placement(transformation(
             extent={{-114,-14},{-86,14}}, rotation=0)));
-      PowerConnection powerConnection_b "B" 
+      PowerConnection powerConnection_b "B"
                                         annotation (Placement(transformation(
             extent={{86,-14},{114,14}}, rotation=0)));
   protected
-      Modelica.Blocks.Interfaces.BooleanInput closedInternal_gen_a 
+      Modelica.Blocks.Interfaces.BooleanInput closedInternal_gen_a
         annotation (Placement(transformation(
           origin={-40,29},
           extent={{-9,-8},{9,8}},
           rotation=270)));
-      Modelica.Blocks.Interfaces.BooleanInput closedInternal_gen_b 
+      Modelica.Blocks.Interfaces.BooleanInput closedInternal_gen_b
         annotation (Placement(transformation(
           origin={40,29},
           extent={{-9,-8},{9,8}},
@@ -1926,9 +1898,9 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
                                                       final C_ab = e_a*e_b/(X_a+X_b+Xline));
       parameter Boolean hasBreaker = false
       "Model includes a breaker controlled by external input";
-      parameter Modelica.SIunits.Voltage e_a "e.m.f voltage (generator A)" 
+      parameter Modelica.SIunits.Voltage e_a "e.m.f voltage (generator A)"
                                                        annotation(Dialog(group="Generator side A"));
-      parameter Modelica.SIunits.Voltage e_b "e.m.f voltage (generator B)" 
+      parameter Modelica.SIunits.Voltage e_b "e.m.f voltage (generator B)"
                                                        annotation(Dialog(group="Generator side B"));
       parameter Modelica.SIunits.Reactance X_a
       "Internal reactance (generator A)"                   annotation(Dialog(group="Generator side A"));
@@ -1939,17 +1911,17 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       "Moment of inertia of the generator/shaft system A (for damping term calculation only)"
                                                                                                           annotation(Dialog(group="Generator side A"));
       parameter Real r_a=0.2
-      "Electrical damping of generator/shaft system (generator A)" 
+      "Electrical damping of generator/shaft system (generator A)"
                              annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
-      parameter Integer Np_a=2 "Number of electrical poles (generator A)" 
+      parameter Integer Np_a=2 "Number of electrical poles (generator A)"
                                annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
       parameter Modelica.SIunits.MomentOfInertia J_b=0
       "Moment of inertia of the generator/shaft system B (for damping term calculation only)"
                                                                                                           annotation(Dialog(group="Generator side B"));
       parameter Real r_b=0.2
-      "Electrical damping of generator/shaft system (generator B)" 
+      "Electrical damping of generator/shaft system (generator B)"
                              annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
-      parameter Integer Np_b=2 "Number of electrical poles (generator B)" 
+      parameter Integer Np_b=2 "Number of electrical poles (generator B)"
                                annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
       parameter Modelica.SIunits.Frequency fnom=50
       "Nominal frequency of the network";
@@ -1957,7 +1929,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       "Start value of the load angle between side A and side B"                     annotation(Dialog(tab="Initialization"));
       Real D_a "Electrical damping coefficient side A";
       Real D_b "Electrical damping coefficient side B";
-      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker 
+      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker
         annotation (Placement(transformation(
           origin={0,97},
           extent={{-15,-16},{15,16}},
@@ -2031,17 +2003,17 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       "Moment of inertia of the generator/shaft system A (for damping term calculation only)"
                                                                                                           annotation(Dialog(group="Generator side A"));
       parameter Real r_a=0.2
-      "Electrical damping of generator/shaft system (generator A)" 
+      "Electrical damping of generator/shaft system (generator A)"
                              annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
-      parameter Integer Np_a=2 "Number of electrical poles (generator A)" 
+      parameter Integer Np_a=2 "Number of electrical poles (generator A)"
                                annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
       parameter Modelica.SIunits.MomentOfInertia J_b=0
       "Moment of inertia of the generator/shaft system B (for damping term calculation only)"
                                                                                                           annotation(Dialog(group="Generator side B"));
       parameter Real r_b=0.2
-      "Electrical damping of generator/shaft system (generator B)" 
+      "Electrical damping of generator/shaft system (generator B)"
                              annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
-      parameter Integer Np_b=2 "Number of electrical poles (generator B)" 
+      parameter Integer Np_b=2 "Number of electrical poles (generator B)"
                                annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
       parameter Modelica.SIunits.Frequency fnom=50
       "Nominal frequency of the network";
@@ -2049,7 +2021,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       "Start value of the load angle between side A and side B"                     annotation(Dialog(tab="Initialization"));
       Real D_a "Electrical damping coefficient side A";
       Real D_b "Electrical damping coefficient side B";
-      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker 
+      Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker
         annotation (Placement(transformation(
           origin={0,97},
           extent={{-15,-16},{15,16}},
@@ -2119,9 +2091,9 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       parameter Boolean hasBreaker = false
       "Model includes a breaker controlled by external input";
       parameter Modelica.SIunits.Voltage v "Network connection frame";
-      parameter Modelica.SIunits.Voltage e_a "e.m.f voltage (generator A)" 
+      parameter Modelica.SIunits.Voltage e_a "e.m.f voltage (generator A)"
                                                        annotation(Dialog(group="Generator side A"));
-      parameter Modelica.SIunits.Voltage e_b "e.m.f voltage (generator B)" 
+      parameter Modelica.SIunits.Voltage e_b "e.m.f voltage (generator B)"
                                                        annotation(Dialog(group="Generator side B"));
       parameter Modelica.SIunits.Reactance X_a
       "Internal reactance (generator A)"                   annotation(Dialog(group="Generator side A"));
@@ -2132,17 +2104,17 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       "Moment of inertia of the generator/shaft system A (for damping term calculation only)"
                                                                                                           annotation(Dialog(group="Generator side A"));
       parameter Real r_a=0.2
-      "Electrical damping of generator/shaft system (generator A)" 
+      "Electrical damping of generator/shaft system (generator A)"
                              annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
-      parameter Integer Np_a=2 "Number of electrical poles (generator A)" 
+      parameter Integer Np_a=2 "Number of electrical poles (generator A)"
                                annotation(dialog(enable=if J_a>0 then true else false, group="Generator side A"));
       parameter Modelica.SIunits.MomentOfInertia J_b=0
       "Moment of inertia of the generator/shaft system B (for damping term calculation only)"
                                                                                                           annotation(Dialog(group="Generator side B"));
       parameter Real r_b=0.2
-      "Electrical damping of generator/shaft system (generator B)" 
+      "Electrical damping of generator/shaft system (generator B)"
                              annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
-      parameter Integer Np_b=2 "Number of electrical poles (generator B)" 
+      parameter Integer Np_b=2 "Number of electrical poles (generator B)"
                                annotation(dialog(enable=if J_b>0 then true else false, group="Generator side B"));
       parameter Modelica.SIunits.Frequency fnom=50 "Frequency of the network";
       Real D_a "Electrical damping coefficient side A";
@@ -2162,26 +2134,26 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
       Modelica.SIunits.Angle delta_bg
       "Load angle between generator side B and the grid";
       Modelica.SIunits.Angle delta_g "Grid phase";
-      Modelica.Blocks.Interfaces.BooleanInput closed_gen_a if 
-                                                        hasBreaker 
+      Modelica.Blocks.Interfaces.BooleanInput closed_gen_a if
+                                                        hasBreaker
         annotation (Placement(transformation(
           origin={-68,59},
           extent={{-15,-16},{15,16}},
           rotation=270)));
-      Modelica.Blocks.Interfaces.BooleanInput closed_gen_b if 
-                                                        hasBreaker 
+      Modelica.Blocks.Interfaces.BooleanInput closed_gen_b if
+                                                        hasBreaker
         annotation (Placement(transformation(
           origin={68,59},
           extent={{-15,-16},{15,16}},
           rotation=270)));
-      Modelica.Blocks.Interfaces.BooleanInput closed_grid if 
-                                                        hasBreaker 
+      Modelica.Blocks.Interfaces.BooleanInput closed_grid if
+                                                        hasBreaker
         annotation (Placement(transformation(
           origin={0,97},
           extent={{-15,-16},{15,16}},
           rotation=270)));
   protected
-      Modelica.Blocks.Interfaces.BooleanInput closedInternal_grid 
+      Modelica.Blocks.Interfaces.BooleanInput closedInternal_grid
         annotation (Placement(transformation(
           origin={0,49},
           extent={{-9,-8},{9,8}},
@@ -2298,6 +2270,43 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
 <p>These models are meant to be used as simplified boundary conditions for a thermal power plant model, rather than for fully modular description of three-phase networks. Specialized libraries should be used for this purpose; bear in mind, however, that full three-phase models of electrical machinery and power lines could make the power plant simulation substantially heavier, if special numeric integration strategies are not adopted.
 </html>"));
   end Electrical;
+
+
+
+
+
+
+
+
+
+
+
+
+  type HydraulicConductance = Real (final quantity="HydraulicConductance",
+                                    final unit="(kg/s)/Pa");
+
+
+  type HydraulicResistance = Real (final quantity="HydraulicResistance",
+                                   final unit="Pa/(kg/s)");
+
+
+  type PerUnit = Real (final quantity="PerUnit",final unit="pu");
+
+
+  type Density = Modelica.SIunits.Density (start=40) "generic start value";
+
+
+  type LiquidDensity = Density (start=1000) "start value for liquids";
+
+
+  type GasDensity = Density (start=5) "start value for gases/vapours";
+
+
+  type AbsoluteTemperature = Temperature (start=300, nominal = 500)
+  "generic temperature";
+
+
+  type AbsolutePressure = Pressure (start=1e5) "generic pressure";
 
 
   annotation (Documentation(info="<HTML>
