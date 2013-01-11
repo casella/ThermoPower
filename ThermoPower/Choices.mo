@@ -80,7 +80,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end FlowReversal;
 
   package System
-  type Dynamics = enumeration(
+    type Dynamics = enumeration(
         DynamicFreeInitial
           "DynamicFreeInitial -- Dynamic balance, Initial guess value",
         FixedInitial "FixedInitial -- Dynamic balance, Initial value fixed",
