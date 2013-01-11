@@ -3,9 +3,9 @@ package Choices "Choice enumerations for ThermoPower models"
   package CylinderFourier
     type NodeDistribution = enumeration(
         uniform "Uniform distribution of node radii",
-        thickInternal "Quadratically distributed node radii - thickest at rint", 
+        thickInternal "Quadratically distributed node radii - thickest at rint",
 
-        thickExternal "Quadratically distributed node radii - thickest at rext", 
+        thickExternal "Quadratically distributed node radii - thickest at rext",
 
         thickBoth
           "Quadratically distributed node radii - thickest at both extremes")
@@ -85,7 +85,7 @@ package Choices "Choice enumerations for ThermoPower models"
           "DynamicFreeInitial -- Dynamic balance, Initial guess value",
         FixedInitial "FixedInitial -- Dynamic balance, Initial value fixed",
         SteadyStateInitial
-          "SteadyStateInitial -- Dynamic balance, Steady state initial with guess value", 
+          "SteadyStateInitial -- Dynamic balance, Steady state initial with guess value",
 
         SteadyState "SteadyState -- Steady state balance, Initial guess value")
       "Enumeration to define definition of balance equations";

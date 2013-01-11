@@ -28,13 +28,13 @@ package Old "Old models"
     LiquidDensity rho "Inlet density";
     AbsoluteTemperature Tin;
     AbsolutePressure pv "Saturation pressure";
-    ThermoPower.Water.FlangeAOld inlet 
+    ThermoPower.Water.FlangeAOld inlet
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld outlet 
+    ThermoPower.Water.FlangeBOld outlet
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput theta 
+    Modelica.Blocks.Interfaces.RealInput theta
       annotation (Placement(transformation(
           origin={0,80},
           extent={{-20,-20},{20,20}},
@@ -132,13 +132,13 @@ package Old "Old models"
     Real z "Normalized x";
     Real sqrtz;
     GasDensity rho "Inlet density";
-    ThermoPower.Water.FlangeAOld inlet 
+    ThermoPower.Water.FlangeAOld inlet
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld outlet 
+    ThermoPower.Water.FlangeBOld outlet
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput theta 
+    Modelica.Blocks.Interfaces.RealInput theta
       annotation (Placement(transformation(
           origin={0,80},
           extent={{-20,-20},{20,20}},
@@ -256,18 +256,18 @@ package Old "Old models"
     Real E;
     Real F;
     ThermoPower.Water.FlangeAOld infl(
-                                   p(start=pin_start)) 
+                                   p(start=pin_start))
       annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=
              0)));
     ThermoPower.Water.FlangeBOld outfl(
-                                    p(start=pout_start)) 
+                                    p(start=pout_start))
       annotation (Placement(transformation(extent={{60,2},{100,42}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_n "RPM" 
+    Modelica.Blocks.Interfaces.RealInput in_n "RPM"
       annotation (Placement(transformation(
           origin={-26,80},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_Np "Number of  parallel pumps" 
+    Modelica.Blocks.Interfaces.RealInput in_Np "Number of  parallel pumps"
       annotation (Placement(transformation(
           origin={28,80},
           extent={{-10,-10},{10,10}},
@@ -428,15 +428,15 @@ package Old "Old models"
     Real E;
     Real F;
     ThermoPower.Water.FlangeAOld infl(
-                                   p(start=pin_start)) 
+                                   p(start=pin_start))
       annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=
              0)));
     ThermoPower.Water.FlangeBOld outfl(
-                                    p(start=pout_start)) 
+                                    p(start=pout_start))
       annotation (Placement(transformation(extent={{36,56},{76,96}}, rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort 
+    Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort
       annotation (Placement(transformation(extent={{56,6},{86,34}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_Np "Number of  parallel pumps" 
+    Modelica.Blocks.Interfaces.RealInput in_Np "Number of  parallel pumps"
       annotation (Placement(transformation(
           origin={0,88},
           extent={{-10,-10},{10,10}},
@@ -1416,22 +1416,22 @@ density and temperature computations across the saturation boundaries, which in 
     Area Asurf "Surface of the liquid-vapour interface";
     Real dVvdy;
     Real dVldy;
-    ThermoPower.Water.FlangeAOld feedwater 
+    ThermoPower.Water.FlangeAOld feedwater
                                         annotation (Placement(transformation(
             extent={{-60,-34},{-26,0}}, rotation=0)));
-    ThermoPower.Water.FlangeAOld riser 
+    ThermoPower.Water.FlangeAOld riser
                                     annotation (Placement(transformation(extent=
              {{26,-36},{62,-2}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld downcomer 
+    ThermoPower.Water.FlangeBOld downcomer
       annotation (Placement(transformation(extent={{-62,-80},{-26,-44}},
             rotation=0)));
-    ThermoPower.Water.FlangeBOld blowdown 
+    ThermoPower.Water.FlangeBOld blowdown
                                        annotation (Placement(transformation(
             extent={{26,-80},{62,-44}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld steam 
+    ThermoPower.Water.FlangeBOld steam
                                     annotation (Placement(transformation(extent=
              {{32,40},{68,76}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput HeatingPower 
+    Modelica.Blocks.Interfaces.RealInput HeatingPower
       annotation (Placement(transformation(extent={{-76,10},{-56,30}}, rotation=
              0)));
   equation
@@ -1703,16 +1703,16 @@ density and temperature computations across the saturation boundaries, which in 
 
   model Drum2States
     extends Icons.Water.Drum;
-    replaceable package Medium = 
+    replaceable package Medium =
         Modelica.Media.Interfaces.PartialTwoPhaseMedium;
     Medium.SaturationProperties sat;
-    ThermoPower.Water.FlangeAOld feed 
+    ThermoPower.Water.FlangeAOld feed
                  annotation (Placement(transformation(extent={{-110,-64},{-70,
               -24}}, rotation=0)));
-    ThermoPower.Water.FlangeBOld steam 
+    ThermoPower.Water.FlangeBOld steam
                   annotation (Placement(transformation(extent={{48,52},{88,92}},
             rotation=0)));
-    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat 
+    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
       annotation (Placement(transformation(extent={{-28,-100},{28,-80}},
             rotation=0)));
     parameter Volume Vd "Drum volume";
@@ -1813,11 +1813,11 @@ density and temperature computations across the saturation boundaries, which in 
     Real Kfl;
     Density rho "Fluid density";
     ThermoPower.Water.FlangeAOld inlet(
-                        w(start=wnom)) 
+                        w(start=wnom))
                   annotation (Placement(transformation(extent={{-120,-20},{-80,
               20}}, rotation=0)));
     ThermoPower.Water.FlangeBOld outlet(
-                         w(start=-wnom)) 
+                         w(start=-wnom))
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
   equation
@@ -1953,23 +1953,23 @@ density and temperature computations across the saturation boundaries, which in 
     Area Asup "Surface of the liquid-vapour interface";
     Area Aext "External drum surface";
     ThermoPower.Water.FlangeAOld feedwater(
-                            redeclare package Medium = Medium) 
+                            redeclare package Medium = Medium)
                       annotation (Placement(transformation(extent={{-114,-32},{
               -80,2}}, rotation=0)));
     ThermoPower.Water.FlangeAOld riser(
-                        redeclare package Medium = Medium) 
+                        redeclare package Medium = Medium)
                   annotation (Placement(transformation(extent={{60,-74},{96,-40}},
             rotation=0)));
     ThermoPower.Water.FlangeBOld downcomer(
-                            redeclare package Medium = Medium) 
+                            redeclare package Medium = Medium)
                       annotation (Placement(transformation(extent={{-88,-88},{
               -52,-52}}, rotation=0)));
     ThermoPower.Water.FlangeBOld blowdown(
-                           redeclare package Medium = Medium) 
+                           redeclare package Medium = Medium)
                      annotation (Placement(transformation(extent={{-18,-116},{
               18,-80}}, rotation=0)));
     ThermoPower.Water.FlangeBOld steam(
-                        redeclare package Medium = Medium) 
+                        redeclare package Medium = Medium)
                   annotation (Placement(transformation(extent={{40,52},{76,88}},
             rotation=0)));
   equation
@@ -2120,16 +2120,16 @@ density and temperature computations across the saturation boundaries, which in 
     ThermoPower.Water.FlangeAOld inlet(
       p(start=pstartin),
       hAB(start=hstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium)
                   annotation (Placement(transformation(extent={{-122,-20},{-80,
               20}}, rotation=0)));
     ThermoPower.Water.FlangeBOld outlet(
       p(start=pstartout),
       hBA(start=hstart),
-      redeclare package Medium = Medium) 
+      redeclare package Medium = Medium)
                    annotation (Placement(transformation(extent={{80,-20},{120,
               20}}, rotation=0)));
-    Medium.AbsolutePressure p(start=pstartout, stateSelect=if Medium.singleState then 
+    Medium.AbsolutePressure p(start=pstartout, stateSelect=if Medium.singleState then
                StateSelect.avoid else StateSelect.prefer)
       "Fluid pressure at the outlet";
     Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
@@ -2193,7 +2193,7 @@ density and temperature computations across the saturation boundaries, which in 
       constant Real pi=Modelica.Constants.pi;
       replaceable package WaterMedium=Water.StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium;
-      replaceable package GasMedium = 
+      replaceable package GasMedium =
           Modelica.Media.Interfaces.PartialMixtureMedium;
       parameter GasMedium.MassFraction Xnom[GasMedium.nX];
       parameter Integer Nr=2 "Number of tube rows";
@@ -2218,7 +2218,7 @@ density and temperature computations across the saturation boundaries, which in 
         L=Lt*Nr,
         N=Nr + 1)              annotation (Placement(transformation(extent={{
                 -12,-40},{8,-20}}, rotation=0)));
-      Thermal.ConvHT_htc WaterMetalHT(N=Nr + 1) 
+      Thermal.ConvHT_htc WaterMetalHT(N=Nr + 1)
                                        annotation (Placement(transformation(
               extent={{-12,-2},{8,-22}}, rotation=0)));
       Thermal.MetalTube TubeWalls(
@@ -2241,25 +2241,25 @@ density and temperature computations across the saturation boundaries, which in 
         N=Nr + 1)              annotation (Placement(transformation(extent={{8,
                 64},{-14,44}}, rotation=0)));
       ThermoPower.Gas.FlangeAOld gasInlet(
-                           redeclare package Medium=GasMedium) 
+                           redeclare package Medium=GasMedium)
         annotation (Placement(transformation(extent={{80,40},{100,60}},
               rotation=0)));
       ThermoPower.Gas.FlangeBOld gasOutlet(
-                            redeclare package Medium=GasMedium) 
+                            redeclare package Medium=GasMedium)
         annotation (Placement(transformation(extent={{-100,40},{-80,60}},
               rotation=0)));
       ThermoPower.Water.FlangeAOld waterInlet(
-                               redeclare package Medium=WaterMedium) 
+                               redeclare package Medium=WaterMedium)
         annotation (Placement(transformation(extent={{-100,-60},{-80,-40}},
               rotation=0)));
       ThermoPower.Water.FlangeBOld waterOutlet(
-                                redeclare package Medium=WaterMedium) 
+                                redeclare package Medium=WaterMedium)
         annotation (Placement(transformation(extent={{80,-60},{100,-40}},
               rotation=0)));
-      Thermal.CounterCurrent CounterCurrent1(N=Nr + 1) 
+      Thermal.CounterCurrent CounterCurrent1(N=Nr + 1)
         annotation (Placement(transformation(extent={{-12,16},{8,36}}, rotation=
                0)));
-      Thermal.ConvHT_htc ConvHT_htc1(N=Nr + 1) 
+      Thermal.ConvHT_htc ConvHT_htc1(N=Nr + 1)
         annotation (Placement(transformation(extent={{-12,30},{8,50}}, rotation=
                0)));
     equation
@@ -2269,9 +2269,9 @@ density and temperature computations across the saturation boundaries, which in 
               {-2,3},{-2,-8.9}}, color={255,127,0}));
       connect(TubeWalls.ext, TubeWalls.int)   annotation (Line(points={{-2,9.1},
               {-2,8},{0,8},{2,6},{-2,6},{-2,3}}, color={255,127,0}));
-      connect(waterInlet, WaterSide.infl) 
+      connect(waterInlet, WaterSide.infl)
         annotation (Line(points={{-90,-50},{-56,-50},{-56,-30},{-12,-30}}));
-      connect(WaterSide.outfl, waterOutlet) 
+      connect(WaterSide.outfl, waterOutlet)
         annotation (Line(points={{8,-30},{52,-30},{52,-50},{90,-50}}));
       connect(gasOutlet, GasSide.outfl) annotation (Line(points={{-90,50},{-58,
               50},{-58,54},{-14,54}}, color={159,159,223}));
@@ -2361,7 +2361,7 @@ This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat tra
               rotation=0)));
       Water.ValveLin ValveLin1(Kv=20/4e5) annotation (Placement(transformation(
               extent={{52,20},{72,0}}, rotation=0)));
-      Water.SinkP SinkP1(p0=1e5) 
+      Water.SinkP SinkP1(p0=1e5)
                          annotation (Placement(transformation(extent={{82,0},{
                 102,20}}, rotation=0)));
       Gas.SourceW SourceW2(w0=10, redeclare package Medium = GasMedium,
@@ -2385,10 +2385,10 @@ This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat tra
                 {-46,22}}, rotation=0)));
       Water.SensT ToutWater annotation (Placement(transformation(extent={{28,4},
                 {48,24}}, rotation=0)));
-      Gas.SensT ToutGas(redeclare package Medium = GasMedium) 
+      Gas.SensT ToutGas(redeclare package Medium = GasMedium)
         annotation (Placement(transformation(extent={{-20,48},{-40,68}},
               rotation=0)));
-      Gas.SensT TinGas(redeclare package Medium = GasMedium) 
+      Gas.SensT TinGas(redeclare package Medium = GasMedium)
         annotation (Placement(transformation(extent={{70,56},{50,76}}, rotation=
                0)));
       Water.SourceP SourceP1(p0=5e5) annotation (Placement(transformation(
@@ -2418,13 +2418,13 @@ This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat tra
               -48,54},{-36,54}}, color={159,159,223}));
       connect(ToutGas.inlet, Boiler.gasOutlet) annotation (Line(points={{-24,54},
               {-20,54},{-20,41},{-16.2,41}}, color={159,159,223}));
-      connect(TinWater.outlet, Boiler.waterInlet) 
+      connect(TinWater.outlet, Boiler.waterInlet)
         annotation (Line(points={{-50,8},{-32,8},{-32,23},{-16.2,23}}));
-      connect(ToutWater.outlet, ValveLin1.inlet) 
+      connect(ToutWater.outlet, ValveLin1.inlet)
         annotation (Line(points={{44,10},{52,10}}));
-      connect(Boiler.waterOutlet, ToutWater.inlet) 
+      connect(Boiler.waterOutlet, ToutWater.inlet)
         annotation (Line(points={{16.2,23},{23.1,23},{23.1,10},{32,10}}));
-      connect(SourceP1.flange, TinWater.inlet) 
+      connect(SourceP1.flange, TinWater.inlet)
         annotation (Line(points={{-80,8},{-62,8}}));
       annotation (Diagram(graphics),
                            Documentation(revisions="<html>

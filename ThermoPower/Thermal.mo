@@ -1443,8 +1443,8 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
 model CylinderFourier
     "Thermal model of a hollow cylinder by Fourier's equation - 1 axial node and Nr radial nodes"
-  import Modelica.SIunits.*;
-  import ThermoPower.Choices.CylinderFourier.NodeDistribution;
+    import Modelica.SIunits.*;
+    import ThermoPower.Choices.CylinderFourier.NodeDistribution;
   extends Icons.MetalWall;
 
   replaceable model MaterialModel = MaterialProperties.Metals.StandardSteel constrainedby

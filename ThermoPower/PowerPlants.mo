@@ -18207,7 +18207,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               lineColor={255,255,255},
               fillColor={127,0,127},
               fillPattern=FillPattern.Solid,
-              textString =       "S")}));
+              textString=        "S")}));
     end Sensors;
 
     expandable connector Actuators
@@ -18222,7 +18222,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               lineColor={255,255,255},
               fillColor={127,0,127},
               fillPattern=FillPattern.Solid,
-              textString =      "A")}));
+              textString=       "A")}));
     end Actuators;
     annotation (Documentation(revisions="<html>
 <ul>
