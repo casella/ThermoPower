@@ -328,10 +328,10 @@ This model computes the thermal and mechanical properties of a generic material.
           tableSpecificHeatCapacity=Functions.CtoKTable([25, 439.5; 100, 477.2;
               150, 498.1; 200, 523.3; 250, 540.0; 300, 560.9; 350, 577.5; 400,
               602.8; 425, 611.2; 450, 627.9; 475, 644.6; 500, 657.2; 550, 690.7]),
-
           tableThermalConductivity=Functions.CtoKTable([25, 41.9; 100, 42.2;
               150, 41.9; 200, 41.4; 250, 40.6; 300, 39.7; 350, 38.5; 400, 37.4;
               425, 36.7; 450, 36.3; 475, 35.7; 500, 35.0; 550, 34.0]));
+
       end AlloySteel_A335P12;
     end Metals;
 
@@ -381,14 +381,13 @@ This package contains models to compute the material properties needed to model 
   connector DHTVolumes "Distributed Heat Terminal"
     parameter Integer N(min=1) = 2 "Number of nodes";
     AbsoluteTemperature T[N] "Temperature at the nodes";
-    flow HeatFlux phi[N] "Heat flux at the nodes";
+    flow Power Q[N] "potenza termica";
     annotation (Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
             fillColor={255,127,0},
             fillPattern=FillPattern.Solid)}));
   end DHTVolumes;
-
 
   model HThtc_HT "HThtc to HT adaptor"
     HT HT_port annotation (Placement(transformation(extent={{100,-20},{140,20}},
@@ -597,8 +596,7 @@ This package contains models to compute the material properties needed to model 
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end HeatFlowDistribution;
 
   model HeatSource1D "Distributed Heat Flow Source"
@@ -700,8 +698,7 @@ This package contains models to compute the material properties needed to model 
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics),
+"),   Diagram(graphics),
       Placement(transformation(
           origin={40,30},
           extent={{-20,-20},{20,20}},
@@ -821,8 +818,7 @@ This package contains models to compute the material properties needed to model 
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end MetalTube_fv;
 
   model MetalTube_fem
@@ -918,8 +914,7 @@ This package contains models to compute the material properties needed to model 
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end MetalTube_fem;
 
   model MetalWall_fv "Generic metal wall - 1 radial node and N axial nodes"
@@ -1008,8 +1003,7 @@ This package contains models to compute the material properties needed to model 
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end MetalWall_fv;
 
   model MetalWall_fem "Generic metal wall - 1 radial node and N axial nodes"
@@ -1095,8 +1089,7 @@ This package contains models to compute the material properties needed to model 
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end MetalWall_fem;
 
   connector HThtc
@@ -1133,7 +1126,6 @@ This package contains models to compute the material properties needed to model 
     extends DHT;
     input CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
   end DHThtc_in;
-
 
   model DHThtc_DHT "DHThtc to DHT adapter"
 
@@ -1276,9 +1268,6 @@ This package contains models to compute the material properties needed to model 
 </html>"),
       Diagram(graphics));
   end ConvHTLumped_htc;
-
-
-
 
   model ConvHT2N
     "1D Convective heat transfer between two DHT connectors with a different number of nodes"
@@ -1517,8 +1506,7 @@ This package contains models to compute the material properties needed to model 
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end ConvHT_htc;
 
   model ConvHT2N_htc
@@ -1814,15 +1802,8 @@ The swapping is performed if the counterCurrent parameter is true (default value
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end MetalWall;
-
-
-
-
-
-
 
   model MetalTube "Cylindrical metal tube - 1 radial node and N axial nodes"
     extends MetalTube_fem;
@@ -1864,8 +1845,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end MetalTube;
 
   model CylinderFourier
