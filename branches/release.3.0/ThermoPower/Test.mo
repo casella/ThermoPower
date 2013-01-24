@@ -1886,7 +1886,7 @@ Algorithm Tolerance = 1e-6
                 0.001,0.0015}, W_nom={350,500,600}),
         wstart=0,
         w0=1,
-        dp0=20000000000)      annotation (Placement(transformation(extent={{-40,
+        dp0=2e5)      annotation (Placement(transformation(extent={{-40,
                 -2},{-20,18}}, rotation=0)));
       ThermoPower.Water.SourceP Source annotation (Placement(transformation(
               extent={{-80,0},{-60,20}}, rotation=0)));
