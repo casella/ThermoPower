@@ -2740,7 +2740,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     annotation (
       Diagram(graphics),
       Icon(graphics),
-      DymolaStoredErrors,
       Documentation(info="<HTML>
 <p>This model describes a water-gas accumulator (the gas is modeled as ideal bi-atomic). <p>
 Water flows in and out through the interfaces at the component bottom (flow reversal supported). <p>
