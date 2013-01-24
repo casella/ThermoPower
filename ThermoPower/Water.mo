@@ -65,8 +65,8 @@ package Water "Models of components with water/steam as working fluid"
     outer ThermoPower.System system "System wide properties";
     Pressure p "Actual pressure";
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p0 annotation (Placement(
           transformation(
           origin={-40,92},
@@ -130,8 +130,8 @@ package Water "Models of components with water/steam as working fluid"
     outer ThermoPower.System system "System wide properties";
     Pressure p;
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p0 annotation (Placement(
           transformation(
           origin={-40,88},
@@ -195,8 +195,8 @@ package Water "Models of components with water/steam as working fluid"
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
           transformation(
           origin={-40,60},
@@ -260,8 +260,8 @@ package Water "Models of components with water/steam as working fluid"
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
           transformation(
           origin={-40,60},
@@ -322,11 +322,11 @@ package Water "Models of components with water/steam as working fluid"
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
           transformation(
           origin={-40,60},
@@ -371,11 +371,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
   equation
     inlet.m_flow + outlet.m_flow = 0;
     inlet.p - outlet.p = R*inlet.m_flow "Flow characteristics";
@@ -384,7 +384,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     inStream(inlet.h_outflow) = outlet.h_outflow;
     annotation (
       Icon(graphics={Text(extent={{-100,-44},{100,-76}}, textString="%name")}),
-
       Documentation(info="<HTML>
 <p>This very simple model provides a pressure drop which is proportional to the flowrate, without computing any fluid property.</p>
 </HTML>", revisions="<html>
@@ -397,8 +396,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end PressDropLin;
 
   model PressDrop "Pressure drop for water/steam flows"
@@ -472,7 +470,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     dp = pin - pout;
     annotation (
       Icon(graphics={Text(extent={{-100,-50},{100,-82}}, textString="%name")}),
-
       Documentation(info="<HTML>
 <p>The pressure drop across the inlet and outlet connectors is computed according to a turbulent friction model, i.e. is proportional to the squared velocity of the fluid. The friction coefficient can be specified directly, or by giving an operating point, or as a multiple of the kinetic pressure. In the latter two cases, the correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit some experimental operating point.</p>
 <p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified; the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate).
@@ -497,8 +494,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end PressDrop;
 
   model Header "Header with metal walls for water/steam flows"
@@ -540,8 +536,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       h_outflow(start=hstart),
       redeclare package Medium = Medium,
       m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
+             0)));
     Pressure p(start=pstart, stateSelect=if Medium.singleState then StateSelect.avoid
            else StateSelect.prefer) "Fluid pressure at the outlet";
     SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
@@ -656,8 +652,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end Header;
 
   model Mixer "Mixer with metal walls for water/steam flows"
@@ -703,8 +698,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       h_outflow(start=hstart),
       redeclare package Medium = Medium,
       m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
+             0)));
     Pressure p(start=pstart, stateSelect=if Medium.singleState then StateSelect.avoid
            else StateSelect.prefer) "Fluid pressure";
     Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
@@ -830,11 +825,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.AbsolutePressure p(start=pext) "Bottom pressure";
     constant Real g=Modelica.Constants.g_n;
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-100,-80},{-60,-40}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-100,-80},{-60,-40}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{60,-80},{100,-40}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{60,-80},{100,-40}}, rotation=0)));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
   equation
@@ -889,7 +884,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </html>"),
       Diagram(graphics));
   end Tank;
-
 
   model Flow1Dfv
     "1-dimensional fluid flow model for water/steam (finite volumes)"
@@ -997,11 +991,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Pressure drop due to static head";
     for j in 1:N - 1 loop
       if Medium.singleState then
-        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) = l*omega*
-          phibar[j] "Energy balance (pressure effects neglected)";
+        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) = Qvol[j]
+          "Energy balance (pressure effects neglected)";
+          //Qvol = l*omega*phibar[j]
       else
         A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
-          l*omega*phibar[j] "Energy balance";
+          Qvol[j] "Energy balance";  //Qvol = l*omega*phibar[j]
       end if;
       dMdt[j] = A*l*(drbdh[j]*der(htilde[j]) + drbdp[j]*der(p))
         "Mass derivative for each volume";
@@ -1046,8 +1041,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     h[1] = inStream(infl.h_outflow);
     h[2:N] = htilde;
 
+    Qvol = wall.Q;
     T = wall.T;
-    phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
+    //phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
 
     Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Total fluid mass";
@@ -1062,8 +1058,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(htilde) = zeros(N - 1);
-    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState
-         then
+    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState then
       der(p) = 0;
     else
       assert(false, "Unsupported initialisation option");
@@ -1071,7 +1066,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
-
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
@@ -1487,8 +1481,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(h) = zeros(N);
-    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState
-         then
+    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState then
       der(p) = 0;
     else
       assert(false, "Unsupported initialisation option");
@@ -1496,7 +1489,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-52},{100,-82}}, textString="%name")}),
-
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
@@ -1822,8 +1814,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         ee[i] = 0;
         f[i] = 0;
 
-      elseif noEvent((h[i] < hl) and (h[i + 1] >= hl) and (h[i + 1] <= hv))
-           then
+      elseif noEvent((h[i] < hl) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
         //liquid - two phase
 
         rs[i] = (hl - h[i])/(h[i + 1] - h[i]);
@@ -1895,8 +1886,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         f[i] = (der(h[i])*hv - (der(h[i + 1])*rs[i] + der(h[i])*(1 - rs[i]))*h[
           i])/(hv - h[i]);
 
-      elseif noEvent((h[i] > hv) and (h[i + 1] >= hl) and (h[i + 1] <= hv))
-           then
+      elseif noEvent((h[i] > hv) and (h[i + 1] >= hl) and (h[i + 1] <= hv)) then
         // vapour - two phase
 
         rs[i] = (hv - h[i])/(h[i + 1] - h[i]);
@@ -2253,7 +2243,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-52},{100,-82}}, textString="%name")}),
-
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is either one-phase, or a two-phase mixture.
@@ -2329,14 +2318,14 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean checkFlowDirection=false "Check flow direction"
       annotation (Dialog(enable=not rev_in1 or not rev_in2 or not rev_out));
     FlangeB out(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-20},{80,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-20},{80,20}}, rotation=0)));
     FlangeA in1(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,20},{-40,60}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,20},{-40,60}}, rotation=0)));
     FlangeA in2(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
   equation
     in1.m_flow + in2.m_flow + out.m_flow = 0 "Mass balance";
     in1.p = out.p;
@@ -2381,8 +2370,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end FlowJoin;
 
   model FlowSplit "Splits a flow in two"
@@ -2403,15 +2391,15 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean checkFlowDirection=false "Check flow direction"
       annotation (Dialog(enable=not rev_in1 or not rev_out1 or not rev_out2));
     FlangeA in1(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-20},{-40,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-20},{-40,20}}, rotation=0)));
     FlangeB out1(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,20},{80,60}}, rotation=0),
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,20},{80,60}}, rotation=0),
           iconTransformation(extent={{40,20},{80,60}})));
     FlangeB out2(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
   equation
     in1.m_flow + out1.m_flow + out2.m_flow = 0 "Mass balance";
     out1.p = in1.p;
@@ -2456,8 +2444,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end FlowSplit;
 
   model SensT "Temperature sensor for water-steam"
@@ -2470,11 +2457,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SpecificEnthalpy h "Specific enthalpy of the fluid";
     Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput T annotation (Placement(
           transformation(extent={{60,40},{100,80}}, rotation=0)));
   equation
@@ -2554,11 +2541,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput w annotation (Placement(
           transformation(extent={{60,40},{100,80}}, rotation=0)));
   equation
@@ -2683,11 +2670,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Modelica.Blocks.Interfaces.RealInput GasInfl annotation (Placement(
           transformation(extent={{-84,80},{-64,100}}, rotation=0)));
     FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-44,-100},{-24,-80}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-44,-100},{-24,-80}}, rotation=0)));
     FlangeB WaterOutfl(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{24,-100},{44,-80}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{24,-100},{44,-80}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput OutletValveOpening annotation (
         Placement(transformation(
           origin={44,90},
@@ -2804,11 +2791,11 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 
     Medium.SaturationProperties sat "Saturation conditions";
     FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
     FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
     Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
       "Metal wall thermal port" annotation (Placement(transformation(extent={{-28,
               -100},{28,-80}}, rotation=0)));
@@ -3010,8 +2997,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
       h_outflow(start=hlstart),
       redeclare package Medium = Medium,
       m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{60,-74},{96,-40}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{60,-74},{96,-40}}, rotation=
+             0)));
     FlangeB downcomer(
       p(start=pstart),
       h_outflow(start=hlstart),
@@ -3191,8 +3178,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end Drum;
 
   model ValveLin "Valve for water/steam flows with linear pressure drop"
@@ -3205,11 +3191,11 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput cmd annotation (Placement(
           transformation(
           origin={0,80},
@@ -3226,7 +3212,6 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-74}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>This very simple model provides a pressure drop which is proportional to the flowrate and to the <tt>cmd</tt> signal, without computing any fluid property.</p>
@@ -3241,7 +3226,6 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 </ul>
 </html>"));
   end ValveLin;
-
 
   model ValveLiq "Valve for liquid water flow"
     extends BaseClasses.ValveBase;
@@ -3262,7 +3246,6 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     end if;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>Liquid water valve model according to the IEC 534/ISA S.75 standards for valve sizing, incompressible fluid. <p>
@@ -3334,7 +3317,6 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     end if;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>Liquid water valve model according to the IEC 534/ISA S.75 standards for valve sizing, compressible fluid. <p>
@@ -3395,7 +3377,6 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     end if;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>Liquid water valve model according to the IEC 534/ISA S.75 standards for valve sizing, incompressible fluid, with possible choked flow conditions. <p>
@@ -3421,7 +3402,6 @@ li><i>1 Jul 2004</i>
 </ul>
 </HTML>"));
   end ValveLiqChoked;
-
 
   model Pump "Centrifugal pump with ideally controlled speed"
     extends BaseClasses.PumpBase;
@@ -3649,7 +3629,6 @@ Input variables changed. This function now computes the heat transfer coefficien
 </HTML>"));
   end f_dittus_boelter;
 
-
   model SteamTurbineStodola "Steam turbine"
     extends BaseClasses.SteamTurbineBase;
     parameter Real eta_iso_nom=0.92 "Nominal isentropic efficiency";
@@ -3702,11 +3681,11 @@ Input variables changed. This function now computes the heat transfer coefficien
       "Initialization option" annotation (Dialog(tab="Initialization"));
     Medium.ThermodynamicState fluidState_in(p(start=pstartin),h(start=hstartin));
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,50},{-80,90}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,50},{-80,90}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-90},{120,-50}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-90},{120,-50}}, rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
         Placement(transformation(extent={{-110,-14},{-84,14}}, rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
@@ -4116,8 +4095,7 @@ This model is not yet complete
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(htilde) = zeros(N - 1);
-    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState
-         then
+    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState then
       der(p) = 0;
     else
       assert(false, "Unsupported initialisation option");
@@ -4125,7 +4103,6 @@ This model is not yet complete
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
-
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
@@ -4510,8 +4487,7 @@ This model is not yet complete
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(htilde) = zeros(N - 1);
-    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState
-         then
+    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState then
       der(p) = 0;
     else
       assert(false, "Unsupported initialisation option");
@@ -4520,7 +4496,6 @@ This model is not yet complete
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-54},{100,-80}}, textString="%name")}),
-
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is either one-phase, or a two-phase mixture.
@@ -4992,20 +4967,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </html>"));
   end Flow1D2phChen;
 
-
-
-  annotation (Documentation(info="<HTML>
-This package contains models of physical processes and components using water or steam as working fluid.
-<p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
-<p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
-<ul>
-<li><tt>Choices.Init.Options.noInit</tt>: no initialisation
-<li><tt>Choices.Init.Options.steadyState</tt>: full steady-state initialisation
-<li><tt>Choices.Init.Options.steadyStateNoP</tt>: steady-state initialisation (except pressure)
-<li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
-</ul>
-The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
-</HTML>"));
   package BaseClasses "Contains partial models"
     partial model Flow1DBase
       "Basic interface for 1-dimensional water/steam fluid flow models"
@@ -5201,7 +5162,6 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       dp = inlet.p - outlet.p "Definition of dp";
       annotation (
         Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
         Diagram(graphics),
         Documentation(info="<HTML>
 <p>This is the base model for the <tt>ValveLiq</tt>, <tt>ValveLiqChoked</tt>, and <tt>ValveVap</tt> valve models. The model is based on the IEC 534 / ISA S.75 standards for valve sizing.
@@ -5267,8 +5227,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       replaceable function powerCharacteristic =
           Functions.PumpCharacteristics.constantPower constrainedby
         ThermoPower.Functions.PumpCharacteristics.basePower
-        "Power consumption vs. q_flow at nominal speed and density" annotation
-        (Dialog(group="Characteristics", enable=usePowerCharacteristic),
+        "Power consumption vs. q_flow at nominal speed and density" annotation (
+         Dialog(group="Characteristics", enable=usePowerCharacteristic),
           choicesAllMatching=true);
       replaceable function efficiencyCharacteristic =
           Functions.PumpCharacteristics.constantEfficiency (eta_nom=0.8)
@@ -5331,8 +5291,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
               rotation=0)));
       FlangeB outfl(redeclare package Medium = Medium, m_flow(max=if
               allowFlowReversal then +Modelica.Constants.inf else 0))
-        annotation (Placement(transformation(extent={{40,50},{80,90}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{40,50},{80,90}}, rotation=
+               0)));
       Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps"
         annotation (Placement(transformation(
             origin={28,80},
@@ -5562,7 +5522,6 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
               fillPattern=FillPattern.Solid),
             Polygon(
               points={{26,56},{32,56},{32,76},{60,76},{60,82},{26,82},{26,56}},
-
               lineColor={0,0,0},
               lineThickness=0.5,
               fillColor={0,0,255},
@@ -5597,5 +5556,30 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </html>"));
     end SteamTurbineBase;
+
+    partial model DistributedHeatTransfer_fv
+
+    input ThermodynamicState fluidState[N];
+    input MassFlowRate w[n];
+
+    ThermoPower.Thermal.DHTVolumes wall;
+
+    parameter Integer Nf "numero di nodi lato fluido";
+    parameter Integer Nw=Nf "numero di nodi lato parete";
+    parameter Boolean useAverageTemperature = true;
+
+    end DistributedHeatTransfer_fv;
   end BaseClasses;
+  annotation (Documentation(info="<HTML>
+This package contains models of physical processes and components using water or steam as working fluid.
+<p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
+<p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
+<ul>
+<li><tt>Choices.Init.Options.noInit</tt>: no initialisation
+<li><tt>Choices.Init.Options.steadyState</tt>: full steady-state initialisation
+<li><tt>Choices.Init.Options.steadyStateNoP</tt>: steady-state initialisation (except pressure)
+<li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
+</ul>
+The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
+</HTML>"));
 end Water;
