@@ -848,9 +848,9 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function linearFlow "Linear flow characteristic"
       extends baseFlow;
-      input Modelica.SIunits.VolumeFlowRate q_nom[2]
+      parameter Modelica.SIunits.VolumeFlowRate q_nom[2]
         "Volume flow rate for two operating points (single pump)";
-      input Modelica.SIunits.Height head_nom[2]
+      parameter Modelica.SIunits.Height head_nom[2]
         "Pump head for two operating points";
       /* Linear system to determine the coefficients:
   head_nom[1] = c[1] + q_nom[1]*c[2];
@@ -867,9 +867,9 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function quadraticFlow "Quadratic flow characteristic"
       extends baseFlow;
-      input Modelica.SIunits.VolumeFlowRate q_nom[3]
+      parameter Modelica.SIunits.VolumeFlowRate q_nom[3]
         "Volume flow rate for three operating points (single pump)";
-      input Modelica.SIunits.Height head_nom[3]
+      parameter Modelica.SIunits.Height head_nom[3]
         "Pump head for three operating points";
     protected
       parameter Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
@@ -888,9 +888,9 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function polynomialFlow "Polynomial flow characteristic"
       extends baseFlow;
-      input Modelica.SIunits.VolumeFlowRate q_nom[:]
+      parameter Modelica.SIunits.VolumeFlowRate q_nom[:]
         "Volume flow rate for N operating points (single pump)";
-      input Modelica.SIunits.Height head_nom[:]
+      parameter Modelica.SIunits.Height head_nom[:]
         "Pump head for N operating points";
       constant VolumeFlowRate q_eps=1e-6
         "Small coefficient to avoid numerical singularities";
@@ -913,16 +913,16 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function constantPower "Constant power consumption characteristic"
       extends basePower;
-      input Modelica.SIunits.Power power=0 "Constant power consumption";
+      parameter Modelica.SIunits.Power power=0 "Constant power consumption";
     algorithm
       consumption := power;
     end constantPower;
 
     function linearPower "Linear power consumption characteristic"
       extends basePower;
-      input Modelica.SIunits.VolumeFlowRate q_nom[2]
+      parameter Modelica.SIunits.VolumeFlowRate q_nom[2]
         "Volume flow rate for two operating points (single pump)";
-      input Modelica.SIunits.Power W_nom[2]
+      parameter Modelica.SIunits.Power W_nom[2]
         "Power consumption for two operating points";
       /* Linear system to determine the coefficients:
   W_nom[1] = c[1] + q_nom[1]*c[2];
@@ -937,9 +937,9 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function quadraticPower "Quadratic power consumption characteristic"
       extends basePower;
-      input Modelica.SIunits.VolumeFlowRate q_nom[3]
+      parameter Modelica.SIunits.VolumeFlowRate q_nom[3]
         "Volume flow rate for three operating points (single pump)";
-      input Modelica.SIunits.Power W_nom[3]
+      parameter Modelica.SIunits.Power W_nom[3]
         "Power consumption for three operating points";
     protected
       Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
@@ -957,7 +957,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function constantEfficiency "Constant efficiency characteristic"
       extends baseEfficiency;
-      input Real eta_nom "Nominal efficiency";
+      parameter Real eta_nom "Nominal efficiency";
     algorithm
       eta := eta_nom;
     end constantEfficiency;
