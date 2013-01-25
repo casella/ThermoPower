@@ -282,8 +282,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=false "Steady-state initialization"
           annotation (Dialog(tab="Initialization"));
 
-        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
         Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{80,-20},{120,20}},
                 rotation=0)));
@@ -310,14 +310,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
       partial model ParallelHE
         "Base class for Parallel Heat Exchanger (two fluid with one gas)"
 
-        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
         Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{80,-20},{120,20}},
                 rotation=0)));
         Water.FlangeA waterInA(redeclare package Medium = FluidMedium)
-          "water/steam first inlet" annotation (Placement(transformation(extent
-                ={{-60,80},{-20,120}}, rotation=0)));
+          "water/steam first inlet" annotation (Placement(transformation(extent=
+                 {{-60,80},{-20,120}}, rotation=0)));
         Water.FlangeB waterOutA(redeclare package Medium = FluidMedium)
           "water/steam first outlet" annotation (Placement(transformation(
                 extent={{-60,-120},{-20,-80}}, rotation=0)));
@@ -432,14 +432,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
       partial model ParallelHE_Des
         "Base class for parallel Heat Exchanger (two fluid with one gas) with desuperheater"
 
-        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
         Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{80,-20},{120,20}},
                 rotation=0)));
         Water.FlangeA waterInA(redeclare package Medium = FluidMedium)
-          "water/steam first inlet" annotation (Placement(transformation(extent
-                ={{-60,80},{-20,120}}, rotation=0)));
+          "water/steam first inlet" annotation (Placement(transformation(extent=
+                 {{-60,80},{-20,120}}, rotation=0)));
         Water.FlangeB waterOutA(redeclare package Medium = FluidMedium)
           "water/steam first outlet" annotation (Placement(transformation(
                 extent={{-60,-120},{-20,-80}}, rotation=0)));
@@ -903,8 +903,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-214,-214},{-186,-186}},
                 rotation=0)));
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-414,-14},{-386,14}}, rotation=0)));
+        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-414,-14},{-386,14}}, rotation=0)));
         Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{386,-14},{414,14}},
                 rotation=0)));
@@ -1000,8 +1000,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 {0,0,255}),Polygon(points={{-126,138},{-114,138},{-120,122},{-126,
                 138}}, lineColor={0,0,255}),Polygon(points={{-166,144},{-154,
                 144},{-160,160},{-166,144}}, lineColor={0,0,255}),Polygon(
-                points={{-246,144},{-234,144},{-240,160},{-246,144}}, lineColor
-                ={0,0,255}),Polygon(points={{-206,138},{-194,138},{-200,122},{-206,
+                points={{-246,144},{-234,144},{-240,160},{-246,144}}, lineColor=
+                 {0,0,255}),Polygon(points={{-206,138},{-194,138},{-200,122},{-206,
                 138}}, lineColor={0,0,255}),Polygon(points={{94,144},{106,144},
                 {100,160},{94,144}}, lineColor={0,0,255}),Polygon(points={{134,
                 138},{146,138},{140,122},{134,138}}, lineColor={0,0,255}),
@@ -1009,8 +1009,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 lineColor={0,0,255}),Polygon(points={{214,138},{226,138},{220,
                 122},{214,138}}, lineColor={0,0,255}),Polygon(points={{54,138},
                 {66,138},{60,122},{54,138}}, lineColor={0,0,255}),Polygon(
-                points={{-286,138},{-274,138},{-280,122},{-286,138}}, lineColor
-                ={0,0,255})}), Diagram(coordinateSystem(
+                points={{-286,138},{-274,138},{-280,122},{-286,138}}, lineColor=
+                 {0,0,255})}), Diagram(coordinateSystem(
               preserveAspectRatio=true,
               extent={{-400,-200},{400,200}},
               initialScale=0.1), graphics));
@@ -1315,8 +1315,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-214,-214},{-186,-186}},
                 rotation=0)));
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-414,-14},{-386,14}}, rotation=0)));
+        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-414,-14},{-386,14}}, rotation=0)));
         Gas.FlangeA GasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{386,-14},{414,14}},
                 rotation=0)));
@@ -1421,8 +1421,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 {0,0,255}),Polygon(points={{-286,138},{-274,138},{-280,122},{-286,
                 138}}, lineColor={0,0,255}),Polygon(points={{-246,144},{-234,
                 144},{-240,160},{-246,144}}, lineColor={0,0,255}),Polygon(
-                points={{-206,138},{-194,138},{-200,122},{-206,138}}, lineColor
-                ={0,0,255}),Polygon(points={{-166,144},{-154,144},{-160,160},{-166,
+                points={{-206,138},{-194,138},{-200,122},{-206,138}}, lineColor=
+                 {0,0,255}),Polygon(points={{-166,144},{-154,144},{-160,160},{-166,
                 144}}, lineColor={0,0,255}),Polygon(points={{-126,138},{-114,
                 138},{-120,122},{-126,138}}, lineColor={0,0,255}),Polygon(
                 points={{54,138},{66,138},{60,122},{54,138}}, lineColor={0,0,
@@ -1479,8 +1479,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-314,-214},{-286,-186}},
                 rotation=0)));
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-514,-14},{-486,14}}, rotation=0)));
+        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-514,-14},{-486,14}}, rotation=0)));
         Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{486,-14},{514,14}},
                 rotation=0)));
@@ -1923,14 +1923,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
                       lineThickness=0.5,
                       textString="Rh"),Line(points={{380,202},{380,-100}},
                 color={0,0,255}),Line(points={{340,-100},{344,-110},{356,-120},
-                {364,-120},{376,-110},{380,-100}}, color={0,0,255}),Line(points
-                ={{340,202},{340,-100}}, color={0,0,255}),Line(points={{300,202},
+                {364,-120},{376,-110},{380,-100}}, color={0,0,255}),Line(points=
+                 {{340,202},{340,-100}}, color={0,0,255}),Line(points={{300,202},
                 {300,-100}}, color={0,0,255}),Line(points={{260,-100},{264,-110},
                 {276,-120},{284,-120},{296,-110},{300,-100}}, color={0,0,255}),
                 Line(points={{260,202},{260,-100}}, color={0,0,255}),Line(
                 points={{80,200},{80,-100}}, color={0,0,255}),Line(points={{40,
-                -100},{44,-110},{56,-120},{64,-120},{76,-110},{80,-100}}, color
-                ={0,0,255}),Line(points={{40,202},{40,-100}}, color={0,0,255}),
+                -100},{44,-110},{56,-120},{64,-120},{76,-110},{80,-100}}, color=
+                 {0,0,255}),Line(points={{40,202},{40,-100}}, color={0,0,255}),
                 Line(points={{0,200},{0,-100}}, color={0,0,255}),Line(points={{
                 -40,-100},{-36,-110},{-24,-120},{-16,-120},{-4,-110},{0,-100}},
                 color={0,0,255}),Line(points={{-40,200},{-40,-100}}, color={0,0,
@@ -2004,8 +2004,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 160},{-46,144}}, lineColor={0,0,255}),Polygon(points={{-6,138},
                 {6,138},{0,122},{-6,138}}, lineColor={0,0,255}),Polygon(points=
                 {{34,144},{46,144},{40,160},{34,144}}, lineColor={0,0,255}),
-                Polygon(points={{74,138},{86,138},{80,122},{74,138}}, lineColor
-                ={0,0,255}),Polygon(points={{214,138},{226,138},{220,122},{214,
+                Polygon(points={{74,138},{86,138},{80,122},{74,138}}, lineColor=
+                 {0,0,255}),Polygon(points={{214,138},{226,138},{220,122},{214,
                 138}}, lineColor={0,0,255}),Polygon(points={{254,144},{266,144},
                 {260,160},{254,144}}, lineColor={0,0,255}),Polygon(points={{294,
                 138},{306,138},{300,122},{294,138}}, lineColor={0,0,255}),
@@ -2360,12 +2360,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 lineColor={0,0,255}),Polygon(points={{-226,-234},{-214,-234},{-220,
                 -250},{-226,-234}}, lineColor={0,0,255}),Polygon(points={{-86,-234},
                 {-74,-234},{-80,-250},{-86,-234}}, lineColor={0,0,255}),Polygon(
-                points={{-46,-228},{-34,-228},{-40,-212},{-46,-228}}, lineColor
-                ={0,0,255}),Polygon(points={{-6,-234},{6,-234},{0,-250},{-6,-234}},
+                points={{-46,-228},{-34,-228},{-40,-212},{-46,-228}}, lineColor=
+                 {0,0,255}),Polygon(points={{-6,-234},{6,-234},{0,-250},{-6,-234}},
                 lineColor={0,0,255}),Polygon(points={{34,-228},{46,-228},{40,-212},
                 {34,-228}}, lineColor={0,0,255}),Polygon(points={{74,-234},{86,
-                -234},{80,-250},{74,-234}}, lineColor={0,0,255}),Polygon(points
-                ={{214,-234},{226,-234},{220,-250},{214,-234}}, lineColor={0,0,
+                -234},{80,-250},{74,-234}}, lineColor={0,0,255}),Polygon(points=
+                 {{214,-234},{226,-234},{220,-250},{214,-234}}, lineColor={0,0,
                 255}),Polygon(points={{254,-228},{266,-228},{260,-212},{254,-228}},
                 lineColor={0,0,255}),Polygon(points={{294,-234},{306,-234},{300,
                 -250},{294,-234}}, lineColor={0,0,255}),Polygon(points={{334,-228},
@@ -2567,12 +2567,12 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 lineColor={0,0,255}),Polygon(points={{-226,-234},{-214,-234},{-220,
                 -250},{-226,-234}}, lineColor={0,0,255}),Polygon(points={{-86,-234},
                 {-74,-234},{-80,-250},{-86,-234}}, lineColor={0,0,255}),Polygon(
-                points={{-46,-228},{-34,-228},{-40,-212},{-46,-228}}, lineColor
-                ={0,0,255}),Polygon(points={{-6,-234},{6,-234},{0,-250},{-6,-234}},
+                points={{-46,-228},{-34,-228},{-40,-212},{-46,-228}}, lineColor=
+                 {0,0,255}),Polygon(points={{-6,-234},{6,-234},{0,-250},{-6,-234}},
                 lineColor={0,0,255}),Polygon(points={{34,-228},{46,-228},{40,-212},
                 {34,-228}}, lineColor={0,0,255}),Polygon(points={{74,-234},{86,
-                -234},{80,-250},{74,-234}}, lineColor={0,0,255}),Polygon(points
-                ={{214,-234},{226,-234},{220,-250},{214,-234}}, lineColor={0,0,
+                -234},{80,-250},{74,-234}}, lineColor={0,0,255}),Polygon(points=
+                 {{214,-234},{226,-234},{220,-250},{214,-234}}, lineColor={0,0,
                 255}),Polygon(points={{254,-228},{266,-228},{260,-212},{254,-228}},
                 lineColor={0,0,255}),Polygon(points={{294,-234},{306,-234},{300,
                 -250},{294,-234}}, lineColor={0,0,255}),Polygon(points={{334,-228},
@@ -2599,8 +2599,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-140,-220},{-100,-180}},
                 rotation=0)));
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-220,-60},{-180,-20}}, rotation=0)));
+        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-220,-60},{-180,-20}}, rotation=0)));
         Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{180,-60},{220,-20}},
                 rotation=0)));
@@ -2672,8 +2672,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-180,-220},{-140,-180}},
                 rotation=0)));
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-220,-60},{-180,-20}}, rotation=0)));
+        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-220,-60},{-180,-20}}, rotation=0)));
         Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{180,-60},{220,-20}},
                 rotation=0)));
@@ -2751,8 +2751,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.FlangeB Sh_HP_Out(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-180,-220},{-140,-180}},
                 rotation=0)));
-        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation
-          (Placement(transformation(extent={{-220,-60},{-180,-20}}, rotation=0)));
+        Gas.FlangeA GasIn(redeclare package Medium = FlueGasMedium) annotation (
+           Placement(transformation(extent={{-220,-60},{-180,-20}}, rotation=0)));
         Gas.FlangeB GasOut(redeclare package Medium = FlueGasMedium)
           annotation (Placement(transformation(extent={{180,-60},{220,-20}},
                 rotation=0)));
@@ -3312,13 +3312,13 @@ package PowerPlants "Models of thermoelectrical power plants components"
           annotation (Line(points={{0,29},{0,45}}, color={255,127,0}));
         connect(heatFlowDistribution_A.side1, convHT2N_A.side2)
           annotation (Line(points={{-28,21},{-28,30.9}}, color={255,127,0}));
-        connect(convHT2N_A.side1, convParallel.objectA) annotation (Line(points
-              ={{-28,37},{-28,42},{-14,42},{-14,4},{-6,4},{-6,19}}, color={255,
+        connect(convHT2N_A.side1, convParallel.objectA) annotation (Line(points=
+               {{-28,37},{-28,42},{-14,42},{-14,4},{-6,4},{-6,19}}, color={255,
                 127,0}));
         connect(convHT2N_B.side2, heatFlowDistribution_B.side1)
           annotation (Line(points={{28,30.9},{28,21}}, color={255,127,0}));
-        connect(convHT2N_B.side1, convParallel.objectB) annotation (Line(points
-              ={{28,37},{28,42},{16,42},{16,4},{6,4},{6,19}}, color={255,127,0}));
+        connect(convHT2N_B.side1, convParallel.objectB) annotation (Line(points=
+               {{28,37},{28,42},{16,42},{16,4},{6,4},{6,19}}, color={255,127,0}));
         connect(metalTube_B.ext, cC_B.side2)
           annotation (Line(points={{28,-12.9},{28,-1.1}}, color={255,127,0}));
         connect(metalTube_B.int, convHT_B.side1)
@@ -3933,11 +3933,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(convParallel.source, gasFlow.wall)
           annotation (Line(points={{0,33},{0,49}}, color={255,127,0}));
-        connect(convHT2N_A.side1, convParallel.objectA) annotation (Line(points
-              ={{-28,23},{-28,36},{-14,36},{-14,6},{-6,6},{-6,23}}, color={255,
+        connect(convHT2N_A.side1, convParallel.objectA) annotation (Line(points=
+               {{-28,23},{-28,36},{-14,36},{-14,6},{-6,6},{-6,23}}, color={255,
                 127,0}));
-        connect(convParallel.objectB, convHT2N_B.side1) annotation (Line(points
-              ={{6,23},{6,6},{14,6},{14,36},{28,36},{28,23}}, color={255,127,0}));
+        connect(convParallel.objectB, convHT2N_B.side1) annotation (Line(points=
+               {{6,23},{6,6},{14,6},{14,36},{28,36},{28,23}}, color={255,127,0}));
         connect(metalTube_A.int, convHT_A.side1)
           annotation (Line(points={{-28,-7},{-28,-17}}, color={255,127,0}));
         connect(metalTube_A.ext, convHT2N_A.side2)
@@ -4335,8 +4335,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
             ThermoPower.Functions.PumpCharacteristics.quadraticFlow (q_nom=
                 q_nom, head_nom=head_nom);
 
-        Water.FlangeA inlet(redeclare package Medium = WaterMedium) annotation
-          (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+        Water.FlangeA inlet(redeclare package Medium = WaterMedium) annotation (
+           Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
         Water.FlangeA outlet(redeclare package Medium = WaterMedium)
           annotation (Placement(transformation(extent={{80,-20},{120,20}},
                 rotation=0)));
@@ -4490,10 +4490,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
             smooth=Smooth.None));
         connect(feed_w.inlet, pump.outlet) annotation (Line(
             points={{24,8.88178e-016},{8,8.88178e-016},{8,-1.95943e-015},{-8,-1.95943e-015}},
-
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
+
         connect(pump.inlet, inlet) annotation (Line(
             points={{-40,1.95943e-015},{-66,1.95943e-015},{-66,0},{-100,0}},
             color={0,0,255},
@@ -4809,8 +4809,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 0.5,4},{0.5,4},{20,4}}, color={0,0,127}));
         connect(levelLP_SP.y, Level_LP.SP)
           annotation (Line(points={{-19,-40},{20,-40}}, color={0,0,127}));
-        connect(ActuatorsBus.nPump_feedLP, Level_LP.CS) annotation (Line(points
-              ={{100,0},{60,0},{60,-44},{40,-44}}, color={213,255,170}));
+        connect(ActuatorsBus.nPump_feedLP, Level_LP.CS) annotation (Line(points=
+               {{100,0},{60,0},{60,-44},{40,-44}}, color={213,255,170}));
         annotation (Diagram(graphics));
       end levelsControl;
 
@@ -5209,9 +5209,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(Ec_HP.waterOut, Ec_HP_Out) annotation (Line(
             points={{40,-10},{40,-40},{20,-40},{20,100},{-160,100},{-160,200}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(Sh_LP.waterIn, Sh_LP_In) annotation (Line(
             points={{-20,10},{-20,52},{60,52},{60,200}},
             thickness=0.5,
@@ -5270,7 +5270,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(Sh2_HP.gasIn, GasIn) annotation (Line(
             points={{-350,0},{-355,0},{-355,1.77636e-015},{-400,1.77636e-015}},
-
             color={159,159,223},
             thickness=0.5));
 
@@ -5718,7 +5717,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(Sh2HP_Rh2IP.gasIn, GasIn) annotation (Line(
             points={{-360,0},{-384,0},{-384,1.77636e-015},{-400,1.77636e-015}},
-
             color={159,159,223},
             thickness=0.5));
 
@@ -5747,9 +5745,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(Sh2HP_Rh2IP.waterOutA, Sh_HP_Out) annotation (Line(
             points={{-352.8,-12},{-352,-12},{-352,-148},{-200,-148},{-200,-200}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(Sh1HP_Rh1IP.waterInA, Sh_HP_In) annotation (Line(
             points={{-280.8,12},{-280.8,103},{-280,103},{-280,200}},
             thickness=0.5,
@@ -6299,7 +6297,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(GasIn, Sh2HP_Rh2IP.gasIn) annotation (Line(
             points={{-500,1.77636e-015},{-480,1.77636e-015},{-480,0},{-460,0}},
-
             color={159,159,223},
             thickness=0.5,
             smooth=Smooth.None));
@@ -6376,10 +6373,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
             smooth=Smooth.None));
         connect(mixIP.out, Sh1HP_Rh1IP.waterInB) annotation (Line(
             points={{-262,-110},{-348,-110},{-348,38},{-371.2,38},{-371.2,12}},
-
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
+
         connect(Sh1HP_Rh1IP.waterOutB, Sh2HP_Rh2IP.waterInB) annotation (Line(
             points={{-371.2,-12},{-371.2,-50},{-420,-50},{-420,30},{-443.2,30},
                 {-443.2,12}},
@@ -6984,11 +6981,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
         connect(SensorsBus.T_Rh2IP_Out, RhIPOut_T.T) annotation (Line(points={{
                 500,140},{-250,140},{-250,-124},{-362,-124}}, color={255,170,
                 213}));
-        connect(ActuatorsBus.theta_attShHP, ShHP_RhIP.theta_valveA) annotation
-          (Line(points={{500,80},{440,80},{440,-92},{-360,-92},{-360,-8},{-362,
+        connect(ActuatorsBus.theta_attShHP, ShHP_RhIP.theta_valveA) annotation (
+           Line(points={{500,80},{440,80},{440,-92},{-360,-92},{-360,-8},{-362,
                 -10},{-405.76,-10.08}}, color={213,255,170}));
-        connect(ActuatorsBus.theta_attRhIP, ShHP_RhIP.theta_valveB) annotation
-          (Line(points={{500,80},{440,80},{440,-92},{-360,-92},{-360,-16},{-382,
+        connect(ActuatorsBus.theta_attRhIP, ShHP_RhIP.theta_valveB) annotation (
+           Line(points={{500,80},{440,80},{440,-92},{-360,-92},{-360,-16},{-382,
                 -16},{-405.76,-15.12}}, color={213,255,170}));
         connect(RhIPOut_T.outlet, Rh_IP_Out) annotation (Line(
             points={{-364,-134},{-190,-134},{-190,-200}},
@@ -7000,7 +6997,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(ShHP_RhIP.gasIn, GasIn) annotation (Line(
             points={{-454,0},{-462,0},{-462,1.77636e-015},{-500,1.77636e-015}},
-
             color={159,159,223},
             thickness=0.5));
 
@@ -7014,9 +7010,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             color={0,0,255}));
         connect(flowSplit2.out2, ShHP_RhIP.LiquidWaterIn_A) annotation (Line(
             points={{-224,144},{-224,110},{-472,110},{-472,-10.08},{-454,-10.08}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(flowSplit1.in1, Ec_IP_In) annotation (Line(
             points={{80,166},{80,200}},
             thickness=0.5,
@@ -7149,10 +7145,10 @@ package PowerPlants "Models of thermoelectrical power plants components"
             smooth=Smooth.None));
         connect(mixIP.out, ShHP_RhIP.waterInB) annotation (Line(
             points={{-280,-110},{-380,-110},{-380,58},{-420.4,58},{-420.4,24}},
-
             color={0,0,255},
             thickness=0.5,
             smooth=Smooth.None));
+
         connect(ShHP_RhIP.waterInA, Sh_HP_In) annotation (Line(
             points={{-439.6,24},{-440,52},{-440,78},{-380,78},{-380,200}},
             color={0,0,255},
@@ -8430,9 +8426,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(
             points={{1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(T_waterOut.inlet, hE.waterOut) annotation (Line(
             points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
             thickness=0.5,
@@ -8559,9 +8555,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(
             points={{1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(T_waterOut.inlet, hE.waterOut) annotation (Line(
             points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
             thickness=0.5,
@@ -8690,9 +8686,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(
             points={{1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(T_waterOut.inlet, hE.waterOut) annotation (Line(
             points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
             thickness=0.5,
@@ -8819,9 +8815,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(
             points={{1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(T_waterOut.inlet, hE.waterOut) annotation (Line(
             points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
             thickness=0.5,
@@ -8956,8 +8952,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=100000,
           Tstartbar_G=Tstart_G,
           Tstartbar_M_A=Tstart_M_A,
-          Tstartbar_M_B=Tstart_M_B) annotation (Placement(transformation(extent
-                ={{-20,-20},{20,20}}, rotation=0)));
+          Tstartbar_M_B=Tstart_M_B) annotation (Placement(transformation(extent=
+                 {{-20,-20},{20,20}}, rotation=0)));
         Water.SinkP sinkP_water_B(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_B,
@@ -9167,9 +9163,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(
             points={{1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(T_waterOut.inlet, hE.waterOut) annotation (Line(
             points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
             thickness=0.5,
@@ -9296,9 +9292,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(
             points={{1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(T_waterOut.inlet, hE.waterOut) annotation (Line(
             points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
             thickness=0.5,
@@ -9425,9 +9421,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
             thickness=0.5));
         connect(sinkP_water.flange, T_waterOut.outlet) annotation (Line(
             points={{1.83697e-015,-70},{1.83697e-015,-56},{-8.88178e-016,-56}},
-
             thickness=0.5,
             color={0,0,255}));
+
         connect(T_waterOut.inlet, hE.waterOut) annotation (Line(
             points={{8.88178e-016,-44},{8.88178e-016,-20},{0,-20}},
             thickness=0.5,
@@ -10015,7 +10011,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           n0=1500,
           feedWaterPump(redeclare function efficiencyCharacteristic =
                 Functions.PumpCharacteristics.constantEfficiency (eta_nom=0.6)),
-
           SSInit=true,
           rho0=1000,
           nominalOutletPressure=719048,
@@ -10023,6 +10018,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-10,-10},
               extent={{10,10},{-10,-10}},
               rotation=180)));
+
         ThermoPower.Water.SensW feed_w(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(
               origin={26,-6},
@@ -10897,8 +10893,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Pressure pcond "Condenser pressure";
 
         Water.FlangeB Tap1(redeclare package Medium = FluidMedium) annotation (
-            Placement(transformation(extent={{-140,-210},{-120,-190}}, rotation
-                =0)));
+            Placement(transformation(extent={{-140,-210},{-120,-190}}, rotation=
+                 0)));
         Water.FlangeB Tap2(redeclare package Medium = FluidMedium) annotation (
             Placement(transformation(extent={{-50,-210},{-30,-190}}, rotation=0)));
         Water.FlangeB Tap3(redeclare package Medium = FluidMedium) annotation (
@@ -11064,11 +11060,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.Pressure pcond "Condenser pressure";
 
         Water.FlangeB Tap1(redeclare package Medium = FluidMedium) annotation (
-            Placement(transformation(extent={{-180,-210},{-160,-190}}, rotation
-                =0)));
+            Placement(transformation(extent={{-180,-210},{-160,-190}}, rotation=
+                 0)));
         Water.FlangeB Tap2(redeclare package Medium = FluidMedium) annotation (
-            Placement(transformation(extent={{-140,-210},{-120,-190}}, rotation
-                =0)));
+            Placement(transformation(extent={{-140,-210},{-120,-190}}, rotation=
+                 0)));
         Water.FlangeB Tap3(redeclare package Medium = FluidMedium) annotation (
             Placement(transformation(extent={{-100,-210},{-80,-190}}, rotation=
                   0)));
@@ -13190,8 +13186,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={120,40},
               extent={{10,10},{-10,-10}},
               rotation=180)));
-        Water.SensP p_ST_LP(redeclare package Medium = FluidMedium) annotation
-          (Placement(transformation(extent={{90,74},{110,94}}, rotation=0)));
+        Water.SensP p_ST_LP(redeclare package Medium = FluidMedium) annotation (
+           Placement(transformation(extent={{90,74},{110,94}}, rotation=0)));
       protected
         replaceable Components.BaseReader_water stateHPT_in(redeclare package
             Medium = FluidMedium) constrainedby Components.BaseReader_water(
@@ -13933,8 +13929,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Kp=-3,
           steadyStateInit=SSInit) annotation (Placement(transformation(extent={
                   {-40,34},{-60,54}}, rotation=0)));
-        Modelica.Blocks.Sources.Constant setPoint(k=setPoint_ratio) annotation
-          (Placement(transformation(extent={{-6,42},{-18,54}}, rotation=0)));
+        Modelica.Blocks.Sources.Constant setPoint(k=setPoint_ratio) annotation (
+           Placement(transformation(extent={{-6,42},{-18,54}}, rotation=0)));
         Components.CondenserPreP_tap condenserIdeal_tap(
           redeclare package Medium = FluidMedium,
           p=p,
@@ -15310,8 +15306,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                   -54}}, rotation=0)));
         ThermoPower.PowerPlants.SteamTurbineGroup.Components.CondenserPreP_tap
           condenserIdeal_tap(redeclare package Medium = FluidMedium, p=5398.2)
-          annotation (Placement(transformation(extent={{0,0},{40,40}}, rotation
-                =0)));
+          annotation (Placement(transformation(extent={{0,0},{40,40}}, rotation=
+                 0)));
         Water.SinkW sinkWater(
           redeclare package Medium = FluidMedium,
           p0=5398.2,
@@ -15790,8 +15786,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_A annotation (
             Placement(transformation(extent={{-220,100},{-180,140}}, rotation=0)));
         Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_C annotation (
-            Placement(transformation(extent={{-220,-140},{-180,-100}}, rotation
-                =0)));
+            Placement(transformation(extent={{-220,-140},{-180,-100}}, rotation=
+                 0)));
 
         Buses.Sensors SensorsBus annotation (Placement(transformation(extent={{
                   180,-100},{220,-60}}, rotation=0)));
@@ -16455,9 +16451,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=0.5));
         connect(powerSensor.port_b, breaker.connection1) annotation (Line(
             points={{28,-0.16},{34,-0.16},{34,-3.55271e-016},{50.8,-3.55271e-016}},
-
             pattern=LinePattern.None,
             thickness=0.5));
+
         connect(breaker.connection2, grid.connection) annotation (Line(
             points={{85.2,-3.55271e-016},{86,-3.1606e-022},{86,0},{94,0},{94,
                 3.55271e-016},{102.8,3.55271e-016}},
@@ -16473,7 +16469,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 170,213}));
         connect(generator.shaft, inertia.flange_b) annotation (Line(
             points={{-73.8,5.32907e-016},{-85.9,5.32907e-016},{-85.9,0},{-100,0}},
-
             color={0,0,0},
             thickness=0.5));
 
@@ -16696,7 +16691,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=0.5));
         connect(breaker_B.connection1, powerSensor_B.port_b) annotation (Line(
             points={{62.8,3.55271e-016},{53.55,3.55271e-016},{53.55,-0.2},{40,-0.2}},
-
             pattern=LinePattern.None,
             thickness=0.5));
 
@@ -16846,7 +16840,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               points={{200,-80},{60,-80},{60,50},{40.2,50}}, color={255,170,213}));
         connect(generator.shaft, shaft) annotation (Line(
             points={{-95.8,5.32907e-016},{-100,5.32907e-016},{-100,0},{-200,0}},
-
             color={0,0,0},
             thickness=0.5));
 
@@ -16911,24 +16904,23 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               points={{-117,0},{-200,0}},
               color={0,0,0},
               thickness=0.5));
-          connect(generator_SE.powerConnection, powerSensor.port_a) annotation
-            (Line(
+          connect(generator_SE.powerConnection, powerSensor.port_a) annotation (
+             Line(
               points={{-68.4,5.32907e-016},{-8.8,5.32907e-016},{-8.8,0},{0,0}},
-
               pattern=LinePattern.None,
               thickness=0.5));
+
           connect(powerSensor.port_b, grid.connection) annotation (Line(
               points={{20,-0.2},{48,-0.2},{48,3.55271e-016},{62.8,3.55271e-016}},
-
               pattern=LinePattern.None,
               thickness=0.5));
 
           connect(frequencySensor.port, generator_SE.powerConnection)
             annotation (Line(
               points={{0,30},{-20,30},{-20,5.32907e-016},{-68.4,5.32907e-016}},
-
               pattern=LinePattern.None,
               thickness=0.5));
+
           annotation (Diagram(graphics));
         end SingleShaft_SE;
 
@@ -16979,11 +16971,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           connect(SensorsBus.power_shaftB, powerSensor_B.W) annotation (Line(
                 points={{200,-100},{140,-100},{140,-120},{30,-120},{30,-109.4}},
                 color={255,170,213}));
-          connect(SensorsBus.frequency_shaftA, frequencySensor_A.f) annotation
-            (Line(points={{200,-100},{140,-100},{140,-60},{80,-60},{80,140},{
+          connect(SensorsBus.frequency_shaftA, frequencySensor_A.f) annotation (
+             Line(points={{200,-100},{140,-100},{140,-60},{80,-60},{80,140},{
                   40.2,140}}, color={255,170,213}));
-          connect(SensorsBus.frequency_shaftB, frequencySensor_B.f) annotation
-            (Line(points={{200,-100},{140,-100},{140,-60},{40.2,-60}}, color={
+          connect(SensorsBus.frequency_shaftB, frequencySensor_B.f) annotation (
+             Line(points={{200,-100},{140,-100},{140,-60},{40.2,-60}}, color={
                   255,170,213}));
           connect(powerSensor_B.port_b, grid.connection_B) annotation (Line(
               points={{40,-100.2},{46,-100.2},{46,-100},{100,-100},{100,-8},{
@@ -17084,20 +17076,20 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           connect(SensorsBus.power_shaftC, powerSensor_C.W) annotation (Line(
                 points={{200,-100},{120,-100},{120,-140},{20,-140},{20,-129.4}},
                 color={255,170,213}));
-          connect(SensorsBus.frequency_shaftC, frequencySensor_C.f) annotation
-            (Line(points={{200,-100},{60,-100},{60,-80},{30.2,-80}}, color={255,
+          connect(SensorsBus.frequency_shaftC, frequencySensor_C.f) annotation (
+             Line(points={{200,-100},{60,-100},{60,-80},{30.2,-80}}, color={255,
                   170,213}));
           connect(SensorsBus.power_shaftB, powerSensor_B.W) annotation (Line(
                 points={{200,-100},{60,-100},{60,-20},{20,-20},{20,-9.4}},
                 color={255,170,213}));
-          connect(SensorsBus.frequency_shaftB, frequencySensor_B.f) annotation
-            (Line(points={{200,-100},{60,-100},{60,40},{30.2,40}}, color={255,
+          connect(SensorsBus.frequency_shaftB, frequencySensor_B.f) annotation (
+             Line(points={{200,-100},{60,-100},{60,40},{30.2,40}}, color={255,
                   170,213}));
           connect(SensorsBus.power_shaftA, powerSensor_A.W) annotation (Line(
                 points={{200,-100},{60,-100},{60,100},{20,100},{20,110.6}},
                 color={255,170,213}));
-          connect(SensorsBus.frequency_shaftA, frequencySensor_A.f) annotation
-            (Line(points={{200,-100},{60,-100},{60,160},{30.2,160}}, color={255,
+          connect(SensorsBus.frequency_shaftA, frequencySensor_A.f) annotation (
+             Line(points={{200,-100},{60,-100},{60,160},{30.2,160}}, color={255,
                   170,213}));
           connect(generator_SE_B1.powerConnection, powerSensor_C.port_a)
             annotation (Line(
@@ -17112,14 +17104,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           connect(powerSensor_B.port_a, generator_SE_B.powerConnection)
             annotation (Line(
               points={{10,0},{-6.8,0},{-6.8,5.32907e-016},{-68.4,5.32907e-016}},
-
               pattern=LinePattern.None,
               thickness=0.5));
 
           connect(frequencySensor_B.port, generator_SE_B.powerConnection)
             annotation (Line(
               points={{10,40},{-20,40},{-20,5.32907e-016},{-68.4,5.32907e-016}},
-
               pattern=LinePattern.None,
               thickness=0.5));
 
@@ -17423,8 +17413,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             points={{67.4,-8},{38.8,-8},{38.8,-8}},
             pattern=LinePattern.None,
             thickness=0.5));
-        connect(booleanConstant.y, generator_SE.closed) annotation (Line(points
-              ={{59,56},{78,56},{78,30},{10,30},{10,19.2}}, color={255,0,255}));
+        connect(booleanConstant.y, generator_SE.closed) annotation (Line(points=
+               {{59,56},{78,56},{78,30},{10,30},{10,19.2}}, color={255,0,255}));
         annotation (Diagram(graphics), experiment(StopTime=32,
               NumberOfIntervals=50000));
       end Test_Generator_SE_breaker;
@@ -17981,8 +17971,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         height=-50) annotation (Placement(transformation(extent={{-190,90},{-170,
                 110}}, rotation=0)));
       Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
-        annotation (Placement(transformation(extent={{40,50},{60,70}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{40,50},{60,70}}, rotation=
+               0)));
     public
       Modelica.Blocks.Sources.Ramp valveHP_com(
         height=0,
@@ -18044,8 +18034,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             points={{40,130},{0,130},{0,110},{-20,110}}, color={255,170,213}));
       connect(hRSG.SensorsBus, sTG_3LRh.SensorsBus) annotation (Line(points={{-20,
               110},{0,110},{0,-150},{-20,-150}}, color={255,170,213}));
-      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points
-            ={{-20,-165},{-6,-165},{-6,95},{-20,95}}, color={213,255,170}));
+      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points=
+             {{-20,-165},{-6,-165},{-6,95},{-20,95}}, color={213,255,170}));
       connect(actuators1, hRSG.ActuatorsBus) annotation (Line(points={{90,-50},
               {-6,-50},{-6,95},{-20,95}}, color={213,255,170}));
       connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(
@@ -18211,8 +18201,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         startTime=10) annotation (Placement(transformation(extent={{-190,90},{-170,
                 110}}, rotation=0)));
       Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
-        annotation (Placement(transformation(extent={{40,50},{60,70}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{40,50},{60,70}}, rotation=
+               0)));
       ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
         eta=0.9,
         J_shaft=15000,
@@ -18222,12 +18212,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         delta_start=0.7) annotation (Placement(transformation(extent={{40,-180},
                 {140,-80}}, rotation=0)));
     equation
-      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points
-            ={{159,70},{110,70},{110,-50}}, color={0,0,127}));
-      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points
-            ={{159,30},{110,30},{110,-50}}, color={0,0,127}));
-      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points
-            ={{159,-10},{110,-10},{110,-50}}, color={0,0,127}));
+      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points=
+             {{159,70},{110,70},{110,-50}}, color={0,0,127}));
+      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points=
+             {{159,30},{110,30},{110,-50}}, color={0,0,127}));
+      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points=
+             {{159,-10},{110,-10},{110,-50}}, color={0,0,127}));
       connect(booleanConstant.y, actuators.ConnectedGenerator)
         annotation (Line(points={{159,-50},{110,-50}}, color={255,0,255}));
       connect(sTG_3LRh.WaterOut, hRSG.WaterIn) annotation (Line(
@@ -18256,8 +18246,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             points={{40,130},{0,130},{0,110},{-20,110}}, color={255,170,213}));
       connect(hRSG.SensorsBus, sTG_3LRh.SensorsBus) annotation (Line(points={{-20,
               110},{0,110},{0,-150},{-20,-150}}, color={255,170,213}));
-      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points
-            ={{-20,-165},{-6,-165},{-6,95},{-20,95}}, color={213,255,170}));
+      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points=
+             {{-20,-165},{-6,-165},{-6,95},{-20,95}}, color={213,255,170}));
       connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(
             points={{100,130},{120,130},{120,95},{-20,95}}, color={213,255,170}));
       connect(sinkGas.flange, hRSG.GasOut) annotation (Line(
@@ -18329,8 +18319,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 100},{-90,120}}, rotation=0)));
     public
       ThermoPower.PowerPlants.GasTurbine.Examples.GasTurbineSimplified
-        gasTurbine(redeclare package FlueGasMedium = FlueGasMedium) annotation
-        (Placement(transformation(extent={{-140,-60},{-60,20}}, rotation=0)));
+        gasTurbine(redeclare package FlueGasMedium = FlueGasMedium) annotation (
+         Placement(transformation(extent={{-140,-60},{-60,20}}, rotation=0)));
       inner System system(allowFlowReversal=false)
         annotation (Placement(transformation(extent={{180,180},{200,200}})));
       HRSG.Examples.HRSG_3LRh hRSG(
@@ -18389,8 +18379,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         SSInit=true) annotation (Placement(transformation(extent={{-20,-20},{60,
                 60}}, rotation=0)));
       Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
-        annotation (Placement(transformation(extent={{96,2},{116,22}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{96,2},{116,22}}, rotation=
+               0)));
       ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
         eta=0.9,
         J_shaft=15000,
@@ -18425,12 +18415,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         CSmax_levelLP=2400) annotation (Placement(transformation(extent={{100,
                 60},{160,120}}, rotation=0)));
     equation
-      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points
-            ={{-159,170},{-80,170},{-80,110}}, color={0,0,127}));
-      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points
-            ={{-159,130},{-80,130},{-80,110}}, color={0,0,127}));
-      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points
-            ={{-159,90},{-80,90},{-80,110}}, color={0,0,127}));
+      connect(valveHP_com.y, actuators.Opening_valveHP) annotation (Line(points=
+             {{-159,170},{-80,170},{-80,110}}, color={0,0,127}));
+      connect(valveIP_com.y, actuators.Opening_valveIP) annotation (Line(points=
+             {{-159,130},{-80,130},{-80,110}}, color={0,0,127}));
+      connect(valveLP_com.y, actuators.Opening_valveLP) annotation (Line(points=
+             {{-159,90},{-80,90},{-80,110}}, color={0,0,127}));
       connect(booleanConstant.y, actuators.ConnectedGenerator) annotation (Line(
             points={{-159,50},{-80,50},{-80,110}}, color={255,0,255}));
       connect(gasTurbine.GTLoad, ramp.y)
@@ -18496,7 +18486,6 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           smooth=Smooth.None));
       connect(sTG_3LRh.ActuatorsBus, singleShaft.ActuatorsBus) annotation (Line(
           points={{60,-148},{72,-148},{72,-178},{190,-178},{190,-148},{180,-148}},
-
           color={213,255,170},
           smooth=Smooth.None));
 
@@ -18599,8 +18588,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         CSmax_levelLP=2400) annotation (Placement(transformation(extent={{60,
                 100},{120,160}}, rotation=0)));
       Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
-        annotation (Placement(transformation(extent={{60,50},{80,70}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{60,50},{80,70}}, rotation=
+               0)));
     public
       Modelica.Blocks.Sources.Ramp valveHP_com(
         height=0,
@@ -18661,8 +18650,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             points={{60,130},{20,130},{20,110},{0,110}}, color={255,170,213}));
       connect(hRSG.SensorsBus, sTG_3LRh.SensorsBus) annotation (Line(points={{0,
               110},{20,110},{20,-150},{0,-150}}, color={255,170,213}));
-      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points
-            ={{0,-165},{14,-165},{14,95},{0,95}}, color={213,255,170}));
+      connect(sTG_3LRh.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(points=
+             {{0,-165},{14,-165},{14,95},{0,95}}, color={213,255,170}));
       connect(actuators1, hRSG.ActuatorsBus) annotation (Line(points={{110,-50},
               {14,-50},{14,95},{0,95}},color={213,255,170}));
       connect(levelsControl.ActuatorsBus, hRSG.ActuatorsBus) annotation (Line(

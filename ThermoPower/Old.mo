@@ -79,7 +79,6 @@ package Old "Old models"
 
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>This model is based on the IEC 534/ISA S.75 standards for valve sizing, incompressible fluid.
@@ -167,7 +166,6 @@ package Old "Old models"
     w = FlowChar(theta)*Av*Y*sqrt(dpnom/pnom*inlet.p*rho)*sqrtz;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>This model is based on the IEC 534/ISA S.75 standards for valve sizing, compressible fluid.
@@ -2124,8 +2122,8 @@ density and temperature computations across the saturation boundaries, which in 
       annotation (Placement(transformation(extent={{-114,-32},{-80,2}},
             rotation=0)));
     ThermoPower.Water.FlangeAOld riser(redeclare package Medium = Medium)
-      annotation (Placement(transformation(extent={{60,-74},{96,-40}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{60,-74},{96,-40}}, rotation=
+             0)));
     ThermoPower.Water.FlangeBOld downcomer(redeclare package Medium = Medium)
       annotation (Placement(transformation(extent={{-88,-88},{-52,-52}},
             rotation=0)));
