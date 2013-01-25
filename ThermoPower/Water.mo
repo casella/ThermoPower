@@ -5260,12 +5260,20 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       parameter Modelica.SIunits.Pressure dp0 "Nominal pressure increase"
         annotation (Dialog(group="Characteristics"));
       final parameter Modelica.SIunits.VolumeFlowRate q_single0=w0/(Np0*rho0)
-        "Nominal volume flow rate (single pump)";
+        "Nominal volume flow rate (single pump)"
+        annotation(Evaluate = true);
       final parameter Modelica.SIunits.Height head0=dp0/(rho0*g)
-        "Nominal pump head";
-    protected
-      function df_dqflow = der(flowCharacteristic, q_flow);
-    public
+        "Nominal pump head"
+        annotation(Evaluate = true);
+      final parameter Real d_head_dq_0=
+        (flowCharacteristic(q_single0*1.05) - flowCharacteristic(q_single0*0.95))/
+        (q_single0*0.1)
+        "Approximate derivative of flow characteristic w.r.t. volume flow"
+        annotation(Evaluate = true);
+      final parameter Real d_head_dn_0 = 2/n0*head0 - q_single0/n0*d_head_dq_0
+        "Approximate derivative of the flow characteristic w.r.t. rotational speed"
+        annotation(Evaluate = true);
+
       MassFlowRate w_single(start=wstart/Np0) "Mass flow rate (single pump)";
       MassFlowRate w=Np*w_single "Mass flow rate (total)";
       VolumeFlowRate q_single(start=wstart/(Np0*rho0))
@@ -5286,7 +5294,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         "Small coefficient to avoid numerical singularities";
       constant AngularVelocity_rpm n_eps=1e-6;
       Real eta "Pump efficiency";
-      Real s "Auxiliary Variable";
+      Real s(start = 1, final unit = "1") "Auxiliary non-dimensional variable";
       FlangeA infl(redeclare package Medium = Medium, m_flow(min=if
               allowFlowReversal then -Modelica.Constants.inf else 0))
         annotation (Placement(transformation(extent={{-100,0},{-60,40}},
@@ -5312,23 +5320,23 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       head = dp/(homotopy(rho, rho0)*g);
       if noEvent(s > 0 or (not CheckValve)) then
         // Flow characteristics when check valve is open
-        q_single = s;
+        q_single = s*q_single0;
         head = homotopy((n/n0)^2*flowCharacteristic(q_single*n0/(n + n_eps)),
-          df_dqflow(q_single0)*(q_single - q_single0) + (2/n0*
-          flowCharacteristic(q_single0) - q_single0/n0*df_dqflow(q_single0))*(n
-           - n0) + head0);
+                         head0 + d_head_dq_0*(q_single - q_single0) +
+                                 d_head_dn_0*(n - n0));
       else
         // Flow characteristics when check valve is closed
-        head = homotopy((n/n0)^2*flowCharacteristic(0) - s, df_dqflow(q_single0)
-          *(q_single - q_single0) + (2/n0*flowCharacteristic(q_single0) -
-          q_single0/n0*df_dqflow(q_single0))*(n - n0) + head0);
+        head = homotopy((n/n0)^2*flowCharacteristic(0) - s*head0,
+                         head0 + d_head_dq_0*(q_single - q_single0) +
+                                 d_head_dn_0*(n - n0));
         q_single = 0;
       end if;
 
       // Power consumption
       if usePowerCharacteristic then
-        W_single = (n/n0)^3*(rho/rho0)*powerCharacteristic(q_single*n0/(n +
-          n_eps)) "Power consumption (single pump)";
+        W_single = (n/n0)^3*(rho/rho0)*
+                    powerCharacteristic(q_single*n0/(n + n_eps))
+          "Power consumption (single pump)";
         eta = (dp*q_single)/(W_single + W_eps) "Hydraulic efficiency";
       else
         eta = efficiencyCharacteristic(q_single*n0/(n + n_eps));
@@ -5344,8 +5352,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       dp = outfl.p - infl.p;
       w = infl.m_flow "Pump total flow rate";
       hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
-         else if w >= 0 then inStream(infl.h_outflow) else inStream(outfl.h_outflow),
-        inStream(infl.h_outflow));
+                     else if w >= 0 then inStream(infl.h_outflow)
+                     else inStream(outfl.h_outflow),
+                     inStream(infl.h_outflow));
       infl.h_outflow = hout;
       outfl.h_outflow = hout;
       h = hout;
@@ -5574,18 +5583,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
     end DistributedHeatTransfer_fv;
   end BaseClasses;
-  annotation (Documentation(info="<HTML>
-This package contains models of physical processes and components using water or steam as working fluid.
-<p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
-<p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
-<ul>
-<li><tt>Choices.Init.Options.noInit</tt>: no initialisation
-<li><tt>Choices.Init.Options.steadyState</tt>: full steady-state initialisation
-<li><tt>Choices.Init.Options.steadyStateNoP</tt>: steady-state initialisation (except pressure)
-<li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
-</ul>
-The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
-</HTML>"));
+
   model NoHeatTransfer
     extends BaseClasses.DistributedHeatTransfer_fv(final Nw);
 
@@ -5598,4 +5596,16 @@ The latter options can be useful when two or more components are connected direc
     extends BaseClasses.DistributedHeatTransfer_fv;
 
   end ConstantHeatTransferCoefficient;
+  annotation (Documentation(info="<HTML>
+This package contains models of physical processes and components using water or steam as working fluid.
+<p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
+<p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
+<ul>
+<li><tt>Choices.Init.Options.noInit</tt>: no initialisation
+<li><tt>Choices.Init.Options.steadyState</tt>: full steady-state initialisation
+<li><tt>Choices.Init.Options.steadyStateNoP</tt>: steady-state initialisation (except pressure)
+<li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
+</ul>
+The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
+</HTML>"));
 end Water;
