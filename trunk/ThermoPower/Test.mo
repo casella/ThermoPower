@@ -9,14 +9,16 @@ package Test "Test cases for the ThermoPower models"
             transformation(extent={{-90,40},{-70,60}}, rotation=0)));
       Water.SourceW SourceW2(w0=0.5, h=3.0e6) annotation (Placement(
             transformation(extent={{-90,0},{-70,20}}, rotation=0)));
-      Water.SinkP SinkP1(p0=0) annotation (Placement(transformation(extent={{50,
+      Water.SinkP SinkP1(p0=100000)
+                               annotation (Placement(transformation(extent={{50,
                 20},{70,40}}, rotation=0)));
       Water.Mixer mixer(
         V=1,
         Cm=0,
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam)
+        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+        pstart=100000)
         annotation (Placement(transformation(extent={{-52,20},{-32,40}},
               rotation=0)));
       Water.ValveLin ValveLin1(Kv=1/1e5) annotation (Placement(transformation(
@@ -39,12 +41,14 @@ package Test "Test cases for the ThermoPower models"
         V=1,
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam)
+        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+        pstart=100000)
         annotation (Placement(transformation(extent={{-40,-40},{-20,-20}},
               rotation=0)));
       Water.ValveLin ValveLin2(Kv=1/1e5) annotation (Placement(transformation(
               extent={{-2,-40},{18,-20}}, rotation=0)));
-      Water.SinkP SinkP2(p0=0) annotation (Placement(transformation(extent={{40,
+      Water.SinkP SinkP2(p0=100000)
+                               annotation (Placement(transformation(extent={{40,
                 -40},{60,-20}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -113,8 +117,8 @@ Casella</a>:<br>
         h=2e5,
         redeclare package Medium = Medium) annotation (Placement(transformation(
               extent={{-98,-30},{-78,-10}}, rotation=0)));
-      Water.SinkP SinkP1(p0=1e5, redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{80,-10},{100,10}}, rotation=0)));
+      Water.SinkP SinkP1(p0=1e5, redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{80,-10},{100,10}}, rotation=0)));
       Water.Mixer Mixer1(
         hstart=1e5,
         V=0.01,
@@ -197,8 +201,8 @@ Casella</a>:<br>
       package Medium = Modelica.Media.Water.StandardWater;
       Water.SourceP SourceP1(p0=300000) annotation (Placement(transformation(
               extent={{-78,60},{-58,80}}, rotation=0)));
-      Water.SinkP SinkP1(p0=100000) annotation (Placement(transformation(extent
-              ={{40,60},{60,80}},rotation=0)));
+      Water.SinkP SinkP1(p0=100000) annotation (Placement(transformation(extent=
+               {{40,60},{60,80}},rotation=0)));
       parameter Real Kf_unknown(fixed=false);
       Water.SourceP SourceP3(p0=3e5) annotation (Placement(transformation(
               extent={{-80,-20},{-60,0}}, rotation=0)));
@@ -1081,18 +1085,18 @@ Casella</a>:<br>
         offset=0,
         startTime=0) annotation (Placement(transformation(extent={{-90,30},{-70,
                 50}}, rotation=0)));
-      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-32,54},{-12,74}}, rotation=0)));
-      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-32,14},{-12,34}}, rotation=0)));
-      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{14,34},{34,54}}, rotation=0)));
-      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-30,-66},{-10,-46}}, rotation=0)));
-      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{20,-40},{40,-20}}, rotation=0)));
-      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{20,-92},{40,-72}}, rotation=0)));
+      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-32,54},{-12,74}}, rotation=0)));
+      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-32,14},{-12,34}}, rotation=0)));
+      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{14,34},{34,54}}, rotation=0)));
+      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-30,-66},{-10,-46}}, rotation=0)));
+      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{20,-40},{40,-20}}, rotation=0)));
+      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{20,-92},{40,-72}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine3(
         freqHz=1,
         amplitude=1,
@@ -1211,12 +1215,12 @@ Casella</a>:<br>
               extent={{70,30},{90,50}}, rotation=0)));
       ThermoPower.Water.PressDropLin LossP1(R=1e-5) annotation (Placement(
             transformation(extent={{40,30},{60,50}}, rotation=0)));
-      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-32,54},{-12,74}}, rotation=0)));
-      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-32,14},{-12,34}}, rotation=0)));
-      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{14,34},{34,54}}, rotation=0)));
+      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-32,54},{-12,74}}, rotation=0)));
+      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-32,14},{-12,34}}, rotation=0)));
+      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{14,34},{34,54}}, rotation=0)));
       Modelica.Blocks.Sources.Trapezoid Sine1(
         nperiod=2,
         rising=0.5,
@@ -1250,12 +1254,12 @@ Casella</a>:<br>
               extent={{70,-50},{90,-30}}, rotation=0)));
       ThermoPower.Water.PressDropLin LossP2(R=1e-5) annotation (Placement(
             transformation(extent={{40,-50},{60,-30}}, rotation=0)));
-      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-32,-26},{-12,-6}}, rotation=0)));
-      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-32,-66},{-12,-46}}, rotation=0)));
-      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{14,-46},{34,-26}}, rotation=0)));
+      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-32,-26},{-12,-6}}, rotation=0)));
+      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-32,-66},{-12,-46}}, rotation=0)));
+      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{14,-46},{34,-26}}, rotation=0)));
       Modelica.Blocks.Sources.Trapezoid Sine3(
         nperiod=2,
         rising=0.5,
@@ -1374,12 +1378,12 @@ Casella</a>:<br>
             transformation(extent={{-60,-70},{-40,-50}}, rotation=0)));
       ThermoPower.Water.SourceP S4(h=1e5) annotation (Placement(transformation(
               extent={{-90,-70},{-70,-50}}, rotation=0)));
-      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-30,-66},{-10,-46}}, rotation=0)));
-      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{20,-40},{40,-20}}, rotation=0)));
-      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{20,-92},{40,-72}}, rotation=0)));
+      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-30,-66},{-10,-46}}, rotation=0)));
+      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{20,-40},{40,-20}}, rotation=0)));
+      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{20,-92},{40,-72}}, rotation=0)));
       ThermoPower.Water.SensP P1 annotation (Placement(transformation(extent={{
                 -50,-48},{-30,-28}}, rotation=0)));
       Modelica.Blocks.Sources.Trapezoid Sine3(
@@ -1412,12 +1416,12 @@ Casella</a>:<br>
             transformation(extent={{-60,26},{-40,46}}, rotation=0)));
       ThermoPower.Water.SourceP S3(h=1e5) annotation (Placement(transformation(
               extent={{-90,26},{-70,46}}, rotation=0)));
-      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{-30,30},{-10,50}}, rotation=0)));
-      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{20,56},{40,76}}, rotation=0)));
-      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation
-        (Placement(transformation(extent={{20,4},{40,24}}, rotation=0)));
+      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{-30,30},{-10,50}}, rotation=0)));
+      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{20,56},{40,76}}, rotation=0)));
+      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation (
+         Placement(transformation(extent={{20,4},{40,24}}, rotation=0)));
       ThermoPower.Water.SensP P2 annotation (Placement(transformation(extent={{
                 -50,48},{-30,68}}, rotation=0)));
       Modelica.Blocks.Sources.Trapezoid Sine1(
@@ -2005,17 +2009,17 @@ Schiavo</a>:<br>
       Modelica.Blocks.Sources.Step Step1(height=2e-2, startTime=500)
         annotation (Placement(transformation(extent={{-90,0},{-70,20}},
               rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-40,-20},{-20,0}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-40,-20},{-20,0}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step2(height=-2e-2, startTime=520)
         annotation (Placement(transformation(extent={{-90,-40},{-70,-20}},
               rotation=0)));
       Modelica.Blocks.Sources.Step Step3(height=1, startTime=2500) annotation (
           Placement(transformation(extent={{-90,70},{-70,90}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent
-              ={{-40,50},{-20,70}}, rotation=0)));
-      Modelica.Blocks.Sources.Step Step5(height=-1, startTime=2520) annotation
-        (Placement(transformation(extent={{-90,30},{-70,50}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent=
+               {{-40,50},{-20,70}}, rotation=0)));
+      Modelica.Blocks.Sources.Step Step5(height=-1, startTime=2520) annotation (
+         Placement(transformation(extent={{-90,30},{-70,50}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step4(
         height=0.5,
         offset=5,
@@ -2321,8 +2325,8 @@ Algorithm Tolerance = 1e-4
         pnom=15000000,
         Kt=0.0025)
         annotation (Placement(transformation(extent={{-22,-2},{-2,18}})));
-      Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(w_fixed
-          =3000/60*3.14159)
+      Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(w_fixed=
+           3000/60*3.14159)
         annotation (Placement(transformation(extent={{24,-2},{4,18}})));
       inner System system
         annotation (Placement(transformation(extent={{60,60},{80,80}})));
@@ -2533,11 +2537,11 @@ Algorithm Tolerance = 1e-4
         offset=hinhex,
         startTime=1) annotation (Placement(transformation(extent={{-90,60},{-70,
                 80}}, rotation=0)));
-      Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation
-        (Placement(transformation(extent={{-40,40},{-20,60}}, rotation=0)));
+      Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation (
+         Placement(transformation(extent={{-40,40},{-20,60}}, rotation=0)));
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
+               0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -2659,8 +2663,8 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{-60,-6},{-40,14}},
               rotation=0)));
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
+               0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -2883,8 +2887,8 @@ Algorithm Tolerance = 1e-6
             transformation(extent={{70,-70},{90,-50}}, rotation=0)));
       ThermoPower.Water.SinkP SideB_FluidSink annotation (Placement(
             transformation(extent={{-80,30},{-100,50}}, rotation=0)));
-      ThermoPower.Water.SourceW SideA_MassFlowRate(w0=whex, p0=3e5) annotation
-        (Placement(transformation(extent={{-74,-70},{-54,-50}}, rotation=0)));
+      ThermoPower.Water.SourceW SideA_MassFlowRate(w0=whex, p0=3e5) annotation (
+         Placement(transformation(extent={{-74,-70},{-54,-50}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{14,-70},{34,-50}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) annotation (Placement(
@@ -2918,10 +2922,10 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant2 annotation (Placement(
             transformation(extent={{0,-20},{20,0}}, rotation=0)));
       ThermoPower.Water.SensT SensT_B_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{30,34},{10,54}}, rotation
-              =0)));
-      ThermoPower.Water.SourceW SideB_MassFlowRate(w0=whex, p0=3e5) annotation
-        (Placement(transformation(extent={{60,30},{40,50}}, rotation=0)));
+        annotation (Placement(transformation(extent={{30,34},{10,54}}, rotation=
+               0)));
+      ThermoPower.Water.SourceW SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
+         Placement(transformation(extent={{60,30},{40,50}}, rotation=0)));
       Thermal.ConvHT ConvExCF(N=Nnodes, gamma=400) annotation (Placement(
             transformation(extent={{-20,-40},{0,-20}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
@@ -3063,8 +3067,8 @@ Algorithm Tolerance = 1e-6
             transformation(extent={{70,-60},{90,-40}}, rotation=0)));
       ThermoPower.Water.SinkP SideB_FluidSink annotation (Placement(
             transformation(extent={{-80,40},{-100,60}}, rotation=0)));
-      ThermoPower.Water.SourceW SideA_MassFlowRate(w0=whex, p0=3e5) annotation
-        (Placement(transformation(extent={{-76,-60},{-56,-40}}, rotation=0)));
+      ThermoPower.Water.SourceW SideA_MassFlowRate(w0=whex, p0=3e5) annotation (
+         Placement(transformation(extent={{-76,-60},{-56,-40}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{18,-60},{38,-40}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) annotation (Placement(
@@ -3109,8 +3113,8 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant2 annotation (Placement(
             transformation(extent={{4,-20},{24,0}}, rotation=0)));
       ThermoPower.Water.SensT SensT_B_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
+               0)));
       ThermoPower.Water.SourceW SourceW1(w0=whex, p0=3e5) annotation (Placement(
             transformation(extent={{60,40},{40,60}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
@@ -3285,11 +3289,11 @@ Algorithm Tolerance = 1e-6
         offset=hinhex,
         startTime=1) annotation (Placement(transformation(extent={{-90,50},{-70,
                 70}}, rotation=0)));
-      Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation
-        (Placement(transformation(extent={{-40,50},{-20,70}}, rotation=0)));
+      Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation (
+         Placement(transformation(extent={{-40,50},{-20,70}}, rotation=0)));
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
+               0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -3412,8 +3416,8 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
+               0)));
       ThermoPower.Thermal.ConvHT_htc ConvHTe_htc1(N=Nnodes) annotation (
           Placement(transformation(extent={{-20,36},{0,16}}, rotation=0)));
       inner System system
@@ -3547,11 +3551,11 @@ Algorithm Tolerance = 1e-6
         offset=hinhex,
         startTime=1) annotation (Placement(transformation(extent={{-94,50},{-74,
                 70}}, rotation=0)));
-      Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation
-        (Placement(transformation(extent={{-40,40},{-20,60}}, rotation=0)));
+      Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation (
+         Placement(transformation(extent={{-40,40},{-20,60}}, rotation=0)));
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{38,-6},{58,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{38,-6},{58,14}}, rotation=
+               0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -3673,8 +3677,8 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
+               0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -3801,8 +3805,8 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{10,-6},{30,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{10,-6},{30,14}}, rotation=
+               0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -4022,8 +4026,8 @@ Algorithm Tolerance = 1e-6
             transformation(extent={{70,-50},{90,-30}}, rotation=0)));
       ThermoPower.Water.SinkP SideB_FluidSink annotation (Placement(
             transformation(extent={{-80,40},{-100,60}}, rotation=0)));
-      ThermoPower.Water.SourceW SideA_MassFlowRate(w0=whex, p0=3e5) annotation
-        (Placement(transformation(extent={{-78,-50},{-58,-30}}, rotation=0)));
+      ThermoPower.Water.SourceW SideA_MassFlowRate(w0=whex, p0=3e5) annotation (
+         Placement(transformation(extent={{-78,-50},{-58,-30}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{20,-50},{40,-30}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) annotation (Placement(
@@ -4042,8 +4046,8 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream)
-        annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation=
+               0)));
       ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-46},{-30,-26}},
               rotation=0)));
@@ -4057,10 +4061,10 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant2 annotation (Placement(
             transformation(extent={{4,-20},{24,0}}, rotation=0)));
       ThermoPower.Water.SensT SensT_B_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation
-              =0)));
-      ThermoPower.Water.SourceW SideB_MassFlowRate(w0=whex, p0=3e5) annotation
-        (Placement(transformation(extent={{60,40},{40,60}}, rotation=0)));
+        annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
+               0)));
+      ThermoPower.Water.SourceW SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
+         Placement(transformation(extent={{60,40},{40,60}}, rotation=0)));
       ThermoPower.Thermal.ConvHT ConvExCF(N=Nnodes, gamma=400) annotation (
           Placement(transformation(extent={{-20,-16},{0,4}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
@@ -4207,8 +4211,8 @@ Casella</a>:<br>
             transformation(extent={{70,-60},{90,-40}}, rotation=0)));
       ThermoPower.Water.SinkP SideB_FluidSink annotation (Placement(
             transformation(extent={{-80,40},{-100,60}}, rotation=0)));
-      ThermoPower.Water.SourceW SideA_MassFlowRate(w0=whex, p0=3e5) annotation
-        (Placement(transformation(extent={{-82,-60},{-62,-40}}, rotation=0)));
+      ThermoPower.Water.SourceW SideA_MassFlowRate(w0=whex, p0=3e5) annotation (
+         Placement(transformation(extent={{-82,-60},{-62,-40}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{20,-60},{40,-40}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) annotation (Placement(
@@ -4227,8 +4231,8 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream)
-        annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation=
+               0)));
       ThermoPower.Thermal.MetalTube MetalWall(
         N=Nnodes,
         L=Lhex,
@@ -4253,8 +4257,8 @@ Casella</a>:<br>
       Modelica.Blocks.Sources.Constant Constant2 annotation (Placement(
             transformation(extent={{4,-40},{24,-20}}, rotation=0)));
       ThermoPower.Water.SensT SensT_B_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
+               0)));
       ThermoPower.Water.SourceW SourceW1(w0=whex, p0=3e5) annotation (Placement(
             transformation(extent={{60,40},{40,60}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
@@ -4420,8 +4424,8 @@ Casella</a>:<br>
         startTime=150,
         height=-12e5) annotation (Placement(transformation(extent={{-80,58},{-60,
                 78}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-40,40},{-20,60}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-40,40},{-20,60}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
           Placement(transformation(extent={{0,20},{20,40}}, rotation=0)));
       inner System system
@@ -4569,8 +4573,8 @@ Algorithm Tolerance = 1e-9
         startTime=150,
         height=-12e5) annotation (Placement(transformation(extent={{-80,58},{-60,
                 78}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-40,40},{-20,60}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-40,40},{-20,60}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
           Placement(transformation(extent={{0,20},{20,40}}, rotation=0)));
       inner System system
@@ -4703,8 +4707,8 @@ Algorithm Tolerance = 1e-9
         height=-12e5,
         duration=50) annotation (Placement(transformation(extent={{-80,60},{-60,
                 80}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-40,40},{-20,60}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-40,40},{-20,60}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -4844,8 +4848,8 @@ Algorithm Tolerance = 1e-9
         height=+6e5,
         startTime=400) annotation (Placement(transformation(extent={{-80,58},{-60,
                 78}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-40,40},{-20,60}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-40,40},{-20,60}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
           Placement(transformation(extent={{0,20},{20,40}}, rotation=0)));
       inner System system
@@ -5187,8 +5191,8 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
         height=-50,
         startTime=500) annotation (Placement(transformation(extent={{-100,60},{
                 -80,80}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-66,40},{-46,60}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-66,40},{-46,60}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
           Placement(transformation(extent={{10,-40},{30,-20}}, rotation=0)));
       Thermal.MetalTube Tube(
@@ -5208,8 +5212,8 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
             transformation(extent={{-20,-6},{0,14}}, rotation=0)));
       Thermal.TempSource1Dlin tempSource(N=Nnodes) annotation (Placement(
             transformation(extent={{-20,16},{0,36}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent
-              ={{0,70},{20,90}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent=
+               {{0,70},{20,90}}, rotation=0)));
       Modelica.Blocks.Sources.Constant DT(k=5) annotation (Placement(
             transformation(extent={{-36,60},{-16,80}}, rotation=0)));
       inner System system
@@ -5344,8 +5348,8 @@ Algorithm Tolerance = 1e-8
         height=-3e5,
         startTime=70) annotation (Placement(transformation(extent={{-80,74},{-60,
                 94}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-40,60},{-20,80}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-40,60},{-20,80}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
           Placement(transformation(extent={{0,-20},{20,0}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp hIn1(
@@ -5354,8 +5358,8 @@ Algorithm Tolerance = 1e-8
         height=2.2e6,
         startTime=120) annotation (Placement(transformation(extent={{-90,-20},{
                 -70,0}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent
-              ={{40,60},{60,80}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent=
+               {{40,60},{60,80}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp extPower1(
         duration=60,
         height=-2.5e5,
@@ -5366,8 +5370,8 @@ Algorithm Tolerance = 1e-8
         height=2.5e5,
         startTime=260) annotation (Placement(transformation(extent={{0,44},{20,
                 64}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add3 annotation (Placement(transformation(extent
-              ={{-46,0},{-26,20}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add3 annotation (Placement(transformation(extent=
+               {{-46,0},{-26,20}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     initial equation
@@ -5495,8 +5499,8 @@ Algorithm Tolerance = 1e-7
         height=-30,
         startTime=500) annotation (Placement(transformation(extent={{-100,60},{
                 -80,80}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-66,40},{-46,60}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-66,40},{-46,60}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
           Placement(transformation(extent={{10,-40},{30,-20}}, rotation=0)));
       Thermal.MetalTube Tube(
@@ -5516,8 +5520,8 @@ Algorithm Tolerance = 1e-7
             transformation(extent={{-20,-6},{0,14}}, rotation=0)));
       Thermal.TempSource1Dlin tempSource(N=Nnodes) annotation (Placement(
             transformation(extent={{-20,16},{0,36}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent
-              ={{0,70},{20,90}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent=
+               {{0,70},{20,90}}, rotation=0)));
       Modelica.Blocks.Sources.Constant DT(k=5) annotation (Placement(
             transformation(extent={{-36,60},{-16,80}}, rotation=0)));
       inner System system
@@ -5649,8 +5653,8 @@ Algorithm Tolerance = 1e-8
         height=-3e5,
         startTime=70) annotation (Placement(transformation(extent={{-80,76},{-60,
                 96}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-40,60},{-20,80}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-40,60},{-20,80}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
           Placement(transformation(extent={{0,-20},{20,0}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp hIn1(
@@ -5659,8 +5663,8 @@ Algorithm Tolerance = 1e-8
         height=2.2e6,
         startTime=120) annotation (Placement(transformation(extent={{-90,-20},{
                 -70,0}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent
-              ={{40,60},{60,80}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent=
+               {{40,60},{60,80}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp extPower1(
         duration=60,
         height=-2.5e5,
@@ -5671,8 +5675,8 @@ Algorithm Tolerance = 1e-8
         height=2.5e5,
         startTime=260) annotation (Placement(transformation(extent={{0,44},{20,
                 64}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add3 annotation (Placement(transformation(extent
-              ={{-52,0},{-32,20}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add3 annotation (Placement(transformation(extent=
+               {{-52,0},{-32,20}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -5808,8 +5812,8 @@ Algorithm Tolerance = 1e-7
         height=-3e6,
         startTime=70) annotation (Placement(transformation(extent={{-90,54},{-70,
                 74}}, rotation=0)));
-      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent
-              ={{-50,40},{-30,60}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
+               {{-50,40},{-30,60}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
           Placement(transformation(extent={{0,-20},{20,0}}, rotation=0)));
       Thermal.MetalTube MetalWall(
@@ -6248,8 +6252,8 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
         annotation (Placement(transformation(extent={{-94,20},{-74,40}},
               rotation=0)));
       ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{38,-6},{58,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{38,-6},{58,14}}, rotation=
+               0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -7106,8 +7110,8 @@ This model tests the <tt>PressDrop</tt>, <tt>PressDropLin</tt> and <tt>Valve</tt
       Gas.SourceP SourceP1(redeclare package Medium = Medium, p0=5e5)
         annotation (Placement(transformation(extent={{-80,10},{-60,30}},
               rotation=0)));
-      Gas.SinkP SinkP1(redeclare package Medium = Medium, p0=2.5e5) annotation
-        (Placement(transformation(extent={{62,10},{82,30}}, rotation=0)));
+      Gas.SinkP SinkP1(redeclare package Medium = Medium, p0=2.5e5) annotation (
+         Placement(transformation(extent={{62,10},{82,30}}, rotation=0)));
       Gas.Valve Valve1(
         redeclare package Medium = Medium,
         pnom=5e5,
@@ -7141,8 +7145,8 @@ This model tests the <tt>PressDrop</tt>, <tt>PressDropLin</tt> and <tt>Valve</tt
       Gas.SourceP SourceP2(redeclare package Medium = Medium, p0=5e5)
         annotation (Placement(transformation(extent={{-80,-60},{-60,-40}},
               rotation=0)));
-      Gas.SinkP SinkP2(redeclare package Medium = Medium, p0=2.5e5) annotation
-        (Placement(transformation(extent={{62,-60},{82,-40}}, rotation=0)));
+      Gas.SinkP SinkP2(redeclare package Medium = Medium, p0=2.5e5) annotation (
+         Placement(transformation(extent={{62,-60},{82,-40}}, rotation=0)));
       Gas.Valve Valve3(
         redeclare package Medium = Medium,
         pnom=5e5,
@@ -7566,8 +7570,8 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         Tstart_out=883,
         Ndesign=523.3,
         Tdes_in=1400,
-        Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix) annotation
-        (Placement(transformation(extent={{-40,-20},{0,20}}, rotation=0)));
+        Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix) annotation (
+         Placement(transformation(extent={{-40,-20},{0,20}}, rotation=0)));
       Gas.SinkP SinkP1(
         redeclare package Medium = Medium,
         p0=1.52e5,
@@ -7742,8 +7746,8 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
         T=300) annotation (Placement(transformation(extent={{-20,34},{0,54}},
               rotation=0)));
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=50)
-        annotation (Placement(transformation(extent={{6,-24},{26,-4}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{6,-24},{26,-4}}, rotation=
+               0)));
       Gas.PressDrop PressDrop1(
         redeclare package Medium = Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
@@ -8099,8 +8103,8 @@ This model tests <tt>GTunit_ISO</tt>.
         tableHI=tabHI,
         tablePR=tabPR,
         tableW=tabW,
-        Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix) annotation
-        (Placement(transformation(extent={{-72,-20},{-32,20}}, rotation=0)));
+        Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix) annotation (
+         Placement(transformation(extent={{-72,-20},{-32,20}}, rotation=0)));
       ThermoPower.Gas.SourceP SourceP1(
         redeclare package Medium = ThermoPower.Media.Air,
         p0=0.999e5,
@@ -8111,8 +8115,8 @@ This model tests <tt>GTunit_ISO</tt>.
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{-22,20},{-2,
                 40}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia Inertia(J=1) annotation
-        (Placement(transformation(extent={{-22,-10},{-2,10}}, rotation=0)));
+      Modelica.Mechanics.Rotational.Components.Inertia Inertia(J=1) annotation (
+         Placement(transformation(extent={{-22,-10},{-2,10}}, rotation=0)));
       ThermoPower.Gas.SourceW SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
         T=291.44,
@@ -8226,8 +8230,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         offset=1) annotation (Placement(transformation(extent={{-30,54},{-10,74}},
               rotation=0)));
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(w(start=
-              Modelica.SIunits.Conversions.from_rpm(590)), J=10000) annotation
-        (Placement(transformation(extent={{-20,-10},{0,10}}, rotation=0)));
+              Modelica.SIunits.Conversions.from_rpm(590)), J=10000) annotation (
+         Placement(transformation(extent={{-20,-10},{0,10}}, rotation=0)));
       Gas.PressDrop PressDrop1(
         wnom=2000*1.229,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
@@ -8472,8 +8476,8 @@ Algorithm Tolerance = 1e-6
         useSupport=false) annotation (Placement(transformation(extent={{-78,-10},
                 {-58,10}}, rotation=0)));
       Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true)
-        annotation (Placement(transformation(extent={{12,20},{32,40}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{12,20},{32,40}}, rotation=
+               0)));
       Modelica.Mechanics.Rotational.Components.Damper damper(d=25) annotation (
           Placement(transformation(extent={{-10,-40},{10,-20}}, rotation=0)));
       Modelica.Mechanics.Rotational.Components.Fixed fixed annotation (
@@ -8584,7 +8588,6 @@ Algorithm Tolerance = 1e-6
           thickness=0.5));
       connect(torque_a.flange, gen_a.shaft) annotation (Line(
           points={{-50,0},{-47.3,0},{-47.3,1.77636e-016},{-38.6,1.77636e-016}},
-
           color={0,0,0},
           thickness=0.5));
 
@@ -8685,11 +8688,11 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{86,-70},{66,-50}},
               rotation=0)));
       ThermoPower.Test.ElectricalElements.StaticController controller_A(droop=
-            0.05, CVnom=1e7/157.08) annotation (Placement(transformation(extent
-              ={{-40,20},{-60,40}}, rotation=0)));
+            0.05, CVnom=1e7/157.08) annotation (Placement(transformation(extent=
+               {{-40,20},{-60,40}}, rotation=0)));
       ThermoPower.Test.ElectricalElements.StaticController controller_b(droop=
-            0.05, CVnom=1e7/157.08) annotation (Placement(transformation(extent
-              ={{40,20},{60,40}}, rotation=0)));
+            0.05, CVnom=1e7/157.08) annotation (Placement(transformation(extent=
+               {{40,20},{60,40}}, rotation=0)));
       Modelica.Blocks.Sources.Step step_a(
         startTime=50,
         offset=8e6,
