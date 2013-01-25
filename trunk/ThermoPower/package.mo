@@ -848,10 +848,10 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function linearFlow "Linear flow characteristic"
       extends baseFlow;
-      parameter Modelica.SIunits.VolumeFlowRate q_nom[2]
-        "Volume flow rate for two operating points (single pump)";
-      parameter Modelica.SIunits.Height head_nom[2]
-        "Pump head for two operating points";
+      input Modelica.SIunits.VolumeFlowRate q_nom[2]
+        "Volume flow rate for two operating points (single pump)" annotation(Dialog);
+      input Modelica.SIunits.Height head_nom[2]
+        "Pump head for two operating points" annotation(Dialog);
       /* Linear system to determine the coefficients:
   head_nom[1] = c[1] + q_nom[1]*c[2];
   head_nom[2] = c[1] + q_nom[2]*c[2];
@@ -867,10 +867,10 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function quadraticFlow "Quadratic flow characteristic"
       extends baseFlow;
-      parameter Modelica.SIunits.VolumeFlowRate q_nom[3]
-        "Volume flow rate for three operating points (single pump)";
-      parameter Modelica.SIunits.Height head_nom[3]
-        "Pump head for three operating points";
+      input Modelica.SIunits.VolumeFlowRate q_nom[3]
+        "Volume flow rate for three operating points (single pump)" annotation(Dialog);
+      input Modelica.SIunits.Height head_nom[3]
+        "Pump head for three operating points" annotation(Dialog);
     protected
       parameter Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
         "Squared nominal flow rates";
@@ -888,10 +888,10 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function polynomialFlow "Polynomial flow characteristic"
       extends baseFlow;
-      parameter Modelica.SIunits.VolumeFlowRate q_nom[:]
-        "Volume flow rate for N operating points (single pump)";
-      parameter Modelica.SIunits.Height head_nom[:]
-        "Pump head for N operating points";
+      input Modelica.SIunits.VolumeFlowRate q_nom[:]
+        "Volume flow rate for N operating points (single pump)" annotation(Dialog);
+      input Modelica.SIunits.Height head_nom[:]
+        "Pump head for N operating points"                                         annotation(Dialog);
       constant VolumeFlowRate q_eps=1e-6
         "Small coefficient to avoid numerical singularities";
     protected
@@ -913,17 +913,17 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function constantPower "Constant power consumption characteristic"
       extends basePower;
-      parameter Modelica.SIunits.Power power=0 "Constant power consumption";
+      input Modelica.SIunits.Power power=0 "Constant power consumption" annotation(Dialog);
     algorithm
       consumption := power;
     end constantPower;
 
     function linearPower "Linear power consumption characteristic"
       extends basePower;
-      parameter Modelica.SIunits.VolumeFlowRate q_nom[2]
-        "Volume flow rate for two operating points (single pump)";
-      parameter Modelica.SIunits.Power W_nom[2]
-        "Power consumption for two operating points";
+      input Modelica.SIunits.VolumeFlowRate q_nom[2]
+        "Volume flow rate for two operating points (single pump)" annotation(Dialog);
+      input Modelica.SIunits.Power W_nom[2]
+        "Power consumption for two operating points" annotation(Dialog);
       /* Linear system to determine the coefficients:
   W_nom[1] = c[1] + q_nom[1]*c[2];
   W_nom[2] = c[1] + q_nom[2]*c[2];
@@ -937,10 +937,10 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function quadraticPower "Quadratic power consumption characteristic"
       extends basePower;
-      parameter Modelica.SIunits.VolumeFlowRate q_nom[3]
-        "Volume flow rate for three operating points (single pump)";
-      parameter Modelica.SIunits.Power W_nom[3]
-        "Power consumption for three operating points";
+      input Modelica.SIunits.VolumeFlowRate q_nom[3]
+        "Volume flow rate for three operating points (single pump)" annotation(Dialog);
+      input Modelica.SIunits.Power W_nom[3]
+        "Power consumption for three operating points" annotation(Dialog);
     protected
       Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
         "Squared nominal flow rates";
@@ -957,7 +957,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function constantEfficiency "Constant efficiency characteristic"
       extends baseEfficiency;
-      parameter Real eta_nom "Nominal efficiency";
+      input Real eta_nom "Nominal efficiency" annotation(Dialog);
     algorithm
       eta := eta_nom;
     end constantEfficiency;
@@ -991,8 +991,8 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function equalPercentage "Equal percentage characteristic"
       extends baseFun;
-      input Real rangeability=20 "Rangeability";
-      input Real delta=0.01;
+      input Real rangeability=20 "Rangeability" annotation(Dialog);
+      input Real delta=0.01 "Characteristic is linear for opening < delta" annotation(Dialog);
     algorithm
       rc := if pos > delta then rangeability^(pos - 1) else pos/delta*
         rangeability^(delta - 1);
@@ -1001,14 +1001,13 @@ This characteristic is such that the relative change of the flow coefficient is 
 <p> d(rc)/d(pos) = k d(pos).
 <p> The constant k is expressed in terms of the rangeability, i.e. the ratio between the maximum and the minimum useful flow coefficient:
 <p> rangeability = exp(k) = rc(1.0)/rc(0.0).
-<p> The theoretical characteristic has a non-zero opening when pos = 0; the implemented characteristic is modified so that the valve closes linearly when pos &lt delta.
+<p> The theoretical characteristic has a non-zero opening when pos = 0; the implemented characteristic is modified so that the valve closes linearly when pos &lt; delta.
 </html>"));
     end equalPercentage;
 
     function sinusoidal "Sinusoidal characteristic"
       extends baseFun;
-      import Modelica.Math.*;
-      import Modelica.Constants.*;
+      import Modelica.Constants.pi;
     algorithm
       rc := sin(pos*pi/2);
     end sinusoidal;
@@ -1042,9 +1041,9 @@ This characteristic is such that the relative change of the flow coefficient is 
     function linearFlow "Linear flow characteristic, fixed blades"
       extends baseFlow;
       input Modelica.SIunits.VolumeFlowRate q_nom[2]
-        "Volume flow rate for two operating points (single fan)";
+        "Volume flow rate for two operating points (single fan)" annotation(Dialog);
       input Modelica.SIunits.Height H_nom[2]
-        "Specific energy for two operating points";
+        "Specific energy for two operating points" annotation(Dialog);
       /* Linear system to determine the coefficients:
   H_nom[1] = c[1] + q_nom[1]*c[2];
   H_nom[2] = c[1] + q_nom[2]*c[2];
@@ -1060,9 +1059,9 @@ This characteristic is such that the relative change of the flow coefficient is 
     function quadraticFlow "Quadratic flow characteristic, fixed blades"
       extends baseFlow;
       input Modelica.SIunits.VolumeFlowRate q_nom[3]
-        "Volume flow rate for three operating points (single fan)";
+        "Volume flow rate for three operating points (single fan)" annotation(Dialog);
       input Modelica.SIunits.Height H_nom[3]
-        "Specific work for three operating points";
+        "Specific work for three operating points" annotation(Dialog);
     protected
       parameter Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
         "Squared nominal flow rates";
@@ -1083,13 +1082,15 @@ This characteristic is such that the relative change of the flow coefficient is 
       extends baseFlow;
       input Real bladePos_nom[:];
       input Modelica.SIunits.VolumeFlowRate q_nom[3, :]
-        "Volume flow rate for three operating points at N_pos blade positionings";
+        "Volume flow rate for three operating points at N_pos blade positionings"
+                                                                                  annotation(Dialog);
       input Modelica.SIunits.Height H_nom[3, :]
-        "Specific work for three operating points at N_pos blade positionings";
+        "Specific work for three operating points at N_pos blade positionings" annotation(Dialog);
       input Real slope_s(
         unit="(J/kg)/(m3/s)",
         max=0) = 0
-        "Slope of flow characteristic at stalling conditions (must be negative)";
+        "Slope of flow characteristic at stalling conditions (must be negative)"
+                                                                                 annotation(Dialog);
     algorithm
       H := Utilities.quadraticFlowBlades(
               q_flow,
@@ -1105,9 +1106,9 @@ This characteristic is such that the relative change of the flow coefficient is 
     function polynomialFlow "Polynomial flow characteristic, fixed blades"
       extends baseFlow;
       input Modelica.SIunits.VolumeFlowRate q_nom[:]
-        "Volume flow rate for N operating points (single fan)";
+        "Volume flow rate for N operating points (single fan)" annotation(Dialog);
       input Modelica.SIunits.Height H_nom[:]
-        "Specific work for N operating points";
+        "Specific work for N operating points"                                      annotation(Dialog);
     protected
       parameter Integer N=size(q_nom, 1) "Number of nominal operating points";
       parameter Real q_nom_pow[N, N]={{q_nom[j]^(i - 1) for j in 1:N} for i in
@@ -1127,14 +1128,14 @@ This characteristic is such that the relative change of the flow coefficient is 
 
     function constantEfficiency "Constant efficiency characteristic"
       extends baseEfficiency;
-      input Real eta_nom "Nominal efficiency";
+      input Real eta_nom "Nominal efficiency" annotation(Dialog);
     algorithm
       eta := eta_nom;
     end constantEfficiency;
 
     function constantPower "Constant power consumption characteristic"
       extends FanCharacteristics.basePower;
-      input Modelica.SIunits.Power power=0 "Constant power consumption";
+      input Modelica.SIunits.Power power=0 "Constant power consumption" annotation(Dialog);
     algorithm
       consumption := power;
     end constantPower;
@@ -1143,9 +1144,9 @@ This characteristic is such that the relative change of the flow coefficient is 
       "Quadratic power consumption characteristic, fixed blades"
       extends basePower;
       input Modelica.SIunits.VolumeFlowRate q_nom[3]
-        "Volume flow rate for three operating points (single fan)";
+        "Volume flow rate for three operating points (single fan)" annotation(Dialog);
       input Modelica.SIunits.Power W_nom[3]
-        "Power consumption for three operating points";
+        "Power consumption for three operating points" annotation(Dialog);
     protected
       Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
         "Squared nominal flow rates";
