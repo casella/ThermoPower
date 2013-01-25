@@ -24,19 +24,19 @@ package GasExtra
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableEta_low,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabEta_low",
-
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-10,60},{10,80}}, rotation=
               0)));
+
     Modelica.Blocks.Tables.CombiTable2D PressRatio_low(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePR_low,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPR_low",
-
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-10,0},{10,20}}, rotation=0)));
+
     Modelica.Blocks.Tables.CombiTable2D Phic_low(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePhic_low,
@@ -130,11 +130,11 @@ This model adds the performance characteristics to the Compressor_Base model, at
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableEta_low,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabEta_low",
-
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-10,48},{10,68}}, rotation=
               0)));
+
     Modelica.Blocks.Tables.CombiTable2D Phic_low(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePhic_low,
@@ -322,8 +322,8 @@ This model adds the performance characteristics to the Compressor_Base model, by
     equation
       connect(GTunit1.shaft_b, Inertia1.flange_a) annotation (Line(points={{
               19.36,-2},{26.68,-2},{26.68,-16},{34,-16}}, color={0,0,0}));
-      connect(ConstantSpeed1.flange, Inertia1.flange_b) annotation (Line(points
-            ={{52,-48},{68,-48},{68,-16},{54,-16}}, color={0,0,0}));
+      connect(ConstantSpeed1.flange, Inertia1.flange_b) annotation (Line(points=
+             {{52,-48},{68,-48},{68,-16},{54,-16}}, color={0,0,0}));
       connect(SourceW1.flange, GTunit1.Fuel_in) annotation (Line(points={{-18,
               52},{-14,52},{-14,21.04},{-12,21.04}}, color={159,159,223}));
       connect(SourceP1.flange, GTunit1.Air_in) annotation (Line(points={{-78,22},
@@ -383,8 +383,8 @@ double tabHI(12,4)   # table for HI_iso=h(ZLPout_iso,Tsync)
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{-22,42},{-2,
                 62}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia Inertia(J=1) annotation
-        (Placement(transformation(extent={{-22,0},{-2,20}}, rotation=0)));
+      Modelica.Mechanics.Rotational.Components.Inertia Inertia(J=1) annotation (
+         Placement(transformation(extent={{-22,0},{-2,20}}, rotation=0)));
       ThermoPower.Gas.SourceW SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
         T=291.44,
@@ -449,8 +449,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         T=560) annotation (Placement(transformation(extent={{66,20},{86,40}},
               rotation=0)));
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=10000)
-        annotation (Placement(transformation(extent={{-20,-6},{0,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{-20,-6},{0,14}}, rotation=
+               0)));
 
       Modelica.Mechanics.Rotational.Sources.ConstantSpeed ConstantSpeed1(
           w_fixed=5.23, useSupport=false) annotation (Placement(transformation(
@@ -540,8 +540,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         T=560) annotation (Placement(transformation(extent={{66,20},{86,40}},
               rotation=0)));
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=10000)
-        annotation (Placement(transformation(extent={{-20,-6},{0,14}}, rotation
-              =0)));
+        annotation (Placement(transformation(extent={{-20,-6},{0,14}}, rotation=
+               0)));
 
       ThermoPower.Gas.Compressor_low Compressor1(
         redeclare package Medium = Medium,
@@ -658,8 +658,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     equation
       connect(GTunit1.shaft_b, Inertia1.flange_a) annotation (Line(points={{
               19.36,-2},{26.68,-2},{26.68,-16},{34,-16}}, color={0,0,0}));
-      connect(ConstantSpeed1.flange, Inertia1.flange_b) annotation (Line(points
-            ={{52,-48},{68,-48},{68,-16},{54,-16}}, color={0,0,0}));
+      connect(ConstantSpeed1.flange, Inertia1.flange_b) annotation (Line(points=
+             {{52,-48},{68,-48},{68,-16},{54,-16}}, color={0,0,0}));
       connect(SourceW1.flange, GTunit1.Fuel_in) annotation (Line(points={{-18,
               52},{-14,52},{-14,21.04},{-12,21.04}}, color={159,159,223}));
       connect(SourceP1.flange, GTunit1.Air_in) annotation (Line(points={{-78,22},

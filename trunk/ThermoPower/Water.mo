@@ -920,6 +920,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
+    replaceable ThermoPower.Water.BaseClasses.DistributedHeatTransfer_fv heatTransfer constrainedby
+      ThermoPower.Water.BaseClasses.DistributedHeatTransfer_fv annotation(choicesAllMatching = true);
   protected
     Density rhobar[N - 1] "Fluid average density";
     SpecificVolume vbar[N - 1] "Fluid average specific volume";
@@ -5038,9 +5040,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf
                else 0)) annotation (Placement(transformation(extent={{80,-20},{
                 120,20}}, rotation=0)));
-      replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
-              false), Placement(transformation(extent={{-40,40},{40,60}},
-              rotation=0)));
+      //replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
+      //        false), Placement(transformation(extent={{-40,40},{40,60}},
+      //        rotation=0)));
       Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
       Time Tr "Residence time";
       final parameter Real dzdx=H/L "Slope" annotation (Evaluate=true);
@@ -5050,7 +5052,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
 </HTML>
-", revisions="<html>
+",     revisions=
+             "<html>
 <ul>
 <li><i>23 Jul 2007</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -5558,13 +5561,15 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
     partial model DistributedHeatTransfer_fv
 
+    extends ThermoPower.Icons.HeatFlow;
+
     input ThermodynamicState fluidState[N];
     input MassFlowRate w[n];
 
     ThermoPower.Thermal.DHTVolumes wall;
 
-    parameter Integer Nf "numero di nodi lato fluido";
-    parameter Integer Nw=Nf "numero di nodi lato parete";
+    parameter Integer Nf "Number of nodes fluid-side";
+    parameter Integer Nw=Nf "Number of nodes wall-side";
     parameter Boolean useAverageTemperature = true;
 
     end DistributedHeatTransfer_fv;
@@ -5581,4 +5586,16 @@ This package contains models of physical processes and components using water or
 </ul>
 The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
 </HTML>"));
+  model NoHeatTransfer
+    extends BaseClasses.DistributedHeatTransfer_fv(final Nw);
+
+  equation
+    wall.Q = zeros[N];
+
+  end NoHeatTransfer;
+
+  model ConstantHeatTransferCoefficient
+    extends BaseClasses.DistributedHeatTransfer_fv;
+
+  end ConstantHeatTransferCoefficient;
 end Water;

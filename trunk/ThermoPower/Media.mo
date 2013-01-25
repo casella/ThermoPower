@@ -118,9 +118,9 @@ package Media "Medium models for the ThermoPower library"
     extends Common.MixtureGasNasa(
       mediumName="NaturalGas",
       data={Common.SingleGasesData.N2,Common.SingleGasesData.CO2,Common.SingleGasesData.CH4},
-
       substanceNames={"Nitrogen","Carbondioxide","Methane"},
       reference_X={0.02,0.012,0.968});
+
   end NaturalGas;
 
   package FlueGas "flue gas"

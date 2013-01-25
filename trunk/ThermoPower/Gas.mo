@@ -64,8 +64,8 @@ package Gas "Models of components with ideal gases as working fluid"
     outer ThermoPower.System system "System wide properties";
 
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p annotation (Placement(
           transformation(
           origin={-60,64},
@@ -146,8 +146,8 @@ package Gas "Models of components with ideal gases as working fluid"
     outer ThermoPower.System system "System wide properties";
 
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_p annotation (Placement(
           transformation(
           origin={-64.5,59.5},
@@ -228,8 +228,8 @@ package Gas "Models of components with ideal gases as working fluid"
     MassFlowRate w;
 
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
           transformation(
           origin={-60,50},
@@ -327,8 +327,8 @@ package Gas "Models of components with ideal gases as working fluid"
           rotation=270)));
 
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
   equation
     if G == 0 then
       flange.m_flow = w;
@@ -385,11 +385,11 @@ package Gas "Models of components with ideal gases as working fluid"
     outer ThermoPower.System system "System wide properties";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
           transformation(
           origin={-60,50},
@@ -461,11 +461,11 @@ package Gas "Models of components with ideal gases as working fluid"
     Time Tr "Residence Time";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     replaceable Thermal.HT thermalPort annotation (Placement(transformation(
             extent={{-40,60},{40,80}}, rotation=0)));
   equation
@@ -569,11 +569,11 @@ package Gas "Models of components with ideal gases as working fluid"
     Time Tr "Residence Time";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     replaceable Thermal.HT thermalPort annotation (Placement(transformation(
             extent={{-40,60},{40,80}}, rotation=0)));
   equation
@@ -651,8 +651,7 @@ package Gas "Models of components with ideal gases as working fluid"
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics));
+"),   Diagram(graphics));
   end Header;
 
   model Mixer "Mixer with metal walls for gas flows"
@@ -693,14 +692,14 @@ package Gas "Models of components with ideal gases as working fluid"
     Time Tr "Residence time";
 
     FlangeA in1(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-100,40},{-60,80}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-100,40},{-60,80}}, rotation=0)));
     FlangeB out(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     FlangeA in2(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-100,-80},{-60,-40}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-100,-80},{-60,-40}}, rotation=0)));
 
     replaceable Thermal.HT thermalPort annotation (Placement(transformation(
             extent={{-38,60},{42,80}}, rotation=0)));
@@ -808,14 +807,14 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(enable=not rev_inlet1 or not rev_inlet2 or not
             rev_outlet));
     FlangeA inlet1(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,20},{-40,60}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,20},{-40,60}}, rotation=0)));
     FlangeA inlet2(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-20},{80,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-20},{80,20}}, rotation=0)));
   equation
     inlet1.m_flow + inlet2.m_flow + outlet.m_flow = 0 "Mass balance";
 
@@ -906,14 +905,14 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(enable=not rev_inlet or not rev_outlet1 or not
             rev_outlet2));
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-20},{-40,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-20},{-40,20}}, rotation=0)));
     FlangeB outlet1(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,20},{80,60}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,20},{80,60}}, rotation=0)));
     FlangeB outlet2(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
 
   equation
     inlet.m_flow + outlet1.m_flow + outlet2.m_flow = 0 "Mass balance";
@@ -992,11 +991,11 @@ package Gas "Models of components with ideal gases as working fluid"
     outer ThermoPower.System system "System wide properties";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
 
   equation
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
@@ -1009,7 +1008,6 @@ package Gas "Models of components with ideal gases as working fluid"
     inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<html>
 <p>This very simple model provides a pressure drop which is proportional to the flowrate, without computing any fluid property.</p>
@@ -1065,12 +1063,12 @@ package Gas "Models of components with ideal gases as working fluid"
     Pressure dp "Pressure drop";
   public
     FlangeA inlet(redeclare package Medium = Medium, m_flow(start=wnom, min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(start=-wnom, max=
             if allowFlowReversal then +Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
+             0)));
   initial equation
     // Set Kf if FFtype <> FFtypes.Kf
     if FFtype == FFtypes.OpPoint then
@@ -1112,7 +1110,6 @@ package Gas "Models of components with ideal gases as working fluid"
     inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<html>
 <p>The pressure drop across the inlet and outlet connectors is computed according to a turbulent friction model, i.e. is proportional to the squared velocity of the fluid. The friction coefficient can be specified directly, or by giving an operating point, or as a multiple of the kinetic pressure. The correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit some experimental operating point.</p>
@@ -1145,11 +1142,11 @@ package Gas "Models of components with ideal gases as working fluid"
 
     Medium.BaseProperties gas;
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput T annotation (Placement(
           transformation(extent={{60,50},{80,70}}, rotation=0)));
   equation
@@ -1239,11 +1236,11 @@ package Gas "Models of components with ideal gases as working fluid"
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput w annotation (Placement(
           transformation(extent={{56,50},{76,70}}, rotation=0),
           iconTransformation(extent={{60,50},{80,70}})));
@@ -1324,11 +1321,11 @@ package Gas "Models of components with ideal gases as working fluid"
     outer ThermoPower.System system "System wide properties";
     Medium.BaseProperties gas "Gas properties";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-80,-60},{-40,-20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput q "Volume flow rate" annotation (
         Placement(transformation(extent={{56,50},{76,70}}, rotation=0)));
     MassFlowRate w "Mass flow rate";
@@ -1380,11 +1377,11 @@ package Gas "Models of components with ideal gases as working fluid"
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput cmd annotation (Placement(
           transformation(
           origin={0,70},
@@ -1404,7 +1401,6 @@ package Gas "Models of components with ideal gases as working fluid"
     inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<html>
 <p>This very simple model provides a pressure drop which is proportional to the flowrate and to the <tt>cmd</tt> signal, without computing any fluid property.</p>
@@ -1558,7 +1554,6 @@ package Gas "Models of components with ideal gases as working fluid"
 
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<html>
 <p>This model is based on the IEC 534/ISA S.75 standards for valve sizing, compressible fluid.
@@ -1593,8 +1588,7 @@ package Gas "Models of components with ideal gases as working fluid"
        First release.</li>
 </ul>
 </html>
-"),
-      DymolaStoredErrors);
+"),   DymolaStoredErrors);
   end Valve;
 
   model Flow1Dfv "1-dimensional fluid flow model for gas (finite volumes)"
@@ -1659,12 +1653,12 @@ package Gas "Models of components with ideal gases as working fluid"
     constant Real g=Modelica.Constants.g_n;
   public
     FlangeA infl(redeclare package Medium = Medium, m_flow(start=wnom, min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outfl(redeclare package Medium = Medium, m_flow(start=-wnom, max=
             if allowFlowReversal then +Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
+             0)));
     replaceable Thermal.DHT wall(N=N) annotation (Dialog(enable=false),
         Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
   public
@@ -1908,7 +1902,6 @@ package Gas "Models of components with ideal gases as working fluid"
 
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<html>
 <p>This model describes the flow of a gas in a rigid tube. The basic modelling assumptions are:
@@ -2029,8 +2022,8 @@ package Gas "Models of components with ideal gases as working fluid"
               120}}, rotation=0)));
     FlangeB out(redeclare package Medium = Exhaust, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) "flue gas"
-      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
+             0)));
   equation
     M = fluegas.d*V "Gas mass";
     E = fluegas.u*M "Gas energy";
@@ -2193,11 +2186,11 @@ This model extends the CombustionChamber Base model, with the definition of the 
     Real PR "pressure ratio";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-100,60},{-60,100}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-100,60},{-60,100}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{60,60},{100,100}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{60,60},{100,100}}, rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
         Placement(transformation(extent={{-72,-12},{-48,12}}, rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
@@ -2276,8 +2269,7 @@ This model extends the CombustionChamber Base model, with the definition of the 
        First release.</li>
 </ul>
 </html>
-"),
-      Diagram(graphics),
+"),   Diagram(graphics),
       Icon(graphics={Text(
             extent={{-128,-60},{128,-100}},
             lineColor={0,0,255},
@@ -2429,11 +2421,11 @@ This model adds the performance characteristics to the Compressor_Base model, by
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
         Placement(transformation(extent={{48,-12},{72,12}}, rotation=0)));
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-100,60},{-60,100}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-100,60},{-60,100}}, rotation=0)));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{60,60},{100,100}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{60,60},{100,100}}, rotation=0)));
   equation
     w = inlet.m_flow;
     assert(w >= 0, "The turbine model does not support flow reversal");
@@ -2613,8 +2605,8 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     parameter Boolean fixedEta=true "true:eta is a parameter,
       false:eta is calculated from table";
     parameter Real eta_nom=0.8 "Nominal efficiency value";
-    parameter Real K(fixed=if (NominalCondition == false) then true else false)
-       = 4.75e-3 "Stodola's constant";
+    parameter Real K(fixed=if (NominalCondition == false) then true else false)=
+         4.75e-3 "Stodola's constant";
     parameter Real wnom "Nominal massflowrate";
 
     Real N_T "Referred speed";
@@ -2729,14 +2721,14 @@ This model extends the Turbine_Base model with the calculation of the performanc
     Modelica.SIunits.Pressure pin "inlet pressure";
 
     FlangeA Air_in(redeclare package Medium = Air,m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-100,20},{-80,40}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-100,20},{-80,40}}, rotation=0)));
     FlangeA Fuel_in(redeclare package Medium = Fuel,m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-10,62},{10,82}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-10,62},{10,82}}, rotation=0)));
     FlangeB FlueGas_out(redeclare package Medium = Exhaust,m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{80,20},{100,40}}, rotation=0)));
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,20},{100,40}}, rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
         Placement(transformation(extent={{88,-10},{108,10}}, rotation=0)));
   equation
@@ -2871,11 +2863,11 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableData,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tableData",
-
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-10,28},{10,48}}, rotation=
               0)));
+
   equation
     // HI_ISO = f(ZLPout_ISO)
     OperatingPoint.u = ZLPout_ISO;
@@ -2960,8 +2952,8 @@ This model adds the performance characteristics to the GTunit_base model, when o
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabW",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
-      annotation (Placement(transformation(extent={{-10,-24},{10,-4}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{-10,-24},{10,-4}}, rotation=
+             0)));
     AbsoluteTemperature Tsync
       "temperature corresponding to omega referred in synchronous conditions";
   equation
@@ -3027,8 +3019,8 @@ The packages Medium are redeclared and a mass balance determines the composition
       "Fluid properties at the inlet";
     replaceable function flowCharacteristic =
         Functions.FanCharacteristics.quadraticFlow
-      "Head vs. q_flow characteristic at nominal speed and density" annotation
-      (Dialog(group="Characteristics"), choicesAllMatching=true);
+      "Head vs. q_flow characteristic at nominal speed and density" annotation (
+       Dialog(group="Characteristics"), choicesAllMatching=true);
     parameter Boolean usePowerCharacteristic=false
       "Use powerCharacteristic (vs. efficiencyCharacteristic)"
       annotation (Dialog(group="Characteristics"));
@@ -3100,8 +3092,8 @@ The packages Medium are redeclared and a mass balance determines the composition
       h_outflow(start=hstart),
       redeclare package Medium = Medium,
       m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=
+             0)));
     FlangeB outfl(
       h_outflow(start=hstart),
       redeclare package Medium = Medium,
@@ -3341,12 +3333,12 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     constant Real g=Modelica.Constants.g_n;
   public
     FlangeA infl(redeclare package Medium = Medium, m_flow(start=wnom, min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation
-      (Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
     FlangeB outfl(redeclare package Medium = Medium, m_flow(start=-wnom, max=
             if allowFlowReversal then +Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation
-            =0)));
+      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
+             0)));
     replaceable Thermal.DHT wall(N=N) annotation (Dialog(enable=false),
         Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
   public
@@ -3590,7 +3582,6 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-
       Diagram(graphics),
       Documentation(info="<html>
 <p>This model describes the flow of a gas in a rigid tube. The basic modelling assumptions are:

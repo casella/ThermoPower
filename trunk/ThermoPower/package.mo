@@ -23,7 +23,7 @@ model System "System wide properties"
           extent={{-80,40},{80,-20}},
           lineColor={0,0,255},
           textString="system")}));
-  end System;
+end System;
 
 
 package Icons "Icons for ThermoPower library"
@@ -42,7 +42,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={255,255,255},
               textString="P"),
             Text(extent={{-100,-78},{100,-106}}, textString="%name")}));
-      end SourceP;
+    end SourceP;
 
     partial model SourceW
       annotation (Icon(graphics={
@@ -58,14 +58,14 @@ package Icons "Icons for ThermoPower library"
               fillPattern=FillPattern.Solid),
             Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
 
-      end SourceW;
+    end SourceW;
 
     partial model Tube
       annotation (Icon(graphics={Rectangle(
               extent={{-80,40},{80,-40}},
               lineColor={0,0,0},
               fillPattern=FillPattern.HorizontalCylinder)}), Diagram(graphics));
-      end Tube;
+    end Tube;
 
     partial model Mixer
       annotation (Icon(graphics={Ellipse(
@@ -74,7 +74,7 @@ package Icons "Icons for ThermoPower library"
               fillPattern=FillPattern.Solid,
               fillColor={0,0,255}), Text(extent={{-100,-84},{100,-110}},
                 textString="%name")}), Diagram(graphics));
-      end Mixer;
+    end Mixer;
 
     partial model Tank
       annotation (Icon(graphics={
@@ -89,7 +89,7 @@ package Icons "Icons for ThermoPower library"
               fillColor={255,255,255},
               fillPattern=FillPattern.Solid),
             Rectangle(extent={{-54,12},{54,-72}}, lineColor={0,0,255})}));
-      end Tank;
+    end Tank;
 
     partial model Valve
       annotation (Icon(graphics={
@@ -114,7 +114,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={0,0,0},
               fillColor={0,0,0},
               fillPattern=FillPattern.Solid)}), Diagram(graphics));
-      end Valve;
+    end Valve;
 
     model FlowJoin
       annotation (Diagram(graphics), Icon(graphics={Polygon(
@@ -123,7 +123,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={0,0,0},
               fillPattern=FillPattern.Solid,
               fillColor={0,0,255})}));
-      end FlowJoin;
+    end FlowJoin;
 
     model FlowSplit
       annotation (Diagram(graphics), Icon(graphics={Polygon(
@@ -132,7 +132,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={0,0,0},
               fillPattern=FillPattern.Solid,
               fillColor={0,0,255})}));
-      end FlowSplit;
+    end FlowSplit;
 
     model SensThrough
       annotation (Icon(graphics={
@@ -146,7 +146,7 @@ package Icons "Icons for ThermoPower library"
             Line(points={{40,60},{60,60}}),
             Text(extent={{-100,-76},{100,-100}}, textString="%name")}));
 
-      end SensThrough;
+    end SensThrough;
 
     model SensP
       annotation (Icon(graphics={
@@ -154,7 +154,7 @@ package Icons "Icons for ThermoPower library"
             Ellipse(extent={{-40,100},{40,20}}, lineColor={0,0,0}),
             Line(points={{40,60},{60,60}}),
             Text(extent={{-100,-52},{100,-86}}, textString="%name")}));
-      end SensP;
+    end SensP;
 
     model Drum
       annotation (Icon(graphics={
@@ -178,7 +178,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={128,128,128},
               fillColor={159,191,223},
               fillPattern=FillPattern.Solid)}));
-      end Drum;
+    end Drum;
 
     partial model Pump
       annotation (Icon(graphics={
@@ -199,7 +199,7 @@ package Icons "Icons for ThermoPower library"
               fillPattern=FillPattern.HorizontalCylinder,
               fillColor={255,255,255}),
             Text(extent={{-100,-64},{100,-90}}, textString="%name")}));
-      end Pump;
+    end Pump;
 
     partial model Accumulator
 
@@ -264,7 +264,7 @@ package Icons "Icons for ThermoPower library"
               pattern=LinePattern.None,
               fillColor={128,128,128},
               fillPattern=FillPattern.Solid)}), Diagram(graphics));
-      end Accumulator;
+    end Accumulator;
 
     partial model PumpMech
       annotation (Icon(graphics={
@@ -290,7 +290,7 @@ package Icons "Icons for ThermoPower library"
               fillPattern=FillPattern.HorizontalCylinder,
               fillColor={255,255,255}),
             Text(extent={{-100,-64},{100,-90}}, textString="%name")}));
-      end PumpMech;
+    end PumpMech;
 
     partial model PressDrop
       annotation (Icon(graphics={Rectangle(
@@ -303,7 +303,7 @@ package Icons "Icons for ThermoPower library"
               fillPattern=FillPattern.HorizontalCylinder,
               fillColor={0,0,255})}), Diagram(graphics));
 
-      end PressDrop;
+    end PressDrop;
 
     partial model SteamTurbineUnit
       annotation (Icon(graphics={
@@ -350,7 +350,7 @@ package Icons "Icons for ThermoPower library"
               points={{66,-70},{100,-70}},
               color={0,0,255},
               thickness=0.5)}), Diagram(graphics));
-      end SteamTurbineUnit;
+    end SteamTurbineUnit;
 
     partial model Header
       annotation (Icon(graphics={
@@ -366,8 +366,8 @@ package Icons "Icons for ThermoPower library"
               fillColor={0,0,255}),
             Text(extent={{-100,-84},{100,-110}}, textString="%name")}), Diagram(
             graphics));
-      end Header;
-    end Water;
+    end Header;
+  end Water;
 
   partial model HeatFlow
     annotation (Icon(graphics={Rectangle(
@@ -375,7 +375,7 @@ package Icons "Icons for ThermoPower library"
             lineColor={0,0,0},
             fillColor={255,255,255},
             fillPattern=FillPattern.Forward)}));
-    end HeatFlow;
+  end HeatFlow;
 
   partial model MetalWall
     annotation (Icon(graphics={Rectangle(
@@ -383,7 +383,7 @@ package Icons "Icons for ThermoPower library"
             lineColor={0,0,0},
             fillColor={128,128,128},
             fillPattern=FillPattern.Solid)}));
-    end MetalWall;
+  end MetalWall;
 
   package Gas "Icons for component using water/steam as working fluid"
     extends Modelica.Icons.Library;
@@ -399,7 +399,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={255,255,255},
               textString="P"),
             Text(extent={{-100,-78},{100,-106}}, textString="%name")}));
-      end SourceP;
+    end SourceP;
 
     partial model SourceW
       annotation (Icon(graphics={
@@ -414,7 +414,7 @@ package Icons "Icons for ThermoPower library"
               fillColor={0,0,0},
               fillPattern=FillPattern.Solid),
             Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-      end SourceW;
+    end SourceW;
 
     partial model Tube
       annotation (Icon(graphics={Rectangle(
@@ -422,7 +422,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={0,0,0},
               fillPattern=FillPattern.HorizontalCylinder,
               fillColor={159,159,223})}), Diagram(graphics));
-      end Tube;
+    end Tube;
 
     partial model Mixer
       annotation (Icon(graphics={Ellipse(
@@ -431,7 +431,7 @@ package Icons "Icons for ThermoPower library"
               fillColor={159,159,223},
               fillPattern=FillPattern.Solid), Text(extent={{-100,-84},{100,-110}},
                 textString="%name")}), Diagram(graphics));
-      end Mixer;
+    end Mixer;
 
     partial model Valve
       annotation (Icon(graphics={
@@ -456,7 +456,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={0,0,0},
               fillColor={0,0,0},
               fillPattern=FillPattern.Solid)}), Diagram(graphics));
-      end Valve;
+    end Valve;
 
     model FlowJoin
       annotation (Diagram(graphics), Icon(graphics={Polygon(
@@ -465,7 +465,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={128,128,128},
               fillColor={159,159,223},
               fillPattern=FillPattern.Solid)}));
-      end FlowJoin;
+    end FlowJoin;
 
     model FlowSplit
       annotation (Diagram(graphics), Icon(graphics={Polygon(
@@ -474,7 +474,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={128,128,128},
               fillColor={159,159,223},
               fillPattern=FillPattern.Solid)}));
-      end FlowSplit;
+    end FlowSplit;
 
     model SensThrough
       annotation (Icon(graphics={
@@ -487,7 +487,7 @@ package Icons "Icons for ThermoPower library"
             Ellipse(extent={{-40,100},{40,20}}, lineColor={0,0,0}),
             Line(points={{40,60},{60,60}}),
             Text(extent={{-100,-76},{100,-100}}, textString="%name")}));
-      end SensThrough;
+    end SensThrough;
 
     model SensP
       annotation (Icon(graphics={
@@ -495,13 +495,12 @@ package Icons "Icons for ThermoPower library"
             Ellipse(extent={{-40,100},{40,20}}, lineColor={0,0,0}),
             Line(points={{40,60},{60,60}}),
             Text(extent={{-130,-80},{132,-124}}, textString="%name")}));
-      end SensP;
+    end SensP;
 
     partial model Compressor
       annotation (Icon(graphics={
             Polygon(
               points={{24,26},{30,26},{30,76},{60,76},{60,82},{24,82},{24,26}},
-
               lineColor={128,128,128},
               lineThickness=0.5,
               fillColor={159,159,223},
@@ -525,7 +524,7 @@ package Icons "Icons for ThermoPower library"
               fillColor={159,159,223},
               fillPattern=FillPattern.Solid)}), Diagram(graphics));
 
-      end Compressor;
+    end Compressor;
 
     partial model Turbine
       annotation (Icon(graphics={
@@ -538,7 +537,6 @@ package Icons "Icons for ThermoPower library"
               fillPattern=FillPattern.Solid),
             Polygon(
               points={{26,56},{32,56},{32,76},{60,76},{60,82},{26,82},{26,56}},
-
               lineColor={128,128,128},
               lineThickness=0.5,
               fillColor={159,159,223},
@@ -555,7 +553,7 @@ package Icons "Icons for ThermoPower library"
               fillColor={159,159,223},
               fillPattern=FillPattern.Solid)}), Diagram(graphics));
 
-      end Turbine;
+    end Turbine;
 
     partial model GasTurbineUnit
       annotation (Icon(graphics={
@@ -585,7 +583,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={0,0,0},
               fillPattern=FillPattern.Sphere,
               fillColor={255,0,0})}), Diagram(graphics));
-      end GasTurbineUnit;
+    end GasTurbineUnit;
 
     partial model Fan
       annotation (Icon(graphics={
@@ -610,9 +608,9 @@ package Icons "Icons for ThermoPower library"
               extent={{-100,-64},{100,-90}},
               lineColor={95,95,95},
               textString="%name")}));
-      end Fan;
-    end Gas;
-  end Icons;
+    end Fan;
+  end Gas;
+end Icons;
 
 
 package Functions "Miscellaneous functions"
@@ -621,37 +619,37 @@ package Functions "Miscellaneous functions"
     extends Modelica.Icons.Function;
     input Real x;
     output Real y;
-    algorithm
+  algorithm
     y := x;
     annotation (derivative=Functions.linear_der);
-    end linear;
+  end linear;
 
   function linear_der
     extends Modelica.Icons.Function;
     input Real x;
     input Real der_x;
     output Real der_y;
-    algorithm
+  algorithm
     der_y := der_x;
-    end linear_der;
+  end linear_der;
 
   function one
     extends Modelica.Icons.Function;
     input Real x;
     output Real y;
-    algorithm
+  algorithm
     y := 1;
     annotation (derivative=Functions.one_der);
-    end one;
+  end one;
 
   function one_der
     extends Modelica.Icons.Function;
     input Real x;
     input Real der_x;
     output Real der_y;
-    algorithm
+  algorithm
     der_y := 0;
-    end one_der;
+  end one_der;
 
   function sqrtReg
     "Symmetric square root approximation with finite derivative in zero"
@@ -659,7 +657,7 @@ package Functions "Miscellaneous functions"
     input Real x;
     input Real delta=0.01 "Range of significant deviation from sqrt(x)";
     output Real y;
-    algorithm
+  algorithm
     y := x/sqrt(sqrt(x*x + delta*delta));
 
     annotation (
@@ -702,7 +700,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
        Created. </li>
 </ul>
 </html>"));
-    end sqrtReg;
+  end sqrtReg;
 
   function sqrtReg_der "Derivative of sqrtReg"
     extends Modelica.Icons.Function;
@@ -710,7 +708,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     input Real delta=0.01 "Range of significant deviation from sqrt(x)";
     input Real dx "Derivative of x";
     output Real dy;
-    algorithm
+  algorithm
     dy := dx*0.5*(x*x + 2*delta*delta)/((x*x + delta*delta)^1.25);
     annotation (Documentation(info="<html>
 </html>", revisions="<html>
@@ -720,7 +718,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
        Created. </li>
 </ul>
 </html>"));
-    end sqrtReg_der;
+  end sqrtReg_der;
 
   function squareReg
     "Anti-symmetric square approximation with non-zero derivative in the origin"
@@ -728,7 +726,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     input Real x;
     input Real delta=0.01 "Range of significant deviation from x^2*sgn(x)";
     output Real y;
-    algorithm
+  algorithm
     y := x*sqrt(x*x + delta*delta);
 
     annotation (Documentation(info="<html>
@@ -769,7 +767,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
        Created. </li>
 </ul>
 </html>"));
-    end squareReg;
+  end squareReg;
 
   function stepReg = Modelica.Fluid.Utilities.regStep
     "Regularized step function" annotation (
@@ -826,7 +824,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
           transformation(extent={{-140,-100},{-100,-60}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput CO annotation (Placement(
           transformation(extent={{100,-20},{140,20}}, rotation=0)));
-    equation
+  equation
     SP = if time <= Tstart then SP0 else if time >= Tend then SP0 + deltaSP
        else SP0 + (time - Tstart)/(Tend - Tstart)*deltaSP;
     error = (SP - PV)*steadyStateGain;
@@ -860,7 +858,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 </HTML>"),
       Diagram(graphics),
       Icon(graphics={Text(extent={{-90,90},{94,-92}}, textString="SS Offset")}));
-    end OffsetController;
+  end OffsetController;
 
   package PumpCharacteristics "Functions for pump characteristics"
     import NonSI = Modelica.SIunits.Conversions.NonSIunits;
@@ -869,7 +867,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       extends Modelica.Icons.Function;
       input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
       output Modelica.SIunits.Height head "Pump head";
-      end baseFlow;
+    end baseFlow;
 
     partial function basePower
       "Base class for pump power consumption characteristics"
@@ -877,13 +875,13 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
       output Modelica.SIunits.Power consumption
         "Power consumption at nominal density";
-      end basePower;
+    end basePower;
 
     partial function baseEfficiency "Base class for efficiency characteristics"
       extends Modelica.Icons.Function;
       input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
       output Real eta "Efficiency";
-      end baseEfficiency;
+    end baseEfficiency;
 
     function linearFlow "Linear flow characteristic"
       extends baseFlow;
@@ -898,11 +896,11 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     protected
       parameter Real c[2]=Modelica.Math.Matrices.solve([ones(2), q_nom],
           head_nom) "Coefficients of linear head curve";
-      algorithm
+    algorithm
       // Flow equation: head = q*c[1] + c[2];
       head := c[1] + q_flow*c[2];
       annotation (smoothOrder=2);
-      end linearFlow;
+    end linearFlow;
 
     function quadraticFlow "Quadratic flow characteristic"
       extends baseFlow;
@@ -920,10 +918,10 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
   */
       parameter Real c[3]=Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],
           head_nom) "Coefficients of quadratic head curve";
-      algorithm
+    algorithm
       // Flow equation: head = c[1] + q_flow*c[2] + q_flow^2*c[3];
       head := c[1] + q_flow*c[2] + q_flow^2*c[3];
-      end quadraticFlow;
+    end quadraticFlow;
 
     function polynomialFlow "Polynomial flow characteristic"
       extends baseFlow;
@@ -944,18 +942,18 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
   */
       parameter Real c[N]=Modelica.Math.Matrices.solve(q_nom_pow, head_nom)
         "Coefficients of polynomial head curve";
-      algorithm
+    algorithm
       // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
       // Note: the implementation is numerically efficient only for low values of N
       head := sum((q_flow + q_eps)^(i - 1)*c[i] for i in 1:N);
-      end polynomialFlow;
+    end polynomialFlow;
 
     function constantPower "Constant power consumption characteristic"
       extends basePower;
       input Modelica.SIunits.Power power=0 "Constant power consumption";
-      algorithm
+    algorithm
       consumption := power;
-      end constantPower;
+    end constantPower;
 
     function linearPower "Linear power consumption characteristic"
       extends basePower;
@@ -970,9 +968,9 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     protected
       Real c[2]=Modelica.Math.Matrices.solve([ones(2), q_nom], W_nom)
         "Coefficients of quadratic power consumption curve";
-      algorithm
+    algorithm
       consumption := c[1] + q_flow*c[2];
-      end linearPower;
+    end linearPower;
 
     function quadraticPower "Quadratic power consumption characteristic"
       extends basePower;
@@ -990,49 +988,49 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
   */
       Real c[3]=Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2], W_nom)
         "Coefficients of quadratic power consumption curve";
-      algorithm
+    algorithm
       consumption := c[1] + q_flow*c[2] + q_flow^2*c[3];
-      end quadraticPower;
+    end quadraticPower;
 
     function constantEfficiency "Constant efficiency characteristic"
       extends baseEfficiency;
       input Real eta_nom "Nominal efficiency";
-      algorithm
+    algorithm
       eta := eta_nom;
-      end constantEfficiency;
+    end constantEfficiency;
 
-    end PumpCharacteristics;
+  end PumpCharacteristics;
 
   package ValveCharacteristics "Functions for valve characteristics"
     partial function baseFun "Base class for valve characteristics"
       extends Modelica.Icons.Function;
       input Real pos "Stem position (per unit)";
       output Real rc "Relative coefficient (per unit)";
-      end baseFun;
+    end baseFun;
 
     function linear "Linear characteristic"
       extends baseFun;
-      algorithm
+    algorithm
       rc := pos;
-      end linear;
+    end linear;
 
     function one "Constant characteristic"
       extends baseFun;
-      algorithm
+    algorithm
       rc := 1;
-      end one;
+    end one;
 
     function quadratic "Quadratic characteristic"
       extends baseFun;
-      algorithm
+    algorithm
       rc := pos*pos;
-      end quadratic;
+    end quadratic;
 
     function equalPercentage "Equal percentage characteristic"
       extends baseFun;
       input Real rangeability=20 "Rangeability";
       input Real delta=0.01;
-      algorithm
+    algorithm
       rc := if pos > delta then rangeability^(pos - 1) else pos/delta*
         rangeability^(delta - 1);
       annotation (Documentation(info="<html>
@@ -1042,16 +1040,16 @@ This characteristic is such that the relative change of the flow coefficient is 
 <p> rangeability = exp(k) = rc(1.0)/rc(0.0).
 <p> The theoretical characteristic has a non-zero opening when pos = 0; the implemented characteristic is modified so that the valve closes linearly when pos &lt delta.
 </html>"));
-      end equalPercentage;
+    end equalPercentage;
 
     function sinusoidal "Sinusoidal characteristic"
       extends baseFun;
       import Modelica.Math.*;
       import Modelica.Constants.*;
-      algorithm
+    algorithm
       rc := sin(pos*pi/2);
-      end sinusoidal;
-    end ValveCharacteristics;
+    end sinusoidal;
+  end ValveCharacteristics;
 
   package FanCharacteristics "Functions for fan characteristics"
     import NonSI = Modelica.SIunits.Conversions.NonSIunits;
@@ -1061,7 +1059,7 @@ This characteristic is such that the relative change of the flow coefficient is 
       input VolumeFlowRate q_flow "Volumetric flow rate";
       input Real bladePos=1 "Blade position";
       output SpecificEnergy H "Specific Energy";
-      end baseFlow;
+    end baseFlow;
 
     partial function basePower
       "Base class for fan power consumption characteristics"
@@ -1069,14 +1067,14 @@ This characteristic is such that the relative change of the flow coefficient is 
       input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
       input Real bladePos=1 "Blade position";
       output Modelica.SIunits.Power consumption "Power consumption";
-      end basePower;
+    end basePower;
 
     partial function baseEfficiency "Base class for efficiency characteristics"
       extends Modelica.Icons.Function;
       input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
       input Real bladePos=1 "Blade position";
       output Real eta "Efficiency";
-      end baseEfficiency;
+    end baseEfficiency;
 
     function linearFlow "Linear flow characteristic, fixed blades"
       extends baseFlow;
@@ -1091,10 +1089,10 @@ This characteristic is such that the relative change of the flow coefficient is 
     protected
       parameter Real c[2]=Modelica.Math.Matrices.solve([ones(2), q_nom], H_nom)
         "Coefficients of linear head curve";
-      algorithm
+    algorithm
       // Flow equation: head = q*c[1] + c[2];
       H := c[1] + q_flow*c[2];
-      end linearFlow;
+    end linearFlow;
 
     function quadraticFlow "Quadratic flow characteristic, fixed blades"
       extends baseFlow;
@@ -1112,10 +1110,10 @@ This characteristic is such that the relative change of the flow coefficient is 
   */
       parameter Real c[3]=Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],
           H_nom) "Coefficients of quadratic specific work characteristic";
-      algorithm
+    algorithm
       // Flow equation: H = c[1] + q_flow*c[2] + q_flow^2*c[3];
       H := c[1] + q_flow*c[2] + q_flow^2*c[3];
-      end quadraticFlow;
+    end quadraticFlow;
 
     function quadraticFlowBlades
       "Quadratic flow characteristic, movable blades"
@@ -1129,7 +1127,7 @@ This characteristic is such that the relative change of the flow coefficient is 
         unit="(J/kg)/(m3/s)",
         max=0) = 0
         "Slope of flow characteristic at stalling conditions (must be negative)";
-      algorithm
+    algorithm
       H := Utilities.quadraticFlowBlades(
               q_flow,
               bladePos,
@@ -1139,7 +1137,7 @@ This characteristic is such that the relative change of the flow coefficient is 
                 q_nom,
                 H_nom),
               slope_s);
-      end quadraticFlowBlades;
+    end quadraticFlowBlades;
 
     function polynomialFlow "Polynomial flow characteristic, fixed blades"
       extends baseFlow;
@@ -1158,25 +1156,25 @@ This characteristic is such that the relative change of the flow coefficient is 
   */
       parameter Real c[N]=Modelica.Math.Matrices.solve(q_nom_pow, H_nom)
         "Coefficients of polynomial specific work curve";
-      algorithm
+    algorithm
       // Flow equation (example N=3): H = c[1] + q_flow*c[2] + q_flow^2*c[3];
       // Note: the implementation is numerically efficient only for low values of Na
       H := sum(q_flow^(i - 1)*c[i] for i in 1:N);
-      end polynomialFlow;
+    end polynomialFlow;
 
     function constantEfficiency "Constant efficiency characteristic"
       extends baseEfficiency;
       input Real eta_nom "Nominal efficiency";
-      algorithm
+    algorithm
       eta := eta_nom;
-      end constantEfficiency;
+    end constantEfficiency;
 
     function constantPower "Constant power consumption characteristic"
       extends FanCharacteristics.basePower;
       input Modelica.SIunits.Power power=0 "Constant power consumption";
-      algorithm
+    algorithm
       consumption := power;
-      end constantPower;
+    end constantPower;
 
     function quadraticPower
       "Quadratic power consumption characteristic, fixed blades"
@@ -1195,9 +1193,9 @@ This characteristic is such that the relative change of the flow coefficient is 
   */
       Real c[3]=Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2], W_nom)
         "Coefficients of quadratic power consumption curve";
-      algorithm
+    algorithm
       consumption := c[1] + q_flow*c[2] + q_flow^2*c[3];
-      end quadraticPower;
+    end quadraticPower;
 
     package Utilities
       function quadraticFlowBlades
@@ -1218,7 +1216,7 @@ This characteristic is such that the relative change of the flow coefficient is 
         Integer i;
         Real alpha;
         Real q_s "Volume flow rate at stalling conditions";
-        algorithm
+      algorithm
         // Flow equation: H = c[1] + q_flow*c[2] + q_flow^2*c[3];
         i := N_pos - 1;
         while bladePos <= bladePos_nom[i] and i > 1 loop
@@ -1233,7 +1231,7 @@ This characteristic is such that the relative change of the flow coefficient is 
            + alpha*c[3, i + 1])*q_flow^2 else ((1 - alpha)*c[1, i] + alpha*c[1,
           i + 1]) + ((1 - alpha)*c[2, i] + alpha*c[2, i + 1])*q_s + ((1 - alpha)
           *c[3, i] + alpha*c[3, i + 1])*q_s^2 + (q_flow - q_s)*slope_s;
-        end quadraticFlowBlades;
+      end quadraticFlowBlades;
 
       function quadraticFlowBladesCoeff
         extends Modelica.Icons.Function;
@@ -1247,19 +1245,19 @@ This characteristic is such that the relative change of the flow coefficient is 
       protected
         Integer N_pos=size(bladePos_nom, 1);
         Real q_nom2[3];
-        algorithm
+      algorithm
         for j in 1:N_pos loop
           q_nom2 := {q_nom[1, j]^2,q_nom[2, j]^2,q_nom[3, j]^2};
           c[:, j] := Modelica.Math.Matrices.solve([ones(3), q_nom[:, j], q_nom2],
             H_nom[:, j]);
         end for;
-        end quadraticFlowBladesCoeff;
-      end Utilities;
-    end FanCharacteristics;
+      end quadraticFlowBladesCoeff;
+    end Utilities;
+  end FanCharacteristics;
   annotation (Documentation(info="<HTML>
 This package contains general-purpose functions and models
 </HTML>"));
-  end Functions;
+end Functions;
 
 
 package Electrical "Simplified models of electric power components"
@@ -1274,7 +1272,7 @@ package Electrical "Simplified models of electric power components"
                 lineThickness=0.5,
                 fillColor={255,0,0},
                 fillPattern=FillPattern.Solid)}));
-    end PowerConnection;
+  end PowerConnection;
 
   model Grid "Ideal grid with finite droop"
     parameter Frequency fn=50 "Nominal frequency";
@@ -1282,7 +1280,7 @@ package Electrical "Simplified models of electric power components"
     parameter Real droop=0.05 "Network droop";
     PowerConnection connection annotation (Placement(transformation(extent={{-100,
               -14},{-72,14}}, rotation=0)));
-    equation
+  equation
     connection.f = fn + droop*fn*connection.W/Pn;
     annotation (Diagram(graphics), Icon(graphics={Line(points={{18,-16},{2,-38}},
             color={0,0,0}),Line(points={{-72,0},{-40,0}}, color={0,0,0}),
@@ -1330,7 +1328,7 @@ package Electrical "Simplified models of electric power components"
                 lineColor={0,0,0},
                 fillColor={255,255,255},
                 fillPattern=FillPattern.Solid)}));
-    end Grid;
+  end Grid;
 
   model Generator "Active power generator"
     import Modelica.SIunits.Conversions.NonSIunits.*;
@@ -1352,11 +1350,11 @@ package Electrical "Simplified models of electric power components"
       "Angular velocity of the e.m.f. rotating frame";
     AngularVelocity_rpm n "Rotational speed";
     Modelica.SIunits.Frequency f "Electrical frequency";
-    PowerConnection powerConnection annotation (Placement(transformation(extent
-            ={{72,-14},{100,14}}, rotation=0)));
+    PowerConnection powerConnection annotation (Placement(transformation(extent=
+             {{72,-14},{100,14}}, rotation=0)));
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft annotation (
         Placement(transformation(extent={{-100,-14},{-72,14}}, rotation=0)));
-    equation
+  equation
     omega_m = der(shaft.phi) "Mechanical boundary condition";
     omega_e = omega_m*Np;
     f = omega_e/(2*Modelica.Constants.pi) "Electrical frequency";
@@ -1372,7 +1370,7 @@ package Electrical "Simplified models of electric power components"
     f = powerConnection.f;
     Pe = -powerConnection.W;
     tau = shaft.tau;
-    initial equation
+  initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
@@ -1403,7 +1401,7 @@ package Electrical "Simplified models of electric power components"
 The frequency in the electrical connector is the e.m.f. of generator.
 <p>It is possible to consider the generator inertia in the model, by setting the parameter <tt>J > 0</tt>. 
 </html>"));
-    end Generator;
+  end Generator;
 
   model Breaker "Circuit breaker"
     PowerConnection connection1 annotation (Placement(transformation(extent={{-100,
@@ -1415,7 +1413,7 @@ The frequency in the electrical connector is the e.m.f. of generator.
           origin={0,80},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    equation
+  equation
     connection1.W + connection2.W = 0;
     if closed then
       connection1.f = connection2.f;
@@ -1443,7 +1441,7 @@ The frequency in the electrical connector is the e.m.f. of generator.
       Documentation(info="<html>
 Ideal breaker model. Can only be used to connect a generator to a grid with finite droop. Otherwise, please consider the other models in this package.
 </html>"));
-    end Breaker;
+  end Breaker;
 
   model Load "Electrical load"
     parameter Power Wn "Nominal active power consumption";
@@ -1459,7 +1457,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
           origin={-33,0},
           extent={{13,12},{-13,-12}},
           rotation=180)));
-    equation
+  equation
     if cardinality(powerConsumption) == 1 then
       W = powerConsumption*powerCurve((f - fn)/fn)
         "Power consumption determined by connector";
@@ -1487,7 +1485,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
           origin={-10,90},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-    end Load;
+  end Load;
 
   model PowerSensor "Measures power flow through the component"
     PowerConnection port_a annotation (Placement(transformation(extent={{-110,-10},
@@ -1500,7 +1498,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
           origin={0,-94},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-    equation
+  equation
     port_a.W + port_b.W = 0;
     port_a.f = port_b.f;
     W = port_a.W;
@@ -1510,8 +1508,8 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
                 fillColor={255,255,255},
                 fillPattern=FillPattern.Solid),Line(points={{0,70},{0,40}},
             color={0,0,0}),Line(points={{22.9,32.8},{40.2,57.3}}, color={0,0,0}),
-            Line(points={{-22.9,32.8},{-40.2,57.3}}, color={0,0,0}),Line(points
-            ={{37.6,13.7},{65.8,23.9}}, color={0,0,0}),Line(points={{-37.6,13.7},
+            Line(points={{-22.9,32.8},{-40.2,57.3}}, color={0,0,0}),Line(points=
+             {{37.6,13.7},{65.8,23.9}}, color={0,0,0}),Line(points={{-37.6,13.7},
             {-65.8,23.9}}, color={0,0,0}),Line(points={{0,0},{9.02,28.6}},
             color={0,0,0}),Polygon(
                 points={{-0.48,31.6},{18,26},{18,57.2},{-0.48,31.6}},
@@ -1528,15 +1526,15 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
             Line(points={{100,0},{70,0}}, color={0,0,0}),Text(extent={{-148,88},
             {152,128}}, textString="%name"),Line(points={{0,-70},{0,-84}},
             color={0,0,0})}));
-    end PowerSensor;
+  end PowerSensor;
 
   model FrequencySensor "Measures the frequency at the connector"
     PowerConnection port annotation (Placement(transformation(extent={{-110,-10},
               {-90,10}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput f "Frequency at the connector"
-      annotation (Placement(transformation(extent={{92,-10},{112,10}}, rotation
-            =0)));
-    equation
+      annotation (Placement(transformation(extent={{92,-10},{112,10}}, rotation=
+             0)));
+  equation
     port.W = 0;
     f = port.f;
     annotation (Diagram(graphics), Icon(graphics={Ellipse(
@@ -1545,8 +1543,8 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
                 fillColor={255,255,255},
                 fillPattern=FillPattern.Solid),Line(points={{0,70},{0,40}},
             color={0,0,0}),Line(points={{22.9,32.8},{40.2,57.3}}, color={0,0,0}),
-            Line(points={{-22.9,32.8},{-40.2,57.3}}, color={0,0,0}),Line(points
-            ={{37.6,13.7},{65.8,23.9}}, color={0,0,0}),Line(points={{-37.6,13.7},
+            Line(points={{-22.9,32.8},{-40.2,57.3}}, color={0,0,0}),Line(points=
+             {{37.6,13.7},{65.8,23.9}}, color={0,0,0}),Line(points={{-37.6,13.7},
             {-65.8,23.9}}, color={0,0,0}),Line(points={{0,0},{9.02,28.6}},
             color={0,0,0}),Polygon(
                 points={{-0.48,31.6},{18,26},{18,57.2},{-0.48,31.6}},
@@ -1562,7 +1560,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
                 textString="f"),Line(points={{-70,0},{-90,0}}, color={0,0,0}),
             Line(points={{100,0},{70,0}}, color={0,0,0}),Text(extent={{-148,88},
             {152,128}}, textString="%name")}));
-    end FrequencySensor;
+  end FrequencySensor;
 
   partial model Network1portBase "Base class for one-port network"
     parameter Boolean hasBreaker=false
@@ -1579,8 +1577,8 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
     Modelica.SIunits.Angle delta(stateSelect=StateSelect.prefer, start=
           deltaStart) "Load angle";
 
-    PowerConnection powerConnection annotation (Placement(transformation(extent
-            ={{-114,-14},{-86,14}}, rotation=0)));
+    PowerConnection powerConnection annotation (Placement(transformation(extent=
+             {{-114,-14},{-86,14}}, rotation=0)));
     Modelica.Blocks.Interfaces.BooleanInput closed if hasBreaker annotation (
         Placement(transformation(
           origin={0,97},
@@ -1598,7 +1596,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
           origin={0,-90},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-    equation
+  equation
     // Load angle
     der(delta) = omega - omegaRef;
     // Power flow
@@ -1616,7 +1614,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
     connect(closed, closedInternal);
     //Output signal
     delta_out = delta;
-    initial equation
+  initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
@@ -1649,7 +1647,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
 </html>"));
-    end Network1portBase;
+  end Network1portBase;
 
   model NetworkGrid_eX
     extends ThermoPower.Electrical.Network1portBase(final C=e*v/(X + Xline));
@@ -1669,7 +1667,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
     parameter Integer Np=2 "Number of electrical poles" annotation (dialog(
           enable=if J > 0 then true else false, group="Generator"));
     Real D "Electrical damping coefficient";
-    equation
+  equation
     // Definition of the reference angular velocity
     omegaRef = 2*Modelica.Constants.pi*fnom;
     // Damping power loss
@@ -1704,7 +1702,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
 </html>"));
-    end NetworkGrid_eX;
+  end NetworkGrid_eX;
 
   model NetworkGrid_Pmax
     extends ThermoPower.Electrical.Network1portBase(final C=Pmax);
@@ -1719,7 +1717,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
     parameter Integer Np=2 "Number of electrical poles" annotation (dialog(
           enable=if J > 0 then true else false, group="Generator"));
     Real D "Electrical damping coefficient";
-    equation
+  equation
     // Definition of the reference
     omegaRef = 2*Modelica.Constants.pi*fnom;
     // Definition of damping power loss
@@ -1754,7 +1752,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
 </html>"));
-    end NetworkGrid_Pmax;
+  end NetworkGrid_Pmax;
 
   partial model Network2portBase "Base class for network with two port"
     parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
@@ -1790,7 +1788,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
           origin={40,29},
           extent={{-9,-8},{9,8}},
           rotation=270)));
-    equation
+  equation
     // Definition of load angles
     der(delta_a) = omega_a;
     der(delta_b) = omega_b;
@@ -1806,7 +1804,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
     Pe_b + Ploss_b = powerConnection_b.W;
     omega_a = 2*Modelica.Constants.pi*powerConnection_a.f;
     omega_b = 2*Modelica.Constants.pi*powerConnection_b.f;
-    initial equation
+  initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
@@ -1839,7 +1837,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
 </html>"));
-    end Network2portBase;
+  end Network2portBase;
 
   model NetworkTwoGenerators_eX
     "Connection: generator(a) - generator(b); Parameters: voltages and reactances"
@@ -1886,7 +1884,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
           origin={0,97},
           extent={{-15,-16},{15,16}},
           rotation=270)));
-    equation
+  equation
     // Breaker and its connections (unique breaker => closedInternal_gen_a = closedInternal_gen_b)
     if not hasBreaker then
       closedInternal_gen_a = true;
@@ -1940,7 +1938,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
                 lineColor={0,0,0},
                 fillColor={255,255,255},
                 fillPattern=FillPattern.Solid)}));
-    end NetworkTwoGenerators_eX;
+  end NetworkTwoGenerators_eX;
 
   model NetworkTwoGenerators_Pmax
     "Connection: generator(a) - generator(b); Parameters: maximum power"
@@ -1978,7 +1976,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
           origin={0,97},
           extent={{-15,-16},{15,16}},
           rotation=270)));
-    equation
+  equation
     // Breaker and its connections (unique breaker => closedInternal_gen_a = closedInternal_gen_b)
     if not hasBreaker then
       closedInternal_gen_a = true;
@@ -2033,7 +2031,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
                 lineColor={0,0,0},
                 fillColor={255,255,255},
                 fillPattern=FillPattern.Solid)}));
-    end NetworkTwoGenerators_Pmax;
+  end NetworkTwoGenerators_Pmax;
 
   model NetworkGridTwoGenerators "Base class for network with two port"
     extends ThermoPower.Electrical.Network2portBase(final C_ab=e_a*e_b/(X_a +
@@ -2107,7 +2105,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
           origin={0,49},
           extent={{-9,-8},{9,8}},
           rotation=270)));
-    equation
+  equation
     // Load angles
     omegaRef = 2*Modelica.Constants.pi*fnom;
     der(delta_g) = omegaRef;
@@ -2158,7 +2156,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
     else
       D_b = 0;
     end if;
-    initial equation
+  initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
@@ -2208,12 +2206,12 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
 </html>"));
-    end NetworkGridTwoGenerators;
+  end NetworkGridTwoGenerators;
   annotation (Documentation(info="<html>
 <p>This package allows to describe the flow of active power between a synchronous generator and a grid, through simplified power transmission line models, assuming ideal voltage control. </p>
 <p>These models are meant to be used as simplified boundary conditions for a thermal power plant model, rather than for fully modular description of three-phase networks. Specialized libraries should be used for this purpose; bear in mind, however, that full three-phase models of electrical machinery and power lines could make the power plant simulation substantially heavier, if special numeric integration strategies are not adopted.
 </html>"));
-  end Electrical;
+end Electrical;
 
 
 type HydraulicConductance = Real (final quantity="HydraulicConductance", final
@@ -2349,6 +2347,6 @@ most user-developed models.</li>
 <p>The ThermoPower package is licensed by Politecnico di Milano under the  <a href=\"http://www.modelica.org/licenses/ModelicaLicense2\"><b>Modelica License 2</b></a>.</p> 
 <p><b>Copyright &copy; 2002-2013, Politecnico di Milano.</b></p>
 </HTML>"),
-  uses(Modelica(version="3.2.1")),
+  uses(Modelica(version="3.2")),
   version="3.1");
 end ThermoPower;
