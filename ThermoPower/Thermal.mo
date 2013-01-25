@@ -1835,7 +1835,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
     "Thermal model of a hollow cylinder by Fourier's equation - 1 axial node and Nr radial nodes"
     import Modelica.SIunits.*;
     import ThermoPower.Choices.CylinderFourier.NodeDistribution;
-    extends Icons.MetalWall;
+    extends ThermoPower.Icons.MetalWall;
 
     replaceable model MaterialModel = MaterialProperties.Metals.StandardSteel
       constrainedby MaterialProperties.Interfaces.PartialMaterial "Metal model";
@@ -1969,7 +1969,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
             extent={{-98,-44},{102,-72}},
             lineColor={191,95,0},
             textString="%name")}),
-      DymolaStoredErrors,
       Documentation(info="<html>
 This is the 1D thermal model of a solid hollow cylinder by Fourier's equations. 
 <p>The model is axis-symmetric, has one node in the longitudinal direction, and <tt>Nr</tt> nodes in the radial direction. The two connectors correspond to the internal and external surfaces; if one of the surface is thermally insulated, just leave the connector unconnected (no connection on a <tt>DHT</tt> connector means zero heat flux). The temperature-dependent properties of the material are described by the replaceable <tt>MaterialModel</tt> model.
