@@ -920,7 +920,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.BaseClasses.DistributedHeatTransfer_fv heatTransfer constrainedby
+    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransfer_fv annotation(choicesAllMatching = true);
   protected
     Density rhobar[N - 1] "Fluid average density";
@@ -1134,6 +1134,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     "1-dimensional fluid flow model for water/steam (finite elements)"
 
     extends BaseClasses.Flow1DBase;
+    replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
+            false), Placement(transformation(extent={{-40,40},{40,60}},
+            rotation=0)));
     import Modelica.Math.*;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
@@ -1560,6 +1563,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
           StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
+    replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
+            false), Placement(transformation(extent={{-40,40},{40,60}},
+            rotation=0)));
     parameter Real alpha(
       min=0,
       max=2) = 1 "Numerical stabilization coefficient";
@@ -5040,9 +5046,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf
                else 0)) annotation (Placement(transformation(extent={{80,-20},{
                 120,20}}, rotation=0)));
-      //replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
-      //        false), Placement(transformation(extent={{-40,40},{40,60}},
-      //        rotation=0)));
+    //   replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
+    //           false), Placement(transformation(extent={{-40,40},{40,60}},
+    //           rotation=0)));
       Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
       Time Tr "Residence time";
       final parameter Real dzdx=H/L "Slope" annotation (Evaluate=true);
@@ -5574,9 +5580,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
     input ThermodynamicState fluidState[N];
     input MassFlowRate w[n];
-
     ThermoPower.Thermal.DHTVolumes wall;
-
     parameter Integer Nf "Number of nodes fluid-side";
     parameter Integer Nw=Nf "Number of nodes wall-side";
     parameter Boolean useAverageTemperature = true;
@@ -5592,10 +5596,17 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
   end NoHeatTransfer;
 
-  model ConstantHeatTransferCoefficient
-    extends BaseClasses.DistributedHeatTransfer_fv;
+  model ConstantHeatTransferCoefficient1ph
+    extends BaseClasses.DistributedHeatTransfer_fv(final Nw);
 
-  end ConstantHeatTransferCoefficient;
+    parameter CoefficientOfHeatTransfer gamma
+      "Constant heat transfer coefficient";
+  equation
+
+     for j in 1:N - 1 loop
+
+     end for;
+  end ConstantHeatTransferCoefficient1ph;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
 <p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
