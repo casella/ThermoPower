@@ -105,8 +105,8 @@ Casella</a>:<br>
     end TestMixer;
 
     model TestMixerSlowFast
-      // package Medium=Modelica.Media.Water.StandardWater;
-      package Medium = Media.LiquidWaterConstant;
+      package Medium=Modelica.Media.Water.StandardWater;
+      // package Medium = Modelica.Media.Incompressible.Examples.Glycol47;
       Water.SourceW SourceW1(
         w0=0.5,
         h=1e5,
@@ -117,13 +117,15 @@ Casella</a>:<br>
         h=2e5,
         redeclare package Medium = Medium) annotation (Placement(transformation(
               extent={{-98,-30},{-78,-10}}, rotation=0)));
-      Water.SinkP SinkP1(p0=1e5, redeclare package Medium = Medium) annotation (
+      Water.SinkP SinkP1(        redeclare package Medium = Medium, p0=100000)
+                                                                    annotation (
          Placement(transformation(extent={{80,-10},{100,10}}, rotation=0)));
       Water.Mixer Mixer1(
         hstart=1e5,
         V=0.01,
         redeclare package Medium = Medium,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        pstart=100000)                                        annotation (
           Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
       Water.ValveLin ValveLin1(Kv=1/1e5, redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{38,-10},{58,10}},
@@ -144,7 +146,8 @@ Casella</a>:<br>
         hstart=1e5,
         V=0.01,
         redeclare package Medium = Medium,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        pstart=100000)                                        annotation (
           Placement(transformation(extent={{0,-10},{20,10}}, rotation=0)));
       Modelica.Blocks.Sources.Step StepEnthalpy(
         height=1e5,
@@ -184,7 +187,7 @@ Casella</a>:<br>
         annotation (Line(points={{35,40},{48,40},{48,8}}, color={0,0,127}));
       annotation (
         Diagram(graphics),
-        experiment(StopTime=50, NumberOfIntervals=5000),
+        experiment(StopTime=50, __Dymola_NumberOfIntervals=4000),
         Documentation(info="<HTML>
 <p>This model tests the <tt>Mixer</tt> and <tt>Header</tt> models with different medium models. If an incompressible medium model is used, the fast pressure dynamics is neglected, thus allowing simulation with explicit algorithms and large time steps.
 </HTML>", revisions="<html>
@@ -194,7 +197,8 @@ Casella</a>:<br>
 Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</html>"),
+        __Dymola_experimentSetupOutput);
     end TestMixerSlowFast;
 
     model TestPressDrop
@@ -365,7 +369,7 @@ This test model demonstrate four possible ways of setting the friction coefficie
               rotation=0)));
       inner ThermoPower.System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Real y "Derivate of dp";
+      Real y "Derivative of dp";
     equation
       y = der(pressDrop.dp);
       connect(Cmd1.y, sourceW.in_w0) annotation (Line(
@@ -384,8 +388,7 @@ This test model demonstrate four possible ways of setting the friction coefficie
           smooth=Smooth.None));
       annotation (
         Diagram(graphics),
-        experiment(NumberOfIntervals=5000, Tolerance=1e-005),
-        experimentSetupOutput,
+        experiment(__Dymola_NumberOfIntervals=5000, Tolerance=1e-005),
         Documentation(info="<html>
 <p>This model tests the <code>PressDrop</code> model in condition of flow reversal.</p>
 </html>"));
@@ -454,6 +457,7 @@ Casella</a>:<br>
     end TestThroughW;
 
     model TwoTanks "Test case for Tank and Flow1D"
+
       ThermoPower.Water.Tank Tank2(
         A=0.1,
         redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph,
@@ -530,7 +534,7 @@ Casella</a>:<br>
        First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TwoTanks;
 
     model TestValves "Test cases for valves"
@@ -773,7 +777,8 @@ Casella</a>:<br>
 </html>"));
     end TestValveChoked;
 
-    model TestCoeffValve "Test case for valve with the several coefficients"
+    model TestCoeffValve "Test case for valve with different CvData settings"
+
       ThermoPower.Water.SourceP SourceP1(p0=5e5, h=2e5) annotation (Placement(
             transformation(extent={{-50,50},{-30,70}}, rotation=0)));
       ThermoPower.Water.SinkP SinkP1(p0=3e5) annotation (Placement(
@@ -1935,11 +1940,6 @@ Casella</a>:<br>
       connect(Damper.flange_b, J.flange_a)
         annotation (Line(points={{36,-12},{36,0},{48,0}}, color={0,0,0}));
       annotation (
-        Window(
-          x=0.15,
-          y=0.18,
-          width=0.45,
-          height=0.58),
         Icon(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
@@ -1973,7 +1973,6 @@ Schiavo</a>:<br>
        First release.</li>
 </ul>
 </html>"),
-        DymolaStoredErrors,
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
@@ -2162,6 +2161,7 @@ Algorithm Tolerance = 1e-6
       der(ST.omega) = 0;
       der(ST.P_HP) = 0;
       der(ST.P_LP) = 0;
+
     equation
       connect(ValveLin1.outlet, SensT1.inlet) annotation (Line(
           points={{-50,14},{-42,14}},
@@ -2179,9 +2179,8 @@ Algorithm Tolerance = 1e-6
         Diagram(graphics),
         experiment(
           StopTime=5,
-          fixedstepsize=1e-005,
-          Algorithm=""),
-        experimentSetupOutput,
+          __Dymola_fixedstepsize=1e-005,
+          __Dymola_Algorithm=""),
         Documentation(info="<html>
 <p>This model is designed to test the <tt>SteamTurbineUnit</tt> component when connected to an inertial load. Simulation sequence:
 <ul>
@@ -2277,6 +2276,7 @@ Algorithm Tolerance = 1e-4
       ST.phi = 0;
       der(ST.P_HP) = 0;
       der(ST.P_LP) = 0;
+
     equation
       connect(Speed1.flange, Inertia1.flange_b) annotation (Line(
           points={{60,0},{50,0}},
@@ -2290,9 +2290,8 @@ Algorithm Tolerance = 1e-4
         Diagram(graphics),
         experiment(
           StopTime=10,
-          fixedstepsize=1e-005,
-          Algorithm=""),
-        experimentSetupOutput,
+          __Dymola_fixedstepsize=1e-005,
+          __Dymola_Algorithm=""),
         Documentation(info="<html>
 <p>This model is designed to test the <tt>SteamTurbineUnit</tt> component when connected to a fixed speed load. Simulation sequence:
 <ul>
