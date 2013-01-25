@@ -4357,7 +4357,7 @@ Casella</a>:<br>
 
     model TestFlow1D2phA "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
-      import Modelica.Constants.*;
+      constant Real pi = Modelica.Constants.pi;
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
@@ -4500,7 +4500,7 @@ Algorithm Tolerance = 1e-9
 
     model TestFlow1D2phB "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
-      import Modelica.Constants.*;
+      constant Real pi = Modelica.Constants.pi;
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
@@ -4632,7 +4632,7 @@ Algorithm Tolerance = 1e-9
 
     model TestFlow1D2phC "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
-      import Modelica.Constants.*;
+      constant Real pi = Modelica.Constants.pi;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -4765,7 +4765,7 @@ Algorithm Tolerance = 1e-9
 
     model TestFlow1D2phD "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
-      import Modelica.Constants.*;
+      constant Real pi = Modelica.Constants.pi;
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
@@ -5111,7 +5111,7 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
 
     model TestFlow1D2phDB "Test case for Flow1D2phDB"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
-      import Modelica.Constants.*;
+      constant Real pi = Modelica.Constants.pi;
       // number of Nodes
       parameter Integer Nnodes=8;
       // total length
@@ -5268,7 +5268,7 @@ Algorithm Tolerance = 1e-8
 
     model TestFlow1D2phDB_hf "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph (smoothModel=true);
-      import Modelica.Constants.*;
+      constant Real pi = Modelica.Constants.pi;
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
@@ -5565,7 +5565,7 @@ Algorithm Tolerance = 1e-8
 
     model TestFlow1D2phChen_hf "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph (smoothModel=true);
-      import Modelica.Constants.*;
+      constant Real pi = Modelica.Constants.pi;
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
