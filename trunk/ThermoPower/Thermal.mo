@@ -1265,19 +1265,19 @@ This package contains models to compute the material properties needed to model 
               -20}}, rotation=0)));
 
   protected
-    parameter Real H12[:, :]=(if N1 >= N2 then ones(N1, N2) else
+    final parameter Real H12[N1, N2]=(if N1 >= N2 then ones(N1, N2) else
         Modelica.Math.Matrices.inv(H1)*H2)
       "Heat flux weight matrix to use if N2>N1" annotation (Evaluate=true);
-    parameter Real H21[:, :]=(if N1 >= N2 then Modelica.Math.Matrices.inv(H2)*
+    final parameter Real H21[N2, N1]=(if N1 >= N2 then Modelica.Math.Matrices.inv(H2)*
         H1 else ones(N2, N1)) "Heat flux weight matrix to use if N1>=N2"
       annotation (Evaluate=true);
-    parameter Real G1[N2, N1]=compG1(N1, N2)
+    final parameter Real G1[N2, N1]=compG1(N1, N2)
       "Temperature weight matrix - side 1";
-    parameter Real G2[N1, N2]=compG2(N1, N2)
+    final parameter Real G2[N1, N2]=compG2(N1, N2)
       "Temperature weight matrix - side 2";
-    parameter Real H1[min(N1, N2), N1]=compH1(N1, N2)
+    final parameter Real H1[min(N1, N2), N1]=compH1(N1, N2)
       "Heat flux weight matrix - side 1" annotation (Evaluate=true);
-    parameter Real H2[min(N1, N2), N2]=compH2(N1, N2)
+    final parameter Real H2[min(N1, N2), N2]=compH2(N1, N2)
       "Heat flux weight matrix - side 2" annotation (Evaluate=true);
 
     function compHm "Computes matrix H - side with more nodes"
@@ -1446,8 +1446,7 @@ This package contains models to compute the material properties needed to model 
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),
-      DymolaStoredErrors);
+</html>"));
   end ConvHT2N;
 
   model ConvHT_htc "1D Convective heat transfer between a DHT and a DHT_htc"
@@ -1501,10 +1500,10 @@ This package contains models to compute the material properties needed to model 
     ThermoPower.Thermal.DHT side2(N=N2) annotation (Placement(transformation(
             extent={{-40,-42},{40,-20}}, rotation=0)));
   protected
-    parameter Real H12[:, :]=(if N1 >= N2 then ones(N1, N2) else
+    parameter Real H12[N1, N2]=(if N1 >= N2 then ones(N1, N2) else
         Modelica.Math.Matrices.inv(H1)*H2)
       "Heat flux weight matrix to use if N2>N1" annotation (Evaluate=true);
-    parameter Real H21[:, :]=(if N1 >= N2 then Modelica.Math.Matrices.inv(H2)*
+    parameter Real H21[N2, N2]=(if N1 >= N2 then Modelica.Math.Matrices.inv(H2)*
         H1 else ones(N2, N1)) "Heat flux weight matrix to use if N1>=N2"
       annotation (Evaluate=true);
     parameter Real G1[N2, N1]=compG1(N1, N2)
