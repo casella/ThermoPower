@@ -706,7 +706,7 @@ This package contains models to compute the material properties needed to model 
     extends HeatSource1D(redeclare Thermal.DHThtc_in wall);
   end HeatSource1Dhtc;
 
-  model MetalTube_fv "Cylindrical metal tube - 1 radial node and N axial nodes"
+  model MetalTubeFV "Cylindrical metal tube - 1 radial node and N axial nodes"
 
     // TO BE ADAPTED!!!!
 
@@ -802,10 +802,9 @@ This package contains models to compute the material properties needed to model 
 </ul>
 </html>
 "),   Diagram(graphics));
-  end MetalTube_fv;
+  end MetalTubeFV;
 
-  model MetalTube_fem
-    "Cylindrical metal tube - 1 radial node and N axial nodes"
+  model MetalTubeFEM "Cylindrical metal tube - 1 radial node and N axial nodes"
     extends Icons.MetalWall;
     parameter Integer N(min=1) = 2 "Number of nodes";
     parameter Length L "Tube length";
@@ -898,9 +897,9 @@ This package contains models to compute the material properties needed to model 
 </ul>
 </html>
 "),   Diagram(graphics));
-  end MetalTube_fem;
+  end MetalTubeFEM;
 
-  model MetalWall_fv "Generic metal wall - 1 radial node and N axial nodes"
+  model MetalWallFV "Generic metal wall - 1 radial node and N axial nodes"
 
     // TO BE ADAPTED!!!!
 
@@ -987,9 +986,9 @@ This package contains models to compute the material properties needed to model 
 </ul>
 </html>
 "),   Diagram(graphics));
-  end MetalWall_fv;
+  end MetalWallFV;
 
-  model MetalWall_fem "Generic metal wall - 1 radial node and N axial nodes"
+  model MetalWallFEM "Generic metal wall - 1 radial node and N axial nodes"
     extends ThermoPower.Icons.MetalWall;
     parameter Integer N(min=1) = 2 "Number of nodes";
     parameter Modelica.SIunits.Mass M "Mass";
@@ -1073,7 +1072,7 @@ This package contains models to compute the material properties needed to model 
 </ul>
 </html>
 "),   Diagram(graphics));
-  end MetalWall_fem;
+  end MetalWallFEM;
 
   connector HThtc
     "Thermal port for lumped parameter heat transfer with outgoing heat transfer coefficient"
@@ -1747,7 +1746,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
   end CounterCurrent;
 
   model MetalWall
-    extends MetalWall_fem;
+    extends MetalWallFEM;
     annotation (
       Icon(graphics={
           Text(
@@ -1789,7 +1788,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
   end MetalWall;
 
   model MetalTube "Cylindrical metal tube - 1 radial node and N axial nodes"
-    extends MetalTube_fem;
+    extends MetalTubeFEM;
 
     annotation (
       Icon(graphics={
