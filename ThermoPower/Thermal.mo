@@ -687,8 +687,6 @@ This package contains models to compute the material properties needed to model 
         temperature_nodeN,
         N);
     annotation (
-      extent=[20, 10; 60, 50],
-      rotation=-90,
       Documentation(info="<HTML>
 <p>Model of an ideal 1D temperature source with a linear distribution. The values of the temperature at the two ends of the source are provided by the <tt>temperature_node1</tt> and <tt>temperature_nodeN</tt> signal connectors.
 </HTML>", revisions="<html>
@@ -698,25 +696,10 @@ This package contains models to compute the material properties needed to model 
        First release.</li>
 </ul>
 </html>
-"),   Diagram(graphics),
-      Placement(transformation(
-          origin={40,30},
-          extent={{-20,-20},{20,20}},
-          rotation=270)),
-      Diagram,
-      Icon(graphics={Text(
+"),   Icon(graphics={Text(
             extent={{-100,-46},{100,-72}},
             lineColor={191,95,0},
-            textString="%name")}),
-      Documentation(info="<HTML>
-<p>Model of an ideal 1D temperature source with a linear distribution. The values of the temperature at the two ends of the source are provided by the <tt>temperature_node1</tt> and <tt>temperature_nodeN</tt> signal connectors.
-<p><b>Revision history:</b></p>
-<ul>
-<li><i>10 Jan 2004</i>
-    by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
-       First release.</li>
-</ul>
-</HTML>"));
+            textString="%name")}));
   end TempSource1Dlin;
 
   model HeatSource1Dhtc "Distributed Heat Flow Source"

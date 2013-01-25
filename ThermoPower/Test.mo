@@ -3208,8 +3208,8 @@ Algorithm Tolerance = 1e-6
     end TestFlow1Df;
 
     model TestFlow1DSlowFast "Test case for Flow1D"
-      // package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
-      package Medium = Media.LiquidWaterConstant;
+      package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
+      // package Medium = Media.LiquidWaterConstant;
 
       // number of Nodes
       parameter Integer Nnodes=20;
@@ -4462,18 +4462,13 @@ Casella</a>:<br>
       connect(extPower2.y, Add1.u1)
         annotation (Line(points={{-59,68},{-42,56}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
             grid={2,2}), graphics),
         experiment(
           StopTime=250,
-          NumberOfIntervals=2000,
+          __Dymola_NumberOfIntervals=2000,
           Tolerance=1e-009),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as an evaporator.<br>
@@ -4500,7 +4495,7 @@ Algorithm Tolerance = 1e-9
     First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestFlow1D2phA;
 
     model TestFlow1D2phB "Test case for Flow1D2ph"
@@ -4611,18 +4606,13 @@ Algorithm Tolerance = 1e-9
       connect(xValve.y, valve.cmd)
         annotation (Line(points={{21,30},{30,30},{30,-12}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
             grid={2,2}), graphics),
         experiment(
           StopTime=250,
-          NumberOfIntervals=2000,
+          __Dymola_NumberOfIntervals=2000,
           Tolerance=1e-009),
         Documentation(info="<HTML>
 <p>Same as TestFlow1D2phA, but in this case the enthalpy at the inlet changes stepwise. The avodInletEnthalpyDerivative flag is set to true, in order to avoid problems with the derivative of h[1]. 
@@ -4637,7 +4627,7 @@ Algorithm Tolerance = 1e-9
     Created.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestFlow1D2phB;
 
     model TestFlow1D2phC "Test case for Flow1D2ph"
@@ -4737,18 +4727,13 @@ Algorithm Tolerance = 1e-9
       connect(hIn.y, Source.in_h)
         annotation (Line(points={{-59,0},{-46,0},{-46,-14}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=true,
             extent={{-100,-100},{100,100}},
             grid={2,2}), graphics),
         experiment(
           StopTime=250,
-          NumberOfIntervals=2000,
+          __Dymola_NumberOfIntervals=2000,
           Tolerance=1e-009),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as an evaporator.<br>
@@ -4775,7 +4760,7 @@ Algorithm Tolerance = 1e-9
     First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestFlow1D2phC;
 
     model TestFlow1D2phD "Test case for Flow1D2ph"
@@ -4886,18 +4871,13 @@ Algorithm Tolerance = 1e-9
       connect(xValve.y, valve.cmd)
         annotation (Line(points={{21,30},{30,30},{30,-12}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
             grid={2,2}), graphics),
         experiment(
           StopTime=600,
-          NumberOfIntervals=2000,
+          __Dymola_NumberOfIntervals=2000,
           Tolerance=1e-009),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as a condenser.<br>
@@ -4924,7 +4904,7 @@ Algorithm Tolerance = 1e-9
     First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestFlow1D2phD;
 
     model CheckFlow1D2phMassBalance
@@ -5121,12 +5101,12 @@ Algorithm Tolerance = 1e-9
       annotation (
         experiment(
           StopTime=19,
-          NumberOfIntervals=5000,
+          __Dymola_NumberOfIntervals=5000,
           Tolerance=1e-009),
-        experimentSetupOutput,
         Documentation(info="<html>
 This model checks the dynamic mass balance equations of Flow1D2ph, by prescribing enthalpy and pressure values that will ensure complete coverage of the different cases.
-</html>"));
+</html>"),
+        __Dymola_experimentSetupOutput);
     end CheckFlow1D2phMassBalance;
 
     model TestFlow1D2phDB "Test case for Flow1D2phDB"
@@ -5255,18 +5235,13 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
       connect(extTemp2.y, Add1.u1)
         annotation (Line(points={{-79,70},{-68,56}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
             grid={2,2}), graphics),
         experiment(
           StopTime=1000,
-          NumberOfIntervals=5000,
+          __Dymola_NumberOfIntervals=5000,
           Tolerance=1e-008),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2phDB</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow, computation of the heat transfer coefficient).<br>
@@ -5376,6 +5351,7 @@ Algorithm Tolerance = 1e-8
     initial equation
       der(hex.p) = 0;
       der(hex.htilde) = zeros(Nnodes - 1);
+
     equation
       connect(heatSource.wall, hex.wall) annotation (Line(points={{-20,-21},{-20,
               -28},{-20,-35}}, color={255,127,0}));
@@ -5410,18 +5386,13 @@ Algorithm Tolerance = 1e-8
       connect(Add2.u2, extPower3.y)
         annotation (Line(points={{38,64},{21,54}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
             grid={2,2}), graphics),
         experiment(
           StopTime=300,
-          NumberOfIntervals=2000,
+          __Dymola_NumberOfIntervals=2000,
           Tolerance=1e-007),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2phDB</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow, heat transfer computation) with a prescribed external heat flux, for debugging purposes. The heat transfer coefficient on the <tt>wall</tt> connector should be a continuous function.
@@ -5436,7 +5407,7 @@ Algorithm Tolerance = 1e-7
     First release.</li>
 </ul>
 </HTML>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestFlow1D2phDB_hf;
 
     model TestFlow1D2phChen "Test case for Flow1D2phChen"
@@ -5563,11 +5534,6 @@ Algorithm Tolerance = 1e-7
       connect(extTemp2.y, Add1.u1)
         annotation (Line(points={{-79,70},{-68,56}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
@@ -5594,7 +5560,7 @@ Algorithm Tolerance = 1e-8
     First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestFlow1D2phChen;
 
     model TestFlow1D2phChen_hf "Test case for Flow1D2ph"
@@ -5696,6 +5662,7 @@ Algorithm Tolerance = 1e-8
     initial equation
       der(hex.p) = 0;
       der(hex.htilde) = zeros(Nnodes - 1);
+
     equation
       connect(extPower.y, Add1.u2)
         annotation (Line(points={{-59,54},{-42,64}}, color={0,0,127}));
@@ -5716,18 +5683,13 @@ Algorithm Tolerance = 1e-8
       connect(Add3.u2, Add1.y) annotation (Line(points={{-54,4},{-72,4},{-72,36},
               {-10,36},{-10,70},{-19,70}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-100,-100},{100,100}},
             grid={2,2}), graphics),
         experiment(
           StopTime=300,
-          NumberOfIntervals=2000,
+          __Dymola_NumberOfIntervals=2000,
           Tolerance=1e-007),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2phDB</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow, heat transfer computation) with a prescribed external heat flux, for debugging purposes. The heat transfer coefficient on the <tt>wall</tt> connector should be a continuous function.
@@ -5742,7 +5704,7 @@ Algorithm Tolerance = 1e-7
     First release.</li>
 </ul>
 </HTML>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestFlow1D2phChen_hf;
 
     model TestFlow1Dfem2ph "Test case for Flow1D2ph"
@@ -5866,11 +5828,6 @@ Algorithm Tolerance = 1e-7
       connect(xValve.y, valve.cmd) annotation (Line(points={{21,-10},{30,-10},{
               30,-32}}, color={0,0,127}));
       annotation (
-        Window(
-          x=0.01,
-          y=0.03,
-          width=0.59,
-          height=0.55),
         Diagram(coordinateSystem(
             preserveAspectRatio=true,
             extent={{-100,-100},{100,100}},
@@ -5897,7 +5854,7 @@ Algorithm Tolerance = 1e-6
     First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestFlow1Dfem2ph;
 
     model Flow1D_check
@@ -6064,7 +6021,7 @@ Simulation Interval = [0...60] sec <br>
 Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6 
 </HTML>"),
-        experimentSetupOutput);
+        __Dymola_experimentSetupOutput);
     end TestGasFlow1DA;
 
     model TestGasFlow1DB
@@ -6075,7 +6032,7 @@ Algorithm Tolerance = 1e-6
 
       Modelica.Blocks.Sources.Step[2] Step3(
         height=deltaX,
-        startTime=30,
+        each startTime=30,
         offset=Medium.reference_X) annotation (Placement(transformation(extent=
                 {{-100,60},{-80,80}}, rotation=0)));
     equation
@@ -6083,8 +6040,6 @@ Algorithm Tolerance = 1e-6
         annotation (Line(points={{-79,70},{-62,70},{-62,5}}, color={0,0,127}));
       annotation (
         experiment(StopTime=50),
-        experimentSetupOutput,
-        Diagram(graphics),
         Documentation(info="<html>
 Same as <tt>TestGasFlow1DA</tt>, but with mixture fluid (CombustionAir) and UniformComposition = true. The inlet composition is changed stepwise at time t = 30;
 </html>"));
@@ -6119,8 +6074,7 @@ Same as <tt>TestGasFlow1DB</tt>, but with QuasiStatic = true; the model is purel
         hstartin=8e5,
         hstartout=2.9e6,
         csilstart=0.2*L,
-        csivstart=0.8*L) annotation (extent=[-60, -20; 60, 40], Placement(
-            transformation(extent={{-60,-20},{60,40}}, rotation=0)));
+        csivstart=0.8*L);
       Temperature Text "External temperature";
       parameter Real K(fixed=false, start=1.2e3);
     equation
@@ -6143,12 +6097,12 @@ Same as <tt>TestGasFlow1DB</tt>, but with QuasiStatic = true; the model is purel
       annotation (
         experiment(
           StopTime=600,
-          NumberOfIntervals=1000,
+          __Dymola_NumberOfIntervals=1000,
           Tolerance=1e-008),
-        experimentSetupOutput,
         Documentation(info="<html>
 The moving boundary evaporator model is still incomplete, and it fails at t = 245.
-</html>"));
+</html>"),
+        __Dymola_experimentSetupOutput);
     end TestEvaporatorTemp;
 
     model TestEvaporatorFlux
@@ -6164,8 +6118,7 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 24
         hstartin=4e5,
         hstartout=4e5,
         csilstart=0,
-        csivstart=0) annotation (extent=[-60, -20; 60, 40], Placement(
-            transformation(extent={{-60,-20},{60,40}}, rotation=0)));
+        csivstart=0);
     equation
       Ql = 2.5e5*csil/L*min(max(time - 10, 0), 100);
       Qb = 2.5e5*(csiv - csil)/L*min(max(time - 10, 0), 100);
@@ -6180,7 +6133,6 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 24
       der(p) = 0;
       annotation (
         experiment(StopTime=30, Tolerance=1e-008),
-        experimentSetupOutput,
         Documentation(info="<html>
 The moving boundary evaporator model is still incomplete, and it fails at t = 12.
 </html>"));
@@ -6296,8 +6248,7 @@ Algorithm Tolerance = 1e-6
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
     First release.</li>
 </ul>
-</html>"),
-        experimentSetupOutput);
+</html>"));
     end TestFlow1DfemG;
 
     model TestFlow1DfemH "Test case for Flow1Dfem"
@@ -6385,8 +6336,7 @@ Algorithm Tolerance = 1e-6
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
     First release.</li>
 </ul>
-</html>"),
-        experimentSetupOutput);
+</html>"));
     end TestFlow1DfemH;
 
     model TestFlow1DfemK "Test case for Flow1Dfem"
@@ -6477,7 +6427,6 @@ Algorithm Tolerance = 1e-6
           color={0,0,127},
           smooth=Smooth.None));
       annotation (
-        Diagram(graphics),
         experiment(
           StartTime=-10,
           StopTime=10,
@@ -6502,7 +6451,7 @@ Algorithm Tolerance = 1e-6
     First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(doublePrecision=true, equdistant=false));
+        __Dymola_experimentSetupOutput(doublePrecision=true, equdistant=false));
     end TestFlow1DfemK;
 
     model TestFlow1DfemJ "Test case for Flow1Dfem"
@@ -6591,11 +6540,10 @@ Algorithm Tolerance = 1e-6
           color={0,0,127},
           smooth=Smooth.None));
       annotation (
-        Diagram(graphics),
         experiment(
           StartTime=-10,
           StopTime=10,
-          NumberOfIntervals=10000,
+          __Dymola_NumberOfIntervals=10000,
           Tolerance=1e-007),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
@@ -6617,7 +6565,7 @@ Algorithm Tolerance = 1e-6
     First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(doublePrecision=true, equdistant=false));
+        __Dymola_experimentSetupOutput(doublePrecision=true, equdistant=false));
     end TestFlow1DfemJ;
   end ThermoHydraulicElements;
 
@@ -8522,7 +8470,7 @@ Algorithm Tolerance = 1e-6
        First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestNetworkGridGenerator_Pmax;
 
     model TestNetworkGridTwoGenerators
@@ -8604,7 +8552,7 @@ Algorithm Tolerance = 1e-6
        First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestNetworkGridTwoGenerators;
 
     model StaticController
@@ -8777,7 +8725,7 @@ Algorithm Tolerance = 1e-6
        First release.</li>
 </ul>
 </html>"),
-        experimentSetupOutput(equdistant=false));
+        __Dymola_experimentSetupOutput(equdistant=false));
     end TestN2GControl;
   end ElectricalElements;
 
