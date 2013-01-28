@@ -6567,6 +6567,11 @@ Algorithm Tolerance = 1e-6
 </html>"),
         __Dymola_experimentSetupOutput(doublePrecision=true, equdistant=false));
     end TestFlow1DfemJ;
+
+    model TestFlow1DFV
+      Water.Flow1DFV flow1DFV
+        annotation (Placement(transformation(extent={{-38,10},{-12,38}})));
+    end TestFlow1DFV;
   end ThermoHydraulicElements;
 
   package GasElements "Test for Gas package elements except Flow1D models"

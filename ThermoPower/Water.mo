@@ -920,8 +920,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
+    Power Qvol[N-1] "Heat flow in the volume";
+    replaceable ThermoPower.Thermal.DHTVolumes wall(N=N) annotation (Dialog(enable=
+            false), Placement(transformation(extent={{-40,40},{40,60}},
+            rotation=0)));
     replaceable ThermoPower.Water.NoHeatTransfer heatTransfer constrainedby
-      ThermoPower.Water.BaseClasses.DistributedHeatTransfer_fv annotation(choicesAllMatching = true);
+      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
   protected
     Density rhobar[N - 1] "Fluid average density";
     SpecificVolume vbar[N - 1] "Fluid average specific volume";
@@ -1043,11 +1047,14 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     h[1] = inStream(infl.h_outflow);
     h[2:N] = htilde;
 
-    Qvol = wall.Q;
-    T = wall.T;
+    wall.T = heatTransfer.wall.T;
+    wall.Q = heatTransfer.wall.Q;
+    Qvol = heatTransfer.wall.Q;
+    T = heatTransfer.wall.T;
+
     //phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
 
-    Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
+    //Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Total fluid mass";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
   initial equation
@@ -2307,7 +2314,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </html>
 "));
   end Flow1DFEM2ph;
-
 
   model FlowJoin "Joins two water/steam flows"
     extends Icons.Water.FlowJoin;
@@ -6759,38 +6765,38 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </html>"));
     end SteamTurbineBase;
 
-    partial model DistributedHeatTransfer_fv
+    partial model DistributedHeatTransferFV
 
-    extends ThermoPower.Icons.HeatFlow;
+      extends ThermoPower.Icons.HeatFlow;
+      replaceable package Medium = StandardWater constrainedby
+        Modelica.Media.Interfaces.PartialMedium "Medium model";
+      input Medium.ThermodynamicState fluidState[Nf];       //ThermodynamicState
+      input MassFlowRate w[Nf];                      //MassFlowRate
+      ThermoPower.Thermal.DHTVolumes wall(N=Nf);
+      parameter Integer Nf "Number of nodes fluid-side";
+      parameter Integer Nw=Nf "Number of nodes wall-side";
+      parameter Boolean useAverageTemperature = true;
 
-    input ThermodynamicState fluidState[N];
-    input MassFlowRate w[n];
-    ThermoPower.Thermal.DHTVolumes wall;
-    parameter Integer Nf "Number of nodes fluid-side";
-    parameter Integer Nw=Nf "Number of nodes wall-side";
-    parameter Boolean useAverageTemperature = true;
-
-    end DistributedHeatTransfer_fv;
+    end DistributedHeatTransferFV;
   end BaseClasses;
 
   model NoHeatTransfer
-    extends BaseClasses.DistributedHeatTransfer_fv(final Nw);
+    extends BaseClasses.DistributedHeatTransferFV(final Nw, final useAverageTemperature);
 
   equation
-    wall.Q = zeros[N];
+    wall.Q = zeros(Nf);
 
   end NoHeatTransfer;
 
   model ConstantHeatTransferCoefficient1ph
-    extends BaseClasses.DistributedHeatTransfer_fv(final Nw);
+    extends BaseClasses.DistributedHeatTransferFV(final Nw);
+
+  // TO DO
 
     parameter CoefficientOfHeatTransfer gamma
       "Constant heat transfer coefficient";
   equation
 
-     for j in 1:N - 1 loop
-
-     end for;
   end ConstantHeatTransferCoefficient1ph;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
