@@ -379,7 +379,7 @@ This package contains models to compute the material properties needed to model 
   end DHTNodes;
 
   connector DHTVolumes "Distributed Heat Terminal"
-    parameter Integer N(min=1) = 2 "Number of nodes";
+    parameter Integer N "Number of nodes";
     AbsoluteTemperature T[N] "Temperature at the nodes";
     flow Power Q[N] "Heat flow through the connector";
     annotation (Icon(graphics={Rectangle(
