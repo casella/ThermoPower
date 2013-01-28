@@ -4241,11 +4241,13 @@ This model is not yet complete
             rotation=0)));
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
-    package SmoothMedium = Medium (final smoothModel=true);
+    // package SmoothMedium = Medium (final smoothModel=true);
     constant Pressure pzero=10 "Small deltap for calculations";
     constant Pressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SpecificEnthalpy hzero=1e-3 "Small value for deltah";
-    SmoothMedium.ThermodynamicState fluidState[N]
+    // SmoothMedium.ThermodynamicState fluidState[N]
+    //   "Thermodynamic state of the fluid at the nodes";
+    Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Length omega_hyd "Wet perimeter (single tube)";
@@ -4264,8 +4266,9 @@ This model is not yet complete
     Medium.Temperature T[N] "Fluid temperature";
     Medium.Temperature Ts "Saturated water temperature";
     Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
-    Medium.SpecificEnthalpy htilde[N - 1](start=hstart[2:N], stateSelect=
-          StateSelect.prefer) "Enthalpy state variables";
+    Medium.SpecificEnthalpy htilde[N - 1](start=hstart[2:N], 
+                                          each stateSelect=StateSelect.prefer)
+      "Enthalpy state variables";
     Medium.SpecificEnthalpy hl "Saturated liquid temperature";
     Medium.SpecificEnthalpy hv "Saturated vapour temperature";
     Real x[N] "Steam quality";
