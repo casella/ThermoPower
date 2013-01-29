@@ -1617,7 +1617,7 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean QuasiStatic=false
       "Quasi-static model (mass, energy and momentum static balances"
       annotation (Evaluate=true);
-    parameter Integer HydraulicCapacitance=HCtypes.Downstream
+    parameter HCtypes HydraulicCapacitance=HCtypes.Downstream
       "1: Upstream, 2: Downstream";
     parameter Boolean avoidInletEnthalpyDerivative=true
       "Avoid inlet enthalpy derivative";
@@ -3297,7 +3297,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Boolean QuasiStatic=false
       "Quasi-static model (mass, energy and momentum static balances"
       annotation (Evaluate=true);
-    parameter Integer HydraulicCapacitance=HCtypes.Downstream
+    parameter HCtypes HydraulicCapacitance=HCtypes.Downstream
       "1: Upstream, 2: Downstream";
     parameter Boolean avoidInletEnthalpyDerivative=true
       "Avoid inlet enthalpy derivative";
