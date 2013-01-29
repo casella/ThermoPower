@@ -381,7 +381,7 @@ This package contains models to compute the material properties needed to model 
   connector DHTVolumes "Distributed Heat Terminal"
     parameter Integer N "Number of nodes";
     AbsoluteTemperature T[N] "Temperature at the nodes";
-    flow Power Q[N] "Heat flow through the connector";
+    flow Power Q[N] "Heat flow at the nodes";
     annotation (Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
