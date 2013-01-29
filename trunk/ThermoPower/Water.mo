@@ -920,7 +920,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    Power Qvol[N-1] "Heat flow in the volume";
     replaceable ThermoPower.Thermal.DHTVolumes wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
@@ -997,12 +996,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Pressure drop due to static head";
     for j in 1:N - 1 loop
       if Medium.singleState then
-        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) = Qvol[j]
+        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) = heatTransfer.wall.Q[j]
           "Energy balance (pressure effects neglected)";
           //Qvol = l*omega*phibar[j]
       else
         A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
-          Qvol[j] "Energy balance";  //Qvol = l*omega*phibar[j]
+          heatTransfer.wall.Q[j] "Energy balance";  //Qvol = l*omega*phibar[j]
       end if;
       dMdt[j] = A*l*(drbdh[j]*der(htilde[j]) + drbdp[j]*der(p))
         "Mass derivative for each volume";
@@ -1048,13 +1047,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     h[2:N] = htilde;
 
     wall.T = heatTransfer.wall.T;
-    wall.Q = heatTransfer.wall.Q;
-    Qvol = heatTransfer.wall.Q;
-    T = heatTransfer.wall.T;
 
-    //phibar = (wall.phi[1:N - 1] + wall.phi[2:N])/2;
-
-    //Q = Nt*l*omega*sum(phibar) "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Total fluid mass";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
   initial equation
@@ -6773,12 +6766,14 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       extends ThermoPower.Icons.HeatFlow;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model";
-      input Medium.ThermodynamicState fluidState[Nf];       //ThermodynamicState
-      input MassFlowRate w[Nf];                      //MassFlowRate
-      ThermoPower.Thermal.DHTVolumes wall(N=Nf);
-      parameter Integer Nf "Number of nodes fluid-side";
+      input Medium.ThermodynamicState fluidState[Nf];
+      input MassFlowRate w[Nf];
+      ThermoPower.Thermal.DHTVolumes wall(N=Nf) annotation (Placement(transformation(extent={{-40,20},{40,
+                40}}, rotation=0)));
+      parameter Integer Nf(min=2) "Number of nodes fluid-side";
       parameter Integer Nw=Nf "Number of nodes wall-side";
-      parameter Boolean useAverageTemperature = true;
+      parameter Boolean useAverageTemperature = true
+        "= true to use average temperature for heat transfer";
 
     end DistributedHeatTransferFV;
   end BaseClasses;
@@ -6786,21 +6781,76 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
   model NoHeatTransfer
     extends BaseClasses.DistributedHeatTransferFV(final Nw, final useAverageTemperature);
 
+  // partial model DistributedHeatTransferFV
+  //
+  //   extends ThermoPower.Icons.HeatFlow;
+  //   replaceable package Medium = StandardWater constrainedby
+  //     Modelica.Media.Interfaces.PartialMedium "Medium model";
+  //   input Medium.ThermodynamicState fluidState[Nf];       //ThermodynamicState
+  //   input MassFlowRate w[Nf];                      //MassFlowRate
+  //   ThermoPower.Thermal.DHTVolumes wall(N=Nf) annotation (Placement(transformation(extent={{-40,20},{40,
+  //             40}}, rotation=0)));
+  //   parameter Integer Nf(min=2) "Number of nodes fluid-side";
+  //   parameter Integer Nw=Nf "Number of nodes wall-side";
+  //   parameter Boolean useAverageTemperature = true;
+  //
+  // end DistributedHeatTransferFV;
+
+  // DHTVolumes
+  // parameter Integer N "Number of nodes";
+  // AbsoluteTemperature T[N] "Temperature at the nodes";
+  // flow Power Q[N] "Heat flow through the connector";
+
   equation
     wall.Q = zeros(Nf);
 
   end NoHeatTransfer;
 
-  model ConstantHeatTransferCoefficient1ph
+  model ConstantHeatTransferCoefficient
     extends BaseClasses.DistributedHeatTransferFV(final Nw);
+
+  // partial model DistributedHeatTransferFV
+  //
+  //   extends ThermoPower.Icons.HeatFlow;
+  //   replaceable package Medium = StandardWater constrainedby
+  //     Modelica.Media.Interfaces.PartialMedium "Medium model";
+  //   input Medium.ThermodynamicState fluidState[Nf];
+  //   input MassFlowRate w[Nf];
+  //   ThermoPower.Thermal.DHTVolumes wall(N=Nf);
+  //   parameter Integer Nf(min=2) "Number of nodes fluid-side";
+  //   parameter Integer Nw=Nf "Number of nodes wall-side";
+  //   parameter Boolean useAverageTemperature = true "= true to use average temperature for heat transfer";
+  // end DistributedHeatTransferFV;
+
+  // DHTVolumes
+  // parameter Integer N "Number of nodes";
+  // AbsoluteTemperature T[N] "Temperature at the nodes";
+  // flow Power Q[N] "Heat flow through the connector";
 
   // TO DO
 
-    parameter CoefficientOfHeatTransfer gamma
-      "Constant heat transfer coefficient";
-  equation
+  //   parameter CoefficientOfHeatTransfer gamma "Constant heat transfer coefficient";
+    final AbsoluteTemperature T[Nf] "Fluid temperature";
+  //   final AbsoluteTemperature Tvol[Nf-1] "Fluid temperature in the volumes";
+  //   parameter Length L "Tube length";
+  //   parameter Length omega "Perimeter of heat transfer surface (single tube)";
+  //   final parameter Length l=L/(Nf - 1) "Length of a single volume";
 
-  end ConstantHeatTransferCoefficient1ph;
+  equation
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+
+  //     for j in 1:Nf-1 loop
+  //       if useAverageTemperature then
+  //         Tvol[j] = (T[j] + T[j + 1])/2;
+  //         wall.Q[j] = (wall.T[j] - Tvol[j])*l*omega*gamma;
+  //       else
+  //         Tvol[j] = T[j+1];
+  //         wall.Q[j] = (wall.T[j] - Tvol[j])*l*omega*gamma;
+  //       end if;
+  //     end for;
+  end ConstantHeatTransferCoefficient;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
 <p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
