@@ -1684,7 +1684,7 @@ Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model
     end HRBPlant;
 
     model Flow1DGashtc "Gas flow model with h.t.c. computation"
-      extends Gas.Flow1Dfv(redeclare ThermoPower.Thermal.DHThtc wall);
+      extends Gas.Flow1D(redeclare ThermoPower.Thermal.DHThtc wall);
       parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_nom
         "Nominal h.t.c. coefficient";
       parameter Real kw
@@ -2202,7 +2202,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         Tstartbar=Tstart_M) annotation (Placement(transformation(extent={{-10,-6},
                 {10,-26}}, rotation=0)));
 
-      Gas.Flow1Dfv gasFlow(
+      Gas.Flow1D gasFlow(
         Dhyd=1,
         wnom=gasNomFlowRate,
         N=N_G,
@@ -2374,7 +2374,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
       Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
           Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-      Gas.Flow1Dfv gasFlow(
+      Gas.Flow1D gasFlow(
         Dhyd=1,
         wnom=gasNomFlowRate,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
