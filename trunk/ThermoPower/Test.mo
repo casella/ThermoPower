@@ -2514,7 +2514,9 @@ Algorithm Tolerance = 1e-4
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
+        dpnom=1000,
+        pstart=phex)
+                    annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
       ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
@@ -2636,7 +2638,9 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000) annotation (Placement(transformation(extent={{-26,-10},{-6,
+        dpnom=1000,
+        pstart=phex)
+                    annotation (Placement(transformation(extent={{-26,-10},{-6,
                 10}}, rotation=0)));
       ThermoPower.Thermal.TempSource1D TempSource(N=Nnodes) annotation (
           Placement(transformation(extent={{-26,40},{-6,60}}, rotation=0)));
@@ -2654,7 +2658,8 @@ Algorithm Tolerance = 1e-6
         offset=297,
         startTime=20) annotation (Placement(transformation(extent={{-60,60},{-40,
                 80}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
             transformation(extent={{-10,70},{10,90}}, rotation=0)));
       ThermoPower.Thermal.ConvHT ConvEx(N=Nnodes, gamma=400) annotation (
           Placement(transformation(extent={{-26,20},{-6,40}}, rotation=0)));
@@ -2696,7 +2701,9 @@ Algorithm Tolerance = 1e-6
       connect(Constant1.y, ValveLin1.cmd)
         annotation (Line(points={{11,80},{20,80},{20,8}}, color={0,0,127}));
       annotation (
-        Diagram(graphics),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}),
+                graphics),
         experiment(StopTime=200, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes). <br>
@@ -2759,7 +2766,9 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
+        dpnom=1000,
+        pstart=phex)
+                    annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
       ThermoPower.Water.SourceW MassFlowRateSource(w0=whex, h=hs) annotation (
           Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
@@ -2775,7 +2784,8 @@ Algorithm Tolerance = 1e-6
         offset=whex,
         startTime=0.5) annotation (Placement(transformation(extent={{-90,30},{-70,
                 50}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
             transformation(extent={{8,60},{28,80}}, rotation=0)));
       ThermoPower.Thermal.HeatSource1D HeatSource1D1(
         N=Nnodes,
@@ -2880,7 +2890,9 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-70},{0,-50}},
+        dpnom=1000,
+        pstart=phex)
+                    annotation (Placement(transformation(extent={{-20,-70},{0,-50}},
               rotation=0)));
       ThermoPower.Water.SinkP SideA_FluidSink annotation (Placement(
             transformation(extent={{70,-70},{90,-50}}, rotation=0)));
@@ -2906,7 +2918,9 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000) annotation (Placement(transformation(extent={{0,50},{-20,30}},
+        dpnom=1000,
+        pstart=phex)
+                    annotation (Placement(transformation(extent={{0,50},{-20,30}},
               rotation=0)));
       ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-66},{-30,-46}},
@@ -2916,9 +2930,11 @@ Algorithm Tolerance = 1e-6
         offset=1e5,
         startTime=50) annotation (Placement(transformation(extent={{-90,-20},{-70,
                 0}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
             transformation(extent={{-70,70},{-50,90}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant2 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant2(k=1)
+                                                 annotation (Placement(
             transformation(extent={{0,-20},{20,0}}, rotation=0)));
       ThermoPower.Water.SensT SensT_B_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{30,34},{10,54}}, rotation=
@@ -3056,7 +3072,9 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-60},{0,-40}},
+        dpnom=1000,
+        pstart=phex)
+                    annotation (Placement(transformation(extent={{-20,-60},{0,-40}},
               rotation=0)));
       Thermal.ConvHT ConvHTB(N=Nnodes, gamma=400) annotation (Placement(
             transformation(extent={{-20,20},{0,40}}, rotation=0)));
@@ -3086,7 +3104,9 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000) annotation (Placement(transformation(extent={{0,60},{-20,40}},
+        dpnom=1000,
+        pstart=phex)
+                    annotation (Placement(transformation(extent={{0,60},{-20,40}},
               rotation=0)));
       ThermoPower.Thermal.MetalTube MetalWall(
         N=Nnodes,
@@ -3107,9 +3127,11 @@ Algorithm Tolerance = 1e-6
         offset=1e5,
         startTime=50) annotation (Placement(transformation(extent={{-90,-20},{-70,
                 0}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
             transformation(extent={{-72,70},{-52,90}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant2 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant2(k=1)
+                                                 annotation (Placement(
             transformation(extent={{4,-20},{24,0}}, rotation=0)));
       ThermoPower.Water.SensT SensT_B_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
