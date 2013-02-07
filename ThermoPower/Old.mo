@@ -2508,16 +2508,19 @@ This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat tra
               rotation=0)));
       Water.ValveLin ValveLin1(Kv=20/4e5) annotation (Placement(transformation(
               extent={{52,20},{72,0}}, rotation=0)));
-      Water.SinkP SinkP1(p0=1e5) annotation (Placement(transformation(extent={{
+      Water.SinkPressure
+                  SinkP1(p0=1e5) annotation (Placement(transformation(extent={{
                 82,0},{102,20}}, rotation=0)));
-      Gas.SourceW SourceW2(
+      Gas.SourceMassFlow
+                  SourceW2(
         w0=10,
         redeclare package Medium = GasMedium,
         Xnom=Xnom,
         p0=1e5,
         T=670) annotation (Placement(transformation(extent={{102,52},{82,72}},
               rotation=0)));
-      Gas.SinkP SinkP2(
+      Gas.SinkPressure
+                SinkP2(
         redeclare package Medium = GasMedium,
         T=300,
         Xnom=Xnom) annotation (Placement(transformation(extent={{-78,44},{-98,
@@ -2538,7 +2541,8 @@ This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat tra
           Placement(transformation(extent={{-20,48},{-40,68}}, rotation=0)));
       Gas.SensT TinGas(redeclare package Medium = GasMedium) annotation (
           Placement(transformation(extent={{70,56},{50,76}}, rotation=0)));
-      Water.SourceP SourceP1(p0=5e5) annotation (Placement(transformation(
+      Water.SourcePressure
+                    SourceP1(p0=5e5) annotation (Placement(transformation(
               extent={{-100,-2},{-80,18}}, rotation=0)));
     equation
       connect(ValveLin1.outlet, SinkP1.flange)

@@ -297,12 +297,14 @@ This model adds the performance characteristics to the Compressor_Base model, by
         fileName="D:/mati_nuovo/ThermoPower/table/tableGTunit_ISO.txt",
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.file) annotation (
           Placement(transformation(extent={{-44,-34},{20,30}}, rotation=0)));
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = ThermoPower.Media.Air,
         p0=0.999e5,
         T=280.55) annotation (Placement(transformation(extent={{-98,12},{-78,32}},
               rotation=0)));
-      ThermoPower.Gas.SinkP SinkP1(
+      ThermoPower.Gas.SinkPressure
+                            SinkP1(
         redeclare package Medium = ThermoPower.Media.FlueGas,
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{66,2},{86,22}},
@@ -313,7 +315,8 @@ This model adds the performance characteristics to the Compressor_Base model, by
       Modelica.Mechanics.Rotational.Sources.ConstantSpeed ConstantSpeed1(
           w_fixed=1791.336, useSupport=false) annotation (Placement(
             transformation(extent={{32,-58},{52,-38}}, rotation=0)));
-      ThermoPower.Gas.SourceW SourceW1(
+      ThermoPower.Gas.SourceMassFlow
+                              SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
         T=291.44,
         p0=12.5e5,
@@ -373,19 +376,22 @@ double tabHI(12,4)   # table for HI_iso=h(ZLPout_iso,Tsync)
         fileName="D:/mati_nuovo/ThermoPower/table/tableGTunit.txt",
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.file) annotation (
           Placement(transformation(extent={{-72,-6},{-28,36}}, rotation=0)));
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = ThermoPower.Media.Air,
         p0=0.999e5,
         T=280.55) annotation (Placement(transformation(extent={{-98,12},{-78,32}},
               rotation=0)));
-      ThermoPower.Gas.SinkP SinkP1(
+      ThermoPower.Gas.SinkPressure
+                            SinkP1(
         redeclare package Medium = ThermoPower.Media.FlueGas,
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{-22,42},{-2,
                 62}}, rotation=0)));
       Modelica.Mechanics.Rotational.Components.Inertia Inertia(J=1) annotation (
          Placement(transformation(extent={{-22,0},{-2,20}}, rotation=0)));
-      ThermoPower.Gas.SourceW SourceW1(
+      ThermoPower.Gas.SourceMassFlow
+                              SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
         T=291.44,
         p0=12.5e5,
@@ -438,12 +444,14 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 
     model Test_low
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = Medium,
         T=244.4,
         p0=0.5e5) annotation (Placement(transformation(extent={{-102,32},{-82,
                 52}}, rotation=0)));
-      ThermoPower.Gas.SinkP SinkP1(
+      ThermoPower.Gas.SinkPressure
+                            SinkP1(
         redeclare package Medium = Medium,
         p0=1e5,
         T=560) annotation (Placement(transformation(extent={{66,20},{86,40}},
@@ -529,12 +537,14 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 
     model Test_low1
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = Medium,
         T=244.4,
         p0=0.5e5) annotation (Placement(transformation(extent={{-102,32},{-82,
                 52}}, rotation=0)));
-      ThermoPower.Gas.SinkP SinkP1(
+      ThermoPower.Gas.SinkPressure
+                            SinkP1(
         redeclare package Medium = Medium,
         p0=1e5,
         T=560) annotation (Placement(transformation(extent={{66,20},{86,40}},
@@ -633,12 +643,14 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         fileName="D:/mati_nuovo/ThermoPower/table/tableGTunit.txt",
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.file) annotation (
           Placement(transformation(extent={{-44,-34},{20,30}}, rotation=0)));
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = ThermoPower.Media.Air,
         p0=0.999e5,
         T=280.55) annotation (Placement(transformation(extent={{-98,12},{-78,32}},
               rotation=0)));
-      ThermoPower.Gas.SinkP SinkP1(
+      ThermoPower.Gas.SinkPressure
+                            SinkP1(
         redeclare package Medium = ThermoPower.Media.FlueGas,
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{66,2},{86,22}},
@@ -649,7 +661,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       Modelica.Mechanics.Rotational.Sources.ConstantSpeed ConstantSpeed1(
           w_fixed=314, useSupport=false) annotation (Placement(transformation(
               extent={{32,-58},{52,-38}}, rotation=0)));
-      ThermoPower.Gas.SourceW SourceW1(
+      ThermoPower.Gas.SourceMassFlow
+                              SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
         T=291.44,
         p0=12.5e5,
@@ -692,12 +705,14 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                                 5,17,21.5,24.2];
   
 public */
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = Medium,
         p0=0.35e5,
         T=244.4) annotation (Placement(transformation(extent={{-60,30},{-40,50}},
               rotation=0)));
-      ThermoPower.Gas.SinkP SinkP1(
+      ThermoPower.Gas.SinkPressure
+                            SinkP1(
         redeclare package Medium = Medium,
         T=691.4,
         p0=0.35e5) annotation (Placement(transformation(extent={{62,26},{82,46}},
@@ -758,12 +773,14 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         HH=47.92e6,
         pstart=0.99e5) annotation (Placement(transformation(extent={{-38,-10},{
                 8,30}}, rotation=0)));
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = ThermoPower.Media.Air,
         T=288.15,
         p0=0.99e5) annotation (Placement(transformation(extent={{-100,6},{-80,
                 26}}, rotation=0)));
-      ThermoPower.Gas.SinkP SinkP1(
+      ThermoPower.Gas.SinkPressure
+                            SinkP1(
         redeclare package Medium = ThermoPower.Media.FlueGas,
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{34,6},{54,26}},
@@ -774,7 +791,8 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
       Modelica.Mechanics.Rotational.Sources.ConstantSpeed ConstantSpeed1(
           w_fixed=1819.6, useSupport=false) annotation (Placement(
             transformation(extent={{62,-26},{82,-6}}, rotation=0)));
-      ThermoPower.Gas.SourceW SourceW1(
+      ThermoPower.Gas.SourceMassFlow
+                              SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
         T=291.44,
         p0=13.27e5,
@@ -795,12 +813,14 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
 
     model TestCompressor
       package Medium = ThermoPower.Media.Air;
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = Medium,
         T=-20 + 273.15,
         p0=1.003e5) annotation (Placement(transformation(extent={{-60,30},{-40,
                 50}}, rotation=0)));
-      ThermoPower.Gas.SinkP SinkP1(
+      ThermoPower.Gas.SinkPressure
+                            SinkP1(
         redeclare package Medium = Medium,
         p0=12.223e5,
         T=298.6 + 273.15) annotation (Placement(transformation(extent={{10,30},
@@ -845,7 +865,8 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
       parameter Modelica.SIunits.MassFraction Xexhaust[Medium.nX]={0.16342,
           0.01323,0.03444,0.04988,0.73904};
     public
-      ThermoPower.Gas.SourceP SourceP1(
+      ThermoPower.Gas.SourcePressure
+                              SourceP1(
         redeclare package Medium = Medium,
         p0=12.223e5,
         Xnom=Xturb,
@@ -868,7 +889,8 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         NominalCondition=true,
         wnom=158.5) annotation (Placement(transformation(extent={{-24,20},{-6,
                 40}}, rotation=0)));
-      Gas.SinkP SinkP1(
+      Gas.SinkPressure
+                SinkP1(
         redeclare package Medium = Medium,
         Xnom=Xexhaust,
         p0=1.003e5,

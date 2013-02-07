@@ -47,7 +47,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end FlangeB;
   extends Modelica.Icons.Library;
 
-  model SourceP "Pressure source for gas flows"
+  model SourcePressure "Pressure source for gas flows"
     extends Icons.Gas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
@@ -61,26 +61,37 @@ package Gas "Models of components with ideal gases as working fluid"
       "Nominal gas composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_T = false
+      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_X = false
+      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"));
+
     outer ThermoPower.System system "System wide properties";
 
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_p annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_p0 if use_in_p0 annotation (Placement(
           transformation(
           origin={-60,64},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_T annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_T if use_in_T annotation (Placement(
           transformation(
           origin={0,90},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] if use_in_X annotation (Placement(
           transformation(
           origin={60,62},
           extent={{-10,-10},{10,10}},
           rotation=270)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_p0_internal;
+    Modelica.Blocks.Interfaces.RealInput in_T_internal;
+    Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
+
   equation
     if R == 0 then
       flange.p = gas.p;
@@ -88,24 +99,28 @@ package Gas "Models of components with ideal gases as working fluid"
       flange.p = gas.p + flange.m_flow*R;
     end if;
 
-    gas.p = in_p;
-    if cardinality(in_p) == 0 then
-      in_p = p0 "Pressure set by parameter";
+    gas.p = in_p0_internal;
+    if not use_in_p0 then
+      in_p0_internal = p0 "Pressure set by parameter";
     end if;
 
-    gas.T = in_T;
-    if cardinality(in_T) == 0 then
-      in_T = T "Temperature set by parameter";
+    gas.T = in_T_internal;
+    if not use_in_T then
+      in_T_internal = T "Temperature set by parameter";
     end if;
 
-    gas.Xi = in_X[1:Medium.nXi];
-    if cardinality(in_X) == 0 then
-      in_X = Xnom "Composition set by parameter";
+    gas.Xi = in_X_internal[1:Medium.nXi];
+    if not use_in_X then
+      in_X_internal = Xnom "Composition set by parameter";
     end if;
 
     flange.h_outflow = gas.h;
     flange.Xi_outflow = gas.Xi;
 
+    // Connect protected connectors to public conditional connectors
+    connect(in_p0, in_p0_internal);
+    connect(in_T, in_T_internal);
+    connect(in_X, in_X_internal);
     annotation (
       Icon(graphics),
       Diagram(graphics),
@@ -127,9 +142,9 @@ package Gas "Models of components with ideal gases as working fluid"
 </ul>
 </html>
 "));
-  end SourceP;
+  end SourcePressure;
 
-  model SinkP "Pressure sink for gas flows"
+  model SinkPressure "Pressure sink for gas flows"
     extends Icons.Gas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
@@ -143,26 +158,36 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter HydraulicResistance R=0 "Hydraulic Resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_T = false
+      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_X = false
+      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"));
+
     outer ThermoPower.System system "System wide properties";
 
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_p annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_p0 if use_in_p0 annotation (Placement(
           transformation(
           origin={-64.5,59.5},
           extent={{-12.5,-12.5},{12.5,12.5}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_T annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_T if use_in_T annotation (Placement(
           transformation(
           origin={0,90},
           extent={{-10,-12},{10,12}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] if use_in_X annotation (Placement(
           transformation(
           origin={66,59},
           extent={{-13,-14},{13,14}},
           rotation=270)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_p0_internal;
+    Modelica.Blocks.Interfaces.RealInput in_T_internal;
+    Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
   equation
     if R == 0 then
       flange.p = gas.p;
@@ -170,23 +195,28 @@ package Gas "Models of components with ideal gases as working fluid"
       flange.p = gas.p + flange.m_flow*R;
     end if;
 
-    gas.p = in_p;
-    if cardinality(in_p) == 0 then
-      in_p = p0 "Pressure set by parameter";
+    gas.p = in_p0_internal;
+    if not use_in_p0 then
+      in_p0_internal = p0 "Pressure set by parameter";
     end if;
 
-    gas.T = in_T;
-    if cardinality(in_T) == 0 then
-      in_T = T "Temperature set by parameter";
+    gas.T = in_T_internal;
+    if not use_in_T then
+      in_T_internal = T "Temperature set by parameter";
     end if;
 
-    gas.Xi = in_X[1:Medium.nXi];
-    if cardinality(in_X) == 0 then
-      in_X = Xnom "Composition set by parameter";
+    gas.Xi = in_X_internal[1:Medium.nXi];
+    if not use_in_X then
+      in_X_internal = Xnom "Composition set by parameter";
     end if;
 
     flange.h_outflow = gas.h;
     flange.Xi_outflow = gas.Xi;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_p0, in_p0_internal);
+    connect(in_T, in_T_internal);
+    connect(in_X, in_X_internal);
 
     annotation (Documentation(info="<html>
 <p><b>Modelling options</b></p>
@@ -206,9 +236,9 @@ package Gas "Models of components with ideal gases as working fluid"
        First release.</li>
 </ul>
 </html>"));
-  end SinkP;
+  end SinkPressure;
 
-  model SourceW "Flowrate source for gas flows"
+  model SourceMassFlow "Flow rate source for gas flows"
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
@@ -223,54 +253,70 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter HydraulicConductance G=0 "HydraulicConductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_w0 = false
+      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_T = false
+      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_X = false
+      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"));
     outer ThermoPower.System system "System wide properties";
 
-    MassFlowRate w;
+    MassFlowRate w "Nominal mass flow rate";
 
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_w0 if use_in_w0 annotation (Placement(
           transformation(
           origin={-60,50},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_T annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_T if use_in_T annotation (Placement(
           transformation(
           origin={0,50},
           extent={{10,-10},{-10,10}},
           rotation=90)));
-    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] if use_in_X annotation (Placement(
           transformation(
           origin={60,50},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-  equation
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_w0_internal;
+    Modelica.Blocks.Interfaces.RealInput in_T_internal;
+    Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
 
+  equation
     if G == 0 then
       flange.m_flow = -w;
     else
       flange.m_flow = -w + (flange.p - p0)*G;
     end if;
 
-    w = in_w0;
-    if cardinality(in_w0) == 0 then
-      in_w0 = w0 "Flow rate set by parameter";
+    w = in_w0_internal;
+
+    if not use_in_w0 then
+      in_w0_internal = w0 "Flow rate set by parameter";
     end if;
 
-    gas.T = in_T;
-    if cardinality(in_T) == 0 then
-      in_T = T "Temperature set by parameter";
+    gas.T = in_T_internal;
+    if not use_in_T then
+      in_T_internal = T "Temperature set by parameter";
     end if;
 
-    gas.Xi = in_X[1:Medium.nXi];
-    if cardinality(in_X) == 0 then
-      in_X = Xnom "Composition set by parameter";
+    gas.Xi = in_X_internal[1:Medium.nXi];
+    if not use_in_X then
+      in_X_internal = Xnom "Composition set by parameter";
     end if;
 
     flange.p = gas.p;
     flange.h_outflow = gas.h;
     flange.Xi_outflow = gas.Xi;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_w0, in_w0_internal);
+    connect(in_T, in_T_internal);
+    connect(in_X, in_X_internal);
 
     annotation (Documentation(info="<html>
 <p><b>Modelling options</b></p>
@@ -289,9 +335,9 @@ package Gas "Models of components with ideal gases as working fluid"
        First release.</li>
 </ul>
 </html>"), Diagram(graphics));
-  end SourceW;
+  end SourceMassFlow;
 
-  model SinkW "Flowrate sink for gas flows"
+  model SinkMassFlow "Flow rate sink for gas flows"
 
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
@@ -307,28 +353,39 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter HydraulicConductance G=0 "Hydraulic Conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_w0 = false
+      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_T = false
+      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_X = false
+      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"));
     outer ThermoPower.System system "System wide properties";
 
-    MassFlowRate w;
-    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+    MassFlowRate w "Nominal mass flow rate";
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+
+    Modelica.Blocks.Interfaces.RealInput in_w0 if use_in_w0 annotation (Placement(
           transformation(
           origin={-60,50},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_T annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_T if use_in_T annotation (Placement(
           transformation(
           origin={0,50},
           extent={{-10,10},{10,-10}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] if use_in_X annotation (Placement(
           transformation(
           origin={60,50},
           extent={{-10,-10},{10,10}},
           rotation=270)));
 
-    FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_w0_internal;
+    Modelica.Blocks.Interfaces.RealInput in_T_internal;
+    Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
   equation
     if G == 0 then
       flange.m_flow = w;
@@ -336,24 +393,29 @@ package Gas "Models of components with ideal gases as working fluid"
       flange.m_flow = w + (flange.p - p0)*G;
     end if;
 
-    w = in_w0;
-    if cardinality(in_w0) == 0 then
-      in_w0 = w0 "Flow rate set by parameter";
+    w = in_w0_internal;
+    if not use_in_w0 then
+      in_w0_internal = w0 "Flow rate set by parameter";
     end if;
 
-    gas.T = in_T;
-    if cardinality(in_T) == 0 then
-      in_T = T "Temperature set by parameter";
+    gas.T = in_T_internal;
+    if not use_in_T then
+      in_T_internal = T "Temperature set by parameter";
     end if;
 
-    gas.Xi = in_X[1:Medium.nXi];
-    if cardinality(in_X) == 0 then
-      in_X = Xnom "Composition set by parameter";
+    gas.Xi = in_X_internal[1:Medium.nXi];
+    if not use_in_X then
+      in_X_internal = Xnom "Composition set by parameter";
     end if;
 
     flange.p = gas.p;
     flange.h_outflow = gas.h;
     flange.Xi_outflow = gas.Xi;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_w0, in_w0_internal);
+    connect(in_T, in_T_internal);
+    connect(in_X, in_X_internal);
 
     annotation (
       Icon(graphics),
@@ -374,15 +436,19 @@ package Gas "Models of components with ideal gases as working fluid"
        First release.</li>
 </ul>
 </html>"));
-  end SinkW;
+  end SinkMassFlow;
 
-  model ThroughW "Prescribes the flow rate across the component"
+  model ThroughMassFlow "Prescribes the mass flow rate across the component"
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
-    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter MassFlowRate w0=0 "Nominal mass flow rate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_w0 = false
+      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"));
     outer ThermoPower.System system "System wide properties";
+
+    MassFlowRate w "Mass flow rate";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -390,21 +456,20 @@ package Gas "Models of components with ideal gases as working fluid"
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_w0 if use_in_w0 annotation (Placement(
           transformation(
           origin={-60,50},
           extent={{-10,-10},{10,10}},
           rotation=270)));
-
-    MassFlowRate w "Mass flow rate";
-
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_w0_internal;
   equation
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
     inlet.m_flow = w "Flow characteristics";
 
-    w = in_w0;
-    if cardinality(in_w0) == 0 then
-      in_w0 = w0 "Flow rate set by parameter";
+    w = in_w0_internal;
+    if not use_in_w0 then
+      in_w0_internal = w0 "Flow rate set by parameter";
     end if;
 
     // Energy and partial mass balance
@@ -412,6 +477,9 @@ package Gas "Models of components with ideal gases as working fluid"
     inStream(inlet.h_outflow) = outlet.h_outflow;
     inlet.Xi_outflow = inStream(outlet.Xi_outflow);
     inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_w0, in_w0_internal);
 
     annotation (Documentation(info="<html>
 <p><b>Modelling options</b></p>
@@ -430,7 +498,7 @@ package Gas "Models of components with ideal gases as working fluid"
        First release.</li>
 </ul>
 </html>"), Diagram(graphics));
-  end ThroughW;
+  end ThroughMassFlow;
 
   model Plenum "Rigid adiabatic volume"
     extends Icons.Gas.Mixer;
@@ -3631,6 +3699,391 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 </html>"),
       DymolaStoredErrors);
   end Flow1D;
+
+  model SourceP "Pressure source for gas flows"
+    extends Icons.Gas.SourceP;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    Medium.BaseProperties gas(
+      p(start=p0),
+      T(start=T),
+      Xi(start=Xnom[1:Medium.nXi]));
+    parameter Pressure p0=101325 "Nominal pressure";
+    parameter HydraulicResistance R=0 "Hydraulic resistance";
+    parameter AbsoluteTemperature T=300 "Nominal temperature";
+    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+      "Nominal gas composition";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+
+    FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_p annotation (Placement(
+          transformation(
+          origin={-60,64},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_T annotation (Placement(
+          transformation(
+          origin={0,90},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] annotation (Placement(
+          transformation(
+          origin={60,62},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+  equation
+    if R == 0 then
+      flange.p = gas.p;
+    else
+      flange.p = gas.p + flange.m_flow*R;
+    end if;
+
+    gas.p = in_p;
+    if cardinality(in_p) == 0 then
+      in_p = p0 "Pressure set by parameter";
+    end if;
+
+    gas.T = in_T;
+    if cardinality(in_T) == 0 then
+      in_T = T "Temperature set by parameter";
+    end if;
+
+    gas.Xi = in_X[1:Medium.nXi];
+    if cardinality(in_X) == 0 then
+      in_X = Xnom "Composition set by parameter";
+    end if;
+
+    flange.h_outflow = gas.h;
+    flange.Xi_outflow = gas.Xi;
+
+    annotation (
+      Icon(graphics),
+      Diagram(graphics),
+      Documentation(info="<html>
+<p><b>Modelling options</b></p>
+<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package.In the case of multiple componet, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>, whose default value is <tt>Medium.reference_X</tt> .
+<p>If <tt>R</tt> is set to zero, the pressure source is ideal; otherwise, the outlet pressure decreases proportionally to the outgoing flowrate.</p>
+<p>If the <tt>in_p</tt> connector is wired, then the source pressure is given by the corresponding signal, otherwise it is fixed to <tt>p0</tt>.</p>
+<p>If the <tt>in_T</tt> connector is wired, then the source temperature is given by the corresponding signal, otherwise it is fixed to <tt>T</tt>.</p>
+<p>If the <tt>in_X</tt> connector is wired, then the source massfraction is given by the corresponding signal, otherwise it is fixed to <tt>Xnom</tt>.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>19 Nov 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>p0fix</tt> and <tt>Tfix</tt> and <tt>Xfix</tt>; the connection of external signals is now detected automatically.</li> <br> Adapted to Modelica.Media
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
+  end SourceP;
+
+  model SinkP "Pressure sink for gas flows"
+    extends Icons.Gas.SourceP;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    Medium.BaseProperties gas(
+      p(start=p0),
+      T(start=T),
+      Xi(start=Xnom[1:Medium.nXi]));
+    parameter Pressure p0=101325 "Nominal pressure";
+    parameter AbsoluteTemperature T=300 "Nominal temperature";
+    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+      "Nominal gas composition";
+    parameter HydraulicResistance R=0 "Hydraulic Resistance";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_p annotation (Placement(
+          transformation(
+          origin={-64.5,59.5},
+          extent={{-12.5,-12.5},{12.5,12.5}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_T annotation (Placement(
+          transformation(
+          origin={0,90},
+          extent={{-10,-12},{10,12}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] annotation (Placement(
+          transformation(
+          origin={66,59},
+          extent={{-13,-14},{13,14}},
+          rotation=270)));
+  equation
+    if R == 0 then
+      flange.p = gas.p;
+    else
+      flange.p = gas.p + flange.m_flow*R;
+    end if;
+
+    gas.p = in_p;
+    if cardinality(in_p) == 0 then
+      in_p = p0 "Pressure set by parameter";
+    end if;
+
+    gas.T = in_T;
+    if cardinality(in_T) == 0 then
+      in_T = T "Temperature set by parameter";
+    end if;
+
+    gas.Xi = in_X[1:Medium.nXi];
+    if cardinality(in_X) == 0 then
+      in_X = Xnom "Composition set by parameter";
+    end if;
+
+    flange.h_outflow = gas.h;
+    flange.Xi_outflow = gas.Xi;
+
+    annotation (Documentation(info="<html>
+<p><b>Modelling options</b></p>
+<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>, whose default value is <tt>Medium.reference_X</tt> .
+<p>If <tt>R</tt> is set to zero, the pressure sink is ideal; otherwise, the inlet pressure increases proportionally to the outgoing flowrate.</p>
+<p>If the <tt>in_p</tt> connector is wired, then the source pressure is given by the corresponding signal, otherwise it is fixed to <tt>p0</tt>.</p>
+<p>If the <tt>in_T</tt> connector is wired, then the source temperature is given by the corresponding signal, otherwise it is fixed to <tt>T</tt>.</p>
+<p>If the <tt>in_X</tt> connector is wired, then the source massfraction is given by the corresponding signal, otherwise it is fixed to <tt>Xnom</tt>.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>19 Nov 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>p0fix</tt> and <tt>Tfix</tt> and <tt>Xfix</tt>; the connection of external signals is now detected automatically.</li>
+<br> Adapted to Modelica.Media
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end SinkP;
+
+  model SourceW "Flowrate source for gas flows"
+    extends Icons.Gas.SourceW;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    Medium.BaseProperties gas(
+      p(start=p0),
+      T(start=T),
+      Xi(start=Xnom[1:Medium.nXi]));
+    parameter Pressure p0=101325 "Nominal pressure";
+    parameter AbsoluteTemperature T=300 "Nominal temperature";
+    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+      "Nominal gas composition";
+    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter HydraulicConductance G=0 "HydraulicConductance";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+
+    MassFlowRate w;
+
+    FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+          transformation(
+          origin={-60,50},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_T annotation (Placement(
+          transformation(
+          origin={0,50},
+          extent={{10,-10},{-10,10}},
+          rotation=90)));
+    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] annotation (Placement(
+          transformation(
+          origin={60,50},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+  equation
+
+    if G == 0 then
+      flange.m_flow = -w;
+    else
+      flange.m_flow = -w + (flange.p - p0)*G;
+    end if;
+
+    w = in_w0;
+    if cardinality(in_w0) == 0 then
+      in_w0 = w0 "Flow rate set by parameter";
+    end if;
+
+    gas.T = in_T;
+    if cardinality(in_T) == 0 then
+      in_T = T "Temperature set by parameter";
+    end if;
+
+    gas.Xi = in_X[1:Medium.nXi];
+    if cardinality(in_X) == 0 then
+      in_X = Xnom "Composition set by parameter";
+    end if;
+
+    flange.p = gas.p;
+    flange.h_outflow = gas.h;
+    flange.Xi_outflow = gas.Xi;
+
+    annotation (Documentation(info="<html>
+<p><b>Modelling options</b></p>
+<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>,whose default value is <tt>Medium.reference_X</tt> .
+<p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the outgoing flowrate decreases proportionally to the outlet pressure.</p>
+<p>If the <tt>in_w0</tt> connector is wired, then the source massflowrate is given by the corresponding signal, otherwise it is fixed to <tt>w0</tt>.</p>
+<p>If the <tt>in_T</tt> connector is wired, then the source temperature is given by the corresponding signal, otherwise it is fixed to <tt>T</tt>.</p>
+<p>If the <tt>in_X</tt> connector is wired, then the source massfraction is given by the corresponding signal, otherwise it is fixed to <tt>Xnom</tt>.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>19 Nov 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>w0fix</tt> and <tt>Tfix</tt> and <tt>Xfix</tt>; the connection of external signals is now detected automatically.</li> <br> Adapted to Modelica.Media
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"), Diagram(graphics));
+  end SourceW;
+
+  model SinkW "Flowrate sink for gas flows"
+
+    extends Icons.Gas.SourceW;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    Medium.BaseProperties gas(
+      p(start=p0),
+      T(start=T),
+      Xi(start=Xnom[1:Medium.nXi]));
+    parameter Pressure p0=101325 "Nominal pressure";
+    parameter AbsoluteTemperature T=300 "Nominal Temperature";
+    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+      "Nominal gas composition";
+    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter HydraulicConductance G=0 "Hydraulic Conductance";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+
+    MassFlowRate w;
+    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+          transformation(
+          origin={-60,50},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_T annotation (Placement(
+          transformation(
+          origin={0,50},
+          extent={{-10,10},{10,-10}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_X[Medium.nX] annotation (Placement(
+          transformation(
+          origin={60,50},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+  equation
+    if G == 0 then
+      flange.m_flow = w;
+    else
+      flange.m_flow = w + (flange.p - p0)*G;
+    end if;
+
+    w = in_w0;
+    if cardinality(in_w0) == 0 then
+      in_w0 = w0 "Flow rate set by parameter";
+    end if;
+
+    gas.T = in_T;
+    if cardinality(in_T) == 0 then
+      in_T = T "Temperature set by parameter";
+    end if;
+
+    gas.Xi = in_X[1:Medium.nXi];
+    if cardinality(in_X) == 0 then
+      in_X = Xnom "Composition set by parameter";
+    end if;
+
+    flange.p = gas.p;
+    flange.h_outflow = gas.h;
+    flange.Xi_outflow = gas.Xi;
+
+    annotation (
+      Icon(graphics),
+      Diagram(graphics),
+      Documentation(info="<html>
+<p>The actual gas used in the component is determined by the replaceable <tt>GasModel</tt> model. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>, whose default value is <tt>Medium.reference_X</tt> .
+<p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the incoming flowrate increases proportionally to the outlet pressure.</p>
+<p>If the <tt>in_w0</tt> connector is wired, then the source massflowrate is given by the corresponding signal, otherwise it is fixed to <tt>w0</tt>.</p>
+<p>If the <tt>in_T</tt> connector is wired, then the source temperature is given by the corresponding signal, otherwise it is fixed to <tt>T</tt>.</p>
+<p>If the <tt>in_X</tt> connector is wired, then the source massfraction is given by the corresponding signal, otherwise it is fixed to <tt>Xnom</tt>.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>19 Nov 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>w0fix</tt> and <tt>Tfix</tt> and <tt>Xfix</tt>; the connection of external signals is now detected automatically.</li> <br> Adapted to Modelica.Media
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end SinkW;
+
+  model ThroughW "Prescribes the flow rate across the component"
+    extends Icons.Gas.SourceW;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+          transformation(
+          origin={-60,50},
+          extent={{-10,-10},{10,10}},
+          rotation=270)));
+
+    MassFlowRate w "Mass flow rate";
+
+  equation
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+    inlet.m_flow = w "Flow characteristics";
+
+    w = in_w0;
+    if cardinality(in_w0) == 0 then
+      in_w0 = w0 "Flow rate set by parameter";
+    end if;
+
+    // Energy and partial mass balance
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
+    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+    inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
+
+    annotation (Documentation(info="<html>
+<p><b>Modelling options</b></p>
+<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the nominal gas composition is given by <tt>Xnom</tt>,whose default value is <tt>Medium.reference_X</tt> .
+<p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the outgoing flowrate decreases proportionally to the outlet pressure.</p>
+<p>If the <tt>in_w0</tt> connector is wired, then the source massflowrate is given by the corresponding signal, otherwise it is fixed to <tt>w0</tt>.</p>
+<p>If the <tt>in_T</tt> connector is wired, then the source temperature is given by the corresponding signal, otherwise it is fixed to <tt>T</tt>.</p>
+<p>If the <tt>in_X</tt> connector is wired, then the source massfraction is given by the corresponding signal, otherwise it is fixed to <tt>Xnom</tt>.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>19 Nov 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>w0fix</tt> and <tt>Tfix</tt> and <tt>Xfix</tt>; the connection of external signals is now detected automatically.</li> <br> Adapted to Modelica.Media
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"), Diagram(graphics));
+  end ThroughW;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using ideal gases as working fluid.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
