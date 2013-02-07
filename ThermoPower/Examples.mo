@@ -521,8 +521,8 @@ Casella</a>:<br>
       Modelica.Blocks.Sources.Ramp ValveOpening1(
         duration=1,
         height=0,
-        offset=ValveOpening_offset) annotation (Placement(transformation(extent
-              ={{-80,-20},{-60,0}}, rotation=0)));
+        offset=ValveOpening_offset) annotation (Placement(transformation(extent=
+               {{-80,-20},{-60,0}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp ValveOpening2(
         duration=1,
         height=0,
@@ -1114,8 +1114,8 @@ Casella</a>:<br>
       Modelica.Blocks.Sources.Ramp ValveOpening1(
         duration=1,
         height=0,
-        offset=ValveOpening_offset) annotation (Placement(transformation(extent
-              ={{-80,-100},{-60,-80}}, rotation=0)));
+        offset=ValveOpening_offset) annotation (Placement(transformation(extent=
+               {{-80,-100},{-60,-80}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp ValveOpening2(
         duration=1,
         height=0,
@@ -1329,8 +1329,8 @@ Casella</a>:<br>
           Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
       Gas.FlangeB gasOut(redeclare package Medium = GasMedium) annotation (
           Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-      Water.FlangeA waterIn(redeclare package Medium = WaterMedium) annotation
-        (Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
+      Water.FlangeA waterIn(redeclare package Medium = WaterMedium) annotation (
+         Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
       Water.FlangeB waterOut(redeclare package Medium = WaterMedium)
         annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
               rotation=0)));
@@ -1487,8 +1487,8 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
         T=670,
         w0=10) annotation (Placement(transformation(extent={{-96,-10},{-76,10}},
               rotation=0)));
-      Gas.SinkP SinkP2(redeclare package Medium = GasMedium, T=300) annotation
-        (Placement(transformation(extent={{100,-10},{120,10}}, rotation=0)));
+      Gas.SinkP SinkP2(redeclare package Medium = GasMedium, T=300) annotation (
+         Placement(transformation(extent={{100,-10},{120,10}}, rotation=0)));
       Gas.PressDropLin PressDropLin1(redeclare package Medium = GasMedium, R=
             1000/10) annotation (Placement(transformation(extent={{60,-10},{80,
                 10}}, rotation=0)));
@@ -2162,8 +2162,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
       Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
           Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-      Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation
-        (Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
+      Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
+         Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
       Water.FlangeB waterOut(redeclare package Medium = FluidMedium)
         annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
               rotation=0)));
@@ -2172,7 +2172,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         N=N_F,
         wnom=fluidNomFlowRate,
         initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
-
         redeclare package Medium = FluidMedium,
         L=exchSurface_F^2/(fluidVol*pi*4),
         A=(fluidVol*4/exchSurface_F)^2/4*pi,
@@ -2194,7 +2193,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         lambda=lambda,
         N=N_F,
         initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
-
         L=exchSurface_F^2/(fluidVol*pi*4),
         rint=fluidVol*4/exchSurface_F/2,
         WallRes=false,
@@ -2207,7 +2205,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         wnom=gasNomFlowRate,
         N=N_G,
         initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
-
         redeclare package Medium = FlueGasMedium,
         QuasiStatic=gasQuasiStatic,
         L=L,
@@ -2365,8 +2362,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
             origin={0,-28},
             extent={{-10,-10},{10,10}},
             rotation=180)));
-      Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation
-        (Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
+      Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
+         Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
       Water.FlangeB waterOut(redeclare package Medium = FluidMedium)
         annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
               rotation=0)));
@@ -2382,7 +2379,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         QuasiStatic=gasQuasiStatic,
         N=N,
         initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
-
         L=L,
         A=gasVol/L,
         omega=exchSurface/L,
@@ -2396,8 +2392,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
       final parameter Modelica.SIunits.Distance L=1 "Tube length";
     equation
       voidFraction = 1 - water.Vld/water.Vd;
-      connect(heatTransfer_ext.side2, adapter.DHT_port) annotation (Line(points
-            ={{3.79641e-016,-24.9},{3.79641e-016,-12},{0,-12},{0,-11},{-2.02067e-015,
+      connect(heatTransfer_ext.side2, adapter.DHT_port) annotation (Line(points=
+             {{3.79641e-016,-24.9},{3.79641e-016,-12},{0,-12},{0,-11},{-2.02067e-015,
               -11}}, color={255,127,0}));
       connect(water.feed, waterIn) annotation (Line(
           points={{-18,37.2},{-52,37.2},{-52,100},{0,100}},
@@ -2468,7 +2464,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         n0=n0,
         redeclare package Medium = FluidMedium,
         initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
-
         wstart=nominalMassFlowRate,
         w0=nominalMassFlowRate,
         dp0=nominalOutletPressure - nominalInletPressure,
@@ -2609,8 +2604,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         constrainedby Modelica.Media.Interfaces.PartialPureSubstance
         "Fluid model";
       parameter Boolean SSInit=false "Steady-state initialization";
-      ThermoPower.Examples.RankineCycle.PrescribedPressureCondenser condenser(p
-          =5390, redeclare package Medium = Water) annotation (Placement(
+      ThermoPower.Examples.RankineCycle.PrescribedPressureCondenser condenser(p=
+           5390, redeclare package Medium = Water) annotation (Placement(
             transformation(extent={{100,-100},{140,-60}}, rotation=0)));
       ThermoPower.Examples.RankineCycle.PrescribedSpeedPump prescribedSpeedPump(
         n0=1500,
@@ -2621,8 +2616,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         head_nom={450,300,0},
         rho0=1000,
         nominalOutletPressure=3000000,
-        nominalInletPressure=50000) annotation (Placement(transformation(extent
-              ={{40,-180},{0,-140}}, rotation=0)));
+        nominalInletPressure=50000) annotation (Placement(transformation(extent=
+               {{40,-180},{0,-140}}, rotation=0)));
       Modelica.Blocks.Continuous.FirstOrder temperatureActuator(
         k=1,
         y_start=750,
@@ -2778,11 +2773,11 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           redeclare package Medium = FlueGas) annotation (Placement(
             transformation(extent={{-150,50},{-130,70}}, rotation=0)));
       ThermoPower.PowerPlants.HRSG.Components.StateReader_gas
-        stateGasInletEvaporator(redeclare package Medium = FlueGas) annotation
-        (Placement(transformation(extent={{-150,-30},{-130,-10}}, rotation=0)));
+        stateGasInletEvaporator(redeclare package Medium = FlueGas) annotation (
+         Placement(transformation(extent={{-150,-30},{-130,-10}}, rotation=0)));
       ThermoPower.PowerPlants.HRSG.Components.StateReader_gas
-        stateGasInletEconomizer(redeclare package Medium = FlueGas) annotation
-        (Placement(transformation(extent={{-150,-110},{-130,-90}}, rotation=0)));
+        stateGasInletEconomizer(redeclare package Medium = FlueGas) annotation (
+         Placement(transformation(extent={{-150,-110},{-130,-90}}, rotation=0)));
       ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGasOutlet(
           redeclare package Medium = FlueGas) annotation (Placement(
             transformation(extent={{-70,-110},{-50,-90}}, rotation=0)));
@@ -2793,8 +2788,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
             extent={{-10,-10},{10,10}},
             rotation=90)));
       ThermoPower.PowerPlants.HRSG.Components.StateReader_water
-        stateWaterSuperheater_out(redeclare package Medium = Water) annotation
-        (Placement(transformation(
+        stateWaterSuperheater_out(redeclare package Medium = Water) annotation (
+         Placement(transformation(
             origin={-100,102},
             extent={{-10,-10},{10,10}},
             rotation=90)));
@@ -2881,7 +2876,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
       connect(stateGasInletEconomizer.inlet, evaporator.gasOut) annotation (
           Line(
           points={{-146,-100},{-160,-100},{-160,-50},{-40,-50},{-40,-20},{-80,-20}},
-
           color={159,159,223},
           thickness=0.5));
 
@@ -2908,8 +2902,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           points={{-100,0},{-100,14}},
           thickness=0.5,
           color={0,0,255}));
-      connect(stateWaterSuperheater_in.outlet, superheater.waterIn) annotation
-        (Line(
+      connect(stateWaterSuperheater_in.outlet, superheater.waterIn) annotation (
+         Line(
           points={{-100,26},{-100,40}},
           thickness=0.5,
           color={0,0,255}));
@@ -2918,8 +2912,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           points={{-100,80},{-100,96}},
           thickness=0.5,
           color={0,0,255}));
-      connect(stateWaterSuperheater_out.outlet, steamTurbine.inlet) annotation
-        (Line(
+      connect(stateWaterSuperheater_out.outlet, steamTurbine.inlet) annotation (
+         Line(
           points={{-100,108},{-100,120},{32,120},{32,82}},
           thickness=0.5,
           color={0,0,255}));
@@ -2970,6 +2964,7 @@ This is a simple model of a steam plant.
     model PID "PID controller with anti-windup"
       parameter Real Kp "Proportional gain (normalised units)";
       parameter Modelica.SIunits.Time Ti "Integral time";
+      parameter Boolean integralAction = true "Use integral action";
       parameter Modelica.SIunits.Time Td=0 "Derivative time";
       parameter Real Nd=1 "Derivative action up to Nd / Td rad/s";
       parameter Real Ni=1
@@ -3013,7 +3008,8 @@ This is a simple model of a steam plant.
       CS = CSmin + CSs*(CSmax - CSmin);
       // Controller actions
       P = b*SPs - PVs;
-      if Ti > 0 then
+      if integralAction then
+        assert(Ti>0, "Integral time must be positive");
         Ti*der(I) = SPs - PVs + track;
       else
         I = 0;
@@ -3114,8 +3110,8 @@ This is a simple model of a steam plant.
       equation
         connect(voidFractionController.SP, voidFractionSetPoint.y)
           annotation (Line(points={{-40,-30},{-59,-30}}, color={0,0,127}));
-        connect(voidFractionController.CS, plant.nPump) annotation (Line(points
-              ={{-20,-34},{0,-34},{0,0},{20,0}}, color={0,0,127}));
+        connect(voidFractionController.CS, plant.nPump) annotation (Line(points=
+               {{-20,-34},{0,-34},{0,0},{20,0}}, color={0,0,127}));
         connect(voidFractionController.PV, plant.voidFraction) annotation (Line(
               points={{-40,-38},{-50,-38},{-50,-60},{90,-60},{90,0},{80,0}},
               color={0,0,127}));
@@ -3154,8 +3150,7 @@ This is a simple model of a steam plant.
 </html>", info="<html>
 <p>This model simulates a simple continuous-time control system for the steam power plant.
 <p>The generated power and the evaporator void fraction are controlled to the set point by PI controllers with anti-windup.</p>
-</html>"),
-          experimentSetupOutput(equdistant=false));
+</html>"),experimentSetupOutput(equdistant=false));
       end ClosedLoop;
     end Simulators;
     annotation (Documentation(info="<html>
@@ -3279,8 +3274,8 @@ This is a simple model of a steam plant.
             origin={-104,10},
             extent={{-10,-10},{10,10}},
             rotation=90)));
-      Modelica.Mechanics.Rotational.Sensors.PowerSensor powerSensor annotation
-        (Placement(transformation(extent={{60,-70},{80,-50}}, rotation=0)));
+      Modelica.Mechanics.Rotational.Sensors.PowerSensor powerSensor annotation (
+         Placement(transformation(extent={{60,-70},{80,-50}}, rotation=0)));
       Modelica.Blocks.Continuous.FirstOrder gasFlowActuator(
         k=1,
         T=4,
