@@ -1,5 +1,8 @@
 within ThermoPower;
 package Old "Old models"
+  extends Modelica.Icons.Package;
+  extends Modelica.Icons.ObsoleteModel;
+
   model ValveLiq "Valve for liquid water flow"
     extends Icons.Water.Valve;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium

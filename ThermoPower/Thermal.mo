@@ -364,7 +364,7 @@ This model computes the thermal and mechanical properties of a generic material.
 This package contains models to compute the material properties needed to model heat transfer and thermo-mechanical stresses in objects such as turbine shafts or headers.
 </html>"));
   end MaterialProperties;
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.Package;
   connector HT = Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a
     "Thermal port for lumped parameter heat transfer";
   connector DHTNodes "Distributed Heat Terminal"
@@ -390,6 +390,7 @@ This package contains models to compute the material properties needed to model 
   end DHTVolumes;
 
   model HThtc_HT "HThtc to HT adaptor"
+
     HT HT_port annotation (Placement(transformation(extent={{100,-20},{140,20}},
             rotation=0)));
     HThtc_in HThtc_port annotation (Placement(transformation(extent={{-140,-20},

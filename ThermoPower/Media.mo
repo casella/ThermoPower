@@ -1,5 +1,6 @@
 within ThermoPower;
 package Media "Medium models for the ThermoPower library"
+  extends Modelica.Icons.Package;
   package LiquidWaterConstant "Simple incompressible water model"
     import ThermoPower;
     extends Modelica.Media.Interfaces.PartialMedium(

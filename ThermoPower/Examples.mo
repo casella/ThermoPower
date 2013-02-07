@@ -1,6 +1,6 @@
 within ThermoPower;
 package Examples "Application examples"
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.ExamplesPackage;
   package CISE "CISE plant models"
     extends Modelica.Icons.Library;
     model CISEPlant "Model of the CISE lab steam generator"

@@ -1,6 +1,6 @@
 within ThermoPower;
 package Test "Test cases for the ThermoPower models"
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.Package;
 
   package WaterElements "Test for Water package elements except Flow1D models"
     model TestMixer

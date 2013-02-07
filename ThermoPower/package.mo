@@ -27,10 +27,11 @@ end System;
 
 
 package Icons "Icons for ThermoPower library"
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.Package;
   package Water "Icons for component using water/steam as working fluid"
-    extends Modelica.Icons.Library;
+    extends Modelica.Icons.Package;
     partial model SourceP
+
       annotation (Icon(graphics={
             Ellipse(
               extent={{-80,80},{80,-80}},
@@ -45,6 +46,7 @@ package Icons "Icons for ThermoPower library"
     end SourceP;
 
     partial model SourceW
+
       annotation (Icon(graphics={
             Rectangle(
               extent={{-80,40},{80,-40}},
@@ -61,6 +63,7 @@ package Icons "Icons for ThermoPower library"
     end SourceW;
 
     partial model Tube
+
       annotation (Icon(graphics={Rectangle(
               extent={{-80,40},{80,-40}},
               lineColor={0,0,0},
@@ -68,6 +71,7 @@ package Icons "Icons for ThermoPower library"
     end Tube;
 
     partial model Mixer
+
       annotation (Icon(graphics={Ellipse(
               extent={{80,80},{-80,-80}},
               lineColor={0,0,0},
@@ -77,6 +81,7 @@ package Icons "Icons for ThermoPower library"
     end Mixer;
 
     partial model Tank
+
       annotation (Icon(graphics={
             Rectangle(
               extent={{-60,60},{60,-80}},
@@ -92,6 +97,7 @@ package Icons "Icons for ThermoPower library"
     end Tank;
 
     partial model Valve
+
       annotation (Icon(graphics={
             Line(
               points={{0,40},{0,0}},
@@ -117,6 +123,7 @@ package Icons "Icons for ThermoPower library"
     end Valve;
 
     model FlowJoin
+
       annotation (Diagram(graphics), Icon(graphics={Polygon(
               points={{-40,60},{0,20},{40,20},{40,-20},{0,-20},{-40,-60},{-40,-20},
                   {-20,0},{-40,20},{-40,60}},
@@ -126,6 +133,7 @@ package Icons "Icons for ThermoPower library"
     end FlowJoin;
 
     model FlowSplit
+
       annotation (Diagram(graphics), Icon(graphics={Polygon(
               points={{40,60},{0,20},{-40,20},{-40,-20},{0,-20},{40,-60},{40,-20},
                   {22,0},{40,20},{40,60}},
@@ -135,6 +143,7 @@ package Icons "Icons for ThermoPower library"
     end FlowSplit;
 
     model SensThrough
+
       annotation (Icon(graphics={
             Rectangle(
               extent={{-40,-20},{40,-60}},
@@ -149,6 +158,7 @@ package Icons "Icons for ThermoPower library"
     end SensThrough;
 
     model SensP
+
       annotation (Icon(graphics={
             Line(points={{0,20},{0,-20}}, color={0,0,0}),
             Ellipse(extent={{-40,100},{40,20}}, lineColor={0,0,0}),
@@ -157,6 +167,7 @@ package Icons "Icons for ThermoPower library"
     end SensP;
 
     model Drum
+
       annotation (Icon(graphics={
             Ellipse(
               extent={{-80,80},{80,-80}},
@@ -181,6 +192,7 @@ package Icons "Icons for ThermoPower library"
     end Drum;
 
     partial model Pump
+
       annotation (Icon(graphics={
             Polygon(
               points={{-40,-24},{-60,-60},{60,-60},{40,-24},{-40,-24}},
@@ -267,6 +279,7 @@ package Icons "Icons for ThermoPower library"
     end Accumulator;
 
     partial model PumpMech
+
       annotation (Icon(graphics={
             Rectangle(
               extent={{54,28},{80,12}},
@@ -293,6 +306,7 @@ package Icons "Icons for ThermoPower library"
     end PumpMech;
 
     partial model PressDrop
+
       annotation (Icon(graphics={Rectangle(
               extent={{-80,40},{80,-40}},
               lineColor={0,0,0},
@@ -306,6 +320,7 @@ package Icons "Icons for ThermoPower library"
     end PressDrop;
 
     partial model SteamTurbineUnit
+
       annotation (Icon(graphics={
             Line(
               points={{14,20},{14,42},{38,42},{38,20}},
@@ -353,6 +368,7 @@ package Icons "Icons for ThermoPower library"
     end SteamTurbineUnit;
 
     partial model Header
+
       annotation (Icon(graphics={
             Ellipse(
               extent={{-80,80},{80,-80}},
@@ -370,6 +386,7 @@ package Icons "Icons for ThermoPower library"
   end Water;
 
   partial model HeatFlow
+
     annotation (Icon(graphics={Rectangle(
             extent={{-80,20},{80,-20}},
             lineColor={0,0,0},
@@ -378,6 +395,7 @@ package Icons "Icons for ThermoPower library"
   end HeatFlow;
 
   partial model MetalWall
+
     annotation (Icon(graphics={Rectangle(
             extent={{-80,20},{80,-20}},
             lineColor={0,0,0},
@@ -386,8 +404,9 @@ package Icons "Icons for ThermoPower library"
   end MetalWall;
 
   package Gas "Icons for component using water/steam as working fluid"
-    extends Modelica.Icons.Library;
+    extends Modelica.Icons.Package;
     partial model SourceP
+
       annotation (Icon(graphics={
             Ellipse(
               extent={{-80,80},{80,-80}},
@@ -402,6 +421,7 @@ package Icons "Icons for ThermoPower library"
     end SourceP;
 
     partial model SourceW
+
       annotation (Icon(graphics={
             Rectangle(
               extent={{-80,40},{80,-40}},
@@ -417,6 +437,7 @@ package Icons "Icons for ThermoPower library"
     end SourceW;
 
     partial model Tube
+
       annotation (Icon(graphics={Rectangle(
               extent={{-80,40},{80,-40}},
               lineColor={0,0,0},
@@ -425,6 +446,7 @@ package Icons "Icons for ThermoPower library"
     end Tube;
 
     partial model Mixer
+
       annotation (Icon(graphics={Ellipse(
               extent={{80,80},{-80,-80}},
               lineColor={128,128,128},
@@ -434,6 +456,7 @@ package Icons "Icons for ThermoPower library"
     end Mixer;
 
     partial model Valve
+
       annotation (Icon(graphics={
             Line(
               points={{0,40},{0,0}},
@@ -459,6 +482,7 @@ package Icons "Icons for ThermoPower library"
     end Valve;
 
     model FlowJoin
+
       annotation (Diagram(graphics), Icon(graphics={Polygon(
               points={{-40,60},{0,20},{40,20},{40,-20},{0,-20},{-40,-60},{-40,-20},
                   {-20,0},{-40,20},{-40,60}},
@@ -468,6 +492,7 @@ package Icons "Icons for ThermoPower library"
     end FlowJoin;
 
     model FlowSplit
+
       annotation (Diagram(graphics), Icon(graphics={Polygon(
               points={{40,60},{0,20},{-40,20},{-40,-20},{0,-20},{40,-60},{40,-20},
                   {22,0},{40,20},{40,60}},
@@ -477,6 +502,7 @@ package Icons "Icons for ThermoPower library"
     end FlowSplit;
 
     model SensThrough
+
       annotation (Icon(graphics={
             Rectangle(
               extent={{-40,-20},{40,-60}},
@@ -490,6 +516,7 @@ package Icons "Icons for ThermoPower library"
     end SensThrough;
 
     model SensP
+
       annotation (Icon(graphics={
             Line(points={{0,20},{0,-20}}, color={0,0,0}),
             Ellipse(extent={{-40,100},{40,20}}, lineColor={0,0,0}),
@@ -498,6 +525,7 @@ package Icons "Icons for ThermoPower library"
     end SensP;
 
     partial model Compressor
+
       annotation (Icon(graphics={
             Polygon(
               points={{24,26},{30,26},{30,76},{60,76},{60,82},{24,82},{24,26}},
@@ -527,6 +555,7 @@ package Icons "Icons for ThermoPower library"
     end Compressor;
 
     partial model Turbine
+
       annotation (Icon(graphics={
             Polygon(
               points={{-28,76},{-28,28},{-22,28},{-22,82},{-60,82},{-60,76},{-28,
@@ -556,6 +585,7 @@ package Icons "Icons for ThermoPower library"
     end Turbine;
 
     partial model GasTurbineUnit
+
       annotation (Icon(graphics={
             Line(
               points={{-22,26},{-22,48},{22,48},{22,28}},
@@ -586,6 +616,7 @@ package Icons "Icons for ThermoPower library"
     end GasTurbineUnit;
 
     partial model Fan
+
       annotation (Icon(graphics={
             Polygon(
               points={{-38,-24},{-58,-60},{62,-60},{42,-24},{-38,-24}},
@@ -614,7 +645,7 @@ end Icons;
 
 
 package Functions "Miscellaneous functions"
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.Package;
   function linear
     extends Modelica.Icons.Function;
     input Real x;
@@ -1223,7 +1254,7 @@ end Functions;
 
 
 package Electrical "Simplified models of electric power components"
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.Package;
   connector PowerConnection "Electrical power connector"
     flow Power W "Active power";
     Frequency f "Frequency";
@@ -1365,6 +1396,7 @@ The frequency in the electrical connector is the e.m.f. of generator.
   end Generator;
 
   model Breaker "Circuit breaker"
+
     PowerConnection connection1 annotation (Placement(transformation(extent={{-100,
               -14},{-72,14}}, rotation=0)));
     PowerConnection connection2 annotation (Placement(transformation(extent={{
@@ -1449,6 +1481,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
   end Load;
 
   model PowerSensor "Measures power flow through the component"
+
     PowerConnection port_a annotation (Placement(transformation(extent={{-110,-10},
               {-90,10}}, rotation=0)));
     PowerConnection port_b annotation (Placement(transformation(extent={{90,-12},
@@ -1490,6 +1523,7 @@ Ideal breaker model. Can only be used to connect a generator to a grid with fini
   end PowerSensor;
 
   model FrequencySensor "Measures the frequency at the connector"
+
     PowerConnection port annotation (Placement(transformation(extent={{-110,-10},
               {-90,10}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput f "Frequency at the connector"

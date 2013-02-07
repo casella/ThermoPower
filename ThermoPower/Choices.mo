@@ -1,5 +1,6 @@
 within ThermoPower;
 package Choices "Choice enumerations for ThermoPower models"
+  extends Modelica.Icons.Package;
   package CylinderFourier
     type NodeDistribution = enumeration(
         uniform "Uniform distribution of node radii",
