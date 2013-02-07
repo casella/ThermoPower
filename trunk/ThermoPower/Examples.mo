@@ -25,7 +25,8 @@ package Examples "Application examples"
         hlstart=1.15e5,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
           Placement(transformation(extent={{-120,24},{-60,84}}, rotation=0)));
-      Water.SourceW FeedWater(h=1.1059e6) annotation (Placement(transformation(
+      Water.SourceMassFlow
+                    FeedWater(h=1.1059e6) annotation (Placement(transformation(
               extent={{-176,34},{-146,64}}, rotation=0)));
       Water.Flow1D2ph Downcomer(
         redeclare package Medium = Medium,
@@ -97,7 +98,8 @@ package Examples "Application examples"
             origin={-19,-17},
             extent={{-15,15},{15,-15}},
             rotation=90)));
-      Water.SinkW Blowdown(w0=0) annotation (Placement(transformation(extent={{
+      Water.SinkMassFlow
+                  Blowdown(w0=0) annotation (Placement(transformation(extent={{
                 -80,-20},{-50,10}}, rotation=0)));
       Water.Flow1D Pipe2SH(
         redeclare package Medium = Medium,
@@ -168,7 +170,8 @@ package Examples "Application examples"
         CvData=ThermoPower.Choices.Valve.CvTypes.Av,
         dpnom=4899700) annotation (Placement(transformation(extent={{92,80},{
                 122,110}}, rotation=0)));
-      Water.SinkP Sink(p0=5.5e5) annotation (Placement(transformation(extent={{
+      Water.SinkPressure
+                  Sink(p0=5.5e5) annotation (Placement(transformation(extent={{
                 138,80},{168,110}}, rotation=0)));
       Thermal.HeatSource1D HeatSourceSH(
         Nt=1,
@@ -832,7 +835,10 @@ Casella</a>:<br>
       parameter Length H=1.455 "Drum height";
       Pressure DrumPressure;
       Length DrumLevel;
-      Water.SourceW FeedWater(h=1.1059e6) annotation (Placement(transformation(
+      Water.SourceMassFlow
+                    FeedWater(h=1.1059e6,
+        use_in_w0=true,
+        use_in_h=true)                    annotation (Placement(transformation(
               extent={{-92,0},{-72,20}}, rotation=0)));
       Water.Flow1D Pipe2SH(
         redeclare package Medium = Medium,
@@ -906,7 +912,8 @@ Casella</a>:<br>
         CvData=ThermoPower.Choices.Valve.CvTypes.Av,
         dpnom=4899700) annotation (Placement(transformation(extent={{50,40},{70,
                 20}}, rotation=0)));
-      Water.SinkP Sink(p0=5.5e5) annotation (Placement(transformation(extent={{
+      Water.SinkPressure
+                  Sink(p0=5.5e5) annotation (Placement(transformation(extent={{
                 80,20},{100,40}}, rotation=0)));
       Thermal.HeatSource1D HeatSourceSH(
         Nt=1,
@@ -1478,16 +1485,21 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
       Water.ValveLin Valve(Kv=20/4e5, redeclare package Medium = WaterMedium)
         annotation (Placement(transformation(extent={{36,-50},{56,-70}},
               rotation=0)));
-      Water.SinkP SinkP1(redeclare package Medium = WaterMedium, p0=100000)
+      Water.SinkPressure
+                  SinkP1(redeclare package Medium = WaterMedium, p0=100000)
         annotation (Placement(transformation(extent={{70,-70},{90,-50}},
               rotation=0)));
-      Gas.SourceW SourceW2(
+      Gas.SourceMassFlow
+                  SourceW2(
         redeclare package Medium = GasMedium,
-        p0=1e5,
+        w0=10,
+        p0=100000,
         T=670,
-        w0=10) annotation (Placement(transformation(extent={{-96,-10},{-76,10}},
+        use_in_w0=true)
+               annotation (Placement(transformation(extent={{-96,-10},{-76,10}},
               rotation=0)));
-      Gas.SinkP SinkP2(redeclare package Medium = GasMedium, T=300) annotation (
+      Gas.SinkPressure
+                SinkP2(redeclare package Medium = GasMedium, T=300) annotation (
          Placement(transformation(extent={{100,-10},{120,10}}, rotation=0)));
       Gas.PressDropLin PressDropLin1(redeclare package Medium = GasMedium, R=
             1000/10) annotation (Placement(transformation(extent={{60,-10},{80,
@@ -1500,7 +1512,8 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
           Placement(transformation(extent={{30,-6},{50,14}}, rotation=0)));
       Gas.SensT GasIn(redeclare package Medium = GasMedium) annotation (
           Placement(transformation(extent={{-60,-6},{-40,14}}, rotation=0)));
-      Water.SourceP SourceP1(redeclare package Medium = WaterMedium, p0=500000)
+      Water.SourcePressure
+                    SourceP1(redeclare package Medium = WaterMedium, p0=500000)
         annotation (Placement(transformation(extent={{-80,40},{-60,60}},
               rotation=0)));
       Modelica.Blocks.Interfaces.RealInput ValveOpening annotation (Placement(
@@ -1717,9 +1730,11 @@ Casella</a>:<br>
         max=CSmax) = 0 "Control signal initial value";
       parameter Boolean StartSteadyState=false
         "True=steady state initial equations activated";
+      parameter Boolean useMANswitch = false "Use MANswitch input connector";
+      parameter Boolean useTRKswitch = false "Use TRKswitch input connector";
+      parameter Boolean useMANport = false "Use MANport input connector";
+      parameter Boolean useTRKport = false "Use TRKport input connector";
 
-      Modelica.Blocks.Interfaces.BooleanInput MANswitch annotation (Placement(
-            transformation(extent={{-110,40},{-90,60}}, rotation=0)));
       Real SP "Set-Point (input)";
       Real PV "Process Value (input)";
       discrete Real CS(start=CSstart) "Control Signal (output)";
@@ -1736,62 +1751,70 @@ Casella</a>:<br>
             transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput CSport annotation (Placement(
             transformation(extent={{80,-20},{120,20}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput MANport annotation (Placement(
+      Modelica.Blocks.Interfaces.RealInput PVport annotation (Placement(
+            transformation(extent={{-120,-80},{-80,-40}}, rotation=0)));
+      Modelica.Blocks.Interfaces.BooleanInput MANswitch if useMANswitch annotation (Placement(
+            transformation(extent={{-110,40},{-90,60}}, rotation=0)));
+      Modelica.Blocks.Interfaces.RealInput MANport if useMANport annotation (Placement(
             transformation(
             origin={60,100},
             extent={{-20,-20},{20,20}},
             rotation=270)));
-      Modelica.Blocks.Interfaces.RealInput PVport annotation (Placement(
-            transformation(extent={{-120,-80},{-80,-40}}, rotation=0)));
-      Modelica.Blocks.Interfaces.BooleanInput TRKswitch annotation (Placement(
+      Modelica.Blocks.Interfaces.BooleanInput TRKswitch if useTRKswitch annotation (Placement(
             transformation(extent={{-110,76},{-90,96}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput TRKport annotation (Placement(
+      Modelica.Blocks.Interfaces.RealInput TRKport if useTRKport annotation (Placement(
             transformation(
             origin={-8,100},
             extent={{-20,-20},{20,20}},
             rotation=270)));
+    protected
+      Modelica.Blocks.Interfaces.BooleanInput MANswitch_internal;
+      Modelica.Blocks.Interfaces.RealInput MANport_internal;
+      Modelica.Blocks.Interfaces.BooleanInput TRKswitch_internal;
+      Modelica.Blocks.Interfaces.RealInput TRKport_internal;
+
     equation
-      if cardinality(MANswitch) == 0 then
-        MANswitch = false;
+      if not useMANswitch then
+        MANswitch_internal = false;
       end if;
 
-      if cardinality(TRKswitch) == 0 then
-        TRKswitch = false;
+      if not useTRKswitch then
+        TRKswitch_internal = false;
       end if;
 
-      if cardinality(MANport) == 0 then
-        MANport = 0;
+      if not useMANport then
+        MANport_internal = 0;
       end if;
 
-      if cardinality(TRKport) == 0 then
-        TRKport = 0;
+      if not useTRKport then
+        TRKport_internal = 0;
       end if;
 
       when {initial(),sampleTrigger} then
-        Man = MANswitch;
-        Trk = TRKswitch;
+        Man = MANswitch_internal;
+        Trk = TRKswitch_internal;
         if Man then
-          if MANport >= CSmax then
+          if MANport_internal >= CSmax then
             CS = CSmax;
             CSport = CSmax;
-          elseif MANport <= CSmin then
+          elseif MANport_internal <= CSmin then
             CS = CSmin;
             CSport = CSmin;
           else
-            CS = MANport;
-            CSport = MANport;
+            CS = MANport_internal;
+            CSport = MANport_internal;
           end if;
         else
           if (Trk and not Man) then
-            if TRKport >= CSmax then
+            if TRKport_internal >= CSmax then
               CS = CSmax;
               CSport = CSmax;
-            elseif TRKport <= CSmin then
+            elseif TRKport_internal <= CSmin then
               CS = CSmin;
               CSport = CSmin;
             else
-              CS = TRKport;
-              CSport = TRKport;
+              CS = TRKport_internal;
+              CSport = TRKport_internal;
             end if;
           else
             if CSwind >= CSmax then
@@ -1810,12 +1833,19 @@ Casella</a>:<br>
         SP = SPport;
         PV = PVport;
       end when;
+
+      connect(MANport, MANport_internal);
+      connect(MANswitch, MANswitch_internal);
+      connect(TRKport, TRKport_internal);
+      connect(TRKswitch, TRKswitch_internal);
+
     initial equation
       if StartSteadyState then
         pre(CS) = CS;
         pre(PV) = PV;
         pre(SP) = SP;
       end if;
+
       annotation (
         Icon(graphics={
             Text(extent={{-56,36},{16,-34}}, textString="SP"),
@@ -2805,12 +2835,16 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
             origin={-100,-140},
             extent={{-10,-10},{10,10}},
             rotation=90)));
-      ThermoPower.Gas.SourceW sourceW_gas(
-        T=750,
+      ThermoPower.Gas.SourceMassFlow
+                              sourceW_gas(
         w0=500,
-        redeclare package Medium = FlueGas) annotation (Placement(
+        redeclare package Medium = FlueGas,
+        T=750,
+        use_in_w0=true,
+        use_in_T=true)                      annotation (Placement(
             transformation(extent={{-200,50},{-180,70}}, rotation=0)));
-      ThermoPower.Gas.SinkP sinkP_gas(T=400, redeclare package Medium = FlueGas)
+      ThermoPower.Gas.SinkPressure
+                            sinkP_gas(T=400, redeclare package Medium = FlueGas)
         annotation (Placement(transformation(extent={{-40,-110},{-20,-90}},
               rotation=0)));
       inner ThermoPower.System system
@@ -3110,22 +3144,22 @@ This is a simple model of a steam plant.
       equation
         connect(voidFractionController.SP, voidFractionSetPoint.y)
           annotation (Line(points={{-40,-30},{-59,-30}}, color={0,0,127}));
-        connect(voidFractionController.CS, plant.nPump) annotation (Line(points=
-               {{-20,-34},{0,-34},{0,0},{20,0}}, color={0,0,127}));
+        connect(voidFractionController.CS, plant.nPump) annotation (Line(points={{-20,-34},
+                {0,-34},{0,-2.4},{21.2,-2.4}},   color={0,0,127}));
         connect(voidFractionController.PV, plant.voidFraction) annotation (Line(
-              points={{-40,-38},{-50,-38},{-50,-60},{90,-60},{90,0},{80,0}},
+              points={{-40,-38},{-50,-38},{-50,-60},{90,-60},{90,2},{80,2}},
               color={0,0,127}));
         connect(powerSetPoint.y, powerController.SP) annotation (Line(points={{
                 -59,60},{-50,60},{-40,60}}, color={0,0,127}));
         connect(powerController.PV, plant.generatedPower) annotation (Line(
-              points={{-40,68},{-50,68},{-50,90},{90,90},{90,20},{80,20}},
+              points={{-40,68},{-50,68},{-50,90},{90,90},{90,18.4},{80.6,18.4}},
               color={0,0,127}));
         connect(gasFlowRate.y, plant.gasTemperature) annotation (Line(
-            points={{-59,20},{20,20}},
+            points={{-59,20},{-18.6,20},{-18.6,21.6},{21.8,21.6}},
             color={0,0,127},
             smooth=Smooth.None));
         connect(powerController.CS, plant.gasFlowRate) annotation (Line(
-            points={{-20,64},{0,64},{0,10},{20,10}},
+            points={{-20,64},{0,64},{0,10},{21.8,10}},
             color={0,0,127},
             smooth=Smooth.None));
         annotation (
@@ -3234,21 +3268,26 @@ This is a simple model of a steam plant.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HH=41.6e6) annotation (Placement(transformation(extent={{-72,20},{-32,
                 60}}, rotation=0)));
-      Gas.SourceP SourceP1(
+      Gas.SourcePressure
+                  SourceP1(
         redeclare package Medium = Media.Air,
         p0=0.343e5,
         T=244.4) annotation (Placement(transformation(extent={{-188,-30},{-168,
                 -10}}, rotation=0)));
-      Gas.SinkP SinkP1(
+      Gas.SinkPressure
+                SinkP1(
         redeclare package Medium = Media.FlueGas,
         p0=1.52e5,
         T=800) annotation (Placement(transformation(extent={{94,-10},{114,10}},
               rotation=0)));
-      Gas.SourceW SourceW1(
+      Gas.SourceMassFlow
+                  SourceW1(
         redeclare package Medium = Media.NaturalGas,
         w0=2.02,
-        p0=8.11e5,
-        T=300) annotation (Placement(transformation(extent={{-100,70},{-80,90}},
+        p0=811000,
+        T=300,
+        use_in_w0=true)
+               annotation (Placement(transformation(extent={{-100,70},{-80,90}},
               rotation=0)));
       Gas.PressDrop PressDrop1(
         redeclare package Medium = Media.FlueGas,

@@ -53,7 +53,7 @@ package Water "Models of components with water/steam as working fluid"
 
   package StandardWater = Modelica.Media.Water.StandardWater;
 
-  model SourceP "Pressure source for water/steam flows"
+  model SourcePressure "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -62,21 +62,27 @@ package Water "Models of components with water/steam as working fluid"
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_h = false
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"));
     outer ThermoPower.System system "System wide properties";
     Pressure p "Actual pressure";
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_p0 annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_p0 if use_in_p0 annotation (Placement(
           transformation(
           origin={-40,92},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_h annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_h if use_in_h annotation (Placement(
           transformation(
           origin={40,90},
           extent={{-20,-20},{20,20}},
           rotation=270)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_p0_internal;
+    Modelica.Blocks.Interfaces.RealInput in_h_internal;
   equation
     if R == 0 then
       flange.p = p;
@@ -84,15 +90,20 @@ package Water "Models of components with water/steam as working fluid"
       flange.p = p + flange.m_flow*R;
     end if;
 
-    p = in_p0;
-    if cardinality(in_p0) == 0 then
-      in_p0 = p0 "Pressure set by parameter";
+    p = in_p0_internal;
+    if not use_in_p0 then
+      in_p0_internal = p0 "Pressure set by parameter";
     end if;
 
-    flange.h_outflow = in_h;
-    if cardinality(in_h) == 0 then
-      in_h = h "Enthalpy set by parameter";
+    flange.h_outflow = in_h_internal;
+    if not use_in_h then
+      in_h_internal = h "Enthalpy set by parameter";
     end if;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_p0, in_p0_internal);
+    connect(in_h, in_h_internal);
+
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-106,90},{-52,50}}, textString="p0"), Text(
@@ -115,9 +126,9 @@ package Water "Models of components with water/steam as working fluid"
        First release.</li>
 </ul>
 </html>"));
-  end SourceP;
+  end SourcePressure;
 
-  model SinkP "Pressure sink for water/steam flows"
+  model SinkPressure "Pressure sink for water/steam flows"
     extends Icons.Water.SourceP;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -127,21 +138,28 @@ package Water "Models of components with water/steam as working fluid"
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_h = false
+      "Use connector input for the specific enthalpy"                                  annotation(Dialog(group="External inputs"));
     outer ThermoPower.System system "System wide properties";
-    Pressure p;
+    Pressure p "Actual pressure";
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_p0 annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_p0 if use_in_p0 annotation (Placement(
           transformation(
           origin={-40,88},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_h annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_h if use_in_h annotation (Placement(
           transformation(
           origin={40,88},
           extent={{-20,-20},{20,20}},
           rotation=270)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_p0_internal;
+    Modelica.Blocks.Interfaces.RealInput in_h_internal;
+
   equation
     if R == 0 then
       flange.p = p;
@@ -149,15 +167,20 @@ package Water "Models of components with water/steam as working fluid"
       flange.p = p + flange.m_flow*R;
     end if;
 
-    p = in_p0;
-    if cardinality(in_p0) == 0 then
-      in_p0 = p0 "Pressure set by parameter";
+    p = in_p0_internal;
+    if not use_in_p0 then
+      in_p0_internal = p0 "Pressure set by parameter";
     end if;
 
-    flange.h_outflow = in_h;
-    if cardinality(in_h) == 0 then
-      in_h = h "Enthalpy set by parameter";
+    flange.h_outflow = in_h_internal;
+    if not use_in_h then
+      in_h_internal = h "Enthalpy set by parameter";
     end if;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_p0, in_p0_internal);
+    connect(in_h, in_h_internal);
+
     annotation (
       Icon(graphics={Text(extent={{-106,92},{-56,50}}, textString="p0"), Text(
               extent={{54,94},{112,52}}, textString="h")}),
@@ -180,9 +203,9 @@ package Water "Models of components with water/steam as working fluid"
        First release.</li>
 </ul>
 </html>"));
-  end SinkP;
+  end SinkPressure;
 
-  model SourceW "Flowrate source for water/steam flows"
+  model SourceMassFlow "Flowrate source for water/steam flows"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -192,21 +215,28 @@ package Water "Models of components with water/steam as working fluid"
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
+                                                                                annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_h = false
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"));
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_w0 if use_in_w0 annotation (Placement(
           transformation(
           origin={-40,60},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_h annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_h if use_in_h annotation (Placement(
           transformation(
           origin={40,60},
           extent={{-20,-20},{20,20}},
           rotation=270)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_w0_internal;
+    Modelica.Blocks.Interfaces.RealInput in_h_internal;
   equation
     if G == 0 then
       flange.m_flow = -w;
@@ -214,15 +244,19 @@ package Water "Models of components with water/steam as working fluid"
       flange.m_flow = -w + (flange.p - p0)*G;
     end if;
 
-    w = in_w0;
-    if cardinality(in_w0) == 0 then
-      in_w0 = w0 "Flow rate set by parameter";
+    w = in_w0_internal;
+    if not use_in_w0 then
+      in_w0_internal = w0 "Flow rate set by parameter";
     end if;
 
-    flange.h_outflow = in_h "Enthalpy set by connector";
-    if cardinality(in_h) == 0 then
-      in_h = h "Enthalpy set by parameter";
+    flange.h_outflow = in_h_internal "Enthalpy set by connector";
+    if not use_in_h then
+      in_h_internal = h "Enthalpy set by parameter";
     end if;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_w0, in_w0_internal);
+    connect(in_h, in_h_internal);
     annotation (
       Icon(graphics={Text(extent={{-98,74},{-48,42}}, textString="w0"), Text(
               extent={{48,74},{98,42}}, textString="h")}),
@@ -245,9 +279,9 @@ package Water "Models of components with water/steam as working fluid"
        First release.</li>
 </ul>
 </html>"));
-  end SourceW;
+  end SourceMassFlow;
 
-  model SinkW "Flowrate sink for water/steam flows"
+  model SinkMassFlow "Flowrate sink for water/steam flows"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -257,21 +291,28 @@ package Water "Models of components with water/steam as working fluid"
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
+                                                                                annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_h = false
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"));
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_w0 if use_in_w0 annotation (Placement(
           transformation(
           origin={-40,60},
           extent={{-20,-20},{20,20}},
           rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_h annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_h if use_in_h annotation (Placement(
           transformation(
           origin={40,60},
           extent={{-20,-20},{20,20}},
           rotation=270)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_w0_internal;
+    Modelica.Blocks.Interfaces.RealInput in_h_internal;
   equation
     if G == 0 then
       flange.m_flow = w;
@@ -279,15 +320,20 @@ package Water "Models of components with water/steam as working fluid"
       flange.m_flow = w + (flange.p - p0)*G;
     end if;
 
-    w = in_w0 "Flow rate set by connector";
-    if cardinality(in_w0) == 0 then
-      in_w0 = w0 "Flow rate set by parameter";
+    w = in_w0_internal;
+
+    if not use_in_w0 then
+      in_w0_internal = w0 "Flow rate set by parameter";
     end if;
 
-    flange.h_outflow = in_h "Enthalpy set by connector";
-    if cardinality(in_h) == 0 then
-      in_h = h "Enthalpy set by parameter";
+    flange.h_outflow = in_h_internal;
+    if not use_in_h then
+      in_h_internal = h "Enthalpy set by parameter";
     end if;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_w0, in_w0_internal);
+    connect(in_h, in_h_internal);
     annotation (
       Icon(graphics={Text(extent={{-98,72},{-48,40}}, textString="w0"), Text(
               extent={{48,72},{98,40}}, textString="h")}),
@@ -310,15 +356,17 @@ package Water "Models of components with water/steam as working fluid"
 </ul>
 </html>"),
       Diagram(graphics));
-  end SinkW;
+  end SinkMassFlow;
 
-  model ThroughW "Prescribes the flow rate across the component"
+  model ThroughMassFlow "Prescribes the flow rate across the component"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
+    parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
+                                                                                annotation(Dialog(group="External inputs"));
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -327,23 +375,30 @@ package Water "Models of components with water/steam as working fluid"
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput in_w0 if use_in_w0 annotation (Placement(
           transformation(
           origin={-40,60},
           extent={{-20,-20},{20,20}},
           rotation=270)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_w0_internal;
+
   equation
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
     inlet.m_flow = w "Flow characteristics";
 
-    w = in_w0;
-    if cardinality(in_w0) == 0 then
-      in_w0 = w0 "Flow rate set by parameter";
+    w = in_w0_internal;
+    if not use_in_w0 then
+      in_w0_internal = w0 "Flow rate set by parameter";
     end if;
 
     // Energy balance
     inlet.h_outflow = inStream(outlet.h_outflow);
     inStream(inlet.h_outflow) = outlet.h_outflow;
+
+    // Connect protected connectors to public conditional connectors
+    connect(in_w0, in_w0_internal);
+
     annotation (
       Icon(graphics={Text(extent={{-98,72},{-48,40}}, textString="w0")}),
       Documentation(info="<HTML>
@@ -360,7 +415,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </ul>
 </html>"),
       Diagram(graphics));
-  end ThroughW;
+  end ThroughMassFlow;
 
   model PressDropLin "Linear pressure drop for water/steam flows"
     extends Icons.Water.PressDrop;
@@ -4259,7 +4314,7 @@ This model is not yet complete
     Medium.Temperature T[N] "Fluid temperature";
     Medium.Temperature Ts "Saturated water temperature";
     Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
-    Medium.SpecificEnthalpy htilde[N - 1](start=hstart[2:N], 
+    Medium.SpecificEnthalpy htilde[N - 1](start=hstart[2:N],
                                           each stateSelect=StateSelect.prefer)
       "Enthalpy state variables";
     Medium.SpecificEnthalpy hl "Saturated liquid temperature";
@@ -6851,6 +6906,315 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
   //       end if;
   //     end for;
   end ConstantHeatTransferCoefficient;
+
+  model SourceP2 "Pressure source for water/steam flows"
+    extends Icons.Water.SourceP;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter Pressure p0=1.01325e5 "Nominal pressure";
+    parameter HydraulicResistance R=0 "Hydraulic resistance";
+    parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+    Pressure p "Actual pressure";
+    FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_p0 annotation (Placement(
+          transformation(
+          origin={-40,92},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_h annotation (Placement(
+          transformation(
+          origin={40,90},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    if R == 0 then
+      flange.p = p;
+    else
+      flange.p = p + flange.m_flow*R;
+    end if;
+
+    p = in_p0;
+    if cardinality(in_p0) == 0 then
+      in_p0 = p0 "Pressure set by parameter";
+    end if;
+
+    flange.h_outflow = in_h;
+    if cardinality(in_h) == 0 then
+      in_h = h "Enthalpy set by parameter";
+    end if;
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(extent={{-106,90},{-52,50}}, textString="p0"), Text(
+              extent={{66,90},{98,52}}, textString="h")}),
+      Documentation(info="<HTML>
+<p><b>Modelling options</b></p>
+<p>If <tt>R</tt> is set to zero, the pressure source is ideal; otherwise, the outlet pressure decreases proportionally to the outgoing flowrate.</p>
+<p>If the <tt>in_p0</tt> connector is wired, then the source pressure is given by the corresponding signal, otherwise it is fixed to <tt>p0</tt>.</p>
+<p>If the <tt>in_h</tt> connector is wired, then the source pressure is given by the corresponding signal, otherwise it is fixed to <tt>h</tt>.</p>
+</HTML>", revisions="<html>
+<ul>
+<li><i>16 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Medium model and standard medium definition added.</li>
+<li><i>18 Jun 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>p0_fix</tt> and <tt>hfix</tt>; the connection of external signals is now detected automatically.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end SourceP2;
+
+  model SinkP2 "Pressure sink for water/steam flows"
+    extends Icons.Water.SourceP;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter Pressure p0=1.01325e5 "Nominal pressure";
+    parameter HydraulicResistance R=0 "Hydraulic resistance"
+      annotation (Evaluate=true);
+    parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+    Pressure p;
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_p0 annotation (Placement(
+          transformation(
+          origin={-40,88},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_h annotation (Placement(
+          transformation(
+          origin={40,88},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    if R == 0 then
+      flange.p = p;
+    else
+      flange.p = p + flange.m_flow*R;
+    end if;
+
+    p = in_p0;
+    if cardinality(in_p0) == 0 then
+      in_p0 = p0 "Pressure set by parameter";
+    end if;
+
+    flange.h_outflow = in_h;
+    if cardinality(in_h) == 0 then
+      in_h = h "Enthalpy set by parameter";
+    end if;
+    annotation (
+      Icon(graphics={Text(extent={{-106,92},{-56,50}}, textString="p0"), Text(
+              extent={{54,94},{112,52}}, textString="h")}),
+      Diagram(graphics),
+      Documentation(info="<HTML>
+<p><b>Modelling options</b></p>
+<p>If <tt>R</tt> is set to zero, the pressure sink is ideal; otherwise, the inlet pressure increases proportionally to the incoming flowrate.</p>
+<p>If the <tt>in_p0</tt> connector is wired, then the source pressure is given by the corresponding signal, otherwise it is fixed to <tt>p0</tt>.</p>
+<p>If the <tt>in_h</tt> connector is wired, then the source pressure is given by the corresponding signal, otherwise it is fixed to <tt>h</tt>.</p>
+</HTML>", revisions="<html>
+<ul>
+<li><i>16 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Medium model and standard medium definition added.</li>
+<li><i>18 Jun 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>p0_fix</tt> and <tt>hfix</tt>; the connection of external signals is now detected automatically.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end SinkP2;
+
+  model SourceW2 "Flowrate source for water/steam flows"
+    extends Icons.Water.SourceW;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Pressure p0=1e5 "Nominal pressure";
+    parameter HydraulicConductance G=0 "Hydraulic conductance";
+    parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+    MassFlowRate w "Mass flowrate";
+    FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+          transformation(
+          origin={-40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_h annotation (Placement(
+          transformation(
+          origin={40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    if G == 0 then
+      flange.m_flow = -w;
+    else
+      flange.m_flow = -w + (flange.p - p0)*G;
+    end if;
+
+    w = in_w0;
+    if cardinality(in_w0) == 0 then
+      in_w0 = w0 "Flow rate set by parameter";
+    end if;
+
+    flange.h_outflow = in_h "Enthalpy set by connector";
+    if cardinality(in_h) == 0 then
+      in_h = h "Enthalpy set by parameter";
+    end if;
+    annotation (
+      Icon(graphics={Text(extent={{-98,74},{-48,42}}, textString="w0"), Text(
+              extent={{48,74},{98,42}}, textString="h")}),
+      Diagram(graphics),
+      Documentation(info="<HTML>
+<p><b>Modelling options</b></p>
+<p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the outgoing flowrate decreases proportionally to the outlet pressure.</p>
+<p>If the <tt>in_w0</tt> connector is wired, then the source pressure is given by the corresponding signal, otherwise it is fixed to <tt>p0</tt>.</p>
+<p>If the <tt>in_h</tt> connector is wired, then the source pressure is given by the corresponding signal, otherwise it is fixed to <tt>h</tt>.</p>
+</HTML>", revisions="<html>
+<ul>
+<li><i>16 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Medium model and standard medium definition added.</li>
+<li><i>18 Jun 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>p0_fix</tt> and <tt>hfix</tt>; the connection of external signals is now detected automatically.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end SourceW2;
+
+  model SinkW2 "Flowrate sink for water/steam flows"
+    extends Icons.Water.SourceW;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Pressure p0=1e5 "Nominal pressure";
+    parameter HydraulicConductance G=0 "Hydraulic conductance";
+    parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+    MassFlowRate w "Mass flowrate";
+    FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+          transformation(
+          origin={-40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput in_h annotation (Placement(
+          transformation(
+          origin={40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    if G == 0 then
+      flange.m_flow = w;
+    else
+      flange.m_flow = w + (flange.p - p0)*G;
+    end if;
+
+    w = in_w0 "Flow rate set by connector";
+    if cardinality(in_w0) == 0 then
+      in_w0 = w0 "Flow rate set by parameter";
+    end if;
+
+    flange.h_outflow = in_h "Enthalpy set by connector";
+    if cardinality(in_h) == 0 then
+      in_h = h "Enthalpy set by parameter";
+    end if;
+    annotation (
+      Icon(graphics={Text(extent={{-98,72},{-48,40}}, textString="w0"), Text(
+              extent={{48,72},{98,40}}, textString="h")}),
+      Documentation(info="<HTML>
+<p><b>Modelling options</b></p>
+<p>If <tt>G</tt> is set to zero, the flowrate source is ideal; otherwise, the incoming flowrate increases proportionally to the inlet pressure.</p>
+<p>If <tt>w0Fix</tt> is set to true, the incoming flowrate is given by the parameter <tt>w0</tt>; otherwise, the <tt>in_w0</tt> connector must be wired, providing the (possibly varying) source flowrate.</p>
+<p>If <tt>hFix</tt> is set to true, the source enthalpy is given by the parameter <tt>h</tt>; otherwise, the <tt>in_h</tt> connector must be wired, providing the (possibly varying) source enthalpy.</p>
+</HTML>", revisions="<html>
+<ul>
+<li><i>16 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Medium model and standard medium definition added.</li>
+<li><i>18 Jun 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Removed <tt>p0_fix</tt> and <tt>hfix</tt>; the connection of external signals is now detected automatically.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+      Diagram(graphics));
+  end SinkW2;
+
+  model ThroughW2 "Prescribes the flow rate across the component"
+    extends Icons.Water.SourceW;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialMedium "Medium model";
+    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction";
+    outer ThermoPower.System system "System wide properties";
+    MassFlowRate w "Mass flowrate";
+    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
+          transformation(
+          origin={-40,60},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+    inlet.m_flow = w "Flow characteristics";
+
+    w = in_w0;
+    if cardinality(in_w0) == 0 then
+      in_w0 = w0 "Flow rate set by parameter";
+    end if;
+
+    // Energy balance
+    inlet.h_outflow = inStream(outlet.h_outflow);
+    inStream(inlet.h_outflow) = outlet.h_outflow;
+    annotation (
+      Icon(graphics={Text(extent={{-98,72},{-48,40}}, textString="w0")}),
+      Documentation(info="<HTML>
+This component prescribes the flow rate passing through it. The change of 
+specific enthalpy due to the pressure difference between the inlet and the
+outlet is ignored; use <t>Pump</t> models if this has to be taken into account correctly.
+<p><b>Modelling options</b></p>
+<p>If <tt>w0Fix</tt> is set to true, the flowrate is given by the parameter <tt>w0</tt>; otherwise, the <tt>in_w0</tt> connector must be wired, providing the (possibly varying) flowrate value.</p>
+</HTML>", revisions="<html>
+<ul>
+<li><i>18 Mar 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+      Diagram(graphics));
+  end ThroughW2;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
 <p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.

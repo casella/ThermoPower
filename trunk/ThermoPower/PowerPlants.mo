@@ -197,7 +197,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
         Examples.GasTurbineSimplified gasTurbine annotation (Placement(
               transformation(extent={{-40,-40},{0,0}}, rotation=0)));
-        ThermoPower.Gas.SinkP sinkP(redeclare package Medium =
+        ThermoPower.Gas.SinkPressure
+                              sinkP(redeclare package Medium =
               ThermoPower.Media.FlueGas) annotation (Placement(transformation(
                 extent={{62,-14},{82,6}}, rotation=0)));
         Modelica.Blocks.Sources.Constant const annotation (Placement(
@@ -7171,7 +7172,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
       model DG_2L_NC
         "Drums Group with two pressure level, natural circulation, all ideal feed pumps and desuperheater"
         extends ThermoPower.PowerPlants.HRSG.Interfaces.DG_2L;
-        Water.SinkW blowDownHP(redeclare package Medium = FluidMedium, w0=0)
+        Water.SinkMassFlow
+                    blowDownHP(redeclare package Medium = FluidMedium, w0=0)
           annotation (Placement(transformation(
               origin={-228,-80},
               extent={{-20,-20},{20,20}},
@@ -7191,7 +7193,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-288,-220},
               extent={{20,-20},{-20,20}},
               rotation=90)));
-        Water.SinkW blowDownLP(redeclare package Medium = FluidMedium, w0=0)
+        Water.SinkMassFlow
+                    blowDownLP(redeclare package Medium = FluidMedium, w0=0)
           annotation (Placement(transformation(
               origin={112,-80},
               extent={{-20,-20},{20,20}},
@@ -7211,7 +7214,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={52,-220},
               extent={{20,-20},{-20,20}},
               rotation=90)));
-        Water.ThroughW IPfeedPump(redeclare package Medium = FluidMedium)
+        Water.ThroughMassFlow
+                       IPfeedPump(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-30,-188},{-70,-148}},
                 rotation=0)));
       equation
@@ -7301,32 +7305,38 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.MassFlowRate RiserLPFlowRate=0
           "Nominal mass flowrate through the riser of LP";
 
-        Water.ThroughW feedPumpIP(redeclare package Medium = FluidMedium)
+        Water.ThroughMassFlow
+                       feedPumpIP(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(
               origin={80,-182},
               extent={{-20,-20},{20,20}},
               rotation=270)));
-        Water.ThroughW feedPumpHP(redeclare package Medium = FluidMedium)
+        Water.ThroughMassFlow
+                       feedPumpHP(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(
               origin={-220,-180},
               extent={{-20,-20},{20,20}},
               rotation=270)));
-        Water.ThroughW circulationPumpLP(redeclare package Medium = FluidMedium,
+        Water.ThroughMassFlow
+                       circulationPumpLP(redeclare package Medium = FluidMedium,
             w0=RiserLPFlowRate) annotation (Placement(transformation(
               origin={300,-208},
               extent={{20,-20},{-20,20}},
               rotation=90)));
-        Water.SinkW blowDownHP(redeclare package Medium = FluidMedium, w0=0)
+        Water.SinkMassFlow
+                    blowDownHP(redeclare package Medium = FluidMedium, w0=0)
           annotation (Placement(transformation(
               origin={-328,-58},
               extent={{-20,-20},{20,20}},
               rotation=270)));
-        Water.SinkW blowDownLP(redeclare package Medium = FluidMedium, w0=0)
+        Water.SinkMassFlow
+                    blowDownLP(redeclare package Medium = FluidMedium, w0=0)
           annotation (Placement(transformation(
               origin={272,-56},
               extent={{-20,-20},{20,20}},
               rotation=270)));
-        Water.SinkW blowDownIP(redeclare package Medium = FluidMedium, w0=0)
+        Water.SinkMassFlow
+                    blowDownIP(redeclare package Medium = FluidMedium, w0=0)
           annotation (Placement(transformation(
               origin={-28,-64},
               extent={{-20,-20},{20,20}},
@@ -7361,12 +7371,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
           pstart=LPd_pstart,
           Cm=LPd_Cm) "LP drum" annotation (Placement(transformation(extent={{
                   306,-4},{226,76}}, rotation=0)));
-        Water.ThroughW circulationPumpIP(redeclare package Medium = FluidMedium,
+        Water.ThroughMassFlow
+                       circulationPumpIP(redeclare package Medium = FluidMedium,
             w0=RiserIPFlowRate) annotation (Placement(transformation(
               origin={0,-180},
               extent={{-20,20},{20,-20}},
               rotation=270)));
-        Water.ThroughW circulationPumpHP(redeclare package Medium = FluidMedium,
+        Water.ThroughMassFlow
+                       circulationPumpHP(redeclare package Medium = FluidMedium,
             w0=RiserHPFlowRate) annotation (Placement(transformation(
               origin={-300,-180},
               extent={{-20,20},{20,-20}},
@@ -7982,7 +7994,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=true "Steady-state initialization";
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SourceW sourseW_water_A(
+        Water.SourceMassFlow
+                      sourseW_water_A(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate_A,
           p0=fluidNomPressure_A,
@@ -7990,29 +8003,34 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-20,68},
               extent={{-10,10},{10,-10}},
               rotation=270)));
-        Water.SinkP sinkP_water_A(
+        Water.SinkPressure
+                    sinkP_water_A(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_A,
           h=hstart_F_A_Out) annotation (Placement(transformation(
               origin={-20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           T=Tstart_G_In,
           w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-70,
                   -10},{-50,10}}, rotation=0)));
-        Water.SinkP sinkP_water_B(
+        Water.SinkPressure
+                    sinkP_water_B(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_B,
           h=hstart_F_B_Out) annotation (Placement(transformation(
               origin={20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SourceW sourseW_water_B(
+        Water.SourceMassFlow
+                      sourseW_water_B(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate_B,
           p0=fluidNomPressure_B,
@@ -8203,7 +8221,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=true "Steady-state initialization";
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SourceW sourseW_water_A(
+        Water.SourceMassFlow
+                      sourseW_water_A(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate_A,
           p0=fluidNomPressure_A,
@@ -8211,29 +8230,34 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-20,68},
               extent={{-10,10},{10,-10}},
               rotation=270)));
-        Water.SinkP sinkP_water_A(
+        Water.SinkPressure
+                    sinkP_water_A(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_A,
           h=hstart_F_A_Out) annotation (Placement(transformation(
               origin={-20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           T=Tstart_G_In,
           w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-70,
                   -10},{-50,10}}, rotation=0)));
-        Water.SinkP sinkP_water_B(
+        Water.SinkPressure
+                    sinkP_water_B(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_B,
           h=hstart_F_B_Out) annotation (Placement(transformation(
               origin={20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SourceW sourseW_water_B(
+        Water.SourceMassFlow
+                      sourseW_water_B(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate_B,
           p0=fluidNomPressure_B,
@@ -8381,7 +8405,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=true "Steady-state initialization";
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SourceW sourseW_water(
+        Water.SourceMassFlow
+                      sourseW_water(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
@@ -8389,17 +8414,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SinkP sinkP_water(
+        Water.SinkPressure
+                    sinkP_water(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
               origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
           T=Tstart_G_In) annotation (Placement(transformation(extent={{-70,-10},
@@ -8510,7 +8538,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=true "Steady-state initialization";
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SourceW sourseW_water(
+        Water.SourceMassFlow
+                      sourseW_water(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
@@ -8518,17 +8547,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SinkP sinkP_water(
+        Water.SinkPressure
+                    sinkP_water(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
               origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
           T=Tstart_G_In) annotation (Placement(transformation(extent={{-70,-10},
@@ -8641,7 +8673,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=true "Steady-state initialization";
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SourceW sourseW_water(
+        Water.SourceMassFlow
+                      sourseW_water(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
@@ -8649,17 +8682,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SinkP sinkP_water(
+        Water.SinkPressure
+                    sinkP_water(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
               origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
           T=Tstart_G_In) annotation (Placement(transformation(extent={{-70,-10},
@@ -8770,7 +8806,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=true "Steady-state initialization";
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SourceW sourseW_water(
+        Water.SourceMassFlow
+                      sourseW_water(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
@@ -8778,17 +8815,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SinkP sinkP_water(
+        Water.SinkPressure
+                    sinkP_water(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
               origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
           T=Tstart_G_In) annotation (Placement(transformation(extent={{-70,-10},
@@ -8894,7 +8934,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.SpecificEnthalpy hstart_F_B_Out=
             FluidMedium.specificEnthalpy_pT(fluidNomPressure_B, Tstart_F_B_Out)
           "Nominal specific enthalpy";
-        Water.SourceW sourseW_water_A(
+        Water.SourceMassFlow
+                      sourseW_water_A(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate_A,
           p0=fluidNomPressure_A,
@@ -8902,17 +8943,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-20,68},
               extent={{-10,10},{10,-10}},
               rotation=270)));
-        Water.SinkP sinkP_water_A(
+        Water.SinkPressure
+                    sinkP_water_A(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_A,
           h=hstart_F_A_Out) annotation (Placement(transformation(
               origin={-20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           T=Tstart_G_In,
           w0=gasNomFlowRate) annotation (Placement(transformation(extent={{-70,
@@ -8954,14 +8998,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Tstartbar_M_A=Tstart_M_A,
           Tstartbar_M_B=Tstart_M_B) annotation (Placement(transformation(extent=
                  {{-20,-20},{20,20}}, rotation=0)));
-        Water.SinkP sinkP_water_B(
+        Water.SinkPressure
+                    sinkP_water_B(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure_B,
           h=hstart_F_B_Out) annotation (Placement(transformation(
               origin={20,-70},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SourceW sourseW_water_B(
+        Water.SourceMassFlow
+                      sourseW_water_B(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate_B,
           p0=fluidNomPressure_B,
@@ -9118,7 +9164,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=true "Steady-state initialization";
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SourceW sourseW_water(
+        Water.SourceMassFlow
+                      sourseW_water(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
@@ -9126,17 +9173,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SinkP sinkP_water(
+        Water.SinkPressure
+                    sinkP_water(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
               origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
           T=Tstart_G_In) annotation (Placement(transformation(extent={{-70,-10},
@@ -9218,7 +9268,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.SpecificEnthalpy hstart_F_Out=1.065e6
           "Nominal specific enthalpy";
 
-        Water.SourceW sourseW_water(
+        Water.SourceMassFlow
+                      sourseW_water(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
@@ -9226,17 +9277,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SinkP sinkP_water(
+        Water.SinkPressure
+                    sinkP_water(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
               origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
           T=Tstart_G_In) annotation (Placement(transformation(extent={{-70,-10},
@@ -9376,7 +9430,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Boolean SSInit=true "Steady-state initialization";
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SourceW sourseW_water(
+        Water.SourceMassFlow
+                      sourseW_water(
           redeclare package Medium = FluidMedium,
           w0=fluidNomFlowRate,
           p0=fluidNomPressure,
@@ -9384,17 +9439,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={0,60},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.SinkP sinkP_water(
+        Water.SinkPressure
+                    sinkP_water(
           redeclare package Medium = FluidMedium,
           p0=fluidNomPressure,
           h=hstart_F_Out) annotation (Placement(transformation(
               origin={0,-80},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Gas.SinkP sinkP_gas(redeclare package Medium = FlueGasMedium, T=
+        Gas.SinkPressure
+                  sinkP_gas(redeclare package Medium = FlueGasMedium, T=
               Tstart_G_Out) annotation (Placement(transformation(extent={{60,-10},
                   {80,10}}, rotation=0)));
-        Gas.SourceW sourceW_gas(
+        Gas.SourceMassFlow
+                    sourceW_gas(
           redeclare package Medium = FlueGasMedium,
           w0=gasNomFlowRate,
           T=Tstart_G_In) annotation (Placement(transformation(extent={{-70,-10},
@@ -9514,18 +9572,22 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.SpecificEnthalpy Ec_LP_hstart_F_Out=6.39929e5
           "Nominal specific enthalpy";
 
-        Water.SinkP OutHP(redeclare package Medium = FluidMedium, p0=0)
+        Water.SinkPressure
+                    OutHP(redeclare package Medium = FluidMedium, p0=0)
           annotation (Placement(transformation(extent={{-88,-90},{-100,-78}},
                 rotation=0)));
-        Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=375.386)
+        Gas.SinkPressure
+                  sinkGas(redeclare package Medium = FlueGasMedium, T=375.386)
           annotation (Placement(transformation(extent={{88,-10},{100,2}},
                 rotation=0)));
-        Gas.SourceW sourceGas(
+        Gas.SourceMassFlow
+                    sourceGas(
           redeclare package Medium = FlueGasMedium,
           w0=585.5,
           T=884.65) annotation (Placement(transformation(extent={{-100,-10},{-88,
                   2}}, rotation=0)));
-        Water.SinkP sinkEvHP(
+        Water.SinkPressure
+                    sinkEvHP(
           redeclare package Medium = FluidMedium,
           p0=fluidHPNomPressure_Ev,
           h=Ev_HP_hstart_F_Out) annotation (Placement(transformation(
@@ -9535,13 +9597,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Water.ValveLin valveLinHP(redeclare package Medium = FluidMedium, Kv=
               fluidHPNomFlowRate_Sh/fluidHPNomPressure_Sh) annotation (
             Placement(transformation(extent={{-68,-78},{-80,-90}}, rotation=0)));
-        Water.SinkP OutLP(redeclare package Medium = FluidMedium, p0=0)
+        Water.SinkPressure
+                    OutLP(redeclare package Medium = FluidMedium, p0=0)
           annotation (Placement(transformation(extent={{70,-92},{82,-80}},
                 rotation=0)));
         Water.ValveLin valveLinLP(redeclare package Medium = FluidMedium, Kv=
               fluidLPNomFlowRate_Sh/fluidLPNomPressure_Sh) annotation (
             Placement(transformation(extent={{50,-80},{62,-92}}, rotation=0)));
-        Water.SourceW sourceEvHP(
+        Water.SourceMassFlow
+                      sourceEvHP(
           redeclare package Medium = FluidMedium,
           w0=fluidHPNomFlowRate_Ev,
           p0=fluidHPNomPressure_Ev,
@@ -9549,7 +9613,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-52,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Water.SourceW sourceRhIP(
+        Water.SourceMassFlow
+                      sourceRhIP(
           redeclare package Medium = FluidMedium,
           w0=fluidIPNomFlowRate_Rh,
           p0=fluidIPNomPressure_Rh,
@@ -9557,7 +9622,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-19,-53},
               extent={{-5,-5},{5,5}},
               rotation=90)));
-        Water.SinkP sinkRhIP(
+        Water.SinkPressure
+                    sinkRhIP(
           redeclare package Medium = FluidMedium,
           p0=fluidIPNomPressure_Rh,
           h=Rh2_IP_hstart_F_Out) annotation (Placement(transformation(
@@ -9569,14 +9635,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-1,-85},
               extent={{-5,-5},{5,5}},
               rotation=270)));
-        Water.SinkP sinkEcHP(
+        Water.SinkPressure
+                    sinkEcHP(
           redeclare package Medium = FluidMedium,
           p0=fluidHPNomPressure_Ec,
           h=Ec2_HP_hstart_F_Out) annotation (Placement(transformation(
               origin={-44,76},
               extent={{-6,-6},{6,6}},
               rotation=90)));
-        Water.SourceW sourceEcHP(
+        Water.SourceMassFlow
+                      sourceEcHP(
           redeclare package Medium = FluidMedium,
           w0=fluidHPNomFlowRate_Ec,
           p0=fluidHPNomPressure_Ec,
@@ -9584,14 +9652,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-38,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Water.SinkP sinkEvIP(
+        Water.SinkPressure
+                    sinkEvIP(
           redeclare package Medium = FluidMedium,
           p0=fluidIPNomPressure_Ev,
           h=Ev_IP_hstart_F_Out) annotation (Placement(transformation(
               origin={-10,76},
               extent={{-6,-6},{6,6}},
               rotation=90)));
-        Water.SourceW sourceEvIP(
+        Water.SourceMassFlow
+                      sourceEvIP(
           redeclare package Medium = FluidMedium,
           w0=fluidIPNomFlowRate_Ev,
           p0=fluidIPNomPressure_Ev,
@@ -9599,14 +9669,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={-6,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Water.SinkP sinkEcIP(
+        Water.SinkPressure
+                    sinkEcIP(
           redeclare package Medium = FluidMedium,
           p0=fluidIPNomPressure_Ec,
           h=Ec_IP_hstart_F_Out) annotation (Placement(transformation(
               origin={4,76},
               extent={{-6,-6},{6,6}},
               rotation=90)));
-        Water.SourceW sourceEcIP(
+        Water.SourceMassFlow
+                      sourceEcIP(
           redeclare package Medium = FluidMedium,
           w0=fluidIPNomFlowRate_Ec,
           p0=fluidIPNomPressure_Ec,
@@ -9614,14 +9686,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={10,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Water.SinkP sinkEvLP(
+        Water.SinkPressure
+                    sinkEvLP(
           redeclare package Medium = FluidMedium,
           p0=fluidLPNomPressure_Ev,
           h=Ev_LP_hstart_F_Out) annotation (Placement(transformation(
               origin={44,76},
               extent={{-6,-6},{6,6}},
               rotation=90)));
-        Water.SourceW sourceEvLP(
+        Water.SourceMassFlow
+                      sourceEvLP(
           redeclare package Medium = FluidMedium,
           w0=fluidLPNomFlowRate_Ev,
           p0=fluidLPNomPressure_Ev,
@@ -9629,14 +9703,16 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={52,64},
               extent={{6,-6},{-6,6}},
               rotation=90)));
-        Water.SinkP sinkEcLP(
+        Water.SinkPressure
+                    sinkEcLP(
           redeclare package Medium = FluidMedium,
           p0=fluidLPNomPressure_Ec,
           h=Ec_LP_hstart_F_Out) annotation (Placement(transformation(
               origin={60,76},
               extent={{-6,-6},{6,6}},
               rotation=90)));
-        Water.SourceW sourceEcLP(
+        Water.SourceMassFlow
+                      sourceEcLP(
           redeclare package Medium = FluidMedium,
           w0=fluidLPNomFlowRate_Ec,
           p0=fluidLPNomPressure_Ec,
@@ -9644,19 +9720,22 @@ package PowerPlants "Models of thermoelectrical power plants components"
               origin={68,64},
               extent={{6,-6},{-6,6}},
               rotation=90)));
-        Water.SourceP sourceShHP(p0=fluidHPNomPressure_Sh, h=Sh1_HP_hstart_F_In)
+        Water.SourcePressure
+                      sourceShHP(p0=fluidHPNomPressure_Sh, h=Sh1_HP_hstart_F_In)
           annotation (Placement(transformation(
               origin={-68,64},
               extent={{-6,6},{6,-6}},
               rotation=270)));
-        Water.SourceW sourceShIP(
+        Water.SourceMassFlow
+                      sourceShIP(
           p0=fluidIPNomPressure_Sh,
           h=Sh_IP_hstart_F_In,
           w0=fluidIPNomFlowRate_Sh) annotation (Placement(transformation(
               origin={-20,64},
               extent={{-6,6},{6,-6}},
               rotation=270)));
-        Water.SourceP sourceShLP(p0=fluidLPNomPressure_Sh, h=Sh_LP_hstart_F_In)
+        Water.SourcePressure
+                      sourceShLP(p0=fluidLPNomPressure_Sh, h=Sh_LP_hstart_F_In)
           annotation (Placement(transformation(
               origin={34,64},
               extent={{6,-6},{-6,6}},
@@ -9975,9 +10054,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
         import ThermoPower;
         package FluidMedium = ThermoPower.Water.StandardWater;
 
-        Water.SinkP sinkToEcLP_p(h=2.440e5, p0=7.19e5) annotation (Placement(
+        ThermoPower.Water.SinkPressure
+                    sinkToEcLP_p(h=2.440e5, p0=7.19e5) annotation (Placement(
               transformation(extent={{60,-20},{80,0}}, rotation=0)));
-        Water.SourceP sourceShLP(
+        ThermoPower.Water.SourcePressure
+                      sourceShLP(
           redeclare package Medium = FluidMedium,
           p0=5398.2,
           h=1.43495e5) annotation (Placement(transformation(
@@ -10059,12 +10140,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
         package FlueGasMedium = ThermoPower.Media.FlueGas;
         package FluidMedium = ThermoPower.Water.StandardWater;
 
-        Gas.SourceW sourceGas(
+        Gas.SourceMassFlow
+                    sourceGas(
           redeclare package Medium = FlueGasMedium,
           w0=585.5,
           T=884.65) annotation (Placement(transformation(extent={{-88,18},{-72,
                   34}}, rotation=0)));
-        Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=379.448)
+        Gas.SinkPressure
+                  sinkGas(redeclare package Medium = FlueGasMedium, T=379.448)
           annotation (Placement(transformation(extent={{74,18},{90,34}},
                 rotation=0)));
         ThermoPower.PowerPlants.HRSG.Components.StateReader_gas stateGas_out(
@@ -10075,7 +10158,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
           redeclare package FluidMedium = FluidMedium,
           SSInit=true) annotation (Placement(transformation(extent={{-48,-6},{
                   32,74}}, rotation=0)));
-        Water.SinkP OutLP(
+        Water.SinkPressure
+                    OutLP(
           redeclare package Medium = FluidMedium,
           p0=5389.2,
           h=2.3854e6) annotation (Placement(transformation(extent={{64,-80},{76,
@@ -10114,7 +10198,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
             w_fixed=314.16/2, useSupport=false) annotation (Placement(
               transformation(extent={{98,-88},{88,-78}}, rotation=0)));
-        Water.SourceP sourceShLP(
+        Water.SourcePressure
+                      sourceShLP(
           redeclare package Medium = FluidMedium,
           p0=5398.2,
           h=1.43495e5) annotation (Placement(transformation(
@@ -13829,13 +13914,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           SSInit=SSInit,
           pstart_cond=pstart_cond) annotation (Placement(transformation(extent=
                   {{-18,-22},{22,18}}, rotation=0)));
-        Water.SourceW coolingIn(
+        Water.SourceMassFlow
+                      coolingIn(
           redeclare package Medium = FluidMedium,
           p0=coolNomPressure,
           w0=coolNomFlowRate,
           h=h_cool_in) annotation (Placement(transformation(extent={{90,-20},{
                   70,0}}, rotation=0)));
-        Water.SinkP coolingOut(redeclare package Medium = FluidMedium, p0=
+        Water.SinkPressure
+                    coolingOut(redeclare package Medium = FluidMedium, p0=
               coolNomPressure) annotation (Placement(transformation(extent={{70,
                   0},{90,20}}, rotation=0)));
         replaceable Components.BaseReader_water stateCoolingOut(redeclare
@@ -13887,11 +13974,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Placement(transformation(extent={{68,-54},{38,-34}},
                 rotation=0)));
 
-        Water.SinkP sinkP(p0=p) annotation (Placement(transformation(
+        Water.SinkPressure
+                    sinkP(p0=p) annotation (Placement(transformation(
               extent={{-10,-10},{10,10}},
               rotation=270,
               origin={0,30})));
-        Water.SourceP sourceP(p0=p) annotation (Placement(transformation(
+        Water.SourcePressure
+                      sourceP(p0=p) annotation (Placement(transformation(
               extent={{-10,-10},{10,10}},
               rotation=270,
               origin={0,-40})));
@@ -13937,7 +14026,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Vtot=Vtot,
           Vlstart=Vlstart) annotation (Placement(transformation(extent={{16,-26},
                   {76,34}}, rotation=0)));
-        Water.SourceW sourceTap(
+        Water.SourceMassFlow
+                      sourceTap(
           redeclare package Medium = FluidMedium,
           p0=p,
           allowFlowReversal=true) annotation (Placement(transformation(extent={
@@ -14574,12 +14664,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=130/30,
           pnom=13000000) annotation (Placement(transformation(extent={{-40,-40},
                   {20,20}},rotation=0)));
-        Water.SinkP sinkP(h=3.1076e6, p0=2980000) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(h=3.1076e6, p0=2980000) annotation (Placement(
               transformation(extent={{30,60},{50,80}}, rotation=0)));
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
             w_fixed=314.16/2, useSupport=false) annotation (Placement(
               transformation(extent={{70,-20},{50,0}}, rotation=0)));
-        Water.SourceP sourceP(h=3.47e6, p0=12800000) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.47e6, p0=12800000) annotation (Placement(
               transformation(extent={{-80,60},{-60,80}}, rotation=0)));
         inner System system
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -14610,9 +14702,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=27/6,
           pnom=2700000) annotation (Placement(transformation(extent={{-40,-40},
                   {20,20}}, rotation=0)));
-        Water.SinkP sinkP(h=3.1281e6, p0=600000) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(h=3.1281e6, p0=600000) annotation (Placement(
               transformation(extent={{30,60},{50,80}}, rotation=0)));
-        Water.SourceP sourceP(h=3.554e6, p0=2680000) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.554e6, p0=2680000) annotation (Placement(
               transformation(extent={{-80,60},{-60,80}}, rotation=0)));
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
             w_fixed=314.16/2, useSupport=false) annotation (Placement(
@@ -14646,9 +14740,11 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=6,
           pnom=600000) annotation (Placement(transformation(extent={{-40,-40},{
                   20,20}}, rotation=0)));
-        Water.SinkP sinkP(h=2.3854e6, p0=5398.2) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(h=2.3854e6, p0=5398.2) annotation (Placement(
               transformation(extent={{30,60},{50,80}}, rotation=0)));
-        Water.SourceP sourceP(h=3.109e6, p0=6e5) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.109e6, p0=6e5) annotation (Placement(
               transformation(extent={{-80,60},{-60,80}}, rotation=0)));
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
             w_fixed=314.16/2, useSupport=false) annotation (Placement(
@@ -14674,7 +14770,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestSettingTurbineLP;
 
       model TestValveTurbineHP
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(extent={{30,60},{50,80}}, rotation=0)));
         Water.ValveVap valveHP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -14687,7 +14784,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-32,50},
               extent={{10,10},{-10,-10}},
               rotation=90)));
-        Water.SourceP sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
               transformation(extent={{-80,60},{-60,80}}, rotation=0)));
       public
         Modelica.Blocks.Sources.Constant com_valveHP(k=0.7) annotation (
@@ -14732,7 +14830,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestValveTurbineHP;
 
       model TestValveTurbineIP
-        Water.SinkP sinkP(p0=6e5, h=3.1281e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=6e5, h=3.1281e6) annotation (Placement(
               transformation(extent={{30,60},{50,80}}, rotation=0)));
         Water.ValveVap valveIP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -14744,7 +14843,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-36,50},
               extent={{10,10},{-10,-10}},
               rotation=90)));
-        Water.SourceP sourceP(h=3.554e6, p0=2730000) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.554e6, p0=2730000) annotation (Placement(
               transformation(extent={{-80,60},{-60,80}}, rotation=0)));
       public
         Modelica.Blocks.Sources.Constant com_valveHP annotation (Placement(
@@ -14790,7 +14890,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       end TestValveTurbineIP;
 
       model TestValveTurbineLP
-        Water.SinkP sinkP(p0=5.3982e3, h=2.3854e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=5.3982e3, h=2.3854e6) annotation (Placement(
               transformation(extent={{30,60},{50,80}}, rotation=0)));
         Water.ValveVap valveLP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -14802,7 +14903,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-34,50},
               extent={{10,10},{-10,-10}},
               rotation=90)));
-        Water.SourceP sourceP(h=3.109e6, p0=6.296e5) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.109e6, p0=6.296e5) annotation (Placement(
               transformation(extent={{-80,60},{-60,80}}, rotation=0)));
       public
         Modelica.Blocks.Sources.Constant com_valveHP annotation (Placement(
@@ -14857,7 +14959,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=128/28,
           pnom=12800000) annotation (Placement(transformation(extent={{-58,-90},
                   {2,-30}}, rotation=0)));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(extent={{10,10},{30,30}}, rotation=0)));
         Water.ValveVap valveHP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -14869,7 +14972,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-52,0},
               extent={{10,10},{-10,-10}},
               rotation=90)));
-        Water.SourceP sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
               transformation(extent={{-90,10},{-70,30}}, rotation=0)));
       public
         Modelica.Blocks.Sources.Ramp com_valveHP(
@@ -14972,7 +15076,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           steamLPNomPressure=600000,
           pcond=5398.2) annotation (Placement(transformation(extent={{-80,-40},
                   {0,40}},rotation=0)));
-        Water.SinkP sinkLPT(
+        Water.SinkPressure
+                    sinkLPT(
           redeclare package Medium = FluidMedium,
           p0=5.3982e3,
           h=2.3854e6) annotation (Placement(transformation(extent={{4,-66},{16,
@@ -14980,24 +15085,28 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
             w_fixed=314.16/2, useSupport=false) annotation (Placement(
               transformation(extent={{66,-10},{46,10}}, rotation=0)));
-        Water.SourceP sourceHPT(h=3.47e6, p0=1.28e7) annotation (Placement(
+        Water.SourcePressure
+                      sourceHPT(h=3.47e6, p0=1.28e7) annotation (Placement(
               transformation(
               origin={-72,66},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Water.SourceP sourceLPT(h=3.109e6, p0=6e5) annotation (Placement(
+        Water.SourcePressure
+                      sourceLPT(h=3.109e6, p0=6e5) annotation (Placement(
               transformation(
               origin={-24,60},
               extent={{-6,-6},{6,6}},
               rotation=270)));
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SinkP sinkP(h=3.1076e6, p0=2980000) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(h=3.1076e6, p0=2980000) annotation (Placement(
               transformation(
               extent={{-6,-6},{6,6}},
               rotation=90,
               origin={-60,84})));
-        Water.SourceP sourceP(h=3.554e6, p0=2680000) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.554e6, p0=2680000) annotation (Placement(
               transformation(
               extent={{-6,-6},{6,6}},
               rotation=270,
@@ -15061,7 +15170,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           IPT_Kt=0.018883,
           LPT_Kt=0.078004) annotation (Placement(transformation(extent={{-80,-40},
                   {0,40}},rotation=0)));
-        Water.SinkP sinkLPT_p(
+        Water.SinkPressure
+                    sinkLPT_p(
           redeclare package Medium = FluidMedium,
           p0=5.3982e3,
           h=2.3854e6) annotation (Placement(transformation(extent={{-26,-64},{-38,
@@ -15080,12 +15190,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       public
         Modelica.Blocks.Sources.Constant com_valveLP(k=1) annotation (Placement(
               transformation(extent={{92,-90},{72,-70}}, rotation=0)));
-        Water.SourceP sourceHPT_p(h=3.47e6, p0=1.296e7) annotation (Placement(
+        Water.SourcePressure
+                      sourceHPT_p(h=3.47e6, p0=1.296e7) annotation (Placement(
               transformation(
               origin={-72,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Water.SourceP sourceLPT(h=3.109e6, p0=6.296e5) annotation (Placement(
+        Water.SourcePressure
+                      sourceLPT(h=3.109e6, p0=6.296e5) annotation (Placement(
               transformation(
               origin={-24,64},
               extent={{-6,-6},{6,6}},
@@ -15098,12 +15210,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                   72,-30}}, rotation=0)));
         inner System system
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(
               extent={{-6,-6},{6,6}},
               rotation=90,
               origin={-60,78})));
-        Water.SourceP sourceP(h=3.554e6, p0=2730000) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.554e6, p0=2730000) annotation (Placement(
               transformation(
               extent={{-6,-6},{6,6}},
               rotation=270,
@@ -15206,29 +15320,34 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       public
         Modelica.Blocks.Sources.Constant com_bypassLP(k=0) annotation (
             Placement(transformation(extent={{36,-50},{56,-30}}, rotation=0)));
-        Water.SinkP sinkLPT_p(
+        Water.SinkPressure
+                    sinkLPT_p(
           redeclare package Medium = FluidMedium,
           p0=5.3982e3,
           h=2.3854e6) annotation (Placement(transformation(extent={{-34,-66},{-46,
                   -54}}, rotation=0)));
-        Water.SourceP sourceHPT_p(h=3.47e6, p0=1.296e7) annotation (Placement(
+        Water.SourcePressure
+                      sourceHPT_p(h=3.47e6, p0=1.296e7) annotation (Placement(
               transformation(
               origin={-86,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Water.SourceP sourceLPT(h=3.109e6, p0=6.296e5) annotation (Placement(
+        Water.SourcePressure
+                      sourceLPT(h=3.109e6, p0=6.296e5) annotation (Placement(
               transformation(
               origin={-38,64},
               extent={{-6,-6},{6,6}},
               rotation=270)));
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(
               extent={{-6,-6},{6,6}},
               rotation=90,
               origin={-74,80})));
-        Water.SourceP sourceP(h=3.554e6, p0=2730000) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.554e6, p0=2730000) annotation (Placement(
               transformation(
               extent={{-6,-6},{6,6}},
               rotation=270,
@@ -15292,7 +15411,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Kp=-3,
           steadyStateInit=true) annotation (Placement(transformation(extent={{-18,
                   -80},{2,-60}}, rotation=0)));
-        Water.SourceW sourceSteam(
+        Water.SourceMassFlow
+                      sourceSteam(
           redeclare package Medium = FluidMedium,
           w0=89.8,
           h=2.3854e6,
@@ -15308,13 +15428,15 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           condenserIdeal_tap(redeclare package Medium = FluidMedium, p=5398.2)
           annotation (Placement(transformation(extent={{0,0},{40,40}}, rotation=
                  0)));
-        Water.SinkW sinkWater(
+        Water.SinkMassFlow
+                    sinkWater(
           redeclare package Medium = FluidMedium,
           p0=5398.2,
           h=1.43495e5,
           w0=89.8) annotation (Placement(transformation(extent={{70,-20},{90,0}},
                 rotation=0)));
-        Water.SourceW sourceTap(
+        Water.SourceMassFlow
+                      sourceTap(
           redeclare package Medium = FluidMedium,
           h=1.43495e5,
           p0=5389.2,
@@ -15358,7 +15480,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(
             w_fixed=314.16/2, useSupport=false) annotation (Placement(
               transformation(extent={{30,-26},{10,-6}}, rotation=0)));
-        Water.SourceP sourceHPT(
+        Water.SourcePressure
+                      sourceHPT(
           h=3.47e6,
           p0=1.28e7,
           redeclare package Medium = FluidMedium) annotation (Placement(
@@ -15366,7 +15489,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-82,78},
               extent={{-6,-6},{6,6}},
               rotation=270)));
-        Water.SourceP sourceLPT(
+        Water.SourcePressure
+                      sourceLPT(
           h=3.109e6,
           p0=6e5,
           redeclare package Medium = FluidMedium) annotation (Placement(
@@ -15377,7 +15501,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Examples.STG_3LRh_valve_cc sTG_3LRh(redeclare package FluidMedium =
               FluidMedium, steamTurbines(SSInit=true)) annotation (Placement(
               transformation(extent={{-90,-56},{-10,24}}, rotation=0)));
-        Water.SinkP sinkWater(
+        Water.SinkPressure
+                    sinkWater(
           redeclare package Medium = FluidMedium,
           h=1.43495e5,
           p0=6e5) annotation (Placement(transformation(
@@ -15403,12 +15528,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               transformation(extent={{40,30},{60,50}}, rotation=0)));
         inner System system(allowFlowReversal=false)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(
               extent={{-6,-6},{6,6}},
               rotation=90,
               origin={-70,66})));
-        Water.SourceP sourceP(h=3.554e6, p0=2730000) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.554e6, p0=2730000) annotation (Placement(
               transformation(
               extent={{-6,-6},{6,6}},
               rotation=270,
@@ -17165,7 +17292,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=12800000) annotation (Placement(transformation(extent={{-80,-24},
                   {-48,8}},rotation=0)));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(extent={{-44,34},{-32,46}}, rotation=0)));
         Water.ValveVap valveHP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -17177,7 +17305,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-76,24},
               extent={{6,6},{-6,-6}},
               rotation=90)));
-        Water.SourceP sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
               transformation(extent={{-96,34},{-84,46}}, rotation=0)));
       public
         Modelica.Blocks.Sources.Ramp com_valveHP_a(
@@ -17251,7 +17380,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=12800000) annotation (Placement(transformation(extent={{-80,-24},
                   {-48,8}},rotation=0)));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(extent={{-44,34},{-32,46}}, rotation=0)));
         Water.ValveVap valveHP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -17263,7 +17393,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-76,24},
               extent={{6,6},{-6,-6}},
               rotation=90)));
-        Water.SourceP sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
               transformation(extent={{-96,34},{-84,46}}, rotation=0)));
       public
         Modelica.Blocks.Sources.Ramp com_valveHP_a(
@@ -17335,7 +17466,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=12800000) annotation (Placement(transformation(extent={{-80,-24},
                   {-48,8}},rotation=0)));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(extent={{-44,34},{-32,46}}, rotation=0)));
         Water.ValveVap valveHP(
           CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -17347,7 +17479,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               origin={-76,24},
               extent={{6,6},{-6,-6}},
               rotation=90)));
-        Water.SourceP sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
+        Water.SourcePressure
+                      sourceP(h=3.47e6, p0=1.296e7) annotation (Placement(
               transformation(extent={{-96,34},{-84,46}}, rotation=0)));
       public
         Modelica.Blocks.Sources.Ramp com_valveHP_a(
@@ -17437,12 +17570,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=12800000) annotation (Placement(transformation(extent={{-80,-20},
                   {-40,20}}, rotation=0)));
-        Water.SourceW sourceW(
+        Water.SourceMassFlow
+                      sourceW(
           h=3.47e6,
           w0=67.6,
           p0=128e5) annotation (Placement(transformation(extent={{-102,50},{-82,
                   70}}, rotation=0)));
-        Water.SinkP sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(extent={{-36,50},{-16,70}}, rotation=0)));
       protected
         Buses.Sensors sensors annotation (Placement(transformation(
@@ -17489,12 +17624,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=12800000) annotation (Placement(transformation(extent={{-76,8},{
                   -36,48}}, rotation=0)));
-        Water.SourceW sourceW1(
+        Water.SourceMassFlow
+                      sourceW1(
           h=3.47e6,
           w0=67.6,
           p0=128e5) annotation (Placement(transformation(extent={{-96,54},{-82,
                   68}}, rotation=0)));
-        Water.SinkP sinkP1(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP1(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(extent={{-30,54},{-18,66}}, rotation=0)));
       protected
         Buses.Sensors sensors annotation (Placement(transformation(
@@ -17524,12 +17661,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=2800000) annotation (Placement(transformation(extent={{-76,-50},
                   {-36,-10}}, rotation=0)));
-        Water.SourceW sourceW2(
+        Water.SourceMassFlow
+                      sourceW2(
           w0=81.1,
           p0=26.8e5,
           h=3.554e6) annotation (Placement(transformation(extent={{-96,-6},{-82,
                   8}}, rotation=0)));
-        Water.SinkP sinkP2(p0=6e5, h=3.128e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP2(p0=6e5, h=3.128e6) annotation (Placement(
               transformation(extent={{-30,-6},{-18,6}}, rotation=0)));
         inner System system
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -17600,12 +17739,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=12800000) annotation (Placement(transformation(extent={{-84,40},
                   {-44,80}}, rotation=0)));
-        Water.SourceW sourceW1(
+        Water.SourceMassFlow
+                      sourceW1(
           h=3.47e6,
           w0=67.6,
           p0=128e5) annotation (Placement(transformation(extent={{-100,80},{-86,
                   94}}, rotation=0)));
-        Water.SinkP sinkP1(p0=29.8e5, h=3.1076e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP1(p0=29.8e5, h=3.1076e6) annotation (Placement(
               transformation(extent={{-40,82},{-28,94}}, rotation=0)));
         Water.SteamTurbineStodola Turbine2(
           eta_iso_nom=0.9,
@@ -17615,12 +17756,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=2700000) annotation (Placement(transformation(extent={{-84,-20},
                   {-44,20}}, rotation=0)));
-        Water.SourceW sourceW2(
+        Water.SourceMassFlow
+                      sourceW2(
           w0=81.1,
           p0=26.8e5,
           h=3.554e6) annotation (Placement(transformation(extent={{-100,24},{-86,
                   38}}, rotation=0)));
-        Water.SinkP sinkP2(p0=6e5, h=3.128e6) annotation (Placement(
+        Water.SinkPressure
+                    sinkP2(p0=6e5, h=3.128e6) annotation (Placement(
               transformation(extent={{-40,26},{-28,38}}, rotation=0)));
         Water.SteamTurbineStodola Turbine3(
           wstart=89.82,
@@ -17629,12 +17772,14 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           PRstart=5,
           pnom=600000) annotation (Placement(transformation(extent={{-84,-78},{
                   -44,-38}}, rotation=0)));
-        Water.SourceW sourceW3(
+        Water.SourceMassFlow
+                      sourceW3(
           w0=89.82,
           p0=6e5,
           h=3.109e6) annotation (Placement(transformation(extent={{-100,-36},{-86,
                   -22}}, rotation=0)));
-        Water.SinkP sinkP3(p0=5.3982e3, h=2.3854) annotation (Placement(
+        Water.SinkPressure
+                    sinkP3(p0=5.3982e3, h=2.3854) annotation (Placement(
               transformation(extent={{-40,-34},{-28,-22}}, rotation=0)));
         inner System system
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -17959,7 +18104,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Level_LP(steadyStateInit=true),
         CSmax_levelLP=2400) annotation (Placement(transformation(extent={{40,
                 100},{100,160}}, rotation=0)));
-      Gas.SourceW sourceGas(
+      Gas.SourceMassFlow
+                  sourceGas(
         redeclare package Medium = FlueGasMedium,
         w0=585.5,
         T=884.65) annotation (Placement(transformation(extent={{-160,50},{-140,
@@ -17970,7 +18116,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         startTime=10,
         height=-50) annotation (Placement(transformation(extent={{-190,90},{-170,
                 110}}, rotation=0)));
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
+      Gas.SinkPressure
+                sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
         annotation (Placement(transformation(extent={{40,50},{60,70}}, rotation=
                0)));
     public
@@ -18189,7 +18336,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Level_LP(steadyStateInit=true),
         CSmax_levelLP=2400) annotation (Placement(transformation(extent={{40,
                 100},{100,160}}, rotation=0)));
-      Gas.SourceW sourceGas(
+      Gas.SourceMassFlow
+                  sourceGas(
         redeclare package Medium = FlueGasMedium,
         w0=585.5,
         T=884.65) annotation (Placement(transformation(extent={{-160,50},{-140,
@@ -18200,7 +18348,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         height=0,
         startTime=10) annotation (Placement(transformation(extent={{-190,90},{-170,
                 110}}, rotation=0)));
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
+      Gas.SinkPressure
+                sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
         annotation (Placement(transformation(extent={{40,50},{60,70}}, rotation=
                0)));
       ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
@@ -18378,7 +18527,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           Ec_LP_Tstartbar=450),
         SSInit=true) annotation (Placement(transformation(extent={{-20,-20},{60,
                 60}}, rotation=0)));
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
+      Gas.SinkPressure
+                sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
         annotation (Placement(transformation(extent={{96,2},{116,22}}, rotation=
                0)));
       ElectricGeneratorGroup.Examples.GeneratorGroup singleShaft(
@@ -18519,7 +18669,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
       parameter Boolean SSInit=true "Steady-state initialization";
 
-      ThermoPower.Gas.SourceW sourceGas(
+      ThermoPower.Gas.SourceMassFlow
+                              sourceGas(
         redeclare package Medium = FlueGasMedium,
         w0=585.5,
         T=884.65) annotation (Placement(transformation(extent={{-160,50},{-140,
@@ -18587,7 +18738,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         Level_LP(steadyStateInit=true),
         CSmax_levelLP=2400) annotation (Placement(transformation(extent={{60,
                 100},{120,160}}, rotation=0)));
-      Gas.SinkP sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
+      Gas.SinkPressure
+                sinkGas(redeclare package Medium = FlueGasMedium, T=362.309)
         annotation (Placement(transformation(extent={{60,50},{80,70}}, rotation=
                0)));
     public
