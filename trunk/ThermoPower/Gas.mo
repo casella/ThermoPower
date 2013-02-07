@@ -45,7 +45,7 @@ package Gas "Models of components with ideal gases as working fluid"
             fillColor={255,255,255},
             fillPattern=FillPattern.Solid)}));
   end FlangeB;
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.Package;
 
   model SourcePressure "Pressure source for gas flows"
     extends Icons.Gas.SourceP;

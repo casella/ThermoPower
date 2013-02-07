@@ -49,7 +49,7 @@ package Water "Models of components with water/steam as working fluid"
             fillColor={255,255,255},
             fillPattern=FillPattern.Solid)}));
   end FlangeB;
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.Package;
 
   package StandardWater = Modelica.Media.Water.StandardWater;
 

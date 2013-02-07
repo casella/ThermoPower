@@ -1,5 +1,7 @@
 within ThermoPower;
 package PowerPlants "Models of thermoelectrical power plants components"
+  extends Modelica.Icons.Package;
+
   import SI = Modelica.SIunits;
   import ThermoPower.Choices.Init.Options;
 

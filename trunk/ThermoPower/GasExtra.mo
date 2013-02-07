@@ -1,6 +1,6 @@
 within ThermoPower;
 package GasExtra
-  extends Modelica.Icons.Library;
+  extends Modelica.Icons.Package;
   model Compressor_low "Gas compressor"
     extends ThermoPower.Gas.CompressorBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
