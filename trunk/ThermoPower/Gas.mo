@@ -1673,12 +1673,12 @@ package Gas "Models of components with ideal gases as working fluid"
     Real Cf "Fanning friction factor";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     AbsoluteTemperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))/
-          (N - 1)*(Tstartout - Tstartin), stateSelect=StateSelect.prefer)
+          (N - 1)*(Tstartout - Tstartin), each stateSelect=StateSelect.prefer)
       "Temperature state variables";
     AbsoluteTemperature Tin(start=Tstartin);
     Real Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
-        stateSelect=StateSelect.prefer) "Composition state variables";
+        each stateSelect=StateSelect.prefer) "Composition state variables";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
     Velocity u[N] "Fluid velocity";
     Pressure p(start=pstart, stateSelect=StateSelect.prefer);
@@ -1697,9 +1697,9 @@ package Gas "Models of components with ideal gases as working fluid"
       "Derivative of average density by left temperature";
     DerDensityByTemperature drbdT2[N - 1]
       "Derivative of average density by right temperature";
-    Real drbdX1[N - 1, nX](unit="kg/m3")
+    Real drbdX1[N - 1, nX](each unit="kg/m3")
       "Derivative of average density by left composition";
-    Real drbdX2[N - 1, nX](unit="kg/m3")
+    Real drbdX2[N - 1, nX](each unit="kg/m3")
       "Derivative of average density by right composition";
     Medium.SpecificHeatCapacity cvbar[N - 1] "Average cv";
     Real dMdt[N - 1] "Derivative of mass in a finite volume";
@@ -1707,7 +1707,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.DerDensityByTemperature dddT[N]
       "Derivative of density by temperature";
     Medium.DerDensityByPressure dddp[N] "Derivative of density by pressure";
-    Real dddX[N, nX](unit="kg/m3") "Derivative of density by composition";
+    Real dddX[N, nX](each unit="kg/m3") "Derivative of density by composition";
   equation
     assert(FFtype == FFtypes.NoFriction or dpnom > 0,
       "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
@@ -3353,12 +3353,12 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     Real Cf "Fanning friction factor";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     AbsoluteTemperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))/
-          (N - 1)*(Tstartout - Tstartin), stateSelect=StateSelect.prefer)
+          (N - 1)*(Tstartout - Tstartin), each stateSelect=StateSelect.prefer)
       "Temperature state variables";
     AbsoluteTemperature Tin(start=Tstartin);
     Real Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
-        stateSelect=StateSelect.prefer) "Composition state variables";
+        each stateSelect=StateSelect.prefer) "Composition state variables";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
     Velocity u[N] "Fluid velocity";
     Pressure p(start=pstart, stateSelect=StateSelect.prefer);
@@ -3377,9 +3377,9 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       "Derivative of average density by left temperature";
     DerDensityByTemperature drbdT2[N - 1]
       "Derivative of average density by right temperature";
-    Real drbdX1[N - 1, nX](unit="kg/m3")
+    Real drbdX1[N - 1, nX](each unit="kg/m3")
       "Derivative of average density by left composition";
-    Real drbdX2[N - 1, nX](unit="kg/m3")
+    Real drbdX2[N - 1, nX](each unit="kg/m3")
       "Derivative of average density by right composition";
     Medium.SpecificHeatCapacity cvbar[N - 1] "Average cv";
     Real dMdt[N - 1] "Derivative of mass in a finite volume";
@@ -3387,7 +3387,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     Medium.DerDensityByTemperature dddT[N]
       "Derivative of density by temperature";
     Medium.DerDensityByPressure dddp[N] "Derivative of density by pressure";
-    Real dddX[N, nX](unit="kg/m3") "Derivative of density by composition";
+    Real dddX[N, nX](each unit="kg/m3") "Derivative of density by composition";
   equation
     assert(FFtype == FFtypes.NoFriction or dpnom > 0,
       "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
