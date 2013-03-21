@@ -6799,7 +6799,7 @@ Algorithm Tolerance = 1e-6
 
     model TestFlow1DFV
       Water.Flow1DFV flow1DFV
-        annotation (Placement(transformation(extent={{-38,10},{-12,38}})));
+        annotation (Placement(transformation(extent={{-56,24},{-28,50}})));
     end TestFlow1DFV;
   end ThermoHydraulicElements;
 

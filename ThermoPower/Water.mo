@@ -966,6 +966,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Fluid pressure for property calculations";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
+    MassFlowRate wstar[N];
     Velocity u[N] "Fluid velocity";
     Medium.Temperature T[N] "Fluid temperature";
     Medium.SpecificEnthalpy h[N](start=hstart)
@@ -975,15 +976,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Thermal.DHTVolumes wall(N=N) annotation (Dialog(enable=
+    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(final Nf=N, final w=wstar*ones(N),                               fluidState=fluidState) constrainedby
+      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
+                                                                                                /* final w=wstar[1]*ones(N)*/
+    ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
-    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer constrainedby
-      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
   protected
     Density rhobar[N - 1] "Fluid average density";
     SpecificVolume vbar[N - 1] "Fluid average specific volume";
-    HeatFlux phibar[N - 1] "Average heat flux";
+    //HeatFlux phibar[N - 1] "Average heat flux";
     DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     DerDensityByEnthalpy drbdh[N - 1]
       "Derivative of average density by enthalpy";
@@ -1065,8 +1067,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       drbdp[j] = (drdp[j] + drdp[j + 1])/2;
       drbdh[j] = (drdh[j] + drdh[j + 1])/2;
       vbar[j] = 1/rhobar[j];
-      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/
-        Nt);
+      wstar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
     end for;
 
     // Fluid property calculations
@@ -1100,8 +1101,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     h[1] = inStream(infl.h_outflow);
     h[2:N] = htilde;
+    wbar = (wstar[1:N - 1] + wstar[2:N])/2;
 
-    wall.T = heatTransfer.wall.T;
+    connect(wall,heatTransfer.wall);
 
     M = sum(rhobar)*A*l "Total fluid mass";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
@@ -6225,7 +6227,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       import ThermoPower.Choices.Flow1D.FFtypes;
       import ThermoPower.Choices.Flow1D.HCtypes;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
-      parameter Integer Nt=1 "Number of tubes in parallel";
+      parameter Integer Nt = 1 "Number of tubes in parallel";
+      parameter Integer Nw = N - 1;
       parameter Distance L "Tube length" annotation (Evaluate=true);
       parameter Position H=0 "Elevation of outlet over inlet";
       parameter Area A "Cross-sectional area (single tube)";
@@ -6823,89 +6826,135 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
         Modelica.Media.Interfaces.PartialMedium "Medium model";
       input Medium.ThermodynamicState fluidState[Nf];
       input MassFlowRate w[Nf];
-      ThermoPower.Thermal.DHTVolumes wall(N=Nf) annotation (Placement(transformation(extent={{-40,20},{40,
+      ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
                 40}}, rotation=0)));
-      parameter Integer Nf(min=2) "Number of nodes fluid-side";
-      parameter Integer Nw=Nf "Number of nodes wall-side";
+      parameter Integer Nf(min=1) = 10 "Number of nodes fluid-side";
+      parameter Integer Nw=Nf-1 "Number of nodes wall-side";
       parameter Boolean useAverageTemperature = true
-        "= true to use average temperature for heat transfer";
+        "= true to use average temperature for heat transfer";  //mettere enumerazione
 
     end DistributedHeatTransferFV;
   end BaseClasses;
 
   model NoHeatTransfer
-    extends BaseClasses.DistributedHeatTransferFV(final Nw, final useAverageTemperature);
-
-  // partial model DistributedHeatTransferFV
-  //
-  //   extends ThermoPower.Icons.HeatFlow;
-  //   replaceable package Medium = StandardWater constrainedby
-  //     Modelica.Media.Interfaces.PartialMedium "Medium model";
-  //   input Medium.ThermodynamicState fluidState[Nf];       //ThermodynamicState
-  //   input MassFlowRate w[Nf];                      //MassFlowRate
-  //   ThermoPower.Thermal.DHTVolumes wall(N=Nf) annotation (Placement(transformation(extent={{-40,20},{40,
-  //             40}}, rotation=0)));
-  //   parameter Integer Nf(min=2) "Number of nodes fluid-side";
-  //   parameter Integer Nw=Nf "Number of nodes wall-side";
-  //   parameter Boolean useAverageTemperature = true;
-  //
-  // end DistributedHeatTransferFV;
-
-  // DHTVolumes
-  // parameter Integer N "Number of nodes";
-  // AbsoluteTemperature T[N] "Temperature at the nodes";
-  // flow Power Q[N] "Heat flow through the connector";
+    extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature, final Nw = Nf-1);
 
   equation
-    wall.Q = zeros(Nf);
+    wall.Q = zeros(Nw);
 
   end NoHeatTransfer;
 
   model ConstantHeatTransferCoefficient
-    extends BaseClasses.DistributedHeatTransferFV(final Nw);
+    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1);
 
-  // partial model DistributedHeatTransferFV
-  //
-  //   extends ThermoPower.Icons.HeatFlow;
-  //   replaceable package Medium = StandardWater constrainedby
-  //     Modelica.Media.Interfaces.PartialMedium "Medium model";
-  //   input Medium.ThermodynamicState fluidState[Nf];
-  //   input MassFlowRate w[Nf];
-  //   ThermoPower.Thermal.DHTVolumes wall(N=Nf);
-  //   parameter Integer Nf(min=2) "Number of nodes fluid-side";
-  //   parameter Integer Nw=Nf "Number of nodes wall-side";
-  //   parameter Boolean useAverageTemperature = true "= true to use average temperature for heat transfer";
-  // end DistributedHeatTransferFV;
-
-  // DHTVolumes
-  // parameter Integer N "Number of nodes";
-  // AbsoluteTemperature T[N] "Temperature at the nodes";
-  // flow Power Q[N] "Heat flow through the connector";
-
-  // TO DO
-
-  //   parameter CoefficientOfHeatTransfer gamma "Constant heat transfer coefficient";
-    final AbsoluteTemperature T[Nf] "Fluid temperature";
-  //   final AbsoluteTemperature Tvol[Nf-1] "Fluid temperature in the volumes";
-  //   parameter Length L "Tube length";
-  //   parameter Length omega "Perimeter of heat transfer surface (single tube)";
-  //   final parameter Length l=L/(Nf - 1) "Length of a single volume";
+     parameter CoefficientOfHeatTransfer gamma
+      "Constant heat transfer coefficient";
+     Medium.Temperature T[Nf] "Fluid temperature";
+     Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+     Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+     parameter Length L "Tube length";
+     parameter Length omega "Perimeter of heat transfer surface (single tube)";
+     final parameter Length l=L/(Nw) "Length of a single volume";
 
   equation
-      for j in 1:Nf loop
-        T[j] = Medium.temperature(fluidState[j]);
-      end for;
+    // Temperature at the nodes
+    for j in 1:Nf loop
+      T[j] = Medium.temperature(fluidState[j]);
+    end for;
 
-  //     for j in 1:Nf-1 loop
-  //       if useAverageTemperature then
-  //         Tvol[j] = (T[j] + T[j + 1])/2;
-  //         wall.Q[j] = (wall.T[j] - Tvol[j])*l*omega*gamma;
-  //       else
-  //         Tvol[j] = T[j+1];
-  //         wall.Q[j] = (wall.T[j] - Tvol[j])*l*omega*gamma;
-  //       end if;
-  //     end for;
+    for j in 1:Nw loop
+       if useAverageTemperature then
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*gamma;
+       else
+           wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma;
+       end if;
+       Tvolbar[j] = (T[j] + T[j + 1])/2;
+       Tvol[j] = T[j+1];
+    end for;
+
   end ConstantHeatTransferCoefficient;
+
+  model HeatTransfer2phDB
+    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1);
+
+    parameter CoefficientOfHeatTransfer gamma_b=20000
+      "Coefficient of heat transfer for boiling flow";
+    parameter Area A "Cross-sectional area (single tube)";
+    parameter Length Dhyd "Hydraulic Diameter (single tube)";
+    parameter Length omega "Perimeter of heat transfer surface (single tube)";
+    parameter Length L "Tube length";
+    final parameter Length l=L/(Nw) "Length of a single volume";
+    Real alfa_l[Nf];
+    Real alfa_v[Nf];
+    Real alfa2_l[Nf];
+    Real alfa2_v[Nf];
+    CoefficientOfHeatTransfer gamma1ph[Nf];
+    CoefficientOfHeatTransfer gamma2ph = gamma_b;
+    CoefficientOfHeatTransfer gammabar[Nw]
+      "Average coefficient of heat transfer in the volumes";
+    Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
+    Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
+    Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
+    Medium.Temperature T[Nf] "Fluid temperature";
+    Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+    Medium.Temperature Ts "Saturated water temperature";
+    Medium.SaturationProperties sat "Properties of saturated fluid";
+    Medium.AbsolutePressure p "Fluid pressure for property calculations";
+    Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
+    Medium.ThermalConductivity k[Nf] "Thermal conductivity";
+    Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+
+  equation
+    // Saturated fluid property calculations
+    sat = Medium.setSat_p(p);
+    Ts = sat.Tsat;
+    hl = Medium.bubbleEnthalpy(sat);
+    hv = Medium.dewEnthalpy(sat);
+
+    // Fluid property calculations (at nodes)
+    for j in 1:Nf loop
+      T[j] = Medium.temperature(fluidState[j]);
+      mu[j] = Medium.dynamicViscosity(fluidState[j]);
+      k[j] = Medium.thermalConductivity(fluidState[j]);
+      cp[j] = Medium.heatCapacity_cp(fluidState[j]);
+      gamma1ph[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]);
+      alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
+      alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
+      alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+      alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+    end for;
+
+    for j in 1:Nw loop
+      if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then // 1-phase liquid or vapour
+        wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*gammabar[j];
+      elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
+        wall.Q[j] = alfa_l*((T[j] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa_l)*(Ts - wall.T[j])*omega*l*gamma2ph;
+      elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then  // 2-phase --> vapour
+        wall.Q[j] = alfa_v*((T[j + 1] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa_v)*(Ts - wall.T[j])*omega*l*gamma2ph;
+      elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then //2-phase --> liquid
+        wall.Q[j] = alfa2_l*((T[j + 1] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa2_l)*(Ts - wall.T[j])*omega*l*gamma2ph;
+      elseif noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then //vapour --> 2-phase
+        wall.Q[j] = alfa2_v*((T[j] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa2_v)*(Ts - wall.T[j])*omega*l*gamma2ph;
+      end if;
+      Tvolbar[j] = (T[j] + T[j + 1])/2;
+      gammabar[j] = (gamma1ph[j] + gamma1ph[j+1])/2;
+   end for;
+
+  //   for j in 1:Nw loop
+  //      if useAverageTemperature then
+  //          wall.Q[j] = (wall.T[j] - Tvolbar[j])*l*omega*gamma;
+  //      else
+  //          wall.Q[j] = (wall.T[j] - Tvol[j])*l*omega*gamma;
+  //      end if;
+  //      Tvolbar[j] = (T[j] + T[j + 1])/2;
+  //      Tvol[j] = T[j+1];
+  //   end for;
+  //
+  //   Tm = ((T1 + Tsat)/2)*alfa + Tsat*(1 - alfa);
+  //   alfa = (hl - h1)/(h2 - h1);
+  //   wall.Q = gamma1ph*((T1 + Tsat)/2 - Te)*l*omega*alfa + gamma2ph*(Tsat - Te)*l*omega*(1 - alfa);  // Te = wall.T[j]
+
+  end HeatTransfer2phDB;
 
   model SourceP2 "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
@@ -7215,6 +7264,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </html>"),
       Diagram(graphics));
   end ThroughW2;
+
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
 <p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
