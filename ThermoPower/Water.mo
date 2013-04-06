@@ -976,9 +976,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(final Nf=N, final w=wstar*ones(N),                               fluidState=fluidState) constrainedby
-      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
-                                                                                                /* final w=wstar[1]*ones(N)*/
+    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(final Nf=N, final w=wstar, fluidState=fluidState) constrainedby
+      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true); /* final w=wstar*ones(N) wstar NON è scalare*/
+
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
@@ -6828,7 +6828,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       input MassFlowRate w[Nf];
       ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
                 40}}, rotation=0)));
-      parameter Integer Nf(min=1) = 10 "Number of nodes fluid-side";
+      parameter Integer Nf(min=2) "Number of nodes fluid-side";
       parameter Integer Nw=Nf-1 "Number of nodes wall-side";
       parameter Boolean useAverageTemperature = true
         "= true to use average temperature for heat transfer";  //mettere enumerazione
@@ -6924,18 +6924,26 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
     end for;
 
+    // Boundary conditions
+    // infl.h_outflow = htilde[1];
+    // outfl.h_outflow = htilde[N - 1];
+    // h[1] = inStream(infl.h_outflow);
+    // h[2:N] = htilde;
+
     for j in 1:Nw loop
       if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then // 1-phase liquid or vapour
         wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*gammabar[j];
       elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
-        wall.Q[j] = alfa_l*((T[j] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa_l)*(Ts - wall.T[j])*omega*l*gamma2ph;
+        wall.Q[j] = alfa_l[j]*((T[j] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa_l[j])*(Ts - wall.T[j])*omega*l*gamma2ph;
       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then  // 2-phase --> vapour
-        wall.Q[j] = alfa_v*((T[j + 1] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa_v)*(Ts - wall.T[j])*omega*l*gamma2ph;
+        wall.Q[j] = alfa_v[j]*((T[j + 1] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa_v[j])*(Ts - wall.T[j])*omega*l*gamma2ph;
       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then //2-phase --> liquid
-        wall.Q[j] = alfa2_l*((T[j + 1] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa2_l)*(Ts - wall.T[j])*omega*l*gamma2ph;
+        wall.Q[j] = alfa2_l[j]*((T[j + 1] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa2_l[j])*(Ts - wall.T[j])*omega*l*gamma2ph;
       elseif noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then //vapour --> 2-phase
-        wall.Q[j] = alfa2_v*((T[j] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa2_v)*(Ts - wall.T[j])*omega*l*gamma2ph;
+        wall.Q[j] = alfa2_v[j]*((T[j] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa2_v[j])*(Ts - wall.T[j])*omega*l*gamma2ph;
       end if;
+      assert(h[j + 1] - h[j] > 0, "Division by zero during enthalpy calculation");
+      assert(h[j] - h[j + 1] > 0, "Division by zero during enthalpy calculation");
       Tvolbar[j] = (T[j] + T[j + 1])/2;
       gammabar[j] = (gamma1ph[j] + gamma1ph[j+1])/2;
    end for;
