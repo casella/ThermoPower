@@ -712,7 +712,8 @@ This package contains models to compute the material properties needed to model 
     // TO BE ADAPTED!!!!
 
     extends Icons.MetalWall;
-    parameter Integer N(min=1) = 2 "Number of nodes";
+    parameter Integer N(min=2) = 3 "Number of nodes";
+    parameter Integer Nw = N - 1 "Number of volume";
     parameter Length L "Tube length";
     parameter Length rint "Internal radius (single tube)";
     parameter Length rext "External radius (single tube)";
@@ -722,44 +723,55 @@ This package contains models to compute the material properties needed to model 
     parameter Temperature Tstartbar=300 "Avarage temperature"
       annotation (Dialog(tab="Initialisation"));
     parameter Temperature Tstart1=Tstartbar
-      "Temperature start value - first node"
+      "Temperature start value - first volume"
       annotation (Dialog(tab="Initialisation"));
     parameter Temperature TstartN=Tstartbar
-      "Temperature start value - last node"
+      "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart[N]=ThermoPower.Thermal.linspaceExt(
+  //   parameter Temperature Tstart[N]=ThermoPower.Thermal.linspaceExt(
+  //         Tstart1,
+  //         TstartN,
+  //         N) "Start value of temperature vector (initialized by default)"
+  //     annotation (Dialog(tab="Initialisation"));
+   parameter Temperature Tvolstart[Nw]=linspace(
           Tstart1,
           TstartN,
-          N) "Start value of temperature vector (initialized by default)"
-      annotation (Dialog(tab="Initialisation"));
+          Nw);
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
-    AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
+    //AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
+    AbsoluteTemperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
     Area Am "Area of the metal tube cross-section";
-    DHT int(N=N, T(start=Tstart)) "Internal surface" annotation (Placement(
-          transformation(extent={{-40,20},{40,40}}, rotation=0)));
-    DHT ext(N=N, T(start=Tstart)) "External surface" annotation (Placement(
-          transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
+    ThermoPower.Thermal.DHTVolumes int(final N=Nw, T(start=Tvolstart))
+      "Internal surface"
+       annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=0)));
+    ThermoPower.Thermal.DHTVolumes ext(final N=Nw, T(start=Tvolstart))
+      "External surface"
+       annotation (Placement(transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
+  //   DHT int(N=N, T(start=Tstart)) "Internal surface" annotation (Placement(
+  //         transformation(extent={{-40,20},{40,40}}, rotation=0)));
+  //   DHT ext(N=N, T(start=Tstart)) "External surface" annotation (Placement(
+  //         transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
   equation
     assert(rext > rint, "External radius must be greater than internal radius");
     Am = (rext^2 - rint^2)*pi "Area of the metal cross section";
-    rhomcm*Am*der(T) = rint*2*pi*int.phi + rext*2*pi*ext.phi "Energy balance";
+    L*rhomcm*Am*der(Tvol) = int.Q + ext.Q "Energy balance";    // M = rhom*L*Am   rhomcm = rhom*cm
     if WallRes then
-      int.phi = lambda/(rint*log((rint + rext)/(2*rint)))*(int.T - T)
-        "Heat conduction through the internal half-thickness";
-      ext.phi = lambda/(rext*log((2*rext)/(rint + rext)))*(ext.T - T)
+      int.Q = (lambda*(2*pi*L)*(int.T - Tvol))/(log((rint + rext)/(2*rint)))
+        "Heat conduction through the internal half-thickness";                 //moltiplico dx e sx per L*omega
+      ext.Q = (lambda*(2*pi*L)*(ext.T - Tvol))/(log((2*rext)/(rint + rext)))
         "Heat conduction through the external half-thickness";
     else
       // No temperature gradients across the thickness
-      int.T = T;
-      ext.T = T;
+      ext.T = Tvol;
+      int.T = Tvol;
     end if;
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(T) = zeros(N);
+      der(Tvol) = zeros(Nw);
     elseif initOpt == Choices.Init.Options.steadyStateNoT then
       // do nothing
     else
@@ -905,45 +917,58 @@ This package contains models to compute the material properties needed to model 
     // TO BE ADAPTED!!!!
 
     extends ThermoPower.Icons.MetalWall;
-    parameter Integer N(min=1) = 2 "Number of nodes";
+    parameter Integer N(min=2)=3 "Number of nodes";
+    parameter Integer Nw = N - 1 "Number of volume";
     parameter Modelica.SIunits.Mass M "Mass";
-    parameter Modelica.SIunits.Area Sint "Internal surface";
-    parameter Modelica.SIunits.Area Sext "External surface";
+    //parameter Modelica.SIunits.Area Sint "Internal surface";
+    //parameter Modelica.SIunits.Area Sext "External surface";
     parameter Modelica.SIunits.SpecificHeatCapacity cm
       "Specific heat capacity of metal";
-    parameter Temperature Tstartbar=300 "Avarage temperature"
+    parameter Temperature Tstartbar=300 "Average temperature"
       annotation (Dialog(tab="Initialisation"));
     parameter Temperature Tstart1=Tstartbar
-      "Temperature start value - first node"
+      "Temperature start value - first volume"
       annotation (Dialog(tab="Initialisation"));
     parameter Temperature TstartN=Tstartbar
-      "Temperature start value - last node"
+      "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart[N]=ThermoPower.Thermal.linspaceExt(
+  //   parameter Temperature Tstart[N]=ThermoPower.Thermal.linspaceExt(
+  //         Tstart1,
+  //         TstartN,
+  //         N) "Start value of temperature vector (initialized by default)"
+  //     annotation (Dialog(tab="Initialisation"));
+    parameter Temperature Tvolstart[Nw]=linspace(
           Tstart1,
           TstartN,
-          N) "Start value of temperature vector (initialized by default)"
-      annotation (Dialog(tab="Initialisation"));
+          Nw);
     parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
-    ThermoPower.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
-    ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface"
-      annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=
-              0)));
-    ThermoPower.Thermal.DHT ext(N=N, T(start=Tstart)) "External surface"
-      annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
-            rotation=0)));
+    //ThermoPower.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
+    AbsoluteTemperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
+    ThermoPower.Thermal.DHTVolumes int(final N=Nw, T(start=Tvolstart))
+      "Internal surface"
+       annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=0)));
+    ThermoPower.Thermal.DHTVolumes ext(final N=Nw, T(start=Tvolstart))
+      "External surface"
+       annotation (Placement(transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
+
+  //   ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface"
+  //     annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=
+  //             0)));
+  //   ThermoPower.Thermal.DHT ext(N=N, T(start=Tstart)) "External surface"
+  //     annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
+  //           rotation=0)));
   equation
-    (cm*M)*der(T) = Sint*int.phi + Sext*ext.phi "Energy balance";
+    (cm*M)*der(Tvol) = int.Q + ext.Q "Energy balance";
     // No temperature gradients across the thickness
-    int.T = T;
-    ext.T = T;
+    ext.T = Tvol;
+    int.T = Tvol;
   initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
-      der(T) = zeros(N);
+      der(Tvol) = zeros(Nw);
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyStateNoT then
       // do nothing
     else
@@ -1827,7 +1852,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
        First release.</li>
 </ul>
 </html>
-"),   Diagram(graphics));
+"),   Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+              100,100}}),
+              graphics));
   end MetalTube;
 
   model CylinderFourier
