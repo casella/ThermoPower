@@ -582,7 +582,7 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
     annotation (
       Documentation(info="<html>
-<p>This model describes a rigid, adiabatic control volume. 
+<p>This model describes a rigid, adiabatic control volume.
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt> .
 </html>", revisions="<html>
@@ -1104,7 +1104,7 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter FFtypes FFtype=FFtypes.Kf "Friction factor type";
     parameter Real Kf(
       fixed=if FFtype == FFtypes.Kf then true else false,
-      unit="Pa.kg/(m3.kg2/s2)") = 0 "Hydraulic resistance coefficient";
+      unit="Pa.kg/(m3.kg2/s2)") "Hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop";
     parameter Density rhonom=0 "Nominal density";
     parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity^2/2)";
@@ -1193,7 +1193,7 @@ package Gas "Models of components with ideal gases as working fluid"
 <li><i>19 Nov 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to Modelica.Media.</li>
-<br> <tt>Kfnom</tt> removed, <tt>Kf</tt> can now be set directly.</li> 
+<br> <tt>Kfnom</tt> removed, <tt>Kf</tt> can now be set directly.</li>
 <li><i>5 Mar 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
@@ -1625,8 +1625,8 @@ package Gas "Models of components with ideal gases as working fluid"
       Diagram(graphics),
       Documentation(info="<html>
 <p>This model is based on the IEC 534/ISA S.75 standards for valve sizing, compressible fluid.
-<p>The model optionally supports reverse flow conditions (assuming symmetrical behaviour) or check valve operation, and has been suitably modified to avoid numerical singularities at zero pressure drop. 
-<p>The model operating range include choked flow operation, due to sonic conditions in the vena contracta. 
+<p>The model optionally supports reverse flow conditions (assuming symmetrical behaviour) or check valve operation, and has been suitably modified to avoid numerical singularities at zero pressure drop.
+<p>The model operating range include choked flow operation, due to sonic conditions in the vena contracta.
 <p>The flow characteristic can be customised.
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>,whose default value is <tt>Medium.reference_X</tt>.
@@ -1634,7 +1634,7 @@ package Gas "Models of components with ideal gases as working fluid"
 <ul><li><tt>CvData = 0</tt>: the flow coefficient is given by the metric Av coefficient <tt>Av</tt> (m^2).
 <li><tt>CvData = 1</tt>: the flow coefficient is given by the metric Kv coefficient <tt>Kv</tt> (m^3/h).
 <li><tt>CvData = 2</tt>: the flow coefficient is given by the US Cv coefficient <tt>Cv</tt> (USG/min).
-<li><tt>CvData = 3</tt>: the flow coefficient must be specified by an additional initial equation (e.g. w=0.5); the start value given by Av is used to initialise the numerical solution of the equation. 
+<li><tt>CvData = 3</tt>: the flow coefficient must be specified by an additional initial equation (e.g. w=0.5); the start value given by Av is used to initialise the numerical solution of the equation.
 </ul>
 <p>The nominal inlet pressure <tt>pnom</tt> and pressure drop <tt>dpnom</tt> must always be specified; to avoid numerical singularities, the flow characteristic is modified for pressure drops less than <tt>b*dpnom</tt> (the default value is 1% of the nominal pressure drop). Increase this parameter if numerical instabilities occur in valves with very low pressure drops.
 <p>If <tt>CheckValve</tt> is true, then the flow is stopped when the outlet pressure is higher than the inlet pressure; otherwise, reverse flow takes place.
@@ -1823,7 +1823,7 @@ package Gas "Models of components with ideal gases as working fluid"
           vector(drbdX2[j, :])*vector(der(gas[j + 1].X))) "Mass balance";
         /*
       dMdt[j] = A*l*(drbdT[j]*der(Ttilde[j]) + drbdp[j]*der(p) + vector(drbdX[j, :])*
-      vector(der(Xtilde[if UniformComposition then 1 else j, :]))) 
+      vector(der(Xtilde[if UniformComposition then 1 else j, :])))
       "Mass balance";
 */
         // Average volume quantities
@@ -1976,7 +1976,7 @@ package Gas "Models of components with ideal gases as working fluid"
 <ul>
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most power generation applications.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
@@ -2148,7 +2148,7 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     annotation (Documentation(info="<html>
-This is the model-base of a Combustion Chamber, with a constant volume. 
+This is the model-base of a Combustion Chamber, with a constant volume.
 <p>The metal wall temperature and the heat transfer coefficient between the wall and the fluid are uniform. The wall is thermally insulated from the outside. It has been assumed that inlet gases are premixed before entering in the volume.
 <p><b>Modelling options</b></p>
 <p>This model has three different Medium models to characterize the inlet air, fuel, and flue gas exhaust.
@@ -2161,7 +2161,7 @@ This is the model-base of a Combustion Chamber, with a constant volume.
        Initialisation support added.</li>
 <li><i>31 Jan 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-    CombustionChamber model restructured using inheritance.   
+    CombustionChamber model restructured using inheritance.
 <p> First release.</li>
 </ul>
 </html>
@@ -2199,14 +2199,14 @@ This model extends the CombustionChamber Base model, with the definition of the 
 <p>In particular, the air inlet uses the <tt>Media.Air</tt> medium model, the fuel input uses the <tt>Media.NaturalGas</tt> medium model, and the flue gas outlet uses the <tt>Medium.FlueGas</tt> medium model.
 <p>The composition of the outgoing gas is determined by the mass balance of every component, taking into account the combustion reaction CH4+2O2--->2H2O+CO2.</p>
 <p>The model assumes complete combustion, so that it is only valid if the oxygen flow at the air inlet is greater than the stoichiometric flow corresponding to the flow at the fuel inlet.</p>
- 
+
 </html>", revisions="<html>
 <ul>
 <li><i>31 Jan 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
  Combustion Chamber model restructured using inheritance.
      <p>  First release.
- </li>   
+ </li>
 </ul>
 </html>"));
   end CombustionChamber;
@@ -2314,9 +2314,9 @@ This model extends the CombustionChamber Base model, with the definition of the 
     der(phi) = omega;
     annotation (
       Documentation(info="<html>
-<p>This is the base model for a compressor, including the interface and all equations except the actual computation of the performance characteristics. Reverse flow conditions are not supported.</p> 
-<p>This model does not include any shaft inertia by itself; if that is needed, connect a Modelica.Mechanics.Rotational.Inertia model to one of the shaft connectors.</p> 
-<p>As a base-model, it can be used both for axial and centrifugal compressors. 
+<p>This is the base model for a compressor, including the interface and all equations except the actual computation of the performance characteristics. Reverse flow conditions are not supported.</p>
+<p>This model does not include any shaft inertia by itself; if that is needed, connect a Modelica.Mechanics.Rotational.Inertia model to one of the shaft connectors.</p>
+<p>As a base-model, it can be used both for axial and centrifugal compressors.
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
 <p>The following options are available to calculate the enthalpy of the outgoing gas:
@@ -2411,7 +2411,7 @@ This model extends the CombustionChamber Base model, with the definition of the 
     PR = PressRatio.y;
     annotation (Documentation(info="<html>
 This model adds the performance characteristics to the Compressor_Base model, by means of 2D interpolation tables.</p>
-<p>The perfomance characteristics are specified by two characteristic equations: the first relates the flow number <tt>phic</tt>, the pressure ratio <tt>PR</tt> and the referred speed <tt>N_T</tt>; the second relates the efficiency <tt>eta</tt>, the flow number <tt>phic</tt>, and the referred speed <tt>N_T</tt> [1]. To avoid singularities, the two characteristic equations are expressed in parametric form by adding a further variable <tt>beta</tt> (method of beta lines [2]). 
+<p>The perfomance characteristics are specified by two characteristic equations: the first relates the flow number <tt>phic</tt>, the pressure ratio <tt>PR</tt> and the referred speed <tt>N_T</tt>; the second relates the efficiency <tt>eta</tt>, the flow number <tt>phic</tt>, and the referred speed <tt>N_T</tt> [1]. To avoid singularities, the two characteristic equations are expressed in parametric form by adding a further variable <tt>beta</tt> (method of beta lines [2]).
 <p>The performance maps are thus tabulated into three differents tables, <tt>tablePhic</tt>,  <tt>tablePR</tt> and <tt>tableEta</tt>, which express <tt>phic</tt>, <tt>PR</tt> and <tt>eta</tt> as a function of <tt>N_T</tt> and <tt>beta</tt>, respectively, where <tt>N_T</tt> is the first row while <tt>beta</tt> is the first column. The referred speed <tt>N_T</tt> is defined as a percentage of the design referred speed and <tt>beta</tt> are arbitrary lines, usually drawn parallel to the surge-line on the performance maps.
 <p><tt>Modelica.Blocks.Tables.CombiTable2D</tt> interpolates the tables to obtain values of referred flow, pressure ratio and efficiency at given levels of referred speed and beta.
 <p><b>Modelling options</b></p>
@@ -2423,7 +2423,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
 <ol>
 <li>S. L. Dixon: <i>Fluid mechanics, thermodynamics of turbomachinery</i>, Oxford, Pergamon press, 1966, pp. 213.
 <li>P. P. Walsh, P. Fletcher: <i>Gas Turbine Performance</i>, 2nd ed., Oxford, Blackwell, 2004, pp. 646.
-</ol> 
+</ol>
 </html>", revisions="<html>
 <ul>
 <li><i>13 Apr 2005</i>
@@ -2544,9 +2544,9 @@ This model adds the performance characteristics to the Compressor_Base model, by
     der(phi) = omega;
     annotation (
       Documentation(info="<html>
-<p>This is the base model for a turbine, including the interface and all equations except the actual computation of the performance characteristics. Reverse flow conditions are not supported.</p> 
-<p>This model does not include any shaft inertia by itself; if that is needed, connect a Modelica.Mechanics.Rotational.Inertia model to one of the shaft connectors.</p> 
-<p>As a base-model, it can be used both for axial and radial turbines. 
+<p>This is the base model for a turbine, including the interface and all equations except the actual computation of the performance characteristics. Reverse flow conditions are not supported.</p>
+<p>This model does not include any shaft inertia by itself; if that is needed, connect a Modelica.Mechanics.Rotational.Inertia model to one of the shaft connectors.</p>
+<p>As a base-model, it can be used both for axial and radial turbines.
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
 <p>The following options are available to calculate the enthalpy of the outgoing gas:
@@ -2626,7 +2626,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
     eta = Eta.y;
     annotation (Documentation(info="<html>
 This model adds the performance characteristics to the Turbine_Base model, by means of 2D interpolation tables.
-<p>The performance characteristics are described by two characteristic equations: the first relates the flow number <tt>phic</tt>, the pressure ratio <tt>PR</tt> and the referred speed <tt>N_T</tt>; the second relates the efficiency <tt>eta</tt>, the flow number <tt>phic</tt>, and the referred speed <tt>N_T</tt> [1]. </p> 
+<p>The performance characteristics are described by two characteristic equations: the first relates the flow number <tt>phic</tt>, the pressure ratio <tt>PR</tt> and the referred speed <tt>N_T</tt>; the second relates the efficiency <tt>eta</tt>, the flow number <tt>phic</tt>, and the referred speed <tt>N_T</tt> [1]. </p>
 <p>The performance maps are tabulated into two differents tables, <tt>tablePhic</tt> and <tt>tableEta</tt> which express <tt>phic</tt> and <tt>eta</tt> as a function of <tt>N_T</tt> and <tt>PR</tt> respectively, where <tt>N_T</tt> represents the first row and <tt>PR</tt> the first column [2]. The referred speed <tt>N_T</tt> is defined as a percentage of the design referred speed.
 <p>The <tt>Modelica.Blocks.Tables.CombiTable2D</tt> interpolates the tables to obtain values of referred flow and efficiency at given levels of referred speed.
 <p><b>Modelling options</b></p>
@@ -2638,7 +2638,7 @@ This model adds the performance characteristics to the Turbine_Base model, by me
 <ol>
 <li>S. L. Dixon: <i>Fluid mechanics, thermodynamics of turbomachinery</i>, Oxford, Pergamon press, 1966, pp. 213.
 <li>P. P. Walsh, P. Fletcher: <i>Gas Turbine Performance</i>, 2nd ed., Oxford, Blackwell, 2004, pp. 646.
-</ol> 
+</ol>
 </html>", revisions="<html>
 <ul>
 <li><i>13 Apr 2005</i>
@@ -2717,14 +2717,14 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     annotation (
       Documentation(info="<html>
 This model extends the Turbine_Base model with the calculation of the performance parameters, mass flowrate, pressure ratio and efficiency.
-<p>This method is based on the Stodola's law, which calculates <tt>PR</tt> as function of the inlet conditions, i.e. mass flowrate, inlet temperature and pressure.</p> 
+<p>This method is based on the Stodola's law, which calculates <tt>PR</tt> as function of the inlet conditions, i.e. mass flowrate, inlet temperature and pressure.</p>
 <p><b>Modelling options</b></p>
 <p>The following options are available to define Stodola's constant <tt>K</tt>:
 <ul><li><tt>NominalCondition = true</tt>: Stodola's constant K is specified by the nominal operating point (<tt>wnom,Tstart_in,pstart_in,pstart_out</tt>)
-<li><tt>NominalCondition = false</tt>: Stodola's constant K is used directly.</ul> 
+<li><tt>NominalCondition = false</tt>: Stodola's constant K is used directly.</ul>
 <p>The following options are available to define the efficiency <tt>eta</tt>:
-<ul><li><tt>fixedEta = true</tt>: the efficiency is explicitly supplied as a parameter. 
-<li><tt>fixedEta = false</tt>: the efficiency is a function of the pressure ratio <tt>PR</tt> and of the referred speed <tt>N_T</tt>. The function is defined by interpolation of the table <tt>tableEta</tt>, where <tt>N_T</tt> represents the first row and <tt>PR</tt> the first column of the table. The interpolation is performed by a <tt>Modelica.Blocks.Tables.CombiTable2D</tt> model. 
+<ul><li><tt>fixedEta = true</tt>: the efficiency is explicitly supplied as a parameter.
+<li><tt>fixedEta = false</tt>: the efficiency is a function of the pressure ratio <tt>PR</tt> and of the referred speed <tt>N_T</tt>. The function is defined by interpolation of the table <tt>tableEta</tt>, where <tt>N_T</tt> represents the first row and <tt>PR</tt> the first column of the table. The interpolation is performed by a <tt>Modelica.Blocks.Tables.CombiTable2D</tt> model.
 </ul>
 <p><p><p>The following options are available to select the way of definition of the table:
 <ul><li><tt>Table = 0</tt>: the table is explicitly supplied as a matrix parameter.
@@ -3062,7 +3062,7 @@ The packages Medium are redeclared and a mass balance determines the composition
 <p><b>References:</b></p>
 <ol>
 <li>P. P. Walsh, P. Fletcher: <i>Gas Turbine Performance</i>, 2nd ed., Oxford, Blackwell, 2004, pp. 646.
-</ol> 
+</ol>
 
 </html>", revisions="<html>
 <ul>
@@ -3281,7 +3281,7 @@ The packages Medium are redeclared and a mass balance determines the composition
       Diagram(graphics),
       Documentation(info="<HTML>
 <p>This is the base model for the <tt>FanMech</tt> fan model.
-<p>The model describes a fan, or a group of <tt>Np</tt> identical fans, with optional blade angle regulation. The fan model is based on the theory of kinematic similarity: the fan characteristics are given for nominal operating conditions (rotational speed and fluid density), and then adapted to actual operating condition, according to the similarity equations. 
+<p>The model describes a fan, or a group of <tt>Np</tt> identical fans, with optional blade angle regulation. The fan model is based on the theory of kinematic similarity: the fan characteristics are given for nominal operating conditions (rotational speed and fluid density), and then adapted to actual operating condition, according to the similarity equations.
 <p>In order to avoid singularities in the computation of the outlet enthalpy at zero flowrate, the thermal capacity of the fluid inside the fan body can be taken into account.
 <p>The model can either support reverse flow conditions or include a built-in check valve to avoid flow reversal.
 <p><b>Modelling options</b></p>
@@ -3503,7 +3503,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
           vector(drbdX2[j, :])*vector(der(gas[j + 1].X))) "Mass balance";
         /*
       dMdt[j] = A*l*(drbdT[j]*der(Ttilde[j]) + drbdp[j]*der(p) + vector(drbdX[j, :])*
-      vector(der(Xtilde[if UniformComposition then 1 else j, :]))) 
+      vector(der(Xtilde[if UniformComposition then 1 else j, :])))
       "Mass balance";
 */
         // Average volume quantities
@@ -3656,7 +3656,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 <ul>
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most power generation applications.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
