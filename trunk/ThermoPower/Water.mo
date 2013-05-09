@@ -402,7 +402,7 @@ package Water "Models of components with water/steam as working fluid"
     annotation (
       Icon(graphics={Text(extent={{-98,72},{-48,40}}, textString="w0")}),
       Documentation(info="<HTML>
-This component prescribes the flow rate passing through it. The change of 
+This component prescribes the flow rate passing through it. The change of
 specific enthalpy due to the pressure difference between the inlet and the
 outlet is ignored; use <t>Pump</t> models if this has to be taken into account correctly.
 <p><b>Modelling options</b></p>
@@ -464,7 +464,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter FFtypes FFtype=FFtypes.Kf "Friction Factor Type";
     parameter Real Kf(
       fixed=if FFtype == FFtypes.Kf then true else false,
-      unit="Pa.kg/(m3.kg2/s2)") = 0 "Hydraulic resistance coefficient";
+      unit="Pa.kg/(m3.kg2/s2)") "Hydraulic resistance coefficient";
     parameter Pressure dpnom=0 "Nominal pressure drop";
     parameter Density rhonom=0 "Nominal density";
     parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity2/2)";
@@ -664,7 +664,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     annotation (
       Icon(graphics),
       Documentation(info="<HTML>
-<p>This model describes a constant volume header with metal walls. The fluid can be water, steam, or a two-phase mixture. 
+<p>This model describes a constant volume header with metal walls. The fluid can be water, steam, or a two-phase mixture.
 <p>It is possible to take into account the heat storage and transfer in the metal wall in two ways:
 <ul>
 <li>
@@ -677,7 +677,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 <li>
   Set <tt>Cm = 0</tt>, and connect a suitable thermal model of the the
   wall to the <tt>InternalSurface</tt> connector instead. This can be
-  useful in case a more detailed thermal model is needed, e.g. for 
+  useful in case a more detailed thermal model is needed, e.g. for
   thermal stress studies.
 </li>
 </ul>
@@ -966,7 +966,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Fluid pressure for property calculations";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
-    MassFlowRate wstar[N];
+  //   MassFlowRate wstar[N];
     Velocity u[N] "Fluid velocity";
     Medium.Temperature T[N] "Fluid temperature";
     Medium.SpecificEnthalpy h[N](start=hstart)
@@ -976,7 +976,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(final Nf=N, final w=wstar, fluidState=fluidState) constrainedby
+    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(final Nf=N, final w=w*ones(N), final fluidState=fluidState) constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true); /* final w=wstar*ones(N) wstar NON è scalare*/
 
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
@@ -1010,7 +1010,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           Dhyd/A,
           e,
           Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
-    elseif FFtype == FFtypes.NoFriction then
+    else  // if FFtype == FFtypes.NoFriction then
       Cf = 0;
     end if;
     Kf = Cf*omega_hyd*L/(2*A^3)
@@ -1041,13 +1041,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     elseif HydraulicCapacitance == HCtypes.Upstream then
       Dpfric1 = 0 "Pressure drop from inlet to capacitance";
       Dpfric2 = homotopy(Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar)/(N - 1),
-        dpnom/(wnom/Nt)*wout) "Pressure drop from capacitance to outlet";
-    elseif HydraulicCapacitance == HCtypes.Downstream then
+                         dpnom/(wnom/Nt)*wout)
+        "Pressure drop from capacitance to outlet";
+    else // if HydraulicCapacitance == HCtypes.Downstream then
       Dpfric1 = homotopy(Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar)/(N - 1),
-        dpnom/(wnom/Nt)*win) "Pressure drop from inlet to capacitance";
+                         dpnom/(wnom/Nt)*win)
+        "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
-    else
-      assert(false, "Unsupported HydraulicCapacitance option");
     end if "Pressure drop due to friction";
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*l*dzdx*sum(rhobar)
       "Pressure drop due to static head";
@@ -1067,8 +1067,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       drbdp[j] = (drdp[j] + drdp[j + 1])/2;
       drbdh[j] = (drdh[j] + drdh[j + 1])/2;
       vbar[j] = 1/rhobar[j];
-      wstar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
     end for;
+
+    // for j in 1:N loop
+    //   wstar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+    // end for;
 
     // Fluid property calculations
     for j in 1:N loop
@@ -1084,24 +1088,26 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     // Boundary conditions
     win = infl.m_flow/Nt;
     wout = -outfl.m_flow/Nt;
+    assert(HydraulicCapacitance == HCtypes.Upstream or
+             HydraulicCapacitance == HCtypes.Middle or
+             HydraulicCapacitance == HCtypes.Downstream,
+             "Unsupported HydraulicCapacitance option");
     if HydraulicCapacitance == HCtypes.Middle then
       p = infl.p - Dpfric1 - Dpstat/2;
       w = win;
     elseif HydraulicCapacitance == HCtypes.Upstream then
       p = infl.p;
       w = -outfl.m_flow/Nt;
-    elseif HydraulicCapacitance == HCtypes.Downstream then
+    else  // if HydraulicCapacitance == HCtypes.Downstream then
       p = outfl.p;
       w = win;
-    else
-      assert(false, "Unsupported HydraulicCapacitance option");
     end if;
     infl.h_outflow = htilde[1];
     outfl.h_outflow = htilde[N - 1];
 
     h[1] = inStream(infl.h_outflow);
     h[2:N] = htilde;
-    wbar = (wstar[1:N - 1] + wstar[2:N])/2;
+  //   wbar = (wstar[1:N - 1] + wstar[2:N])/2;
 
     connect(wall,heatTransfer.wall);
 
@@ -1130,7 +1136,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the compressibility effects are lumped at the inlet, at the outlet, or at the middle of the pipe.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
@@ -1556,7 +1562,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
@@ -2314,7 +2320,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 <li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
@@ -3870,12 +3876,12 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     constant Real g=Modelica.Constants.g_n;
     /*
   FlangeA infl(p(start=pstartin),w(start=wnom),hAB(start=hstartin),
-    redeclare package Medium = Medium) 
+    redeclare package Medium = Medium)
     annotation (extent=[-120, -20; -80, 20]);
   FlangeB outfl(p(start=pstartout),w(start=-wnom),hBA(start=hstartout),
-    redeclare package Medium = Medium) 
+    redeclare package Medium = Medium)
     annotation (extent=[80, -20; 120, 20]);
-  replaceable ThermoPower.Thermal.DHT wall(N=N) 
+  replaceable ThermoPower.Thermal.DHT wall(N=N)
     annotation (extent=[-40, 40; 40, 60]);
 */
     Medium.AbsolutePressure p(start=pstartin, stateSelect=StateSelect.prefer);
@@ -4175,7 +4181,7 @@ This model is not yet complete
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the compressibility effects are lumped at the inlet, at the outlet, or at the middle of the pipe.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
@@ -4575,7 +4581,7 @@ This model is not yet complete
 <li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
@@ -5409,7 +5415,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
@@ -6167,7 +6173,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 <li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
 <li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
 <li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics). 
+<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 <li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
@@ -6419,7 +6425,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         Documentation(info="<HTML>
 <p>This is the base model for the <tt>ValveLiq</tt>, <tt>ValveLiqChoked</tt>, and <tt>ValveVap</tt> valve models. The model is based on the IEC 534 / ISA S.75 standards for valve sizing.
 <p>The model optionally supports reverse flow conditions (assuming symmetrical behaviour) or check valve operation, and has been suitably modified to avoid numerical singularities at zero pressure drop.</p>
-<p>An optional heat loss to the ambient can be included, proportional to the mass flow rate; <tt>Qnom</tt> specifies the heat loss at nominal flow rate.</p> 
+<p>An optional heat loss to the ambient can be included, proportional to the mass flow rate; <tt>Qnom</tt> specifies the heat loss at nominal flow rate.</p>
 <p><b>Modelling options</b></p>
 <p>The following options are available to specify the valve flow coefficient in fully open conditions:
 <ul><li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.Av</tt>: the flow coefficient is given by the metric <tt>Av</tt> coefficient (m^2).
@@ -6637,11 +6643,11 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         Documentation(info="<HTML>
 <p>This is the base model for the <tt>Pump</tt> and <tt>
 PumpMech</tt> pump models.
-<p>The model describes a centrifugal pump, or a group of <tt>Np</tt> identical pumps in parallel. The pump model is based on the theory of kinematic similarity: the pump characteristics are given for nominal operating conditions (rotational speed and fluid density), and then adapted to actual operating condition, according to the similarity equations. 
+<p>The model describes a centrifugal pump, or a group of <tt>Np</tt> identical pumps in parallel. The pump model is based on the theory of kinematic similarity: the pump characteristics are given for nominal operating conditions (rotational speed and fluid density), and then adapted to actual operating condition, according to the similarity equations.
 <p>In order to avoid singularities in the computation of the outlet enthalpy at zero flowrate, the thermal capacity of the fluid inside the pump body can be taken into account.
 <p>The model can either support reverse flow conditions or include a built-in check valve to avoid flow reversal.
 <p><b>Modelling options</b></p>
-<p> The nominal hydraulic characteristic (head vs. volume flow rate) is given by the the replaceable function <tt>flowCharacteristic</tt>. 
+<p> The nominal hydraulic characteristic (head vs. volume flow rate) is given by the the replaceable function <tt>flowCharacteristic</tt>.
 <p> The pump energy balance can be specified in two alternative ways:
 <ul>
 <li><tt>usePowerCharacteristic = false</tt> (default option): the replaceable function <tt>efficiencyCharacteristic</tt> (efficiency vs. volume flow rate in nominal conditions) is used to determine the efficiency, and then the power consumption. The default is a constant efficiency of 0.8.
@@ -6650,7 +6656,7 @@ PumpMech</tt> pump models.
 <p>
 Several functions are provided in the package <tt>Functions.PumpCharacteristics</tt> to specify the characteristics as a function of some operating points at nominal conditions.
 <p>Depending on the value of the <tt>checkValve</tt> parameter, the model either supports reverse flow conditions, or includes a built-in check valve to avoid flow reversal.
- 
+
 <p>If the <tt>in_Np</tt> input connector is wired, it provides the number of pumps in parallel; otherwise,  <tt>Np0</tt> parallel pumps are assumed.</p>
 <p>It is possible to take into account the heat capacity of the fluid inside the pump by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
 <p>The <tt>CheckValve</tt> parameter determines whether the pump has a built-in check valve or not.
@@ -6820,6 +6826,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     end SteamTurbineBase;
 
     partial model DistributedHeatTransferFV
+      "Distributed heat transfer model - finite volume"
 
       extends ThermoPower.Icons.HeatFlow;
       replaceable package Medium = StandardWater constrainedby
@@ -6828,10 +6835,10 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       input MassFlowRate w[Nf];
       ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
                 40}}, rotation=0)));
-      parameter Integer Nf(min=2) "Number of nodes fluid-side";
-      parameter Integer Nw=Nf-1 "Number of nodes wall-side";
+      parameter Integer Nf(min=2) = 2 "Number of nodes fluid-side";
+      parameter Integer Nw=Nf-1 "Number of nodes wall-side";   //volumes wall-side
       parameter Boolean useAverageTemperature = true
-        "= true to use average temperature for heat transfer";  //mettere enumerazione
+        "= true to use average temperature for heat transfer";
 
     end DistributedHeatTransferFV;
   end BaseClasses;
@@ -6855,6 +6862,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
      parameter Length L "Tube length";
      parameter Length omega "Perimeter of heat transfer surface (single tube)";
      final parameter Length l=L/(Nw) "Length of a single volume";
+     Power Q "Total heat flow through lateral boundary";
 
   equation
     // Temperature at the nodes
@@ -6872,26 +6880,37 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
        Tvol[j] = T[j+1];
     end for;
 
+    Q = sum(wall.Q);
+
+    annotation (
+      Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+              100,100}}),
+              graphics),
+      Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
   end ConstantHeatTransferCoefficient;
 
   model HeatTransfer2phDB
-    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1);
-
-    parameter CoefficientOfHeatTransfer gamma_b=20000
-      "Coefficient of heat transfer for boiling flow";
+    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1,final useAverageTemperature,redeclare
+        replaceable package Medium =
+          StandardWater                                                                      constrainedby
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
+    parameter CoefficientOfHeatTransfer gamma_b=10000
+      "Coefficient of heat transfer";
     parameter Area A "Cross-sectional area (single tube)";
     parameter Length Dhyd "Hydraulic Diameter (single tube)";
     parameter Length omega "Perimeter of heat transfer surface (single tube)";
     parameter Length L "Tube length";
     final parameter Length l=L/(Nw) "Length of a single volume";
-    Real alfa_l[Nf];
-    Real alfa_v[Nf];
-    Real alfa2_l[Nf];
-    Real alfa2_v[Nf];
+    Real state[Nw];
+    Real alfa_l[Nw];
+    Real alfa_v[Nw];
+    Real alfa2_l[Nw];
+    Real alfa2_v[Nw];
     CoefficientOfHeatTransfer gamma1ph[Nf];
+    CoefficientOfHeatTransfer gamma_bubble;
+    CoefficientOfHeatTransfer gamma_dew;
     CoefficientOfHeatTransfer gamma2ph = gamma_b;
-    CoefficientOfHeatTransfer gammabar[Nw]
-      "Average coefficient of heat transfer in the volumes";
+    //CoefficientOfHeatTransfer gammabar[Nw] "Average coefficient of heat transfer in the volumes";
     Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
     Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
@@ -6899,72 +6918,98 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
     Medium.Temperature Ts "Saturated water temperature";
     Medium.SaturationProperties sat "Properties of saturated fluid";
+    Medium.ThermodynamicState bubble "Bubble point, one-phase side";
+    Medium.ThermodynamicState dew "Dew point, one-phase side";
     Medium.AbsolutePressure p "Fluid pressure for property calculations";
     Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
     Medium.ThermalConductivity k[Nf] "Thermal conductivity";
     Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+    Medium.DynamicViscosity mu_bubble "Dynamic viscosity at bubble point";
+    Medium.ThermalConductivity k_bubble "Thermal conductivity at bubble point";
+    Medium.SpecificHeatCapacity cp_bubble
+      "Heat capacity at constant pressure at bubble point";
+    Medium.DynamicViscosity mu_dew "Dynamic viscosity at dew point";
+    Medium.ThermalConductivity k_dew "Thermal conductivity at dew point";
+    Medium.SpecificHeatCapacity cp_dew
+      "Heat capacity at constant pressure at dew point";
+    Power Q "Total heat flow through lateral boundary";
 
   equation
     // Saturated fluid property calculations
+    p = Medium.pressure(fluidState[1]);
     sat = Medium.setSat_p(p);
     Ts = sat.Tsat;
     hl = Medium.bubbleEnthalpy(sat);
     hv = Medium.dewEnthalpy(sat);
+    bubble = Medium.setBubbleState(sat,1);
+    dew = Medium.setDewState(sat,1);
+    mu_bubble = Medium.dynamicViscosity(bubble);
+    k_bubble = Medium.thermalConductivity(bubble);
+    cp_bubble = Medium.heatCapacity_cp(bubble);
+    mu_dew =  Medium.dynamicViscosity(dew);
+    k_dew = Medium.thermalConductivity(dew);
+    cp_dew = Medium.heatCapacity_cp(dew);
 
-    // Fluid property calculations (at nodes)
+    // Heat transfer coefficient at bubble/dew point
+    gamma_bubble = f_dittus_boelter(w[1],Dhyd,A,mu_bubble,k_bubble,cp_bubble);
+    gamma_dew = f_dittus_boelter(w[1],Dhyd,A,mu_dew,k_dew,cp_dew);
+
+    // Fluid property calculations at nodes
     for j in 1:Nf loop
       T[j] = Medium.temperature(fluidState[j]);
-      mu[j] = Medium.dynamicViscosity(fluidState[j]);
-      k[j] = Medium.thermalConductivity(fluidState[j]);
-      cp[j] = Medium.heatCapacity_cp(fluidState[j]);
-      gamma1ph[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]);
+      h[j] = Medium.specificEnthalpy(fluidState[j]);
+      /* to be fixed */
+      mu[j] = Medium.dynamicViscosity(fluidState[j]);  //not all nodes, only 1-phase nodes
+      k[j] = Medium.thermalConductivity(fluidState[j]); //not all nodes, only 1-phase nodes
+      cp[j] = Medium.heatCapacity_cp(fluidState[j]); //not all nodes, only 1-phase nodes
+      gamma1ph[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]); //not all nodes, only 1-phase nodes
+      /* to be fixed */
+    end for;
+
+    for j in 1:Nw loop
       alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
       alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
       alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
       alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
     end for;
 
-    // Boundary conditions
-    // infl.h_outflow = htilde[1];
-    // outfl.h_outflow = htilde[N - 1];
-    // h[1] = inStream(infl.h_outflow);
-    // h[2:N] = htilde;
+     for j in 1:Nw loop
+       if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then // 1-phase liquid or vapour
+         wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2);
+         state[j] = 1;
+       elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
+         wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         state[j] = 2;
+       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then // 2-phase
+         wall.Q[j] = (wall.T[j] - Ts)*omega*l*gamma2ph;
+         state[j] = 3;
+  //      elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then  // 2-phase --> vapour
+  //        wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*gammabar[j] + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+  //        state[j] = 4;
+  //      elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then //2-phase --> liquid
+  //        wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*gammabar[j] + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+  //        state[j] = 5;
+       else // noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then //vapour --> 2-phase
+         wall.Q[j] = 0; /*= alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*gammabar[j] + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;*/
+         state[j] = 0;
+       end if;
+       assert((h[j + 1] - h[j]) > 0 or (h[j + 1] - h[j]) < 0, "Division by zero during enthalpy calculation (h[j+1] - h[j]) = 0");
+       assert((h[j] - h[j + 1]) > 0 or (h[j] - h[j + 1]) < 0, "Division by zero during enthalpy calculation (h[j] - h[j + 1]) = 0");
+       Tvolbar[j] = (T[j] + T[j + 1])/2;
+       //gammabar[j] = (gamma1ph[j] + gamma1ph[j+1])/2;
+     end for;
 
-    for j in 1:Nw loop
-      if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then // 1-phase liquid or vapour
-        wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*gammabar[j];
-      elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
-        wall.Q[j] = alfa_l[j]*((T[j] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa_l[j])*(Ts - wall.T[j])*omega*l*gamma2ph;
-      elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then  // 2-phase --> vapour
-        wall.Q[j] = alfa_v[j]*((T[j + 1] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa_v[j])*(Ts - wall.T[j])*omega*l*gamma2ph;
-      elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then //2-phase --> liquid
-        wall.Q[j] = alfa2_l[j]*((T[j + 1] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa2_l[j])*(Ts - wall.T[j])*omega*l*gamma2ph;
-      elseif noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then //vapour --> 2-phase
-        wall.Q[j] = alfa2_v[j]*((T[j] + Ts)/2 - wall.T[j])*omega*l*gammabar[j] + (1 - alfa2_v[j])*(Ts - wall.T[j])*omega*l*gamma2ph;
-      end if;
-      assert(h[j + 1] - h[j] > 0, "Division by zero during enthalpy calculation");
-      assert(h[j] - h[j + 1] > 0, "Division by zero during enthalpy calculation");
-      Tvolbar[j] = (T[j] + T[j + 1])/2;
-      gammabar[j] = (gamma1ph[j] + gamma1ph[j+1])/2;
-   end for;
+     Q = sum(wall.Q);
 
-  //   for j in 1:Nw loop
-  //      if useAverageTemperature then
-  //          wall.Q[j] = (wall.T[j] - Tvolbar[j])*l*omega*gamma;
-  //      else
-  //          wall.Q[j] = (wall.T[j] - Tvol[j])*l*omega*gamma;
-  //      end if;
-  //      Tvolbar[j] = (T[j] + T[j + 1])/2;
-  //      Tvol[j] = T[j+1];
-  //   end for;
-  //
-  //   Tm = ((T1 + Tsat)/2)*alfa + Tsat*(1 - alfa);
-  //   alfa = (hl - h1)/(h2 - h1);
-  //   wall.Q = gamma1ph*((T1 + Tsat)/2 - Te)*l*omega*alfa + gamma2ph*(Tsat - Te)*l*omega*(1 - alfa);  // Te = wall.T[j]
-
+     annotation (
+      Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+              100}}),
+              graphics),
+      Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
   end HeatTransfer2phDB;
 
-  model SourceP2 "Pressure source for water/steam flows"
+  model SourceP "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -7026,9 +7071,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
        First release.</li>
 </ul>
 </html>"));
-  end SourceP2;
+  end SourceP;
 
-  model SinkP2 "Pressure sink for water/steam flows"
+  model SinkP "Pressure sink for water/steam flows"
     extends Icons.Water.SourceP;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -7091,9 +7136,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
        First release.</li>
 </ul>
 </html>"));
-  end SinkP2;
+  end SinkP;
 
-  model SourceW2 "Flowrate source for water/steam flows"
+  model SourceW "Flowrate source for water/steam flows"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -7156,9 +7201,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
        First release.</li>
 </ul>
 </html>"));
-  end SourceW2;
+  end SourceW;
 
-  model SinkW2 "Flowrate sink for water/steam flows"
+  model SinkW "Flowrate sink for water/steam flows"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -7221,7 +7266,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </ul>
 </html>"),
       Diagram(graphics));
-  end SinkW2;
+  end SinkW;
 
   model ThroughW2 "Prescribes the flow rate across the component"
     extends Icons.Water.SourceW;
@@ -7258,7 +7303,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     annotation (
       Icon(graphics={Text(extent={{-98,72},{-48,40}}, textString="w0")}),
       Documentation(info="<HTML>
-This component prescribes the flow rate passing through it. The change of 
+This component prescribes the flow rate passing through it. The change of
 specific enthalpy due to the pressure difference between the inlet and the
 outlet is ignored; use <t>Pump</t> models if this has to be taken into account correctly.
 <p><b>Modelling options</b></p>
