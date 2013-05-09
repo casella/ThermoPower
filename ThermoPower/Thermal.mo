@@ -152,7 +152,7 @@ package Thermal "Thermal models of heat transfer"
         linearExpansionCoefficient = Poly.evaluate(poly_alfa, T);
         thermalConductivity = Poly.evaluate(poly_kappa, T);
         annotation (Documentation(info="<html>
-This model computes the thermal and mechanical properties of a generic material. The data is provided in the form of tables, and interpolated by polinomials. 
+This model computes the thermal and mechanical properties of a generic material. The data is provided in the form of tables, and interpolated by polinomials.
 <p>To use the model, set the material temperature to the desired value by a suitable equation.
 </html>"));
       end MaterialTable;
@@ -379,9 +379,9 @@ This package contains models to compute the material properties needed to model 
   end DHTNodes;
 
   connector DHTVolumes "Distributed Heat Terminal"
-    parameter Integer N "Number of nodes";
-    AbsoluteTemperature T[N] "Temperature at the nodes";
-    flow Power Q[N] "Heat flow at the nodes";
+    parameter Integer N "Number of volumes";
+    AbsoluteTemperature T[N] "Temperature at the volumes";
+    flow Power Q[N] "Heat flow at the volumes";
     annotation (Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
@@ -635,6 +635,39 @@ This package contains models to compute the material properties needed to model 
 "));
   end HeatSource1D;
 
+  model TempSource1DFV "Distributed Temperature Source"
+    extends Icons.HeatFlow;
+    parameter Integer N "Number of nodes";
+    final parameter Integer Nw = N - 1 "Number of volumes";
+    ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput temperature annotation (Placement(
+          transformation(
+          origin={0,40},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    for i in 1:Nw loop
+      wall.T[i] = temperature;
+    end for;
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-100,-46},{100,-70}},
+            lineColor={191,95,0},
+            textString="%name")}),
+      Documentation(info="<HTML>
+<p>Model of an ideal 1D uniform temperature source (finite volume). The actual temperature is provided by the <tt>temperature</tt> signal connector.
+</HTML>", revisions="<html>
+<ul>
+<li><i>3 May 2013</i>
+    by <a href=\"mailto:stefanoboni@hotmail.com\">Stefano Boni</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
+  end TempSource1DFV;
+
   model TempSource1D "Distributed Temperature Source"
     extends Icons.HeatFlow;
     parameter Integer N=2 "Number of nodes";
@@ -709,8 +742,6 @@ This package contains models to compute the material properties needed to model 
 
   model MetalTubeFV "Cylindrical metal tube - 1 radial node and N axial nodes"
 
-    // TO BE ADAPTED!!!!
-
     extends Icons.MetalWall;
     parameter Integer N(min=2) = 3 "Number of nodes";
     parameter Integer Nw = N - 1 "Number of volume";
@@ -756,11 +787,11 @@ This package contains models to compute the material properties needed to model 
   equation
     assert(rext > rint, "External radius must be greater than internal radius");
     Am = (rext^2 - rint^2)*pi "Area of the metal cross section";
-    L*rhomcm*Am*der(Tvol) = int.Q + ext.Q "Energy balance";    // M = rhom*L*Am   rhomcm = rhom*cm
+    (L/Nw)*rhomcm*Am*der(Tvol) = int.Q + ext.Q "Energy balance";    // M = rhom*L*Am   rhomcm = rhom*cm
     if WallRes then
-      int.Q = (lambda*(2*pi*L)*(int.T - Tvol))/(log((rint + rext)/(2*rint)))
+      int.Q = (lambda*(2*pi*L/Nw)*(int.T - Tvol))/(log((rint + rext)/(2*rint)))
         "Heat conduction through the internal half-thickness";                 //moltiplico dx e sx per L*omega
-      ext.Q = (lambda*(2*pi*L)*(ext.T - Tvol))/(log((2*rext)/(rint + rext)))
+      ext.Q = (lambda*(2*pi*L/Nw)*(ext.T - Tvol))/(log((2*rext)/(rint + rext)))
         "Heat conduction through the external half-thickness";
     else
       // No temperature gradients across the thickness
@@ -914,8 +945,6 @@ This package contains models to compute the material properties needed to model 
 
   model MetalWallFV "Generic metal wall - 1 radial node and N axial nodes"
 
-    // TO BE ADAPTED!!!!
-
     extends ThermoPower.Icons.MetalWall;
     parameter Integer N(min=2)=3 "Number of nodes";
     parameter Integer Nw = N - 1 "Number of volume";
@@ -960,7 +989,7 @@ This package contains models to compute the material properties needed to model 
   //     annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
   //           rotation=0)));
   equation
-    (cm*M)*der(Tvol) = int.Q + ext.Q "Energy balance";
+    (cm*M/Nw)*der(Tvol) = int.Q + ext.Q "Energy balance";
     // No temperature gradients across the thickness
     ext.T = Tvol;
     int.T = Tvol;
@@ -1331,7 +1360,7 @@ This package contains models to compute the material properties needed to model 
             1);
     end compHm;
 
-    function fluxWeights "Returns the vector of the weights of the nodal fluxes 
+    function fluxWeights "Returns the vector of the weights of the nodal fluxes
      (more nodes side) corresponding to the given boundaries"
       input Integer Nm "Number of nodes on the side with more nodes";
       input Real lb "Left boundary, normalised";
@@ -1566,7 +1595,7 @@ This package contains models to compute the material properties needed to model 
             1);
     end compHm;
 
-    function fluxWeights "Returns the vector of the weights of the nodal fluxes 
+    function fluxWeights "Returns the vector of the weights of the nodal fluxes
      (more nodes side) corresponding to the given boundaries"
       input Integer Nm "Number of nodes on the side with more nodes";
       input Real lb "Left boundary, normalised";
@@ -1996,14 +2025,14 @@ The swapping is performed if the counterCurrent parameter is true (default value
             lineColor={191,95,0},
             textString="%name")}),
       Documentation(info="<html>
-This is the 1D thermal model of a solid hollow cylinder by Fourier's equations. 
+This is the 1D thermal model of a solid hollow cylinder by Fourier's equations.
 <p>The model is axis-symmetric, has one node in the longitudinal direction, and <tt>Nr</tt> nodes in the radial direction. The two connectors correspond to the internal and external surfaces; if one of the surface is thermally insulated, just leave the connector unconnected (no connection on a <tt>DHT</tt> connector means zero heat flux). The temperature-dependent properties of the material are described by the replaceable <tt>MaterialModel</tt> model.
 <p><b>Modelling options</b></p>
 The radial distribution of the nodes can be chosen by selecting the value of <tt>nodeDistribution</tt>:
 <ul>
-<li> <tt>Choices.CylinderFourier.NodeDistribution.uniform</tt> uniform distribution, nodes are equally spaced; 
-<li> <tt>Choices.CylinderFourier.NodeDistribution.thickInternal</tt> quadratic distribution, nodes are thickest near the internal surface; 
-<li> <tt>Choices.CylinderFourier.NodeDistribution.thickExternal</tt> quadratic distribution, nodes are thickest near the external surface; 
+<li> <tt>Choices.CylinderFourier.NodeDistribution.uniform</tt> uniform distribution, nodes are equally spaced;
+<li> <tt>Choices.CylinderFourier.NodeDistribution.thickInternal</tt> quadratic distribution, nodes are thickest near the internal surface;
+<li> <tt>Choices.CylinderFourier.NodeDistribution.thickExternal</tt> quadratic distribution, nodes are thickest near the external surface;
 <li> <tt>Choices.CylinderFourier.NodeDistribution.thickBoth</tt> quadratic distribution, nodes are thickest near both surfaces.
 </ul>
 </html>", revisions="<html>
