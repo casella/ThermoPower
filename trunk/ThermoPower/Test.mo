@@ -210,6 +210,113 @@ Casella</a>:<br>
         __Dymola_experimentSetupOutput);
     end TestMixerSlowFast;
 
+    model TestMixerSlowFastSteam
+      package Medium=Modelica.Media.Water.StandardWater;
+      // package Medium = Modelica.Media.Incompressible.Examples.Glycol47;
+      Water.SourceMassFlow
+                    SourceW1(
+        w0=0.5,
+        redeclare package Medium = Medium,
+        use_in_h=true,
+        h=3.2e6)
+          annotation (Placement(transformation(
+              extent={{-98,10},{-78,30}}, rotation=0)));
+      Water.SourceMassFlow
+                    SourceW2(
+        w0=0.5,
+        redeclare package Medium = Medium,
+        h=3.2e6)                           annotation (Placement(transformation(
+              extent={{-98,-30},{-78,-10}}, rotation=0)));
+      Water.SinkPressure
+                  SinkP1(        redeclare package Medium = Medium, p0=100000)
+                                                                    annotation (
+         Placement(transformation(extent={{80,-10},{100,10}}, rotation=0)));
+      Water.Mixer Mixer1(
+        redeclare package Medium = Medium,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+        V=0.1,
+        pstart=100000,
+        hstart=3.2e6,
+        Tmstart=573.15)                                       annotation (
+          Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
+      Water.ValveLin ValveLin1(Kv=1/1e5, redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{38,-10},{58,10}},
+              rotation=0)));
+      Modelica.Blocks.Sources.Step StepValv(
+        height=-0.2,
+        offset=1,
+        startTime=2) annotation (Placement(transformation(extent={{14,30},{34,
+                50}}, rotation=0)));
+      Water.PressDrop PressDrop1(
+        wnom=1,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
+        dpnom=100,
+        rhonom=1)                                             annotation (
+          Placement(transformation(extent={{-30,-10},{-10,10}}, rotation=0)));
+      Water.Header Header1(
+        redeclare package Medium = Medium,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+        V=0.1,
+        pstart=100000,
+        hstart=3.2e6,
+        Tmstart=573.15)                                       annotation (
+          Placement(transformation(extent={{0,-10},{20,10}}, rotation=0)));
+      Modelica.Blocks.Sources.Step StepEnthalpy(
+        startTime=4,
+        height=1e5,
+        offset=3.2e6)
+                     annotation (Placement(transformation(extent={{-92,50},{-72,
+                70}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+    equation
+      connect(SourceW1.flange, Mixer1.in1) annotation (Line(
+          points={{-78,20},{-66,20},{-66,6},{-58,6}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SourceW2.flange, Mixer1.in2) annotation (Line(
+          points={{-78,-20},{-66,-20},{-66,-6},{-58,-6}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(ValveLin1.outlet, SinkP1.flange) annotation (Line(
+          points={{58,0},{80,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(Mixer1.out, PressDrop1.inlet) annotation (Line(
+          points={{-40,0},{-30,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(PressDrop1.outlet, Header1.inlet) annotation (Line(
+          points={{-10,0},{-0.1,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(Header1.outlet, ValveLin1.inlet) annotation (Line(
+          points={{20,0},{38,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(StepEnthalpy.y, SourceW1.in_h) annotation (Line(points={{-71,60},
+              {-60,60},{-60,40},{-84,40},{-84,26}}, color={0,0,127}));
+      connect(StepValv.y, ValveLin1.cmd)
+        annotation (Line(points={{35,40},{48,40},{48,8}}, color={0,0,127}));
+      annotation (
+        Diagram(graphics),
+        experiment(StopTime=6, __Dymola_NumberOfIntervals=4000),
+        Documentation(info="<HTML>
+<p>This model tests the <tt>Mixer</tt> and <tt>Header</tt> models with different medium models. If an incompressible medium model is used, the fast pressure dynamics is neglected, thus allowing simulation with explicit algorithms and large time steps.
+</HTML>", revisions="<html>
+<ul>
+<li><i>24 Sep 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+        __Dymola_experimentSetupOutput);
+    end TestMixerSlowFastSteam;
+
     model TestPressDrop
       package Medium = Modelica.Media.Water.StandardWater;
       Water.SourcePressure
@@ -359,7 +466,7 @@ This test model demonstrate four possible ways of setting the friction coefficie
 </ol>
 </html>", revisions="<html>
 <ul>
-    <li><i>18 Nov 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>: 
+    <li><i>18 Nov 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:
     <br>First release.</li>
 </ul>
 </html>"));
@@ -566,6 +673,7 @@ Casella</a>:<br>
     end TwoTanks;
 
     model TestValves "Test cases for valves"
+
       ThermoPower.Water.SourcePressure
                                 SourceP1(p0=10e5) annotation (Placement(
             transformation(extent={{-100,40},{-80,60}}, rotation=0)));
@@ -718,6 +826,7 @@ Casella</a>:<br>
     end TestValves;
 
     model TestValveChoked "Test case for valves in choked flow"
+
       ThermoPower.Water.SourcePressure
                                 SourceP1(p0=5e5, h=400e3) annotation (Placement(
             transformation(extent={{-50,30},{-30,50}}, rotation=0)));
@@ -798,7 +907,7 @@ Casella</a>:<br>
         experiment(StopTime=4, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>This model tests the transition from normal to choked flow for the <tt>ValveLiq</tt> and <tt>ValveVap</tt> models.
-<p>Simulate the model for 4 s and observe the flowrate through the two valves. 
+<p>Simulate the model for 4 s and observe the flowrate through the two valves.
 </HTML>", revisions="<html>
 <ul>
 <li><i>18 Nov 2003</i>
@@ -928,7 +1037,7 @@ Casella</a>:<br>
 <li>Cv (US) flow coefficient [USG/min];
 <li>Av defined by nominal operating point [m2].
 </ol>
-<p>Simulate the model for 4 s and observe the flowrate through the valves. 
+<p>Simulate the model for 4 s and observe the flowrate through the valves.
 </HTML>", revisions="<html>
 <ul>
 <li><i>3 Dec 2008</i>
@@ -939,6 +1048,7 @@ Casella</a>:<br>
     end TestCoeffValve;
 
     model ValveZeroFlow "Test case for valves with zero flowrate"
+
       ThermoPower.Water.SourcePressure
                                 Source(p0=5e5) annotation (Placement(
             transformation(extent={{-90,-10},{-70,10}}, rotation=0)));
@@ -1031,6 +1141,7 @@ Casella</a>:<br>
     end ValveZeroFlow;
 
     model ValveZeroFlow2 "Test case for valves with zero flowrate"
+
       Modelica.Blocks.Sources.Step Cmd1(
         height=0,
         offset=1,
@@ -1082,6 +1193,7 @@ Casella</a>:<br>
     initial equation
       Tank1.y = 2;
       Tank2.y = 1;
+
     equation
       connect(Cmd1.y, Valve.theta)
         annotation (Line(points={{-19,30},{0,30},{0,-2}}, color={0,0,127}));
@@ -1639,7 +1751,7 @@ Casella</a>:<br>
   redeclare package SatMedium = Modelica.Media.Water.StandardWater,
     ComputeNPSHa=true,
     CheckValve=true,
-    initOpt=ThermoPower.Choices.Init.Options.steadyState) 
+    initOpt=ThermoPower.Choices.Init.Options.steadyState)
                         annotation (extent=[-54,26; -34,46]);
 */
       Water.PumpNPSH Pump1(
@@ -1701,9 +1813,9 @@ Casella</a>:<br>
 <p>This model tests the <tt>Pump</tt> model with the check valve option active. Two pumps in parallel are simulated.
 <p>The valve is opened at time t=1s. The sink pressure is then increased so as to operate the pump in all the possible working conditions, including stopped flow.
 <p>
-Simulation Interval = [0...10] sec <br> 
+Simulation Interval = [0...10] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </HTML>", revisions="<html>
 <ul>
 <li><i>30 Jul 2007</i>
@@ -1867,9 +1979,9 @@ Schiavo</a>:<br>
 <p>This model tests three <tt>Pump</tt> models with different flow caratteristcs and with the check valve option active. Two pumps in parallel are simulated.
 <p>The valve is opened at time t=1s. The sink pressure is then increased so as to operate the pump in all the possible working conditions, including stopped flow.
 <p>
-Simulation Interval = [0...10] sec <br> 
+Simulation Interval = [0...10] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </HTML>", revisions="<html>
 <ul>
 <li><i>3 Dec 2008</i>
@@ -1956,12 +2068,12 @@ Algorithm Tolerance = 1e-6
 The simulation starts with a stopped motor and a closed valve.
 <ul>
     <li>t=2 s: The voltage supplied is increased up to 380V in 5 s.
-    <li>t=15 s, The valve is opened in 5 s. 
+    <li>t=15 s, The valve is opened in 5 s.
 </ul>
 <p>
-Simulation Interval = [0...25] sec <br> 
+Simulation Interval = [0...25] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </html>
 ", revisions="<html>
@@ -2138,6 +2250,7 @@ Schiavo</a>:<br>
   der(Accumulator1.hl) = 0;
   Accumulator1.zl = 0;
 */
+
     equation
       connect(Add1.y, Accumulator1.GasInfl) annotation (Line(points={{-19,-10},
               {-14,-10},{-14,-44},{-4.8,-44}}, color={0,0,127}));
@@ -2161,17 +2274,17 @@ Schiavo</a>:<br>
 Simulation sequence:
 <ul>
     <li>t=500 s: The accumulator is charged for 20 s.
-    <li>t=2500 s, The accumulator is discharged for 20 s. 
+    <li>t=2500 s, The accumulator is discharged for 20 s.
     <li>t=8000 s, 10% increase of the inlet flowrate
 </ul>
 <p>
-Simulation Interval = [0...8000] sec <br> 
+Simulation Interval = [0...8000] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </html>", revisions="<html>
 <ul>
-        <li><i>5 Feb 2004</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+        <li><i>5 Feb 2004</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
         First release.</li>
 </ul>
 </html>"));
@@ -2283,13 +2396,13 @@ Algorithm Tolerance = 1e-6
     <li>t=5 s: After 4 s the turbine speed has lost rad/s.
 </ul>
 <p>
-Simulation Interval = [0...5] sec <br> 
+Simulation Interval = [0...5] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-4 
+Algorithm Tolerance = 1e-4
 </p>
 </html>", revisions="<html>
 <ul>
-        <li><i>21 Jul 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+        <li><i>21 Jul 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
         First release.</li>
 </ul>
 </html>
@@ -2396,13 +2509,13 @@ Algorithm Tolerance = 1e-4
     <li>t=10 s: After 9 s the torque applied to the load has been reduced by 6%.
 </ul>
 <p>
-Simulation Interval = [0...10] sec <br> 
+Simulation Interval = [0...10] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-4 
+Algorithm Tolerance = 1e-4
 </p>
 </html>", revisions="<html>
 <ul>
-        <li><i>21 Jul 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+        <li><i>21 Jul 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
         First release.</li>
 </ul>
 </html>
@@ -2410,6 +2523,7 @@ Algorithm Tolerance = 1e-4
     end TestST2;
 
     model TestTurbine "Test turbine with prescribed pressure conditions"
+
       Water.SourcePressure
                     source(             h=3.3e6,
         p0=15000000,
@@ -2471,6 +2585,9 @@ Algorithm Tolerance = 1e-4
 
   package ThermoHydraulicElements
     "Test for Thermal package elements and Flow1D models of Water and Gas packages"
+
+    package OldTests "Contains tests for old Flow1D components"
+    end OldTests;
 
     model TestConvHT2N
       parameter Integer Nbig=6;
@@ -2559,6 +2676,134 @@ Algorithm Tolerance = 1e-4
 
 "));
     end TestConvHT2N;
+
+    model TestHeatTransfer2phDBa "Test case for HeatTransfer2phDB"
+      package Medium = Modelica.Media.Water.WaterIF97_ph;
+      parameter Integer Nnodes = 10;
+      final parameter SpecificEnthalpy hstartin = 1e5;
+      SpecificEnthalpy hstartout = (1e5+0.001) + 3.4e6*time;
+      SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
+      final parameter Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
+      final parameter AbsolutePressure p = 3e6;
+      final parameter MassFlowRate wnom = 2;  // u = 2 [m/s]   wnom = rho*Across*u
+      final parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
+      Medium.ThermodynamicState fluidState[Nnodes];
+
+      Water.HeatTransfer2phDB HeatTransfer(
+        Nf=Nnodes,
+        A=Across,
+        Dhyd=0.06,
+        omega=0.188496,
+        L=10,
+        redeclare package Medium = Medium,
+        fluidState=fluidState,
+        w=w,
+        gamma_b=30000)
+        annotation (Placement(transformation(extent={{-20,-46},{16,-16}})));
+      Thermal.TempSource1DFV TempSource(N=Nnodes)
+        annotation (Placement(transformation(extent={{-14,0},{14,26}})));
+      Modelica.Blocks.Sources.Constant Temperature_const(k=873.15)
+                                                 annotation (Placement(
+            transformation(extent={{-62,56},{-42,76}},rotation=0)));
+    equation
+      connect(TempSource.wall, HeatTransfer.wall) annotation (Line(
+          points={{0,9.1},{0,-26.5},{-2,-26.5}},
+          color={255,127,0},
+          smooth=Smooth.None));
+
+      for j in 1:Nnodes loop
+        fluidState[j] = Medium.setState_ph(p, h[j]);
+      end for;
+      connect(Temperature_const.y, TempSource.temperature) annotation (Line(
+          points={{-41,66},{0,66},{0,18.2}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics),
+        Diagram(graphics),
+        experiment(StopTime=1,__Dymola_NumberOfIntervals=10000, Tolerance=1e-006),
+        Documentation(info="<HTML>
+<p>The model is designed to test the component  <tt>HeatTransfer2phDB</tt> during evaporation process.<br>
+This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is liquid water.<br>
+<p>
+Integration Algorithm = DASSL <br>
+Algorithm Tolerance = 1e-6
+</p>
+</HTML>", revisions="<html>
+<ul>
+    <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
+    First release.</li>
+</ul>
+</html>"),
+        __Dymola_experimentSetupOutput);
+    end TestHeatTransfer2phDBa;
+
+    model TestHeatTransfer2phDBb "Test case for HeatTransfer2phDB"
+      package Medium = Modelica.Media.Water.WaterIF97_ph;
+      parameter Integer Nnodes = 10;
+      final parameter SpecificEnthalpy hstartin = 3.7e6;
+      SpecificEnthalpy hstartout = (3.7e6-0.001) - 3e6*(time/250);
+      SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
+      final parameter Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
+      final parameter AbsolutePressure p = 3e6;
+      final parameter MassFlowRate wnom = 2;  // u = 2 [m/s]   wnom = rho*Across*u
+      final parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
+      Medium.ThermodynamicState fluidState[Nnodes];
+
+      Water.HeatTransfer2phDB HeatTransfer(
+        Nf=Nnodes,
+        A=Across,
+        Dhyd=0.06,
+        omega=0.188496,
+        L=10,
+        redeclare package Medium = Medium,
+        fluidState=fluidState,
+        w=w,
+        gamma_b=10000)
+        annotation (Placement(transformation(extent={{-20,-46},{22,-10}})));
+      Thermal.TempSource1DFV TempSource(N=Nnodes)
+        annotation (Placement(transformation(extent={{-14,0},{14,26}})));
+      Modelica.Blocks.Sources.Constant Temperature_const(k=373.15)
+                                                 annotation (Placement(
+            transformation(extent={{-62,56},{-42,76}},rotation=0)));
+    equation
+      connect(TempSource.wall, HeatTransfer.wall) annotation (Line(
+          points={{0,9.1},{0,-22.6},{1,-22.6}},
+          color={255,127,0},
+          smooth=Smooth.None));
+
+      for j in 1:Nnodes loop
+        fluidState[j] = Medium.setState_ph(p, h[j]);
+      end for;
+      connect(Temperature_const.y, TempSource.temperature) annotation (Line(
+          points={{-41,66},{0,66},{0,18.2}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics),
+        Diagram(graphics),
+        experiment(StopTime=1,__Dymola_NumberOfIntervals=10000,Tolerance=1e-006),
+        Documentation(info="<HTML>
+<p>The model is designed to test the component  <tt>HeatTransfer2phDB</tt> during condensation process.<br>
+This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is liquid water.<br>
+<p>
+Simulation Interval = [0...300] sec <br>
+Integration Algorithm = DASSL <br>
+Algorithm Tolerance = 1e-6
+</p>
+</HTML>", revisions="<html>
+<ul>
+    <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
+    First release.</li>
+</ul>
+</html>"));
+    end TestHeatTransfer2phDBb;
+
+    model TestFlow1DFV
+
+      Water.Flow1DFV flow1DFV
+        annotation (Placement(transformation(extent={{-8,-28},{20,-2}})));
+    end TestFlow1DFV;
 
     model TestFlow1Da "Test case for Flow1D"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
@@ -2689,21 +2934,21 @@ Algorithm Tolerance = 1e-4
         experiment(StopTime=80, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
 During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
 <ul>
     <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...80] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -2816,21 +3061,21 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=200, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes). <br>
-This model represent the fluid side of a heat exchanger with convective exchange with an external source of given temperature. The operating fluid is liquid water.<br> 
-During experiment the external (fixed) temperature changes: 
+This model represent the fluid side of a heat exchanger with convective exchange with an external source of given temperature. The operating fluid is liquid water.<br>
+During experiment the external (fixed) temperature changes:
 <ul>
     <li>t=20 s, Step variation of the external temperature. Heat exchanger outlet temperature should vary accordingly to the transfer function (K1/(1+s*tau1))*(1-exp(-K2-s*tau2)), where the parameters K1, K2, tau1, tau1 depend on exchanger geometry, the fluid heat transfer coefficient and the operating conditions.</li>
 </ul>
 </p>
 </p>
 <p>
-Simulation Interval = [0...200] sec <br> 
+Simulation Interval = [0...200] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -2929,6 +3174,7 @@ Algorithm Tolerance = 1e-6
         annotation (Line(points={{-10,27},{-10,5}}, color={255,127,0}));
     initial equation
       der(hex.p) = 0;
+
     equation
       connect(SensP.flange, ValveLin1.inlet)
         annotation (Line(points={{20,20},{20,12},{34,12},{34,0}}));
@@ -2951,13 +3197,13 @@ During simulation mass flow rate changes:
 </p>
 </p>
 <p>
-Simulation Interval = [0...2] sec <br> 
+Simulation Interval = [0...2] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -3129,7 +3375,7 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=900, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, model uses finite volumes).<br>
-This model represent the two fluid sides of a heat exchanger in counterflow configuration. The operating fluid is liquid water.<br> 
+This model represent the two fluid sides of a heat exchanger in counterflow configuration. The operating fluid is liquid water.<br>
 The mass flow rate during the experiment and initial conditions are the same for the two sides. <br>
 During the simulation, the inlet specific enthalpy for hexA (\"hot side\") is changed:
 <ul>
@@ -3139,13 +3385,13 @@ The outlet temperature of the hot side starts changing after the fluid transport
 </p>
 </p>
 <p>
-Simulation Interval = [0...900] sec <br> 
+Simulation Interval = [0...900] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -3341,13 +3587,13 @@ During the simulation, the inlet specific enthalpy for hexA (\"hot side\") is ch
 </ul>
 The outlet temperature of the hot side changes after the fluid transport time delay and the first order delay due to the wall's thermal inertia. The outlet temperature of the cold side starts changing after the thermal inertia delay. </p>
 <p>
-Simulation Interval = [0...900] sec <br> 
+Simulation Interval = [0...900] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -3482,22 +3728,22 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=80, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<p> 
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<p>
 Different media models can be employed; incompressible medium models avoid fast pressure states.<p>
 During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
 <ul>
     <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...80] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>24 Sep 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+    <li><i>24 Sep 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Adapted to multiple media models.
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
@@ -3607,21 +3853,21 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=200, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes). <br>
-This model represent the fluid side of a heat exchanger with convective exchange with an external source of given temperature. The operating fluid is liquid water.<br> 
-During experiment the external (fixed) temperature changes: 
+This model represent the fluid side of a heat exchanger with convective exchange with an external source of given temperature. The operating fluid is liquid water.<br>
+During experiment the external (fixed) temperature changes:
 <ul>
     <li>t=20 s, Step variation of the external temperature. Heat exchanger outlet temperature should vary accordingly to the transfer function (K1/(1+s*tau1))*(1-exp(-K2-s*tau2)), where the parameters K1, K2, tau1, tau1 depend on exchanger geometry, the fluid heat transfer coefficient and the operating conditions.</li>
 </ul>
 </p>
 </p>
 <p>
-Simulation Interval = [0...200] sec <br> 
+Simulation Interval = [0...200] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -3750,21 +3996,21 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=80, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
 During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
 <ul>
     <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...80] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -3874,21 +4120,21 @@ Algorithm Tolerance = 1e-6
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method). <br>
 This model represent the fluid side of a heat exchanger with convective exchange with an external source at a given temperature.<br>
-The operating fluid is liquid water.<br> 
-During the experiment the external (fixed) temperature changes: 
+The operating fluid is liquid water.<br>
+During the experiment the external (fixed) temperature changes:
 <ul>
         <li>t=20 s, Step variation of the external temperature. Heat exchanger outlet temperature should vary accordingly to the transfer function (K1/(1+s*tau1))*(1-exp(-K2-s*tau2)), where the parameters K1, K2, tau1, tau1 depend on exchanger geometry, the fluid heat transfer coefficient and operating conditions.</li>
 </ul>
 </p>
 </p>
 <p>
-Simulation Interval = [0...200] sec <br> 
+Simulation Interval = [0...200] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -4013,13 +4259,13 @@ During the simulation, flow reversal is achieved:
 </p>
 </p>
 <p>
-Simulation Interval = [0...1000] sec <br> 
+Simulation Interval = [0...1000] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -4112,6 +4358,7 @@ Algorithm Tolerance = 1e-6
     initial equation
       der(hex.p) = 0;
       der(hex.h) = zeros(hex.N);
+
     equation
       connect(SensP.flange, ValveLin1.inlet)
         annotation (Line(points={{22,10},{40,10},{40,0}}));
@@ -4134,13 +4381,13 @@ During simulation mass flow rate changes:
 </p>
 </p>
 <p>
-Simulation Interval = [0...2] sec <br> 
+Simulation Interval = [0...2] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -4306,7 +4553,7 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=900, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
-This model represent the two fluid sides of a heat exchanger in counterflow configuration. The operating fluid is liquid water.<br> 
+This model represent the two fluid sides of a heat exchanger in counterflow configuration. The operating fluid is liquid water.<br>
 The mass flow rate during the experiment and initial conditions are the same for the two sides. <br>
 During the simulation, the inlet specific enthalpy for hexA (\"hot side\") is changed:
 <ul>
@@ -4316,9 +4563,9 @@ The outlet temperature of the hot side starts changing after the fluid transport
 </p>
 </p>
 <p>
-Simulation Interval = [0...900] sec <br> 
+Simulation Interval = [0...900] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
@@ -4326,7 +4573,7 @@ Algorithm Tolerance = 1e-6
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
        New heat transfer components.</li>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 
@@ -4517,9 +4764,9 @@ During the simulation, the inlet specific enthalpy for hexA (\"hot side\") is ch
 </ul>
 The outlet temperature of the hot side changes after the fluid transport time delay and the first order delay due to the wall's thermal inertia. The outlet temperature of the cold side starts changing after the thermal inertia delay. </p>
 <p>
-Simulation Interval = [0...900] sec <br> 
+Simulation Interval = [0...900] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </HTML>", revisions="<html>
 <ul>
 <li><i>20 Dec 2004</i>
@@ -4654,18 +4901,18 @@ Casella</a>:<br>
           Tolerance=1e-009),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as an evaporator.<br>
-This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water.<br> 
+This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water.<br>
 During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant:
 <ul>
     <li>t=0 s. The initial state of the water is subcooled liquid.
     <li>t=10 s. Ramp increase of the applied heat flow. The water starts boiling and is blown out of the outlet, whose pressure and flowrate undergo a transient increase. At the end of the transient the outlet fluid is in superheated vapour state.</li>
-    <li>t=100 s. Step increase of the inlet enthalpy</li> 
-    <li>t=150 s. The heat flow is brought back to zero. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li> 
+    <li>t=100 s. Step increase of the inlet enthalpy</li>
+    <li>t=150 s. The heat flow is brought back to zero. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li>
 </ul>
 <p>
-Simulation Interval = [0...250] sec <br> 
+Simulation Interval = [0...250] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-9 
+Algorithm Tolerance = 1e-9
 </p>
 </HTML>", revisions="<html>
 <ul>
@@ -4673,7 +4920,7 @@ Algorithm Tolerance = 1e-9
     Parameters updated.</li>
     <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Parameters updated.</li>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"),
@@ -4801,15 +5048,15 @@ Algorithm Tolerance = 1e-9
           __Dymola_NumberOfIntervals=2000,
           Tolerance=1e-009),
         Documentation(info="<HTML>
-<p>Same as TestFlow1D2phA, but in this case the enthalpy at the inlet changes stepwise. The avodInletEnthalpyDerivative flag is set to true, in order to avoid problems with the derivative of h[1]. 
+<p>Same as TestFlow1D2phA, but in this case the enthalpy at the inlet changes stepwise. The avodInletEnthalpyDerivative flag is set to true, in order to avoid problems with the derivative of h[1].
 <p>
-Simulation Interval = [0...250] sec <br> 
+Simulation Interval = [0...250] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-9 
+Algorithm Tolerance = 1e-9
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>27 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+    <li><i>27 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Created.</li>
 </ul>
 </html>"),
@@ -4927,18 +5174,18 @@ Algorithm Tolerance = 1e-9
           Tolerance=1e-009),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as an evaporator.<br>
-This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water. The outlet pressure is kept constant, emulating perfect pressure control.<br> 
+This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water. The outlet pressure is kept constant, emulating perfect pressure control.<br>
 During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant:
 <ul>
     <li>t=0 s. The initial state of the water is subcooled liquid.
     <li>t=10 s. Ramp increase of the applied heat flow. The water starts boiling and is blown out of the outlet, whose flowrate undergo a transient increase. At the end of the transient the outlet fluid is in superheated vapour state.</li>
-    <li>t=100 s. Step increase of the inlet enthalpy</li> 
-    <li>t=150 s. The heat flow is brought back to zero. The vapour collapses, causing a suddend decrease in the outlet flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li> 
+    <li>t=100 s. Step increase of the inlet enthalpy</li>
+    <li>t=150 s. The heat flow is brought back to zero. The vapour collapses, causing a suddend decrease in the outlet flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li>
 </ul>
 <p>
-Simulation Interval = [0...250] sec <br> 
+Simulation Interval = [0...250] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-9 
+Algorithm Tolerance = 1e-9
 </p>
 </HTML>", revisions="<html>
 <ul>
@@ -5075,22 +5322,22 @@ Algorithm Tolerance = 1e-9
           Tolerance=1e-009),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as a condenser.<br>
-This model represent the fluid side of a condenser with an applied external heat flow. The operating fluid is water.<br> 
+This model represent the fluid side of a condenser with an applied external heat flow. The operating fluid is water.<br>
 During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant:
 <ul>
     <li>t=0 s. The initial state of the water is superheated vapour.
     <li>t=10 s. Ramp increase of the heat flow extracted from the component. The steam condenses, causing a reduction of pressure and a flow rate transient decrease. At the end of the transient the outlet fluid is in subcooled liquid state.</li>
-    <li>t=300 s. Step increase of the inlet enthalpy</li> 
-    <li>t=400 s. The heat flow is brought back to zero. The fluids evaporates, causing an increase of pressure and a surge of flow rate at the outlet..</li> 
+    <li>t=300 s. Step increase of the inlet enthalpy</li>
+    <li>t=400 s. The heat flow is brought back to zero. The fluids evaporates, causing an increase of pressure and a surge of flow rate at the outlet..</li>
 </ul>
 <p>
-Simulation Interval = [0...600] sec <br> 
+Simulation Interval = [0...600] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-9 
+Algorithm Tolerance = 1e-9
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>26 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+    <li><i>26 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Parameters updated.</li>
     <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Parameters updated.</li>
@@ -5337,7 +5584,8 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-70},{0,-50}},
+        dpnom=1000) annotation (Placement(transformation(extent={{-20,-70},{0,
+                -50}},
               rotation=0)));
       ThermoPower.Water.ValveLin valve(Kv=0.05/60e5) annotation (Placement(
             transformation(extent={{30,-70},{50,-50}}, rotation=0)));
@@ -5397,7 +5645,7 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(hex.outfl, valve.inlet) annotation (Line(
-          points={{0,-60},{30,-60}},
+          points={{0,-60},{16,-60},{30,-60}},
           color={0,0,255},
           thickness=0.5));
       connect(valve.outlet, Sink.flange) annotation (Line(
@@ -5405,7 +5653,7 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
           color={0,0,255},
           thickness=0.5));
       connect(Source.flange, hex.infl) annotation (Line(
-          points={{-40,-60},{-20,-60}},
+          points={{-40,-60},{-30,-60},{-20,-60}},
           thickness=0.5,
           color={0,0,255}));
       connect(htExt.side2, Tube.ext)
@@ -5443,22 +5691,22 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
           Tolerance=1e-008),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2phDB</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow, computation of the heat transfer coefficient).<br>
-This model represent the fluid side of a once-through boiler with an applied external linear temperature profile. The operating fluid is water.<br> 
+This model represent the fluid side of a once-through boiler with an applied external linear temperature profile. The operating fluid is water.<br>
 The simulation proceeds through the following steps:
 <ul>
     <li>t=0 s. The initial state of the water is subcooled liquid. After 40 seconds all the thermal transients have settled.
     <li>t=100 s. Ramp increase of the external temperature profile. The water starts boiling at t=118 s. At the end of the transient (t=300) the outlet fluid is superheated vapour.</li>
-    <li>t=500 s. Ramp decrease of the external temperature profile. After the transient has settled, the fluid in the boiler is again subcooled water.</li> 
+    <li>t=500 s. Ramp decrease of the external temperature profile. After the transient has settled, the fluid in the boiler is again subcooled water.</li>
 </ul>
 <p> During the transient it is possible to observe the change in the heat transfer coefficients when boiling takes place; note that the h.t.c.'s  do not change abruptly due to the smoothing algorithm inside the <tt>Flow1D2phDB</tt> model.
 <p>
-Simulation Interval = [0...1000] sec <br> 
+Simulation Interval = [0...1000] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-8 
+Algorithm Tolerance = 1e-8
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>4 Feb 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+    <li><i>4 Feb 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -5598,13 +5846,13 @@ Algorithm Tolerance = 1e-8
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2phDB</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow, heat transfer computation) with a prescribed external heat flux, for debugging purposes. The heat transfer coefficient on the <tt>wall</tt> connector should be a continuous function.
 <p>
-Simulation Interval = [0...300] sec <br> 
+Simulation Interval = [0...300] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-7 
+Algorithm Tolerance = 1e-7
 </p>
 </HTML>", revisions="<HTML>
 <ul>
-    <li><i>11 Oct 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+    <li><i>11 Oct 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     First release.</li>
 </ul>
 </HTML>"),
@@ -5747,22 +5995,22 @@ Algorithm Tolerance = 1e-7
         experiment(StopTime=1000, Tolerance=1e-008),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2phDB</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow, computation of the heat transfer coefficient).<br>
-This model represent the fluid side of a once-through boiler with an applied external linear temperature profile. The operating fluid is water.<br> 
+This model represent the fluid side of a once-through boiler with an applied external linear temperature profile. The operating fluid is water.<br>
 The simulation proceeds through the following steps:
 <ul>
     <li>t=0 s. The initial state of the water is subcooled liquid. After 40 seconds all the thermal transients have settled.
     <li>t=100 s. Ramp increase of the external temperature profile. The water starts boiling at t=118 s. At the end of the transient (t=300) the outlet fluid is superheated vapour.</li>
-    <li>t=500 s. Ramp decrease of the external temperature profile. After the transient has settled, the fluid in the boiler is again subcooled water.</li> 
+    <li>t=500 s. Ramp decrease of the external temperature profile. After the transient has settled, the fluid in the boiler is again subcooled water.</li>
 </ul>
 <p> During the transient it is possible to observe the change in the heat transfer coefficients when boiling takes place; note that the h.t.c.'s  do not change abruptly due to the smoothing algorithm inside the <tt>Flow1D2phDB</tt> model.
 <p>
-Simulation Interval = [0...1000] sec <br> 
+Simulation Interval = [0...1000] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-8 
+Algorithm Tolerance = 1e-8
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>4 Feb 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+    <li><i>4 Feb 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     First release.</li>
 </ul>
 </html>"),
@@ -5903,13 +6151,13 @@ Algorithm Tolerance = 1e-8
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2phDB</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow, heat transfer computation) with a prescribed external heat flux, for debugging purposes. The heat transfer coefficient on the <tt>wall</tt> connector should be a continuous function.
 <p>
-Simulation Interval = [0...300] sec <br> 
+Simulation Interval = [0...300] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-7 
+Algorithm Tolerance = 1e-7
 </p>
 </HTML>", revisions="<HTML>
 <ul>
-    <li><i>11 Oct 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br> 
+    <li><i>11 Oct 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     First release.</li>
 </ul>
 </HTML>"),
@@ -6048,22 +6296,22 @@ Algorithm Tolerance = 1e-7
         experiment(StopTime=100, Tolerance=1e-008),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D2ph</tt> (fluid side of a heat exchanger, finite volumes, two-phase flow).<br>
-This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water.<br> 
+This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water.<br>
 During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant:
 <ul>
     <li>t=0 s. The initial state of the water is subcooled liquid.
     <li>t=10 s. Ramp increase of the applied heat flow. The water starts boiling and is blown out of the outlet, whose pressure and flowrate undergo a transient increase. At the end of the transient the outlet fluid is in superheated vapour state.</li>
-    <li>t=30 s. Step increase of the inlet enthalpy</li> 
-    <li>t=50 s. The heat flow is reduced to zero in 2s. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the pressure and flowrate rise again rapidly to the inlet values.</li> 
+    <li>t=30 s. Step increase of the inlet enthalpy</li>
+    <li>t=50 s. The heat flow is reduced to zero in 2s. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the pressure and flowrate rise again rapidly to the inlet values.</li>
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...80] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"),
@@ -6234,9 +6482,9 @@ The model starts at steady state. At t = 10 s, step variation of the temperature
 The working fluid is pure nitrogen.
 </ul>
 <p>
-Simulation Interval = [0...60] sec <br> 
+Simulation Interval = [0...60] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </HTML>"),
         __Dymola_experimentSetupOutput);
     end TestGasFlow1DA;
@@ -6452,21 +6700,21 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
         experiment(StopTime=100, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
 During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
 <ul>
     <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...80] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -6542,21 +6790,21 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=100, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
 During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
 <ul>
     <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...80] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
@@ -6658,21 +6906,21 @@ Algorithm Tolerance = 1e-6
           Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
 During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
 <ul>
     <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...80] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"),
@@ -6776,31 +7024,27 @@ Algorithm Tolerance = 1e-6
           Tolerance=1e-007),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br> 
+This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
 During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
 <ul>
     <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li> 
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li> 
+    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
+    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
 </ul>
 <p>
-Simulation Interval = [0...80] sec <br> 
+Simulation Interval = [0...80] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br> 
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"),
         __Dymola_experimentSetupOutput(doublePrecision=true, equdistant=false));
     end TestFlow1DfemJ;
 
-    model TestFlow1DFV
-      Water.Flow1DFV flow1DFV
-        annotation (Placement(transformation(extent={{-56,24},{-28,50}})));
-    end TestFlow1DFV;
   end ThermoHydraulicElements;
 
   package GasElements "Test for Gas package elements except Flow1D models"
@@ -7072,7 +7316,7 @@ This model tests the <tt>Header</tt> model.
         Diagram(graphics),
         experiment(StopTime=20),
         Documentation(info="<html>
-This model tests the <tt>Mixer</tt> model. 
+This model tests the <tt>Mixer</tt> model.
 <p>
 Simulate for 20 s. At time t=1 the first inlet flow rate is reduced. At time t=8 the second inlet flow rate is reduced. At time t=15, the outlet valve is partially closed.
 </html>"));
@@ -7157,7 +7401,7 @@ Simulate for 20 s. At time t=1 the first inlet flow rate is reduced. At time t=8
       annotation (Documentation(info="<html>
 This model tests the <tt>CombustionChamber</tt> model. The model start at steady state. At time t = 0.5, the fuel flow rate is reduced by 10%.
 
-<p>Simulate for 5s. 
+<p>Simulate for 5s.
 </html>"), experiment(StopTime=5));
     end TestCC;
 
@@ -7389,7 +7633,7 @@ This model tests the <tt>PressDrop</tt>, <tt>PressDropLin</tt> and <tt>Valve</tt
         offset=1,
         startTime=0.7) annotation (Placement(transformation(extent={{-10,-30},{
                 10,-10}}, rotation=0)));
-      /*initial equation 
+      /*initial equation
   Valve1.w=1;
   Valve2.Av=0.25*Valve1.Av;
   Valve3.w=1;
@@ -7826,9 +8070,9 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         experiment(StopTime=10),
         experimentSetupOutput,
         Documentation(info="<html>
-This model test the Turbine model with an inertial load. Boundary conditions and data refer to an turbojet engine at 11.000 m. 
+This model test the Turbine model with an inertial load. Boundary conditions and data refer to an turbojet engine at 11.000 m.
 
-<p>Simulate for 5 seconds.  
+<p>Simulate for 5 seconds.
 </html>"));
     end TestGasTurbine;
 
@@ -7895,8 +8139,8 @@ This model test the Turbine model with an inertial load. Boundary conditions and
         extent=[-58, 20; -38, 40],
         Diagram(graphics),
         Documentation(info="<html>
-This model test the Turbine model based on the Stodola's law at constant speed. Boundary conditions and data refer to an turbojet engine at 11.000 m. 
-<p>Simulate for 5 seconds. 
+This model test the Turbine model based on the Stodola's law at constant speed. Boundary conditions and data refer to an turbojet engine at 11.000 m.
+<p>Simulate for 5 seconds.
 </html>"),
         experiment(StopTime=5),
         Placement(transformation(extent={{-58,20},{-38,40}}, rotation=0)),
@@ -8070,7 +8314,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
 <p><b>References:</b></p>
 <ol>
 <li>P. P. Walsh, P. Fletcher: <i>Gas Turbine Performance</i>, 2nd ed., Oxford, Blackwell, 2004, pp. 646.
-</ol> 
+</ol>
 </html>"), experiment(StopTime=5));
     end TestTurboJetInertia;
 
@@ -8217,12 +8461,12 @@ This is the full model of a turbojet-type engine at 11.000m [1].
           color={0,0,0},
           thickness=0.5));
       annotation (experiment(StopTime=5), Documentation(info="<html>
-This is a simplified model of a turbojet-type engine at 11.000m [1], at costant speed. 
-<p>Simulate the model for 20s. At time t = 1 the fuel flow rate is reduced by 10%; the engine slows down accordingly.  
+This is a simplified model of a turbojet-type engine at 11.000m [1], at costant speed.
+<p>Simulate the model for 20s. At time t = 1 the fuel flow rate is reduced by 10%; the engine slows down accordingly.
 <p><b>References:</b></p>
 <ol>
 <li>P. P. Walsh, P. Fletcher: <i>Gas Turbine Performance</i>, 2nd ed., Oxford, Blackwell, 2004, pp. 646.
-</ol> 
+</ol>
 </html>"));
     end TestTurboJetConstSpeed;
 
@@ -8584,9 +8828,9 @@ Simulation sequence:
     <li>t=2 s: After 10% of the turbine acceleration time, the frequency has dropped by around 10%. The approximation is due to nonlinear effects.
 </ul>
 <p>
-Simulation Interval = [0...2] sec <br> 
+Simulation Interval = [0...2] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </html>", revisions="<html>
 <ul>
@@ -8685,9 +8929,9 @@ Simulation sequence:
     <li>t=2 s: After 10% of the turbine acceleration time, the frequency has dropped by around 10%. The approximation is due to nonlinear effects.
 </ul>
 <p>
-Simulation Interval = [0...2] sec <br> 
+Simulation Interval = [0...2] sec <br>
 Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6 
+Algorithm Tolerance = 1e-6
 </p>
 </html>", revisions="<html>
 <ul>
