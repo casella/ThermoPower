@@ -6910,7 +6910,6 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     CoefficientOfHeatTransfer gamma_bubble;
     CoefficientOfHeatTransfer gamma_dew;
     CoefficientOfHeatTransfer gamma2ph = gamma_b;
-    //CoefficientOfHeatTransfer gammabar[Nw] "Average coefficient of heat transfer in the volumes";
     Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
     Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";

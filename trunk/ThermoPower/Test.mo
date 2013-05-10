@@ -2685,7 +2685,7 @@ Algorithm Tolerance = 1e-4
       SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
       final parameter Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
       final parameter AbsolutePressure p = 3e6;
-      final parameter MassFlowRate wnom = 2;  // u = 2 [m/s]   wnom = rho*Across*u
+      final parameter MassFlowRate wnom = 2;
       final parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
       Medium.ThermodynamicState fluidState[Nnodes];
 
@@ -2699,7 +2699,7 @@ Algorithm Tolerance = 1e-4
         fluidState=fluidState,
         w=w,
         gamma_b=30000)
-        annotation (Placement(transformation(extent={{-20,-46},{16,-16}})));
+        annotation (Placement(transformation(extent={{-18,-40},{18,-10}})));
       Thermal.TempSource1DFV TempSource(N=Nnodes)
         annotation (Placement(transformation(extent={{-14,0},{14,26}})));
       Modelica.Blocks.Sources.Constant Temperature_const(k=873.15)
@@ -2707,7 +2707,7 @@ Algorithm Tolerance = 1e-4
             transformation(extent={{-62,56},{-42,76}},rotation=0)));
     equation
       connect(TempSource.wall, HeatTransfer.wall) annotation (Line(
-          points={{0,9.1},{0,-26.5},{-2,-26.5}},
+          points={{0,9.1},{0,-20.5}},
           color={255,127,0},
           smooth=Smooth.None));
 
@@ -2721,7 +2721,10 @@ Algorithm Tolerance = 1e-4
       annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
                 -100},{100,100}}), graphics),
         Diagram(graphics),
-        experiment(StopTime=1,__Dymola_NumberOfIntervals=10000, Tolerance=1e-006),
+        experiment(
+          StartTime=0.1,
+          __Dymola_NumberOfIntervals=10000,
+          Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>HeatTransfer2phDB</tt> during evaporation process.<br>
 This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is liquid water.<br>
@@ -2741,12 +2744,12 @@ Algorithm Tolerance = 1e-6
     model TestHeatTransfer2phDBb "Test case for HeatTransfer2phDB"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       parameter Integer Nnodes = 10;
-      final parameter SpecificEnthalpy hstartin = 3.7e6;
-      SpecificEnthalpy hstartout = (3.7e6-0.001) - 3e6*(time/250);
+      final parameter SpecificEnthalpy hstartin = 3.5e6;
+      SpecificEnthalpy hstartout = (3.5e6+0.001) - 3.4e6*time;
       SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
       final parameter Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
       final parameter AbsolutePressure p = 3e6;
-      final parameter MassFlowRate wnom = 2;  // u = 2 [m/s]   wnom = rho*Across*u
+      final parameter MassFlowRate wnom = 2;
       final parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
       Medium.ThermodynamicState fluidState[Nnodes];
 
@@ -2759,16 +2762,16 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         fluidState=fluidState,
         w=w,
-        gamma_b=10000)
-        annotation (Placement(transformation(extent={{-20,-46},{22,-10}})));
+        gamma_b=30000)
+        annotation (Placement(transformation(extent={{-20,-40},{18,-10}})));
       Thermal.TempSource1DFV TempSource(N=Nnodes)
         annotation (Placement(transformation(extent={{-14,0},{14,26}})));
-      Modelica.Blocks.Sources.Constant Temperature_const(k=373.15)
+      Modelica.Blocks.Sources.Constant Temperature_const(k=873.15)
                                                  annotation (Placement(
             transformation(extent={{-62,56},{-42,76}},rotation=0)));
     equation
       connect(TempSource.wall, HeatTransfer.wall) annotation (Line(
-          points={{0,9.1},{0,-22.6},{1,-22.6}},
+          points={{0,9.1},{0,-20.5},{-1,-20.5}},
           color={255,127,0},
           smooth=Smooth.None));
 
@@ -2782,12 +2785,15 @@ Algorithm Tolerance = 1e-6
       annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
                 -100},{100,100}}), graphics),
         Diagram(graphics),
-        experiment(StopTime=1,__Dymola_NumberOfIntervals=10000,Tolerance=1e-006),
+        experiment(
+          StartTime=0.1,
+          __Dymola_NumberOfIntervals=10000,
+          Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>HeatTransfer2phDB</tt> during condensation process.<br>
 This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is liquid water.<br>
 <p>
-Simulation Interval = [0...300] sec <br>
+<br>
 Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6
 </p>
@@ -2796,7 +2802,8 @@ Algorithm Tolerance = 1e-6
     <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
     First release.</li>
 </ul>
-</html>"));
+</html>"),
+        __Dymola_experimentSetupOutput);
     end TestHeatTransfer2phDBb;
 
     model TestFlow1DFV
