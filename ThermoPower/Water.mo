@@ -6973,32 +6973,34 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
     end for;
 
-     for j in 1:Nw loop
-       if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then // 1-phase liquid or vapour
+    for j in 1:Nw loop
+       if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then       // 1-phase liquid or vapour
          wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2);
          state[j] = 1;
-       elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
-         wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+       elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then               // liquid --> 2-phase
+         //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
          state[j] = 2;
-       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then // 2-phase
+       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
          wall.Q[j] = (wall.T[j] - Ts)*omega*l*gamma2ph;
          state[j] = 3;
-  //      elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then  // 2-phase --> vapour
-  //        wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*gammabar[j] + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-  //        state[j] = 4;
-  //      elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then //2-phase --> liquid
-  //        wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*gammabar[j] + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-  //        state[j] = 5;
-       else // noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then //vapour --> 2-phase
-         wall.Q[j] = 0; /*= alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*gammabar[j] + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;*/
-         state[j] = 0;
+       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                      // 2-phase --> vapour
+         //wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_dew + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         state[j] = 4;
+       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                      // 2-phase --> liquid
+         //wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_bubble + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         state[j] = 5;
+       else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then              // vapour --> 2-phase
+         //wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma_dew)/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         state[j] = 6;
        end if;
        assert((h[j + 1] - h[j]) > 0 or (h[j + 1] - h[j]) < 0, "Division by zero during enthalpy calculation (h[j+1] - h[j]) = 0");
        assert((h[j] - h[j + 1]) > 0 or (h[j] - h[j + 1]) < 0, "Division by zero during enthalpy calculation (h[j] - h[j + 1]) = 0");
        Tvolbar[j] = (T[j] + T[j + 1])/2;
-       //gammabar[j] = (gamma1ph[j] + gamma1ph[j+1])/2;
-     end for;
+    end for;
 
      Q = sum(wall.Q);
 
