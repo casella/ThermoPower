@@ -943,8 +943,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   model Flow1DFV
     "1-dimensional fluid flow model for water/steam (finite volumes)"
 
-    // TO BE ADAPTED!!!!
-
     extends BaseClasses.Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
@@ -976,8 +974,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(final Nf=N, final w=w*ones(N), final fluidState=fluidState) constrainedby
-      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true); /* final w=wstar*ones(N) wstar NON è scalare*/
+    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer( final Nf=N, final w=w*ones(N), final fluidState=fluidState) constrainedby
+      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
 
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -1111,6 +1109,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     connect(wall,heatTransfer.wall);
 
+    Q = sum(heatTransfer.wall.Q) "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Total fluid mass";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
   initial equation
