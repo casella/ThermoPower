@@ -736,6 +736,43 @@ This package contains models to compute the material properties needed to model 
             textString="%name")}));
   end TempSource1Dlin;
 
+  model TempSource1DlinFV "Linearly Distributed Temperature Source"
+    extends Icons.HeatFlow;
+    parameter Integer N=3 "Number of nodes";
+    final parameter Integer Nw = N - 1;
+    replaceable Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput temperature_1 annotation (
+        Placement(transformation(
+          origin={-40,30},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput temperature_Nw annotation (
+        Placement(transformation(
+          origin={40,28},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    wall.T = linspace(
+        temperature_1,
+        temperature_Nw,
+        Nw);
+    annotation (
+      Documentation(info="<HTML>
+<p>Model of an ideal 1D temperature source with a linear distribution. The values of the temperature at the two ends of the source are provided by the <tt>temperature_node1</tt> and <tt>temperature_nodeN</tt> signal connectors.
+</HTML>", revisions="<html>
+<ul>
+<li><i>10 Jan 2004</i>
+    by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"),   Icon(graphics={Text(
+            extent={{-100,-46},{100,-72}},
+            lineColor={191,95,0},
+            textString="%name")}));
+  end TempSource1DlinFV;
+
   model HeatSource1Dhtc "Distributed Heat Flow Source"
     extends HeatSource1D(redeclare Thermal.DHThtc_in wall);
   end HeatSource1Dhtc;
@@ -1747,6 +1784,58 @@ This package contains models to compute the material properties needed to model 
 </ul>
 </html>"));
   end ConvHT2N_htc;
+
+  model CounterCurrentFV
+    "Counter-current heat transfer adaptor for 1D heat transfer"
+    extends Icons.HeatFlow;
+    parameter Integer N=5 "Number of Nodes";
+    final parameter Integer Nw = N - 1;
+    parameter Boolean counterCurrent=true
+      "Swap temperature and flux vector order";
+    Thermal.DHTVolumes side1(N=Nw) annotation (Placement(transformation(extent={{-40,20},
+              {40,40}}, rotation=0)));
+    Thermal.DHTVolumes side2(N=Nw) annotation (Placement(transformation(extent={{-40,-42},
+              {40,-20}}, rotation=0)));
+  equation
+    // Swap temperature and flux vector order
+    if counterCurrent then
+      side1.Q = -side2.Q[Nw:-1:1];
+      side1.T = side2.T[Nw:-1:1];
+    else
+      side1.Q = -side2.Q;
+      side1.T = side2.T;
+    end if;
+    annotation (Icon(graphics={
+          Polygon(
+            points={{-74,2},{-48,8},{-74,16},{-56,8},{-74,2}},
+            lineColor={0,0,0},
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{74,-16},{60,-10},{74,-2},{52,-10},{74,-16}},
+            lineColor={0,0,0},
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid),
+          Text(
+            extent={{-100,-46},{100,-70}},
+            lineColor={191,95,0},
+            textString="%name")}), Documentation(info="<HTML>
+<p>This component can be used to model counter-current heat transfer. The temperature and flux vectors on one side are swapped with respect to the other side. This means that the temperature of node <tt>j</tt> on side 1 is equal to the temperature of note <tt>N-j+1</tt> on side 2; heat fluxes behave correspondingly.
+<p>
+The swapping is performed if the counterCurrent parameter is true (default value).
+</HTML>", revisions="<html>
+<ul>
+<li><i>25 Aug 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       <tt>counterCurrent</tt> parameter added.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+
+</html>
+"));
+  end CounterCurrentFV;
 
   model CounterCurrent
     "Counter-current heat transfer adaptor for 1D heat transfer"

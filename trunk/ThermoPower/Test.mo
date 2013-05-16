@@ -2806,7 +2806,7 @@ Algorithm Tolerance = 1e-6
         __Dymola_experimentSetupOutput);
     end TestHeatTransfer2phDBb;
 
-    model TestFlow1DFV
+    model TestFlow1DFVb
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=10;
@@ -2917,7 +2917,536 @@ Algorithm Tolerance = 1e-6
                 -100},{100,100}}), graphics),
         experiment(StopTime=200, Tolerance=1e-006),
         __Dymola_experimentSetupOutput);
-    end TestFlow1DFV;
+    end TestFlow1DFVb;
+
+    model TestFlow1DFVe
+      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      // number of Nodes
+      parameter Integer Nnodes=20;
+      // total length
+      parameter Modelica.SIunits.Length Lhex=200;
+      // internal diameter
+      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      // internal radius
+      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      // internal perimeter
+      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex=0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.SIunits.MassFlowRate whex=0.31;
+      // initial pressure
+      parameter Modelica.SIunits.Pressure phex=3e5;
+      // initial inlet specific enthalpy
+      parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
+      // initial outlet specific enthalpy
+      parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
+
+      Water.SinkPressure      SideA_FluidSink annotation (Placement(
+            transformation(extent={{74,-82},{94,-62}}, rotation=0)));
+      Water.SinkPressure      SideB_FluidSink annotation (Placement(
+            transformation(extent={{-76,18},{-96,38}},  rotation=0)));
+      Water.SourceMassFlow      SideA_MassFlowRate(w0=whex,
+        p0=300000,
+        use_in_h=true)                                              annotation (
+         Placement(transformation(extent={{-70,-82},{-50,-62}}, rotation=0)));
+      Water.ValveLin             ValveLin1(Kv=whex/(2e5)) annotation (Placement(
+            transformation(extent={{18,-82},{38,-62}}, rotation=0)));
+      Water.ValveLin             ValveLin2(Kv=whex/(2e5)) annotation (Placement(
+            transformation(extent={{-26,18},{-46,38}}, rotation=0)));
+      Water.SensT             SensT_A_in(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{-46,-78},{-26,-58}},
+              rotation=0)));
+      Modelica.Blocks.Sources.Step SideA_InSpecEnth(
+        height=1e5,
+        offset=1e5,
+        startTime=50) annotation (Placement(transformation(extent={{-86,-32},{-66,-12}},
+                     rotation=0)));
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
+            transformation(extent={{-66,58},{-46,78}}, rotation=0)));
+      Modelica.Blocks.Sources.Constant Constant2(k=1)
+                                                 annotation (Placement(
+            transformation(extent={{4,-32},{24,-12}},
+                                                    rotation=0)));
+      Water.SensT             SensT_B_in(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{34,22},{14,42}}, rotation=
+               0)));
+      Water.SourceMassFlow      SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
+         Placement(transformation(extent={{64,18},{44,38}}, rotation=0)));
+      Water.SensT             SensT_A_out(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{44,-78},{64,-58}},
+              rotation=0)));
+      Water.SensT             SensT_B_out(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{-50,22},{-70,42}},
+              rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Water.Flow1DFV hexBfv(
+        N=Nnodes,
+        Nt=1,
+        L=Lhex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        A=Ahex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        hstartin=hinhex,
+        hstartout=houthex,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        pstart=phex,
+        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient heatTransfer(
+          redeclare package Medium = Medium,
+          fluidState=hexBfv.fluidState,
+          w=hexBfv.w*ones(Nnodes),
+          L=Lhex,
+          omega=omegahex,
+          Nf=Nnodes,
+          gamma=400),
+        dpnom=1000)  annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=180,
+            origin={-8,28})));
+      Water.Flow1DFV hexAfv(
+        N=Nnodes,
+        L=Lhex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        A=Ahex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        hstartin=hinhex,
+        hstartout=houthex,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        pstart=phex,
+        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient heatTransfer(
+          redeclare package Medium = Medium,
+          fluidState=hexAfv.fluidState,
+          w=hexAfv.w*ones(Nnodes),
+          L=Lhex,
+          omega=omegahex,
+          Nf=Nnodes,
+          gamma=400),
+        dpnom=1000)
+        annotation (Placement(transformation(extent={{-18,-82},{2,-62}})));
+      Thermal.CounterCurrentFV counterCurrentFV(N=Nnodes, counterCurrent=true)
+        annotation (Placement(transformation(extent={{-18,-28},{2,-8}})));
+    equation
+      connect(SideA_MassFlowRate.flange,SensT_A_in. inlet) annotation (Line(
+          points={{-50,-72},{-42,-72}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SideB_MassFlowRate.flange,SensT_B_in. inlet) annotation (Line(
+          points={{44,28},{30,28}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(ValveLin1.outlet,SensT_A_out. inlet) annotation (Line(
+          points={{38,-72},{48,-72}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SensT_A_out.outlet,SideA_FluidSink. flange) annotation (Line(
+          points={{60,-72},{74,-72}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SensT_B_out.outlet,SideB_FluidSink. flange) annotation (Line(
+          points={{-66,28},{-76,28}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(SensT_B_out.inlet,ValveLin2. outlet) annotation (Line(
+          points={{-54,28},{-46,28}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SideA_InSpecEnth.y,SideA_MassFlowRate. in_h) annotation (Line(
+            points={{-65,-22},{-56,-22},{-56,-66}}, color={0,0,127}));
+      connect(Constant2.y,ValveLin1. cmd) annotation (Line(points={{25,-22},{28,-22},
+              {28,-64}},      color={0,0,127}));
+      connect(Constant1.y,ValveLin2. cmd) annotation (Line(points={{-45,68},{-36,68},
+              {-36,36}},     color={0,0,127}));
+      connect(ValveLin2.inlet, hexBfv.outfl)
+                                           annotation (Line(
+          points={{-26,28},{-18,28}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(hexBfv.infl, SensT_B_in.outlet)
+                                            annotation (Line(
+          points={{2,28},{18,28}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(SensT_A_in.outlet, hexAfv.infl)
+                                            annotation (Line(
+          points={{-30,-72},{-18,-72}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(hexAfv.outfl, ValveLin1.inlet)
+                                           annotation (Line(
+          points={{2,-72},{18,-72}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(counterCurrentFV.side1, hexBfv.wall)
+                                                 annotation (Line(
+          points={{-8,-15},{-8,23}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(counterCurrentFV.side2, hexAfv.wall)
+                                                 annotation (Line(
+          points={{-8,-21.1},{-8,-67}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics),
+        experiment(StopTime=900, Tolerance=1e-006),
+        __Dymola_experimentSetupOutput);
+    end TestFlow1DFVe;
+
+    model TestFlow1DFVf
+      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      // number of Nodes
+      parameter Integer Nnodes=20;
+      // total length
+      parameter Modelica.SIunits.Length Lhex=200;
+      // internal diameter
+      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      // internal radius
+      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      // internal perimeter
+      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex=0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.SIunits.MassFlowRate whex=0.31;
+      // initial pressure
+      parameter Modelica.SIunits.Pressure phex=3e5;
+      // initial inlet specific enthalpy
+      parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
+      // initial outlet specific enthalpy
+      parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
+      Water.SinkPressure      SideA_FluidSink annotation (Placement(
+            transformation(extent={{70,-60},{90,-40}}, rotation=0)));
+      Water.SinkPressure      SideB_FluidSink annotation (Placement(
+            transformation(extent={{-80,40},{-100,60}}, rotation=0)));
+      Water.SourceMassFlow      SideA_MassFlowRate(w0=whex,
+        p0=300000,
+        use_in_h=true)                                              annotation (
+         Placement(transformation(extent={{-76,-60},{-56,-40}}, rotation=0)));
+      Water.ValveLin             ValveLin1(Kv=whex/(2e5)) annotation (Placement(
+            transformation(extent={{18,-60},{38,-40}}, rotation=0)));
+      Water.ValveLin             ValveLin2(Kv=whex/(2e5)) annotation (Placement(
+            transformation(extent={{-30,40},{-50,60}}, rotation=0)));
+      Water.SensT             SensT_A_in(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{-50,-56},{-30,-36}},
+              rotation=0)));
+      Modelica.Blocks.Sources.Step SideA_InSpecEnth(
+        height=1e5,
+        offset=1e5,
+        startTime=50) annotation (Placement(transformation(extent={{-90,-20},{-70,0}},
+                     rotation=0)));
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
+            transformation(extent={{-72,70},{-52,90}}, rotation=0)));
+      Modelica.Blocks.Sources.Constant Constant2(k=1)
+                                                 annotation (Placement(
+            transformation(extent={{4,-20},{24,0}}, rotation=0)));
+      Water.SensT             SensT_B_in(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
+               0)));
+      Water.SourceMassFlow      SourceW1(w0=whex, p0=3e5) annotation (Placement(
+            transformation(extent={{60,40},{40,60}}, rotation=0)));
+      Water.SensT             SensT_A_out(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{44,-56},{64,-36}},
+              rotation=0)));
+      Water.SensT             SensT_B_out(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{-54,44},{-74,64}},
+              rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Water.Flow1DFV hexBfv(
+        N=Nnodes,
+        L=Lhex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        A=Ahex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        hstartin=hinhex,
+        hstartout=houthex,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        pstart=phex,
+        dpnom=1000,
+        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient
+          heatTransfer(
+          gamma=400,
+          L=Lhex,
+          omega=omegahex,
+          useAverageTemperature=true,
+          redeclare package Medium = Medium,
+          fluidState=hexBfv.fluidState,
+          w=hexBfv.w*ones(Nnodes),
+          Nf=Nnodes))       annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=180,
+            origin={-8,50})));
+      Water.Flow1DFV hexAfv(
+        N=Nnodes,
+        Nt=1,
+        L=Lhex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        A=Ahex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        hstartin=hinhex,
+        hstartout=houthex,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        pstart=phex,
+        dpnom=1000,
+        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient
+          heatTransfer(
+          useAverageTemperature=true,
+          gamma=400,
+          L=Lhex,
+          omega=omegahex,
+          redeclare package Medium = Medium,
+          fluidState=hexAfv.fluidState,
+          w=hexAfv.w*ones(Nnodes),
+          Nf=Nnodes))
+        annotation (Placement(transformation(extent={{-18,-60},{2,-40}})));
+      Thermal.MetalTubeFV metalTubeFV(
+        N=Nnodes,
+        L=Lhex,
+        lambda=20,
+        rint=rhex,
+        rext=rhex + 1e-3,
+        rhomcm=4.9e6,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Tstart1=297,
+        TstartN=297)
+        annotation (Placement(transformation(extent={{-18,-16},{2,4}})));
+      Thermal.CounterCurrentFV counterCurrentFV(N=Nnodes)
+        annotation (Placement(transformation(extent={{-18,10},{2,30}})));
+    equation
+      connect(SideA_MassFlowRate.flange,SensT_A_in. inlet) annotation (Line(
+          points={{-56,-50},{-46,-50}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SourceW1.flange,SensT_B_in. inlet) annotation (Line(
+          points={{40,50},{26,50}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SensT_A_out.inlet,ValveLin1. outlet) annotation (Line(
+          points={{48,-50},{38,-50}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SensT_A_out.outlet,SideA_FluidSink. flange) annotation (Line(
+          points={{60,-50},{70,-50}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SensT_B_out.outlet,SideB_FluidSink. flange) annotation (Line(
+          points={{-70,50},{-80,50}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(SensT_B_out.inlet,ValveLin2. outlet) annotation (Line(
+          points={{-58,50},{-50,50}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(Constant1.y,ValveLin2. cmd) annotation (Line(points={{-51,80},{-40,80},
+              {-40,58}},     color={0,0,127}));
+      connect(SideA_InSpecEnth.y,SideA_MassFlowRate. in_h) annotation (Line(
+            points={{-69,-10},{-62,-10},{-62,-44}}, color={0,0,127}));
+      connect(Constant2.y,ValveLin1. cmd) annotation (Line(points={{25,-10},{28,-10},
+              {28,-42}},      color={0,0,127}));
+      connect(hexBfv.wall, counterCurrentFV.side1) annotation (Line(
+          points={{-8,45},{-8,23}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(counterCurrentFV.side2, metalTubeFV.int) annotation (Line(
+          points={{-8,16.9},{-8,-3}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(metalTubeFV.ext, hexAfv.wall) annotation (Line(
+          points={{-8,-9.1},{-8,-45}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(hexAfv.infl, SensT_A_in.outlet) annotation (Line(
+          points={{-18,-50},{-34,-50}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(hexAfv.outfl, ValveLin1.inlet) annotation (Line(
+          points={{2,-50},{18,-50}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(ValveLin2.inlet, hexBfv.outfl) annotation (Line(
+          points={{-30,50},{-18,50}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(hexBfv.infl, SensT_B_in.outlet) annotation (Line(
+          points={{2,50},{14,50}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics),
+        experiment(StopTime=900, Tolerance=1e-006),
+        __Dymola_experimentSetupOutput);
+    end TestFlow1DFVf;
+
+    model TestFlow1DFV2ph
+       package Medium = Modelica.Media.Water.WaterIF97_ph;
+      constant Real pi = Modelica.Constants.pi;
+      // number of Nodes
+      parameter Integer Nnodes=8;
+      // total length
+      parameter Length Lhex=20;
+      // internal diameter
+      parameter Diameter Dhex=0.01;
+      // wall thickness
+      parameter Thickness thhex=0.002;
+      // internal radius
+      parameter Radius rhex=Dhex/2;
+      // internal perimeter
+      parameter Length omegahex=pi*Dhex;
+      // internal cross section
+      parameter Area Ahex=pi*rhex^2;
+      // friction factor
+      parameter Real Cfhex=0.005;
+      Water.ValveLin             valve(Kv=0.05/60e5) annotation (Placement(
+            transformation(extent={{30,-70},{50,-50}}, rotation=0)));
+      Water.SinkPressure      Sink(p0=0) annotation (Placement(transformation(
+              extent={{70,-70},{90,-50}}, rotation=0)));
+      Modelica.Blocks.Sources.Step hIn(
+        height=0,
+        offset=1e6,
+        startTime=30) annotation (Placement(transformation(extent={{-80,-40},{-60,-20}},
+                       rotation=0)));
+      Modelica.Blocks.Sources.Ramp extTemp1(
+        duration=100,
+        height=50,
+        offset=540,
+        startTime=100) annotation (Placement(transformation(extent={{-100,20},{-80,40}},
+                          rotation=0)));
+      Water.SourceMassFlow      Source(
+        w0=0.05,
+        G=0.05/600e5,
+        p0=6000000,
+        use_in_h=true)
+                      annotation (Placement(transformation(extent={{-60,-70},{-40,-50}},
+                       rotation=0)));
+      Modelica.Blocks.Sources.Ramp extTemp2(
+        duration=100,
+        height=-50,
+        startTime=500) annotation (Placement(transformation(extent={{-100,60},{-80,80}},
+                          rotation=0)));
+      Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent={{-66,40},
+                {-46,60}},          rotation=0)));
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+          Placement(transformation(extent={{10,-40},{30,-20}}, rotation=0)));
+      Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(extent={{0,70},{
+                20,90}},         rotation=0)));
+      Modelica.Blocks.Sources.Constant DT(k=5) annotation (Placement(
+            transformation(extent={{-36,60},{-16,80}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Thermal.TempSource1DlinFV tempSource1DlinFV(N=Nnodes)
+        annotation (Placement(transformation(extent={{-16,26},{4,46}})));
+      Thermal.MetalTubeFV metalTubeFV(
+        N=Nnodes,
+        L=Lhex,
+        rint=rhex,
+        rhomcm=7000*680,
+        lambda=20,
+        rext=rhex + 2*thhex,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Tstart1=510,
+        TstartN=510)
+        annotation (Placement(transformation(extent={{-16,-10},{4,10}})));
+      Water.Flow1DFV hexFV(
+        N=Nnodes,
+        L=Lhex,
+        omega=omegahex,
+        A=Ahex,
+        Cfnom=0.005,
+        DynamicMomentum=false,
+        hstartin=1e6,
+        hstartout=1e6,
+        Dhyd=2*rhex,
+        wnom=0.05,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        dpnom=1000,
+        redeclare ThermoPower.Water.HeatTransfer2phDB heatTransfer(
+          Nf=Nnodes,
+          A=Ahex,
+          Dhyd=2*rhex,
+          omega=omegahex,
+          L=Lhex,
+          redeclare package Medium = Medium,
+          fluidState=hexFV.fluidState,
+          w=hexFV.w*ones(Nnodes)))
+        annotation (Placement(transformation(extent={{-16,-70},{4,-50}})));
+    equation
+      connect(valve.outlet,Sink. flange) annotation (Line(
+          points={{50,-60},{70,-60}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(hIn.y,Source. in_h) annotation (Line(points={{-59,-30},{-46,-30},{-46,
+              -54}},      color={0,0,127}));
+      connect(Add2.u2,DT. y) annotation (Line(points={{-2,74},{-8,74},{-8,70},{-15,70}},
+                        color={0,0,127}));
+      connect(Add2.u1,Add1. y) annotation (Line(points={{-2,86},{-40,86},{-40,50},{-45,
+              50}},          color={0,0,127}));
+      connect(xValve.y,valve. cmd) annotation (Line(points={{31,-30},{40,-30},{40,-52}},
+                        color={0,0,127}));
+      connect(extTemp1.y,Add1. u2)
+        annotation (Line(points={{-79,30},{-68,44}}, color={0,0,127}));
+      connect(extTemp2.y,Add1. u1)
+        annotation (Line(points={{-79,70},{-68,56}}, color={0,0,127}));
+      connect(Add2.y, tempSource1DlinFV.temperature_Nw) annotation (Line(
+          points={{21,80},{34,80},{34,50},{-2,50},{-2,38.8}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(tempSource1DlinFV.temperature_1, Add1.y) annotation (Line(
+          points={{-10,39},{-10,50},{-45,50}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(hexFV.infl, Source.flange)    annotation (Line(
+          points={{-16,-60},{-40,-60}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(hexFV.outfl, valve.inlet)    annotation (Line(
+          points={{4,-60},{30,-60}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(tempSource1DlinFV.wall, metalTubeFV.int) annotation (Line(
+          points={{-6,33},{-6,3}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(hexFV.wall, metalTubeFV.ext)    annotation (Line(
+          points={{-6,-55},{-6,-3.1}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics),
+        experiment(
+          StopTime=1000,
+          __Dymola_NumberOfIntervals=5000,
+          Tolerance=1e-008),
+        __Dymola_experimentSetupOutput);
+    end TestFlow1DFV2ph;
 
     model TestFlow1Da "Test case for Flow1D"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
@@ -3361,9 +3890,8 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000,
-        pstart=phex)
-                    annotation (Placement(transformation(extent={{-20,-70},{0,-50}},
+        pstart=phex,
+        dpnom=1000) annotation (Placement(transformation(extent={{-20,-70},{0,-50}},
               rotation=0)));
       ThermoPower.Water.SinkPressure
                               SideA_FluidSink annotation (Placement(
@@ -3394,9 +3922,8 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000,
-        pstart=phex)
-                    annotation (Placement(transformation(extent={{0,50},{-20,30}},
+        pstart=phex,
+        dpnom=1000) annotation (Placement(transformation(extent={{0,50},{-20,30}},
               rotation=0)));
       ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-66},{-30,-46}},
@@ -3426,10 +3953,11 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.SensT SensT_B_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-54,34},{-74,54}},
               rotation=0)));
-      Thermal.CounterCurrent CounterCurrent1(N=Nnodes) annotation (Placement(
-            transformation(extent={{-20,0},{0,20}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Thermal.CounterCurrent CounterCurrent1(N=Nnodes, counterCurrent=true)
+                                                       annotation (Placement(
+            transformation(extent={{-20,-6},{0,14}},rotation=0)));
     equation
       connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) annotation (Line(
           points={{-54,-60},{-46,-60}},
@@ -3473,18 +4001,24 @@ Algorithm Tolerance = 1e-6
           points={{-58,40},{-50,40}},
           thickness=0.5,
           color={0,0,255}));
-      connect(ConvExCF.side1, CounterCurrent1.side2)
-        annotation (Line(points={{-10,-27},{-10,6.9}}, color={255,127,0}));
-      connect(CounterCurrent1.side1, hexB.wall)
-        annotation (Line(points={{-10,13},{-10,35}}, color={255,127,0}));
       connect(SideA_InSpecEnth.y, SideA_MassFlowRate.in_h) annotation (Line(
             points={{-69,-10},{-60,-10},{-60,-54}}, color={0,0,127}));
       connect(Constant2.y, ValveLin1.cmd) annotation (Line(points={{21,-10},{24,
               -10},{24,-52}}, color={0,0,127}));
       connect(Constant1.y, ValveLin2.cmd) annotation (Line(points={{-49,80},{-40,
               80},{-40,48}}, color={0,0,127}));
+      connect(hexB.wall, CounterCurrent1.side1) annotation (Line(
+          points={{-10,35},{-10,7}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(CounterCurrent1.side2, ConvExCF.side1) annotation (Line(
+          points={{-10,0.9},{-10,-27}},
+          color={255,127,0},
+          smooth=Smooth.None));
       annotation (
-        Diagram(graphics),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}),
+                graphics),
         experiment(StopTime=900, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, model uses finite volumes).<br>
@@ -3597,9 +4131,9 @@ Algorithm Tolerance = 1e-6
         rint=rhex,
         rext=rhex + 1e-3,
         rhomcm=4.9e6,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         Tstart1=297,
-        TstartN=297,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=297)                                          annotation (
           Placement(transformation(extent={{-20,0},{0,-20}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-56},{-30,-36}},
