@@ -6862,6 +6862,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
      parameter Length omega "Perimeter of heat transfer surface (single tube)";
      final parameter Length l=L/(Nw) "Length of a single volume";
      Power Q "Total heat flow through lateral boundary";
+     //parameter Boolean counterCurrent=true;
 
   equation
     // Temperature at the nodes
@@ -6871,13 +6872,20 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
     for j in 1:Nw loop
        if useAverageTemperature then
-           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*gamma;
+         wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*gamma;
        else
-           wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma;
+         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma;
        end if;
        Tvolbar[j] = (T[j] + T[j + 1])/2;
        Tvol[j] = T[j+1];
     end for;
+
+  //   if counterCurrent then
+  //     for j in 1:Nw loop
+  //       wall.Q[j] = wall.Q[Nw+1-j];
+  //       wall.T[j] = wall.T[Nw+1-j];
+  //     end for;
+  //   end if;
 
     Q = sum(wall.Q);
 
