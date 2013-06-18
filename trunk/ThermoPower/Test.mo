@@ -2806,7 +2806,6 @@ Algorithm Tolerance = 1e-6
         __Dymola_experimentSetupOutput);
     end TestHeatTransfer2phDBb;
 
-
     model TestFlow1DFVb
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
@@ -3342,8 +3341,8 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficientDB heatTransfer(
+        redeclare ThermoPower.Water.ConstantHeatTransferCoefficientDB
+          heatTransfer(
           redeclare package Medium = Medium,
           Nf=Nnodes,
           fluidState=hexFV.fluidState,
@@ -3352,8 +3351,8 @@ Algorithm Tolerance = 1e-6
           omega=omegahex,
           A=Ahex,
           Dhyd=Dihex,
-          useAverageTemperature=true))
-                    annotation (Placement(transformation(extent={{-20,-10},{0,10}},
+          useAverageTemperature=true),
+        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,10}},
                       rotation=0)));
       Thermal.TempSource1DFV
                            TempSource(N=Nnodes) annotation (Placement(

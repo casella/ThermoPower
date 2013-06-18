@@ -7412,10 +7412,11 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
   end HeatTransfer2phDB_a;
 
   model HeatTransfer2phDB
-    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1,final useAverageTemperature, redeclare
+    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1, final useAverageTemperature,                                redeclare
         replaceable package Medium =
           StandardWater                                                                      constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
+
     parameter CoefficientOfHeatTransfer gamma_b=10000
       "Coefficient of heat transfer";
     parameter Area A "Cross-sectional area (single tube)";
