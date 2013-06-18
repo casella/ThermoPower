@@ -365,6 +365,39 @@ This package contains models to compute the material properties needed to model 
 </html>"));
   end MaterialProperties;
   extends Modelica.Icons.Package;
+  package BaseClasses
+
+    partial model HeatExchangerConfiguration2
+      extends Icons.HeatFlow;
+
+      parameter Integer C[Nw] "Configuration vector";
+
+      HeatExchangerTopology hexConfiguration
+        annotation (Placement(transformation(extent={{-54,34},{-10,60}})));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics));
+    end HeatExchangerConfiguration2;
+
+    partial model HeatExchangerTopology
+      extends Icons.HeatFlow;
+      parameter Integer Nw "Number of volumes";
+      Thermal.DHTVolumes side1(N=Nw) annotation (Placement(transformation(extent={{-40,20},
+                {40,40}}, rotation=0)));
+      Thermal.DHTVolumes side2(N=Nw) annotation (Placement(transformation(extent={{-40,-42},
+                {40,-20}}, rotation=0)));
+      parameter Integer correspondingVolumesSide2[Nw];
+
+    equation
+      for j in 1:Nw loop
+        side2.T[correspondingVolumesSide2[j]] = side1.T[j];
+        side2.Q[correspondingVolumesSide2[j]] + side1.Q[j] = 0;
+      end for;
+      annotation (
+        Diagram(graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end HeatExchangerTopology;
+  end BaseClasses;
+
   connector HT = Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a
     "Thermal port for lumped parameter heat transfer";
   connector DHTNodes "Distributed Heat Terminal"
@@ -1785,33 +1818,6 @@ This package contains models to compute the material properties needed to model 
 </html>"));
   end ConvHT2N_htc;
 
-  partial model FlowConfiguration
-    parameter Integer N=5 "Number of Nodes";
-    final parameter Integer Nw = N - 1;
-    final parameter Integer C[Nw,Nw];
-    Thermal.DHTVolumes side1(N=Nw) annotation (Placement(transformation(extent={{-40,20},
-              {40,40}}, rotation=0)));
-    Thermal.DHTVolumes side2(N=Nw) annotation (Placement(transformation(extent={{-40,-42},
-              {40,-20}}, rotation=0)));
-  end FlowConfiguration;
-
-  model HexConfiguration
-    extends Icons.HeatFlow;
-    replaceable Thermal.FlowConfiguration config constrainedby
-      Thermal.FlowConfiguration                                                           annotation(choicesAllMatching = true);
-
-  equation
-    // Swap temperature and flux vector order
-    if counterCurrent then
-      side1.Q = -side2.Q[Nw:-1:1];
-      side1.T = side2.T[Nw:-1:1];
-    else
-      side1.Q = -side2.Q;
-      side1.T = side2.T;
-    end if;
-
-  end HexConfiguration;
-
   model CounterCurrentFV
     "Counter-current heat transfer adaptor for 1D heat transfer"
     extends Icons.HeatFlow;
@@ -2175,6 +2181,20 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
         N);
   end linspaceExt;
 
+  model ParallelFlow
+    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = [1:Nw]);
+  end ParallelFlow;
+
+  model CounterFlow
+    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = [Nw:-1:1]);
+  end CounterFlow;
+
+  model ShellAndTubeU
+   extends BaseClasses.HeatExchangerTopology;
+
+  equation
+      //funzione che calcola il correspondingVector secondo alcuni parametri (numero passaggi, etc)
+  end ShellAndTubeU;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components related to heat transfer phenomena.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
