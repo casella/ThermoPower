@@ -2189,12 +2189,72 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
     extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = [Nw:-1:1]);
   end CounterFlow;
 
-  model ShellAndTubeU
-   extends BaseClasses.HeatExchangerTopology;
+  model ShellAndTube
+   extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = corrVolumesST(Nw,Ntp,inletTubeAtTop,inletShellAtTop));
+   parameter Integer Nw "Number of volumes";
+   parameter Integer Ntp "Number of passes tube-side";
+   parameter Boolean inletTubeAtTop "Tube inlet at the top of heat exchanger";
+   parameter Boolean inletShellAtTop "Shell inlet at the top of heat exchanger";
+  end ShellAndTube;
 
-  equation
-      //funzione che calcola il correspondingVector secondo alcuni parametri (numero passaggi, etc)
-  end ShellAndTubeU;
+  function corrVolumesST
+  input Integer Nw "Number of volumes";
+  input Integer Ntp(min = 1, max = 2) "Number of passes tube-side";
+  input Boolean inletTubeAtTop "Tube inlet at the top of heat exchanger";
+  input Boolean inletShellAtTop "Shell inlet at the top of heat exchanger";
+  output Integer correspondingVolumesSide2[Nw];
+
+  protected
+    Integer k;
+
+  algorithm
+    // side2.T[correspondingVolumesSide2[j]] = side1.T[j];
+    // side1 <---> tube
+    // side2 <---> shell
+    // correspondingVolumesSide2 := [1 4 3 2];                    Nw = 4
+    // correspondingVolumesSide2 := [1 4 5 6 3 2];                Nw = 6
+    // correspondingVolumesSide2 := [1 4 5 8 7 6 3 2];            Nw = 8
+    // correspondingVolumesSide2 := [1 4 5 8 9 10 7 6 3 2];       Nw = 10
+    k := 1;
+    correspondingVolumesSide2[1] := k;
+    if (inletTubeAtTop and inletShellAtTop) or (inletTubeAtTop == false and inletShellAtTop == false) then
+      for j in 2:(div(Nw,2)) loop
+        if (mod(j,2) == 0) then
+            k := k+3;
+        else
+            k := k+1;
+        end if;
+        correspondingVolumesSide2[j] := k;
+      end for;
+
+      if mod(div(Nw,2),2) == 0 then
+        k := Nw - 1;
+      else
+        k := Nw;
+      end if;
+
+      for j in (div(Nw,2))+1:Nw loop
+        correspondingVolumesSide2[j] := k;
+        if (mod(j,2) == 0) then
+            k := k-3;
+        else
+            k := k-1;
+        end if;
+      end for;
+    else
+      assert(false,"Unsupported topology");
+    end if;
+
+    assert(mod(Nw,2) == 0,"Number of volumes must be even");
+
+    // elseif (inletTubeAtTop == false and inletShellAtTop) then
+    //   // correspondingVolumesSide2 := [2 3 6 5 4 1];              Nw = 6
+    //   // correspondingVolumesSide2 := [];                         Nw = 8
+    // else // (inletTubeAtTop and inletShellAtTop == false)
+    //   // correspondingVolumesSide2 := [];                        Nw = 6
+    //   // correspondingVolumesSide2 := [];                        Nw = 8
+
+  end corrVolumesST;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components related to heat transfer phenomena.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
