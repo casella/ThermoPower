@@ -3037,8 +3037,8 @@ Algorithm Tolerance = 1e-6
           gamma=400),
         dpnom=1000)
         annotation (Placement(transformation(extent={{-18,-82},{2,-62}})));
-      Thermal.CounterCurrentFV counterCurrentFV(N=Nnodes, counterCurrent=true)
-        annotation (Placement(transformation(extent={{-18,-28},{2,-8}})));
+      Thermal.CounterFlow counterFlow(Nw=Nnodes - 1)
+        annotation (Placement(transformation(extent={{-18,-26},{2,-6}})));
     equation
       connect(SideA_MassFlowRate.flange,SensT_A_in. inlet) annotation (Line(
           points={{-50,-72},{-42,-72}},
@@ -3090,14 +3090,12 @@ Algorithm Tolerance = 1e-6
           points={{2,-72},{18,-72}},
           color={0,0,255},
           smooth=Smooth.None));
-      connect(counterCurrentFV.side1,hexFVb. wall)
-                                                 annotation (Line(
-          points={{-8,-15},{-8,23}},
+      connect(hexFVb.wall, counterFlow.side1) annotation (Line(
+          points={{-8,23},{-8,-13}},
           color={255,127,0},
           smooth=Smooth.None));
-      connect(counterCurrentFV.side2,hexFVa. wall)
-                                                 annotation (Line(
-          points={{-8,-21.1},{-8,-67}},
+      connect(counterFlow.side2, hexFVa.wall) annotation (Line(
+          points={{-8,-19.1},{-8,-67}},
           color={255,127,0},
           smooth=Smooth.None));
       annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
