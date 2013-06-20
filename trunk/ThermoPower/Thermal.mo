@@ -2182,11 +2182,11 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
   end linspaceExt;
 
   model ParallelFlow
-    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = [1:Nw]);
+    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = 1:Nw);
   end ParallelFlow;
 
   model CounterFlow
-    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = [Nw:-1:1]);
+    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2=  Nw:-1:1);
   end CounterFlow;
 
   model ShellAndTube
