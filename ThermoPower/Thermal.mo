@@ -2206,15 +2206,12 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 
   protected
     Integer k;
+    Integer v[Nw];
 
   algorithm
     // side2.T[correspondingVolumesSide2[j]] = side1.T[j];
     // side1 <---> tube
     // side2 <---> shell
-    // correspondingVolumesSide2 := [1 4 3 2];                    Nw = 4
-    // correspondingVolumesSide2 := [1 4 5 6 3 2];                Nw = 6
-    // correspondingVolumesSide2 := [1 4 5 8 7 6 3 2];            Nw = 8
-    // correspondingVolumesSide2 := [1 4 5 8 9 10 7 6 3 2];       Nw = 10
     k := 1;
     correspondingVolumesSide2[1] := k;
     if (inletTubeAtTop and inletShellAtTop) or (inletTubeAtTop == false and inletShellAtTop == false) then
@@ -2241,18 +2238,44 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
             k := k-1;
         end if;
       end for;
+    elseif (inletTubeAtTop == false and inletShellAtTop) or (inletTubeAtTop and inletShellAtTop == false) then
+      for j in 2:(div(Nw,2)) loop
+        if (mod(j,2) == 0) then
+            k := k+3;
+        else
+            k := k+1;
+        end if;
+        correspondingVolumesSide2[j] := k;
+      end for;
+
+      if mod(div(Nw,2),2) == 0 then
+        k := Nw - 1;
+      else
+        k := Nw;
+      end if;
+
+      for j in (div(Nw,2))+1:Nw loop
+        correspondingVolumesSide2[j] := k;
+        if (mod(j,2) == 0) then
+            k := k-3;
+        else
+            k := k-1;
+        end if;
+      end for;
+
+      for j in 1:Nw loop
+        v[j] := correspondingVolumesSide2[Nw-j+1];
+      end for;
+      for j in 1:Nw loop
+       correspondingVolumesSide2[j] := v[j];
+      end for;
+
     else
       assert(false,"Unsupported topology");
     end if;
 
     assert(mod(Nw,2) == 0,"Number of volumes must be even");
-
-    // elseif (inletTubeAtTop == false and inletShellAtTop) then
-    //   // correspondingVolumesSide2 := [2 3 6 5 4 1];              Nw = 6
-    //   // correspondingVolumesSide2 := [];                         Nw = 8
-    // else // (inletTubeAtTop and inletShellAtTop == false)
-    //   // correspondingVolumesSide2 := [];                        Nw = 6
-    //   // correspondingVolumesSide2 := [];                        Nw = 8
+    assert(Ntp >= 1, "Number of passes tube-side must be greater than one");
 
   end corrVolumesST;
   annotation (Documentation(info="<HTML>
