@@ -2206,10 +2206,9 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 
   protected
     Integer k;
-    Integer v[Nw];
+    Integer v[Nw],t1[div(Nw,2)],t2[div(Nw,2)];
 
   algorithm
-    // side2.T[correspondingVolumesSide2[j]] = side1.T[j];
     // side1 <---> tube
     // side2 <---> shell
     k := 1;
@@ -2238,7 +2237,7 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
             k := k-1;
         end if;
       end for;
-    elseif (inletTubeAtTop == false and inletShellAtTop) or (inletTubeAtTop and inletShellAtTop == false) then
+    elseif (inletTubeAtTop == false and inletShellAtTop) then
       for j in 2:(div(Nw,2)) loop
         if (mod(j,2) == 0) then
             k := k+3;
@@ -2269,6 +2268,37 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
       for j in 1:Nw loop
        correspondingVolumesSide2[j] := v[j];
       end for;
+
+    elseif (inletTubeAtTop and inletShellAtTop == false) then
+      for j in 2:(div(Nw,2)) loop
+        if (mod(j,2) == 0) then
+            k := k+3;
+        else
+            k := k+1;
+        end if;
+        correspondingVolumesSide2[j] := k;
+      end for;
+
+      if mod(div(Nw,2),2) == 0 then
+        k := Nw - 1;
+      else
+        k := Nw;
+      end if;
+
+      for j in (div(Nw,2))+1:Nw loop
+        correspondingVolumesSide2[j] := k;
+        if (mod(j,2) == 0) then
+            k := k-3;
+        else
+            k := k-1;
+        end if;
+      end for;
+
+      for j in 1:(div(Nw,2)) loop
+        t1[j] := correspondingVolumesSide2[j];
+        t2[j] := correspondingVolumesSide2[j+div(Nw,2)];
+      end for;
+      correspondingVolumesSide2 := cat(1,t2,t1);
 
     else
       assert(false,"Unsupported topology");
