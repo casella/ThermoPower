@@ -963,7 +963,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
       "Fluid pressure for property calculations";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
-    MassFlowRate wbar[N - 1](each start=wnom/Nt);
+    MassFlowRate wbar[N - 1](each start=wnom/Nt)
+      "Average flow rate through volumes (single tube)";
+    Power Q_single[Nw]
+      "Heat flows entering the volumes from the lateral boundary (single tube)";
   //   MassFlowRate wstar[N];
     Velocity u[N] "Fluid velocity";
     Medium.Temperature T[N] "Fluid temperature";
@@ -972,12 +975,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.SpecificEnthalpy htilde[N - 1](start=hstart[2:N],each stateSelect=StateSelect.prefer)
       "Enthalpy state variables";
     Medium.Density rho[N] "Fluid nodal density";
-    Mass M "Fluid mass";
+    Mass M "Fluid mass (single tube)";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer( final Nf=N, final w=w*ones(N), final fluidState=fluidState) constrainedby
+    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(
+      redeclare package Medium = Medium,
+      final Nf=N, final Nw = Nw,
+      final L = L, final A = A, final Dhyd = Dhyd, final omega = omega, final wnom = wnom,
+      final w=w*ones(N), final fluidState=fluidState) constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
 
-    ThermoPower.Thermal.DHTVolumes wall(final N=heatTransfer.Nw) annotation (Dialog(enable=
+    ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
   protected
@@ -1051,12 +1058,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Pressure drop due to static head";
     for j in 1:Nw loop
       if Medium.singleState then
-        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) = heatTransfer.wall.Q[j]
+        A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) = Q_single[j]
           "Energy balance (pressure effects neglected)";
           //Qvol = l*omega*phibar[j]
       else
         A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) =
-          heatTransfer.wall.Q[j] "Energy balance";  //Qvol = l*omega*phibar[j]
+          Q_single[j] "Energy balance";  //Qvol = l*omega*phibar[j]
       end if;
       dMdt[j] = A*l*(drbdh[j]*der(htilde[j]) + drbdp[j]*der(p))
         "Mass derivative for each volume";
@@ -1086,6 +1093,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     // Boundary conditions
     win = infl.m_flow/Nt;
     wout = -outfl.m_flow/Nt;
+    Q_single = wall.Q/Nt;
     assert(HydraulicCapacitance == HCtypes.Upstream or
              HydraulicCapacitance == HCtypes.Middle or
              HydraulicCapacitance == HCtypes.Downstream,
@@ -1198,10 +1206,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
-    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer( final Nf=N, final w=w*ones(N), final fluidState=fluidState) constrainedby
+    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(
+      redeclare package Medium = Medium,
+      final Nf=N, final Nw = Nw, final L = L, final A = A, final Dhyd = Dhyd, final omega = omega, final wnom = wnom,
+      final w=w*ones(N), final fluidState=fluidState) constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
 
-    ThermoPower.Thermal.DHTVolumes wall(final N=heatTransfer.Nw) annotation (Dialog(enable=
+    ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
     import ThermoPower.Choices.Flow1D.FFtypes;
@@ -1224,10 +1235,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p(start=pstart)
       "Fluid pressure for property calculations";
+
                                           /*, stateSelect=StateSelect.prefer*/
     Pressure dpf[N - 1] "Pressure drop due to friction between two nodes";
     MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     MassFlowRate wbar[N - 1](each start=wnom/Nt);
+    Power Q_single[Nw]
+      "Heat flows entering the volumes from the lateral boundary (single tube)";
     Velocity u[N] "Fluid velocity";
     Medium.Temperature T[N] "Fluid temperature";
     Medium.Temperature Ts "Saturated water temperature";
@@ -1317,7 +1331,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Pressure drop due to static head";
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
     for j in 1:(N - 1) loop
-      A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) = heatTransfer.wall.Q[j]
+      A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) - A*l*der(p) = Q_single[j]
         "Energy balance";
       dMdt[j] = A*l*(drbdh1[j]*der(h[j]) + drbdh2[j]*der(h[j + 1]) + drbdp[j]*
         der(p)) "Mass balance for each volume";
@@ -1452,6 +1466,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
+    Q_single = wall.Q/Nt;
     infl.h_outflow = htilde[1];
     outfl.h_outflow = htilde[N - 1];
     h[1] = inStream(infl.h_outflow);
@@ -6589,7 +6604,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       import ThermoPower.Choices.Flow1D.HCtypes;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
       parameter Integer Nt = 1 "Number of tubes in parallel";
-      parameter Integer Nw = N - 1;
+      parameter Integer Nw = N - 1 "Number of volumes on the wall interface";
       parameter Distance L "Tube length" annotation (Evaluate=true);
       parameter Position H=0 "Elevation of outlet over inlet";
       parameter Area A "Cross-sectional area (single tube)";
@@ -7190,8 +7205,13 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       input MassFlowRate w[Nf];
       ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
                 40}}, rotation=0)));
-      parameter Integer Nf(min=2) = 2 "Number of nodes fluid-side";
-      parameter Integer Nw=Nf-1 "Number of nodes wall-side";   //volumes wall-side
+      parameter Integer Nf(min=2) "Number of nodes fluid-side";
+      parameter Integer Nw "Number of nodes wall-side";   //volumes wall-side
+      parameter Distance L "Tube length";
+      parameter Area A "Cross-sectional area (single tube)";
+      parameter Length omega "Perimeter of heat transfer surface (single tube)";
+      parameter Length Dhyd "Hydraulic Diameter (single tube)";
+      parameter MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter Boolean useAverageTemperature = true
         "= true to use average temperature for heat transfer";
 
@@ -7199,7 +7219,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
   end BaseClasses;
 
   model NoHeatTransfer
-    extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature, final Nw = Nf-1);
+    extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature);
 
   equation
     wall.Q = zeros(Nw);
@@ -7207,7 +7227,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
   end NoHeatTransfer;
 
   model ConstantHeatTransferCoefficient
-    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1);
+    extends BaseClasses.DistributedHeatTransferFV;
 
      parameter CoefficientOfHeatTransfer gamma
       "Constant heat transfer coefficient";
@@ -7220,6 +7240,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
      Power Q "Total heat flow through lateral boundary";
 
   equation
+    assert(Nw=  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
     // Temperature at the nodes
     for j in 1:Nf loop
       T[j] = Medium.temperature(fluidState[j]);
@@ -7245,7 +7266,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
   end ConstantHeatTransferCoefficient;
 
   model ConstantHeatTransferCoefficientDB
-    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1);
+    extends BaseClasses.DistributedHeatTransferFV;
 
      CoefficientOfHeatTransfer gamma[Nf] "Constant heat transfer coefficient";
      Medium.Temperature T[Nf] "Fluid temperature";
@@ -7262,6 +7283,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
      Power Q "Total heat flow through lateral boundary";
 
   equation
+    assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
     // Temperature at the nodes
     for j in 1:Nf loop
       T[j] = Medium.temperature(fluidState[j]);
@@ -7335,6 +7357,8 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     Power Q "Total heat flow through lateral boundary";
 
   equation
+    assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
     // Saturated fluid property calculations
     p = Medium.pressure(fluidState[1]);
     sat = Medium.setSat_p(p);
@@ -7457,6 +7481,8 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     Power Q "Total heat flow through lateral boundary";
 
   equation
+    assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
     // Saturated fluid property calculations
     p = Medium.pressure(fluidState[1]);
     sat = Medium.setSat_p(p);
