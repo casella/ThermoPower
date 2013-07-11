@@ -977,10 +977,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass (single tube)";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(
+    replaceable ThermoPower.Water.HeatTransfer.IdealHeatTransfer
+                                                    heatTransfer(
       redeclare package Medium = Medium,
-      final Nf=N, final Nw = Nw,
-      final L = L, final A = A, final Dhyd = Dhyd, final omega = omega, final wnom = wnom,
+      final Nf=N, final Nw = Nw, final L = L, final A = A, final Dhyd = Dhyd,
+      final omega = omega, final wnom = wnom/Nt,
       final w=w*ones(N), final fluidState=fluidState) constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
 
@@ -1206,9 +1207,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
-    replaceable ThermoPower.Water.NoHeatTransfer heatTransfer(
+    replaceable ThermoPower.Water.HeatTransfer.IdealHeatTransfer
+                                                    heatTransfer(
       redeclare package Medium = Medium,
-      final Nf=N, final Nw = Nw, final L = L, final A = A, final Dhyd = Dhyd, final omega = omega, final wnom = wnom,
+      final Nf=N, final Nw = Nw, final L = L, final A = A,
+      final Dhyd = Dhyd, final omega = omega, final wnom = wnom/Nt,
       final w=w*ones(N), final fluidState=fluidState) constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
 
@@ -7211,382 +7214,426 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       parameter Area A "Cross-sectional area (single tube)";
       parameter Length omega "Perimeter of heat transfer surface (single tube)";
       parameter Length Dhyd "Hydraulic Diameter (single tube)";
-      parameter MassFlowRate wnom "Nominal mass flowrate (total)";
+      parameter MassFlowRate wnom "Nominal mass flowrate (single tube)";
       parameter Boolean useAverageTemperature = true
         "= true to use average temperature for heat transfer";
 
     end DistributedHeatTransferFV;
   end BaseClasses;
 
-  model NoHeatTransfer
-    extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature);
+  package HeatTransfer "Heat transfer models"
+    model IdealHeatTransfer
+      "Delta T across the boundary layer is zero (infinite heat transfer coeffficient)"
+      extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature = false);
+       Medium.Temperature T[Nf] "Fluid temperature";
 
-  equation
-    wall.Q = zeros(Nw);
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
-  end NoHeatTransfer;
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
 
-  model ConstantHeatTransferCoefficient
-    extends BaseClasses.DistributedHeatTransferFV;
+      for j in 1:Nw loop
+        wall.T[j] = T[j+1];
+      end for;
+    end IdealHeatTransfer;
 
-     parameter CoefficientOfHeatTransfer gamma
-      "Constant heat transfer coefficient";
-     Medium.Temperature T[Nf] "Fluid temperature";
-     Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
-     Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-     parameter Length L "Tube length";
-     parameter Length omega "Perimeter of heat transfer surface (single tube)";
-     final parameter Length l=L/(Nw) "Length of a single volume";
-     Power Q "Total heat flow through lateral boundary";
+    model ConstantHeatTransferCoefficient
+      extends BaseClasses.DistributedHeatTransferFV;
 
-  equation
-    assert(Nw=  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
-    // Temperature at the nodes
-    for j in 1:Nf loop
-      T[j] = Medium.temperature(fluidState[j]);
-    end for;
+       parameter CoefficientOfHeatTransfer gamma
+        "Constant heat transfer coefficient";
+       Medium.Temperature T[Nf] "Fluid temperature";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       final parameter Length l=L/(Nw) "Length of a single volume";
+       Power Q "Total heat flow through lateral boundary";
 
-    for j in 1:Nw loop
-       if useAverageTemperature then
-         wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*gamma;
-       else
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+
+      for j in 1:Nw loop
          wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma;
-       end if;
-       Tvolbar[j] = (T[j] + T[j + 1])/2;
-       Tvol[j] = T[j+1];
-    end for;
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+      end for;
 
-    Q = sum(wall.Q);
+      Q = sum(wall.Q);
 
-    annotation (
-      Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
-              100,100}}),
-              graphics),
-      Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-  end ConstantHeatTransferCoefficient;
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantHeatTransferCoefficient;
 
-  model ConstantHeatTransferCoefficientDB
-    extends BaseClasses.DistributedHeatTransferFV;
+    model ConstantThermalConductance
+      "Constant global thermal conductance (UA value)"
+      extends BaseClasses.DistributedHeatTransferFV;
 
-     CoefficientOfHeatTransfer gamma[Nf] "Constant heat transfer coefficient";
-     Medium.Temperature T[Nf] "Fluid temperature";
-     Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
-     Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-     Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
-     Medium.ThermalConductivity k[Nf] "Thermal conductivity";
-     Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
-     parameter Length L "Tube length";
-     parameter Length omega "Perimeter of heat transfer surface (single tube)";
-     parameter Length Dhyd "Hydraulic Diameter (single tube)";
-     parameter Area A "Cross-sectional area (single tube)";
-     final parameter Length l=L/(Nw) "Length of a single volume";
-     Power Q "Total heat flow through lateral boundary";
+       parameter Modelica.SIunits.ThermalConductance UA
+        "Global thermal conductance (UA value), for Nt tubes";
+       Medium.Temperature T[Nf] "Fluid temperature";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       Power Q "Total heat flow through lateral boundary";
 
-  equation
-    assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
-    // Temperature at the nodes
-    for j in 1:Nf loop
-      T[j] = Medium.temperature(fluidState[j]);
-      mu[j] = Medium.dynamicViscosity(fluidState[j]);
-      k[j] = Medium.thermalConductivity(fluidState[j]);
-      cp[j] = Medium.heatCapacity_cp(fluidState[j]);
-      gamma[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]);
-    end for;
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
 
-    for j in 1:Nw loop
-       if useAverageTemperature then
-         wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma[j] + gamma[j+1])/2);
-       else
-         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*((gamma[j] + gamma[j+1])/2);
-       end if;
-       Tvolbar[j] = (T[j] + T[j + 1])/2;
-       Tvol[j] = T[j + 1];
-    end for;
+      for j in 1:Nw loop
+         wall.Q[j] = UA*(wall.T[j] - Tvol[j])/Nw;
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+      end for;
 
-    Q = sum(wall.Q);
+      Q = sum(wall.Q);
 
-    annotation (
-      Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
-              100,100}}),
-              graphics),
-      Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-  end ConstantHeatTransferCoefficientDB;
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantThermalConductance;
 
-  model HeatTransfer2phDB_a
-    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1,final useAverageTemperature,redeclare
-        replaceable package Medium =
-          StandardWater                                                                      constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
-    parameter CoefficientOfHeatTransfer gamma_b=10000
-      "Coefficient of heat transfer";
-    parameter Area A "Cross-sectional area (single tube)";
-    parameter Length Dhyd "Hydraulic Diameter (single tube)";
-    parameter Length omega "Perimeter of heat transfer surface (single tube)";
-    parameter Length L "Tube length";
-    final parameter Length l=L/(Nw) "Length of a single volume";
-    Real state[Nw];
-    Real alfa_l[Nw];
-    Real alfa_v[Nw];
-    Real alfa2_l[Nw];
-    Real alfa2_v[Nw];
-    CoefficientOfHeatTransfer gamma1ph[Nf];
-    CoefficientOfHeatTransfer gamma_bubble;
-    CoefficientOfHeatTransfer gamma_dew;
-    CoefficientOfHeatTransfer gamma2ph = gamma_b;
-    Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
-    Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
-    Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
-    Medium.Temperature T[Nf] "Fluid temperature";
-    Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
-    Medium.Temperature Ts "Saturated water temperature";
-    Medium.SaturationProperties sat "Properties of saturated fluid";
-    Medium.ThermodynamicState bubble "Bubble point, one-phase side";
-    Medium.ThermodynamicState dew "Dew point, one-phase side";
-    Medium.AbsolutePressure p "Fluid pressure for property calculations";
-    Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
-    Medium.ThermalConductivity k[Nf] "Thermal conductivity";
-    Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
-    Medium.DynamicViscosity mu_bubble "Dynamic viscosity at bubble point";
-    Medium.ThermalConductivity k_bubble "Thermal conductivity at bubble point";
-    Medium.SpecificHeatCapacity cp_bubble
-      "Heat capacity at constant pressure at bubble point";
-    Medium.DynamicViscosity mu_dew "Dynamic viscosity at dew point";
-    Medium.ThermalConductivity k_dew "Thermal conductivity at dew point";
-    Medium.SpecificHeatCapacity cp_dew
-      "Heat capacity at constant pressure at dew point";
-    Power Q "Total heat flow through lateral boundary";
+    model DittusBoelter
+      extends BaseClasses.DistributedHeatTransferFV;
 
-  equation
-    assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+       CoefficientOfHeatTransfer gamma[Nf] "Constant heat transfer coefficient";
+       Medium.Temperature T[Nf] "Fluid temperature";
+       Medium.Temperature Tvolbar[Nw]
+        "Fluid average temperature in the volumes";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
+       Medium.ThermalConductivity k[Nf] "Thermal conductivity";
+       Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+       parameter Length L "Tube length";
+       parameter Length omega
+        "Perimeter of heat transfer surface (single tube)";
+       parameter Length Dhyd "Hydraulic Diameter (single tube)";
+       parameter Area A "Cross-sectional area (single tube)";
+       final parameter Length l=L/(Nw) "Length of a single volume";
+       Power Q "Total heat flow through lateral boundary";
 
-    // Saturated fluid property calculations
-    p = Medium.pressure(fluidState[1]);
-    sat = Medium.setSat_p(p);
-    Ts = sat.Tsat;
-    hl = Medium.bubbleEnthalpy(sat);
-    hv = Medium.dewEnthalpy(sat);
-    bubble = Medium.setBubbleState(sat,1);
-    dew = Medium.setDewState(sat,1);
-    mu_bubble = Medium.dynamicViscosity(bubble);
-    k_bubble = Medium.thermalConductivity(bubble);
-    cp_bubble = Medium.heatCapacity_cp(bubble);
-    mu_dew =  Medium.dynamicViscosity(dew);
-    k_dew = Medium.thermalConductivity(dew);
-    cp_dew = Medium.heatCapacity_cp(dew);
+    equation
+      assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+        mu[j] = Medium.dynamicViscosity(fluidState[j]);
+        k[j] = Medium.thermalConductivity(fluidState[j]);
+        cp[j] = Medium.heatCapacity_cp(fluidState[j]);
+        gamma[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]);
+      end for;
 
-    // Heat transfer coefficient at bubble/dew point
-    gamma_bubble = f_dittus_boelter(w[1],Dhyd,A,mu_bubble,k_bubble,cp_bubble);
-    gamma_dew = f_dittus_boelter(w[1],Dhyd,A,mu_dew,k_dew,cp_dew);
-
-    // Fluid property calculations at nodes
-    for j in 1:Nf loop
-      T[j] = Medium.temperature(fluidState[j]);
-      h[j] = Medium.specificEnthalpy(fluidState[j]);
-      /* to be fixed */
-      mu[j] = Medium.dynamicViscosity(fluidState[j]);  //not all nodes, only 1-phase nodes
-      k[j] = Medium.thermalConductivity(fluidState[j]); //not all nodes, only 1-phase nodes
-      cp[j] = Medium.heatCapacity_cp(fluidState[j]); //not all nodes, only 1-phase nodes
-      gamma1ph[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]); //not all nodes, only 1-phase nodes
-      /* to be fixed */
-    end for;
-
-    for j in 1:Nw loop
-      alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
-      alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
-      alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-      alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-    end for;
-
-    for j in 1:Nw loop
-       if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then       // 1-phase liquid or vapour
-         wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2);
-         state[j] = 1;
-       elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then               // liquid --> 2-phase
-         //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 2;
-       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
-         wall.Q[j] = (wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 3;
-       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                      // 2-phase --> vapour
-         //wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_dew + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 4;
-       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                      // 2-phase --> liquid
-         //wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_bubble + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 5;
-       else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then              // vapour --> 2-phase
-         //wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma_dew)/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 6;
-       end if;
-       assert((h[j + 1] - h[j]) > 0 or (h[j + 1] - h[j]) < 0, "Division by zero during enthalpy calculation (h[j+1] - h[j]) = 0");
-       assert((h[j] - h[j + 1]) > 0 or (h[j] - h[j + 1]) < 0, "Division by zero during enthalpy calculation (h[j] - h[j + 1]) = 0");
-       Tvolbar[j] = (T[j] + T[j + 1])/2;
-    end for;
-
-     Q = sum(wall.Q);
-
-     annotation (
-      Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
-              100}}),
-              graphics),
-      Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-  end HeatTransfer2phDB_a;
-
-  model HeatTransfer2phDB
-    extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1, final useAverageTemperature,                                redeclare
-        replaceable package Medium =
-          StandardWater                                                                      constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
-
-    parameter CoefficientOfHeatTransfer gamma_b=10000
-      "Coefficient of heat transfer";
-    parameter Area A "Cross-sectional area (single tube)";
-    parameter Length Dhyd "Hydraulic Diameter (single tube)";
-    parameter Length omega "Perimeter of heat transfer surface (single tube)";
-    parameter Length L "Tube length";
-    final parameter Length l=L/(Nw) "Length of a single volume";
-    Real state[Nw];
-    Real alfa_l[Nw];
-    Real alfa_v[Nw];
-  //   Real alfa2_l[Nw];
-  //   Real alfa2_v[Nw];
-    CoefficientOfHeatTransfer gamma1ph[Nf];
-    CoefficientOfHeatTransfer gamma_bubble;
-    CoefficientOfHeatTransfer gamma_dew;
-    CoefficientOfHeatTransfer gamma2ph = gamma_b;
-    Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
-    Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
-    Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
-    Medium.Temperature T[Nf] "Fluid temperature";
-    Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
-    Medium.Temperature Ts "Saturated water temperature";
-    Medium.SaturationProperties sat "Properties of saturated fluid";
-    Medium.ThermodynamicState bubble "Bubble point, one-phase side";
-    Medium.ThermodynamicState dew "Dew point, one-phase side";
-    Medium.AbsolutePressure p "Fluid pressure for property calculations";
-    Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
-    Medium.ThermalConductivity k[Nf] "Thermal conductivity";
-    Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
-    Medium.DynamicViscosity mu_bubble "Dynamic viscosity at bubble point";
-    Medium.ThermalConductivity k_bubble "Thermal conductivity at bubble point";
-    Medium.SpecificHeatCapacity cp_bubble
-      "Heat capacity at constant pressure at bubble point";
-    Medium.DynamicViscosity mu_dew "Dynamic viscosity at dew point";
-    Medium.ThermalConductivity k_dew "Thermal conductivity at dew point";
-    Medium.SpecificHeatCapacity cp_dew
-      "Heat capacity at constant pressure at dew point";
-    Power Q "Total heat flow through lateral boundary";
-
-  equation
-    assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
-
-    // Saturated fluid property calculations
-    p = Medium.pressure(fluidState[1]);
-    sat = Medium.setSat_p(p);
-    Ts = sat.Tsat;
-    hl = Medium.bubbleEnthalpy(sat);
-    hv = Medium.dewEnthalpy(sat);
-    bubble = Medium.setBubbleState(sat,1);
-    dew = Medium.setDewState(sat,1);
-    mu_bubble = Medium.dynamicViscosity(bubble);
-    k_bubble = Medium.thermalConductivity(bubble);
-    cp_bubble = Medium.heatCapacity_cp(bubble);
-    mu_dew =  Medium.dynamicViscosity(dew);
-    k_dew = Medium.thermalConductivity(dew);
-    cp_dew = Medium.heatCapacity_cp(dew);
-
-    // Heat transfer coefficient at bubble/dew point
-    gamma_bubble = f_dittus_boelter(w[1],Dhyd,A,mu_bubble,k_bubble,cp_bubble);
-    gamma_dew = f_dittus_boelter(w[1],Dhyd,A,mu_dew,k_dew,cp_dew);
-
-    // Fluid property calculations at nodes
-    for j in 1:Nf loop
-      T[j] = Medium.temperature(fluidState[j]);
-      h[j] = Medium.specificEnthalpy(fluidState[j]);
-      /* to be fixed */
-      mu[j] = Medium.dynamicViscosity(fluidState[j]);  //not all nodes, only 1-phase nodes
-      k[j] = Medium.thermalConductivity(fluidState[j]); //not all nodes, only 1-phase nodes
-      cp[j] = Medium.heatCapacity_cp(fluidState[j]); //not all nodes, only 1-phase nodes
-      gamma1ph[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]); //not all nodes, only 1-phase nodes
-      /* to be fixed */
-    end for;
-
-  //   for j in 1:Nw loop
-  //     alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
-  //     alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
-  //     alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-  //     alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-  //   end for;
-
-    for j in 1:Nw loop
-       if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then       // 1-phase liquid or vapour
-         wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2);
-         state[j] = 1;
-         alfa_l[j] = 0;
-         alfa_v[j] = 0;
-  //        alfa2_l[j] = 0;
-  //        alfa2_v[j] = 0;
-       elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then               // liquid --> 2-phase
-         //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 2;
-         alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
-         alfa_v[j] = 0;
-  //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-  //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
-         wall.Q[j] = (wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 3;
-         alfa_l[j] = 0;
-         alfa_v[j] = 0;
-  //        alfa2_l[j] = 0;
-  //        alfa2_v[j] = 0;
-       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                      // 2-phase --> vapour
-         //wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_dew + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 4;
-         alfa_l[j] = 0;
-         alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
-  //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-  //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-       elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                      // 2-phase --> liquid
-         //wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_bubble + gamma1ph[j+1])/2 + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 5;
-         alfa_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-         alfa_v[j] = 0;
-  //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-  //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-       else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then              // vapour --> 2-phase
-         //wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma_dew)/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-         state[j] = 6;
-         alfa_l[j] = 0;
-         alfa_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-  //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-  //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-       end if;
-  //      assert((h[j + 1] - h[j]) > 0 or (h[j + 1] - h[j]) < 0, "Division by zero during enthalpy calculation (h[j+1] - h[j]) = 0");
-  //      assert((h[j] - h[j + 1]) > 0 or (h[j] - h[j + 1]) < 0, "Division by zero during enthalpy calculation (h[j] - h[j + 1]) = 0");
-
-       if useAverageTemperature then
+      for j in 1:Nw loop
+         if useAverageTemperature then
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma[j] + gamma[j+1])/2);
+         else
+           wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*((gamma[j] + gamma[j+1])/2);
+         end if;
          Tvolbar[j] = (T[j] + T[j + 1])/2;
-       else
-         Tvolbar[j] = T[j + 1];
-       end if;
-    end for;
+         Tvol[j] = T[j + 1];
+      end for;
 
-    Q = sum(wall.Q);
+      Q = sum(wall.Q);
 
-     annotation (
-      Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
-              100}}),
-              graphics),
-      Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-  end HeatTransfer2phDB;
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end DittusBoelter;
+
+    model HeatTransfer2phDB
+      extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1, final useAverageTemperature,                                redeclare
+          replaceable package Medium =
+            StandardWater                                                                      constrainedby
+          Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
+
+      parameter CoefficientOfHeatTransfer gamma_b=10000
+        "Coefficient of heat transfer";
+      parameter Area A "Cross-sectional area (single tube)";
+      parameter Length Dhyd "Hydraulic Diameter (single tube)";
+      parameter Length omega "Perimeter of heat transfer surface (single tube)";
+      parameter Length L "Tube length";
+      final parameter Length l=L/(Nw) "Length of a single volume";
+      Real state[Nw];
+      Real alfa_l[Nw];
+      Real alfa_v[Nw];
+    //   Real alfa2_l[Nw];
+    //   Real alfa2_v[Nw];
+      CoefficientOfHeatTransfer gamma1ph[Nf];
+      CoefficientOfHeatTransfer gamma_bubble;
+      CoefficientOfHeatTransfer gamma_dew;
+      CoefficientOfHeatTransfer gamma2ph = gamma_b;
+      Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
+      Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
+      Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
+      Medium.Temperature T[Nf] "Fluid temperature";
+      Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+      Medium.Temperature Ts "Saturated water temperature";
+      Medium.SaturationProperties sat "Properties of saturated fluid";
+      Medium.ThermodynamicState bubble "Bubble point, one-phase side";
+      Medium.ThermodynamicState dew "Dew point, one-phase side";
+      Medium.AbsolutePressure p "Fluid pressure for property calculations";
+      Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
+      Medium.ThermalConductivity k[Nf] "Thermal conductivity";
+      Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+      Medium.DynamicViscosity mu_bubble "Dynamic viscosity at bubble point";
+      Medium.ThermalConductivity k_bubble
+        "Thermal conductivity at bubble point";
+      Medium.SpecificHeatCapacity cp_bubble
+        "Heat capacity at constant pressure at bubble point";
+      Medium.DynamicViscosity mu_dew "Dynamic viscosity at dew point";
+      Medium.ThermalConductivity k_dew "Thermal conductivity at dew point";
+      Medium.SpecificHeatCapacity cp_dew
+        "Heat capacity at constant pressure at dew point";
+      Power Q "Total heat flow through lateral boundary";
+
+    equation
+      assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Saturated fluid property calculations
+      p = Medium.pressure(fluidState[1]);
+      sat = Medium.setSat_p(p);
+      Ts = sat.Tsat;
+      hl = Medium.bubbleEnthalpy(sat);
+      hv = Medium.dewEnthalpy(sat);
+      bubble = Medium.setBubbleState(sat,1);
+      dew = Medium.setDewState(sat,1);
+      mu_bubble = Medium.dynamicViscosity(bubble);
+      k_bubble = Medium.thermalConductivity(bubble);
+      cp_bubble = Medium.heatCapacity_cp(bubble);
+      mu_dew =  Medium.dynamicViscosity(dew);
+      k_dew = Medium.thermalConductivity(dew);
+      cp_dew = Medium.heatCapacity_cp(dew);
+
+      // Heat transfer coefficient at bubble/dew point
+      gamma_bubble = f_dittus_boelter(w[1],Dhyd,A,mu_bubble,k_bubble,cp_bubble);
+      gamma_dew = f_dittus_boelter(w[1],Dhyd,A,mu_dew,k_dew,cp_dew);
+
+      // Fluid property calculations at nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+        h[j] = Medium.specificEnthalpy(fluidState[j]);
+        /* to be fixed */
+        mu[j] = Medium.dynamicViscosity(fluidState[j]);  //not all nodes, only 1-phase nodes
+        k[j] = Medium.thermalConductivity(fluidState[j]); //not all nodes, only 1-phase nodes
+        cp[j] = Medium.heatCapacity_cp(fluidState[j]); //not all nodes, only 1-phase nodes
+        gamma1ph[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]); //not all nodes, only 1-phase nodes
+        /* to be fixed */
+      end for;
+
+    //   for j in 1:Nw loop
+    //     alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
+    //     alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
+    //     alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+    //     alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+    //   end for;
+
+      for j in 1:Nw loop
+         if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then       // 1-phase liquid or vapour
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2);
+           state[j] = 1;
+           alfa_l[j] = 0;
+           alfa_v[j] = 0;
+    //        alfa2_l[j] = 0;
+    //        alfa2_v[j] = 0;
+         elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then               // liquid --> 2-phase
+           //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 2;
+           alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
+           alfa_v[j] = 0;
+    //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+    //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
+           wall.Q[j] = (wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 3;
+           alfa_l[j] = 0;
+           alfa_v[j] = 0;
+    //        alfa2_l[j] = 0;
+    //        alfa2_v[j] = 0;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                      // 2-phase --> vapour
+           //wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_dew + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 4;
+           alfa_l[j] = 0;
+           alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
+    //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+    //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                      // 2-phase --> liquid
+           //wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_bubble + gamma1ph[j+1])/2 + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 5;
+           alfa_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+           alfa_v[j] = 0;
+    //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+    //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+         else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then              // vapour --> 2-phase
+           //wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma_dew)/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 6;
+           alfa_l[j] = 0;
+           alfa_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+    //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+    //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+         end if;
+    //      assert((h[j + 1] - h[j]) > 0 or (h[j + 1] - h[j]) < 0, "Division by zero during enthalpy calculation (h[j+1] - h[j]) = 0");
+    //      assert((h[j] - h[j + 1]) > 0 or (h[j] - h[j + 1]) < 0, "Division by zero during enthalpy calculation (h[j] - h[j + 1]) = 0");
+
+         if useAverageTemperature then
+           Tvolbar[j] = (T[j] + T[j + 1])/2;
+         else
+           Tvolbar[j] = T[j + 1];
+         end if;
+      end for;
+
+      Q = sum(wall.Q);
+
+       annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end HeatTransfer2phDB;
+
+    model HeatTransfer2phDB_a
+      extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1,final useAverageTemperature,redeclare
+          replaceable package Medium =
+            StandardWater                                                                      constrainedby
+          Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
+      parameter CoefficientOfHeatTransfer gamma_b=10000
+        "Coefficient of heat transfer";
+      parameter Area A "Cross-sectional area (single tube)";
+      parameter Length Dhyd "Hydraulic Diameter (single tube)";
+      parameter Length omega "Perimeter of heat transfer surface (single tube)";
+      parameter Length L "Tube length";
+      final parameter Length l=L/(Nw) "Length of a single volume";
+      Real state[Nw];
+      Real alfa_l[Nw];
+      Real alfa_v[Nw];
+      Real alfa2_l[Nw];
+      Real alfa2_v[Nw];
+      CoefficientOfHeatTransfer gamma1ph[Nf];
+      CoefficientOfHeatTransfer gamma_bubble;
+      CoefficientOfHeatTransfer gamma_dew;
+      CoefficientOfHeatTransfer gamma2ph = gamma_b;
+      Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
+      Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
+      Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
+      Medium.Temperature T[Nf] "Fluid temperature";
+      Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+      Medium.Temperature Ts "Saturated water temperature";
+      Medium.SaturationProperties sat "Properties of saturated fluid";
+      Medium.ThermodynamicState bubble "Bubble point, one-phase side";
+      Medium.ThermodynamicState dew "Dew point, one-phase side";
+      Medium.AbsolutePressure p "Fluid pressure for property calculations";
+      Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
+      Medium.ThermalConductivity k[Nf] "Thermal conductivity";
+      Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+      Medium.DynamicViscosity mu_bubble "Dynamic viscosity at bubble point";
+      Medium.ThermalConductivity k_bubble
+        "Thermal conductivity at bubble point";
+      Medium.SpecificHeatCapacity cp_bubble
+        "Heat capacity at constant pressure at bubble point";
+      Medium.DynamicViscosity mu_dew "Dynamic viscosity at dew point";
+      Medium.ThermalConductivity k_dew "Thermal conductivity at dew point";
+      Medium.SpecificHeatCapacity cp_dew
+        "Heat capacity at constant pressure at dew point";
+      Power Q "Total heat flow through lateral boundary";
+
+    equation
+      assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Saturated fluid property calculations
+      p = Medium.pressure(fluidState[1]);
+      sat = Medium.setSat_p(p);
+      Ts = sat.Tsat;
+      hl = Medium.bubbleEnthalpy(sat);
+      hv = Medium.dewEnthalpy(sat);
+      bubble = Medium.setBubbleState(sat,1);
+      dew = Medium.setDewState(sat,1);
+      mu_bubble = Medium.dynamicViscosity(bubble);
+      k_bubble = Medium.thermalConductivity(bubble);
+      cp_bubble = Medium.heatCapacity_cp(bubble);
+      mu_dew =  Medium.dynamicViscosity(dew);
+      k_dew = Medium.thermalConductivity(dew);
+      cp_dew = Medium.heatCapacity_cp(dew);
+
+      // Heat transfer coefficient at bubble/dew point
+      gamma_bubble = f_dittus_boelter(w[1],Dhyd,A,mu_bubble,k_bubble,cp_bubble);
+      gamma_dew = f_dittus_boelter(w[1],Dhyd,A,mu_dew,k_dew,cp_dew);
+
+      // Fluid property calculations at nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+        h[j] = Medium.specificEnthalpy(fluidState[j]);
+        /* to be fixed */
+        mu[j] = Medium.dynamicViscosity(fluidState[j]);  //not all nodes, only 1-phase nodes
+        k[j] = Medium.thermalConductivity(fluidState[j]); //not all nodes, only 1-phase nodes
+        cp[j] = Medium.heatCapacity_cp(fluidState[j]); //not all nodes, only 1-phase nodes
+        gamma1ph[j] = f_dittus_boelter(w[j],Dhyd,A,mu[j],k[j],cp[j]); //not all nodes, only 1-phase nodes
+        /* to be fixed */
+      end for;
+
+      for j in 1:Nw loop
+        alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
+        alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
+        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+      end for;
+
+      for j in 1:Nw loop
+         if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then       // 1-phase liquid or vapour
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2);
+           state[j] = 1;
+         elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then               // liquid --> 2-phase
+           //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 2;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
+           wall.Q[j] = (wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 3;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                      // 2-phase --> vapour
+           //wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_dew + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 4;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                      // 2-phase --> liquid
+           //wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_bubble + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 5;
+         else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then              // vapour --> 2-phase
+           //wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma_dew)/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           state[j] = 6;
+         end if;
+         assert((h[j + 1] - h[j]) > 0 or (h[j + 1] - h[j]) < 0, "Division by zero during enthalpy calculation (h[j+1] - h[j]) = 0");
+         assert((h[j] - h[j + 1]) > 0 or (h[j] - h[j + 1]) < 0, "Division by zero during enthalpy calculation (h[j] - h[j + 1]) = 0");
+         Tvolbar[j] = (T[j] + T[j + 1])/2;
+      end for;
+
+       Q = sum(wall.Q);
+
+       annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end HeatTransfer2phDB_a;
+  end HeatTransfer;
+
+
+
+
+
 
   model SourceP "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
