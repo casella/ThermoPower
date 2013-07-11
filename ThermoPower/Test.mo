@@ -2689,7 +2689,8 @@ Algorithm Tolerance = 1e-4
       parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
       Medium.ThermodynamicState fluidState[Nnodes];
 
-      Water.HeatTransfer2phDB HeatTransfer(
+      Water.HeatTransfer.HeatTransfer2phDB
+                              HeatTransfer(
         Nf=Nnodes,
         A=Across,
         Dhyd=0.06,
@@ -2753,7 +2754,8 @@ Algorithm Tolerance = 1e-6
       parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
       Medium.ThermodynamicState fluidState[Nnodes];
 
-      Water.HeatTransfer2phDB HeatTransfer(
+      Water.HeatTransfer.HeatTransfer2phDB
+                              HeatTransfer(
         Nf=Nnodes,
         A=Across,
         Dhyd=0.06,
@@ -2858,7 +2860,9 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{-22,14},{-2,34}})));
       Water.Flow1DFV hexFV(
         redeclare package Medium = Medium,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient heatTransfer(
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+                                                                    heatTransfer(
           redeclare package Medium = Medium,
           Nf=Nnodes,
           fluidState=hexFV.fluidState,
@@ -3000,7 +3004,9 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient heatTransfer(
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+                                                                    heatTransfer(
           redeclare package Medium = Medium,
           fluidState=hexFVb.fluidState,
           w=hexFVb.w*ones(Nnodes),
@@ -3027,7 +3033,9 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient heatTransfer(
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+                                                                    heatTransfer(
           redeclare package Medium = Medium,
           fluidState=hexFVa.fluidState,
           w=hexFVa.w*ones(Nnodes),
@@ -3185,7 +3193,9 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient heatTransfer(
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+                                                                    heatTransfer(
           redeclare package Medium = Medium,
           fluidState=hexFVb.fluidState,
           w=hexFVb.w*ones(Nnodes),
@@ -3212,7 +3222,9 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient heatTransfer(
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+                                                                    heatTransfer(
           redeclare package Medium = Medium,
           fluidState=hexFVa.fluidState,
           w=hexFVa.w*ones(Nnodes),
@@ -3367,7 +3379,8 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(
           gamma=400,
           L=Lhex,
@@ -3397,7 +3410,8 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(
           useAverageTemperature=true,
           gamma=400,
@@ -3565,7 +3579,8 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(
           gamma=400,
           L=Lhex,
@@ -3595,7 +3610,8 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficient
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(
           useAverageTemperature=true,
           gamma=400,
@@ -3722,7 +3738,7 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        redeclare ThermoPower.Water.ConstantHeatTransferCoefficientDB
+        redeclare ThermoPower.Water.HeatTransfer.DittusBoelter
           heatTransfer(
           redeclare package Medium = Medium,
           Nf=Nnodes,
@@ -3851,7 +3867,8 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        redeclare ThermoPower.Water.HeatTransfer2phDB heatTransfer(
+        redeclare ThermoPower.Water.HeatTransfer.HeatTransfer2phDB
+                                                      heatTransfer(
           Nf=Nnodes,
           A=Ahex,
           Dhyd=2*rhex,
