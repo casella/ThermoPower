@@ -794,6 +794,22 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
        Created. </li>
 </ul>
 </html>"));
+  function smoothSat "Smooth saturation function"
+    input Real x;
+    input Real xmin "Lower bound of range where y = x";
+    input Real xmax "Upper bound of range where y = x";
+    input Real dxmin "Width of lower smoothing range";
+    input Real dxmax=dxmin "Width of upper smoothing range";
+    output Real y;
+  algorithm
+    y := if x < xmin + dxmin then
+           xmin + dxmin - dxmin*(xmin + dxmin - x)/(dxmin^4 + (xmin + dxmin - x)^4)^0.25
+         else if x > xmax - dxmax then
+           xmax - dxmax + dxmax*(x - xmax + dxmax)/(dxmax^4 + (x - xmax + dxmax)^4)^0.25
+         else x;
+    annotation (smoothOrder=4, InLine=true);
+  end smoothSat;
+
   block OffsetController "Offset computation for steady-state conditions"
     extends Modelica.Blocks.Interfaces.BlockIcon;
     parameter Real steadyStateGain=0.0
@@ -2342,6 +2358,6 @@ most user-developed models.</li>
 <p>The ThermoPower package is licensed by Politecnico di Milano under the  <a href=\"http://www.modelica.org/licenses/ModelicaLicense2\"><b>Modelica License 2</b></a>.</p> 
 <p><b>Copyright &copy; 2002-2013, Politecnico di Milano.</b></p>
 </HTML>"),
-  uses(Modelica(version="3.2.1")),
+  uses(Modelica(version="3.2")),
   version="3.1");
 end ThermoPower;
