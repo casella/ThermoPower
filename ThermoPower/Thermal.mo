@@ -1017,7 +1017,7 @@ This package contains models to compute the material properties needed to model 
 
     extends ThermoPower.Icons.MetalWall;
     parameter Integer N(min=2)=3 "Number of nodes";
-    parameter Integer Nw = N - 1 "Number of volume";
+    parameter Integer Nw = N - 1 "Number of volumes";
     parameter Modelica.SIunits.Mass M "Mass";
     //parameter Modelica.SIunits.Area Sint "Internal surface";
     //parameter Modelica.SIunits.Area Sext "External surface";

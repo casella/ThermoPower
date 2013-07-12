@@ -2029,7 +2029,6 @@ package Gas "Models of components with ideal gases as working fluid"
 "),   DymolaStoredErrors);
   end Valve;
 
-
   function f_colebrook "Fanning friction factor for water/steam flows"
     input MassFlowRate w;
     input Real D_A;
@@ -3349,7 +3348,6 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 </html>"));
   end FanMech;
 
-
   model SourceP "Pressure source for gas flows"
     extends Icons.Gas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
@@ -3734,17 +3732,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 </ul>
 </html>"), Diagram(graphics));
   end ThroughW;
-  annotation (Documentation(info="<HTML>
-This package contains models of physical processes and components using ideal gases as working fluid.
-<p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
-<ul>
-<li><tt>Choices.Init.Options.noInit</tt>: no initialisation
-<li><tt>Choices.Init.Options.steadyState</tt>: full steady-state initialisation
-<li><tt>Choices.Init.Options.steadyStateNoP</tt>: steady-state initialisation (except pressure)
-<li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
-</ul>
-The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
-</HTML>"));
+
   package BaseClasses
     partial model DistributedHeatTransferFV
       "Distributed heat transfer model - finite volume"
@@ -3850,6 +3838,50 @@ The latter options can be useful when two or more components are connected direc
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end ConstantThermalConductance;
 
+    model FlowDependentHeatTransferCoefficient
+      "Flow-dependent heat transfer coefficient, gamma = gamma_nom*(w/wnom)^alpha"
+      extends BaseClasses.DistributedHeatTransferFV;
+
+       parameter CoefficientOfHeatTransfer gamma_nom
+        "Nominal heat transfer coefficient";
+       parameter Real alpha(final unit="1")
+        "Exponent in the flow-dependency law";
+       parameter Real beta(final unit="1") = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is not reduced";
+       final parameter Length l=L/(Nw) "Length of a single volume";
+       Medium.Temperature T[Nf] "Fluid temperature";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       Power Q "Total heat flow through lateral boundary";
+       CoefficientOfHeatTransfer gamma "Actual heat transfer coefficient";
+       Real w_wnom(final unit = "1")
+        "Ratio between actual and nominal flow rate";
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities
+      w_wnom = abs(w[1])/wnom
+        "Inlet flow rate used for the computation of the conductance";
+      gamma = gamma_nom*Functions.smoothSat(w_wnom,wnom*beta,1e9,wnom*beta/2)^alpha;
+
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+
+      for j in 1:Nw loop
+         wall.Q[j] = (wall.T[j] - Tvol[j])*gamma*omega*l;
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+      end for;
+
+      Q = sum(wall.Q);
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end FlowDependentHeatTransferCoefficient;
+
     model FlowDependentThermalConductance
       "Flow-dependent global thermal conductance (UA value), UA = UAnom*(w/wnom)^alpha"
       extends BaseClasses.DistributedHeatTransferFV;
@@ -3871,7 +3903,7 @@ The latter options can be useful when two or more components are connected direc
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities
-      w_wnom = abs(w[1])/(wnom/Nt)
+      w_wnom = abs(w[1])/wnom
         "Inlet flow rate used for the computation of the conductance";
       UA = UAnom*Functions.smoothSat(w_wnom,wnom*beta,1e9,wnom*beta/2)^alpha;
 
@@ -4255,4 +4287,15 @@ The latter options can be useful when two or more components are connected direc
 </html>"),
       DymolaStoredErrors);
   end Flow1D;
+  annotation (Documentation(info="<HTML>
+This package contains models of physical processes and components using ideal gases as working fluid.
+<p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
+<ul>
+<li><tt>Choices.Init.Options.noInit</tt>: no initialisation
+<li><tt>Choices.Init.Options.steadyState</tt>: full steady-state initialisation
+<li><tt>Choices.Init.Options.steadyStateNoP</tt>: steady-state initialisation (except pressure)
+<li><tt>Choices.Init.Options.steadyStateNoT</tt>: steady-state initialisation (except temperature)
+</ul>
+The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
+</HTML>"));
 end Gas;
