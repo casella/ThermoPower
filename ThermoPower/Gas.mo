@@ -49,7 +49,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SourcePressure "Pressure source for gas flows"
     extends Icons.Gas.SourceP;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=p0),
       T(start=T),
@@ -146,7 +147,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SinkPressure "Pressure sink for gas flows"
     extends Icons.Gas.SourceP;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=p0),
       T(start=T),
@@ -240,7 +242,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SourceMassFlow "Flow rate source for gas flows"
     extends Icons.Gas.SourceW;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=p0),
       T(start=T),
@@ -340,7 +343,8 @@ package Gas "Models of components with ideal gases as working fluid"
   model SinkMassFlow "Flow rate sink for gas flows"
 
     extends Icons.Gas.SourceW;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=p0),
       T(start=T),
@@ -440,7 +444,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model ThroughMassFlow "Prescribes the mass flow rate across the component"
     extends Icons.Gas.SourceW;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter MassFlowRate w0=0 "Nominal mass flow rate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -502,7 +507,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model Plenum "Rigid adiabatic volume"
     extends Icons.Gas.Mixer;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
@@ -604,7 +610,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model Header "Header with metal walls for gas flows"
     extends Icons.Gas.Mixer;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
@@ -724,7 +731,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model Mixer "Mixer with metal walls for gas flows"
     extends Icons.Gas.Mixer;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
@@ -861,7 +869,8 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.Tube;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
     final parameter Integer Nw = N - 1
       "Number of volumes on the wall interface";
@@ -1229,7 +1238,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model FlowJoin "Joins two gas flows"
     extends Icons.Gas.FlowJoin;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     constant MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
@@ -1327,7 +1337,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model FlowSplit "Splits a gas flow in two"
     extends Icons.Gas.FlowSplit;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     constant MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
@@ -1422,7 +1433,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model PressDropLin "Linear pressure drop for gas flows"
     extends Icons.Gas.Tube;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter HydraulicResistance R "Hydraulic resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -1465,7 +1477,8 @@ package Gas "Models of components with ideal gases as working fluid"
   model PressDrop "Pressure drop for gas flows"
     extends Icons.Gas.Tube;
     import ThermoPower.Choices.PressDrop.FFtypes;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=pstart),
       T(start=Tstart),
@@ -1573,7 +1586,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SensT "Temperature sensor for gas"
     extends Icons.Gas.SensThrough;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -1632,7 +1646,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SensT1 "Temperature sensor for gas flows, single port"
     extends Icons.Gas.SensP;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Modelica.Blocks.Interfaces.RealOutput T annotation (Placement(
           transformation(extent={{60,50},{72,70}}, rotation=0),
           iconTransformation(extent={{60,50},{80,70}})));
@@ -1669,7 +1684,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SensW "Mass Flowrate sensor for gas flows"
     extends Icons.Gas.SensThrough;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -1719,7 +1735,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SensP "Pressure sensor for gas flows"
     extends Icons.Gas.SensP;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Modelica.Blocks.Interfaces.RealOutput p annotation (Placement(
           transformation(extent={{60,50},{72,70}}, rotation=0),
           iconTransformation(extent={{60,50},{80,70}})));
@@ -1753,7 +1770,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SensQ "Volume Flow Rate sensor for gas flows"
     extends Icons.Gas.SensThrough;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -1808,7 +1826,8 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model ValveLin "Valve for gas flows with linear pressure drop"
     extends Icons.Gas.Valve;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter HydraulicConductance Kv "Hydraulic conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -1857,7 +1876,8 @@ package Gas "Models of components with ideal gases as working fluid"
   model Valve "Valve for gas flow"
     extends Icons.Gas.Valve;
     import ThermoPower.Choices.Valve.CvTypes;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
       p(start=pin_start),
       T(start=Tstart),
@@ -2222,7 +2242,8 @@ This model extends the CombustionChamber Base model, with the definition of the 
 
   partial model CompressorBase "Gas compressor"
     extends ThermoPower.Icons.Gas.Compressor;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter Boolean explicitIsentropicEnthalpy=true
       "isentropicEnthalpy function used";
     parameter Real eta_mech=0.98 "mechanical efficiency";
@@ -2453,7 +2474,8 @@ This model adds the performance characteristics to the Compressor_Base model, by
 
   partial model TurbineBase "Gas Turbine"
     extends ThermoPower.Icons.Gas.Turbine;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      annotation(choicesAllMatching = true);
     parameter Boolean explicitIsentropicEnthalpy=true
       "isentropicEnthalpy function used";
     parameter Real eta_mech=0.98 "mechanical efficiency";
@@ -3090,8 +3112,9 @@ The packages Medium are redeclared and a mass balance determines the composition
   partial model FanBase "Base model for fans"
     extends Icons.Gas.Fan;
     import Modelica.SIunits.Conversions.NonSIunits.*;
-    replaceable package Medium = Water.StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+      "Medium model"
+      annotation(choicesAllMatching = true);
     Medium.BaseProperties inletFluid(h(start=hstart))
       "Fluid properties at the inlet";
     replaceable function flowCharacteristic =
@@ -3347,6 +3370,200 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 </ul>
 </html>"));
   end FanMech;
+
+  package BaseClasses
+    partial model DistributedHeatTransferFV
+      "Distributed heat transfer model - finite volume"
+
+      extends ThermoPower.Icons.HeatFlow;
+      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+        "Medium model";
+      input Medium.ThermodynamicState fluidState[Nf];
+      input MassFlowRate w[Nf];
+      ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
+                40}}, rotation=0)));
+      parameter Integer Nf(min=2) = 2 "Number of nodes fluid-side";
+      parameter Integer Nw "Number of nodes wall-side";
+      parameter Distance L "Tube length";
+      parameter Area A "Cross-sectional area (single tube)";
+      parameter Length omega "Perimeter of heat transfer surface (single tube)";
+      parameter Length Dhyd "Hydraulic Diameter (single tube)";
+      parameter MassFlowRate wnom "Nominal mass flowrate (single tube)";
+      parameter Boolean useAverageTemperature = true
+        "= true to use average temperature for heat transfer";
+
+    end DistributedHeatTransferFV;
+  end BaseClasses;
+
+  package HeatTransfer "Heat transfer models"
+    model IdealHeatTransfer
+      "Delta T across the boundary layer is zero (infinite heat transfer coeffficient)"
+      extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature=false);
+       Medium.Temperature T[Nf] "Fluid temperature";
+
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+
+      for j in 1:Nw loop
+        wall.T[j] = T[j+1] "Ideal infinite heat transfer";
+      end for;
+    end IdealHeatTransfer;
+
+    model ConstantHeatTransferCoefficient
+      extends BaseClasses.DistributedHeatTransferFV;
+
+       parameter CoefficientOfHeatTransfer gamma
+        "Constant heat transfer coefficient";
+       Medium.Temperature T[Nf] "Fluid temperature";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       final parameter Length l=L/(Nw) "Length of a single volume";
+       Power Q "Total heat flow through lateral boundary";
+
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+
+      for j in 1:Nw loop
+         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma;
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+      end for;
+
+      Q = sum(wall.Q);
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantHeatTransferCoefficient;
+
+    model ConstantThermalConductance
+      "Constant global thermal conductance (UA value)"
+      extends BaseClasses.DistributedHeatTransferFV;
+
+       parameter Modelica.SIunits.ThermalConductance UA
+        "Global thermal conductance (UA value), for Nt tubes";
+       Medium.Temperature T[Nf] "Fluid temperature";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       Power Q "Total heat flow through lateral boundary";
+
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+
+      for j in 1:Nw loop
+         wall.Q[j] = UA*(wall.T[j] - Tvol[j])/Nw;
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+      end for;
+
+      Q = sum(wall.Q);
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantThermalConductance;
+
+    model FlowDependentHeatTransferCoefficient
+      "Flow-dependent heat transfer coefficient, gamma = gamma_nom*(w/wnom)^alpha"
+      extends BaseClasses.DistributedHeatTransferFV;
+
+       parameter CoefficientOfHeatTransfer gamma_nom
+        "Nominal heat transfer coefficient";
+       parameter Real alpha(final unit="1")
+        "Exponent in the flow-dependency law";
+       parameter Real beta(final unit="1") = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is not reduced";
+       final parameter Length l=L/(Nw) "Length of a single volume";
+       Medium.Temperature T[Nf] "Fluid temperature";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       Power Q "Total heat flow through lateral boundary";
+       CoefficientOfHeatTransfer gamma "Actual heat transfer coefficient";
+       Real w_wnom(final unit = "1")
+        "Ratio between actual and nominal flow rate";
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities
+      w_wnom = abs(w[1])/wnom
+        "Inlet flow rate used for the computation of the conductance";
+      gamma = gamma_nom*Functions.smoothSat(w_wnom,wnom*beta,1e9,wnom*beta/2)^alpha;
+
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+
+      for j in 1:Nw loop
+         wall.Q[j] = (wall.T[j] - Tvol[j])*gamma*omega*l;
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+      end for;
+
+      Q = sum(wall.Q);
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end FlowDependentHeatTransferCoefficient;
+
+    model FlowDependentThermalConductance
+      "Flow-dependent global thermal conductance (UA value), UA = UAnom*(w/wnom)^alpha"
+      extends BaseClasses.DistributedHeatTransferFV;
+
+       parameter Modelica.SIunits.ThermalConductance UAnom
+        "Nominal global thermal conductance (UA value), for Nt tubes";
+       parameter Real alpha(final unit="1")
+        "Exponent in the flow-dependency law";
+       parameter Real beta(final unit="1") = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is not reduced";
+       Medium.Temperature T[Nf] "Fluid temperature";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       Power Q "Total heat flow through lateral boundary";
+       Modelica.SIunits.ThermalConductance UA
+        "Actual global thermal conductance (UA value), for Nt tubes";
+       Real w_wnom(final unit = "1")
+        "Ratio between actual and nominal flow rate";
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities
+      w_wnom = abs(w[1])/wnom
+        "Inlet flow rate used for the computation of the conductance";
+      UA = UAnom*Functions.smoothSat(w_wnom,wnom*beta,1e9,wnom*beta/2)^alpha;
+
+      // Temperature at the nodes
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+
+      for j in 1:Nw loop
+         wall.Q[j] = UA*(wall.T[j] - Tvol[j])/Nw;
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+      end for;
+
+      Q = sum(wall.Q);
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end FlowDependentThermalConductance;
+  end HeatTransfer;
 
   model SourceP "Pressure source for gas flows"
     extends Icons.Gas.SourceP;
@@ -3733,199 +3950,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 </html>"), Diagram(graphics));
   end ThroughW;
 
-  package BaseClasses
-    partial model DistributedHeatTransferFV
-      "Distributed heat transfer model - finite volume"
 
-      extends ThermoPower.Icons.HeatFlow;
-      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
-        "Medium model";
-      input Medium.ThermodynamicState fluidState[Nf];
-      input MassFlowRate w[Nf];
-      ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
-                40}}, rotation=0)));
-      parameter Integer Nf(min=2) = 2 "Number of nodes fluid-side";
-      parameter Integer Nw "Number of nodes wall-side";
-      parameter Distance L "Tube length";
-      parameter Area A "Cross-sectional area (single tube)";
-      parameter Length omega "Perimeter of heat transfer surface (single tube)";
-      parameter Length Dhyd "Hydraulic Diameter (single tube)";
-      parameter MassFlowRate wnom "Nominal mass flowrate (single tube)";
-      parameter Boolean useAverageTemperature = true
-        "= true to use average temperature for heat transfer";
-
-    end DistributedHeatTransferFV;
-  end BaseClasses;
-
-  package HeatTransfer "Heat transfer models"
-    model IdealHeatTransfer
-      "Delta T across the boundary layer is zero (infinite heat transfer coeffficient)"
-      extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature=false);
-       Medium.Temperature T[Nf] "Fluid temperature";
-
-    equation
-      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
-
-      // Temperature at the nodes
-      for j in 1:Nf loop
-        T[j] = Medium.temperature(fluidState[j]);
-      end for;
-
-      for j in 1:Nw loop
-        wall.T[j] = T[j+1] "Ideal infinite heat transfer";
-      end for;
-    end IdealHeatTransfer;
-
-    model ConstantHeatTransferCoefficient
-      extends BaseClasses.DistributedHeatTransferFV;
-
-       parameter CoefficientOfHeatTransfer gamma
-        "Constant heat transfer coefficient";
-       Medium.Temperature T[Nf] "Fluid temperature";
-       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-       final parameter Length l=L/(Nw) "Length of a single volume";
-       Power Q "Total heat flow through lateral boundary";
-
-    equation
-      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
-      // Temperature at the nodes
-      for j in 1:Nf loop
-        T[j] = Medium.temperature(fluidState[j]);
-      end for;
-
-      for j in 1:Nw loop
-         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma;
-         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
-      end for;
-
-      Q = sum(wall.Q);
-
-      annotation (
-        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
-                100,100}}),
-                graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-    end ConstantHeatTransferCoefficient;
-
-    model ConstantThermalConductance
-      "Constant global thermal conductance (UA value)"
-      extends BaseClasses.DistributedHeatTransferFV;
-
-       parameter Modelica.SIunits.ThermalConductance UA
-        "Global thermal conductance (UA value), for Nt tubes";
-       Medium.Temperature T[Nf] "Fluid temperature";
-       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-       Power Q "Total heat flow through lateral boundary";
-
-    equation
-      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
-      // Temperature at the nodes
-      for j in 1:Nf loop
-        T[j] = Medium.temperature(fluidState[j]);
-      end for;
-
-      for j in 1:Nw loop
-         wall.Q[j] = UA*(wall.T[j] - Tvol[j])/Nw;
-         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
-      end for;
-
-      Q = sum(wall.Q);
-
-      annotation (
-        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
-                100,100}}),
-                graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-    end ConstantThermalConductance;
-
-    model FlowDependentHeatTransferCoefficient
-      "Flow-dependent heat transfer coefficient, gamma = gamma_nom*(w/wnom)^alpha"
-      extends BaseClasses.DistributedHeatTransferFV;
-
-       parameter CoefficientOfHeatTransfer gamma_nom
-        "Nominal heat transfer coefficient";
-       parameter Real alpha(final unit="1")
-        "Exponent in the flow-dependency law";
-       parameter Real beta(final unit="1") = 0.1
-        "Fraction of nominal flow rate below which the heat transfer is not reduced";
-       final parameter Length l=L/(Nw) "Length of a single volume";
-       Medium.Temperature T[Nf] "Fluid temperature";
-       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-       Power Q "Total heat flow through lateral boundary";
-       CoefficientOfHeatTransfer gamma "Actual heat transfer coefficient";
-       Real w_wnom(final unit = "1")
-        "Ratio between actual and nominal flow rate";
-    equation
-      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
-
-      // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities
-      w_wnom = abs(w[1])/wnom
-        "Inlet flow rate used for the computation of the conductance";
-      gamma = gamma_nom*Functions.smoothSat(w_wnom,wnom*beta,1e9,wnom*beta/2)^alpha;
-
-      // Temperature at the nodes
-      for j in 1:Nf loop
-        T[j] = Medium.temperature(fluidState[j]);
-      end for;
-
-      for j in 1:Nw loop
-         wall.Q[j] = (wall.T[j] - Tvol[j])*gamma*omega*l;
-         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
-      end for;
-
-      Q = sum(wall.Q);
-
-      annotation (
-        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
-                100,100}}),
-                graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-    end FlowDependentHeatTransferCoefficient;
-
-    model FlowDependentThermalConductance
-      "Flow-dependent global thermal conductance (UA value), UA = UAnom*(w/wnom)^alpha"
-      extends BaseClasses.DistributedHeatTransferFV;
-
-       parameter Modelica.SIunits.ThermalConductance UAnom
-        "Nominal global thermal conductance (UA value), for Nt tubes";
-       parameter Real alpha(final unit="1")
-        "Exponent in the flow-dependency law";
-       parameter Real beta(final unit="1") = 0.1
-        "Fraction of nominal flow rate below which the heat transfer is not reduced";
-       Medium.Temperature T[Nf] "Fluid temperature";
-       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-       Power Q "Total heat flow through lateral boundary";
-       Modelica.SIunits.ThermalConductance UA
-        "Actual global thermal conductance (UA value), for Nt tubes";
-       Real w_wnom(final unit = "1")
-        "Ratio between actual and nominal flow rate";
-    equation
-      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
-
-      // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities
-      w_wnom = abs(w[1])/wnom
-        "Inlet flow rate used for the computation of the conductance";
-      UA = UAnom*Functions.smoothSat(w_wnom,wnom*beta,1e9,wnom*beta/2)^alpha;
-
-      // Temperature at the nodes
-      for j in 1:Nf loop
-        T[j] = Medium.temperature(fluidState[j]);
-      end for;
-
-      for j in 1:Nw loop
-         wall.Q[j] = UA*(wall.T[j] - Tvol[j])/Nw;
-         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
-      end for;
-
-      Q = sum(wall.Q);
-
-      annotation (
-        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
-                100,100}}),
-                graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-    end FlowDependentThermalConductance;
-  end HeatTransfer;
 
   model Flow1D "1-dimensional fluid flow model for gas (finite volumes)"
     extends Icons.Gas.Tube;

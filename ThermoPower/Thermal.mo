@@ -813,8 +813,8 @@ This package contains models to compute the material properties needed to model 
   model MetalTubeFV "Cylindrical metal tube - 1 radial node and N axial nodes"
 
     extends Icons.MetalWall;
-    parameter Integer N(min=2) = 3 "Number of nodes";
-    parameter Integer Nw = N - 1 "Number of volume";
+    parameter Integer N(min=2) = 2 "Number of nodes";
+    final parameter Integer Nw = N - 1 "Number of volume";
     parameter Length L "Tube length";
     parameter Length rint "Internal radius (single tube)";
     parameter Length rext "External radius (single tube)";
@@ -829,15 +829,8 @@ This package contains models to compute the material properties needed to model 
     parameter Temperature TstartN=Tstartbar
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
-  //   parameter Temperature Tstart[N]=ThermoPower.Thermal.linspaceExt(
-  //         Tstart1,
-  //         TstartN,
-  //         N) "Start value of temperature vector (initialized by default)"
-  //     annotation (Dialog(tab="Initialisation"));
-   parameter Temperature Tvolstart[Nw]=linspace(
-          Tstart1,
-          TstartN,
-          Nw);
+   parameter Temperature Tvolstart[Nw]=
+     Functions.linspaceExt(Tstart1, TstartN, Nw);
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
@@ -935,7 +928,7 @@ This package contains models to compute the material properties needed to model 
     parameter Temperature TstartN=Tstartbar
       "Temperature start value - last node"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart[N]=ThermoPower.Thermal.linspaceExt(
+    parameter Temperature Tstart[N]=Functions.linspaceExt(
           Tstart1,
           TstartN,
           N) "Start value of temperature vector (initialized by default)"
@@ -1013,14 +1006,11 @@ This package contains models to compute the material properties needed to model 
 "),   Diagram(graphics));
   end MetalTubeFEM;
 
-  model MetalWallFV "Generic metal wall - 1 radial node and N axial nodes"
-
+  model MetalWallFV "Generic 1D metal wall"
     extends ThermoPower.Icons.MetalWall;
-    parameter Integer N(min=2)=3 "Number of nodes";
-    parameter Integer Nw = N - 1 "Number of volumes";
+    parameter Integer N(min=2)=2 "Number of nodes";
+    final parameter Integer Nw = N - 1 "Number of volumes";
     parameter Modelica.SIunits.Mass M "Mass";
-    //parameter Modelica.SIunits.Area Sint "Internal surface";
-    //parameter Modelica.SIunits.Area Sext "External surface";
     parameter Modelica.SIunits.SpecificHeatCapacity cm
       "Specific heat capacity of metal";
     parameter Temperature Tstartbar=300 "Average temperature"
@@ -1031,15 +1021,8 @@ This package contains models to compute the material properties needed to model 
     parameter Temperature TstartN=Tstartbar
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
-  //   parameter Temperature Tstart[N]=ThermoPower.Thermal.linspaceExt(
-  //         Tstart1,
-  //         TstartN,
-  //         N) "Start value of temperature vector (initialized by default)"
-  //     annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tvolstart[Nw]=linspace(
-          Tstart1,
-          TstartN,
-          Nw);
+    parameter Temperature Tvolstart[Nw]=
+      Functions.linspaceExt(Tstart1, TstartN, Nw);
     parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
@@ -1051,13 +1034,6 @@ This package contains models to compute the material properties needed to model 
     ThermoPower.Thermal.DHTVolumes ext(final N=Nw, T(start=Tvolstart))
       "External surface"
        annotation (Placement(transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
-
-  //   ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface"
-  //     annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=
-  //             0)));
-  //   ThermoPower.Thermal.DHT ext(N=N, T(start=Tstart)) "External surface"
-  //     annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
-  //           rotation=0)));
   equation
     (cm*M/Nw)*der(Tvol) = int.Q + ext.Q "Energy balance";
     // No temperature gradients across the thickness
@@ -1129,7 +1105,7 @@ This package contains models to compute the material properties needed to model 
     parameter Temperature TstartN=Tstartbar
       "Temperature start value - last node"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart[N]=ThermoPower.Thermal.linspaceExt(
+    parameter Temperature Tstart[N]=Functions.linspaceExt(
           Tstart1,
           TstartN,
           N) "Start value of temperature vector (initialized by default)"
@@ -2169,17 +2145,6 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 </html>"));
   end CylinderFourier;
 
-  function linspaceExt "Extended linspace handling also the N=1 case"
-    input Real x1;
-    input Real x2;
-    input Integer N;
-    output Real vec[N];
-  algorithm
-    vec := if N == 1 then {x1} else linspace(
-        x1,
-        x2,
-        N);
-  end linspaceExt;
 
   model ParallelFlow
     extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = 1:Nw);

@@ -56,7 +56,8 @@ package Water "Models of components with water/steam as working fluid"
   model SourcePressure "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter Pressure p0=1.01325e5 "Nominal pressure";
     parameter HydraulicResistance R=0 "Hydraulic resistance";
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
@@ -131,7 +132,8 @@ package Water "Models of components with water/steam as working fluid"
   model SinkPressure "Pressure sink for water/steam flows"
     extends Icons.Water.SourceP;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter Pressure p0=1.01325e5 "Nominal pressure";
     parameter HydraulicResistance R=0 "Hydraulic resistance"
       annotation (Evaluate=true);
@@ -208,7 +210,8 @@ package Water "Models of components with water/steam as working fluid"
   model SourceMassFlow "Flowrate source for water/steam flows"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Pressure p0=1e5 "Nominal pressure";
     parameter HydraulicConductance G=0 "Hydraulic conductance";
@@ -284,7 +287,8 @@ package Water "Models of components with water/steam as working fluid"
   model SinkMassFlow "Flowrate sink for water/steam flows"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Pressure p0=1e5 "Nominal pressure";
     parameter HydraulicConductance G=0 "Hydraulic conductance";
@@ -361,7 +365,8 @@ package Water "Models of components with water/steam as working fluid"
   model ThroughMassFlow "Prescribes the flow rate across the component"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -420,7 +425,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   model PressDropLin "Linear pressure drop for water/steam flows"
     extends Icons.Water.PressDrop;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter HydraulicResistance R "Hydraulic resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -458,7 +464,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends Icons.Water.PressDrop;
     import ThermoPower.Choices.PressDrop.FFtypes;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     Medium.ThermodynamicState state "Thermodynamic state of the fluid";
     parameter MassFlowRate wnom "Nominal mass flowrate";
     parameter FFtypes FFtype=FFtypes.Kf "Friction Factor Type";
@@ -555,7 +562,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   model Header "Header with metal walls for water/steam flows"
     extends Icons.Water.Header;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
     parameter Volume V "Inner volume";
     parameter Area S=0 "Internal surface";
@@ -713,7 +721,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   model Mixer "Mixer with metal walls for water/steam flows"
     extends Icons.Water.Mixer;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     Medium.ThermodynamicState fluidState "Thermodynamic state of the fluid";
     parameter Volume V "Internal volume";
     parameter Area S=0 "Internal surface";
@@ -856,7 +865,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   model Tank "Open tank with free surface"
     extends Icons.Water.Tank;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     Medium.ThermodynamicState liquidState(p(start=pext),h(start=hstart))
       "Thermodynamic state of the liquid";
     parameter Area A "Cross-sectional area";
@@ -977,8 +987,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass (single tube)";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.HeatTransfer.IdealHeatTransfer
-                                                    heatTransfer(
+    replaceable ThermoPower.Water.HeatTransfer.IdealHeatTransfer heatTransfer(
       redeclare package Medium = Medium,
       final Nf=N, final Nw = Nw, final L = L, final A = A, final Dhyd = Dhyd,
       final omega = omega, final wnom = wnom/Nt,
@@ -1114,7 +1123,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
      h[1] = inStream(infl.h_outflow);
      h[2:N] = htilde;
-  //   wbar = (wstar[1:N - 1] + wstar[2:N])/2;
 
     connect(wall,heatTransfer.wall);
 
@@ -1207,8 +1215,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
-    replaceable ThermoPower.Water.HeatTransfer.IdealHeatTransfer
-                                                    heatTransfer(
+    replaceable ThermoPower.Water.HeatTransfer.IdealHeatTransfer heatTransfer(
       redeclare package Medium = Medium,
       final Nf=N, final Nw = Nw, final L = L, final A = A,
       final Dhyd = Dhyd, final omega = omega, final wnom = wnom/Nt,
@@ -2745,7 +2752,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model FlowJoin "Joins two water/steam flows"
     extends Icons.Water.FlowJoin;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -2818,7 +2826,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model FlowSplit "Splits a flow in two"
     extends Icons.Water.FlowSplit;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -2892,7 +2901,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model SensT "Temperature sensor for water-steam"
     extends Icons.Water.SensThrough;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -2945,7 +2955,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model SensT1 "Temperature sensor for water/steam flows, single port"
     extends ThermoPower.Icons.Water.SensP;
     replaceable package Medium = ThermoPower.Water.StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     Modelica.Blocks.Interfaces.RealOutput T annotation (Placement(
           transformation(extent={{60,40},{100,80}}, rotation=0)));
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=0))
@@ -2978,7 +2989,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model SensW "Mass Flowrate sensor for water/steam"
     extends Icons.Water.SensThrough;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -3023,7 +3035,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model SensP "Pressure sensor for water/steam flows"
     extends Icons.Water.SensP;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     Modelica.Blocks.Interfaces.RealOutput p annotation (Placement(
           transformation(extent={{60,40},{100,80}}, rotation=0)));
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=0))
@@ -3056,7 +3069,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model Accumulator "Water-Gas Accumulator"
     extends ThermoPower.Icons.Water.Accumulator;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Liquid medium model";
+      Modelica.Media.Interfaces.PartialMedium "Liquid medium model"
+      annotation(choicesAllMatching = true);
     Medium.ThermodynamicState liquidState "Thermodynamic state of the liquid";
 
     parameter Volume V "Total volume";
@@ -3214,7 +3228,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
   model Drum2States
     extends Icons.Water.Drum;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model";
+      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter Volume Vd "Drum volume";
     parameter Volume Vdcr "Volume of downcomer and risers";
     parameter Mass Mmd "Drum metal mass";
@@ -3326,7 +3341,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
   model Drum "Drum for circulation boilers"
     extends Icons.Water.Drum;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model";
+      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+      annotation(choicesAllMatching = true);
     Medium.ThermodynamicState liquidState "Thermodynamic state of the liquid";
     Medium.ThermodynamicState vapourState "Thermodynamic state of the vapour";
     Medium.SaturationProperties sat;
@@ -3625,7 +3641,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
   model ValveLin "Valve for water/steam flows with linear pressure drop"
     extends Icons.Water.Valve;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     parameter HydraulicConductance Kv "Nominal hydraulic conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -4070,7 +4087,8 @@ Input variables changed. This function now computes the heat transfer coefficien
 </HTML>"));
   end f_dittus_boelter;
 
-  model SteamTurbineStodola "Steam turbine"
+  model SteamTurbineStodola
+    "Steam turbine: Stodola's ellipse law and constant isentropic efficiency"
     extends BaseClasses.SteamTurbineBase;
     parameter Real eta_iso_nom=0.92 "Nominal isentropic efficiency";
     parameter Area Kt "Kt coefficient of Stodola's law";
@@ -4097,9 +4115,10 @@ Input variables changed. This function now computes the heat transfer coefficien
 </html>"));
   end SteamTurbineStodola;
 
-  model SteamTurbineUnit "Turbine for steam flows"
+  model SteamTurbineUnit "Simplified HP+LP turbine unit for steam flows"
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialMedium "Medium model";
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
+      annotation(choicesAllMatching = true);
     extends Icons.Water.SteamTurbineUnit;
     parameter Real pnom "Inlet nominal pressure";
     parameter Real wnom "Inlet nominal flowrate";
@@ -6601,7 +6620,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     partial model Flow1DBase
       "Basic interface for 1-dimensional water/steam fluid flow models"
       replaceable package Medium = StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialMedium "Medium model";
+        Modelica.Media.Interfaces.PartialMedium "Medium model"
+        annotation(choicesAllMatching = true);
       extends Icons.Water.Tube;
       import ThermoPower.Choices.Flow1D.FFtypes;
       import ThermoPower.Choices.Flow1D.HCtypes;
@@ -6711,7 +6731,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       extends Icons.Water.Valve;
       import ThermoPower.Choices.Valve.CvTypes;
       replaceable package Medium = StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialMedium "Medium model";
+        Modelica.Media.Interfaces.PartialMedium "Medium model"
+        annotation(choicesAllMatching = true);
       Medium.ThermodynamicState fluidState(p(start=pin_start));
       parameter CvTypes CvData=CvTypes.Av "Selection of flow coefficient";
       parameter Area Av(
@@ -6845,7 +6866,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       extends Icons.Water.Pump;
       import Modelica.SIunits.Conversions.NonSIunits.*;
       replaceable package Medium = StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialMedium "Medium model";
+        Modelica.Media.Interfaces.PartialMedium "Medium model"
+        annotation(choicesAllMatching = true);
       Medium.ThermodynamicState inletFluidState
         "Thermodynamic state of the fluid at the inlet";
       replaceable function flowCharacteristic =
@@ -7067,7 +7089,8 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
     partial model SteamTurbineBase "Steam turbine"
       replaceable package Medium = ThermoPower.Water.StandardWater
-        constrainedby Modelica.Media.Interfaces.PartialMedium "Medium model";
+        constrainedby Modelica.Media.Interfaces.PartialMedium "Medium model"
+        annotation(choicesAllMatching = true);
       parameter Boolean explicitIsentropicEnthalpy=true
         "Outlet enthalpy computed by isentropicEnthalpy function";
       parameter MassFlowRate wstart=wnom "Mass flow rate start value"
@@ -7221,6 +7244,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     end DistributedHeatTransferFV;
   end BaseClasses;
 
+
   package HeatTransfer "Heat transfer models"
     model IdealHeatTransfer
       "Delta T across the boundary layer is zero (infinite heat transfer coeffficient)"
@@ -7228,7 +7252,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
        Medium.Temperature T[Nf] "Fluid temperature";
 
     equation
-      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      assert(Nw ==  Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       // Temperature at the nodes
       for j in 1:Nf loop
@@ -7240,7 +7264,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       end for;
     end IdealHeatTransfer;
 
-    model ConstantHeatTransferCoefficient
+    model ConstantHeatTransferCoefficient "Constant heat transfer coefficient"
       extends BaseClasses.DistributedHeatTransferFV;
 
        parameter CoefficientOfHeatTransfer gamma
@@ -7251,7 +7275,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
        Power Q "Total heat flow through lateral boundary";
 
     equation
-      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      assert(Nw ==  Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
       // Temperature at the nodes
       for j in 1:Nf loop
         T[j] = Medium.temperature(fluidState[j]);
@@ -7302,7 +7326,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end ConstantThermalConductance;
 
-    model DittusBoelter
+    model DittusBoelter "Dittus-Boelter heat transfer correlation"
       extends BaseClasses.DistributedHeatTransferFV;
 
        CoefficientOfHeatTransfer gamma[Nf] "Constant heat transfer coefficient";
@@ -7352,9 +7376,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     end DittusBoelter;
 
     model HeatTransfer2phDB
-      extends BaseClasses.DistributedHeatTransferFV(final Nw = Nf-1, final useAverageTemperature,                                redeclare
-          replaceable package Medium =
-            StandardWater                                                                      constrainedby
+      extends BaseClasses.DistributedHeatTransferFV(
+        final useAverageTemperature,
+        redeclare replaceable package Medium = StandardWater constrainedby
           Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
 
       parameter CoefficientOfHeatTransfer gamma_b=10000
@@ -7367,8 +7391,6 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       Real state[Nw];
       Real alfa_l[Nw];
       Real alfa_v[Nw];
-    //   Real alfa2_l[Nw];
-    //   Real alfa2_v[Nw];
       CoefficientOfHeatTransfer gamma1ph[Nf];
       CoefficientOfHeatTransfer gamma_bubble;
       CoefficientOfHeatTransfer gamma_dew;
@@ -7398,7 +7420,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       Power Q "Total heat flow through lateral boundary";
 
     equation
-      assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      assert(Nw == Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       // Saturated fluid property calculations
       p = Medium.pressure(fluidState[1]);
@@ -7629,11 +7651,6 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end HeatTransfer2phDB_a;
   end HeatTransfer;
-
-
-
-
-
 
   model SourceP "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
