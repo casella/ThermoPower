@@ -948,8 +948,6 @@ package Gas "Models of components with ideal gases as working fluid"
         Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
   public
     Medium.BaseProperties gas[N] "Gas nodal properties";
-    // Xi(start=fill(Xstart[1:nXi],N)),
-    // X(start=fill(Xstart,N)),
     Pressure Dpfric "Pressure drop due to friction";
     Length omega_hyd "Wet perimeter (single tube)";
     Real Kf "Friction factor";
@@ -1142,26 +1140,10 @@ package Gas "Models of components with ideal gases as working fluid"
     for j in 2:N loop
       gas[j].Xi = Xtilde[if UniformComposition then 1 else j - 1, 1:nXi];
     end for;
-    /*
-  if w >= 0 then
-    gas[1].h = infl.hBA;
-    gas[2:N].T = Ttilde;
-    gas[1].Xi = infl.XBA;
-    for j in 2:N loop
-      gas[j].Xi = Xtilde[if UniformComposition then 1 else j - 1, 1:nXi];
-    end for;
-  else
-    gas[N].h = outfl.hAB;
-    gas[1:N - 1].T = Ttilde;
-    gas[N].Xi = outfl.XAB;
-    for j in 1:N - 1 loop
-      gas[j].Xi = Xtilde[if UniformComposition then 1 else j, 1:nXi];
-    end for;
-  end if;
-*/
+
+    connect(wall,heatTransfer.wall);
 
     Tin = gas[1].T;
-
     M = sum(rhobar)*A*l "Total gas mass";
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
