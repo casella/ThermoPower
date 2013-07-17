@@ -924,12 +924,13 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     function squareReg = ThermoPower.Functions.squareReg;
-    replaceable HeatTransfer.IdealHeatTransfer heatTransfer(
+    replaceable HeatTransfer.IdealHeatTransfer heatTransfer
+      constrainedby ThermoPower.Gas.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
       final Nf=N, final Nw = Nw,
-      final L = L, final A = A, final Dhyd = Dhyd, final omega = omega, final wnom = wnom/Nt,
-      final w=w*ones(N), final fluidState=gas.state) constrainedby
-      ThermoPower.Gas.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
+      final L = L, final A = A, final Dhyd = Dhyd,
+      final omega = omega, final wnom = wnom/Nt,
+      final w=w*ones(N), final fluidState=gas.state)  annotation(choicesAllMatching = true);
 
   protected
     parameter Integer nXi=Medium.nXi "number of independent mass fractions";
@@ -3949,8 +3950,6 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 </ul>
 </html>"), Diagram(graphics));
   end ThroughW;
-
-
 
   model Flow1D "1-dimensional fluid flow model for gas (finite volumes)"
     extends Icons.Gas.Tube;
