@@ -987,12 +987,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass (single tube)";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.HeatTransfer.IdealHeatTransfer heatTransfer(
+    replaceable ThermoPower.Water.BaseClasses.DistributedHeatTransferFV heatTransfer constrainedby
+      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
       final Nf=N, final Nw = Nw, final L = L, final A = A, final Dhyd = Dhyd,
       final omega = omega, final wnom = wnom/Nt,
-      final w=w*ones(N), final fluidState=fluidState) constrainedby
-      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
+      final w=w*ones(N), final fluidState=fluidState)
+      annotation(choicesAllMatching = true);
 
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -1215,12 +1216,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
-    replaceable ThermoPower.Water.HeatTransfer.IdealHeatTransfer heatTransfer(
+    replaceable ThermoPower.Water.BaseClasses.DistributedHeatTransferFV heatTransfer constrainedby
+      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
-      final Nf=N, final Nw = Nw, final L = L, final A = A,
-      final Dhyd = Dhyd, final omega = omega, final wnom = wnom/Nt,
-      final w=w*ones(N), final fluidState=fluidState) constrainedby
-      ThermoPower.Water.BaseClasses.DistributedHeatTransferFV  annotation(choicesAllMatching = true);
+      final Nf=N, final Nw = Nw, final L = L, final A = A, final Dhyd = Dhyd,
+      final omega = omega, final wnom = wnom/Nt,
+      final w=w*ones(N), final fluidState=fluidState)
+      annotation(choicesAllMatching = true);
 
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -6626,8 +6628,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       import ThermoPower.Choices.Flow1D.FFtypes;
       import ThermoPower.Choices.Flow1D.HCtypes;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
-      parameter Integer Nt = 1 "Number of tubes in parallel";
       parameter Integer Nw = N - 1 "Number of volumes on the wall interface";
+      parameter Integer Nt = 1 "Number of tubes in parallel";
       parameter Distance L "Tube length" annotation (Evaluate=true);
       parameter Position H=0 "Elevation of outlet over inlet";
       parameter Area A "Cross-sectional area (single tube)";
@@ -7223,7 +7225,6 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
     partial model DistributedHeatTransferFV
       "Distributed heat transfer model - finite volume"
-
       extends ThermoPower.Icons.HeatFlow;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -7232,18 +7233,16 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
                 40}}, rotation=0)));
       parameter Integer Nf(min=2) "Number of nodes fluid-side";
-      parameter Integer Nw "Number of nodes wall-side";   //volumes wall-side
+      parameter Integer Nw(min=1) "Number of nodes wall-side";   //volumes wall-side
       parameter Distance L "Tube length";
       parameter Area A "Cross-sectional area (single tube)";
       parameter Length omega "Perimeter of heat transfer surface (single tube)";
       parameter Length Dhyd "Hydraulic Diameter (single tube)";
       parameter MassFlowRate wnom "Nominal mass flowrate (single tube)";
       parameter Boolean useAverageTemperature = true
-        "= true to use average temperature for heat transfer";
-
+        "= true to use average volume temperature for heat transfer";
     end DistributedHeatTransferFV;
   end BaseClasses;
-
 
   package HeatTransfer "Heat transfer models"
     model IdealHeatTransfer
