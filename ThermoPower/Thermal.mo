@@ -540,138 +540,9 @@ This package contains models to compute the material properties needed to model 
             pattern=LinePattern.None)}), Diagram(graphics));
   end HT_DHTVolumes;
 
-  model ConvHTLumped "Lumped parameter convective heat transfer"
-    extends Icons.HeatFlow;
-    parameter ThermalConductance G "Constant thermal conductance";
-    HT side1 annotation (Placement(transformation(extent={{-40,20},{40,40}},
-            rotation=0)));
-    HT side2 annotation (Placement(transformation(extent={{-40,-20},{40,-42}},
-            rotation=0)));
-  equation
-    side1.Q_flow = G*(side1.T - side2.T) "Convective heat transfer";
-    side1.Q_flow = -side2.Q_flow "Energy balance";
-    annotation (Icon(graphics={Text(
-            extent={{-98,-76},{102,-100}},
-            lineColor={191,95,0},
-            textString="%name")}), Documentation(info="<HTML>
-<p>Model of a simple convective heat transfer mechanism between two lumped parameter objects, with a constant heat transfer coefficient.
-</HTML>", revisions="<html>
-<li><i>28 Dic 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-  end ConvHTLumped;
-
-  model ConvHT "1D Convective heat transfer"
-    extends Icons.HeatFlow;
-    parameter Integer N=2 "Number of Nodes";
-    parameter CoefficientOfHeatTransfer gamma
-      "Constant heat transfer coefficient";
-
-    DHT side1(N=N) annotation (Placement(transformation(extent={{-40,20},{40,40}},
-            rotation=0)));
-    DHT side2(N=N) annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
-            rotation=0)));
-  equation
-    side1.phi = gamma*(side1.T - side2.T) "Convective heat transfer";
-    side1.phi = -side2.phi "Energy balance";
-    annotation (Icon(graphics={Text(
-            extent={{-100,-44},{100,-68}},
-            lineColor={191,95,0},
-            textString="%name")}), Documentation(info="<HTML>
-<p>Model of a simple convective heat transfer mechanism between two 1D objects, with a constant heat transfer coefficient.
-<p>Node <tt>j</tt> on side 1 interacts with node <tt>j</tt> on side 2.
-</HTML>", revisions="<html>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-  end ConvHT;
-
-  model HeatFlowDistribution "Same heat flow through two different surfaces"
-    extends Icons.HeatFlow;
-    parameter Integer N(min=1) = 2 "Number of nodes";
-    parameter Area A1=1 "Side 1 surface area" annotation (Evaluate=true);
-    parameter Area A2=1 "Side 2 surface area" annotation (Evaluate=true);
-
-    DHT side1(N=N) "Area of side 1 surface" annotation (Placement(
-          transformation(extent={{-40,20},{40,40}}, rotation=0)));
-    DHT side2(N=N) "Area of side 2 surface" annotation (Placement(
-          transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
-  equation
-    side1.T = side2.T "Same temperature";
-    side1.phi*A1 + side2.phi*A2 = zeros(N) "Energy balance";
-    annotation (
-      Icon(graphics={
-          Text(
-            extent={{-88,50},{-40,20}},
-            lineColor={0,0,0},
-            fillColor={128,128,128},
-            fillPattern=FillPattern.Forward,
-            textString="s1"),
-          Text(
-            extent={{-100,-44},{100,-72}},
-            lineColor={191,95,0},
-            textString="%name"),
-          Text(
-            extent={{-92,-20},{-40,-50}},
-            lineColor={0,0,0},
-            fillColor={128,128,128},
-            fillPattern=FillPattern.Forward,
-            textString="s2")}),
-      Documentation(info="<HTML>
-<p>This model can be used to describe the heat flow through two different surfaces, having a different area; the total heat flow entering on the internal side is equal to the total heat flow going out of the external side.
-</HTML>", revisions="<html>
-<ul>
-<li><i>8 May 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>
-"),   Diagram(graphics));
-  end HeatFlowDistribution;
-
-  model HeatSource1D "Distributed Heat Flow Source"
-    extends Icons.HeatFlow;
-    parameter Integer N=2 "Number of nodes";
-    parameter Integer Nt=1 "Number of tubes";
-    parameter Length L "Source length";
-    parameter Length omega "Source perimeter (single tube)";
-    replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
-            extent={{-40,-40},{40,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput power annotation (Placement(
-          transformation(
-          origin={0,40},
-          extent={{-20,-20},{20,20}},
-          rotation=270)));
-  equation
-    for i in 1:N loop
-      wall.phi[i] = -power/(omega*L*Nt);
-    end for;
-    annotation (
-      Diagram(graphics),
-      Icon(graphics={Text(
-            extent={{-100,-44},{100,-68}},
-            lineColor={191,95,0},
-            textString="%name")}),
-      Documentation(info="<HTML>
-<p>Model of an ideal tubular heat flow source, with uniform heat flux. The actual heating power is provided by the <tt>power</tt> signal connector.
-</HTML>", revisions="<html>
-<ul>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>
-"));
-  end HeatSource1D;
-
   model TempSource1DFV "Distributed Temperature Source"
     extends Icons.HeatFlow;
-    parameter Integer N "Number of nodes";
-    final parameter Integer Nw = N - 1 "Number of volumes";
+    parameter Integer Nw = 1 "Number of volumes on the wall port";
     ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput temperature annotation (Placement(
@@ -701,78 +572,9 @@ This package contains models to compute the material properties needed to model 
 "));
   end TempSource1DFV;
 
-  model TempSource1D "Distributed Temperature Source"
-    extends Icons.HeatFlow;
-    parameter Integer N=2 "Number of nodes";
-    replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
-            extent={{-40,-40},{40,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput temperature annotation (Placement(
-          transformation(
-          origin={0,40},
-          extent={{-20,-20},{20,20}},
-          rotation=270)));
-  equation
-    for i in 1:N loop
-      wall.T[i] = temperature;
-    end for;
-    annotation (
-      Diagram(graphics),
-      Icon(graphics={Text(
-            extent={{-100,-46},{100,-70}},
-            lineColor={191,95,0},
-            textString="%name")}),
-      Documentation(info="<HTML>
-<p>Model of an ideal 1D uniform temperature source. The actual temperature is provided by the <tt>temperature</tt> signal connector.
-</HTML>", revisions="<html>
-<ul>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>
-"));
-  end TempSource1D;
-
-  model TempSource1Dlin "Linearly Distributed Temperature Source"
-    extends Icons.HeatFlow;
-    parameter Integer N=2 "Number of nodes";
-    replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
-            extent={{-40,-40},{40,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput temperature_node1 annotation (
-        Placement(transformation(
-          origin={-40,30},
-          extent={{-20,-20},{20,20}},
-          rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput temperature_nodeN annotation (
-        Placement(transformation(
-          origin={40,28},
-          extent={{-20,-20},{20,20}},
-          rotation=270)));
-  equation
-    wall.T = linspace(
-        temperature_node1,
-        temperature_nodeN,
-        N);
-    annotation (
-      Documentation(info="<HTML>
-<p>Model of an ideal 1D temperature source with a linear distribution. The values of the temperature at the two ends of the source are provided by the <tt>temperature_node1</tt> and <tt>temperature_nodeN</tt> signal connectors.
-</HTML>", revisions="<html>
-<ul>
-<li><i>10 Jan 2004</i>
-    by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
-       First release.</li>
-</ul>
-</html>
-"),   Icon(graphics={Text(
-            extent={{-100,-46},{100,-72}},
-            lineColor={191,95,0},
-            textString="%name")}));
-  end TempSource1Dlin;
-
   model TempSource1DlinFV "Linearly Distributed Temperature Source"
     extends Icons.HeatFlow;
-    parameter Integer N=3 "Number of nodes";
-    final parameter Integer Nw = N - 1;
+    parameter Integer Nw = 1 "Number of volumes on the wall port";
     replaceable Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput temperature_1 annotation (
@@ -805,10 +607,6 @@ This package contains models to compute the material properties needed to model 
             lineColor={191,95,0},
             textString="%name")}));
   end TempSource1DlinFV;
-
-  model HeatSource1Dhtc "Distributed Heat Flow Source"
-    extends HeatSource1D(redeclare Thermal.DHThtc_in wall);
-  end HeatSource1Dhtc;
 
   model MetalTubeFV "Cylindrical metal tube - 1 radial node and N axial nodes"
 
@@ -1006,10 +804,42 @@ This package contains models to compute the material properties needed to model 
 "),   Diagram(graphics));
   end MetalTubeFEM;
 
+  model ConvHTLumped "Lumped parameter convective heat transfer"
+    extends Icons.HeatFlow;
+    parameter ThermalConductance G "Constant thermal conductance";
+    HT side1 annotation (Placement(transformation(extent={{-40,20},{40,40}},
+            rotation=0)));
+    HT side2 annotation (Placement(transformation(extent={{-40,-20},{40,-42}},
+            rotation=0)));
+  equation
+    side1.Q_flow = G*(side1.T - side2.T) "Convective heat transfer";
+    side1.Q_flow = -side2.Q_flow "Energy balance";
+    annotation (Icon(graphics={Text(
+            extent={{-98,-76},{102,-100}},
+            lineColor={191,95,0},
+            textString="%name")}), Documentation(info="<HTML>
+<p>Model of a simple convective heat transfer mechanism between two lumped parameter objects, with a constant heat transfer coefficient.
+</HTML>", revisions="<html>
+<li><i>28 Dic 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end ConvHTLumped;
+
+
+
+
+
+
+
+
+
+
+
   model MetalWallFV "Generic 1D metal wall"
     extends ThermoPower.Icons.MetalWall;
-    parameter Integer N(min=2)=2 "Number of nodes";
-    final parameter Integer Nw = N - 1 "Number of volumes";
+    parameter Integer Nw = 1 "Number of volumes on the wall ports";
     parameter Modelica.SIunits.Mass M "Mass";
     parameter Modelica.SIunits.SpecificHeatCapacity cm
       "Specific heat capacity of metal";
@@ -1324,6 +1154,140 @@ This package contains models to compute the material properties needed to model 
             lineColor={0,0,0},
             pattern=LinePattern.None)}), Diagram(graphics));
   end HThtc_DHThtc;
+
+  model HeatSource1Dhtc "Distributed Heat Flow Source"
+    extends HeatSource1D(redeclare Thermal.DHThtc_in wall);
+  end HeatSource1Dhtc;
+
+  model HeatSource1D "Distributed Heat Flow Source"
+    extends Icons.HeatFlow;
+    parameter Integer N=2 "Number of nodes";
+    parameter Integer Nt=1 "Number of tubes";
+    parameter Length L "Source length";
+    parameter Length omega "Source perimeter (single tube)";
+    replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput power annotation (Placement(
+          transformation(
+          origin={0,40},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    for i in 1:N loop
+      wall.phi[i] = -power/(omega*L*Nt);
+    end for;
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-100,-44},{100,-68}},
+            lineColor={191,95,0},
+            textString="%name")}),
+      Documentation(info="<HTML>
+<p>Model of an ideal tubular heat flow source, with uniform heat flux. The actual heating power is provided by the <tt>power</tt> signal connector.
+</HTML>", revisions="<html>
+<ul>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
+  end HeatSource1D;
+
+  model TempSource1D "Distributed Temperature Source"
+    extends Icons.HeatFlow;
+    parameter Integer N=2 "Number of nodes";
+    replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput temperature annotation (Placement(
+          transformation(
+          origin={0,40},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    for i in 1:N loop
+      wall.T[i] = temperature;
+    end for;
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-100,-46},{100,-70}},
+            lineColor={191,95,0},
+            textString="%name")}),
+      Documentation(info="<HTML>
+<p>Model of an ideal 1D uniform temperature source. The actual temperature is provided by the <tt>temperature</tt> signal connector.
+</HTML>", revisions="<html>
+<ul>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
+  end TempSource1D;
+
+  model TempSource1Dlin "Linearly Distributed Temperature Source"
+    extends Icons.HeatFlow;
+    parameter Integer N=2 "Number of nodes";
+    replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput temperature_node1 annotation (
+        Placement(transformation(
+          origin={-40,30},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput temperature_nodeN annotation (
+        Placement(transformation(
+          origin={40,28},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    wall.T = linspace(
+        temperature_node1,
+        temperature_nodeN,
+        N);
+    annotation (
+      Documentation(info="<HTML>
+<p>Model of an ideal 1D temperature source with a linear distribution. The values of the temperature at the two ends of the source are provided by the <tt>temperature_node1</tt> and <tt>temperature_nodeN</tt> signal connectors.
+</HTML>", revisions="<html>
+<ul>
+<li><i>10 Jan 2004</i>
+    by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"),   Icon(graphics={Text(
+            extent={{-100,-46},{100,-72}},
+            lineColor={191,95,0},
+            textString="%name")}));
+  end TempSource1Dlin;
+
+  model ConvHT "1D Convective heat transfer"
+    extends Icons.HeatFlow;
+    parameter Integer N=2 "Number of Nodes";
+    parameter CoefficientOfHeatTransfer gamma
+      "Constant heat transfer coefficient";
+
+    DHT side1(N=N) annotation (Placement(transformation(extent={{-40,20},{40,40}},
+            rotation=0)));
+    DHT side2(N=N) annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
+            rotation=0)));
+  equation
+    side1.phi = gamma*(side1.T - side2.T) "Convective heat transfer";
+    side1.phi = -side2.phi "Energy balance";
+    annotation (Icon(graphics={Text(
+            extent={{-100,-44},{100,-68}},
+            lineColor={191,95,0},
+            textString="%name")}), Documentation(info="<HTML>
+<p>Model of a simple convective heat transfer mechanism between two 1D objects, with a constant heat transfer coefficient.
+<p>Node <tt>j</tt> on side 1 interacts with node <tt>j</tt> on side 2.
+</HTML>", revisions="<html>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end ConvHT;
 
   model ConvHTLumped_htc
     "Lumped parameter convective heat transfer between a HT and a HThtc"
@@ -2145,7 +2109,6 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 </html>"));
   end CylinderFourier;
 
-
   model ParallelFlow
     extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = 1:Nw);
   end ParallelFlow;
@@ -2153,6 +2116,49 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
   model CounterFlow
     extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2=  Nw:-1:1);
   end CounterFlow;
+
+  model HeatFlowDistribution "Same heat flow through two different surfaces"
+    extends Icons.HeatFlow;
+    parameter Integer N(min=1) = 2 "Number of nodes";
+    parameter Area A1=1 "Side 1 surface area" annotation (Evaluate=true);
+    parameter Area A2=1 "Side 2 surface area" annotation (Evaluate=true);
+
+    DHT side1(N=N) "Area of side 1 surface" annotation (Placement(
+          transformation(extent={{-40,20},{40,40}}, rotation=0)));
+    DHT side2(N=N) "Area of side 2 surface" annotation (Placement(
+          transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
+  equation
+    side1.T = side2.T "Same temperature";
+    side1.phi*A1 + side2.phi*A2 = zeros(N) "Energy balance";
+    annotation (
+      Icon(graphics={
+          Text(
+            extent={{-88,50},{-40,20}},
+            lineColor={0,0,0},
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Forward,
+            textString="s1"),
+          Text(
+            extent={{-100,-44},{100,-72}},
+            lineColor={191,95,0},
+            textString="%name"),
+          Text(
+            extent={{-92,-20},{-40,-50}},
+            lineColor={0,0,0},
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Forward,
+            textString="s2")}),
+      Documentation(info="<HTML>
+<p>This model can be used to describe the heat flow through two different surfaces, having a different area; the total heat flow entering on the internal side is equal to the total heat flow going out of the external side.
+</HTML>", revisions="<html>
+<ul>
+<li><i>8 May 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"),   Diagram(graphics));
+  end HeatFlowDistribution;
 
   model ShellAndTube
    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = corrVolumesST(Nw,Ntp,inletTubeAtTop,inletShellAtTop));
