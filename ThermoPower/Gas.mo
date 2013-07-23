@@ -2317,7 +2317,7 @@ This model extends the CombustionChamber Base model, with the definition of the 
       hout_iso = 0;
     end if;
 
-    w*(hout - gas_in.h)*eta_mech = tau*omega "Energy balance";
+    w*(hout - gas_in.h) = tau*omega*eta_mech "Energy balance";
     PR = pout/gas_in.p "Pressure ratio";
 
     // Mechanical boundary conditions
