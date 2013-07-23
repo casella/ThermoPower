@@ -3482,7 +3482,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities
       w_wnom = abs(w[1])/wnom
         "Inlet flow rate used for the computation of the conductance";
-      gamma = gamma_nom*Functions.smoothSat(w_wnom,wnom*beta,1e9,wnom*beta/2)^alpha;
+      gamma = gamma_nom*Functions.smoothSat(w_wnom, beta, 1e9, beta/2)^alpha;
 
       // Temperature at the nodes
       for j in 1:Nf loop
@@ -3526,7 +3526,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities
       w_wnom = abs(w[1])/wnom
         "Inlet flow rate used for the computation of the conductance";
-      UA = UAnom*Functions.smoothSat(w_wnom,wnom*beta,1e9,wnom*beta/2)^alpha;
+      UA = UAnom*Functions.smoothSat(w_wnom, beta,1e9, beta/2)^alpha;
 
       // Temperature at the nodes
       for j in 1:Nf loop
