@@ -1021,8 +1021,10 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       "Polynomial flow characteristic relative to design point"
       extends baseFlow_rel;
       input Real q_nom[:]
-        "Adimensional volume flow rate for N operating points (single pump)" annotation(Dialog);
-      input Real head_nom[:] "Adimensional pump head for N operating points" annotation(Dialog);
+        "Non - dimensional volume flow rate for N operating points (single pump)"
+                                                                                  annotation(Dialog);
+      input Real head_nom[:]
+        "Non - dimensional pump head for N operating points"                      annotation(Dialog);
     protected
       parameter Integer N=size(q_nom, 1) "Number of nominal operating points";
       parameter Real q_nom_pow[N, N]={{q_nom[i]^(j - 1) for j in 1:N} for i in
@@ -1044,8 +1046,10 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       "Polynomial efficiency characteristic  relative to design point"
       extends baseEfficiency_rel;
       input Real q_nom[:]
-        "Volume flow rate for N operating points (single pump)" annotation(Dialog);
-      input Real eta_nom[:] "Pump efficiency for N operating points"                    annotation(Dialog);
+        "Non - dimensional volume flow rate for N operating points (single pump)"
+                                                                annotation(Dialog);
+      input Real eta_nom[:]
+        "Non - dimensional pump efficiency for N operating points"                                        annotation(Dialog);
     protected
       parameter Integer N=size(q_nom, 1) "Number of nominal operating points";
       parameter Real q_nom_pow[N, N]={{q_nom[i]^(j - 1) for j in 1:N} for i in
@@ -1066,8 +1070,8 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     partial function baseFlow_rel
       "Base class for pump flow characteristics relative to design point"
       extends Modelica.Icons.Function;
-      input Real q_flow "Volumetric flow rate";
-      output Real head "Pump head";
+      input Real q_flow "Non - dimensional volumetric flow rate";
+      output Real head "Non - dimensional pump head";
     end baseFlow_rel;
 
     partial function baseEfficiency_rel
