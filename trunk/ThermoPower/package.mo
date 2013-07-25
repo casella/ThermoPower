@@ -1017,6 +1017,65 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       eta := eta_nom;
     end constantEfficiency;
 
+    function polynomialFlow_rel
+      "Polynomial flow characteristic relative to design point"
+      extends baseFlow_rel;
+      input Real q_nom[:]
+        "Adimensional volume flow rate for N operating points (single pump)" annotation(Dialog);
+      input Real head_nom[:] "Adimensional pump head for N operating points" annotation(Dialog);
+    protected
+      parameter Integer N=size(q_nom, 1) "Number of nominal operating points";
+      parameter Real q_nom_pow[N, N]={{q_nom[i]^(j - 1) for j in 1:N} for i in
+          1:N} "Rows: different operating points; columns: increasing powers";
+      /* Linear system to determine the coefficients (example N=3):
+  head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  head_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  head_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+      parameter Real c[N]=Modelica.Math.Matrices.solve(q_nom_pow, head_nom)
+        "Coefficients of polynomial head curve";
+    algorithm
+      // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
+      // Note: the implementation is numerically efficient only for low values of N
+      head := sum(q_flow^(i - 1)*c[i] for i in 1:N);
+    end polynomialFlow_rel;
+
+    function polynomialEfficiency_rel
+      "Polynomial efficiency characteristic  relative to design point"
+      extends baseEfficiency_rel;
+      input Real q_nom[:]
+        "Volume flow rate for N operating points (single pump)" annotation(Dialog);
+      input Real eta_nom[:] "Pump efficiency for N operating points"                    annotation(Dialog);
+    protected
+      parameter Integer N=size(q_nom, 1) "Number of nominal operating points";
+      parameter Real q_nom_pow[N, N]={{q_nom[i]^(j - 1) for j in 1:N} for i in
+          1:N} "Rows: different operating points; columns: increasing powers";
+      /* Linear system to determine the coefficients (example N=3):
+  head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  head_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  head_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+      parameter Real c[N]=Modelica.Math.Matrices.solve(q_nom_pow, eta_nom)
+        "Coefficients of polynomial head curve";
+    algorithm
+      // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
+      // Note: the implementation is numerically efficient only for low values of N
+      eta := sum(q_flow^(i - 1)*c[i] for i in 1:N);
+    end polynomialEfficiency_rel;
+
+    partial function baseFlow_rel
+      "Base class for pump flow characteristics relative to design point"
+      extends Modelica.Icons.Function;
+      input Real q_flow "Volumetric flow rate";
+      output Real head "Pump head";
+    end baseFlow_rel;
+
+    partial function baseEfficiency_rel
+      "Base class for efficiency characteristics relative to design point"
+      extends Modelica.Icons.Function;
+      input Real q_flow "Volumetric flow rate";
+      output Real eta "Efficiency";
+    end baseEfficiency_rel;
   end PumpCharacteristics;
 
   package ValveCharacteristics "Functions for valve characteristics"

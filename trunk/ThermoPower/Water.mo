@@ -3880,7 +3880,9 @@ li><i>1 Jul 2004</i>
     annotation (
       Icon(graphics={Text(extent={{-58,94},{-30,74}}, textString="n"), Text(
               extent={{-10,102},{18,82}}, textString="Np")}),
-      Diagram(graphics),
+      Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+              100,100}}),
+              graphics),
       Documentation(info="<HTML>
 <p>This model describes a centrifugal pump (or a group of <tt>Np</tt> pumps in parallel) with controlled speed, either fixed or provided by an external signal.
 <p>The model extends <tt>PumpBase</tt>
