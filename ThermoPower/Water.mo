@@ -509,15 +509,19 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     assert(dpnom > 0,
       "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     // Fluid properties
-    if not allowFlowReversal then
+  /*
+  if not allowFlowReversal then
+    state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
+  else
+    state = Medium.setSmoothState(
+        w,
+        Medium.setState_ph(inlet.p, inStream(inlet.h_outflow)),
+        Medium.setState_ph(outlet.p, inStream(outlet.h_outflow)),
+        wnom*wnf);
+  end if;
+  */
       state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
-    else
-      state = Medium.setSmoothState(
-          w,
-          Medium.setState_ph(inlet.p, inStream(inlet.h_outflow)),
-          Medium.setState_ph(outlet.p, inStream(outlet.h_outflow)),
-          wnom*wnf);
-    end if;
+
     rho = Medium.density(state) "Fluid density";
     pin - pout = homotopy(smooth(1, Kf*squareReg(w, wnom*wnf))/rho, dpnom/wnom*
       w) "Flow characteristics";
@@ -1147,7 +1151,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
     annotation (
       Diagram(graphics),
-      Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
@@ -1509,7 +1513,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     annotation (
       Diagram(graphics),
-      Icon(graphics={Text(extent={{-100,-54},{100,-80}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is either one-phase, or a two-phase mixture.
@@ -1936,7 +1940,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
     annotation (
       Diagram(graphics),
-      Icon(graphics={Text(extent={{-100,-52},{100,-82}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
@@ -2693,7 +2697,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
     annotation (
       Diagram(graphics),
-      Icon(graphics={Text(extent={{-100,-52},{100,-82}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is either one-phase, or a two-phase mixture.
