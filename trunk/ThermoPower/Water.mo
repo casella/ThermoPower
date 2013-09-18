@@ -976,7 +976,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Real Cf "Fanning friction factor";
     Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
       "Fluid pressure for property calculations";
-    MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
+    MassFlowRate w(start=wnom/Nt) "Mass flow rate (single tube)";
     MassFlowRate wbar[N - 1](each start=wnom/Nt)
       "Average flow rate through volumes (single tube)";
     Power Q_single[Nw]
@@ -990,11 +990,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Enthalpy state variables";
     Medium.Density rho[N] "Fluid nodal density";
     Mass M "Fluid mass (single tube)";
+    Mass Mtot "Fluid mass (total)";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
     replaceable ThermoPower.Water.BaseClasses.DistributedHeatTransferFV heatTransfer constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
-      final Nf=N, final Nw = Nw, final L = L, final A = A, final Dhyd = Dhyd,
+      final Nf=N, final Nw = Nw, final Nt = Nt,
+      final L = L, final A = A, final Dhyd = Dhyd,
       final omega = omega, final wnom = wnom/Nt,
       final w=w*ones(N), final fluidState=fluidState)
       annotation(choicesAllMatching = true);
@@ -1132,7 +1134,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     connect(wall,heatTransfer.wall);
 
     Q = sum(heatTransfer.wall.Q) "Total heat flow through lateral boundary";
-    M = sum(rhobar)*A*l "Total fluid mass";
+    M = sum(rhobar)*A*l "Fluid mass (single tube)";
+    Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
   initial equation
     if initOpt == Choices.Init.Options.noInit then
@@ -1223,7 +1226,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     replaceable ThermoPower.Water.BaseClasses.DistributedHeatTransferFV heatTransfer constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
-      final Nf=N, final Nw = Nw, final L = L, final A = A, final Dhyd = Dhyd,
+      final Nf=N, final Nw = Nw, final Nt = Nt,
+      final L = L, final A = A, final Dhyd = Dhyd,
       final omega = omega, final wnom = wnom/Nt,
       final w=w*ones(N), final fluidState=fluidState)
       annotation(choicesAllMatching = true);
@@ -6631,6 +6635,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
       extends Icons.Water.Tube;
+      constant Real pi = Modelica.Constants.pi;
       import ThermoPower.Choices.Flow1D.FFtypes;
       import ThermoPower.Choices.Flow1D.HCtypes;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
@@ -6640,7 +6645,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       parameter Position H=0 "Elevation of outlet over inlet";
       parameter Area A "Cross-sectional area (single tube)";
       parameter Length omega "Perimeter of heat transfer surface (single tube)";
-      parameter Length Dhyd "Hydraulic Diameter (single tube)";
       parameter MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter FFtypes FFtype=FFtypes.NoFriction "Friction Factor Type"
         annotation (Evaluate=true);
@@ -6649,6 +6653,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         min=0) = 0 "Nominal hydraulic resistance coefficient";
       parameter Pressure dpnom=0 "Nominal pressure drop (friction term only!)";
       parameter Density rhonom=0 "Nominal inlet density";
+      parameter Length Dhyd = omega/pi "Hydraulic Diameter (single tube)";
       parameter Real Cfnom=0 "Nominal Fanning friction factor";
       parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
       parameter Boolean DynamicMomentum=false
@@ -7230,7 +7235,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     end SteamTurbineBase;
 
     partial model DistributedHeatTransferFV
-      "Distributed heat transfer model - finite volume"
+      "Base class for finite volume distributed heat transfer models"
       extends ThermoPower.Icons.HeatFlow;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -7239,7 +7244,8 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
                 40}}, rotation=0)));
       parameter Integer Nf(min=2) "Number of nodes fluid-side";
-      parameter Integer Nw(min=1) "Number of nodes wall-side";   //volumes wall-side
+      parameter Integer Nw(min=1) "Number of nodes wall-side";
+      parameter Integer Nt(min=1) "Number of tubes in parallel";
       parameter Distance L "Tube length";
       parameter Area A "Cross-sectional area (single tube)";
       parameter Length omega "Perimeter of heat transfer surface (single tube)";
@@ -7287,7 +7293,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       end for;
 
       for j in 1:Nw loop
-         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma;
+         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma*Nt;
          Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
       end for;
 
@@ -7342,11 +7348,6 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
        Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
        Medium.ThermalConductivity k[Nf] "Thermal conductivity";
        Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
-       parameter Length L "Tube length";
-       parameter Length omega
-        "Perimeter of heat transfer surface (single tube)";
-       parameter Length Dhyd "Hydraulic Diameter (single tube)";
-       parameter Area A "Cross-sectional area (single tube)";
        final parameter Length l=L/(Nw) "Length of a single volume";
        Power Q "Total heat flow through lateral boundary";
 
@@ -7363,9 +7364,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
       for j in 1:Nw loop
          if useAverageTemperature then
-           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma[j] + gamma[j+1])/2);
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma[j] + gamma[j+1])/2)*Nt;
          else
-           wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*((gamma[j] + gamma[j+1])/2);
+           wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*((gamma[j] + gamma[j+1])/2)*Nt;
          end if;
          Tvolbar[j] = (T[j] + T[j + 1])/2;
          Tvol[j] = T[j + 1];
@@ -7458,63 +7459,43 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
         /* to be fixed */
       end for;
 
-    //   for j in 1:Nw loop
-    //     alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
-    //     alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
-    //     alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-    //     alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-    //   end for;
-
       for j in 1:Nw loop
-         if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then       // 1-phase liquid or vapour
-           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2);
+         if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then  // 1-phase liquid or vapour
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
            state[j] = 1;
            alfa_l[j] = 0;
            alfa_v[j] = 0;
-    //        alfa2_l[j] = 0;
-    //        alfa2_v[j] = 0;
-         elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then               // liquid --> 2-phase
-           //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then          // liquid --> 2-phase
+           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*((gamma1ph[j] + gamma_bubble)/2) +
+                       (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 2;
            alfa_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
            alfa_v[j] = 0;
-    //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-    //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
-           wall.Q[j] = (wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = (wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 3;
            alfa_l[j] = 0;
            alfa_v[j] = 0;
-    //        alfa2_l[j] = 0;
-    //        alfa2_v[j] = 0;
-         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                      // 2-phase --> vapour
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                // 2-phase --> vapour
            //wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_dew + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_dew + gamma1ph[j+1])/2 +
+                       (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 4;
            alfa_l[j] = 0;
            alfa_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
-    //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-    //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                      // 2-phase --> liquid
-           //wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_bubble + gamma1ph[j+1])/2 + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                // 2-phase --> liquid
+           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_bubble + gamma1ph[j+1])/2 +
+                       (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 5;
            alfa_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
            alfa_v[j] = 0;
-    //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-    //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-         else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then              // vapour --> 2-phase
-           //wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma_dew)/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+         else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then        // vapour --> 2-phase
+           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*(gamma1ph[j] + gamma_dew)/2 +
+                       (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 6;
            alfa_l[j] = 0;
            alfa_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
-    //        alfa2_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
-    //        alfa2_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
          end if;
-    //      assert((h[j + 1] - h[j]) > 0 or (h[j + 1] - h[j]) < 0, "Division by zero during enthalpy calculation (h[j+1] - h[j]) = 0");
-    //      assert((h[j] - h[j + 1]) > 0 or (h[j] - h[j + 1]) < 0, "Division by zero during enthalpy calculation (h[j] - h[j + 1]) = 0");
 
          if useAverageTemperature then
            Tvolbar[j] = (T[j] + T[j + 1])/2;
@@ -7620,26 +7601,26 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
       for j in 1:Nw loop
          if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then       // 1-phase liquid or vapour
-           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2);
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
            state[j] = 1;
          elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then               // liquid --> 2-phase
            //wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma1ph[j+1])/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*((gamma1ph[j] + gamma_bubble)/2) + (1 - alfa_l[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 2;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
-           wall.Q[j] = (wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = (wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 3;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                      // 2-phase --> vapour
            //wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_dew + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_dew + gamma1ph[j+1])/2 + (1 - alfa_v[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 4;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                      // 2-phase --> liquid
            //wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma_bubble + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa2_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_bubble + gamma1ph[j+1])/2 + (1 - alfa2_l[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 5;
          else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then              // vapour --> 2-phase
            //wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*(gamma1ph[j] + gamma_dew)/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alfa2_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*(gamma1ph[j] + gamma_dew)/2 + (1 - alfa2_v[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 6;
          end if;
          assert((h[j + 1] - h[j]) > 0 or (h[j + 1] - h[j]) < 0, "Division by zero during enthalpy calculation (h[j+1] - h[j]) = 0");
