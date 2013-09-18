@@ -5172,7 +5172,7 @@ Algorithm Tolerance = 1e-6
       end TestFlow1DDB;
     end OldTests;
 
-    model TestWaterFlow1DFVa "Test case for Water.Flow1DFV"
+    model TestWaterFlow1DFV_A "Test case for Water.Flow1DFV"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       parameter Integer Nnodes=20 "Number of nodes";
       parameter Modelica.SIunits.Length Lhex=10 "Total length";
@@ -5291,22 +5291,26 @@ Algorithm Tolerance = 1e-6
         Diagram(graphics),
         experiment(StopTime=80, Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.</p><p>During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed. The outlet temperature can be predicted analytically assuming incompressible flow and constant cp.</p>
+<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p>
+<p>This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.</p>
+<p>During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed. The outlet temperature can be predicted analytically assuming incompressible flow and constant cp.</p>
 <p><ul>
 <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step increase of 10 degrees 10 s later. </li>
 <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp increase of 10 degrees lasting 10 s </li>
 <li>t=50 s, Step reduction of the mass flow rate entering the heat exchanger. The outlet temperature should undergo a ramp change of one degree lasting 10s</li>
 </ul></p>
-<p>Simulation Interval = [0...80] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
+<p>Simulation Interval = [0...80] sec </p>
+<p>Integration Algorithm = DASSL </p>
+<p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <p><ul>
 <li>12 Sep 2013 by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br/>Updated to new FV structure. Updated parameters.</li></li>
 <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br/>First release.</li>
 </ul></p>
 </html>"));
-    end TestWaterFlow1DFVa;
+    end TestWaterFlow1DFV_A;
 
-    model TestWaterFlow1DFVb "Test case for Water.Flow1DFV"
+    model TestWaterFlow1DFV_B "Test case for Water.Flow1DFV"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       parameter Integer Nnodes=10 "Number of nodes";
       parameter Integer Nt = 5 "Number of tubes";
@@ -5416,7 +5420,7 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=40, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, finite volumes). </p>
+<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes). </p>
 <p>This model represent the fluid side of a heat exchanger with convective exchange with an external source of uniform given temperature. The operating fluid is liquid water. The number of transfer units in the selected operating point is NTU = 0.73. Assuming incompressible fluid and constant cp, when the external temperature is raised at time t = 20 s, the outlet temperature should follow a ramp change, with a duration equal to the residence time of the fluid in the tubes, and an amplitude equal to a fraction exp(-NTU) of the external temperature change.</p>
 <p>Simulation Interval = [0...200] sec </p>
 <p>Integration Algorithm = DASSL </p>
@@ -5427,9 +5431,9 @@ Algorithm Tolerance = 1e-6
 <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br/>First release.</li>
 </ul></p>
 </html>"));
-    end TestWaterFlow1DFVb;
+    end TestWaterFlow1DFV_B;
 
-    model TestWaterFlow1DFVd "Test case for Water.Flow1D"
+    model TestWaterFlow1DFV_D "Test case for Water.Flow1DFV"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       parameter Integer Nnodes=5 "number of Nodes";
       parameter Integer Nt = 10 "number of tubes in parallel";
@@ -5529,7 +5533,7 @@ Algorithm Tolerance = 1e-6
                 graphics),
         experiment(StopTime=6, Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. </p><p>At time t = 1 the inlet flow rate undergoes a step increase; the pressure follows a first order transient with time constant tau. </p>
+<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. </p><p>At time t = 1 the inlet flow rate undergoes a step increase; the pressure follows a first order transient with time constant tau. </p>
 <p>Simulation Interval = [0...6] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <p><ul>
@@ -5538,9 +5542,9 @@ Algorithm Tolerance = 1e-6
 </ul></p>
 </html>"),
         __Dymola_experimentSetupOutput);
-    end TestWaterFlow1DFVd;
+    end TestWaterFlow1DFV_D;
 
-    model TestWaterFlow1DFVe
+    model TestWaterFlow1DFV_E "Test case for Water.Flow1DFV"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       parameter Integer Nnodes=20 "number of nodes";
       parameter Modelica.SIunits.Length Lhex=200 "total length";
@@ -5710,7 +5714,7 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=1200, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
+<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
 <p>Simulation Interval = [0...1200] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
@@ -5719,9 +5723,9 @@ Algorithm Tolerance = 1e-6
     First release.</li>
 </ul>
 </html>"));
-    end TestWaterFlow1DFVe;
+    end TestWaterFlow1DFV_E;
 
-    model TestWaterFlow1DFVf
+    model TestWaterFlow1DFV_F "Test case for Water.Flow1DFV"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       parameter Integer Nnodes=20 "number of nodes";
       parameter Modelica.SIunits.Length Lhex=200 "total length";
@@ -5910,7 +5914,7 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=1200, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
+<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
 <p>Simulation Interval = [0...1200] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
@@ -5919,10 +5923,10 @@ Algorithm Tolerance = 1e-6
     First release.</li>
 </ul>
 </html>"));
-    end TestWaterFlow1DFVf;
+    end TestWaterFlow1DFV_F;
 
-
-    model TestWaterFlow1DFVDB
+    model TestWaterFlow1DFV_DB
+      "Test case for Water.Flow1DFV with Dittus-Boelter heat transfer"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       parameter Integer Nnodes=10 "number of Nodes";
       parameter Modelica.SIunits.Length Lhex=10 "total length";
@@ -6022,10 +6026,184 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=40, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes), with Dittus-Boelter heat transfer coefficient computation.</p>This model represent the fluid side of a heat exchanger with convective exchange with an external source of uniform given temperature.</p><p>At time t = 10 s, the external temperature is raised.</p>
+<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes), with Dittus-Boelter heat transfer coefficient computation.</p>This model represent the fluid side of a heat exchanger with convective exchange with an external source of uniform given temperature.</p><p>At time t = 10 s, the external temperature is raised.</p>
 <p>Simulation Interval = [0...40] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>"));
-    end TestWaterFlow1DFVDB;
+    end TestWaterFlow1DFV_DB;
+
+    model TestGasFlow1DFV_A "Test case for Gas.Flow1DFV"
+      replaceable package Medium = Modelica.Media.IdealGases.SingleGases.N2
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
+      parameter Integer Nnodes=10 "number of Nodes";
+      parameter Modelica.SIunits.Length Lhex=200 "total length";
+      parameter Modelica.SIunits.Diameter Dihex=0.02 "internal diameter";
+      parameter Modelica.SIunits.Radius rhex=Dihex/2 "internal radius";
+      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex
+        "internal perimeter";
+      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2
+        "internal cross section";
+      parameter Real Cfhex=0.005 "friction coefficient";
+      parameter Modelica.SIunits.MassFlowRate whex=0.05
+        "nominal (and initial) mass flow rate";
+      parameter Modelica.SIunits.Pressure phex=3e5 "initial pressure";
+      parameter Temperature Tinhex=300 "initial inlet temperature";
+      parameter Temperature Touthex=300 "initial outlet temperature";
+      // parameter Temperature deltaT=10 "height of temperature step";
+      parameter Modelica.SIunits.EnergyFlowRate W=500 "height of power step";
+      Real gamma = Medium.specificHeatCapacityCp(hex.gas[1].state)/Medium.specificHeatCapacityCv(hex.gas[1].state) "cp/cv";
+      Real dMtot_dp = hex.Mtot/(hex.p*gamma) "compressibility";
+      Real dw_dp = valve.Kv "sensitivity of valve flow to pressure";
+      Time tau = dMtot_dp/dw_dp "time constant of pressure transient";
+      Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
+      Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
+      Modelica.SIunits.Mass Merr "Mass balance error";
+
+      Gas.SourceMassFlow Source(
+        redeclare package Medium = Medium,
+        p0=phex,
+        T=Tinhex,
+        w0=whex,
+        use_in_T=true)
+                 annotation (Placement(transformation(extent={{-78,-10},{-58,10}},
+              rotation=0)));
+      Gas.SinkPressure Sink(
+        redeclare package Medium = Medium,
+        p0=10000,
+        T=300) annotation (Placement(transformation(extent={{78,-10},{98,10}},
+              rotation=0)));
+      Gas.SensT SensT1(redeclare package Medium = Medium) annotation (Placement(
+            transformation(extent={{-50,-6},{-30,14}}, rotation=0)));
+      Gas.SensT SensT2(redeclare package Medium = Medium) annotation (Placement(
+            transformation(extent={{50,-6},{70,14}}, rotation=0)));
+      Gas.Flow1DFV hex(
+        redeclare package Medium = Medium,
+        N=Nnodes,
+        L=Lhex,
+        A=Ahex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        Tstartin=Tinhex,
+        Tstartout=Touthex,
+        pstart=phex,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
+                10}}, rotation=0)));
+      Gas.ValveLin valve(redeclare package Medium = Medium, Kv=whex/phex)
+        annotation (Placement(transformation(extent={{20,-10},{40,10}},
+              rotation=0)));
+      Thermal.HeatSource1DFV heatSource(Nw=Nnodes - 1)
+                        annotation (Placement(transformation(extent={{-20,16},{
+                0,36}}, rotation=0)));
+      Modelica.Blocks.Sources.Step Step1(height=W, startTime=20) annotation (
+          Placement(transformation(extent={{-40,40},{-20,60}}, rotation=0)));
+      Modelica.Blocks.Sources.Step Step4(
+        height=10,
+        offset=Tinhex,
+        startTime=10) annotation (Placement(transformation(extent={{-100,20},{-80,
+                40}}, rotation=0)));
+      Modelica.Blocks.Sources.Step Step2(
+        height=-0.2,
+        offset=1,
+        startTime=40) annotation (Placement(transformation(extent={{0,40},{20,
+                60}}, rotation=0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+    equation
+      connect(Source.flange, SensT1.inlet)   annotation (Line(
+          points={{-58,0},{-46,0}},
+          color={159,159,223},
+          thickness=0.5));
+      connect(SensT1.outlet, hex.infl) annotation (Line(
+          points={{-34,0},{-20,0}},
+          color={159,159,223},
+          thickness=0.5));
+      connect(hex.outfl, valve.inlet)     annotation (Line(
+          points={{0,0},{20,0}},
+          color={159,159,223},
+          thickness=0.5));
+      connect(valve.outlet, SensT2.inlet)     annotation (Line(
+          points={{40,0},{54,0}},
+          color={159,159,223},
+          thickness=0.5));
+      connect(SensT2.outlet, Sink.flange)   annotation (Line(
+          points={{66,0},{78,0}},
+          color={159,159,223},
+          thickness=0.5));
+      connect(heatSource.wall, hex.wall)
+        annotation (Line(points={{-10,23},{-10,5}}, color={255,127,0}));
+      connect(Step1.y, heatSource.power)    annotation (Line(points={{-19,50},{
+              -10,50},{-10,30}}, color={0,0,127}));
+      connect(Step4.y, Source.in_T)
+        annotation (Line(points={{-79,30},{-68,30},{-68,5}}, color={0,0,127}));
+      connect(Step2.y, valve.cmd)
+        annotation (Line(points={{21,50},{30,50},{30,7}}, color={0,0,127}));
+      Mhex = hex.M;
+      der(Mbal) = hex.infl.m_flow + hex.outfl.m_flow;
+      Merr = Mhex - Mbal;
+    initial equation
+      Mbal = Mhex;
+
+      annotation (
+        Diagram(graphics),
+        experiment(StopTime=80, Tolerance=1e-006),
+        Documentation(info="<html>
+<p>The model is designed to test the component <code>Gas.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes). A uniform prescribed heat flux is applied to the lateral boundary. The working fluid is pure nitrogen.</p>
+<p>The model starts at steady state. </p>
+<p><ul>
+<li>At t = 10 s, step variation of the temperature of the fluid entering the heat exchanger. The temperature change is propagated at the outlet with a delay approximately equal to the residence time</li>
+<li>At t = 20 s, a thermal power flow W is applied to the heat exchanger lateral surface. The outlet temperature undergoes a ramp change, whose duration is approximately equal to the residence time, and whose amplitude is equal to W/(whex*cp)</li>
+<li>At t = 50 s, step reduction of the outlet valve opening</li>
+</ul></p>
+<p>Simulation Interval = [0...80] sec </p>
+<p>Integration Algorithm = DASSL </p>
+<p>Algorithm Tolerance = 1e-6 </p>
+</html>"),
+        __Dymola_experimentSetupOutput);
+    end TestGasFlow1DFV_A;
+
+    model TestGasFlow1DFV_B "Test case for Gas.Flow1DFV"
+      extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DFV_A(
+          redeclare package Medium =
+            Modelica.Media.IdealGases.MixtureGases.CombustionAir, Source(
+            use_in_X=true));
+      parameter Real deltaX[2]={0.05,-0.05} "height of composition step";
+
+      Modelica.Blocks.Sources.Step[2] Step3(
+        height=deltaX,
+        each startTime=30,
+        offset=Medium.reference_X) annotation (Placement(transformation(extent=
+                {{-100,60},{-80,80}}, rotation=0)));
+    equation
+      connect(Step3.y, Source.in_X)
+        annotation (Line(points={{-79,70},{-62,70},{-62,5}}, color={0,0,127}));
+      annotation (
+        experiment(StopTime=80, Tolerance=1e-006),
+        Documentation(info="<html>
+<p>Same as <code>TestGasFlow1DFV_A</code>, but with mixture fluid (CombustionAir) and UniformComposition = true. The inlet composition is changed stepwise at time t = 30; </p>
+</html>"),
+        __Dymola_experimentSetupOutput);
+    end TestGasFlow1DFV_B;
+
+    model TestGasFlow1DFV_C "Test case for Gas.Flow1DFV"
+      extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DFV_B(
+          hex(UniformComposition=false));
+      annotation (
+        experiment(StopTime=80, Tolerance=1e-006),
+        Documentation(info="<html>
+<p>Same as <code>TestGasFlow1D_B</code>, but with UniformComposition = false. The outlet composition transient is computed with greater accuracy. </p>
+</html>"));
+    end TestGasFlow1DFV_C;
+
+    model TestGasFlow1DFV_D "Test case for Gas.Flow1DFV"
+      extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DFV_B(
+          hex(QuasiStatic=true));
+      annotation (Documentation(info="<html>
+<p>Same as <code>TestGasFlow1D_B</code>, but with QuasiStatic = true; the model is purely algebraic (no mass and energy storage). </p>
+</html>"));
+    end TestGasFlow1DFV_D;
 
     model TestHeatTransfer2phDBa "Test case for HeatTransfer2phDB"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
@@ -6076,14 +6254,11 @@ Algorithm Tolerance = 1e-6
           StartTime=0.1,
           __Dymola_NumberOfIntervals=10000,
           Tolerance=1e-006),
-        Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>HeatTransfer2phDB</tt> during evaporation process.<br>
-This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is liquid water.<br>
-<p>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</p>
-</HTML>", revisions="<html>
+        Documentation(info="<html>
+<p><br/>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the evaporation process.</p>
+<p><br/>This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is water.</p>
+<p>Simulation Interval = [0...1] sec </p>
+</html>", revisions="<html>
 <ul>
     <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
     First release.</li>
@@ -6141,15 +6316,11 @@ Algorithm Tolerance = 1e-6
           StartTime=0.1,
           __Dymola_NumberOfIntervals=10000,
           Tolerance=1e-006),
-        Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>HeatTransfer2phDB</tt> during condensation process.<br>
-This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is liquid water.<br>
-<p>
-<br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</p>
-</HTML>", revisions="<html>
+        Documentation(info="<html>
+<p><br/>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the condensation process.</p>
+<p><br/>This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is water.</p>
+<p>Simulation Interval = [0...1] sec </p>
+</html>", revisions="<html>
 <ul>
     <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
     First release.</li>
@@ -6157,8 +6328,6 @@ Algorithm Tolerance = 1e-6
 </html>"),
         __Dymola_experimentSetupOutput);
     end TestHeatTransfer2phDBb;
-
-
 
     model TestFlow1DFV2ph
        package Medium = Modelica.Media.Water.WaterIF97_ph;
@@ -6456,7 +6625,6 @@ Algorithm Tolerance = 1e-6
 </ul>
 </html>"));
     end TestFlow1DSlowFast;
-
 
     model TestFlow1DfemA "Test case for Flow1Dfem"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
@@ -8938,178 +9106,9 @@ Casella</a>:<br>
 </html>"));
     end Flow1D_check;
 
-    model TestGasFlow1DA
-      replaceable package Medium = Modelica.Media.IdealGases.SingleGases.N2
-        constrainedby Modelica.Media.Interfaces.PartialMedium;
-      parameter Integer Nnodes=10 "number of Nodes";
-      parameter Modelica.SIunits.Length Lhex=200 "total length";
-      parameter Modelica.SIunits.Diameter Dihex=0.02 "internal diameter";
-      parameter Modelica.SIunits.Radius rhex=Dihex/2 "internal radius";
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex
-        "internal perimeter";
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2
-        "internal cross section";
-      parameter Real Cfhex=0.005 "friction coefficient";
-      parameter Modelica.SIunits.MassFlowRate whex=0.05
-        "nominal (and initial) mass flow rate";
-      parameter Modelica.SIunits.Pressure phex=3e5 "initial pressure";
-      parameter Temperature Tinhex=300 "initial inlet temperature";
-      parameter Temperature Touthex=300 "initial outlet temperature";
-      // parameter Temperature deltaT=10 "height of temperature step";
-      parameter Modelica.SIunits.EnergyFlowRate W=1e3 "height of power step";
-      Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
-      Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr "Mass balance error";
 
-      Gas.SourceMassFlow
-                  SourceW1(
-        redeclare package Medium = Medium,
-        p0=phex,
-        T=Tinhex,
-        w0=whex,
-        use_in_T=true)
-                 annotation (Placement(transformation(extent={{-78,-10},{-58,10}},
-              rotation=0)));
-      Gas.SinkPressure
-                SinkP1(
-        redeclare package Medium = Medium,
-        p0=0.1e5,
-        T=300) annotation (Placement(transformation(extent={{78,-10},{98,10}},
-              rotation=0)));
-      Gas.SensT SensT1(redeclare package Medium = Medium) annotation (Placement(
-            transformation(extent={{-50,-6},{-30,14}}, rotation=0)));
-      Gas.SensT SensT2(redeclare package Medium = Medium) annotation (Placement(
-            transformation(extent={{50,-6},{70,14}}, rotation=0)));
-      Gas.Flow1Dfv hex(
-        redeclare package Medium = Medium,
-        N=Nnodes,
-        L=Lhex,
-        A=Ahex,
-        omega=omegahex,
-        Dhyd=Dihex,
-        wnom=whex,
-        Cfnom=Cfhex,
-        Tstartin=Tinhex,
-        Tstartout=Touthex,
-        pstart=phex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
-                10}}, rotation=0)));
-      Gas.ValveLin ValveLin1(redeclare package Medium = Medium, Kv=whex/phex)
-        annotation (Placement(transformation(extent={{20,-10},{40,10}},
-              rotation=0)));
-      Thermal.HeatSource1D HeatSource1D1(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (Placement(transformation(extent={{-20,16},{
-                0,36}}, rotation=0)));
-      Modelica.Blocks.Sources.Step Step1(height=W, startTime=20) annotation (
-          Placement(transformation(extent={{-40,40},{-20,60}}, rotation=0)));
-      /*  Modelica.Blocks.Sources.Step Step3(
-    height=deltaT,
-    offset=Tinhex,
-    startTime=1) annotation 10;*/
-      Modelica.Blocks.Sources.Step Step4(
-        height=10,
-        offset=Tinhex,
-        startTime=10) annotation (Placement(transformation(extent={{-100,20},{-80,
-                40}}, rotation=0)));
-      Modelica.Blocks.Sources.Step Step2(
-        height=-0.2,
-        offset=1,
-        startTime=40) annotation (Placement(transformation(extent={{0,40},{20,
-                60}}, rotation=0)));
-      inner System system
-        annotation (Placement(transformation(extent={{80,80},{100,100}})));
-    equation
-      connect(SourceW1.flange, SensT1.inlet) annotation (Line(
-          points={{-58,0},{-46,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(SensT1.outlet, hex.infl) annotation (Line(
-          points={{-34,0},{-20,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(hex.outfl, ValveLin1.inlet) annotation (Line(
-          points={{0,0},{20,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(ValveLin1.outlet, SensT2.inlet) annotation (Line(
-          points={{40,0},{54,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(SensT2.outlet, SinkP1.flange) annotation (Line(
-          points={{66,0},{78,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(HeatSource1D1.wall, hex.wall)
-        annotation (Line(points={{-10,23},{-10,5}}, color={255,127,0}));
-      connect(Step1.y, HeatSource1D1.power) annotation (Line(points={{-19,50},{
-              -10,50},{-10,30}}, color={0,0,127}));
-      connect(Step4.y, SourceW1.in_T)
-        annotation (Line(points={{-79,30},{-68,30},{-68,5}}, color={0,0,127}));
-      connect(Step2.y, ValveLin1.cmd)
-        annotation (Line(points={{21,50},{30,50},{30,7}}, color={0,0,127}));
-      Mhex = hex.M;
-      der(Mbal) = hex.infl.m_flow + hex.outfl.m_flow;
-      Merr = Mhex - Mbal;
-    initial equation
-      Mbal = Mhex;
 
-      annotation (
-        Diagram(graphics),
-        experiment(StopTime=60, Tolerance=1e-007),
-        Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>Gas.Flow1D</tt> (fluid side of a heat exchanger, finite volumes).<br>
-The model starts at steady state. At t = 10 s, step variation of the temperature of the fluid entering the heat exchanger. At t = 20 s, step variation of the thermal flow entering the heat exchanger lateral surface. At t = 50 s, step reduction of the outlet valve opening.<br>
-The working fluid is pure nitrogen.
-</ul>
-<p>
-Simulation Interval = [0...60] sec <br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</HTML>"),
-        __Dymola_experimentSetupOutput);
-    end TestGasFlow1DA;
 
-    model TestGasFlow1DB
-      extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DA(
-          redeclare package Medium =
-            Modelica.Media.IdealGases.MixtureGases.CombustionAir, SourceW1(
-            use_in_X=true));
-      parameter Real deltaX[2]={0.05,-0.05} "height of composition step";
-
-      Modelica.Blocks.Sources.Step[2] Step3(
-        height=deltaX,
-        each startTime=30,
-        offset=Medium.reference_X) annotation (Placement(transformation(extent=
-                {{-100,60},{-80,80}}, rotation=0)));
-    equation
-      connect(Step3.y, SourceW1.in_X)
-        annotation (Line(points={{-79,70},{-62,70},{-62,5}}, color={0,0,127}));
-      annotation (
-        experiment(StopTime=50),
-        Documentation(info="<html>
-Same as <tt>TestGasFlow1DA</tt>, but with mixture fluid (CombustionAir) and UniformComposition = true. The inlet composition is changed stepwise at time t = 30;
-</html>"));
-    end TestGasFlow1DB;
-
-    model TestGasFlow1DC
-      extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DB(
-          hex(UniformComposition=false));
-      annotation (Documentation(info="<html>
-Same as <tt>TestGasFlow1DB</tt>, but with UniformComposition = false. The outlet composition transient is computed with greater accuracy.
-</html>"));
-    end TestGasFlow1DC;
-
-    model TestGasFlow1DD
-      extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DB(
-          hex(QuasiStatic=true));
-      annotation (Documentation(info="<html>
-Same as <tt>TestGasFlow1DB</tt>, but with QuasiStatic = true; the model is purely algebraic (no mass and energy storage).
-</html>"));
-    end TestGasFlow1DD;
 
     model TestEvaporatorTemp
       extends Water.EvaporatorBase(
