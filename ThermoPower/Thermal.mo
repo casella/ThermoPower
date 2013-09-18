@@ -540,12 +540,13 @@ This package contains models to compute the material properties needed to model 
             pattern=LinePattern.None)}), Diagram(graphics));
   end HT_DHTVolumes;
 
-  model TempSource1DFV "Distributed Temperature Source"
+  model TempSource1DFV
+    "Uniform Distributed Temperature Source for Finite Volume models"
     extends Icons.HeatFlow;
     parameter Integer Nw = 1 "Number of volumes on the wall port";
-    ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(
+    Thermal.DHTVolumes wall(final N=Nw) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput temperature annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput temperature "Temperature [K]" annotation (Placement(
           transformation(
           origin={0,40},
           extent={{-20,-20},{20,20}},
@@ -572,10 +573,11 @@ This package contains models to compute the material properties needed to model 
 "));
   end TempSource1DFV;
 
-  model TempSource1DlinFV "Linearly Distributed Temperature Source"
+  model TempSource1DlinFV
+    "Linearly Distributed Temperature Source for Finite Volume models"
     extends Icons.HeatFlow;
     parameter Integer Nw = 1 "Number of volumes on the wall port";
-    replaceable Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(
+    Thermal.DHTVolumes wall(final N=Nw) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput temperature_1 annotation (
         Placement(transformation(
@@ -588,7 +590,7 @@ This package contains models to compute the material properties needed to model 
           extent={{-20,-20},{20,20}},
           rotation=270)));
   equation
-    wall.T = linspace(
+    wall.T = Functions.linspaceExt(
         temperature_1,
         temperature_Nw,
         Nw);
@@ -608,11 +610,42 @@ This package contains models to compute the material properties needed to model 
             textString="%name")}));
   end TempSource1DlinFV;
 
-  model MetalTubeFV "Cylindrical metal tube - 1 radial node and N axial nodes"
+  model HeatSource1DFV "Distributed Heat Flow Source for Finite Volume models"
+    extends Icons.HeatFlow;
+    parameter Integer Nw = 1 "Number of volumes on the wall port";
+    Thermal.DHTVolumes wall(final N=Nw) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput power annotation (Placement(
+          transformation(
+          origin={0,40},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    for i in 1:Nw loop
+      wall.Q[i] = -power/Nw;
+    end for;
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-100,-44},{100,-68}},
+            lineColor={191,95,0},
+            textString="%name")}),
+      Documentation(info="<HTML>
+<p>Model of an ideal tubular heat flow source, with uniform heat flux. The actual heating power is provided by the <tt>power</tt> signal connector.
+</HTML>", revisions="<html>
+<ul>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
+  end HeatSource1DFV;
 
+  model MetalTubeFV "Cylindrical metal tube model with Nw finite volumes"
     extends Icons.MetalWall;
-    parameter Integer N(min=2) = 2 "Number of nodes";
-    final parameter Integer Nw = N - 1 "Number of volume";
+    parameter Integer Nw = 1 "Number of volumes on the wall ports";
+    parameter Integer Nt = 1 "Number of tubes in parallel";
     parameter Length L "Tube length";
     parameter Length rint "Internal radius (single tube)";
     parameter Length rext "External radius (single tube)";
@@ -641,18 +674,15 @@ This package contains models to compute the material properties needed to model 
     ThermoPower.Thermal.DHTVolumes ext(final N=Nw, T(start=Tvolstart))
       "External surface"
        annotation (Placement(transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
-  //   DHT int(N=N, T(start=Tstart)) "Internal surface" annotation (Placement(
-  //         transformation(extent={{-40,20},{40,40}}, rotation=0)));
-  //   DHT ext(N=N, T(start=Tstart)) "External surface" annotation (Placement(
-  //         transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
   equation
     assert(rext > rint, "External radius must be greater than internal radius");
     Am = (rext^2 - rint^2)*pi "Area of the metal cross section";
-    (L/Nw)*rhomcm*Am*der(Tvol) = int.Q + ext.Q "Energy balance";    // M = rhom*L*Am   rhomcm = rhom*cm
+    (L/Nw*Nt)*rhomcm*Am*der(Tvol) = int.Q + ext.Q "Energy balance";
     if WallRes then
-      int.Q = (lambda*(2*pi*L/Nw)*(int.T - Tvol))/(log((rint + rext)/(2*rint)))
-        "Heat conduction through the internal half-thickness";                 //moltiplico dx e sx per L*omega
-      ext.Q = (lambda*(2*pi*L/Nw)*(ext.T - Tvol))/(log((2*rext)/(rint + rext)))
+      // Thermal resistance of the tube walls accounted for
+      int.Q = (lambda*(2*pi*L/Nw)*(int.T - Tvol))/(log((rint + rext)/(2*rint)))*Nt
+        "Heat conduction through the internal half-thickness";
+      ext.Q = (lambda*(2*pi*L/Nw)*(ext.T - Tvol))/(log((2*rext)/(rint + rext)))*Nt
         "Heat conduction through the external half-thickness";
     else
       // No temperature gradients across the thickness
@@ -827,17 +857,7 @@ This package contains models to compute the material properties needed to model 
 </html>"));
   end ConvHTLumped;
 
-
-
-
-
-
-
-
-
-
-
-  model MetalWallFV "Generic 1D metal wall"
+  model MetalWallFV "Generic metal wall model with Nw finite volumes"
     extends ThermoPower.Icons.MetalWall;
     parameter Integer Nw = 1 "Number of volumes on the wall ports";
     parameter Modelica.SIunits.Mass M "Mass";
