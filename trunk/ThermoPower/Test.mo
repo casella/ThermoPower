@@ -4958,6 +4958,218 @@ Algorithm Tolerance = 1e-6
 </ul>
 </html>"));
       end TestFlow1Df;
+
+      model TestConvHT2N
+        parameter Integer Nbig=6;
+        parameter Integer Nsmall=3;
+        Thermal.ConvHT2N HTa(
+          gamma=100,
+          N1=Nbig,
+          N2=Nsmall) annotation (Placement(transformation(extent={{-60,-12},{-20,
+                  28}}, rotation=0)));
+        Thermal.TempSource1Dlin T1a(N=Nbig) annotation (Placement(transformation(
+                extent={{-60,16},{-20,56}}, rotation=0)));
+        Thermal.TempSource1Dlin T2a(N=Nsmall) annotation (Placement(
+              transformation(extent={{-60,0},{-20,-40}}, rotation=0)));
+        Modelica.Blocks.Sources.Constant Constant1(k=300) annotation (Placement(
+              transformation(extent={{-92,50},{-72,70}}, rotation=0)));
+        Modelica.Blocks.Sources.Constant Constant2(k=400) annotation (Placement(
+              transformation(extent={{-64,70},{-44,90}}, rotation=0)));
+        Modelica.Blocks.Sources.Constant Constant3(k=280) annotation (Placement(
+              transformation(extent={{-92,-60},{-72,-40}}, rotation=0)));
+        Modelica.Blocks.Sources.Constant Constant4(k=350) annotation (Placement(
+              transformation(extent={{-66,-80},{-46,-60}}, rotation=0)));
+        Thermal.ConvHT2N HTb(
+          gamma=100,
+          N1=Nsmall,
+          N2=Nsmall) annotation (Placement(transformation(extent={{-16,-12},{24,
+                  28}}, rotation=0)));
+        Thermal.TempSource1Dlin T1b(N=Nsmall) annotation (Placement(
+              transformation(extent={{-16,16},{24,56}}, rotation=0)));
+        Thermal.TempSource1Dlin T2b(N=Nsmall) annotation (Placement(
+              transformation(extent={{-16,0},{24,-40}}, rotation=0)));
+        Thermal.ConvHT2N HTc(
+          gamma=100,
+          N1=Nsmall,
+          N2=Nbig) annotation (Placement(transformation(extent={{30,-12},{70,28}},
+                rotation=0)));
+        Thermal.TempSource1Dlin T1c(N=Nsmall) annotation (Placement(
+              transformation(extent={{30,16},{70,56}}, rotation=0)));
+        Thermal.TempSource1Dlin T2c(N=Nbig) annotation (Placement(transformation(
+                extent={{30,0},{70,-40}}, rotation=0)));
+      equation
+        connect(T1a.wall, HTa.side1)
+          annotation (Line(points={{-40,30},{-40,14}}, color={255,127,0}));
+        connect(HTa.side2, T2a.wall)
+          annotation (Line(points={{-40,1.8},{-40,-14}}, color={255,127,0}));
+        connect(Constant1.y, T1a.temperature_node1) annotation (Line(points={{-71,
+                60},{-48,60},{-48,42}}, color={0,0,127}));
+        connect(Constant2.y, T1a.temperature_nodeN) annotation (Line(points={{-43,
+                80},{-32,80},{-32,41.6}}, color={0,0,127}));
+        connect(Constant3.y, T2a.temperature_node1) annotation (Line(points={{-71,
+                -50},{-48,-50},{-48,-26}}, color={0,0,127}));
+        connect(Constant4.y, T2a.temperature_nodeN) annotation (Line(points={{-45,
+                -70},{-32,-70},{-32,-25.6}}, color={0,0,127}));
+        connect(T1b.wall, HTb.side1)
+          annotation (Line(points={{4,30},{4,14}}, color={255,127,0}));
+        connect(HTb.side2, T2b.wall)
+          annotation (Line(points={{4,1.8},{4,-14}}, color={255,127,0}));
+        connect(T1c.wall, HTc.side1)
+          annotation (Line(points={{50,30},{50,14}}, color={255,127,0}));
+        connect(HTc.side2, T2c.wall)
+          annotation (Line(points={{50,1.8},{50,-14}}, color={255,127,0}));
+        connect(Constant3.y, T2b.temperature_node1) annotation (Line(points={{-71,
+                -50},{-4,-50},{-4,-26}}, color={0,0,127}));
+        connect(Constant3.y, T2c.temperature_node1) annotation (Line(points={{-71,
+                -50},{42,-50},{42,-26}}, color={0,0,127}));
+        connect(Constant4.y, T2b.temperature_nodeN) annotation (Line(points={{-45,
+                -70},{12,-70},{12,-25.6}}, color={0,0,127}));
+        connect(Constant4.y, T2c.temperature_nodeN) annotation (Line(points={{-45,
+                -70},{58,-70},{58,-25.6}}, color={0,0,127}));
+        connect(Constant1.y, T1b.temperature_node1)
+          annotation (Line(points={{-71,60},{-4,60},{-4,42}}, color={0,0,127}));
+        connect(Constant1.y, T1c.temperature_node1)
+          annotation (Line(points={{-71,60},{42,60},{42,42}}, color={0,0,127}));
+        connect(Constant2.y, T1b.temperature_nodeN) annotation (Line(points={{-43,
+                80},{12,80},{12,41.6}}, color={0,0,127}));
+        connect(Constant2.y, T1c.temperature_nodeN) annotation (Line(points={{-43,
+                80},{58,80},{58,41.6}}, color={0,0,127}));
+        annotation (Diagram(graphics), Documentation(info="<html>
+<p>This model is designed to test the <tt>ConvHT2N</tt> model.
+<p> HTa tests the case with a bigger number of nodes on side1, HTb the case with an equal number of nodes on both sides, and HTc the case with a smaller number of nodes on side 1. It is possible to change <tt>Nbig</tt> and <tt>Nsmall</tt> to any value.
+</html>",   revisions="<html>
+<ul>
+        <li><i>12 May 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        First release.</li>
+</ul>
+</html>
+
+"));
+      end TestConvHT2N;
+
+      model TestFlow1DDB "Test case for Flow1D"
+        package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+        // number of Nodes
+        parameter Integer Nnodes=20;
+        // total length
+        parameter Modelica.SIunits.Length Lhex=200;
+        // internal diameter
+        parameter Modelica.SIunits.Diameter Dihex=0.02;
+        // internal radius
+        parameter Modelica.SIunits.Radius rhex=Dihex/2;
+        // internal perimeter
+        parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+        // internal cross section
+        parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+        // friction coefficient
+        parameter Real Cfhex=0.005;
+        // nominal (and initial) mass flow rate
+        parameter Modelica.SIunits.MassFlowRate whex=0.31;
+        // initial pressure
+        parameter Modelica.SIunits.Pressure phex=3e5;
+        // initial inlet specific enthalpy
+        parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
+        Water.Flow1DDB hex(
+          N=Nnodes,
+          L=Lhex,
+          omega=omegahex,
+          Dhyd=Dihex,
+          A=Ahex,
+          wnom=whex,
+          Cfnom=Cfhex,
+          hstartin=hs,
+          hstartout=hs,
+          redeclare package Medium = Medium,
+          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+          initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+          dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
+                  10}}, rotation=0)));
+        Thermal.TempSource1D TempSource(N=Nnodes) annotation (Placement(
+              transformation(extent={{-20,40},{0,60}}, rotation=0)));
+        ThermoPower.Water.ValveLin ValveLin1(Kv=2*whex/phex) annotation (
+            Placement(transformation(extent={{14,-10},{34,10}}, rotation=0)));
+        ThermoPower.Water.SourceMassFlow
+                                  FluidSource(
+          w0=whex,
+          p0=phex,
+          h=hs) annotation (Placement(transformation(extent={{-80,-10},{-60,10}},
+                rotation=0)));
+        ThermoPower.Water.SinkPressure
+                                FluidSink(p0=phex/2, h=hs) annotation (Placement(
+              transformation(extent={{70,-10},{90,10}}, rotation=0)));
+        Modelica.Blocks.Sources.Step Temperature(
+          height=10,
+          offset=297,
+          startTime=20) annotation (Placement(transformation(extent={{-50,60},{-30,
+                  80}}, rotation=0)));
+        Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
+              transformation(extent={{-4,70},{16,90}}, rotation=0)));
+        ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
+          annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
+                rotation=0)));
+        ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
+          annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
+                 0)));
+        ThermoPower.Thermal.ConvHT_htc ConvHTe_htc1(N=Nnodes) annotation (
+            Placement(transformation(extent={{-20,36},{0,16}}, rotation=0)));
+        inner System system
+          annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      equation
+        connect(hex.outfl, ValveLin1.inlet) annotation (Line(
+            points={{0,0},{14,0}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(ValveLin1.outlet, T_out.inlet) annotation (Line(
+            points={{34,0},{44,0}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(T_out.outlet, FluidSink.flange) annotation (Line(
+            points={{56,0},{70,0}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(ConvHTe_htc1.fluidside, hex.wall)
+          annotation (Line(points={{-10,23},{-10,5}}, color={0,0,255}));
+        connect(ConvHTe_htc1.otherside, TempSource.wall)
+          annotation (Line(points={{-10,29},{-10,47}}, color={255,127,0}));
+        connect(Temperature.y, TempSource.temperature) annotation (Line(points={{
+                -29,70},{-10,70},{-10,54}}, color={0,0,127}));
+        connect(Constant1.y, ValveLin1.cmd)
+          annotation (Line(points={{17,80},{24,80},{24,8}}, color={0,0,127}));
+        connect(FluidSource.flange, T_in.inlet) annotation (Line(
+            points={{-60,0},{-46,0}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(T_in.outlet, hex.infl) annotation (Line(
+            points={{-34,0},{-20,0}},
+            thickness=0.5,
+            color={0,0,255}));
+        annotation (
+          Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                  {100,100}}),
+                  graphics),
+          experiment(StopTime=200, Tolerance=1e-006),
+          Documentation(info="<HTML>
+<p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes). <br>
+This model represent the fluid side of a heat exchanger with convective exchange with an external source of given temperature. The operating fluid is liquid water.<br>
+During experiment the external (fixed) temperature changes:
+<ul>
+    <li>t=20 s, Step variation of the external temperature. Heat exchanger outlet temperature should vary accordingly to the transfer function (K1/(1+s*tau1))*(1-exp(-K2-s*tau2)), where the parameters K1, K2, tau1, tau1 depend on exchanger geometry, the fluid heat transfer coefficient and the operating conditions.</li>
+</ul>
+</p>
+</p>
+<p>
+Simulation Interval = [0...200] sec <br>
+Integration Algorithm = DASSL <br>
+Algorithm Tolerance = 1e-6
+</p>
+</HTML>",   revisions="<html>
+<ul>
+    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+    First release.</li>
+</ul>
+</html>"));
+      end TestFlow1DDB;
     end OldTests;
 
     model TestWaterFlow1DFVa "Test case for Water.Flow1DFV"
@@ -5079,7 +5291,7 @@ Algorithm Tolerance = 1e-6
         Diagram(graphics),
         experiment(StopTime=80, Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1D</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.</p><p>During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed. The outlet temperature can be predicted analytically assuming incompressible flow and constant cp.</p>
+<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.</p><p>During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed. The outlet temperature can be predicted analytically assuming incompressible flow and constant cp.</p>
 <p><ul>
 <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step increase of 10 degrees 10 s later. </li>
 <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp increase of 10 degrees lasting 10 s </li>
@@ -5204,7 +5416,7 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=40, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1D</code> (fluid side of a heat exchanger, finite volumes). </p>
+<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, finite volumes). </p>
 <p>This model represent the fluid side of a heat exchanger with convective exchange with an external source of uniform given temperature. The operating fluid is liquid water. The number of transfer units in the selected operating point is NTU = 0.73. Assuming incompressible fluid and constant cp, when the external temperature is raised at time t = 20 s, the outlet temperature should follow a ramp change, with a duration equal to the residence time of the fluid in the tubes, and an amplitude equal to a fraction exp(-NTU) of the external temperature change.</p>
 <p>Simulation Interval = [0...200] sec </p>
 <p>Integration Algorithm = DASSL </p>
@@ -5317,7 +5529,7 @@ Algorithm Tolerance = 1e-6
                 graphics),
         experiment(StopTime=6, Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1D</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. </p><p>At time t = 1 the inlet flow rate undergoes a step increase; the pressure follows a first order transient with time constant tau. </p>
+<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. </p><p>At time t = 1 the inlet flow rate undergoes a step increase; the pressure follows a first order transient with time constant tau. </p>
 <p>Simulation Interval = [0...6] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <p><ul>
@@ -5498,7 +5710,7 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=1200, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1D</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
+<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
 <p>Simulation Interval = [0...1200] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
@@ -5698,7 +5910,7 @@ Algorithm Tolerance = 1e-6
         experiment(StopTime=1200, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Flow1D</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
+<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
 <p>Simulation Interval = [0...1200] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
@@ -5709,93 +5921,111 @@ Algorithm Tolerance = 1e-6
 </html>"));
     end TestWaterFlow1DFVf;
 
-    model TestConvHT2N
-      parameter Integer Nbig=6;
-      parameter Integer Nsmall=3;
-      Thermal.ConvHT2N HTa(
-        gamma=100,
-        N1=Nbig,
-        N2=Nsmall) annotation (Placement(transformation(extent={{-60,-12},{-20,
-                28}}, rotation=0)));
-      Thermal.TempSource1Dlin T1a(N=Nbig) annotation (Placement(transformation(
-              extent={{-60,16},{-20,56}}, rotation=0)));
-      Thermal.TempSource1Dlin T2a(N=Nsmall) annotation (Placement(
-            transformation(extent={{-60,0},{-20,-40}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1(k=300) annotation (Placement(
-            transformation(extent={{-92,50},{-72,70}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant2(k=400) annotation (Placement(
-            transformation(extent={{-64,70},{-44,90}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant3(k=280) annotation (Placement(
-            transformation(extent={{-92,-60},{-72,-40}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant4(k=350) annotation (Placement(
-            transformation(extent={{-66,-80},{-46,-60}}, rotation=0)));
-      Thermal.ConvHT2N HTb(
-        gamma=100,
-        N1=Nsmall,
-        N2=Nsmall) annotation (Placement(transformation(extent={{-16,-12},{24,
-                28}}, rotation=0)));
-      Thermal.TempSource1Dlin T1b(N=Nsmall) annotation (Placement(
-            transformation(extent={{-16,16},{24,56}}, rotation=0)));
-      Thermal.TempSource1Dlin T2b(N=Nsmall) annotation (Placement(
-            transformation(extent={{-16,0},{24,-40}}, rotation=0)));
-      Thermal.ConvHT2N HTc(
-        gamma=100,
-        N1=Nsmall,
-        N2=Nbig) annotation (Placement(transformation(extent={{30,-12},{70,28}},
-              rotation=0)));
-      Thermal.TempSource1Dlin T1c(N=Nsmall) annotation (Placement(
-            transformation(extent={{30,16},{70,56}}, rotation=0)));
-      Thermal.TempSource1Dlin T2c(N=Nbig) annotation (Placement(transformation(
-              extent={{30,0},{70,-40}}, rotation=0)));
-    equation
-      connect(T1a.wall, HTa.side1)
-        annotation (Line(points={{-40,30},{-40,14}}, color={255,127,0}));
-      connect(HTa.side2, T2a.wall)
-        annotation (Line(points={{-40,1.8},{-40,-14}}, color={255,127,0}));
-      connect(Constant1.y, T1a.temperature_node1) annotation (Line(points={{-71,
-              60},{-48,60},{-48,42}}, color={0,0,127}));
-      connect(Constant2.y, T1a.temperature_nodeN) annotation (Line(points={{-43,
-              80},{-32,80},{-32,41.6}}, color={0,0,127}));
-      connect(Constant3.y, T2a.temperature_node1) annotation (Line(points={{-71,
-              -50},{-48,-50},{-48,-26}}, color={0,0,127}));
-      connect(Constant4.y, T2a.temperature_nodeN) annotation (Line(points={{-45,
-              -70},{-32,-70},{-32,-25.6}}, color={0,0,127}));
-      connect(T1b.wall, HTb.side1)
-        annotation (Line(points={{4,30},{4,14}}, color={255,127,0}));
-      connect(HTb.side2, T2b.wall)
-        annotation (Line(points={{4,1.8},{4,-14}}, color={255,127,0}));
-      connect(T1c.wall, HTc.side1)
-        annotation (Line(points={{50,30},{50,14}}, color={255,127,0}));
-      connect(HTc.side2, T2c.wall)
-        annotation (Line(points={{50,1.8},{50,-14}}, color={255,127,0}));
-      connect(Constant3.y, T2b.temperature_node1) annotation (Line(points={{-71,
-              -50},{-4,-50},{-4,-26}}, color={0,0,127}));
-      connect(Constant3.y, T2c.temperature_node1) annotation (Line(points={{-71,
-              -50},{42,-50},{42,-26}}, color={0,0,127}));
-      connect(Constant4.y, T2b.temperature_nodeN) annotation (Line(points={{-45,
-              -70},{12,-70},{12,-25.6}}, color={0,0,127}));
-      connect(Constant4.y, T2c.temperature_nodeN) annotation (Line(points={{-45,
-              -70},{58,-70},{58,-25.6}}, color={0,0,127}));
-      connect(Constant1.y, T1b.temperature_node1)
-        annotation (Line(points={{-71,60},{-4,60},{-4,42}}, color={0,0,127}));
-      connect(Constant1.y, T1c.temperature_node1)
-        annotation (Line(points={{-71,60},{42,60},{42,42}}, color={0,0,127}));
-      connect(Constant2.y, T1b.temperature_nodeN) annotation (Line(points={{-43,
-              80},{12,80},{12,41.6}}, color={0,0,127}));
-      connect(Constant2.y, T1c.temperature_nodeN) annotation (Line(points={{-43,
-              80},{58,80},{58,41.6}}, color={0,0,127}));
-      annotation (Diagram(graphics), Documentation(info="<html>
-<p>This model is designed to test the <tt>ConvHT2N</tt> model.
-<p> HTa tests the case with a bigger number of nodes on side1, HTb the case with an equal number of nodes on both sides, and HTc the case with a smaller number of nodes on side 1. It is possible to change <tt>Nbig</tt> and <tt>Nsmall</tt> to any value.
-</html>", revisions="<html>
-<ul>
-        <li><i>12 May 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        First release.</li>
-</ul>
-</html>
 
-"));
-    end TestConvHT2N;
+    model TestWaterFlow1DFVDB
+      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      parameter Integer Nnodes=10 "number of Nodes";
+      parameter Modelica.SIunits.Length Lhex=10 "total length";
+      parameter Modelica.SIunits.Diameter Dihex=0.02 "internal diameter";
+      parameter Modelica.SIunits.Radius rhex=Dihex/2 "internal radius";
+      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex
+        "internal perimeter";
+      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2
+        "internal cross-section";
+      parameter Real Cfhex=0.005 "friction coefficient";
+      parameter Modelica.SIunits.MassFlowRate whex=0.31
+        "nominal mass flow rate";
+      parameter Modelica.SIunits.Pressure phex=3e5 "intial pressure";
+      parameter Modelica.SIunits.SpecificEnthalpy hs=1e5
+        "initial inlet specific enthalpy";
+
+      Water.Flow1DFV hexFV(
+        N=Nnodes,
+        L=Lhex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        A=Ahex,
+        wnom=whex,
+        Cfnom=Cfhex,
+        hstartin=hs,
+        hstartout=hs,
+        redeclare package Medium = Medium,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        redeclare ThermoPower.Water.HeatTransfer.DittusBoelter
+          heatTransfer(useAverageTemperature=true),
+        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,10}},
+                      rotation=0)));
+      Thermal.TempSource1DFV
+                           TempSource(Nw=Nnodes - 1)
+                                                annotation (Placement(
+            transformation(extent={{-20,18},{0,38}}, rotation=0)));
+      Water.ValveLin valve(Kv=2*whex/phex)                 annotation (
+          Placement(transformation(extent={{14,-10},{34,10}}, rotation=0)));
+      Water.SourceMassFlow      FluidSource(
+        w0=whex,
+        p0=phex,
+        h=hs) annotation (Placement(transformation(extent={{-80,-10},{-60,10}},
+              rotation=0)));
+      Water.SinkPressure      FluidSink(p0=phex/2, h=hs) annotation (Placement(
+            transformation(extent={{70,-10},{90,10}}, rotation=0)));
+      Modelica.Blocks.Sources.Step Temperature(
+        height=10,
+        startTime=10,
+        offset=296.95)
+                      annotation (Placement(transformation(extent={{-46,38},{-26,58}},
+                      rotation=0)));
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
+            transformation(extent={{0,40},{20,60}},  rotation=0)));
+      Water.SensT             T_in(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
+              rotation=0)));
+      Water.SensT             T_out(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
+               0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+    equation
+      connect(hexFV.outfl, valve.inlet)   annotation (Line(
+          points={{0,0},{14,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(valve.outlet, T_out.inlet)     annotation (Line(
+          points={{34,0},{44,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(T_out.outlet,FluidSink. flange) annotation (Line(
+          points={{56,0},{70,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(Temperature.y,TempSource. temperature) annotation (Line(points={{-25,48},
+              {-10,48},{-10,32}},         color={0,0,127}));
+      connect(Constant1.y, valve.cmd)
+        annotation (Line(points={{21,50},{24,50},{24,8}}, color={0,0,127}));
+      connect(FluidSource.flange,T_in. inlet) annotation (Line(
+          points={{-60,0},{-46,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(T_in.outlet, hexFV.infl)
+                                     annotation (Line(
+          points={{-34,0},{-20,0}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(TempSource.wall, hexFV.wall) annotation (Line(
+          points={{-10,25},{-10,5}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics),
+        experiment(StopTime=40, Tolerance=1e-006),
+        __Dymola_experimentSetupOutput,
+        Documentation(info="<html>
+<p>The model is designed to test the component <code>Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes), with Dittus-Boelter heat transfer coefficient computation.</p>This model represent the fluid side of a heat exchanger with convective exchange with an external source of uniform given temperature.</p><p>At time t = 10 s, the external temperature is raised.</p>
+<p>Simulation Interval = [0...40] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
+</html>"));
+    end TestWaterFlow1DFVDB;
 
     model TestHeatTransfer2phDBa "Test case for HeatTransfer2phDB"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
@@ -5929,319 +6159,6 @@ Algorithm Tolerance = 1e-6
     end TestHeatTransfer2phDBb;
 
 
-    model TestFlow1DFVf2
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
-      // number of Nodes
-      parameter Integer Nnodes=19;
-      // total length
-      parameter Modelica.SIunits.Length Lhex=200;
-      // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
-      // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
-      // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
-      // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
-      // friction coefficient
-      parameter Real Cfhex=0.005;
-      // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.31;
-      // initial pressure
-      parameter Modelica.SIunits.Pressure phex=3e5;
-      // initial inlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
-      // initial outlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
-      Water.SinkPressure      SideA_FluidSink annotation (Placement(
-            transformation(extent={{70,-60},{90,-40}}, rotation=0)));
-      Water.SinkPressure      SideB_FluidSink annotation (Placement(
-            transformation(extent={{-80,40},{-100,60}}, rotation=0)));
-      Water.SourceMassFlow      SideA_MassFlowRate(w0=whex,
-        p0=300000,
-        use_in_h=true)                                              annotation (
-         Placement(transformation(extent={{-76,-60},{-56,-40}}, rotation=0)));
-      Water.ValveLin             ValveLin1(Kv=whex/(2e5)) annotation (Placement(
-            transformation(extent={{18,-60},{38,-40}}, rotation=0)));
-      Water.ValveLin             ValveLin2(Kv=whex/(2e5)) annotation (Placement(
-            transformation(extent={{-30,40},{-50,60}}, rotation=0)));
-      Water.SensT             SensT_A_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{-50,-56},{-30,-36}},
-              rotation=0)));
-      Modelica.Blocks.Sources.Step SideA_InSpecEnth(
-        height=1e5,
-        offset=1e5,
-        startTime=50) annotation (Placement(transformation(extent={{-90,-20},{-70,0}},
-                     rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1(k=1)
-                                                 annotation (Placement(
-            transformation(extent={{-72,70},{-52,90}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant2(k=1)
-                                                 annotation (Placement(
-            transformation(extent={{4,-20},{24,0}}, rotation=0)));
-      Water.SensT             SensT_B_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
-               0)));
-      Water.SourceMassFlow      SourceW1(w0=whex, p0=3e5) annotation (Placement(
-            transformation(extent={{60,40},{40,60}}, rotation=0)));
-      Water.SensT             SensT_A_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{44,-56},{64,-36}},
-              rotation=0)));
-      Water.SensT             SensT_B_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{-54,44},{-74,64}},
-              rotation=0)));
-      inner System system
-        annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Water.Flow1DFV hexFVb(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex,
-        Dhyd=Dihex,
-        A=Ahex,
-        wnom=whex,
-        Cfnom=Cfhex,
-        hstartin=hinhex,
-        hstartout=houthex,
-        redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        pstart=phex,
-        redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
-          heatTransfer(
-          gamma=400,
-          L=Lhex,
-          omega=omegahex,
-          useAverageTemperature=true,
-          redeclare package Medium = Medium,
-          fluidState=hexFVb.fluidState,
-          w=hexFVb.w*ones(Nnodes),
-          Nf=Nnodes),
-        dpnom=1000)         annotation (Placement(transformation(
-            extent={{-10,-10},{10,10}},
-            rotation=180,
-            origin={-8,50})));
-      Water.Flow1DFV hexFVa(
-        N=Nnodes,
-        Nt=1,
-        L=Lhex,
-        omega=omegahex,
-        Dhyd=Dihex,
-        A=Ahex,
-        wnom=whex,
-        Cfnom=Cfhex,
-        hstartin=hinhex,
-        hstartout=houthex,
-        redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        pstart=phex,
-        redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
-          heatTransfer(
-          useAverageTemperature=true,
-          gamma=400,
-          L=Lhex,
-          omega=omegahex,
-          redeclare package Medium = Medium,
-          fluidState=hexFVa.fluidState,
-          w=hexFVa.w*ones(Nnodes),
-          Nf=Nnodes),
-        dpnom=1000)
-        annotation (Placement(transformation(extent={{-18,-60},{2,-40}})));
-      Thermal.MetalTubeFV metalTubeFV(
-        N=Nnodes,
-        L=Lhex,
-        lambda=20,
-        rint=rhex,
-        rext=rhex + 1e-3,
-        rhomcm=4.9e6,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        Tstart1=297,
-        TstartN=297)
-        annotation (Placement(transformation(extent={{-18,-16},{2,4}})));
-      Thermal.CounterFlow counterFlow(Nw=Nnodes - 1)
-        annotation (Placement(transformation(extent={{-18,10},{2,30}})));
-    equation
-      connect(SideA_MassFlowRate.flange,SensT_A_in. inlet) annotation (Line(
-          points={{-56,-50},{-46,-50}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(SourceW1.flange,SensT_B_in. inlet) annotation (Line(
-          points={{40,50},{26,50}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(SensT_A_out.inlet,ValveLin1. outlet) annotation (Line(
-          points={{48,-50},{38,-50}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(SensT_A_out.outlet,SideA_FluidSink. flange) annotation (Line(
-          points={{60,-50},{70,-50}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(SensT_B_out.outlet,SideB_FluidSink. flange) annotation (Line(
-          points={{-70,50},{-80,50}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(SensT_B_out.inlet,ValveLin2. outlet) annotation (Line(
-          points={{-58,50},{-50,50}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(Constant1.y,ValveLin2. cmd) annotation (Line(points={{-51,80},{-40,80},
-              {-40,58}},     color={0,0,127}));
-      connect(SideA_InSpecEnth.y,SideA_MassFlowRate. in_h) annotation (Line(
-            points={{-69,-10},{-62,-10},{-62,-44}}, color={0,0,127}));
-      connect(Constant2.y,ValveLin1. cmd) annotation (Line(points={{25,-10},{28,-10},
-              {28,-42}},      color={0,0,127}));
-      connect(metalTubeFV.ext,hexFVa. wall) annotation (Line(
-          points={{-8,-9.1},{-8,-45}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      connect(hexFVa.infl, SensT_A_in.outlet) annotation (Line(
-          points={{-18,-50},{-34,-50}},
-          color={0,0,255},
-          smooth=Smooth.None));
-      connect(hexFVa.outfl, ValveLin1.inlet) annotation (Line(
-          points={{2,-50},{18,-50}},
-          color={0,0,255},
-          smooth=Smooth.None));
-      connect(ValveLin2.inlet,hexFVb. outfl) annotation (Line(
-          points={{-30,50},{-18,50}},
-          color={0,0,255},
-          smooth=Smooth.None));
-      connect(hexFVb.infl, SensT_B_in.outlet) annotation (Line(
-          points={{2,50},{14,50}},
-          color={0,0,255},
-          smooth=Smooth.None));
-      connect(hexFVb.wall, counterFlow.side1) annotation (Line(
-          points={{-8,45},{-8,23}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      connect(counterFlow.side2, metalTubeFV.int) annotation (Line(
-          points={{-8,16.9},{-8,-3}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
-                -100},{100,100}}), graphics),
-        experiment(StopTime=900, Tolerance=1e-006),
-        __Dymola_experimentSetupOutput);
-    end TestFlow1DFVf2;
-
-    model TestFlow1DFVDB
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
-      // number of Nodes
-      parameter Integer Nnodes=20;
-      // total length
-      parameter Modelica.SIunits.Length Lhex=200;
-      // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
-      // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
-      // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
-      // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
-      // friction coefficient
-      parameter Real Cfhex=0.005;
-      // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.31;
-      // initial pressure
-      parameter Modelica.SIunits.Pressure phex=3e5;
-      // initial inlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
-
-      Water.Flow1DFV hexFV(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex,
-        Dhyd=Dihex,
-        A=Ahex,
-        wnom=whex,
-        Cfnom=Cfhex,
-        hstartin=hs,
-        hstartout=hs,
-        redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        redeclare ThermoPower.Water.HeatTransfer.DittusBoelter
-          heatTransfer(
-          redeclare package Medium = Medium,
-          Nf=Nnodes,
-          fluidState=hexFV.fluidState,
-          w=hexFV.w*ones(Nnodes),
-          L=Lhex,
-          omega=omegahex,
-          A=Ahex,
-          Dhyd=Dihex,
-          useAverageTemperature=true),
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,10}},
-                      rotation=0)));
-      Thermal.TempSource1DFV
-                           TempSource(N=Nnodes) annotation (Placement(
-            transformation(extent={{-20,40},{0,60}}, rotation=0)));
-      Water.ValveLin             ValveLin1(Kv=2*whex/phex) annotation (
-          Placement(transformation(extent={{14,-10},{34,10}}, rotation=0)));
-      Water.SourceMassFlow      FluidSource(
-        w0=whex,
-        p0=phex,
-        h=hs) annotation (Placement(transformation(extent={{-80,-10},{-60,10}},
-              rotation=0)));
-      Water.SinkPressure      FluidSink(p0=phex/2, h=hs) annotation (Placement(
-            transformation(extent={{70,-10},{90,10}}, rotation=0)));
-      Modelica.Blocks.Sources.Step Temperature(
-        offset=297,
-        startTime=20,
-        height=10)    annotation (Placement(transformation(extent={{-50,60},{-30,80}},
-                      rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
-            transformation(extent={{-4,70},{16,90}}, rotation=0)));
-      Water.SensT             T_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
-              rotation=0)));
-      Water.SensT             T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
-               0)));
-      inner System system
-        annotation (Placement(transformation(extent={{80,80},{100,100}})));
-    equation
-      connect(hexFV.outfl, ValveLin1.inlet)
-                                          annotation (Line(
-          points={{0,0},{14,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(ValveLin1.outlet,T_out. inlet) annotation (Line(
-          points={{34,0},{44,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(T_out.outlet,FluidSink. flange) annotation (Line(
-          points={{56,0},{70,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(Temperature.y,TempSource. temperature) annotation (Line(points={{-29,70},
-              {-10,70},{-10,54}},         color={0,0,127}));
-      connect(Constant1.y,ValveLin1. cmd)
-        annotation (Line(points={{17,80},{24,80},{24,8}}, color={0,0,127}));
-      connect(FluidSource.flange,T_in. inlet) annotation (Line(
-          points={{-60,0},{-46,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(T_in.outlet, hexFV.infl)
-                                     annotation (Line(
-          points={{-34,0},{-20,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(TempSource.wall, hexFV.wall) annotation (Line(
-          points={{-10,47},{-10,5}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
-                -100},{100,100}}), graphics),
-        experiment(StopTime=200, Tolerance=1e-006),
-        __Dymola_experimentSetupOutput);
-    end TestFlow1DFVDB;
 
     model TestFlow1DFV2ph
        package Medium = Modelica.Media.Water.WaterIF97_ph;
@@ -6387,7 +6304,6 @@ Algorithm Tolerance = 1e-6
           Tolerance=1e-008),
         __Dymola_experimentSetupOutput);
     end TestFlow1DFV2ph;
-
 
     model TestFlow1DSlowFast "Test case for Flow1D"
       package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
@@ -6541,129 +6457,6 @@ Algorithm Tolerance = 1e-6
 </html>"));
     end TestFlow1DSlowFast;
 
-    model TestFlow1DDB "Test case for Flow1D"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
-      // number of Nodes
-      parameter Integer Nnodes=20;
-      // total length
-      parameter Modelica.SIunits.Length Lhex=200;
-      // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
-      // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
-      // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
-      // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
-      // friction coefficient
-      parameter Real Cfhex=0.005;
-      // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.31;
-      // initial pressure
-      parameter Modelica.SIunits.Pressure phex=3e5;
-      // initial inlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
-      Water.Flow1DDB hex(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex,
-        Dhyd=Dihex,
-        A=Ahex,
-        wnom=whex,
-        Cfnom=Cfhex,
-        hstartin=hs,
-        hstartout=hs,
-        redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
-                10}}, rotation=0)));
-      Thermal.TempSource1D TempSource(N=Nnodes) annotation (Placement(
-            transformation(extent={{-20,40},{0,60}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=2*whex/phex) annotation (
-          Placement(transformation(extent={{14,-10},{34,10}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
-                                FluidSource(
-        w0=whex,
-        p0=phex,
-        h=hs) annotation (Placement(transformation(extent={{-80,-10},{-60,10}},
-              rotation=0)));
-      ThermoPower.Water.SinkPressure
-                              FluidSink(p0=phex/2, h=hs) annotation (Placement(
-            transformation(extent={{70,-10},{90,10}}, rotation=0)));
-      Modelica.Blocks.Sources.Step Temperature(
-        height=10,
-        offset=297,
-        startTime=20) annotation (Placement(transformation(extent={{-50,60},{-30,
-                80}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
-            transformation(extent={{-4,70},{16,90}}, rotation=0)));
-      ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
-              rotation=0)));
-      ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
-               0)));
-      ThermoPower.Thermal.ConvHT_htc ConvHTe_htc1(N=Nnodes) annotation (
-          Placement(transformation(extent={{-20,36},{0,16}}, rotation=0)));
-      inner System system
-        annotation (Placement(transformation(extent={{80,80},{100,100}})));
-    equation
-      connect(hex.outfl, ValveLin1.inlet) annotation (Line(
-          points={{0,0},{14,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(ValveLin1.outlet, T_out.inlet) annotation (Line(
-          points={{34,0},{44,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(T_out.outlet, FluidSink.flange) annotation (Line(
-          points={{56,0},{70,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(ConvHTe_htc1.fluidside, hex.wall)
-        annotation (Line(points={{-10,23},{-10,5}}, color={0,0,255}));
-      connect(ConvHTe_htc1.otherside, TempSource.wall)
-        annotation (Line(points={{-10,29},{-10,47}}, color={255,127,0}));
-      connect(Temperature.y, TempSource.temperature) annotation (Line(points={{
-              -29,70},{-10,70},{-10,54}}, color={0,0,127}));
-      connect(Constant1.y, ValveLin1.cmd)
-        annotation (Line(points={{17,80},{24,80},{24,8}}, color={0,0,127}));
-      connect(FluidSource.flange, T_in.inlet) annotation (Line(
-          points={{-60,0},{-46,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(T_in.outlet, hex.infl) annotation (Line(
-          points={{-34,0},{-20,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      annotation (
-        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
-                {100,100}}),
-                graphics),
-        experiment(StopTime=200, Tolerance=1e-006),
-        Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes). <br>
-This model represent the fluid side of a heat exchanger with convective exchange with an external source of given temperature. The operating fluid is liquid water.<br>
-During experiment the external (fixed) temperature changes:
-<ul>
-    <li>t=20 s, Step variation of the external temperature. Heat exchanger outlet temperature should vary accordingly to the transfer function (K1/(1+s*tau1))*(1-exp(-K2-s*tau2)), where the parameters K1, K2, tau1, tau1 depend on exchanger geometry, the fluid heat transfer coefficient and the operating conditions.</li>
-</ul>
-</p>
-</p>
-<p>
-Simulation Interval = [0...200] sec <br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</p>
-</HTML>", revisions="<html>
-<ul>
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
-    First release.</li>
-</ul>
-</html>"));
-    end TestFlow1DDB;
 
     model TestFlow1DfemA "Test case for Flow1Dfem"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
