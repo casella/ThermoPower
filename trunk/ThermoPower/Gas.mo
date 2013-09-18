@@ -968,7 +968,8 @@ package Gas "Models of components with ideal gases as working fluid"
     Velocity u[N] "Fluid velocity";
     Pressure p(start=pstart, stateSelect=StateSelect.prefer);
     Time Tr "Residence time";
-    Mass M "Gas Mass";
+    Mass M "Gas Mass (single tube)";
+    Mass Mtot "Gas Mass (total)";
     Real Q "Total heat flow through the wall (all Nt tubes)";
   protected
     parameter Real dzdx=H/L "Slope";
@@ -1144,7 +1145,8 @@ package Gas "Models of components with ideal gases as working fluid"
     connect(wall,heatTransfer.wall);
 
     Tin = gas[1].T;
-    M = sum(rhobar)*A*l "Total gas mass";
+    M = sum(rhobar)*A*l "Fluid mass (single tube)";
+    Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
   initial equation
