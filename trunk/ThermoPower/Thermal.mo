@@ -365,38 +365,6 @@ This package contains models to compute the material properties needed to model 
 </html>"));
   end MaterialProperties;
   extends Modelica.Icons.Package;
-  package BaseClasses
-
-    partial model HeatExchangerConfiguration2
-      extends Icons.HeatFlow;
-
-      parameter Integer C[Nw] "Configuration vector";
-
-      HeatExchangerTopology hexConfiguration
-        annotation (Placement(transformation(extent={{-54,34},{-10,60}})));
-      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
-                -100},{100,100}}), graphics));
-    end HeatExchangerConfiguration2;
-
-    partial model HeatExchangerTopology
-      extends Icons.HeatFlow;
-      parameter Integer Nw "Number of volumes";
-      Thermal.DHTVolumes side1(N=Nw) annotation (Placement(transformation(extent={{-40,20},
-                {40,40}}, rotation=0)));
-      Thermal.DHTVolumes side2(N=Nw) annotation (Placement(transformation(extent={{-40,-42},
-                {40,-20}}, rotation=0)));
-      parameter Integer correspondingVolumesSide2[Nw];
-
-    equation
-      for j in 1:Nw loop
-        side2.T[correspondingVolumesSide2[j]] = side1.T[j];
-        side2.Q[correspondingVolumesSide2[j]] + side1.Q[j] = 0;
-      end for;
-      annotation (
-        Diagram(graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-    end HeatExchangerTopology;
-  end BaseClasses;
 
   connector HT = Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a
     "Thermal port for lumped parameter heat transfer";
@@ -834,28 +802,6 @@ This package contains models to compute the material properties needed to model 
 "),   Diagram(graphics));
   end MetalTubeFEM;
 
-  model ConvHTLumped "Lumped parameter convective heat transfer"
-    extends Icons.HeatFlow;
-    parameter ThermalConductance G "Constant thermal conductance";
-    HT side1 annotation (Placement(transformation(extent={{-40,20},{40,40}},
-            rotation=0)));
-    HT side2 annotation (Placement(transformation(extent={{-40,-20},{40,-42}},
-            rotation=0)));
-  equation
-    side1.Q_flow = G*(side1.T - side2.T) "Convective heat transfer";
-    side1.Q_flow = -side2.Q_flow "Energy balance";
-    annotation (Icon(graphics={Text(
-            extent={{-98,-76},{102,-100}},
-            lineColor={191,95,0},
-            textString="%name")}), Documentation(info="<HTML>
-<p>Model of a simple convective heat transfer mechanism between two lumped parameter objects, with a constant heat transfer coefficient.
-</HTML>", revisions="<html>
-<li><i>28 Dic 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"));
-  end ConvHTLumped;
 
   model MetalWallFV "Generic metal wall model with Nw finite volumes"
     extends ThermoPower.Icons.MetalWall;
@@ -1024,6 +970,377 @@ This package contains models to compute the material properties needed to model 
 </html>
 "),   Diagram(graphics));
   end MetalWallFEM;
+
+  model ConvHTLumped "Lumped parameter convective heat transfer"
+    extends Icons.HeatFlow;
+    parameter ThermalConductance G "Constant thermal conductance";
+    HT side1 annotation (Placement(transformation(extent={{-40,20},{40,40}},
+            rotation=0)));
+    HT side2 annotation (Placement(transformation(extent={{-40,-20},{40,-42}},
+            rotation=0)));
+  equation
+    side1.Q_flow = G*(side1.T - side2.T) "Convective heat transfer";
+    side1.Q_flow = -side2.Q_flow "Energy balance";
+    annotation (Icon(graphics={Text(
+            extent={{-98,-76},{102,-100}},
+            lineColor={191,95,0},
+            textString="%name")}), Documentation(info="<HTML>
+<p>Model of a simple convective heat transfer mechanism between two lumped parameter objects, with a constant heat transfer coefficient.
+</HTML>", revisions="<html>
+<li><i>28 Dic 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end ConvHTLumped;
+
+  package HeatTransfer "Heat transfer models"
+    model IdealHeatTransfer
+      "Delta T across the boundary layer is zero (infinite heat transfer coeffficient)"
+      extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature=false);
+       Medium.Temperature T[Nf] "Fluid temperature";
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      for j in 1:Nw loop
+        wall.T[j] = T[j+1] "Ideal infinite heat transfer";
+      end for;
+    end IdealHeatTransfer;
+
+    model ConstantHeatTransferCoefficient "Constant heat transfer coefficient"
+      extends BaseClasses.DistributedHeatTransferFV;
+
+       parameter CoefficientOfHeatTransfer gamma
+        "Constant heat transfer coefficient";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       Power Q "Total heat flow through lateral boundary";
+
+    equation
+      assert(Nw ==  Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      for j in 1:Nw loop
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma*Nt;
+      end for;
+
+      Q = sum(wall.Q);
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantHeatTransferCoefficient;
+
+    model ConstantThermalConductance
+      "Constant global thermal conductance (UA value)"
+      extends ConstantHeatTransferCoefficient(
+        final gamma = UA/(omega*L*Nt));
+
+      parameter Modelica.SIunits.ThermalConductance UA
+        "Global thermal conductance (UA value), for Nt tubes";
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantThermalConductance;
+
+    model FlowDependentHeatTransferCoefficient
+      "Flow-dependent heat transfer coefficient, gamma = gamma_nom*(w/wnom)^alpha"
+      extends BaseClasses.DistributedHeatTransferFV;
+
+       parameter CoefficientOfHeatTransfer gamma_nom
+        "Nominal heat transfer coefficient";
+       parameter Real alpha(final unit="1")
+        "Exponent in the flow-dependency law";
+       parameter Real beta(final unit="1") = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is not reduced";
+       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+       Power Q "Total heat flow through lateral boundary";
+       CoefficientOfHeatTransfer gamma "Actual heat transfer coefficient";
+       Real w_wnom(final unit = "1")
+        "Ratio between actual and nominal flow rate";
+    equation
+      assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities at low flows
+      w_wnom = abs(w[1])/wnom
+        "Inlet flow rate used for the computation of the conductance";
+      gamma = gamma_nom*Functions.smoothSat(w_wnom, beta, 1e9, beta/2)^alpha;
+
+      for j in 1:Nw loop
+         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+         wall.Q[j] = (wall.T[j] - Tvol[j])*gamma*omega*l*Nt;
+      end for;
+
+      Q = sum(wall.Q);
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end FlowDependentHeatTransferCoefficient;
+
+    model FlowDependentThermalConductance
+      "Flow-dependent global thermal conductance (UA value), UA = UAnom*(w/wnom)^alpha"
+      extends FlowDependentHeatTransferCoefficient(
+        final gamma_nom = UAnom/(omega*L*Nt));
+       parameter Modelica.SIunits.ThermalConductance UAnom
+        "Nominal global thermal conductance (UA value), for Nt tubes";
+      Modelica.SIunits.ThermalConductance UA = gamma*omega*L*Nt;
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end FlowDependentThermalConductance;
+
+    model DittusBoelter "Dittus-Boelter heat transfer correlation"
+      extends BaseClasses.DistributedHeatTransferFV;
+      CoefficientOfHeatTransfer gamma[Nf]
+        "Heat transfer coefficients at the nodes";
+      CoefficientOfHeatTransfer gamma_vol[Nw]
+        "Heat transfer coefficients at the volumes";
+      Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
+      Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
+      Medium.ThermalConductivity k[Nf] "Thermal conductivity";
+      Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+      Power Q "Total heat flow through lateral boundary";
+
+    equation
+      assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+      // Fluid properties at the nodes
+      for j in 1:Nf loop
+        mu[j] = Medium.dynamicViscosity(fluidState[j]);
+        k[j] = Medium.thermalConductivity(fluidState[j]);
+        cp[j] = Medium.heatCapacity_cp(fluidState[j]);
+        gamma[j] = Water.f_dittus_boelter(
+          w[j],
+          Dhyd,
+          A,
+          mu[j],
+          k[j],
+          cp[j]);
+      end for;
+
+      for j in 1:Nw loop
+         Tvol[j]      = if useAverageTemperature then (T[j] + T[j + 1])/2       else T[j + 1];
+         gamma_vol[j] = if useAverageTemperature then (gamma[j] + gamma[j+1])/2 else gamma[j+1];
+         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma_vol[j]*Nt;
+      end for;
+
+      Q = sum(wall.Q);
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end DittusBoelter;
+
+    model HeatTransfer2phDB
+      extends BaseClasses.DistributedHeatTransferFV(
+        final useAverageTemperature,
+        redeclare replaceable package Medium =
+            Modelica.Media.Interfaces.PartialTwoPhaseMedium);
+
+      parameter CoefficientOfHeatTransfer gamma_b=20000
+        "Coefficient of heat transfer in the 2-phase region";
+
+      Real state[Nw] "Indicator of phase configuration";
+      Real alpha_l[Nw](each unit = "1")
+        "Normalized position of liquid phase boundary";
+      Real alpha_v[Nw](each unit = "1")
+        "Normalized position of vapour phase boundary";
+      CoefficientOfHeatTransfer gamma1ph[Nf]
+        "Heat transfer coefficient for 1-phase fluid";
+      CoefficientOfHeatTransfer gamma_bubble
+        "Heat transfer coefficient for 1-phase fluid at liquid phase boundary";
+      CoefficientOfHeatTransfer gamma_dew
+        "Heat transfer coefficient for 1-phase fluid at vapour phase boundary";
+      CoefficientOfHeatTransfer gamma2ph = gamma_b
+        "Heat transfer coefficient for 2-phase mixture";
+      Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
+      Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
+      Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
+      Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+      Medium.Temperature Ts "Saturated water temperature";
+      Medium.SaturationProperties sat "Properties of saturated fluid";
+      Medium.ThermodynamicState bubble "Bubble point, one-phase side";
+      Medium.ThermodynamicState dew "Dew point, one-phase side";
+      Medium.AbsolutePressure p "Fluid pressure for property calculations";
+      Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
+      Medium.ThermalConductivity k[Nf] "Thermal conductivity";
+      Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+      Medium.DynamicViscosity mu_bubble "Dynamic viscosity at bubble point";
+      Medium.ThermalConductivity k_bubble
+        "Thermal conductivity at bubble point";
+      Medium.SpecificHeatCapacity cp_bubble
+        "Heat capacity at constant pressure at bubble point";
+      Medium.DynamicViscosity mu_dew "Dynamic viscosity at dew point";
+      Medium.ThermalConductivity k_dew "Thermal conductivity at dew point";
+      Medium.SpecificHeatCapacity cp_dew
+        "Heat capacity at constant pressure at dew point";
+      Power Q "Total heat flow through lateral boundary";
+
+    equation
+      assert(Nw == Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Saturated fluid property calculations
+      p = Medium.pressure(fluidState[1]);
+      sat = Medium.setSat_p(p);
+      Ts = sat.Tsat;
+      hl = Medium.bubbleEnthalpy(sat);
+      hv = Medium.dewEnthalpy(sat);
+      bubble = Medium.setBubbleState(sat,1);
+      dew = Medium.setDewState(sat,1);
+      mu_bubble = Medium.dynamicViscosity(bubble);
+      k_bubble = Medium.thermalConductivity(bubble);
+      cp_bubble = Medium.heatCapacity_cp(bubble);
+      mu_dew =  Medium.dynamicViscosity(dew);
+      k_dew = Medium.thermalConductivity(dew);
+      cp_dew = Medium.heatCapacity_cp(dew);
+
+      // Heat transfer coefficient at bubble/dew point
+      gamma_bubble = Water.f_dittus_boelter(
+        w[1],
+        Dhyd,
+        A,
+        mu_bubble,
+        k_bubble,
+        cp_bubble);
+      gamma_dew = Water.f_dittus_boelter(
+        w[1],
+        Dhyd,
+        A,
+        mu_dew,
+        k_dew,
+        cp_dew);
+
+      // Fluid property calculations at nodes
+      for j in 1:Nf loop
+        h[j] = Medium.specificEnthalpy(fluidState[j]);
+        /* to be fixed */
+        mu[j] = Medium.dynamicViscosity(fluidState[j]);  //not all nodes, only 1-phase nodes
+        k[j] = Medium.thermalConductivity(fluidState[j]); //not all nodes, only 1-phase nodes
+        cp[j] = Medium.heatCapacity_cp(fluidState[j]); //not all nodes, only 1-phase nodes
+        gamma1ph[j] = Water.f_dittus_boelter(
+          w[j],
+          Dhyd,
+          A,
+          mu[j],
+          k[j],
+          cp[j]);                                                     //not all nodes, only 1-phase nodes
+        /* to be fixed */
+      end for;
+
+      for j in 1:Nw loop
+         if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then  // 1-phase liquid or vapour
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
+           state[j] = 1;
+           alpha_l[j] = 0;
+           alpha_v[j] = 0;
+         elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then          // liquid --> 2-phase
+           wall.Q[j] = alpha_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*((gamma1ph[j] + gamma_bubble)/2) +
+                       (1 - alpha_l[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           state[j] = 2;
+           alpha_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
+           alpha_v[j] = 0;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
+           wall.Q[j] = (wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           state[j] = 3;
+           alpha_l[j] = 0;
+           alpha_v[j] = 0;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                // 2-phase --> vapour
+           //wall.Q[j] = alpha_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alpha_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
+           wall.Q[j] = alpha_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_dew + gamma1ph[j+1])/2 +
+                       (1 - alpha_v[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           state[j] = 4;
+           alpha_l[j] = 0;
+           alpha_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                // 2-phase --> liquid
+           wall.Q[j] = alpha_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_bubble + gamma1ph[j+1])/2 +
+                       (1 - alpha_l[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           state[j] = 5;
+           alpha_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+           alpha_v[j] = 0;
+         else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then        // vapour --> 2-phase
+           wall.Q[j] = alpha_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*(gamma1ph[j] + gamma_dew)/2 +
+                       (1 - alpha_v[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           state[j] = 6;
+           alpha_l[j] = 0;
+           alpha_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+         end if;
+
+         if useAverageTemperature then
+           Tvolbar[j] = (T[j] + T[j + 1])/2;
+         else
+           Tvolbar[j] = T[j + 1];
+         end if;
+      end for;
+
+      Q = sum(wall.Q);
+
+       annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end HeatTransfer2phDB;
+  end HeatTransfer;
+
+  package BaseClasses
+    partial model HeatExchangerTopology
+      extends Icons.HeatFlow;
+      parameter Integer Nw "Number of volumes";
+      Thermal.DHTVolumes side1(N=Nw) annotation (Placement(transformation(extent={{-40,20},
+                {40,40}}, rotation=0)));
+      Thermal.DHTVolumes side2(N=Nw) annotation (Placement(transformation(extent={{-40,-42},
+                {40,-20}}, rotation=0)));
+      parameter Integer correspondingVolumesSide2[Nw];
+
+    equation
+      for j in 1:Nw loop
+        side2.T[correspondingVolumesSide2[j]] = side1.T[j];
+        side2.Q[correspondingVolumesSide2[j]] + side1.Q[j] = 0;
+      end for;
+      annotation (
+        Diagram(graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end HeatExchangerTopology;
+
+    partial model DistributedHeatTransferFV
+      "Distributed heat transfer model - finite volume"
+      extends ThermoPower.Icons.HeatFlow;
+      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+        "Medium model";
+      input Medium.ThermodynamicState fluidState[Nf];
+      input MassFlowRate w[Nf];
+      ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
+                40}}, rotation=0)));
+      parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side";
+      parameter Integer Nw "Number of nodes on the wallside";
+      parameter Integer Nt(min=1) "Number of tubes in parallel";
+      parameter Distance L "Tube length";
+      parameter Area A "Cross-sectional area (single tube)";
+      parameter Length omega
+        "Wet perimeter of heat transfer surface (single tube)";
+      parameter Length Dhyd "Hydraulic Diameter (single tube)";
+      parameter MassFlowRate wnom "Nominal mass flow rate (single tube)";
+      parameter Boolean useAverageTemperature = true
+        "= true to use average temperature for heat transfer";
+      final parameter Length l=L/(Nw) "Length of a single volume";
+
+      Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
+
+    equation
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+    end DistributedHeatTransferFV;
+  end BaseClasses;
 
   connector HThtc
     "Thermal port for lumped parameter heat transfer with outgoing heat transfer coefficient"
@@ -2129,14 +2446,6 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 </html>"));
   end CylinderFourier;
 
-  model ParallelFlow
-    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = 1:Nw);
-  end ParallelFlow;
-
-  model CounterFlow
-    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2=  Nw:-1:1);
-  end CounterFlow;
-
   model HeatFlowDistribution "Same heat flow through two different surfaces"
     extends Icons.HeatFlow;
     parameter Integer N(min=1) = 2 "Number of nodes";
@@ -2179,6 +2488,15 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 </html>
 "),   Diagram(graphics));
   end HeatFlowDistribution;
+
+  model ParallelFlow
+    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = 1:Nw);
+  end ParallelFlow;
+
+  model CounterFlow
+    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2=  Nw:-1:1);
+  end CounterFlow;
+
 
   model ShellAndTube
    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = corrVolumesST(Nw,Ntp,inletTubeAtTop,inletShellAtTop));

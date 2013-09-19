@@ -5225,9 +5225,7 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         pstart=phex,
-        dpnom=1000,
-        redeclare ThermoPower.Water.HeatTransfer.IdealHeatTransfer heatTransfer)
-                    annotation (Placement(transformation(extent={{-20,-10},{0,
+        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
       ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
@@ -5379,8 +5377,8 @@ Algorithm Tolerance = 1e-6
         hstartout=hs,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
-          heatTransfer(redeclare package Medium = Medium, gamma=gamma),
+          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          heatTransfer(gamma=gamma),
         Nt=Nt,
         dpnom=1000)
         annotation (Placement(transformation(extent={{-22,-22},{-2,-2}})));
@@ -5471,7 +5469,7 @@ Algorithm Tolerance = 1e-6
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Water.HeatTransfer.IdealHeatTransfer heatTransfer,
+        redeclare ThermoPower.Thermal.HeatTransfer.IdealHeatTransfer heatTransfer,
         Nt=Nt,
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
@@ -5619,7 +5617,7 @@ Algorithm Tolerance = 1e-6
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
         redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(gamma=800),
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         A=Aext,
@@ -5642,7 +5640,7 @@ Algorithm Tolerance = 1e-6
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
         redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(gamma=800),
         A=Aint,
         omega=omegahex,
@@ -5806,7 +5804,7 @@ Algorithm Tolerance = 1e-6
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
         redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(gamma=800),
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         A=Aext,
@@ -5829,7 +5827,7 @@ Algorithm Tolerance = 1e-6
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
         redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(gamma=800),
         omega=omegaint,
         A=Aint,
@@ -5957,7 +5955,7 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        redeclare ThermoPower.Water.HeatTransfer.DittusBoelter
+        redeclare ThermoPower.Thermal.HeatTransfer.DittusBoelter
           heatTransfer(useAverageTemperature=true),
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,10}},
                       rotation=0)));
@@ -6217,19 +6215,22 @@ Algorithm Tolerance = 1e-6
       parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
       Medium.ThermodynamicState fluidState[Nnodes];
 
-      Water.HeatTransfer.HeatTransfer2phDB
+      Thermal.HeatTransfer.HeatTransfer2phDB
                               HeatTransfer(
         Nf=Nnodes,
+        Nw=Nnodes-1,
+        Nt = 1,
         A=Across,
         Dhyd=0.06,
         omega=0.188496,
         L=10,
+        wnom = wnom,
         redeclare package Medium = Medium,
         fluidState=fluidState,
         w=w,
         gamma_b=30000)
         annotation (Placement(transformation(extent={{-18,-40},{18,-10}})));
-      Thermal.TempSource1DFV TempSource(N=Nnodes)
+      Thermal.TempSource1DFV TempSource(Nw=Nnodes - 1)
         annotation (Placement(transformation(extent={{-14,0},{14,26}})));
       Modelica.Blocks.Sources.Constant Temperature_const(k=873.15)
                                                  annotation (Placement(
@@ -6255,8 +6256,8 @@ Algorithm Tolerance = 1e-6
           __Dymola_NumberOfIntervals=10000,
           Tolerance=1e-006),
         Documentation(info="<html>
-<p><br/>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the evaporation process.</p>
-<p><br/>This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is water.</p>
+<p>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the evaporation process, using water as a test medium.</p>
+<p>The wall temperature is fixed and uniform. The fluid enthalpy spatial distribution is linear: the inlet condition is subcooled fluid, while the outlet condition is progressively increased from subcooled to superheated. The ensuing heat flows do not show any discontinuity when the phase boundaries cross the volume boundaries.</p>
 <p>Simulation Interval = [0...1] sec </p>
 </html>", revisions="<html>
 <ul>
@@ -6268,47 +6269,10 @@ Algorithm Tolerance = 1e-6
     end TestHeatTransfer2phDBa;
 
     model TestHeatTransfer2phDBb "Test case for HeatTransfer2phDB"
-      package Medium = Modelica.Media.Water.WaterIF97_ph;
-      parameter Integer Nnodes = 10;
-      parameter SpecificEnthalpy hstartin = 3.5e6;
-      SpecificEnthalpy hstartout = (3.5e6+0.001) - 3.4e6*time;
-      SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
-      parameter Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
-      parameter AbsolutePressure p = 3e6;
-      parameter MassFlowRate wnom = 2;
-      parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
-      Medium.ThermodynamicState fluidState[Nnodes];
+      extends TestHeatTransfer2phDBa(
+        hstartin = 3.5e6,
+        hstartout = (3.5e6+0.001) - 3.4e6*time);
 
-      Water.HeatTransfer.HeatTransfer2phDB
-                              HeatTransfer(
-        Nf=Nnodes,
-        A=Across,
-        Dhyd=0.06,
-        omega=0.188496,
-        L=10,
-        redeclare package Medium = Medium,
-        fluidState=fluidState,
-        w=w,
-        gamma_b=30000)
-        annotation (Placement(transformation(extent={{-20,-40},{18,-10}})));
-      Thermal.TempSource1DFV TempSource(N=Nnodes)
-        annotation (Placement(transformation(extent={{-14,0},{14,26}})));
-      Modelica.Blocks.Sources.Constant Temperature_const(k=873.15)
-                                                 annotation (Placement(
-            transformation(extent={{-62,56},{-42,76}},rotation=0)));
-    equation
-      connect(TempSource.wall, HeatTransfer.wall) annotation (Line(
-          points={{0,9.1},{0,-20.5},{-1,-20.5}},
-          color={255,127,0},
-          smooth=Smooth.None));
-
-      for j in 1:Nnodes loop
-        fluidState[j] = Medium.setState_ph(p, h[j]);
-      end for;
-      connect(Temperature_const.y, TempSource.temperature) annotation (Line(
-          points={{-41,66},{0,66},{0,18.2}},
-          color={0,0,127},
-          smooth=Smooth.None));
       annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
                 -100},{100,100}}), graphics),
         Diagram(graphics),
@@ -6317,8 +6281,8 @@ Algorithm Tolerance = 1e-6
           __Dymola_NumberOfIntervals=10000,
           Tolerance=1e-006),
         Documentation(info="<html>
-<p><br/>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the condensation process.</p>
-<p><br/>This model represent the heat transfer between a metal wall (represented by an external temperature source) and a fluid-flow. The operating fluid is water.</p>
+<p>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the condensation process, using water as a test medium.</p>
+<p>The wall temperature is fixed and uniform. The fluid enthalpy spatial distribution is linear: the inlet condition is subcooled fluid, while the outlet condition is progressively increased from subcooled to superheated. The ensuing heat flows do not show any discontinuity when the phase boundaries cross the volume boundaries.</p>
 <p>Simulation Interval = [0...1] sec </p>
 </html>", revisions="<html>
 <ul>
@@ -6381,7 +6345,7 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        redeclare ThermoPower.Water.HeatTransfer.HeatTransfer2phDB
+        redeclare ThermoPower.Thermal.HeatTransfer.HeatTransfer2phDB
                                                       heatTransfer(
           Nf=Nnodes,
           A=Ahex,
@@ -9105,10 +9069,6 @@ Casella</a>:<br>
 </ul>
 </html>"));
     end Flow1D_check;
-
-
-
-
 
     model TestEvaporatorTemp
       extends Water.EvaporatorBase(
