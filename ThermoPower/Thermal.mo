@@ -1,369 +1,5 @@
 within ThermoPower;
 package Thermal "Thermal models of heat transfer"
-  package MaterialProperties "Thermal and mechanical properties of materials"
-    package Interfaces
-      "This package provides interfaces for material property models"
-      partial model PartialMaterial
-        "Partial material properties (base model of all material models)"
-
-        import Modelica.SIunits.*;
-
-        // Constants to be set in Material
-        constant String materialName "Name of the material";
-        constant String materialDescription
-          "Textual description of the material";
-
-        constant PoissonNumber poissonRatio "Poisson ration of material";
-        constant Density density "Density of material";
-
-        // Material properties depending on the material state
-        ModulusOfElasticity youngModulus "Young modulus of material";
-        Stress yieldStress "Tensione di snervamento";
-        Stress ultimateStress "Tensione di rottura";
-        LinearExpansionCoefficient linearExpansionCoefficient
-          "Linear expansion coefficient of the material";
-        SpecificHeatCapacity specificHeatCapacity
-          "Specific heat capacity of material";
-        ThermalConductivity thermalConductivity
-          "Thermal conductivity of the material";
-
-        // Material thermodynamic state
-        Temperature T "Material temperature";
-      end PartialMaterial;
-    end Interfaces;
-
-    package Common "Implementation of material property models"
-      model MaterialTable
-        "Material property model based on table data and polynomial interpolations"
-        import Modelica.SIunits.*;
-
-        import Poly =
-          ThermoPower.Thermal.MaterialProperties.Functions.Polynomials_Temp;
-        // Attenzione e' una funzione temporanea di Media!!!
-
-        extends Interfaces.PartialMaterial(materialName="tableMaterial",
-            materialDescription="tableMaterial");
-
-        // Tables defining temperature dependent properties of material
-      protected
-        constant ModulusOfElasticity[:, :] tableYoungModulus=fill(
-                  0,
-                  0,
-                  0) "Table for youngModulus(T)";
-        constant Stress[:, :] tableYieldStress=fill(
-                  0,
-                  0,
-                  0) "Table for yieldStress(T)";
-        constant Stress[:, :] tableUltimateStress=fill(
-                  0,
-                  0,
-                  0) "Table for ultimateStress(T)";
-        constant SpecificHeatCapacity[:, :] tableSpecificHeatCapacity=fill(
-                  0,
-                  0,
-                  0) "Table for cp(T)";
-        constant LinearExpansionCoefficient[:, :]
-          tableLinearExpansionCoefficient=fill(
-                  0,
-                  0,
-                  0) "Table for alfa(T)";
-        constant ThermalConductivity[:, :] tableThermalConductivity=fill(
-                  0,
-                  0,
-                  0) "Table for kappa(T)";
-        // Functions to interpolate table data
-      public
-        constant Integer npol=2 "degree of polynomial used for fitting";
-      protected
-        final constant ModulusOfElasticity poly_youngModulus[:]=if size(
-            tableYoungModulus, 1) > 1 then Poly.fitting(
-                  tableYoungModulus[:, 1],
-                  tableYoungModulus[:, 2],
-                  npol) else if size(tableYoungModulus, 1) == 1 then array(
-                  0,
-                  0,
-                  tableYoungModulus[1, 2]) else zeros(npol + 1)
-          annotation (keepConstant=true);
-        final constant Real poly_yieldStress[:]=if size(tableYieldStress, 1) >
-            1 then Poly.fitting(
-                  tableYieldStress[:, 1],
-                  tableYieldStress[:, 2],
-                  npol) else if size(tableYieldStress, 1) == 1 then array(
-                  0,
-                  0,
-                  tableYieldStress[1, 2]) else zeros(npol + 1)
-          annotation (keepConstant=true);
-        final constant Real poly_ultimateStress[:]=if size(tableUltimateStress,
-            1) > 1 then Poly.fitting(
-                  tableUltimateStress[:, 1],
-                  tableUltimateStress[:, 2],
-                  npol) else if size(tableUltimateStress, 1) == 1 then array(
-                  0,
-                  0,
-                  tableUltimateStress[1, 2]) else zeros(npol + 1)
-          annotation (keepConstant=true);
-        final constant Real poly_cp[:]=if size(tableSpecificHeatCapacity, 1) >
-            1 then Poly.fitting(
-                  tableSpecificHeatCapacity[:, 1],
-                  tableSpecificHeatCapacity[:, 2],
-                  npol) else if size(tableSpecificHeatCapacity, 1) == 1 then
-            array(0,
-                  0,
-                  tableSpecificHeatCapacity[1, 2]) else zeros(npol + 1)
-          annotation (keepConstant=true);
-        final constant Real poly_alfa[:]=if size(
-            tableLinearExpansionCoefficient, 1) > 1 then Poly.fitting(
-                  tableLinearExpansionCoefficient[:, 1],
-                  tableLinearExpansionCoefficient[:, 2],
-                  npol) else if size(tableLinearExpansionCoefficient, 1) == 1
-             then array(
-                  0,
-                  0,
-                  tableLinearExpansionCoefficient[1, 2]) else zeros(npol + 1)
-          annotation (keepConstant=true);
-        final constant Real poly_kappa[:]=if size(tableThermalConductivity, 1)
-             > 1 then Poly.fitting(
-                  tableThermalConductivity[:, 1],
-                  tableThermalConductivity[:, 2],
-                  npol) else if size(tableThermalConductivity, 1) == 1 then
-            array(0,
-                  0,
-                  tableThermalConductivity[1, 2]) else zeros(npol + 1)
-          annotation (keepConstant=true);
-
-      equation
-        // Table for main properties of the material should be defined!
-        assert(size(tableYoungModulus, 1) > 0, "Material " + materialName +
-          " can not be used without assigning tableYoungModulus.");
-        assert(size(tableSpecificHeatCapacity, 1) > 0, "Material " +
-          materialName +
-          " can not be used without assigning tableYoungModulus.");
-        assert(size(tableLinearExpansionCoefficient, 1) > 0, "Material " +
-          materialName +
-          " can not be used without assigning tableYoungModulus.");
-        assert(size(tableThermalConductivity, 1) > 0, "Material " +
-          materialName +
-          " can not be used without assigning tableYoungModulus.");
-
-        youngModulus = Poly.evaluate(poly_youngModulus, T);
-        yieldStress = Poly.evaluate(poly_yieldStress, T);
-        ultimateStress = Poly.evaluate(poly_ultimateStress, T);
-        specificHeatCapacity = Poly.evaluate(poly_cp, T);
-        linearExpansionCoefficient = Poly.evaluate(poly_alfa, T);
-        thermalConductivity = Poly.evaluate(poly_kappa, T);
-        annotation (Documentation(info="<html>
-This model computes the thermal and mechanical properties of a generic material. The data is provided in the form of tables, and interpolated by polinomials.
-<p>To use the model, set the material temperature to the desired value by a suitable equation.
-</html>"));
-      end MaterialTable;
-    end Common;
-
-    package Functions
-      "Utility functions. Provide conversions and interpolation for table data."
-      function CtoKTable
-        extends Modelica.SIunits.Conversions.ConversionIcon;
-
-        input Real[:, :] table_degC;
-        output Real table_degK[size(table_degC, 1), size(table_degC, 2)];
-      algorithm
-        table_degK := table_degC;
-
-        for i in 1:size(table_degC, 1) loop
-          table_degK[i, 1] := Modelica.SIunits.Conversions.from_degC(table_degC[
-            i, 1]);
-        end for;
-      end CtoKTable;
-
-      package Polynomials_Temp "Temporary Functions operating on polynomials (including polynomial fitting), extracted from Modelica.Media.Incompressible.TableBased;
-   only to be used in Material.MaterialTable"
-        extends Modelica.Icons.Library;
-
-        function evaluate "Evaluate polynomial at a given abszissa value"
-          extends Modelica.Icons.Function;
-          input Real p[:]
-            "Polynomial coefficients (p[1] is coefficient of highest power)";
-          input Real u "Abszissa value";
-          output Real y "Value of polynomial at u";
-        algorithm
-          y := p[1];
-          for j in 2:size(p, 1) loop
-            y := p[j] + u*y;
-          end for;
-        end evaluate;
-
-        function fitting
-          "Computes the coefficients of a polynomial that fits a set of data points in a least-squares sense"
-          extends Modelica.Icons.Function;
-          input Real u[:] "Abscissa data values";
-          input Real y[size(u, 1)] "Ordinate data values";
-          input Integer n(min=1)
-            "Order of desired polynomial that fits the data points (u,y)";
-          output Real p[n + 1]
-            "Polynomial coefficients of polynomial that fits the date points";
-        protected
-          Real V[size(u, 1), n + 1] "Vandermonde matrix";
-        algorithm
-          // Construct Vandermonde matrix
-          V[:, n + 1] := ones(size(u, 1));
-          for j in n:-1:1 loop
-            V[:, j] := {u[i]*V[i, j + 1] for i in 1:size(u, 1)};
-          end for;
-
-          // Solve least squares problem
-          p := Modelica.Math.Matrices.leastSquares(V, y);
-        end fitting;
-      end Polynomials_Temp;
-      annotation (Documentation(info=""));
-    end Functions;
-
-    package Metals "Models of commonly used steel"
-      model StandardSteel
-        extends Common.MaterialTable(
-          final materialName="Standard Steel",
-          final materialDescription="Standard Steel",
-          final density=7763,
-          final poissonRatio=0.3,
-          tableYoungModulus=Functions.CtoKTable([21, 1.923e11]),
-          tableUltimateStress=Functions.CtoKTable([21, 4.83e8]),
-          tableYieldStress=Functions.CtoKTable([21, 2.76e8]),
-          tableLinearExpansionCoefficient=Functions.CtoKTable([21, 10.93e-6]),
-          tableSpecificHeatCapacity=Functions.CtoKTable([21, 478.2]),
-          tableThermalConductivity=Functions.CtoKTable([21, 62.30]));
-      end StandardSteel;
-
-      model CarbonSteel_A106C
-        extends Common.MaterialTable(
-          final materialName="ASME A106-C",
-          final materialDescription="Carbon steel (%C <= 0.30)",
-          final density=7763,
-          final poissonRatio=0.3,
-          tableYoungModulus=Functions.CtoKTable([21, 1.923e11; 93, 1.910e11;
-              149, 1.889e11; 204, 1.861e11; 260, 1.820e11; 316, 1.772e11; 371,
-              1.710e11; 427, 1.613e11; 482, 1.491e11; 538, 1.373e11]),
-          tableUltimateStress=Functions.CtoKTable([21, 4.83e8]),
-          tableYieldStress=Functions.CtoKTable([21, 2.76e8; 93, 2.50e8; 149,
-              2.45e8; 204, 2.37e8; 260, 2.23e8; 316, 2.05e8; 371, 1.98e8; 427,
-              1.84e8; 482, 1.75e8; 538, 1.57e8]),
-          tableLinearExpansionCoefficient=Functions.CtoKTable([21, 10.93e-6; 93,
-              11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6; 316,
-              13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538,
-              14.35e-6]),
-          tableSpecificHeatCapacity=Functions.CtoKTable([21, 478.2; 93, 494.1;
-              149, 510.4; 204, 526.3; 260, 541.0; 316, 556.9; 371, 581.2; 427,
-              608.8; 482, 665.3; 538, 684.6]),
-          tableThermalConductivity=Functions.CtoKTable([21, 62.30; 93, 60.31;
-              149, 57.45; 204, 54.68; 260, 51.57; 316, 48.97; 371, 46.38; 427,
-              43.96; 482, 41.18; 538, 39.11]));
-      end CarbonSteel_A106C;
-
-      model CarbonSteel_A106B
-        extends Common.MaterialTable(
-          final materialName="ASME A106-B",
-          final materialDescription="Carbon steel (%C <= 0.30)",
-          final density=7763,
-          final poissonRatio=0.3,
-          tableYoungModulus=Functions.CtoKTable([21, 1.923e11; 93, 1.910e11;
-              149, 1.889e11; 204, 1.861e11; 260, 1.820e11; 316, 1.772e11; 371,
-              1.710e11; 427, 1.613e11; 482, 1.491e11; 538, 1.373e11]),
-          tableUltimateStress=Functions.CtoKTable([21, 4.1412e8]),
-          tableYieldStress=Functions.CtoKTable([40, 2.41e8; 100, 2.18e8; 150,
-              2.14e8; 200, 2.08e8; 250, 1.98e8; 300, 1.83e8; 350, 1.75e8; 400,
-              1.68e8; 450, 1.56e8; 475, 1.54e8]),
-          tableLinearExpansionCoefficient=Functions.CtoKTable([21, 10.93e-6; 93,
-              11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6; 316,
-              13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538,
-              14.35e-6]),
-          tableSpecificHeatCapacity=Functions.CtoKTable([21, 478.2; 93, 494.1;
-              149, 510.4; 204, 526.3; 260, 541.0; 316, 556.9; 371, 581.2; 427,
-              608.8; 482, 665.3; 538, 684.6]),
-          tableThermalConductivity=Functions.CtoKTable([21, 62.30; 93, 60.31;
-              149, 57.45; 204, 54.68; 260, 51.57; 316, 48.97; 371, 46.38; 427,
-              43.96; 482, 41.18; 538, 39.11]));
-      end CarbonSteel_A106B;
-
-      model AlloySteel_A335P22
-        extends Common.MaterialTable(
-          final materialName="ASME A335-P22",
-          final materialDescription="Alloy steel (2 1/4 Cr - 1 Mo)",
-          final density=7763,
-          final poissonRatio=0.3,
-          tableYoungModulus=Functions.CtoKTable([21, 2.061e11; 93, 2.034e11;
-              149, 1.999e11; 204, 1.972e11; 260, 1.930e11; 316, 1.889e11; 371,
-              1.834e11; 427, 1.772e11; 482, 1.689e11; 538, 1.586e11]),
-          tableUltimateStress=Functions.CtoKTable([21, 4.1412e8]),
-          tableYieldStress=Functions.CtoKTable([21, 2.07e8; 93, 1.92e8; 149,
-              1.87e8; 204, 1.86e8; 260, 1.86e8; 316, 1.86e8; 371, 1.86e8; 427,
-              1.84e8; 482, 1.77e8; 538, 1.63e8]),
-          tableLinearExpansionCoefficient=Functions.CtoKTable([21, 10.93e-6; 93,
-              11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6; 316,
-              13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538,
-              14.35e-6]),
-          tableSpecificHeatCapacity=Functions.CtoKTable([21, 478.2; 93, 494.1;
-              149, 510.4; 204, 526.3; 260, 541.0; 316, 556.9; 371, 581.2; 427,
-              608.8; 482, 665.3; 538, 684.6]),
-          tableThermalConductivity=Functions.CtoKTable([21, 62.30; 93, 60.31;
-              149, 57.45; 204, 54.68; 260, 51.57; 316, 48.97; 371, 46.38; 427,
-              43.96; 482, 41.18; 538, 39.11]));
-      end AlloySteel_A335P22;
-
-      model AlloySteel_A335P12
-        extends Common.MaterialTable(
-          final materialName="ASME A335-P12",
-          final materialDescription="Alloy steel (1 Cr - 1/2 Mo)",
-          final density=7763,
-          final poissonRatio=0.3,
-          tableYoungModulus=Functions.CtoKTable([25, 2.050e11; 100, 2.000e11;
-              150, 1.960e11; 200, 1.930e11; 250, 1.900e11; 300, 1.870e11; 350,
-              1.830e11; 400, 1.790e11; 450, 1.740e11; 475, 1.720e11; 500,
-              1.697e11; 550, 1.648e11]),
-          tableUltimateStress=Functions.CtoKTable([21, 4.1404e8]),
-          tableYieldStress=Functions.CtoKTable([40, 2.07e8; 100, 1.92e8; 150,
-              1.85e8; 200, 1.81e8; 250, 1.79e8; 300, 1.76e8; 350, 1.66e8; 400,
-              1.56e8; 425, 1.55e8; 450, 1.51e8; 475, 1.46e8; 500, 1.43e8; 525,
-              1.39e8]),
-          tableLinearExpansionCoefficient=Functions.CtoKTable([50, 10.49e-6;
-              100, 11.08e-6; 150, 11.63e-6; 200, 12.14e-6; 250, 12.60e-6; 300,
-              13.02e-6; 350, 13.40e-6; 400, 13.74e-6; 425, 13.89e-6; 450,
-              14.02e-6; 500, 14.28e-6; 550, 14.50e-6]),
-          tableSpecificHeatCapacity=Functions.CtoKTable([25, 439.5; 100, 477.2;
-              150, 498.1; 200, 523.3; 250, 540.0; 300, 560.9; 350, 577.5; 400,
-              602.8; 425, 611.2; 450, 627.9; 475, 644.6; 500, 657.2; 550, 690.7]),
-          tableThermalConductivity=Functions.CtoKTable([25, 41.9; 100, 42.2;
-              150, 41.9; 200, 41.4; 250, 40.6; 300, 39.7; 350, 38.5; 400, 37.4;
-              425, 36.7; 450, 36.3; 475, 35.7; 500, 35.0; 550, 34.0]));
-
-      end AlloySteel_A335P12;
-    end Metals;
-
-    package Test "Test cases"
-      model TestMaterial
-        import Modelica.SIunits.*;
-        replaceable Metals.CarbonSteel_A106C Material(npol=3) constrainedby
-          Interfaces.PartialMaterial "Material model";
-        Temp_K T;
-        Temp_C T_C;
-        Stress E;
-      equation
-        T_C = 21 + 500*time;
-        T = Modelica.SIunits.Conversions.from_degC(T_C);
-        Material.T = T;
-        E = Material.yieldStress;
-      end TestMaterial;
-    end Test;
-
-    annotation (Documentation(revisions="<html>
-<ul>
-<li><i>8 June 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Partial restructuring of models.</li>
-<li><i>1 May 2005</i>
-    by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
-       First release.</li>
-</ul>
-</html>", info="<html>
-This package contains models to compute the material properties needed to model heat transfer and thermo-mechanical stresses in objects such as turbine shafts or headers.
-</html>"));
-  end MaterialProperties;
   extends Modelica.Icons.Package;
 
   connector HT = Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a
@@ -802,7 +438,6 @@ This package contains models to compute the material properties needed to model 
 "),   Diagram(graphics));
   end MetalTubeFEM;
 
-
   model MetalWallFV "Generic metal wall model with Nw finite volumes"
     extends ThermoPower.Icons.MetalWall;
     parameter Integer Nw = 1 "Number of volumes on the wall ports";
@@ -970,6 +605,65 @@ This package contains models to compute the material properties needed to model 
 </html>
 "),   Diagram(graphics));
   end MetalWallFEM;
+
+  model HeatExchangerTopologyFV
+    "Connects two DHTVolumes ports according to a selected heat exchanger topology"
+    extends Icons.HeatFlow;
+    parameter Integer Nw "Number of volumes";
+    replaceable HeatExchangerTopologies.CoCurrentFlow HET
+      constrainedby ThermoPower.Thermal.BaseClasses.HeatExchangerTopologyData(final Nw = Nw)
+      annotation(choicesAllMatching=true);
+
+    Thermal.DHTVolumes side1(final N=Nw) annotation (Placement(transformation(extent={{-40,20},
+              {40,40}}, rotation=0)));
+    Thermal.DHTVolumes side2(final N=Nw) annotation (Placement(transformation(extent={{-40,-42},
+              {40,-20}}, rotation=0)));
+
+  equation
+    for j in 1:Nw loop
+      side2.T[HET.correspondingVolumes[j]] = side1.T[j];
+      side2.Q[HET.correspondingVolumes[j]] + side1.Q[j] = 0;
+    end for;
+    annotation (
+      Diagram(graphics),
+      Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
+           graphics));
+  end HeatExchangerTopologyFV;
+
+  model CounterCurrentFV
+    "Connects two DHTVolume ports according to a counter-current flow configuration"
+    extends ThermoPower.Thermal.HeatExchangerTopologyFV(
+      redeclare HeatExchangerTopologies.CounterCurrentFlow HET);
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+              {100,100}}),
+                     graphics={
+          Polygon(
+            points={{-74,2},{-48,8},{-74,16},{-56,8},{-74,2}},
+            lineColor={0,0,0},
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{74,-16},{60,-10},{74,-2},{52,-10},{74,-16}},
+            lineColor={0,0,0},
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid)}),
+                                   Documentation(info="<HTML>
+<p>This component can be used to model counter-current heat transfer. The temperature and flux vectors on one side are swapped with respect to the other side. This means that the temperature of node <tt>j</tt> on side 1 is equal to the temperature of note <tt>N-j+1</tt> on side 2; heat fluxes behave correspondingly.
+<p>
+The swapping is performed if the counterCurrent parameter is true (default value).
+</HTML>", revisions="<html>
+<ul>
+<li><i>25 Aug 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       <tt>counterCurrent</tt> parameter added.</li>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+
+</html>
+"));
+  end CounterCurrentFV;
 
   model ConvHTLumped "Lumped parameter convective heat transfer"
     extends Icons.HeatFlow;
@@ -1291,28 +985,503 @@ This package contains models to compute the material properties needed to model 
     end HeatTransfer2phDB;
   end HeatTransfer;
 
-  package BaseClasses
-    partial model HeatExchangerTopology
-      extends Icons.HeatFlow;
-      parameter Integer Nw "Number of volumes";
-      Thermal.DHTVolumes side1(N=Nw) annotation (Placement(transformation(extent={{-40,20},
-                {40,40}}, rotation=0)));
-      Thermal.DHTVolumes side2(N=Nw) annotation (Placement(transformation(extent={{-40,-42},
-                {40,-20}}, rotation=0)));
-      parameter Integer correspondingVolumesSide2[Nw];
+  package MaterialProperties "Thermal and mechanical properties of materials"
+    package Interfaces
+      "This package provides interfaces for material property models"
+      partial model PartialMaterial
+        "Partial material properties (base model of all material models)"
 
-    equation
-      for j in 1:Nw loop
-        side2.T[correspondingVolumesSide2[j]] = side1.T[j];
-        side2.Q[correspondingVolumesSide2[j]] + side1.Q[j] = 0;
-      end for;
-      annotation (
-        Diagram(graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
-    end HeatExchangerTopology;
+        import Modelica.SIunits.*;
+
+        // Constants to be set in Material
+        constant String materialName "Name of the material";
+        constant String materialDescription
+          "Textual description of the material";
+
+        constant PoissonNumber poissonRatio "Poisson ration of material";
+        constant Density density "Density of material";
+
+        // Material properties depending on the material state
+        ModulusOfElasticity youngModulus "Young modulus of material";
+        Stress yieldStress "Tensione di snervamento";
+        Stress ultimateStress "Tensione di rottura";
+        LinearExpansionCoefficient linearExpansionCoefficient
+          "Linear expansion coefficient of the material";
+        SpecificHeatCapacity specificHeatCapacity
+          "Specific heat capacity of material";
+        ThermalConductivity thermalConductivity
+          "Thermal conductivity of the material";
+
+        // Material thermodynamic state
+        Temperature T "Material temperature";
+      end PartialMaterial;
+    end Interfaces;
+
+    package Common "Implementation of material property models"
+      model MaterialTable
+        "Material property model based on table data and polynomial interpolations"
+        import Modelica.SIunits.*;
+
+        import Poly =
+          ThermoPower.Thermal.MaterialProperties.Functions.Polynomials_Temp;
+        // Attenzione e' una funzione temporanea di Media!!!
+
+        extends Interfaces.PartialMaterial(materialName="tableMaterial",
+            materialDescription="tableMaterial");
+
+        // Tables defining temperature dependent properties of material
+      protected
+        constant ModulusOfElasticity[:, :] tableYoungModulus=fill(
+                  0,
+                  0,
+                  0) "Table for youngModulus(T)";
+        constant Stress[:, :] tableYieldStress=fill(
+                  0,
+                  0,
+                  0) "Table for yieldStress(T)";
+        constant Stress[:, :] tableUltimateStress=fill(
+                  0,
+                  0,
+                  0) "Table for ultimateStress(T)";
+        constant SpecificHeatCapacity[:, :] tableSpecificHeatCapacity=fill(
+                  0,
+                  0,
+                  0) "Table for cp(T)";
+        constant LinearExpansionCoefficient[:, :]
+          tableLinearExpansionCoefficient=fill(
+                  0,
+                  0,
+                  0) "Table for alfa(T)";
+        constant ThermalConductivity[:, :] tableThermalConductivity=fill(
+                  0,
+                  0,
+                  0) "Table for kappa(T)";
+        // Functions to interpolate table data
+      public
+        constant Integer npol=2 "degree of polynomial used for fitting";
+      protected
+        final constant ModulusOfElasticity poly_youngModulus[:]=if size(
+            tableYoungModulus, 1) > 1 then Poly.fitting(
+                  tableYoungModulus[:, 1],
+                  tableYoungModulus[:, 2],
+                  npol) else if size(tableYoungModulus, 1) == 1 then array(
+                  0,
+                  0,
+                  tableYoungModulus[1, 2]) else zeros(npol + 1)
+          annotation (keepConstant=true);
+        final constant Real poly_yieldStress[:]=if size(tableYieldStress, 1) >
+            1 then Poly.fitting(
+                  tableYieldStress[:, 1],
+                  tableYieldStress[:, 2],
+                  npol) else if size(tableYieldStress, 1) == 1 then array(
+                  0,
+                  0,
+                  tableYieldStress[1, 2]) else zeros(npol + 1)
+          annotation (keepConstant=true);
+        final constant Real poly_ultimateStress[:]=if size(tableUltimateStress,
+            1) > 1 then Poly.fitting(
+                  tableUltimateStress[:, 1],
+                  tableUltimateStress[:, 2],
+                  npol) else if size(tableUltimateStress, 1) == 1 then array(
+                  0,
+                  0,
+                  tableUltimateStress[1, 2]) else zeros(npol + 1)
+          annotation (keepConstant=true);
+        final constant Real poly_cp[:]=if size(tableSpecificHeatCapacity, 1) >
+            1 then Poly.fitting(
+                  tableSpecificHeatCapacity[:, 1],
+                  tableSpecificHeatCapacity[:, 2],
+                  npol) else if size(tableSpecificHeatCapacity, 1) == 1 then
+            array(0,
+                  0,
+                  tableSpecificHeatCapacity[1, 2]) else zeros(npol + 1)
+          annotation (keepConstant=true);
+        final constant Real poly_alfa[:]=if size(
+            tableLinearExpansionCoefficient, 1) > 1 then Poly.fitting(
+                  tableLinearExpansionCoefficient[:, 1],
+                  tableLinearExpansionCoefficient[:, 2],
+                  npol) else if size(tableLinearExpansionCoefficient, 1) == 1
+             then array(
+                  0,
+                  0,
+                  tableLinearExpansionCoefficient[1, 2]) else zeros(npol + 1)
+          annotation (keepConstant=true);
+        final constant Real poly_kappa[:]=if size(tableThermalConductivity, 1)
+             > 1 then Poly.fitting(
+                  tableThermalConductivity[:, 1],
+                  tableThermalConductivity[:, 2],
+                  npol) else if size(tableThermalConductivity, 1) == 1 then
+            array(0,
+                  0,
+                  tableThermalConductivity[1, 2]) else zeros(npol + 1)
+          annotation (keepConstant=true);
+
+      equation
+        // Table for main properties of the material should be defined!
+        assert(size(tableYoungModulus, 1) > 0, "Material " + materialName +
+          " can not be used without assigning tableYoungModulus.");
+        assert(size(tableSpecificHeatCapacity, 1) > 0, "Material " +
+          materialName +
+          " can not be used without assigning tableYoungModulus.");
+        assert(size(tableLinearExpansionCoefficient, 1) > 0, "Material " +
+          materialName +
+          " can not be used without assigning tableYoungModulus.");
+        assert(size(tableThermalConductivity, 1) > 0, "Material " +
+          materialName +
+          " can not be used without assigning tableYoungModulus.");
+
+        youngModulus = Poly.evaluate(poly_youngModulus, T);
+        yieldStress = Poly.evaluate(poly_yieldStress, T);
+        ultimateStress = Poly.evaluate(poly_ultimateStress, T);
+        specificHeatCapacity = Poly.evaluate(poly_cp, T);
+        linearExpansionCoefficient = Poly.evaluate(poly_alfa, T);
+        thermalConductivity = Poly.evaluate(poly_kappa, T);
+        annotation (Documentation(info="<html>
+This model computes the thermal and mechanical properties of a generic material. The data is provided in the form of tables, and interpolated by polinomials.
+<p>To use the model, set the material temperature to the desired value by a suitable equation.
+</html>"));
+      end MaterialTable;
+    end Common;
+
+    package Functions
+      "Utility functions. Provide conversions and interpolation for table data."
+      function CtoKTable
+        extends Modelica.SIunits.Conversions.ConversionIcon;
+
+        input Real[:, :] table_degC;
+        output Real table_degK[size(table_degC, 1), size(table_degC, 2)];
+      algorithm
+        table_degK := table_degC;
+
+        for i in 1:size(table_degC, 1) loop
+          table_degK[i, 1] := Modelica.SIunits.Conversions.from_degC(table_degC[
+            i, 1]);
+        end for;
+      end CtoKTable;
+
+      package Polynomials_Temp "Temporary Functions operating on polynomials (including polynomial fitting), extracted from Modelica.Media.Incompressible.TableBased;
+   only to be used in Material.MaterialTable"
+        extends Modelica.Icons.Library;
+
+        function evaluate "Evaluate polynomial at a given abszissa value"
+          extends Modelica.Icons.Function;
+          input Real p[:]
+            "Polynomial coefficients (p[1] is coefficient of highest power)";
+          input Real u "Abszissa value";
+          output Real y "Value of polynomial at u";
+        algorithm
+          y := p[1];
+          for j in 2:size(p, 1) loop
+            y := p[j] + u*y;
+          end for;
+        end evaluate;
+
+        function fitting
+          "Computes the coefficients of a polynomial that fits a set of data points in a least-squares sense"
+          extends Modelica.Icons.Function;
+          input Real u[:] "Abscissa data values";
+          input Real y[size(u, 1)] "Ordinate data values";
+          input Integer n(min=1)
+            "Order of desired polynomial that fits the data points (u,y)";
+          output Real p[n + 1]
+            "Polynomial coefficients of polynomial that fits the date points";
+        protected
+          Real V[size(u, 1), n + 1] "Vandermonde matrix";
+        algorithm
+          // Construct Vandermonde matrix
+          V[:, n + 1] := ones(size(u, 1));
+          for j in n:-1:1 loop
+            V[:, j] := {u[i]*V[i, j + 1] for i in 1:size(u, 1)};
+          end for;
+
+          // Solve least squares problem
+          p := Modelica.Math.Matrices.leastSquares(V, y);
+        end fitting;
+      end Polynomials_Temp;
+      annotation (Documentation(info=""));
+    end Functions;
+
+    package Metals "Models of commonly used steel"
+      model StandardSteel
+        extends Common.MaterialTable(
+          final materialName="Standard Steel",
+          final materialDescription="Standard Steel",
+          final density=7763,
+          final poissonRatio=0.3,
+          tableYoungModulus=Functions.CtoKTable([21, 1.923e11]),
+          tableUltimateStress=Functions.CtoKTable([21, 4.83e8]),
+          tableYieldStress=Functions.CtoKTable([21, 2.76e8]),
+          tableLinearExpansionCoefficient=Functions.CtoKTable([21, 10.93e-6]),
+          tableSpecificHeatCapacity=Functions.CtoKTable([21, 478.2]),
+          tableThermalConductivity=Functions.CtoKTable([21, 62.30]));
+      end StandardSteel;
+
+      model CarbonSteel_A106C
+        extends Common.MaterialTable(
+          final materialName="ASME A106-C",
+          final materialDescription="Carbon steel (%C <= 0.30)",
+          final density=7763,
+          final poissonRatio=0.3,
+          tableYoungModulus=Functions.CtoKTable([21, 1.923e11; 93, 1.910e11;
+              149, 1.889e11; 204, 1.861e11; 260, 1.820e11; 316, 1.772e11; 371,
+              1.710e11; 427, 1.613e11; 482, 1.491e11; 538, 1.373e11]),
+          tableUltimateStress=Functions.CtoKTable([21, 4.83e8]),
+          tableYieldStress=Functions.CtoKTable([21, 2.76e8; 93, 2.50e8; 149,
+              2.45e8; 204, 2.37e8; 260, 2.23e8; 316, 2.05e8; 371, 1.98e8; 427,
+              1.84e8; 482, 1.75e8; 538, 1.57e8]),
+          tableLinearExpansionCoefficient=Functions.CtoKTable([21, 10.93e-6; 93,
+              11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6; 316,
+              13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538,
+              14.35e-6]),
+          tableSpecificHeatCapacity=Functions.CtoKTable([21, 478.2; 93, 494.1;
+              149, 510.4; 204, 526.3; 260, 541.0; 316, 556.9; 371, 581.2; 427,
+              608.8; 482, 665.3; 538, 684.6]),
+          tableThermalConductivity=Functions.CtoKTable([21, 62.30; 93, 60.31;
+              149, 57.45; 204, 54.68; 260, 51.57; 316, 48.97; 371, 46.38; 427,
+              43.96; 482, 41.18; 538, 39.11]));
+      end CarbonSteel_A106C;
+
+      model CarbonSteel_A106B
+        extends Common.MaterialTable(
+          final materialName="ASME A106-B",
+          final materialDescription="Carbon steel (%C <= 0.30)",
+          final density=7763,
+          final poissonRatio=0.3,
+          tableYoungModulus=Functions.CtoKTable([21, 1.923e11; 93, 1.910e11;
+              149, 1.889e11; 204, 1.861e11; 260, 1.820e11; 316, 1.772e11; 371,
+              1.710e11; 427, 1.613e11; 482, 1.491e11; 538, 1.373e11]),
+          tableUltimateStress=Functions.CtoKTable([21, 4.1412e8]),
+          tableYieldStress=Functions.CtoKTable([40, 2.41e8; 100, 2.18e8; 150,
+              2.14e8; 200, 2.08e8; 250, 1.98e8; 300, 1.83e8; 350, 1.75e8; 400,
+              1.68e8; 450, 1.56e8; 475, 1.54e8]),
+          tableLinearExpansionCoefficient=Functions.CtoKTable([21, 10.93e-6; 93,
+              11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6; 316,
+              13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538,
+              14.35e-6]),
+          tableSpecificHeatCapacity=Functions.CtoKTable([21, 478.2; 93, 494.1;
+              149, 510.4; 204, 526.3; 260, 541.0; 316, 556.9; 371, 581.2; 427,
+              608.8; 482, 665.3; 538, 684.6]),
+          tableThermalConductivity=Functions.CtoKTable([21, 62.30; 93, 60.31;
+              149, 57.45; 204, 54.68; 260, 51.57; 316, 48.97; 371, 46.38; 427,
+              43.96; 482, 41.18; 538, 39.11]));
+      end CarbonSteel_A106B;
+
+      model AlloySteel_A335P22
+        extends Common.MaterialTable(
+          final materialName="ASME A335-P22",
+          final materialDescription="Alloy steel (2 1/4 Cr - 1 Mo)",
+          final density=7763,
+          final poissonRatio=0.3,
+          tableYoungModulus=Functions.CtoKTable([21, 2.061e11; 93, 2.034e11;
+              149, 1.999e11; 204, 1.972e11; 260, 1.930e11; 316, 1.889e11; 371,
+              1.834e11; 427, 1.772e11; 482, 1.689e11; 538, 1.586e11]),
+          tableUltimateStress=Functions.CtoKTable([21, 4.1412e8]),
+          tableYieldStress=Functions.CtoKTable([21, 2.07e8; 93, 1.92e8; 149,
+              1.87e8; 204, 1.86e8; 260, 1.86e8; 316, 1.86e8; 371, 1.86e8; 427,
+              1.84e8; 482, 1.77e8; 538, 1.63e8]),
+          tableLinearExpansionCoefficient=Functions.CtoKTable([21, 10.93e-6; 93,
+              11.48e-6; 149, 11.88e-6; 204, 12.28e-6; 260, 12.64e-6; 316,
+              13.01e-6; 371, 13.39e-6; 427, 13.77e-6; 482, 14.11e-6; 538,
+              14.35e-6]),
+          tableSpecificHeatCapacity=Functions.CtoKTable([21, 478.2; 93, 494.1;
+              149, 510.4; 204, 526.3; 260, 541.0; 316, 556.9; 371, 581.2; 427,
+              608.8; 482, 665.3; 538, 684.6]),
+          tableThermalConductivity=Functions.CtoKTable([21, 62.30; 93, 60.31;
+              149, 57.45; 204, 54.68; 260, 51.57; 316, 48.97; 371, 46.38; 427,
+              43.96; 482, 41.18; 538, 39.11]));
+      end AlloySteel_A335P22;
+
+      model AlloySteel_A335P12
+        extends Common.MaterialTable(
+          final materialName="ASME A335-P12",
+          final materialDescription="Alloy steel (1 Cr - 1/2 Mo)",
+          final density=7763,
+          final poissonRatio=0.3,
+          tableYoungModulus=Functions.CtoKTable([25, 2.050e11; 100, 2.000e11;
+              150, 1.960e11; 200, 1.930e11; 250, 1.900e11; 300, 1.870e11; 350,
+              1.830e11; 400, 1.790e11; 450, 1.740e11; 475, 1.720e11; 500,
+              1.697e11; 550, 1.648e11]),
+          tableUltimateStress=Functions.CtoKTable([21, 4.1404e8]),
+          tableYieldStress=Functions.CtoKTable([40, 2.07e8; 100, 1.92e8; 150,
+              1.85e8; 200, 1.81e8; 250, 1.79e8; 300, 1.76e8; 350, 1.66e8; 400,
+              1.56e8; 425, 1.55e8; 450, 1.51e8; 475, 1.46e8; 500, 1.43e8; 525,
+              1.39e8]),
+          tableLinearExpansionCoefficient=Functions.CtoKTable([50, 10.49e-6;
+              100, 11.08e-6; 150, 11.63e-6; 200, 12.14e-6; 250, 12.60e-6; 300,
+              13.02e-6; 350, 13.40e-6; 400, 13.74e-6; 425, 13.89e-6; 450,
+              14.02e-6; 500, 14.28e-6; 550, 14.50e-6]),
+          tableSpecificHeatCapacity=Functions.CtoKTable([25, 439.5; 100, 477.2;
+              150, 498.1; 200, 523.3; 250, 540.0; 300, 560.9; 350, 577.5; 400,
+              602.8; 425, 611.2; 450, 627.9; 475, 644.6; 500, 657.2; 550, 690.7]),
+          tableThermalConductivity=Functions.CtoKTable([25, 41.9; 100, 42.2;
+              150, 41.9; 200, 41.4; 250, 40.6; 300, 39.7; 350, 38.5; 400, 37.4;
+              425, 36.7; 450, 36.3; 475, 35.7; 500, 35.0; 550, 34.0]));
+
+      end AlloySteel_A335P12;
+    end Metals;
+
+    package Test "Test cases"
+      model TestMaterial
+        import Modelica.SIunits.*;
+        replaceable Metals.CarbonSteel_A106C Material(npol=3) constrainedby
+          Interfaces.PartialMaterial "Material model";
+        Temp_K T;
+        Temp_C T_C;
+        Stress E;
+      equation
+        T_C = 21 + 500*time;
+        T = Modelica.SIunits.Conversions.from_degC(T_C);
+        Material.T = T;
+        E = Material.yieldStress;
+      end TestMaterial;
+    end Test;
+
+    annotation (Documentation(revisions="<html>
+<ul>
+<li><i>8 June 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Partial restructuring of models.</li>
+<li><i>1 May 2005</i>
+    by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
+       First release.</li>
+</ul>
+</html>", info="<html>
+This package contains models to compute the material properties needed to model heat transfer and thermo-mechanical stresses in objects such as turbine shafts or headers.
+</html>"));
+  end MaterialProperties;
+
+  package HeatExchangerTopologies
+    model CoCurrentFlow "Co-current flow"
+      extends BaseClasses.HeatExchangerTopologyData(
+        final correspondingVolumes = 1:Nw);
+    end CoCurrentFlow;
+
+    model CounterCurrentFlow "Counter-current flow"
+      extends BaseClasses.HeatExchangerTopologyData(
+        final correspondingVolumes=  Nw:-1:1);
+    end CounterCurrentFlow;
+
+    model ShellAndTube "Shell and tube (side1:tubes, side2:shell)"
+      extends BaseClasses.HeatExchangerTopologyData(
+        final correspondingVolumes=correspondingVolumesComputation(Nw, Ntp, inletTubeAtTop, inletShellAtTop));
+      parameter Integer Ntp "Number of passes on the tube side";
+      parameter Boolean inletTubeAtTop
+        "Tube inlet at the top of heat exchanger";
+      parameter Boolean inletShellAtTop
+        "Shell inlet at the top of heat exchanger";
+
+      function correspondingVolumesComputation
+        input Integer Nw "Number of volumes";
+        input Integer Ntp(min = 1, max = 2) "Number of passes tube-side";
+        input Boolean inletTubeAtTop "Tube inlet at the top of heat exchanger";
+        input Boolean inletShellAtTop
+          "Shell inlet at the top of heat exchanger";
+        output Integer correspondingVolumes[Nw];
+
+      protected
+        Integer k;
+        Integer v[Nw],t1[div(Nw,2)],t2[div(Nw,2)];
+
+      algorithm
+        assert(mod(Nw,2) == 0,"Number of volumes must be even");
+        assert(Ntp >= 1, "Number of passes tube-side must be greater than one");
+        // side1 <---> tube
+        // side2 <---> shell
+        k := 1;
+        correspondingVolumes[1] := k;
+        if (inletTubeAtTop and inletShellAtTop) or (inletTubeAtTop == false and inletShellAtTop == false) then
+          for j in 2:(div(Nw,2)) loop
+            if (mod(j,2) == 0) then
+                k := k+3;
+            else
+                k := k+1;
+            end if;
+            correspondingVolumes[j] := k;
+          end for;
+          if mod(div(Nw,2),2) == 0 then
+            k := Nw - 1;
+          else
+            k := Nw;
+          end if;
+          for j in (div(Nw,2))+1:Nw loop
+            correspondingVolumes[j] := k;
+            if (mod(j,2) == 0) then
+                k := k-3;
+            else
+                k := k-1;
+            end if;
+          end for;
+
+        elseif (inletTubeAtTop == false and inletShellAtTop) then
+          for j in 2:(div(Nw,2)) loop
+            if (mod(j,2) == 0) then
+                k := k+3;
+            else
+                k := k+1;
+            end if;
+            correspondingVolumes[j] := k;
+          end for;
+
+          if mod(div(Nw,2),2) == 0 then
+            k := Nw - 1;
+          else
+            k := Nw;
+          end if;
+          for j in (div(Nw,2))+1:Nw loop
+            correspondingVolumes[j] := k;
+            if (mod(j,2) == 0) then
+                k := k-3;
+            else
+                k := k-1;
+            end if;
+          end for;
+          for j in 1:Nw loop
+            v[j] := correspondingVolumes[Nw-j+1];
+          end for;
+          for j in 1:Nw loop
+            correspondingVolumes[j] := v[j];
+          end for;
+
+        elseif (inletTubeAtTop and inletShellAtTop == false) then
+          for j in 2:(div(Nw,2)) loop
+            if (mod(j,2) == 0) then
+                k := k+3;
+            else
+                k := k+1;
+            end if;
+            correspondingVolumes[j] := k;
+          end for;
+          if mod(div(Nw,2),2) == 0 then
+            k := Nw - 1;
+          else
+            k := Nw;
+          end if;
+          for j in (div(Nw,2))+1:Nw loop
+            correspondingVolumes[j] := k;
+            if (mod(j,2) == 0) then
+                k := k-3;
+            else
+                k := k-1;
+            end if;
+          end for;
+          for j in 1:(div(Nw,2)) loop
+            t1[j] := correspondingVolumes[j];
+            t2[j] := correspondingVolumes[j+div(Nw,2)];
+          end for;
+          correspondingVolumes := cat(1,t2,t1);
+
+        else
+          assert(false,"Unsupported topology");
+        end if;
+      end correspondingVolumesComputation;
+
+    end ShellAndTube;
+  end HeatExchangerTopologies;
+
+  package BaseClasses
 
     partial model DistributedHeatTransferFV
-      "Distributed heat transfer model - finite volume"
+      "Base class for distributed heat transfer models - finite volumes"
       extends ThermoPower.Icons.HeatFlow;
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
         "Medium model";
@@ -1340,6 +1509,13 @@ This package contains models to compute the material properties needed to model 
         T[j] = Medium.temperature(fluidState[j]);
       end for;
     end DistributedHeatTransferFV;
+
+    partial model HeatExchangerTopologyData
+      "Base class for heat exchanger topology data"
+      parameter Integer Nw "Number of volumes on both sides";
+      parameter Integer correspondingVolumes[Nw]
+        "Indeces of corresponding volumes";
+    end HeatExchangerTopologyData;
   end BaseClasses;
 
   connector HThtc
@@ -2095,57 +2271,6 @@ This package contains models to compute the material properties needed to model 
 </html>"));
   end ConvHT2N_htc;
 
-  model CounterCurrentFV
-    "Counter-current heat transfer adaptor for 1D heat transfer"
-    extends Icons.HeatFlow;
-    parameter Integer N=5 "Number of Nodes";
-    final parameter Integer Nw = N - 1;
-    parameter Boolean counterCurrent=true
-      "Swap temperature and flux vector order";
-    Thermal.DHTVolumes side1(N=Nw) annotation (Placement(transformation(extent={{-40,20},
-              {40,40}}, rotation=0)));
-    Thermal.DHTVolumes side2(N=Nw) annotation (Placement(transformation(extent={{-40,-42},
-              {40,-20}}, rotation=0)));
-  equation
-    // Swap temperature and flux vector order
-    if counterCurrent then
-      side1.Q = -side2.Q[Nw:-1:1];
-      side1.T = side2.T[Nw:-1:1];
-    else
-      side1.Q = -side2.Q;
-      side1.T = side2.T;
-    end if;
-    annotation (Icon(graphics={
-          Polygon(
-            points={{-74,2},{-48,8},{-74,16},{-56,8},{-74,2}},
-            lineColor={0,0,0},
-            fillColor={0,0,0},
-            fillPattern=FillPattern.Solid),
-          Polygon(
-            points={{74,-16},{60,-10},{74,-2},{52,-10},{74,-16}},
-            lineColor={0,0,0},
-            fillColor={0,0,0},
-            fillPattern=FillPattern.Solid),
-          Text(
-            extent={{-100,-46},{100,-70}},
-            lineColor={191,95,0},
-            textString="%name")}), Documentation(info="<HTML>
-<p>This component can be used to model counter-current heat transfer. The temperature and flux vectors on one side are swapped with respect to the other side. This means that the temperature of node <tt>j</tt> on side 1 is equal to the temperature of note <tt>N-j+1</tt> on side 2; heat fluxes behave correspondingly.
-<p>
-The swapping is performed if the counterCurrent parameter is true (default value).
-</HTML>", revisions="<html>
-<ul>
-<li><i>25 Aug 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       <tt>counterCurrent</tt> parameter added.</li>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-
-</html>
-"));
-  end CounterCurrentFV;
 
   model CounterCurrent
     "Counter-current heat transfer adaptor for 1D heat transfer"
@@ -2489,134 +2614,9 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 "),   Diagram(graphics));
   end HeatFlowDistribution;
 
-  model ParallelFlow
-    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = 1:Nw);
-  end ParallelFlow;
-
-  model CounterFlow
-    extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2=  Nw:-1:1);
-  end CounterFlow;
 
 
-  model ShellAndTube
-   extends BaseClasses.HeatExchangerTopology(final correspondingVolumesSide2 = corrVolumesST(Nw,Ntp,inletTubeAtTop,inletShellAtTop));
-   parameter Integer Nw "Number of volumes";
-   parameter Integer Ntp "Number of passes tube-side";
-   parameter Boolean inletTubeAtTop "Tube inlet at the top of heat exchanger";
-   parameter Boolean inletShellAtTop "Shell inlet at the top of heat exchanger";
-  end ShellAndTube;
 
-  function corrVolumesST
-  input Integer Nw "Number of volumes";
-  input Integer Ntp(min = 1, max = 2) "Number of passes tube-side";
-  input Boolean inletTubeAtTop "Tube inlet at the top of heat exchanger";
-  input Boolean inletShellAtTop "Shell inlet at the top of heat exchanger";
-  output Integer correspondingVolumesSide2[Nw];
-
-  protected
-    Integer k;
-    Integer v[Nw],t1[div(Nw,2)],t2[div(Nw,2)];
-
-  algorithm
-    // side1 <---> tube
-    // side2 <---> shell
-    k := 1;
-    correspondingVolumesSide2[1] := k;
-    if (inletTubeAtTop and inletShellAtTop) or (inletTubeAtTop == false and inletShellAtTop == false) then
-      for j in 2:(div(Nw,2)) loop
-        if (mod(j,2) == 0) then
-            k := k+3;
-        else
-            k := k+1;
-        end if;
-        correspondingVolumesSide2[j] := k;
-      end for;
-
-      if mod(div(Nw,2),2) == 0 then
-        k := Nw - 1;
-      else
-        k := Nw;
-      end if;
-
-      for j in (div(Nw,2))+1:Nw loop
-        correspondingVolumesSide2[j] := k;
-        if (mod(j,2) == 0) then
-            k := k-3;
-        else
-            k := k-1;
-        end if;
-      end for;
-    elseif (inletTubeAtTop == false and inletShellAtTop) then
-      for j in 2:(div(Nw,2)) loop
-        if (mod(j,2) == 0) then
-            k := k+3;
-        else
-            k := k+1;
-        end if;
-        correspondingVolumesSide2[j] := k;
-      end for;
-
-      if mod(div(Nw,2),2) == 0 then
-        k := Nw - 1;
-      else
-        k := Nw;
-      end if;
-
-      for j in (div(Nw,2))+1:Nw loop
-        correspondingVolumesSide2[j] := k;
-        if (mod(j,2) == 0) then
-            k := k-3;
-        else
-            k := k-1;
-        end if;
-      end for;
-
-      for j in 1:Nw loop
-        v[j] := correspondingVolumesSide2[Nw-j+1];
-      end for;
-      for j in 1:Nw loop
-       correspondingVolumesSide2[j] := v[j];
-      end for;
-
-    elseif (inletTubeAtTop and inletShellAtTop == false) then
-      for j in 2:(div(Nw,2)) loop
-        if (mod(j,2) == 0) then
-            k := k+3;
-        else
-            k := k+1;
-        end if;
-        correspondingVolumesSide2[j] := k;
-      end for;
-
-      if mod(div(Nw,2),2) == 0 then
-        k := Nw - 1;
-      else
-        k := Nw;
-      end if;
-
-      for j in (div(Nw,2))+1:Nw loop
-        correspondingVolumesSide2[j] := k;
-        if (mod(j,2) == 0) then
-            k := k-3;
-        else
-            k := k-1;
-        end if;
-      end for;
-
-      for j in 1:(div(Nw,2)) loop
-        t1[j] := correspondingVolumesSide2[j];
-        t2[j] := correspondingVolumesSide2[j+div(Nw,2)];
-      end for;
-      correspondingVolumesSide2 := cat(1,t2,t1);
-
-    else
-      assert(false,"Unsupported topology");
-    end if;
-
-    assert(mod(Nw,2) == 0,"Number of volumes must be even");
-    assert(Ntp >= 1, "Number of passes tube-side must be greater than one");
-
-  end corrVolumesST;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components related to heat transfer phenomena.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
