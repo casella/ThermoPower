@@ -1357,132 +1357,138 @@ Casella</a>:<br>
   package HRB "Heat recovery boiler models"
     extends Modelica.Icons.Library;
 
-    model HeatExchanger "Base class for heat exchanger fluid - gas"
-      constant Real pi=Modelica.Constants.pi;
-      replaceable package GasMedium =
-          Modelica.Media.IdealGases.MixtureGases.CombustionAir constrainedby
-        Modelica.Media.Interfaces.PartialMedium;
-      replaceable package WaterMedium = Water.StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialMedium;
-      parameter Boolean StaticGasBalances=true;
-      parameter Integer Nr=2 "Number of tube rows";
-      parameter Integer Nt=2 "Number of parallel tubes in each row";
-      parameter Length Lt "Length of a tube in a row";
-      parameter Length Dint "Internal diameter of each tube";
-      parameter Length Dext "External diameter of each tube";
-      parameter Density rhom "Density of the tube metal walls";
-      parameter SpecificHeatCapacity cm
-        "Specific heat capacity of the tube metal walls";
-      parameter Area Sb "Cross-section of the boiler";
-      parameter Length Lb "Length of the boiler";
-      parameter Area St=Dext*pi*Lt*Nt*Nr
-        "Total area of the heat exchange surface";
-      parameter CoefficientOfHeatTransfer gamma_nom=150
-        "Nominal heat transfer coefficient";
+    package Models
+      extends Modelica.Icons.Library;
+      model HeatExchanger "Base class for heat exchanger fluid - gas"
+        constant Real pi=Modelica.Constants.pi;
+        replaceable package GasMedium =
+            Modelica.Media.IdealGases.MixtureGases.CombustionAir constrainedby
+          Modelica.Media.Interfaces.PartialMedium;
+        replaceable package WaterMedium = Water.StandardWater constrainedby
+          Modelica.Media.Interfaces.PartialMedium;
+        parameter Boolean StaticGasBalances=true;
+        parameter Integer Nr=2 "Number of tube rows";
+        parameter Integer Nt=2 "Number of parallel tubes in each row";
+        parameter Length Lt "Length of a tube in a row";
+        parameter Length Dint "Internal diameter of each tube";
+        parameter Length Dext "External diameter of each tube";
+        parameter Density rhom "Density of the tube metal walls";
+        parameter SpecificHeatCapacity cm
+          "Specific heat capacity of the tube metal walls";
+        parameter Area Sb "Cross-section of the boiler";
+        parameter Length Lb "Length of the boiler";
+        parameter Area St=Dext*pi*Lt*Nt*Nr
+          "Total area of the heat exchange surface";
+        parameter CoefficientOfHeatTransfer gamma_nom=150
+          "Nominal heat transfer coefficient";
 
-      Gas.FlangeA gasIn(redeclare package Medium = GasMedium) annotation (
-          Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-      Gas.FlangeB gasOut(redeclare package Medium = GasMedium) annotation (
-          Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-      Water.FlangeA waterIn(redeclare package Medium = WaterMedium) annotation (
-         Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
-      Water.FlangeB waterOut(redeclare package Medium = WaterMedium)
-        annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
-              rotation=0)));
-      replaceable Water.Flow1DDB WaterSide(
-        redeclare package Medium = WaterMedium,
-        Nt=Nt,
-        A=pi*Dint^2/4,
-        omega=pi*Dint,
-        Dhyd=Dint,
-        wnom=20,
-        Cfnom=0.005,
-        L=Lt*Nr,
-        N=Nr + 1,
-        hstartin=1e5,
-        hstartout=2.7e5,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        dpnom=1000) constrainedby Water.Flow1D annotation (Placement(
-            transformation(extent={{-10,-60},{10,-40}}, rotation=0)));
-      Thermal.ConvHT_htc WaterMetalHT(N=Nr + 1) annotation (Placement(
-            transformation(extent={{-10,-18},{10,-38}}, rotation=0)));
-      Thermal.MetalTube TubeWalls(
-        rint=Dint/2,
-        rext=Dext/2,
-        rhomcm=rhom*cm,
-        lambda=20,
-        L=Lt*Nr,
-        N=Nr + 1,
-        Tstart1=300,
-        TstartN=340,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) "Tube"
-        annotation (Placement(transformation(extent={{-10,0},{10,-20}},
-              rotation=0)));
-      Flow1DGashtc GasSide(
-        redeclare package Medium = GasMedium,
-        L=Lb,
-        omega=St/Lb,
-        wnom=10,
-        gamma_nom(start=gamma_nom) = gamma_nom,
-        A=Sb,
-        Dhyd=St/Lb,
-        N=Nr + 1,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
-        QuasiStatic=StaticGasBalances,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        kw=0.6,
-        Tstartin=670,
-        Tstartout=370) annotation (Placement(transformation(extent={{-10,60},{
-                10,40}}, rotation=0)));
-      Thermal.CounterCurrent CounterCurrent1(N=Nr + 1) annotation (Placement(
-            transformation(extent={{-10,2},{10,22}}, rotation=0)));
-      Thermal.ConvHT_htc ConvHT_htc1(N=Nr + 1) annotation (Placement(
-            transformation(extent={{-10,20},{10,40}}, rotation=0)));
-    equation
-      connect(WaterMetalHT.fluidside, WaterSide.wall)
-        annotation (Line(points={{0,-31},{0,-45}}, color={0,0,255}));
-      connect(TubeWalls.int, WaterMetalHT.otherside)
-        annotation (Line(points={{0,-13},{0,-25}}, color={255,127,0}));
-      connect(CounterCurrent1.side2, TubeWalls.ext)
-        annotation (Line(points={{0,8.9},{0,-6.9}}, color={255,127,0}));
-      connect(CounterCurrent1.side1, ConvHT_htc1.otherside)
-        annotation (Line(points={{0,15},{0,27}}, color={255,127,0}));
-      connect(ConvHT_htc1.fluidside, GasSide.wall)
-        annotation (Line(points={{0,33},{0,45}}, color={0,0,255}));
-      connect(GasSide.infl, gasIn) annotation (Line(
-          points={{-10,50},{-60,50},{-60,0},{-100,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(GasSide.outfl, gasOut) annotation (Line(
-          points={{10,50},{60,50},{60,0},{100,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(WaterSide.outfl, waterOut) annotation (Line(
-          points={{10,-50},{40,-50},{40,-70},{0,-70},{0,-100}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(WaterSide.infl, waterIn) annotation (Line(
-          points={{-10,-50},{-40,-50},{-40,70},{0,70},{0,100}},
-          thickness=0.5,
-          color={0,0,255}));
-      annotation (
-        Diagram(graphics),
-        Icon(graphics={
-            Rectangle(
-              extent={{-100,100},{100,-100}},
-              lineColor={0,0,255},
-              fillColor={230,230,230},
-              fillPattern=FillPattern.Solid),
-            Line(
-              points={{0,-80},{0,-40},{40,-20},{-40,20},{0,40},{0,80}},
-              color={0,0,255},
-              thickness=0.5),
-            Text(
-              extent={{-100,-115},{100,-145}},
-              lineColor={85,170,255},
-              textString="%name")}),
-        Documentation(revisions="<html>
+        Gas.FlangeA gasIn(redeclare package Medium = GasMedium) annotation (
+            Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+        Gas.FlangeB gasOut(redeclare package Medium = GasMedium) annotation (
+            Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+        Water.FlangeA waterIn(redeclare package Medium = WaterMedium) annotation (
+           Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
+        Water.FlangeB waterOut(redeclare package Medium = WaterMedium)
+          annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
+                rotation=0)));
+        Water.Flow1DFV WaterSide(
+          redeclare package Medium = WaterMedium,
+          Nt=Nt,
+          A=pi*Dint^2/4,
+          omega=pi*Dint,
+          Dhyd=Dint,
+          wnom=20,
+          Cfnom=0.005,
+          L=Lt*Nr,
+          N=Nr + 1,
+          hstartin=1e5,
+          hstartout=2.7e5,
+          initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+          redeclare ThermoPower.Thermal.HeatTransfer.DittusBoelter heatTransfer,
+          dpnom=1000) annotation (Placement(
+              transformation(extent={{-20,-70},{20,-30}}, rotation=0)));
+        Thermal.MetalTubeFV
+                          TubeWalls(
+          rint=Dint/2,
+          rext=Dext/2,
+          rhomcm=rhom*cm,
+          lambda=20,
+          L=Lt*Nr,
+          initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          Nw=Nr,
+          Tstart1=300,
+          TstartN=340) "Tube"
+          annotation (Placement(transformation(extent={{-20,0},{20,-40}},
+                rotation=0)));
+        Gas.Flow1DFV GasSide(
+          redeclare package Medium = GasMedium,
+          L=Lb,
+          omega=St/Lb,
+          wnom=10,
+          A=Sb,
+          Dhyd=St/Lb,
+          N=Nr + 1,
+          FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+          QuasiStatic=StaticGasBalances,
+          initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          Tstartin=670,
+          Tstartout=370,
+          redeclare
+            ThermoPower.Thermal.HeatTransfer.FlowDependentHeatTransferCoefficient
+            heatTransfer(gamma_nom=gamma_nom, alpha=0.6))
+                         annotation (Placement(transformation(extent={{-20,60},{20,20}},
+                           rotation=0)));
+        Thermal.CounterCurrentFV
+                               CounterCurrent1(Nw=Nr)    annotation (Placement(
+              transformation(extent={{-20,-8},{20,32}},rotation=0)));
+      equation
+        connect(CounterCurrent1.side2, TubeWalls.ext)
+          annotation (Line(points={{0,5.8},{0,5.8},{0,-13.8}},
+                                                      color={255,127,0}));
+        connect(GasSide.infl, gasIn) annotation (Line(
+            points={{-20,40},{-60,40},{-60,0},{-100,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(GasSide.outfl, gasOut) annotation (Line(
+            points={{20,40},{60,40},{60,0},{100,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(WaterSide.outfl, waterOut) annotation (Line(
+            points={{20,-50},{40,-50},{40,-70},{0,-70},{0,-100}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(WaterSide.infl, waterIn) annotation (Line(
+            points={{-20,-50},{-40,-50},{-40,70},{0,70},{0,100}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(GasSide.wall, CounterCurrent1.side1) annotation (Line(
+            points={{0,30},{0,18}},
+            color={255,127,0},
+            smooth=Smooth.None));
+        connect(TubeWalls.int, WaterSide.wall) annotation (Line(
+            points={{0,-26},{0,-40}},
+            color={255,127,0},
+            smooth=Smooth.None));
+        annotation (
+          Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                  100}}),
+                  graphics),
+          Icon(graphics={
+              Rectangle(
+                extent={{-100,100},{100,-100}},
+                lineColor={0,0,255},
+                fillColor={230,230,230},
+                fillPattern=FillPattern.Solid),
+              Line(
+                points={{0,-80},{0,-40},{40,-20},{-40,20},{0,40},{0,80}},
+                color={0,0,255},
+                thickness=0.5),
+              Text(
+                extent={{-100,-115},{100,-145}},
+                lineColor={85,170,255},
+                textString="%name")}),
+          Documentation(revisions="<html>
 <ul>
 <li><i>12 Dec 2008</i>
     by <a>Luca Savoldelli</a>:<br>
@@ -1492,7 +1498,7 @@ Casella</a>:<br>
 Casella</a>:<br>
     First release.</li>
 </ul>
-</html>", info="<html>
+</html>",   info="<html>
 This is the model of a very simple heat exchanger. The modelling assumptions are as follows:
 <ul>
 <li> The boiler contains <tt>Nr</tt> rows of tubes, connected in series; each one is made of <tt>Nt</tt> identical tubes in parallel. 
@@ -1507,193 +1513,194 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
 <li>The external heat transfer coefficient is computed according to the simple law declared <tt>Flow1DGasHT</tt>. To change that correlation, it is only necessary to change equations in that model.
 </ul>
 </html>"));
-    end HeatExchanger;
+      end HeatExchanger;
 
-    model HRBPlant "Simple plant model with HRB"
-      replaceable package GasMedium =
-          Modelica.Media.IdealGases.MixtureGases.CombustionAir constrainedby
-        Modelica.Media.Interfaces.PartialMedium;
-      replaceable package WaterMedium = Modelica.Media.Water.WaterIF97_ph
-        constrainedby Modelica.Media.Interfaces.PartialMedium;
-      parameter Time Ts=4 "Temperature sensor time constant";
-      HeatExchanger Boiler(
-        redeclare package GasMedium = GasMedium,
-        Nr=10,
-        Nt=100,
-        Lt=3,
-        Dint=0.01,
-        Dext=0.012,
-        rhom=7800,
-        cm=650,
-        Sb=8,
-        Lb=2,
-        redeclare package WaterMedium = WaterMedium,
-        StaticGasBalances=false) annotation (Placement(transformation(extent={{
-                -20,-20},{20,20}}, rotation=0)));
-      Water.ValveLin Valve(Kv=20/4e5, redeclare package Medium = WaterMedium)
-        annotation (Placement(transformation(extent={{36,-50},{56,-70}},
-              rotation=0)));
-      Water.SinkPressure
-                  SinkP1(redeclare package Medium = WaterMedium, p0=100000)
-        annotation (Placement(transformation(extent={{70,-70},{90,-50}},
-              rotation=0)));
-      Gas.SourceMassFlow
-                  SourceW2(
-        redeclare package Medium = GasMedium,
-        w0=10,
-        p0=100000,
-        T=670,
-        use_in_w0=true)
-               annotation (Placement(transformation(extent={{-96,-10},{-76,10}},
-              rotation=0)));
-      Gas.SinkPressure
-                SinkP2(redeclare package Medium = GasMedium, T=300) annotation (
-         Placement(transformation(extent={{100,-10},{120,10}}, rotation=0)));
-      Gas.PressDropLin PressDropLin1(redeclare package Medium = GasMedium, R=
-            1000/10) annotation (Placement(transformation(extent={{60,-10},{80,
-                10}}, rotation=0)));
-      Water.SensT WaterIn(redeclare package Medium = WaterMedium) annotation (
-          Placement(transformation(extent={{-40,44},{-20,64}}, rotation=0)));
-      Water.SensT WaterOut(redeclare package Medium = WaterMedium) annotation (
-          Placement(transformation(extent={{6,-66},{26,-46}}, rotation=0)));
-      Gas.SensT GasOut(redeclare package Medium = GasMedium) annotation (
-          Placement(transformation(extent={{30,-6},{50,14}}, rotation=0)));
-      Gas.SensT GasIn(redeclare package Medium = GasMedium) annotation (
-          Placement(transformation(extent={{-60,-6},{-40,14}}, rotation=0)));
-      Water.SourcePressure
-                    SourceP1(redeclare package Medium = WaterMedium, p0=500000)
-        annotation (Placement(transformation(extent={{-80,40},{-60,60}},
-              rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput ValveOpening annotation (Placement(
-            transformation(extent={{-170,-90},{-150,-70}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealOutput WaterOut_T annotation (Placement(
-            transformation(extent={{160,-50},{180,-30}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealOutput WaterIn_T annotation (Placement(
-            transformation(extent={{160,-110},{180,-90}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealOutput GasOut_T annotation (Placement(
-            transformation(extent={{160,90},{180,110}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealOutput GasIn_T annotation (Placement(
-            transformation(extent={{160,30},{180,50}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput GasFlowRate annotation (Placement(
-            transformation(extent={{-170,70},{-150,90}}, rotation=0)));
-      Modelica.Blocks.Continuous.FirstOrder GasFlowActuator(
-        k=1,
-        T=1,
-        y_start=5,
-        initType=Modelica.Blocks.Types.Init.SteadyState) annotation (Placement(
-            transformation(extent={{-130,70},{-110,90}}, rotation=0)));
-      Modelica.Blocks.Continuous.FirstOrder WaterInTSensor(
-        k=1,
-        T=Ts,
-        initType=Modelica.Blocks.Types.Init.SteadyState,
-        y_start=296) annotation (Placement(transformation(extent={{120,-110},{
-                140,-90}}, rotation=0)));
-      Modelica.Blocks.Continuous.FirstOrder WaterOutTSensor(
-        k=1,
-        T=Ts,
-        initType=Modelica.Blocks.Types.Init.SteadyState,
-        y_start=330) annotation (Placement(transformation(extent={{120,-50},{
-                140,-30}}, rotation=0)));
-      Modelica.Blocks.Continuous.FirstOrder GasInTSensor(
-        k=1,
-        T=Ts,
-        initType=Modelica.Blocks.Types.Init.SteadyState,
-        y_start=670) annotation (Placement(transformation(extent={{120,30},{140,
-                50}}, rotation=0)));
-      Modelica.Blocks.Continuous.FirstOrder GasOutTSensor(
-        k=1,
-        T=Ts,
-        initType=Modelica.Blocks.Types.Init.SteadyState,
-        y_start=350) annotation (Placement(transformation(extent={{120,90},{140,
-                110}}, rotation=0)));
-      Modelica.Blocks.Continuous.FirstOrder ValveOpeningActuator(
-        k=1,
-        T=1,
-        initType=Modelica.Blocks.Types.Init.SteadyState,
-        y_start=1) annotation (Placement(transformation(extent={{-130,-90},{-110,
-                -70}}, rotation=0)));
-      inner System system(allowFlowReversal=false)
-        annotation (Placement(transformation(extent={{140,140},{160,160}})));
-    equation
-      connect(GasFlowActuator.y, SourceW2.in_w0) annotation (Line(points={{-109,
-              80},{-92,80},{-92,5}}, color={0,0,127}));
-      connect(GasInTSensor.u, GasIn.T) annotation (Line(points={{118,40},{-32,
-              40},{-32,10},{-43,10}}, color={0,0,127}));
-      connect(GasOut.T, GasOutTSensor.u) annotation (Line(points={{47,10},{60,
-              10},{60,100},{118,100}}, color={0,0,127}));
-      connect(GasOutTSensor.y, GasOut_T)
-        annotation (Line(points={{141,100},{170,100}}, color={0,0,127}));
-      connect(WaterIn.T, WaterInTSensor.u) annotation (Line(points={{-22,60},{
-              94,60},{94,-100},{118,-100}}, color={0,0,127}));
-      connect(WaterOut.T, WaterOutTSensor.u) annotation (Line(points={{24,-50},
-              {24,-40},{118,-40}}, color={0,0,127}));
-      connect(WaterOutTSensor.y, WaterOut_T)
-        annotation (Line(points={{141,-40},{170,-40}}, color={0,0,127}));
-      connect(GasInTSensor.y, GasIn_T)
-        annotation (Line(points={{141,40},{170,40}}, color={0,0,127}));
-      connect(Valve.cmd, ValveOpeningActuator.y) annotation (Line(points={{46,-68},
-              {46,-80},{-109,-80}}, color={0,0,127}));
-      connect(WaterInTSensor.y, WaterIn_T)
-        annotation (Line(points={{141,-100},{170,-100}}, color={0,0,127}));
-    initial equation
-      der(GasFlowActuator.y) = 0;
-      der(GasInTSensor.y) = 0;
-      der(GasOutTSensor.y) = 0;
-      der(ValveOpeningActuator.y) = 0;
-      der(WaterInTSensor.y) = 0;
-      der(WaterOutTSensor.y) = 0;
+      model HRBPlant "Simple plant model with HRB"
+        replaceable package GasMedium =
+            Modelica.Media.IdealGases.MixtureGases.CombustionAir constrainedby
+          Modelica.Media.Interfaces.PartialMedium;
+        replaceable package WaterMedium = Modelica.Media.Water.WaterIF97_ph
+          constrainedby Modelica.Media.Interfaces.PartialMedium;
+        parameter Time Ts=4 "Temperature sensor time constant";
+        Models.HeatExchanger
+                      Boiler(
+          redeclare package GasMedium = GasMedium,
+          Nr=10,
+          Nt=100,
+          Lt=3,
+          Dint=0.01,
+          Dext=0.012,
+          rhom=7800,
+          cm=650,
+          Sb=8,
+          Lb=2,
+          redeclare package WaterMedium = WaterMedium,
+          StaticGasBalances=false) annotation (Placement(transformation(extent={{
+                  -20,-20},{20,20}}, rotation=0)));
+        Water.ValveLin Valve(Kv=20/4e5, redeclare package Medium = WaterMedium)
+          annotation (Placement(transformation(extent={{36,-50},{56,-70}},
+                rotation=0)));
+        Water.SinkPressure
+                    SinkP1(redeclare package Medium = WaterMedium, p0=100000)
+          annotation (Placement(transformation(extent={{70,-70},{90,-50}},
+                rotation=0)));
+        Gas.SourceMassFlow
+                    SourceW2(
+          redeclare package Medium = GasMedium,
+          w0=10,
+          p0=100000,
+          T=670,
+          use_in_w0=true)
+                 annotation (Placement(transformation(extent={{-96,-10},{-76,10}},
+                rotation=0)));
+        Gas.SinkPressure
+                  SinkP2(redeclare package Medium = GasMedium, T=300) annotation (
+           Placement(transformation(extent={{100,-10},{120,10}}, rotation=0)));
+        Gas.PressDropLin PressDropLin1(redeclare package Medium = GasMedium, R=
+              1000/10) annotation (Placement(transformation(extent={{60,-10},{80,
+                  10}}, rotation=0)));
+        Water.SensT WaterIn(redeclare package Medium = WaterMedium) annotation (
+            Placement(transformation(extent={{-40,44},{-20,64}}, rotation=0)));
+        Water.SensT WaterOut(redeclare package Medium = WaterMedium) annotation (
+            Placement(transformation(extent={{6,-66},{26,-46}}, rotation=0)));
+        Gas.SensT GasOut(redeclare package Medium = GasMedium) annotation (
+            Placement(transformation(extent={{30,-6},{50,14}}, rotation=0)));
+        Gas.SensT GasIn(redeclare package Medium = GasMedium) annotation (
+            Placement(transformation(extent={{-60,-6},{-40,14}}, rotation=0)));
+        Water.SourcePressure
+                      SourceP1(redeclare package Medium = WaterMedium, p0=500000)
+          annotation (Placement(transformation(extent={{-80,40},{-60,60}},
+                rotation=0)));
+        Modelica.Blocks.Interfaces.RealInput ValveOpening annotation (Placement(
+              transformation(extent={{-170,-90},{-150,-70}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealOutput WaterOut_T annotation (Placement(
+              transformation(extent={{160,-50},{180,-30}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealOutput WaterIn_T annotation (Placement(
+              transformation(extent={{160,-110},{180,-90}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealOutput GasOut_T annotation (Placement(
+              transformation(extent={{160,90},{180,110}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealOutput GasIn_T annotation (Placement(
+              transformation(extent={{160,30},{180,50}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealInput GasFlowRate annotation (Placement(
+              transformation(extent={{-170,70},{-150,90}}, rotation=0)));
+        Modelica.Blocks.Continuous.FirstOrder GasFlowActuator(
+          k=1,
+          T=1,
+          y_start=5,
+          initType=Modelica.Blocks.Types.Init.SteadyState) annotation (Placement(
+              transformation(extent={{-130,70},{-110,90}}, rotation=0)));
+        Modelica.Blocks.Continuous.FirstOrder WaterInTSensor(
+          k=1,
+          T=Ts,
+          initType=Modelica.Blocks.Types.Init.SteadyState,
+          y_start=296) annotation (Placement(transformation(extent={{120,-110},{
+                  140,-90}}, rotation=0)));
+        Modelica.Blocks.Continuous.FirstOrder WaterOutTSensor(
+          k=1,
+          T=Ts,
+          initType=Modelica.Blocks.Types.Init.SteadyState,
+          y_start=330) annotation (Placement(transformation(extent={{120,-50},{
+                  140,-30}}, rotation=0)));
+        Modelica.Blocks.Continuous.FirstOrder GasInTSensor(
+          k=1,
+          T=Ts,
+          initType=Modelica.Blocks.Types.Init.SteadyState,
+          y_start=670) annotation (Placement(transformation(extent={{120,30},{140,
+                  50}}, rotation=0)));
+        Modelica.Blocks.Continuous.FirstOrder GasOutTSensor(
+          k=1,
+          T=Ts,
+          initType=Modelica.Blocks.Types.Init.SteadyState,
+          y_start=350) annotation (Placement(transformation(extent={{120,90},{140,
+                  110}}, rotation=0)));
+        Modelica.Blocks.Continuous.FirstOrder ValveOpeningActuator(
+          k=1,
+          T=1,
+          initType=Modelica.Blocks.Types.Init.SteadyState,
+          y_start=1) annotation (Placement(transformation(extent={{-130,-90},{-110,
+                  -70}}, rotation=0)));
+        inner System system(allowFlowReversal=false)
+          annotation (Placement(transformation(extent={{140,140},{160,160}})));
+      equation
+        connect(GasFlowActuator.y, SourceW2.in_w0) annotation (Line(points={{-109,
+                80},{-92,80},{-92,5}}, color={0,0,127}));
+        connect(GasInTSensor.u, GasIn.T) annotation (Line(points={{118,40},{-32,
+                40},{-32,10},{-43,10}}, color={0,0,127}));
+        connect(GasOut.T, GasOutTSensor.u) annotation (Line(points={{47,10},{60,
+                10},{60,100},{118,100}}, color={0,0,127}));
+        connect(GasOutTSensor.y, GasOut_T)
+          annotation (Line(points={{141,100},{170,100}}, color={0,0,127}));
+        connect(WaterIn.T, WaterInTSensor.u) annotation (Line(points={{-22,60},{
+                94,60},{94,-100},{118,-100}}, color={0,0,127}));
+        connect(WaterOut.T, WaterOutTSensor.u) annotation (Line(points={{24,-50},
+                {24,-40},{118,-40}}, color={0,0,127}));
+        connect(WaterOutTSensor.y, WaterOut_T)
+          annotation (Line(points={{141,-40},{170,-40}}, color={0,0,127}));
+        connect(GasInTSensor.y, GasIn_T)
+          annotation (Line(points={{141,40},{170,40}}, color={0,0,127}));
+        connect(Valve.cmd, ValveOpeningActuator.y) annotation (Line(points={{46,-68},
+                {46,-80},{-109,-80}}, color={0,0,127}));
+        connect(WaterInTSensor.y, WaterIn_T)
+          annotation (Line(points={{141,-100},{170,-100}}, color={0,0,127}));
+      initial equation
+        der(GasFlowActuator.y) = 0;
+        der(GasInTSensor.y) = 0;
+        der(GasOutTSensor.y) = 0;
+        der(ValveOpeningActuator.y) = 0;
+        der(WaterInTSensor.y) = 0;
+        der(WaterOutTSensor.y) = 0;
 
-    equation
-      connect(WaterOut.inlet, Boiler.waterOut) annotation (Line(
-          points={{10,-60},{0,-60},{0,-20}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(Boiler.gasIn, GasIn.outlet) annotation (Line(
-          points={{-20,0},{-44,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(GasOut.inlet, Boiler.gasOut) annotation (Line(
-          points={{34,0},{20,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(Boiler.waterIn, WaterIn.outlet) annotation (Line(
-          points={{0,20},{0,50},{-24,50}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(SourceP1.flange, WaterIn.inlet) annotation (Line(
-          points={{-60,50},{-36,50}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(WaterOut.outlet, Valve.inlet) annotation (Line(
-          points={{22,-60},{36,-60}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(Valve.outlet, SinkP1.flange) annotation (Line(
-          points={{56,-60},{70,-60}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(PressDropLin1.outlet, SinkP2.flange) annotation (Line(
-          points={{80,0},{100,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(GasOut.outlet, PressDropLin1.inlet) annotation (Line(
-          points={{46,0},{60,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(SourceW2.flange, GasIn.inlet) annotation (Line(
-          points={{-76,0},{-56,0}},
-          color={159,159,223},
-          thickness=0.5));
-      connect(GasFlowActuator.u, GasFlowRate)
-        annotation (Line(points={{-132,80},{-160,80}}, color={0,0,127}));
-      connect(ValveOpeningActuator.u, ValveOpening)
-        annotation (Line(points={{-132,-80},{-160,-80}}, color={0,0,127}));
-      annotation (
-        Diagram(coordinateSystem(
-            preserveAspectRatio=true,
-            extent={{-160,-160},{160,160}},
-            initialScale=0.1), graphics),
-        Documentation(revisions="<html>
+      equation
+        connect(WaterOut.inlet, Boiler.waterOut) annotation (Line(
+            points={{10,-60},{0,-60},{0,-20}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(Boiler.gasIn, GasIn.outlet) annotation (Line(
+            points={{-20,0},{-44,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(GasOut.inlet, Boiler.gasOut) annotation (Line(
+            points={{34,0},{20,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(Boiler.waterIn, WaterIn.outlet) annotation (Line(
+            points={{0,20},{0,50},{-24,50}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(SourceP1.flange, WaterIn.inlet) annotation (Line(
+            points={{-60,50},{-36,50}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(WaterOut.outlet, Valve.inlet) annotation (Line(
+            points={{22,-60},{36,-60}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(Valve.outlet, SinkP1.flange) annotation (Line(
+            points={{56,-60},{70,-60}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(PressDropLin1.outlet, SinkP2.flange) annotation (Line(
+            points={{80,0},{100,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(GasOut.outlet, PressDropLin1.inlet) annotation (Line(
+            points={{46,0},{60,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(SourceW2.flange, GasIn.inlet) annotation (Line(
+            points={{-76,0},{-56,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(GasFlowActuator.u, GasFlowRate)
+          annotation (Line(points={{-132,80},{-160,80}}, color={0,0,127}));
+        connect(ValveOpeningActuator.u, ValveOpening)
+          annotation (Line(points={{-132,-80},{-160,-80}}, color={0,0,127}));
+        annotation (
+          Diagram(coordinateSystem(
+              preserveAspectRatio=true,
+              extent={{-160,-160},{160,160}},
+              initialScale=0.1), graphics),
+          Documentation(revisions="<html>
 <ul>
 <li><i>20 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
@@ -1701,223 +1708,207 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-", info="<html>
+",     info=
+          "<html>
 Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model.
-</html>"),
-        experiment(
-          StopTime=1200,
-          NumberOfIntervals=1000,
-          Tolerance=1e-007),
-        Icon(coordinateSystem(
-            preserveAspectRatio=false,
-            extent={{-160,-160},{160,160}},
-            initialScale=0.1), graphics={
-            Rectangle(
-              extent={{-160,160},{160,-160}},
-              lineColor={0,0,255},
-              fillColor={255,255,255},
-              fillPattern=FillPattern.Solid),
-            Text(
-              extent={{-100,100},{100,-100}},
-              lineColor={0,0,255},
-              lineThickness=0.5,
-              textString="P"),
-            Text(
-              extent={{112,50},{142,30}},
-              lineColor={0,0,255},
-              lineThickness=0.5,
-              textString="TGin"),
-            Text(
-              extent={{112,110},{150,88}},
-              lineColor={0,0,255},
-              lineThickness=0.5,
-              textString="TGout"),
-            Text(
-              extent={{110,-90},{140,-110}},
-              lineColor={0,0,255},
-              lineThickness=0.5,
-              textString="TWin"),
-            Text(
-              extent={{110,-30},{148,-52}},
-              lineColor={0,0,255},
-              lineThickness=0.5,
-              textString="TWout")}));
-    end HRBPlant;
+</html>"),experiment(
+            StopTime=1200,
+            NumberOfIntervals=1000,
+            Tolerance=1e-007),
+          Icon(coordinateSystem(
+              preserveAspectRatio=false,
+              extent={{-160,-160},{160,160}},
+              initialScale=0.1), graphics={
+              Rectangle(
+                extent={{-160,160},{160,-160}},
+                lineColor={0,0,255},
+                fillColor={255,255,255},
+                fillPattern=FillPattern.Solid),
+              Text(
+                extent={{-100,100},{100,-100}},
+                lineColor={0,0,255},
+                lineThickness=0.5,
+                textString="P"),
+              Text(
+                extent={{112,50},{142,30}},
+                lineColor={0,0,255},
+                lineThickness=0.5,
+                textString="TGin"),
+              Text(
+                extent={{112,110},{150,88}},
+                lineColor={0,0,255},
+                lineThickness=0.5,
+                textString="TGout"),
+              Text(
+                extent={{110,-90},{140,-110}},
+                lineColor={0,0,255},
+                lineThickness=0.5,
+                textString="TWin"),
+              Text(
+                extent={{110,-30},{148,-52}},
+                lineColor={0,0,255},
+                lineThickness=0.5,
+                textString="TWout")}));
+      end HRBPlant;
 
-    model Flow1DGashtc "Gas flow model with h.t.c. computation"
-      extends Gas.Flow1D(redeclare ThermoPower.Thermal.DHThtc wall);
-      parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_nom
-        "Nominal h.t.c. coefficient";
-      parameter Real kw
-        "Exponent of the mass flow rate in the h.t.c. correlation";
-    equation
-      for j in 1:N loop
-        wall.gamma[j] = gamma_nom*noEvent(abs(infl.m_flow/wnom)^kw);
-      end for;
-      annotation (Diagram(graphics), Documentation(info="<html>
-This model extends <tt>Gas.Flow1D</tt> by adding the computation of the heat transfer coefficient, which is proportional to the mass flow rate, raised to the power of <tt>kw</tt>.
-</html>", revisions="<html>
-<ul>
-<li><i>20 Dec 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
-Casella</a>:<br>
-    First release.</li>
-</ul>
-</html>"));
-    end Flow1DGashtc;
+      model DigitalPI
+        extends Modelica.Blocks.Interfaces.DiscreteBlock;
+        parameter Real Kp "Gain";
+        parameter Modelica.SIunits.Time Ti(min=0) "Integral time";
+        parameter Real b(min=0) = 1 "Set-point weight (proportional action)";
+        parameter Real CSmax "Control signal saturation upper bound";
+        parameter Real CSmin "Control signal saturation lower bound";
+        parameter Real CSstart(
+          min=CSmin,
+          max=CSmax) = 0 "Control signal initial value";
+        parameter Boolean StartSteadyState=false
+          "True=steady state initial equations activated";
+        parameter Boolean useMANswitch = false "Use MANswitch input connector";
+        parameter Boolean useTRKswitch = false "Use TRKswitch input connector";
+        parameter Boolean useMANport = false "Use MANport input connector";
+        parameter Boolean useTRKport = false "Use TRKport input connector";
 
-    model DigitalPI
-      extends Modelica.Blocks.Interfaces.DiscreteBlock;
-      parameter Real Kp "Gain";
-      parameter Modelica.SIunits.Time Ti(min=0) "Integral time";
-      parameter Real b(min=0) = 1 "Set-point weight (proportional action)";
-      parameter Real CSmax "Control signal saturation upper bound";
-      parameter Real CSmin "Control signal saturation lower bound";
-      parameter Real CSstart(
-        min=CSmin,
-        max=CSmax) = 0 "Control signal initial value";
-      parameter Boolean StartSteadyState=false
-        "True=steady state initial equations activated";
-      parameter Boolean useMANswitch = false "Use MANswitch input connector";
-      parameter Boolean useTRKswitch = false "Use TRKswitch input connector";
-      parameter Boolean useMANport = false "Use MANport input connector";
-      parameter Boolean useTRKport = false "Use TRKport input connector";
+        Real SP "Set-Point (input)";
+        Real PV "Process Value (input)";
+        discrete Real CS(start=CSstart) "Control Signal (output)";
+        Boolean Man;
+        Boolean Trk;
+        discrete Real CSwind
+          "Control Signal auxiliary variable for anti-wind up";
+        parameter Modelica.SIunits.Time Ts=samplePeriod "Sampling Time";
+        parameter Real alpha=(Kp*b*2*Ti + Kp*Ts)/(2*Ti);
+        parameter Real beta=(-Kp*b*2*Ti + Kp*Ts)/(2*Ti);
+        parameter Real gamma=(-Kp*2*Ti - Kp*Ts)/(2*Ti);
+        parameter Real delta=(Kp*2*Ti - Kp*Ts)/(2*Ti);
+      public
+        Modelica.Blocks.Interfaces.RealInput SPport annotation (Placement(
+              transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealOutput CSport annotation (Placement(
+              transformation(extent={{80,-20},{120,20}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealInput PVport annotation (Placement(
+              transformation(extent={{-120,-80},{-80,-40}}, rotation=0)));
+        Modelica.Blocks.Interfaces.BooleanInput MANswitch if useMANswitch annotation (Placement(
+              transformation(extent={{-110,40},{-90,60}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealInput MANport if useMANport annotation (Placement(
+              transformation(
+              origin={60,100},
+              extent={{-20,-20},{20,20}},
+              rotation=270)));
+        Modelica.Blocks.Interfaces.BooleanInput TRKswitch if useTRKswitch annotation (Placement(
+              transformation(extent={{-110,76},{-90,96}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealInput TRKport if useTRKport annotation (Placement(
+              transformation(
+              origin={-8,100},
+              extent={{-20,-20},{20,20}},
+              rotation=270)));
+      protected
+        Modelica.Blocks.Interfaces.BooleanInput MANswitch_internal;
+        Modelica.Blocks.Interfaces.RealInput MANport_internal;
+        Modelica.Blocks.Interfaces.BooleanInput TRKswitch_internal;
+        Modelica.Blocks.Interfaces.RealInput TRKport_internal;
 
-      Real SP "Set-Point (input)";
-      Real PV "Process Value (input)";
-      discrete Real CS(start=CSstart) "Control Signal (output)";
-      Boolean Man;
-      Boolean Trk;
-      discrete Real CSwind "Control Signal auxiliary variable for anti-wind up";
-      parameter Modelica.SIunits.Time Ts=samplePeriod "Sampling Time";
-      parameter Real alpha=(Kp*b*2*Ti + Kp*Ts)/(2*Ti);
-      parameter Real beta=(-Kp*b*2*Ti + Kp*Ts)/(2*Ti);
-      parameter Real gamma=(-Kp*2*Ti - Kp*Ts)/(2*Ti);
-      parameter Real delta=(Kp*2*Ti - Kp*Ts)/(2*Ti);
-    public
-      Modelica.Blocks.Interfaces.RealInput SPport annotation (Placement(
-            transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealOutput CSport annotation (Placement(
-            transformation(extent={{80,-20},{120,20}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput PVport annotation (Placement(
-            transformation(extent={{-120,-80},{-80,-40}}, rotation=0)));
-      Modelica.Blocks.Interfaces.BooleanInput MANswitch if useMANswitch annotation (Placement(
-            transformation(extent={{-110,40},{-90,60}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput MANport if useMANport annotation (Placement(
-            transformation(
-            origin={60,100},
-            extent={{-20,-20},{20,20}},
-            rotation=270)));
-      Modelica.Blocks.Interfaces.BooleanInput TRKswitch if useTRKswitch annotation (Placement(
-            transformation(extent={{-110,76},{-90,96}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput TRKport if useTRKport annotation (Placement(
-            transformation(
-            origin={-8,100},
-            extent={{-20,-20},{20,20}},
-            rotation=270)));
-    protected
-      Modelica.Blocks.Interfaces.BooleanInput MANswitch_internal;
-      Modelica.Blocks.Interfaces.RealInput MANport_internal;
-      Modelica.Blocks.Interfaces.BooleanInput TRKswitch_internal;
-      Modelica.Blocks.Interfaces.RealInput TRKport_internal;
-
-    equation
-      if not useMANswitch then
-        MANswitch_internal = false;
-      end if;
-
-      if not useTRKswitch then
-        TRKswitch_internal = false;
-      end if;
-
-      if not useMANport then
-        MANport_internal = 0;
-      end if;
-
-      if not useTRKport then
-        TRKport_internal = 0;
-      end if;
-
-      when {initial(),sampleTrigger} then
-        Man = MANswitch_internal;
-        Trk = TRKswitch_internal;
-        if Man then
-          if MANport_internal >= CSmax then
-            CS = CSmax;
-            CSport = CSmax;
-          elseif MANport_internal <= CSmin then
-            CS = CSmin;
-            CSport = CSmin;
-          else
-            CS = MANport_internal;
-            CSport = MANport_internal;
-          end if;
-        else
-          if (Trk and not Man) then
-            if TRKport_internal >= CSmax then
-              CS = CSmax;
-              CSport = CSmax;
-            elseif TRKport_internal <= CSmin then
-              CS = CSmin;
-              CSport = CSmin;
-            else
-              CS = TRKport_internal;
-              CSport = TRKport_internal;
-            end if;
-          else
-            if CSwind >= CSmax then
-              CS = CSmax;
-              CSport = CSmax;
-            elseif CSwind <= CSmin then
-              CS = CSmin;
-              CSport = CSmin;
-            else
-              CS = CSwind;
-              CSport = CS;
-            end if;
-          end if;
+      equation
+        if not useMANswitch then
+          MANswitch_internal = false;
         end if;
-        CSwind = pre(CS) + alpha*SP + beta*pre(SP) + gamma*PV + delta*pre(PV);
-        SP = SPport;
-        PV = PVport;
-      end when;
 
-      connect(MANport, MANport_internal);
-      connect(MANswitch, MANswitch_internal);
-      connect(TRKport, TRKport_internal);
-      connect(TRKswitch, TRKswitch_internal);
+        if not useTRKswitch then
+          TRKswitch_internal = false;
+        end if;
 
-    initial equation
-      if StartSteadyState then
-        pre(CS) = CS;
-        pre(PV) = PV;
-        pre(SP) = SP;
-      end if;
+        if not useMANport then
+          MANport_internal = 0;
+        end if;
 
-      annotation (
-        Icon(graphics={
-            Text(extent={{-56,36},{16,-34}}, textString="SP"),
-            Text(extent={{-58,-38},{14,-108}}, textString="PV"),
-            Text(extent={{62,-16},{134,-86}}, textString="CS"),
-            Text(extent={{28,86},{104,24}}, textString="MANp"),
-            Text(extent={{-56,86},{20,24}}, textString="TRKp"),
-            Text(extent={{-88,104},{-50,70}}, textString="TRK"),
-            Text(extent={{-88,66},{-50,32}}, textString="MAN")}),
-        Diagram(graphics),
-        Documentation(info="<html>
+        if not useTRKport then
+          TRKport_internal = 0;
+        end if;
+
+        when {initial(),sampleTrigger} then
+          Man = MANswitch_internal;
+          Trk = TRKswitch_internal;
+          if Man then
+            if MANport_internal >= CSmax then
+              CS = CSmax;
+              CSport = CSmax;
+            elseif MANport_internal <= CSmin then
+              CS = CSmin;
+              CSport = CSmin;
+            else
+              CS = MANport_internal;
+              CSport = MANport_internal;
+            end if;
+          else
+            if (Trk and not Man) then
+              if TRKport_internal >= CSmax then
+                CS = CSmax;
+                CSport = CSmax;
+              elseif TRKport_internal <= CSmin then
+                CS = CSmin;
+                CSport = CSmin;
+              else
+                CS = TRKport_internal;
+                CSport = TRKport_internal;
+              end if;
+            else
+              if CSwind >= CSmax then
+                CS = CSmax;
+                CSport = CSmax;
+              elseif CSwind <= CSmin then
+                CS = CSmin;
+                CSport = CSmin;
+              else
+                CS = CSwind;
+                CSport = CS;
+              end if;
+            end if;
+          end if;
+          CSwind = pre(CS) + alpha*SP + beta*pre(SP) + gamma*PV + delta*pre(PV);
+          SP = SPport;
+          PV = PVport;
+        end when;
+
+        connect(MANport, MANport_internal);
+        connect(MANswitch, MANswitch_internal);
+        connect(TRKport, TRKport_internal);
+        connect(TRKswitch, TRKswitch_internal);
+
+      initial equation
+        if StartSteadyState then
+          pre(CS) = CS;
+          pre(PV) = PV;
+          pre(SP) = SP;
+        end if;
+
+        annotation (
+          Icon(graphics={
+              Text(extent={{-56,36},{16,-34}}, textString="SP"),
+              Text(extent={{-58,-38},{14,-108}}, textString="PV"),
+              Text(extent={{62,-16},{134,-86}}, textString="CS"),
+              Text(extent={{28,86},{104,24}}, textString="MANp"),
+              Text(extent={{-56,86},{20,24}}, textString="TRKp"),
+              Text(extent={{-88,104},{-50,70}}, textString="TRK"),
+              Text(extent={{-88,66},{-50,32}}, textString="MAN")}),
+          Diagram(graphics),
+          Documentation(info="<html>
 This is the model of a digital PI controller, complete with auto/man and tracking functionalies.
-</html>", revisions="<html>
+</html>",   revisions="<html>
 <ul>
 <li><i>15 Sep 2004</i>
     by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
        First release.</li>
 </ul>
 </html>"));
-    end DigitalPI;
+      end DigitalPI;
+    end Models;
 
     package Simulators "Simulation models for the HRB example"
+        extends Modelica.Icons.ExamplesPackage;
+
       model OpenLoopSimulator
-        HRBPlant Plant annotation (Placement(transformation(extent={{-10,-26},{
+
+        Models.HRBPlant
+                 Plant annotation (Placement(transformation(extent={{-10,-26},{
                   70,54}}, rotation=0)));
         Modelica.Blocks.Sources.Step ValveOpening(
           height=-0.1,
@@ -1927,7 +1918,8 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         Modelica.Blocks.Sources.Ramp GasFlowRate(
           offset=10,
           height=1,
-          startTime=100) annotation (Placement(transformation(extent={{-88,18},
+          startTime=100,
+          duration=0.1)  annotation (Placement(transformation(extent={{-88,18},
                   {-68,38}}, rotation=0)));
         Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(
                 extent={{-46,24},{-26,44}}, rotation=0)));
@@ -1971,7 +1963,8 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-", info="<html>
+",     info=
+        "<html>
 This model allows to simulate an open loop transient, starting from the guess initial conditions set inside the HRB model.</p>
 <p>Simulate for 150 s. After about 50 s, the plant reaches a steady state. At time t = 50 s, the water valve is closed by 10%. At time t = 100 s, the gas flow rate is increased by 100%.
 </html>"));
@@ -1989,7 +1982,8 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-", info="<html>
+",     info=
+        "<html>
 This model extends <tt>OpenLoopSimulatorSS</tt>, by computing the heat transfer coefficient to obtain an initial value of the gas outlet temperature equal to 125 degrees Celsius. This is performed by setting the <tt>fixed</tt> attribute of the <tt>Plant.Boiler.gamma_nom</tt> parameter to <tt>false</tt>, and by adding a corresponding initial equation to set the desired value of <tt>Plant.GasOut.T.</tt></p>
 <p>Simulate for 150 s. The transient starts at steady state, with the desired values of the heat transfer coefficient and gas outlet temperature. At time t = 50 s, the water valve is closed by 10%. At time t = 100 s, the gas flow rate is increased by 100%.
 </html>"), experiment(StopTime=150));
@@ -2017,7 +2011,8 @@ Casella</a>:<br>
 
       model ClosedLoopSimulator
 
-        HRBPlant Plant annotation (Placement(transformation(extent={{20,-40},{
+        Models.HRBPlant
+                 Plant annotation (Placement(transformation(extent={{20,-40},{
                   80,20}}, rotation=0)));
         Modelica.Blocks.Sources.Step ValveOpening(
           offset=1,
@@ -2061,14 +2056,17 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-", info="<html>
+",     info=
+        "<html>
 This model simulates a simple continuous-time control system for the HRB. The water outlet temperature is controlled to the set point by a PI controller, despite the disturbances on the water flow rate.</p>
 <p>Simulate for 300 s. the system starts at steady state; at t = 50 s, the water flow rate is reduced by 10%; at t = 150 s, the water temperature set point is increased by 10 K.
 </html>"));
       end ClosedLoopSimulator;
 
       model ClosedLoopDigitalSimulator
-        HRBPlant Plant annotation (Placement(transformation(extent={{20,-40},{
+
+        Models.HRBPlant
+                 Plant annotation (Placement(transformation(extent={{20,-40},{
                   80,20}}, rotation=0)));
         Modelica.Blocks.Sources.Step ValveOpening(
           height=-0.1,
@@ -2080,14 +2078,15 @@ This model simulates a simple continuous-time control system for the HRB. The wa
           height=10,
           startTime=150) annotation (Placement(transformation(extent={{-80,0},{
                   -60,20}}, rotation=0)));
-        DigitalPI DigitalPI1(
+        Models.DigitalPI
+                  DigitalPI1(
           Kp=0.3,
           Ti=12,
           CSmax=11,
           CSmin=5,
-          samplePeriod=0.4,
           CSstart=6.2,
-          StartSteadyState=true) annotation (Placement(transformation(extent={{
+          StartSteadyState=true,
+          samplePeriod=2)        annotation (Placement(transformation(extent={{
                   -34,20},{-14,0}}, rotation=0)));
         inner System system
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -2116,7 +2115,8 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-", info="<html>
+",     info=
+        "<html>
 This model simulates simple digital control system for the HRB. The water outlet temperature is controlled to the set point by a PI controller, despite the disturbances on the water flow rate.</p>
 <p>Simulate for 300 s. the system starts at steady state; at t = 50 s, the water flow rate is reduced by 10%; at t = 150 s, the water temperature set point is increased by 10 K.
 </html>"));
@@ -2159,6 +2159,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
   end HRB;
 
   package RankineCycle "Steam power plant"
+    extends Modelica.Icons.Library;
 
     model HE "Heat Exchanger fluid - gas"
 
@@ -3248,6 +3249,7 @@ This is a simple model of a steam plant.
   end RankineCycle;
 
   package BraytonCycle "Gas power plant"
+    extends Modelica.Icons.Library;
 
     model Plant
     protected
