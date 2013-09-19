@@ -26,9 +26,12 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
           Placement(transformation(extent={{-120,24},{-60,84}}, rotation=0)));
       Water.SourceMassFlow
-                    FeedWater(h=1.1059e6) annotation (Placement(transformation(
+                    FeedWater(h=1.1059e6,
+        use_in_w0=true,
+        use_in_h=true)                    annotation (Placement(transformation(
               extent={{-176,34},{-146,64}}, rotation=0)));
-      Water.Flow1D2ph Downcomer(
+      Water.Flow1DFV2ph
+                      Downcomer(
         redeclare package Medium = Medium,
         N=2,
         L=15.923,
@@ -46,12 +49,16 @@ package Examples "Application examples"
         DynamicMomentum=false,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          heatTransfer(gamma=1800),
         dpnom=1000,
         pstart=6000000) annotation (Placement(transformation(
             origin={-167,-67},
             extent={{-15,-15},{15,15}},
             rotation=270)));
-      Water.Flow1D2ph Risers(
+      Water.Flow1DFV2ph
+                      Risers(
         redeclare package Medium = Medium,
         Nt=6,
         L=14.16,
@@ -70,12 +77,16 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          heatTransfer(gamma=10000),
         dpnom=3000,
         pstart=6118000) annotation (Placement(transformation(
             origin={-19,-125},
             extent={{-15,15},{15,-15}},
             rotation=90)));
-      Water.Flow1D2ph Pipe2Drum(
+      Water.Flow1DFV2ph
+                      Pipe2Drum(
         redeclare package Medium = Medium,
         N=2,
         Nt=1,
@@ -93,6 +104,9 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          heatTransfer(gamma=10000),
         dpnom=17000,
         pstart=6000000) annotation (Placement(transformation(
             origin={-19,-17},
@@ -101,7 +115,8 @@ package Examples "Application examples"
       Water.SinkMassFlow
                   Blowdown(w0=0) annotation (Placement(transformation(extent={{
                 -80,-20},{-50,10}}, rotation=0)));
-      Water.Flow1D Pipe2SH(
+      Water.Flow1DFV
+                   Pipe2SH(
         redeclare package Medium = Medium,
         N=2,
         Nt=1,
@@ -119,9 +134,13 @@ package Examples "Application examples"
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         dpnom=2000,
-        pstart=6000000) annotation (Placement(transformation(extent={{-54,80},{
+        pstart=6000000,
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          heatTransfer(gamma=3000))
+                        annotation (Placement(transformation(extent={{-54,80},{
                 -24,110}}, rotation=0)));
-      Water.Flow1D2phDB SH(
+      Water.Flow1DFV2ph SH(
         redeclare package Medium = Medium,
         Nt=1,
         L=30,
@@ -135,13 +154,17 @@ package Examples "Application examples"
         hstartout=2.8e6,
         N=5,
         e=1.7e-3,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP,
         dpnom=170000,
-        pstart=5900000) annotation (Placement(transformation(extent={{-6,80},{
+        pstart=5900000,
+        redeclare ThermoPower.Water.HeatTransfer.HeatTransfer2phDB heatTransfer(
+            gamma_b=20000))
+                        annotation (Placement(transformation(extent={{-6,80},{
                 24,110}}, rotation=0)));
-      Water.Flow1D2ph Pipe2Valve(
+      Water.Flow1DFV2ph
+                      Pipe2Valve(
         redeclare package Medium = Medium,
         N=2,
         Nt=1,
@@ -160,7 +183,11 @@ package Examples "Application examples"
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
         dpnom=1000,
-        pstart=5600000) annotation (Placement(transformation(extent={{44,80},{
+        pstart=5600000,
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          heatTransfer(gamma=3000))
+                        annotation (Placement(transformation(extent={{44,80},{
                 74,110}}, rotation=0)));
       Water.ValveVap Valve(
         redeclare package Medium = Medium,
@@ -173,18 +200,14 @@ package Examples "Application examples"
       Water.SinkPressure
                   Sink(p0=5.5e5) annotation (Placement(transformation(extent={{
                 138,80},{168,110}}, rotation=0)));
-      Thermal.HeatSource1D HeatSourceSH(
-        Nt=1,
-        L=30,
-        omega=0.0628,
-        N=5) annotation (Placement(transformation(extent={{-6,154},{24,184}},
+      Thermal.HeatSource1DFV
+                           HeatSourceSH(Nw=4)
+             annotation (Placement(transformation(extent={{-6,126},{24,156}},
               rotation=0)));
-      Thermal.HeatSource1D HeatSourceRisers(
-        L=14.16,
-        omega=0.08388,
-        Nt=6,
-        N=7) annotation (Placement(transformation(
-            origin={79,-125},
+      Thermal.HeatSource1DFV
+                           HeatSourceRisers(Nw=6)
+             annotation (Placement(transformation(
+            origin={39,-125},
             extent={{-15,-15},{15,15}},
             rotation=270)));
       Water.Header HeaderLower(
@@ -212,115 +235,101 @@ package Examples "Application examples"
             origin={-19,-71},
             extent={{-15,-15},{15,15}},
             rotation=90)));
-      Thermal.ConvHT DowncomerExchange(N=2, gamma=1800) annotation (Placement(
-            transformation(
-            origin={-135,-67},
-            extent={{-15,-15},{15,15}},
-            rotation=270)));
-      Thermal.ConvHT RisersExchange(gamma=10000, N=7) annotation (Placement(
-            transformation(
-            origin={11,-125},
-            extent={{-15,-15},{15,15}},
-            rotation=90)));
-      Thermal.ConvHT Pipe2DrumExchange(N=2, gamma=10000) annotation (Placement(
-            transformation(
-            origin={13,-17},
-            extent={{-15,-15},{15,15}},
-            rotation=90)));
-      Thermal.ConvHT Pipe2SHExchange(N=2, gamma=3000) annotation (Placement(
-            transformation(extent={{-54,108},{-24,138}}, rotation=0)));
-      Thermal.ConvHT_htc SHExchange(N=5) annotation (Placement(transformation(
-              extent={{-6,136},{24,106}}, rotation=0)));
-      Thermal.ConvHT Pipe2ValveExchange(N=2, gamma=3000) annotation (Placement(
-            transformation(extent={{44,108},{74,138}}, rotation=0)));
-      Thermal.MetalTube DowncomerWall(
-        N=2,
+      Thermal.MetalTubeFV
+                        DowncomerWall(
         L=15.923,
         rint=0.02461,
         rext=0.03015,
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=1,
         Tstart1=540,
-        TstartN=540,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=540)                                          annotation (
           Placement(transformation(
-            origin={-108,-67},
+            origin={-144,-67},
             extent={{-15,-16},{15,16}},
             rotation=90)));
-      Thermal.MetalTube RisersWalls(
+      Thermal.MetalTubeFV
+                        RisersWalls(
         L=14.16,
         rint=0.01048,
         rext=0.01335,
         lambda=19,
         rhomcm=4.08e6,
         WallRes=true,
-        N=7,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=6,
+        Nt=6,
         Tstart1=548,
-        TstartN=548,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={41,-125},
+            origin={5,-125},
             extent={{-15,-15},{15,15}},
             rotation=90)));
-      Thermal.MetalTube Pipe2DrumWall(
-        N=2,
+      Thermal.MetalTubeFV
+                        Pipe2DrumWall(
         L=2.779,
         rint=0.0133,
         rext=0.0167,
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=1,
         Tstart1=548,
-        TstartN=548,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={41,-17},
+            origin={3,-17},
             extent={{-15,-15},{15,15}},
             rotation=90)));
-      Thermal.MetalTube Pipe2SHWall(
-        N=2,
+      Thermal.MetalTubeFV
+                        Pipe2SHWall(
         L=11.480,
         rint=0.01025,
         rext=0.01305,
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=1,
         Tstart1=548,
-        TstartN=548,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={-39,143},
+            origin={-39,115},
             extent={{-15,-15},{15,15}},
             rotation=180)));
-      Thermal.MetalTube SHWall(
+      Thermal.MetalTubeFV
+                        SHWall(
         L=30,
         rint=0.0055,
         rext=0.0100,
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=4,
         Tstart1=551,
-        TstartN=551,
-        N=5,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=551)                                          annotation (
           Placement(transformation(
-            origin={9,143},
+            origin={9,115},
             extent={{-15,-15},{15,15}},
             rotation=180)));
-      Thermal.MetalTube Pipe2ValveWall(
+      Thermal.MetalTubeFV
+                        Pipe2ValveWall(
         L=6.6,
         rint=0.0100,
         rext=0.01275,
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
-        N=2,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=1,
         Tstart1=548,
-        TstartN=548,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={59,143},
+            origin={59,115},
             extent={{-15,-15},{15,15}},
             rotation=180)));
       Water.PressDrop PressDrop(
@@ -328,7 +337,6 @@ package Examples "Application examples"
         wnom=0.23,
         wnf=0.1,
         K=3,
-        Kf=1e8,
         A=5.62e-5,
         Kfc=2,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
@@ -359,12 +367,6 @@ package Examples "Application examples"
           points={{-19,-86.15},{-19,-110}},
           color={0,0,255},
           thickness=0.5));
-      connect(Downcomer.wall, DowncomerExchange.side2) annotation (Line(points=
-              {{-159.5,-67},{-139.65,-67}}, color={255,127,0}));
-      connect(RisersExchange.side2, RisersWalls.int) annotation (Line(points={{
-              15.65,-125},{36.5,-125}}, color={255,127,0}));
-      connect(Risers.wall, RisersExchange.side1)
-        annotation (Line(points={{-11.5,-125},{6.5,-125}}, color={255,127,0}));
       connect(SH.outfl, Pipe2Valve.infl) annotation (Line(
           points={{24,95},{44,95}},
           color={0,0,255},
@@ -385,24 +387,10 @@ package Examples "Application examples"
           points={{-46,-165},{-19,-165},{-19,-140}},
           color={0,0,255},
           thickness=0.5));
-      connect(Pipe2Drum.wall, Pipe2DrumExchange.side1)
-        annotation (Line(points={{-11.5,-17},{8.5,-17}}, color={255,127,0}));
-      connect(Pipe2DrumExchange.side2, Pipe2DrumWall.int)
-        annotation (Line(points={{17.65,-17},{36.5,-17}}, color={255,127,0}));
-      connect(RisersWalls.ext, HeatSourceRisers.wall) annotation (Line(points={
-              {45.65,-125},{74.5,-125}}, color={255,127,0}));
+      connect(RisersWalls.ext, HeatSourceRisers.wall) annotation (Line(points={{9.65,
+              -125},{34.5,-125}},        color={255,127,0}));
       DrumPressure = Drum.p;
       DrumLevel = Drum.y;
-      connect(Pipe2Valve.wall, Pipe2ValveExchange.side2)
-        annotation (Line(points={{59,102.5},{59,118.35}}, color={255,127,0}));
-      connect(Pipe2SH.wall, Pipe2SHExchange.side2) annotation (Line(points={{-39,
-              102.5},{-39,118.35}}, color={255,127,0}));
-      connect(Pipe2SHExchange.side1, Pipe2SHWall.int)
-        annotation (Line(points={{-39,127.5},{-39,138.5}}, color={255,127,0}));
-      connect(Pipe2ValveExchange.side1, Pipe2ValveWall.int)
-        annotation (Line(points={{59,127.5},{59,138.5}}, color={255,127,0}));
-      connect(DowncomerWall.int, DowncomerExchange.side1) annotation (Line(
-            points={{-112.8,-67},{-130.5,-67}}, color={255,127,0}));
       connect(Blowdown.flange, Drum.blowdown) annotation (Line(
           points={{-80,-5},{-90,-5},{-90,24.6}},
           thickness=0.5,
@@ -436,20 +424,40 @@ package Examples "Application examples"
       connect(FeedWaterFlow, FeedWater.in_w0) annotation (Line(points={{-200,
               100},{-167,100},{-167,58}}, color={0,0,127}));
       connect(RiserPower, HeatSourceRisers.power) annotation (Line(points={{200,
-              -120},{120,-120},{120,-125},{85,-125}}, color={0,0,127}));
+              -120},{120,-120},{120,-125},{45,-125}}, color={0,0,127}));
       connect(ValveOpening, Valve.theta) annotation (Line(points={{200,100},{
               174,100},{174,130},{107,130},{107,107}}, color={0,0,127}));
       connect(SHPower, HeatSourceSH.power) annotation (Line(points={{200,160},{
-              106,160},{106,188},{9,188},{9,175}}, color={0,0,127}));
-      connect(SHExchange.fluidside, SH.wall)
-        annotation (Line(points={{9,116.5},{9,102.5}}, color={0,0,255}));
-      connect(SHExchange.otherside, SHWall.int)
-        annotation (Line(points={{9,125.5},{9,138.5}}, color={255,127,0}));
+              106,160},{9,160},{9,147}},           color={0,0,127}));
       connect(SHWall.ext, HeatSourceSH.wall)
-        annotation (Line(points={{9,147.65},{9,164.5}}, color={255,127,0}));
+        annotation (Line(points={{9,119.65},{9,136.5}}, color={255,127,0}));
+      connect(Downcomer.wall, DowncomerWall.int) annotation (Line(
+          points={{-159.5,-67},{-148.8,-67}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(Risers.wall, RisersWalls.int) annotation (Line(
+          points={{-11.5,-125},{0.5,-125}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(Pipe2Drum.wall, Pipe2DrumWall.int) annotation (Line(
+          points={{-11.5,-17},{-1.5,-17}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(SHWall.int, SH.wall) annotation (Line(
+          points={{9,110.5},{9,102.5}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(Pipe2SHWall.int, Pipe2SH.wall) annotation (Line(
+          points={{-39,110.5},{-39,102.5}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(Pipe2ValveWall.int, Pipe2Valve.wall) annotation (Line(
+          points={{59,110.5},{59,102.5}},
+          color={255,127,0},
+          smooth=Smooth.None));
       annotation (
         Diagram(coordinateSystem(
-            preserveAspectRatio=true,
+            preserveAspectRatio=false,
             extent={{-200,-200},{200,200}},
             initialScale=0.1), graphics),
         Documentation(info="<HTML>
@@ -457,7 +465,7 @@ package Examples "Application examples"
 <p>The geometric parameters are already set. The start values set in the model parameters are guess values around the nominal full load steady state (60 bar drum pressure).
 <p><b>This model cannot be simulated alone</b>, as the boundary conditions (feedwater flowrate and enthalpy, steam valve opening, power to the risers and power to the superheater) are not set. See the <tt>CiseSim</tt> model instead.
 </HTML>
-", revisions="<html>
+",     revisions="<html>
 <ul>
 <li><i>19 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
@@ -493,9 +501,9 @@ Casella</a>:<br>
 
     model CISESim
       "CISE Plant model with boundary conditions and initial steady-state computation"
-      parameter MassFlowRate wfeed_offset(fixed=false) = 6.0e-2
+      parameter MassFlowRate wfeed_offset(fixed=false, start = 6.0e-2)
         "Offset of feedwater flow rate";
-      parameter Real ValveOpening_offset(fixed=false) = 0.4
+      parameter Real ValveOpening_offset(fixed=false, start = 0.4)
         "Offset of valve opening";
       parameter Pressure InitialDrumPressure=5.9359e+006;
       parameter Length InitialDrumLevel=-0.091;
@@ -592,6 +600,7 @@ Casella</a>:<br>
       // Additional equations to determine the non-fixed parameters
       Plant.Drum.y = InitialDrumLevel;
       Plant.Drum.p = InitialDrumPressure;
+
     equation
       connect(wfeed5.y, wfeed.u1) annotation (Line(points={{-59,140},{-40,140},
               {-40,118},{38,118}}, color={0,0,127}));
@@ -629,7 +638,8 @@ Casella</a>:<br>
 <p>The steady state is obtained by setting the derivatives of all the state variables to zero in the <tt>initial equation</tt> section. The offset values for <tt>ValveOpening1</tt> and <tt>wfeed1</tt>, i.e. the parameters <tt>ValveOpening_offset</tt> and <tt>wfeed_offset</tt> have a <tt>fixed=false</tt> attribute. Their actual values are set by the two additional initial equations specifying the initial drum level and pressure.
 <p>The <tt>CISESim120501</tt>, <tt>CISESim180503</tt>, <tt>CISESim180504</tt> models extend <tt>CISESim</tt> by adding suitable numerical values to the boundary condition signal generators.
 </HTML>
-", revisions="<html>
+",     revisions=
+             "<html>
 <ul>
 <li><i>19 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
@@ -651,8 +661,8 @@ Casella</a>:<br>
       extends CISESim(
         InitialDrumPressure=59.359e5,
         InitialDrumLevel=-0.091,
-        wfeed_offset=6.0e-2,
-        ValveOpening_offset=0.4,
+        wfeed_offset(start=6.0e-2),
+        ValveOpening_offset(start=0.4),
         hfeed1(offset=1.10593e6),
         wfeed1(
           startTime=63,
@@ -692,8 +702,8 @@ Casella</a>:<br>
       extends CISESim(
         InitialDrumPressure=34.070e5,
         InitialDrumLevel=-0.0507,
-        wfeed_offset=2.89e-2,
-        ValveOpening_offset=0.4,
+        wfeed_offset(start=2.89e-2),
+        ValveOpening_offset(start=0.4),
         hfeed1(
           offset=9.7371109e5,
           startTime=0,
@@ -761,8 +771,8 @@ Casella</a>:<br>
       extends CISESim(
         InitialDrumPressure=29.3052e5,
         InitialDrumLevel=-0.0574,
-        wfeed_offset=2.838e-2,
-        ValveOpening_offset=0.4,
+        wfeed_offset(start=2.838e-2),
+        ValveOpening_offset(start=0.4),
         ValveOpening1(
           startTime=72,
           duration=40,
