@@ -4929,7 +4929,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
       Water.Flow1DFV hexFVb(
-        N=Nnodes,
+        Nw=Nnodes-1,
         Nt=1,
         L=Lhex,
         wnom=whex,
