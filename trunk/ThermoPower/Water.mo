@@ -992,7 +992,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Mass M "Fluid mass (single tube)";
     Mass Mtot "Fluid mass (total)";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable ThermoPower.Water.BaseClasses.DistributedHeatTransferFV heatTransfer constrainedby
+    replaceable HeatTransfer.IdealHeatTransfer heatTransfer constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
       final Nf=N, final Nw = Nw, final Nt = Nt,
@@ -1223,7 +1223,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
-    replaceable ThermoPower.Water.BaseClasses.DistributedHeatTransferFV heatTransfer constrainedby
+    replaceable HeatTransfer.IdealHeatTransfer heatTransfer constrainedby
       ThermoPower.Water.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
       final Nf=N, final Nw = Nw, final Nt = Nt,
