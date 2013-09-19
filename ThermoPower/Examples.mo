@@ -343,19 +343,26 @@ package Examples "Application examples"
         dpnom=1) annotation (Placement(transformation(extent={{-76,-180},{-46,-150}},
               rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput DrumPressure annotation (Placement(
-            transformation(extent={{200,20},{220,40}}, rotation=0)));
+            transformation(extent={{200,20},{220,40}}, rotation=0),
+            iconTransformation(extent={{90,20},{110,40}})));
       Modelica.Blocks.Interfaces.RealOutput DrumLevel annotation (Placement(
-            transformation(extent={{200,-40},{220,-20}}, rotation=0)));
+            transformation(extent={{200,-40},{220,-20}}, rotation=0),
+            iconTransformation(extent={{90,-50},{110,-30}})));
       Modelica.Blocks.Interfaces.RealInput FeedWaterFlow annotation (Placement(
-            transformation(extent={{-210,90},{-190,110}}, rotation=0)));
+            transformation(extent={{-210,90},{-190,110}}, rotation=0),
+            iconTransformation(extent={{-120,72},{-102,89}})));
       Modelica.Blocks.Interfaces.RealInput RiserPower annotation (Placement(
-            transformation(extent={{210,-130},{190,-110}}, rotation=0)));
+            transformation(extent={{210,-130},{190,-110}}, rotation=0),
+            iconTransformation(extent={{-120,-48},{-102,-30}})));
       Modelica.Blocks.Interfaces.RealInput ValveOpening annotation (Placement(
-            transformation(extent={{210,90},{190,110}}, rotation=0)));
+            transformation(extent={{210,90},{190,110}}, rotation=0),
+            iconTransformation(extent={{-120,-9},{-102,9}})));
       Modelica.Blocks.Interfaces.RealInput SHPower annotation (Placement(
-            transformation(extent={{210,150},{190,170}}, rotation=0)));
+            transformation(extent={{210,150},{190,170}}, rotation=0),
+            iconTransformation(extent={{-120,-88},{-103,-71}})));
       Modelica.Blocks.Interfaces.RealInput FeedWaterEnthalpy annotation (
-          Placement(transformation(extent={{-210,150},{-190,170}}, rotation=0)));
+          Placement(transformation(extent={{-210,150},{-190,170}}, rotation=0),
+            iconTransformation(extent={{-120,31},{-102,49}})));
       inner System system(allowFlowReversal=false)
         annotation (Placement(transformation(extent={{-120,160},{-100,180}})));
     equation
@@ -491,12 +498,16 @@ Casella</a>:<br>
 </html>"),
         Icon(coordinateSystem(
             preserveAspectRatio=false,
-            extent={{-200,-200},{200,200}},
-            initialScale=0.1), graphics={Rectangle(
-              extent={{-200,200},{200,-200}},
+            extent={{-100,-100},{100,100}},
+            initialScale=0.1,
+            grid={1,1}),       graphics={Rectangle(
+              extent={{-100,100},{100,-101}},
               lineColor={0,0,255},
               fillColor={255,255,255},
-              fillPattern=FillPattern.Solid)}));
+              fillPattern=FillPattern.Solid), Text(
+              extent={{-88,78},{90,-78}},
+              lineColor={0,0,255},
+              textString="P")}));
     end CISEPlant;
 
     model CISESim
@@ -507,7 +518,7 @@ Casella</a>:<br>
         "Offset of valve opening";
       parameter Pressure InitialDrumPressure=5.9359e+006;
       parameter Length InitialDrumLevel=-0.091;
-      CISEPlant Plant;
+
       Modelica.Blocks.Sources.Constant Qsh(k=4928) annotation (Placement(
             transformation(extent={{40,-140},{60,-120}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp Qev(
@@ -586,16 +597,9 @@ Casella</a>:<br>
       Modelica.Blocks.Math.Add ValveOpening annotation (Placement(
             transformation(extent={{40,-60},{60,-40}}, rotation=0)));
       inner System system
-        annotation (Placement(transformation(extent={{140,140},{160,160}})));
-    equation
-      // Connection of the control signals to the process variables
-      connect(Plant.FeedWaterEnthalpy, hfeed.y);
-      connect(Plant.SHPower, Qsh.y);
-      connect(Plant.RiserPower, Qev.y);
-      connect(Plant.FeedWaterFlow, wfeed.y);
-      connect(Plant.ValveOpening, ValveOpening.y);
-
-      // Block diagram connections
+        annotation (Placement(transformation(extent={{182,140},{202,160}})));
+      CISEPlant Plant
+        annotation (Placement(transformation(extent={{120,-40},{180,20}})));
     initial equation
       // Additional equations to determine the non-fixed parameters
       Plant.Drum.y = InitialDrumLevel;
@@ -628,10 +632,30 @@ Casella</a>:<br>
         annotation (Line(points={{-82,80},{-119,80}}, color={0,0,127}));
       connect(sum_1.u1, wfeed1.y) annotation (Line(points={{-82,88},{-100,88},{
               -100,110},{-119,110}}, color={0,0,127}));
+      connect(wfeed.y, Plant.FeedWaterFlow) annotation (Line(
+          points={{61,110},{108,110},{108,14.15},{116.7,14.15}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(hfeed.y, Plant.FeedWaterEnthalpy) annotation (Line(
+          points={{61,40},{94,40},{94,2},{116.7,2}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(ValveOpening.y, Plant.ValveOpening) annotation (Line(
+          points={{61,-50},{74,-50},{74,-10},{116.7,-10}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(Qev.y, Plant.RiserPower) annotation (Line(
+          points={{61,-90},{92,-90},{92,-21.7},{116.7,-21.7}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(Qsh.y, Plant.SHPower) annotation (Line(
+          points={{61,-130},{106,-130},{106,-33.85},{116.55,-33.85}},
+          color={0,0,127},
+          smooth=Smooth.None));
       annotation (
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
-            extent={{-160,-160},{160,160}},
+            extent={{-160,-160},{200,160}},
             initialScale=0.1), graphics),
         Documentation(info="<HTML>
 <p>This model provides the boundary condition values to the <tt>CISEPlant</tt>model; it can be used to simulate open-loop transients.
@@ -654,7 +678,8 @@ Casella</a>:<br>
 </ul>
 </html>"),
         experiment(StopTime=1200, Tolerance=1e-006),
-        experimentSetupOutput);
+        experimentSetupOutput,
+        Icon(coordinateSystem(extent={{-160,-160},{200,160}})));
     end CISESim;
 
     model CISESim120501
