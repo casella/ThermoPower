@@ -850,7 +850,8 @@ Casella</a>:<br>
         use_in_w0=true,
         use_in_h=true)                    annotation (Placement(transformation(
               extent={{-92,0},{-72,20}}, rotation=0)));
-      Water.Flow1D Pipe2SH(
+      Water.Flow1DFV
+                   Pipe2SH(
         redeclare package Medium = Medium,
         Nt=1,
         L=11.48,
@@ -869,9 +870,13 @@ Casella</a>:<br>
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=1000,
-        pstart=6000000) annotation (Placement(transformation(extent={{-38,20},{
+        pstart=6000000,
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          heatTransfer(gamma=3000))
+                        annotation (Placement(transformation(extent={{-38,20},{
                 -18,40}}, rotation=0)));
-      Water.Flow1D2phDB SH(
+      Water.Flow1DFV2ph SH(
         redeclare package Medium = Medium,
         Nt=1,
         L=30,
@@ -889,10 +894,12 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        redeclare ThermoPower.Water.HeatTransfer.HeatTransfer2phDB heatTransfer,
+
         dpnom=170000,
         pstart=5900000) annotation (Placement(transformation(extent={{-8,20},{
                 12,40}}, rotation=0)));
-      Water.Flow1D2ph Pipe2Valve(
+      Water.Flow1DFV  Pipe2Valve(
         redeclare package Medium = Medium,
         N=2,
         Nt=1,
@@ -911,7 +918,11 @@ Casella</a>:<br>
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
         dpnom=10000,
-        pstart=5600000) annotation (Placement(transformation(extent={{22,20},{
+        pstart=5600000,
+        redeclare
+          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          heatTransfer(gamma=3000))
+                        annotation (Placement(transformation(extent={{22,20},{
                 42,40}}, rotation=0)));
       Water.ValveVap Valve(
         redeclare package Medium = Medium,
@@ -925,61 +936,56 @@ Casella</a>:<br>
       Water.SinkPressure
                   Sink(p0=5.5e5) annotation (Placement(transformation(extent={{
                 80,20},{100,40}}, rotation=0)));
-      Thermal.HeatSource1D HeatSourceSH(
-        Nt=1,
-        L=30,
-        omega=0.0628,
-        N=5) annotation (Placement(transformation(extent={{-8,70},{12,90}},
+      Thermal.HeatSource1DFV
+                           HeatSourceSH(Nw=4)
+             annotation (Placement(transformation(extent={{-8,58},{12,78}},
               rotation=0)));
-      Thermal.ConvHT Pipe2SHExchange(gamma=3000, N=2) annotation (Placement(
-            transformation(extent={{-38,40},{-18,60}}, rotation=0)));
-      Thermal.ConvHT_htc SHExchange(N=5) annotation (Placement(transformation(
-              extent={{-8,60},{12,40}}, rotation=0)));
-      Thermal.ConvHT Pipe2ValveExchange(N=2, gamma=3000) annotation (Placement(
-            transformation(extent={{22,40},{42,60}}, rotation=0)));
-      Thermal.MetalTube Pipe2SHWall(
+      Thermal.MetalTubeFV
+                        Pipe2SHWall(
         L=11.480,
         rint=0.01025,
         rext=0.01305,
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=1,
         Tstart1=548,
-        TstartN=548,
-        N=2,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={-28,64},
+            origin={-28,48},
             extent={{-10,-10},{10,10}},
             rotation=180)));
-      Thermal.MetalTube SHWall(
+      Thermal.MetalTubeFV
+                        SHWall(
         L=30,
         rint=0.0055,
         rext=0.0100,
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=4,
         Tstart1=551,
-        TstartN=551,
-        N=5,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=551)                                          annotation (
           Placement(transformation(
-            origin={2,64},
+            origin={2,48},
             extent={{-10,-10},{10,10}},
             rotation=180)));
-      Thermal.MetalTube Pipe2ValveWall(
+      Thermal.MetalTubeFV
+                        Pipe2ValveWall(
         L=6.6,
         rint=0.0100,
         rext=0.01275,
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
-        N=2,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=1,
         Tstart1=548,
-        TstartN=548,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={32,64},
+            origin={32,48},
             extent={{-10,-10},{10,10}},
             rotation=180)));
       Water.Drum2States DrumBoiler(
@@ -1013,20 +1019,8 @@ Casella</a>:<br>
     equation
       DrumLevel = DrumBoiler.Vld/(pi*r^2) - H/2;
       DrumPressure = DrumBoiler.p;
-      connect(Pipe2SH.wall, Pipe2SHExchange.side2)
-        annotation (Line(points={{-28,35},{-28,46.9}}, color={255,127,0}));
-      connect(Pipe2SHExchange.side1, Pipe2SHWall.int)
-        annotation (Line(points={{-28,53},{-28,61}}, color={255,127,0}));
-      connect(Pipe2Valve.wall, Pipe2ValveExchange.side2)
-        annotation (Line(points={{32,35},{32,46.9}}, color={255,127,0}));
-      connect(Pipe2ValveExchange.side1, Pipe2ValveWall.int)
-        annotation (Line(points={{32,53},{32,61}}, color={255,127,0}));
-      connect(SHWall.int, SHExchange.otherside) annotation (Line(points={{2,61},
-              {2,57},{2,57},{2,53}}, color={255,127,0}));
-      connect(SHExchange.fluidside, SH.wall)
-        annotation (Line(points={{2,47},{2,35}}));
-      connect(HeatSourceSH.wall, SHWall.ext) annotation (Line(points={{2,77},{2,
-              72.05},{2,67.1},{2,67.1}}, color={255,127,0}));
+      connect(HeatSourceSH.wall, SHWall.ext) annotation (Line(points={{2,65},{2,
+              51.1}},                    color={255,127,0}));
       connect(DrumBoiler.heat, RisersHeat.port)
         annotation (Line(points={{-54,5},{-54,-12}}, color={191,0,0}));
       connect(Pipe2SH.outfl, SH.infl) annotation (Line(
@@ -1058,13 +1052,27 @@ Casella</a>:<br>
       connect(ValveOpening, Valve.theta) annotation (Line(points={{-100,-74},{
               60,-74},{60,22}}, color={0,0,127}));
       connect(SHPower, HeatSourceSH.power) annotation (Line(points={{-100,84},{
-              -60,84},{-60,94},{2,94},{2,84}}, color={0,0,127}));
+              -60,84},{2,84},{2,72}},          color={0,0,127}));
       connect(FeedWaterEnthalpy, FeedWater.in_h) annotation (Line(points={{-100,
               57},{-78,57},{-78,16}}, color={0,0,127}));
       connect(FeedWaterFlow, FeedWater.in_w0) annotation (Line(points={{-100,30},
               {-86,30},{-86,16}}, color={0,0,127}));
+      connect(Pipe2SHWall.int, Pipe2SH.wall) annotation (Line(
+          points={{-28,45},{-28,35}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(SHWall.int, SH.wall) annotation (Line(
+          points={{2,45},{2,35}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(Pipe2ValveWall.int, Pipe2Valve.wall) annotation (Line(
+          points={{32,45},{32,35}},
+          color={255,127,0},
+          smooth=Smooth.None));
       annotation (
-        Diagram(graphics),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}),
+                graphics),
         Documentation(info="<HTML>
 <p>This is a simplified model of the CISE steam generation plant described in the paper: F. Casella, A. Leva, \"Modelica open library for power plant simulation: design and experimental validation\", <i>Proceedings of the 2003 Modelica Conference</i>, Link&ouml eping, Sweden, 2003. The drum model is based on the assumption of thermodynamic equilibrium between the liquid and vapour phases, thus leading to a drum model with only two states (pressure and liquid volume).
 <p>The geometric parameters are already set. The start values set in the model parameters are guess values around the nominal full load steady state (60 bar drum pressure).
@@ -1099,9 +1107,9 @@ Casella</a>:<br>
 
     model CISESim2States
       "CISE plant reduced model with boundary conditions and initial steady-state computation"
-      parameter MassFlowRate wfeed_offset(fixed=false) = 6.0e-2
+      parameter MassFlowRate wfeed_offset(fixed=false, start = 6.0e-2)
         "Offset of feedwater flow rate";
-      parameter Real ValveOpening_offset(fixed=false) = 0.4
+      parameter Real ValveOpening_offset(fixed=false, start = 0.4)
         "Offset of valve opening";
       parameter Pressure InitialDrumPressure=5.9359e+006;
       parameter Length InitialDrumLevel=-0.091;
@@ -1192,6 +1200,7 @@ Casella</a>:<br>
       // Additional equations to determine the non-fixed parameters
       Plant.DrumLevel = InitialDrumLevel;
       Plant.DrumPressure = InitialDrumPressure;
+
     equation
       connect(hfeed.y, Plant.FeedWaterEnthalpy) annotation (Line(points={{-59,
               90},{60,90},{60,27.1},{100,27.1}}, color={0,0,127}));
@@ -1225,7 +1234,8 @@ Casella</a>:<br>
 <p>The steady state is obtained by setting the derivatives of all the state variables to zero in the <tt>initial equation</tt> section. The offset values for <tt>ValveOpening1</tt> and <tt>wfeed1</tt>, i.e. the parameters <tt>ValveOpening_offset</tt> and <tt>wfeed_offset</tt> have a <tt>fixed=false</tt> attribute. Their actual values are set by the two additional initial equations specifying the initial drum level and pressure.
 <p>The <tt>CISESim2States120501</tt> model extends <tt>CISESim2States</tt> by adding suitable numerical values to the boundary condition signal generators.
 </HTML>
-", revisions="<html>
+",     revisions=
+             "<html>
 <ul>
 <li><i>16 Nov 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
@@ -1243,8 +1253,8 @@ Casella</a>:<br>
       extends CISESim2States(
         InitialDrumPressure=59.359e5,
         InitialDrumLevel=-0.091,
-        wfeed_offset=6.0e-2,
-        ValveOpening_offset=0.4,
+        wfeed_offset(start=6.0e-2),
+        ValveOpening_offset(start=0.4),
         hfeed1(offset=1.10593e6),
         wfeed1(
           startTime=63,
