@@ -7387,7 +7387,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
         redeclare replaceable package Medium = StandardWater constrainedby
           Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
 
-      parameter CoefficientOfHeatTransfer gamma_b=10000
+      parameter CoefficientOfHeatTransfer gamma_b=20000
         "Coefficient of heat transfer";
       parameter Area A "Cross-sectional area (single tube)";
       parameter Length Dhyd "Hydraulic Diameter (single tube)";
@@ -7518,7 +7518,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
           replaceable package Medium =
             StandardWater                                                                      constrainedby
           Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
-      parameter CoefficientOfHeatTransfer gamma_b=10000
+      parameter CoefficientOfHeatTransfer gamma_b=20000
         "Coefficient of heat transfer";
       parameter Area A "Cross-sectional area (single tube)";
       parameter Length Dhyd "Hydraulic Diameter (single tube)";
