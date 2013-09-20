@@ -521,7 +521,7 @@ This test model demonstrate four possible ways of setting the friction coefficie
 </html>"));
     end TestPressDropRev;
 
-    model TestThroughW "Test of the ThroughW component"
+    model TestThroughMassFlow "Test of the ThroughMassFlow component"
 
       Water.SourcePressure
                     SourceP1 annotation (Placement(transformation(extent={{-80,
@@ -588,7 +588,7 @@ Casella</a>:<br>
        First release.</li>
 </ul>
 </html>"));
-    end TestThroughW;
+    end TestThroughMassFlow;
 
     model TwoTanks "Test case for Tank and Flow1D"
 
@@ -2308,7 +2308,7 @@ Algorithm Tolerance = 1e-6
       parameter Time Ta=10 "Turbine acceleration time";
       parameter MomentOfInertia J=Pnet*Ta/omega^2;
       parameter HydraulicResistance Kv=1/2e5;
-      parameter PerUnit theta0(fixed=false) = 1;
+      parameter PerUnit theta0(fixed=false, start = 1);
 
       Water.SteamTurbineUnit ST(
         hpFraction=0.63,
@@ -4306,7 +4306,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 
   package DistributedParameterComponents
     "Tests for thermo-hydraulic distributed parameter components"
-
 
     model TestWaterFlow1DFV_A "Test case for Water.Flow1DFV"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
