@@ -7234,28 +7234,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 </html>"));
     end SteamTurbineBase;
 
-    partial model DistributedHeatTransferFV
-      "Base class for finite volume distributed heat transfer models"
-      extends ThermoPower.Icons.HeatFlow;
-      replaceable package Medium = StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialMedium "Medium model";
-      input Medium.ThermodynamicState fluidState[Nf];
-      input MassFlowRate w[Nf];
-      ThermoPower.Thermal.DHTVolumes wall(N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
-                40}}, rotation=0)));
-      parameter Integer Nf(min=2) "Number of nodes fluid-side";
-      parameter Integer Nw(min=1) "Number of nodes wall-side";
-      parameter Integer Nt(min=1) "Number of tubes in parallel";
-      parameter Distance L "Tube length";
-      parameter Area A "Cross-sectional area (single tube)";
-      parameter Length omega "Perimeter of heat transfer surface (single tube)";
-      parameter Length Dhyd "Hydraulic Diameter (single tube)";
-      parameter MassFlowRate wnom "Nominal mass flowrate (single tube)";
-      parameter Boolean useAverageTemperature = true
-        "= true to use average volume temperature for heat transfer";
-    end DistributedHeatTransferFV;
   end BaseClasses;
-
 
   model SourceP "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
