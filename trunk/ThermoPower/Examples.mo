@@ -1366,18 +1366,21 @@ Casella</a>:<br>
           Modelica.Media.Interfaces.PartialMedium;
         replaceable package WaterMedium = Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialMedium;
-        parameter Boolean StaticGasBalances=true;
-        parameter Integer Nr=2 "Number of tube rows";
-        parameter Integer Nt=2 "Number of parallel tubes in each row";
+        parameter Boolean StaticGasBalances=false;
+        parameter Integer Nr = 2 "Number of tube rows";
+        parameter Integer Nt = 2 "Number of parallel tubes in each row";
         parameter Length Lt "Length of a tube in a row";
         parameter Length Dint "Internal diameter of each tube";
         parameter Length Dext "External diameter of each tube";
         parameter Density rhom "Density of the tube metal walls";
         parameter SpecificHeatCapacity cm
           "Specific heat capacity of the tube metal walls";
-        parameter Area Sb "Cross-section of the boiler";
+        parameter Area Sb "Cross-section of the boiler (including tubes)";
+        final parameter Area Sb_net = Sb - Nr*Nt*Dext*pi*Lt
+          "Net cross-section of the boiler";
         parameter Length Lb "Length of the boiler";
-        //parameter Area St=Dext*pi*Lt*Nt*Nr "Total area of the heat exchange surface";
+        parameter Area St=Dext*pi*Lt*Nt*Nr
+          "Total area of the heat exchange surface";
         parameter CoefficientOfHeatTransfer gamma_nom=150
           "Nominal heat transfer coefficient";
 
@@ -1404,9 +1407,8 @@ Casella</a>:<br>
           hstartout=2.7e5,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
           redeclare ThermoPower.Thermal.HeatTransfer.DittusBoelter heatTransfer,
-          dpnom=1000,
-          initOpt=ThermoPower.Choices.Init.Options.noInit)
-                      annotation (Placement(
+          initOpt=ThermoPower.Choices.Init.Options.noInit,
+          dpnom=1000) annotation (Placement(
               transformation(extent={{-20,-70},{20,-30}}, rotation=0)));
         Thermal.MetalTubeFV
                           TubeWalls(
@@ -1525,7 +1527,6 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
                       Boiler(
           redeclare package GasMedium = GasMedium,
           Nr=10,
-          Nt=100,
           Lt=3,
           Dint=0.01,
           Dext=0.012,
@@ -1534,7 +1535,8 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
           Sb=8,
           Lb=2,
           redeclare package WaterMedium = WaterMedium,
-          StaticGasBalances=false) annotation (Placement(transformation(extent={{
+          StaticGasBalances=false,
+          Nt=250)                  annotation (Placement(transformation(extent={{
                   -20,-20},{20,20}}, rotation=0)));
         Water.ValveLin Valve(Kv=20/4e5, redeclare package Medium = WaterMedium)
           annotation (Placement(transformation(extent={{36,-50},{56,-70}},
@@ -1547,10 +1549,9 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
                     SourceW2(
           redeclare package Medium = GasMedium,
           w0=10,
+          use_in_w0=true,
           p0=100000,
-          T=670,
-          use_in_w0=true)
-                 annotation (Placement(transformation(extent={{-96,-10},{-76,10}},
+          T=670) annotation (Placement(transformation(extent={{-96,-10},{-76,10}},
                 rotation=0)));
         Gas.SinkPressure
                   SinkP2(redeclare package Medium = GasMedium, T=300) annotation (
@@ -1571,17 +1572,23 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
           annotation (Placement(transformation(extent={{-80,40},{-60,60}},
                 rotation=0)));
         Modelica.Blocks.Interfaces.RealInput ValveOpening annotation (Placement(
-              transformation(extent={{-170,-90},{-150,-70}}, rotation=0)));
+              transformation(extent={{-170,-90},{-150,-70}}, rotation=0),
+              iconTransformation(extent={{-110,-68},{-90,-48}})));
         Modelica.Blocks.Interfaces.RealOutput WaterOut_T annotation (Placement(
-              transformation(extent={{160,-50},{180,-30}}, rotation=0)));
+              transformation(extent={{160,-50},{180,-30}}, rotation=0),
+              iconTransformation(extent={{94,-30},{114,-10}})));
         Modelica.Blocks.Interfaces.RealOutput WaterIn_T annotation (Placement(
-              transformation(extent={{160,-110},{180,-90}}, rotation=0)));
+              transformation(extent={{160,-110},{180,-90}}, rotation=0),
+              iconTransformation(extent={{94,-70},{114,-50}})));
         Modelica.Blocks.Interfaces.RealOutput GasOut_T annotation (Placement(
-              transformation(extent={{160,90},{180,110}}, rotation=0)));
+              transformation(extent={{160,90},{180,110}}, rotation=0),
+              iconTransformation(extent={{92,50},{112,70}})));
         Modelica.Blocks.Interfaces.RealOutput GasIn_T annotation (Placement(
-              transformation(extent={{160,30},{180,50}}, rotation=0)));
+              transformation(extent={{160,30},{180,50}}, rotation=0),
+              iconTransformation(extent={{92,10},{112,30}})));
         Modelica.Blocks.Interfaces.RealInput GasFlowRate annotation (Placement(
-              transformation(extent={{-170,70},{-150,90}}, rotation=0)));
+              transformation(extent={{-170,70},{-150,90}}, rotation=0),
+              iconTransformation(extent={{-110,50},{-90,70}})));
         Modelica.Blocks.Continuous.FirstOrder GasFlowActuator(
           k=1,
           T=1,
@@ -1707,15 +1714,15 @@ Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model
             Tolerance=1e-007),
           Icon(coordinateSystem(
               preserveAspectRatio=false,
-              extent={{-160,-160},{160,160}},
+              extent={{-100,-100},{100,100}},
               initialScale=0.1), graphics={
               Rectangle(
-                extent={{-160,160},{160,-160}},
+                extent={{-100,100},{100,-100}},
                 lineColor={0,0,255},
                 fillColor={255,255,255},
                 fillPattern=FillPattern.Solid),
               Text(
-                extent={{-100,100},{100,-100}},
+                extent={{-72,74},{78,-60}},
                 lineColor={0,0,255},
                 lineThickness=0.5,
                 textString="P")}));
@@ -1739,7 +1746,7 @@ Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model
         discrete Real e_int_wind
           "Integrated error before anti-windup filtering";
         discrete Real CSwind "Control signal before anti-windup filtering";
-        parameter Modelica.SIunits.Time Ts=samplePeriod "Sampling Time";
+        final parameter Modelica.SIunits.Time Ts=samplePeriod "Sampling Time";
       public
         Modelica.Blocks.Interfaces.RealInput SP annotation (Placement(
               transformation(extent={{-120,40},{-80,80}},  rotation=0),
@@ -1793,7 +1800,7 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         extends Modelica.Icons.ExamplesPackage;
 
 
-      model OpenLoopSimulator
+      model OpenLoopSimulator "Open loop plant simulator"
 
         Models.HRBPlant
                  Plant annotation (Placement(transformation(extent={{-10,-26},{
@@ -1801,13 +1808,14 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         Modelica.Blocks.Sources.Step ValveOpening(
           height=-0.1,
           offset=1,
-          startTime=50) annotation (Placement(transformation(extent={{-88,-40},
+          startTime=100)
+                        annotation (Placement(transformation(extent={{-88,-40},
                   {-68,-20}},rotation=0)));
         Modelica.Blocks.Sources.Ramp GasFlowRate(
           offset=10,
           height=1,
-          startTime=100,
-          duration=0.1)  annotation (Placement(transformation(extent={{-88,18},
+          duration=0.1,
+          startTime=200) annotation (Placement(transformation(extent={{-88,18},
                   {-68,38}}, rotation=0)));
         Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(
                 extent={{-46,24},{-26,44}}, rotation=0)));
@@ -1824,27 +1832,33 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         inner System system
           annotation (Placement(transformation(extent={{40,80},{60,100}})));
       equation
-        connect(Plant.GasOut_T, TGoutOutput) annotation (Line(points={{72.5,39},
-                {80,39},{80,80},{100,80}}, color={0,0,127}));
-        connect(Plant.WaterOut_T, TWoutOutput) annotation (Line(points={{72.5,4},
-                {80,4},{80,-60},{100,-60}}, color={0,0,127}));
+        connect(Plant.GasOut_T, TGoutOutput) annotation (Line(points={{70.8,38},{80,38},
+                {80,80},{100,80}},         color={0,0,127}));
+        connect(Plant.WaterOut_T, TWoutOutput) annotation (Line(points={{71.6,6},{80,6},
+                {80,-60},{100,-60}},        color={0,0,127}));
         connect(Add1.u2, GasFlowRate.y)
           annotation (Line(points={{-48,28},{-67,28}}, color={0,0,127}));
         connect(Add1.u1, GasFlowRateInput) annotation (Line(points={{-48,40},{-60,
                 40},{-60,80},{-100,80}}, color={0,0,127}));
         connect(Plant.GasFlowRate, Add1.y)
-          annotation (Line(points={{-10,34},{-25,34}}, color={0,0,127}));
+          annotation (Line(points={{-10,38},{-18,38},{-18,34},{-25,34}},
+                                                       color={0,0,127}));
         connect(Plant.ValveOpening, Add2.y)
-          annotation (Line(points={{-10,-6},{-25,-6}}, color={0,0,127}));
+          annotation (Line(points={{-10,-9.2},{-18,-9.2},{-18,-6},{-25,-6}},
+                                                       color={0,0,127}));
         connect(Add2.u2, ValveOpening.y) annotation (Line(points={{-48,-12},{-60,
                 -12},{-60,-30},{-67,-30}}, color={0,0,127}));
         connect(Add2.u1, ValveOpeningInput)
           annotation (Line(points={{-48,0},{-100,0}}, color={0,0,127}));
         annotation (
           Diagram(graphics),
-          experiment(StopTime=150, Tolerance=1e-006),
+          experiment(StopTime=300, Tolerance=1e-006),
           Documentation(revisions="<html>
 <ul>
+<li><i>20 Sep 2013</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+    Updated and improved models and documentation.</li>
 <li><i>25 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
@@ -1853,21 +1867,26 @@ Casella</a>:<br>
 </html>
 ",     info="<html>
 <p>This model allows to simulate an open loop transient, using start attributes to select the initial values of the state variables. After about 50s, the plant reaches a steady state. </p>
-<p>At time t = 50 s, the water valve is closed by 10&percnt;. At time t = 100 s, the gas flow rate is increased by 10&percnt;.</p>
-<p>The simulator is provided with external inputs to apply changes to the system input. If the system is simulated alone, these are taken to be zero by default, so the step responses can be computed. If the system is linearized at time t = 45, the A,B,C,D matrices of the linearized model around the initial steady state can be obtained.</p>
-</html>"));
+<p>At time t =100 s, the water valve is closed by 10&percnt;. At time t = 200 s, the gas flow rate is increased by 10&percnt;.</p>
+<p>The simulator is provided with external inputs to apply changes to the system input. If the system is simulated alone, these are taken to be zero by default, so the step responses can be computed. If the system is linearized at time t = 99, the A,B,C,D matrices of the linearized model around the initial steady state can be obtained.</p>
+</html>"),__Dymola_experimentSetupOutput);
       end OpenLoopSimulator;
 
       model OpenLoopSimulatorSS
+        "Open loop plant simulator, steady-state initialization"
         extends OpenLoopSimulator(Plant(Boiler(
               GasSide(initOpt=ThermoPower.Choices.Init.Options.steadyState),
               TubeWalls(initOpt=ThermoPower.Choices.Init.Options.steadyState),
               WaterSide(initOpt=ThermoPower.Choices.Init.Options.steadyState))));
         annotation (
           Diagram(graphics),
-          experiment(StopTime=150, Tolerance=1e-006),
+          experiment(StopTime=300, Tolerance=1e-006),
           Documentation(revisions="<html>
 <ul>
+<li><i>20 Sep 2013</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+    Updated and improved models and documentation.</li>
 <li><i>25 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
@@ -1876,18 +1895,23 @@ Casella</a>:<br>
 </html>
 ",     info="<html>
 <p>This model is the same as OpenLoopSimulator, except that it starts directly from a steady state. This requires the solution of a system of nonlinear equations, which might lead to some numerical problems. If the solver is successful, the first relaxation transient of OpenLoopSimulator, which has no physical meaning, is avoided. </p>
-<p>At time t = 50 s, the water valve is closed by 10&percnt;. At time t = 100 s, the gas flow rate is increased by 10&percnt;. </p>
+<p>At time t = 100 s, the water valve is closed by 10&percnt;. At time t = 200 s, the gas flow rate is increased by 10&percnt;. </p>
 <p>The simulator is provided with external inputs to apply changes to the system input. If the system is simulated alone, these are taken to be zero by default, so the step responses can be computed. If the system is linearized at t = 0, the A,B,C,D matrices of the linearized model around the steady state can be obtained.</p>
-</html>"));
+</html>"),__Dymola_experimentSetupOutput);
       end OpenLoopSimulatorSS;
 
       model OpenLoopSimulatorHtc
+        "Open-loop plant simulator with parameter computation"
         extends OpenLoopSimulatorSS(Plant(Boiler(gamma_nom = gamma_nom)));
         parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_nom(fixed = false, start = 150);
       initial equation
-        Plant.GasOut.T = Modelica.SIunits.Conversions.from_degC(140);
+        Plant.GasOut.T = Modelica.SIunits.Conversions.from_degC(130);
         annotation (Documentation(revisions="<html>
 <ul>
+<li><i>20 Sep 2013</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+    Updated and improved models and documentation.</li>
 <li><i>25 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
@@ -1895,168 +1919,203 @@ Casella</a>:<br>
 </ul>
 </html>
 ",     info="<html>
-<p>This example shows how to use a Modelica model to solve for some unknown parameters. In this case, the nominal heat transfer coefficient <code>Plant.Boiler.gamma_nom</code> is computed in order to obtain an initial value of the gas outlet temperature equal to 125 degrees Celsius. Note that steady-state initial conditions are required to make the computation meaningful.</p>
+<p>This example shows how to use a Modelica model to solve for some unknown parameters, given some desired system output (please look at the Modelica textual code). In this case, the nominal heat transfer coefficient <code>Plant.Boiler.gamma_nom</code> is computed in order to obtain an initial value of the gas outlet temperature equal to 130 degrees Celsius. This can be used to match the model to known design data. Note that steady-state initial conditions are required to make the computation meaningful.</p>
 <p>This is performed by defining a <code>gamma_nom</code> parameter at the top level, with a<code>fixed = false</code> attribute (meaning that its value is a unknown) and with a <code>start = 150</code> attribute to provide a reasonable initial guess for the solver. This parameter is then used to override the value of <code>Plant.Boiler.gamma_nom</code>. In order to obtain a closed initialization problem, a corresponding initial equation to set the desired value of <code>Plant.GasOut.T is added.</code> </p>
-<p>The transient starts at steady state, with the desired values of the heat transfer coefficient and gas outlet temperature. At time t = 50 s, the water valve is closed by 10&percnt;. At time t = 100 s, the gas flow rate is increased by 10&percnt;. </p>
-</html>"), experiment(StopTime=150));
+<p>The transient starts at steady state, with the desired values of the heat transfer coefficient and gas outlet temperature. At time t = 100 s, the water valve is closed by 10&percnt;. At time t = 200 s, the gas flow rate is increased by 10&percnt;. </p>
+</html>"), experiment(StopTime=300, Tolerance=1e-006),
+          __Dymola_experimentSetupOutput);
       end OpenLoopSimulatorHtc;
 
       model OpenLoopSimulatorSimplified
+        "Open loop plant simulator with simplified fluid models"
         extends OpenLoopSimulatorSS(
-                                  Plant(
-            redeclare package WaterMedium = Media.LiquidWaterConstant,
-            redeclare package GasMedium =
-                Modelica.Media.IdealGases.MixtureGases.CombustionAir (fixedX=
-                    true),
-            Boiler(StaticGasBalances=true)));
-        annotation (experiment(StopTime=150), Documentation(info="<html>
-This model extends <tt>OpenLoopSimulatorSS</tt>, with some modifiers to obtain a simplified version: the water medium model is replaced by a simpler one, the gas medium is assumed at fixed composition, and static balances are assumed for the gas side.</p>
+            Plant(
+              redeclare package WaterMedium =
+                Modelica.Media.CompressibleLiquids.LinearWater_pT_Ambient,
+              redeclare package GasMedium =
+                Modelica.Media.IdealGases.MixtureGases.CombustionAir (fixedX=true)));
+        annotation (experiment(StopTime=300, Tolerance=1e-006),
+                                              Documentation(info="<html>
+<p>This model extends <code>OpenLoopSimulatorSS</code>, with some modifiers to obtain a simplified version: the water medium model is replaced by a simpler one, the gas medium is assumed at fixed composition, and static balances are assumed for the gas side. As a result, the simulation is much faster.</p>
 </html>", revisions="<html>
 <ul>
+<li><i>20 Sep 2013</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+    Updated and improved models and documentation.</li>
 <li><i>25 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-"));
+"),       __Dymola_experimentSetupOutput);
       end OpenLoopSimulatorSimplified;
 
       model ClosedLoopSimulator
+        "Plant simulation with analogue temperature controller"
 
         Models.HRBPlant
-                 Plant annotation (Placement(transformation(extent={{20,-40},{
-                  80,20}}, rotation=0)));
+                 Plant(Boiler(
+            GasSide(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+            WaterSide(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+            TubeWalls(initOpt=ThermoPower.Choices.Init.Options.steadyState)))
+                       annotation (Placement(transformation(extent={{26,-32},{76,20}},
+                           rotation=0)));
         Modelica.Blocks.Sources.Step ValveOpening(
           offset=1,
           startTime=50,
-          height=-0.1) annotation (Placement(transformation(extent={{-80,-40},{
-                  -60,-20}}, rotation=0)));
-        Modelica.Blocks.Continuous.PI TempController(k=0.3, T=12) annotation (
+          height=-0.1) annotation (Placement(transformation(extent={{-20,-32},{0,-12}},
+                             rotation=0)));
+        Modelica.Blocks.Continuous.PI TempController(
+          initType=Modelica.Blocks.Types.Init.SteadyState,
+          k=0.4,
+          T=20)                                                   annotation (
             Placement(transformation(extent={{-20,0},{0,20}}, rotation=0)));
         Modelica.Blocks.Math.Feedback Feedback1 annotation (Placement(
               transformation(extent={{-50,20},{-30,0}}, rotation=0)));
         Modelica.Blocks.Sources.Step TWOutSetPoint(
           offset=330,
           height=10,
-          startTime=150) annotation (Placement(transformation(extent={{-80,0},{
+          startTime=200) annotation (Placement(transformation(extent={{-80,0},{
                   -60,20}}, rotation=0)));
         inner System system
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
-        connect(ValveOpening.y, Plant.ValveOpening) annotation (Line(points={{-59,
-                -30},{6,-30},{6,-25},{20,-25}}, color={0,0,127}));
-        connect(TempController.y, Plant.GasFlowRate) annotation (Line(points={{
-                1,10},{10,10},{10,5},{20,5}}, color={0,0,127}));
+        connect(ValveOpening.y, Plant.ValveOpening) annotation (Line(points={{1,-22},{
+                26,-22},{26,-21.08}},           color={0,0,127}));
+        connect(TempController.y, Plant.GasFlowRate) annotation (Line(points={{1,10},{
+                26,10},{26,9.6}},             color={0,0,127}));
         connect(Feedback1.y, TempController.u)
           annotation (Line(points={{-31,10},{-22,10}}, color={0,0,127}));
-        connect(Plant.WaterOut_T, Feedback1.u2) annotation (Line(points={{
-                81.875,-17.5},{92,-17.5},{92,46},{-40,46},{-40,18}}, color={0,0,
+        connect(Plant.WaterOut_T, Feedback1.u2) annotation (Line(points={{77,-11.2},{94,
+                -11.2},{94,40},{-40,40},{-40,18}},                   color={0,0,
                 127}));
         connect(TWOutSetPoint.y, Feedback1.u1)
           annotation (Line(points={{-59,10},{-48,10}}, color={0,0,127}));
-      initial equation
-        // Control system
-        der(TempController.x) = 0;
+
         annotation (
           Diagram(graphics),
-          experiment(StopTime=300),
+          experiment(StopTime=400),
           Documentation(revisions="<html>
 <ul>
+<li><i>20 Sep 2013</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+    Updated and improved models and documentation.</li>
 <li><i>25 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-",     info=
-        "<html>
-This model simulates a simple continuous-time control system for the HRB. The water outlet temperature is controlled to the set point by a PI controller, despite the disturbances on the water flow rate.</p>
-<p>Simulate for 300 s. the system starts at steady state; at t = 50 s, the water flow rate is reduced by 10%; at t = 150 s, the water temperature set point is increased by 10 K.
-</html>"));
+",     info="<html>
+<p>This model simulates a simple continuous-time control system for the HRB. The water outlet temperature is controlled to the set point by a PI controller acting on the gas flow rate, rejecting the disturbances due to the changing water flow rate. </p>
+<p>The system starts at steady state; at t = 50 s, the water flow rate is reduced by 10&percnt;; at t = 200 s, the water temperature set point is increased by 10 K. </p>
+</html>"),__Dymola_experimentSetupOutput);
       end ClosedLoopSimulator;
 
       model ClosedLoopDigitalSimulator
+        "Plant simulation with digital temperature controller"
 
         Models.HRBPlant
-                 Plant annotation (Placement(transformation(extent={{20,-40},{
-                  80,20}}, rotation=0)));
+                 Plant(Boiler(
+            GasSide(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+            WaterSide(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+            TubeWalls(initOpt=ThermoPower.Choices.Init.Options.steadyState)))
+                       annotation (Placement(transformation(extent={{10,-30},{60,20}},
+                           rotation=0)));
         Modelica.Blocks.Sources.Step ValveOpening(
           height=-0.1,
           offset=1,
-          startTime=50) annotation (Placement(transformation(extent={{-80,-40},
-                  {-60,-20}},rotation=0)));
+          startTime=50) annotation (Placement(transformation(extent={{-36,-46},{-16,-26}},
+                             rotation=0)));
         Modelica.Blocks.Sources.Step TWOutSetPoint(
           offset=330,
           height=10,
-          startTime=150) annotation (Placement(transformation(extent={{-80,0},{
-                  -60,20}}, rotation=0)));
+          startTime=200) annotation (Placement(transformation(extent={{-76,-6},{-56,14}},
+                            rotation=0)));
         Models.DigitalPI
                   DigitalPI1(
-          Kp=0.3,
-          Ti=12,
-          CSmax=11,
           CSmin=5,
           CSstart=6.2,
           StartSteadyState=true,
-          samplePeriod=2)        annotation (Placement(transformation(extent={{
-                  -34,20},{-14,0}}, rotation=0)));
+          Kp=0.4,
+          Ti=20,
+          CSmax=15,
+          samplePeriod=3)        annotation (Placement(transformation(extent={{-36,20},
+                  {-16,0}},         rotation=0)));
         inner System system
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
       equation
-        connect(ValveOpening.y, Plant.ValveOpening) annotation (Line(points={{-59,
-                -30},{6,-30},{6,-25},{20,-25}}, color={0,0,127}));
-        connect(DigitalPI1.CSport, Plant.GasFlowRate) annotation (Line(points={
-                {-14,10},{8,10},{8,5},{20,5}}, color={0,0,127}));
-        connect(TWOutSetPoint.y, DigitalPI1.SPport)
-          annotation (Line(points={{-59,10},{-34,10}}, color={0,0,127}));
-        connect(Plant.WaterOut_T, DigitalPI1.PVport) annotation (Line(points={{
-                81.875,-17.5},{94,-17.5},{94,40},{-42,40},{-42,16},{-34,16}},
-              color={0,0,127}));
+        connect(ValveOpening.y, Plant.ValveOpening) annotation (Line(points={{-15,-36},
+                {-2,-36},{-2,-19.5},{10,-19.5}},color={0,0,127}));
+        connect(TWOutSetPoint.y, DigitalPI1.SP) annotation (Line(
+            points={{-55,4},{-36,4}},
+            color={0,0,127},
+            smooth=Smooth.None));
+        connect(DigitalPI1.CS, Plant.GasFlowRate) annotation (Line(
+            points={{-16,10},{10,10}},
+            color={0,0,127},
+            smooth=Smooth.None));
+        connect(Plant.WaterOut_T, DigitalPI1.PV) annotation (Line(
+            points={{61,-10},{94,-10},{94,40},{-48,40},{-48,16},{-36,16}},
+            color={0,0,127},
+            smooth=Smooth.None));
         annotation (
-          Diagram(graphics),
+          Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                  100}}),
+                  graphics),
           experiment(
-            StopTime=300,
-            Interval=0.1,
+            StopTime=400,
             Tolerance=1e-006,
-            Algorithm="Dassl"),
+            __Dymola_Algorithm="Dassl"),
           Documentation(revisions="<html>
 <ul>
+<li><i>20 Sep 2013</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+    Updated and improved models and documentation.</li>
 <li><i>25 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-",     info=
-        "<html>
-This model simulates simple digital control system for the HRB. The water outlet temperature is controlled to the set point by a PI controller, despite the disturbances on the water flow rate.</p>
-<p>Simulate for 300 s. the system starts at steady state; at t = 50 s, the water flow rate is reduced by 10%; at t = 150 s, the water temperature set point is increased by 10 K.
-</html>"));
+",     info="<html>
+<p>This model simulates the same scenario as ClosedLoopSimulator, using a digital PI controller with a sample time of 2 s.</p>
+</html>"),__Dymola_experimentSetupOutput);
       end ClosedLoopDigitalSimulator;
 
       model ClosedLoopDigitalSimulatorSimplified
+        "Plant simulation with digital temperature controller and simplified fluid models"
+
         extends ClosedLoopDigitalSimulator(Plant(
-            redeclare package WaterMedium = Media.LiquidWaterConstant,
+            redeclare package WaterMedium =
+                Modelica.Media.CompressibleLiquids.LinearWater_pT_Ambient,
             redeclare package GasMedium =
-                Modelica.Media.IdealGases.MixtureGases.CombustionAir (fixedX=
-                    true),
-            Boiler(StaticGasBalances=true)));
+                Modelica.Media.IdealGases.MixtureGases.CombustionAir (
+                 fixedX=true)));
+            //redeclare package WaterMedium = Media.LiquidWaterConstant,
         annotation (experiment(
             StopTime=300,
-            Interval=0.1,
-            Algorithm="Euler"), Documentation(info="<html>
-This model extends <tt>ClosedLoopDigitalSimulatorSS</tt>, with some modifiers to obtain a simplified version: the water medium model is replaced by a simpler one, the gas medium is assumed at fixed composition, and static balances are assumed for the gas side.</p>
-<p>These simplifications allow to run the simulation much faster than the original version.
+            Tolerance=1e-006,
+            __Dymola_Algorithm="Dassl"),
+                                Documentation(info="<html>
+<p>This model is the same as ClosedLoopDigitalSimulator, using the simplified process model. The simulation speed is approximately three times faster than in the case of the full model.</p>
 </html>", revisions="<html>
 <ul>
+<li><i>20 Sep 2013</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+    Updated and improved models and documentation.</li>
 <li><i>25 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-"));
+"),       __Dymola_experimentSetupOutput);
       end ClosedLoopDigitalSimulatorSimplified;
 
       model TestPI "Test model for digital PI controller"
