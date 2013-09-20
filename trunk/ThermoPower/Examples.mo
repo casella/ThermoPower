@@ -1377,8 +1377,7 @@ Casella</a>:<br>
           "Specific heat capacity of the tube metal walls";
         parameter Area Sb "Cross-section of the boiler";
         parameter Length Lb "Length of the boiler";
-        parameter Area St=Dext*pi*Lt*Nt*Nr
-          "Total area of the heat exchange surface";
+        //parameter Area St=Dext*pi*Lt*Nt*Nr "Total area of the heat exchange surface";
         parameter CoefficientOfHeatTransfer gamma_nom=150
           "Nominal heat transfer coefficient";
 
@@ -1403,10 +1402,11 @@ Casella</a>:<br>
           N=Nr + 1,
           hstartin=1e5,
           hstartout=2.7e5,
-          initOpt=ThermoPower.Choices.Init.Options.steadyState,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
           redeclare ThermoPower.Thermal.HeatTransfer.DittusBoelter heatTransfer,
-          dpnom=1000) annotation (Placement(
+          dpnom=1000,
+          initOpt=ThermoPower.Choices.Init.Options.noInit)
+                      annotation (Placement(
               transformation(extent={{-20,-70},{20,-30}}, rotation=0)));
         Thermal.MetalTubeFV
                           TubeWalls(
@@ -1415,10 +1415,10 @@ Casella</a>:<br>
           rhomcm=rhom*cm,
           lambda=20,
           L=Lt*Nr,
-          initOpt=ThermoPower.Choices.Init.Options.steadyState,
           Nw=Nr,
           Tstart1=300,
-          TstartN=340) "Tube"
+          TstartN=340,
+          initOpt=ThermoPower.Choices.Init.Options.noInit) "Tube"
           annotation (Placement(transformation(extent={{-20,0},{20,-40}},
                 rotation=0)));
         Gas.Flow1DFV GasSide(
@@ -1431,13 +1431,12 @@ Casella</a>:<br>
           N=Nr + 1,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           QuasiStatic=StaticGasBalances,
-          initOpt=ThermoPower.Choices.Init.Options.steadyState,
-          Tstartin=670,
-          Tstartout=370,
           redeclare
             ThermoPower.Thermal.HeatTransfer.FlowDependentHeatTransferCoefficient
-            heatTransfer(gamma_nom=gamma_nom, alpha=0.6))
-                         annotation (Placement(transformation(extent={{-20,60},{20,20}},
+            heatTransfer(gamma_nom=gamma_nom, alpha=0.6),
+          initOpt=ThermoPower.Choices.Init.Options.noInit,
+          Tstartin=670,
+          Tstartout=370) annotation (Placement(transformation(extent={{-20,60},{20,20}},
                            rotation=0)));
         Thermal.CounterCurrentFV
                                CounterCurrent1(Nw=Nr)    annotation (Placement(
@@ -1642,15 +1641,6 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
                 {46,-80},{-109,-80}}, color={0,0,127}));
         connect(WaterInTSensor.y, WaterIn_T)
           annotation (Line(points={{141,-100},{170,-100}}, color={0,0,127}));
-      initial equation
-        der(GasFlowActuator.y) = 0;
-        der(GasInTSensor.y) = 0;
-        der(GasOutTSensor.y) = 0;
-        der(ValveOpeningActuator.y) = 0;
-        der(WaterInTSensor.y) = 0;
-        der(WaterOutTSensor.y) = 0;
-
-      equation
         connect(WaterOut.inlet, Boiler.waterOut) annotation (Line(
             points={{10,-60},{0,-60},{0,-20}},
             thickness=0.5,
@@ -1697,7 +1687,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
           annotation (Line(points={{-132,-80},{-160,-80}}, color={0,0,127}));
         annotation (
           Diagram(coordinateSystem(
-              preserveAspectRatio=true,
+              preserveAspectRatio=false,
               extent={{-160,-160},{160,160}},
               initialScale=0.1), graphics),
           Documentation(revisions="<html>
@@ -1728,27 +1718,7 @@ Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model
                 extent={{-100,100},{100,-100}},
                 lineColor={0,0,255},
                 lineThickness=0.5,
-                textString="P"),
-              Text(
-                extent={{112,50},{142,30}},
-                lineColor={0,0,255},
-                lineThickness=0.5,
-                textString="TGin"),
-              Text(
-                extent={{112,110},{150,88}},
-                lineColor={0,0,255},
-                lineThickness=0.5,
-                textString="TGout"),
-              Text(
-                extent={{110,-90},{140,-110}},
-                lineColor={0,0,255},
-                lineThickness=0.5,
-                textString="TWin"),
-              Text(
-                extent={{110,-30},{148,-52}},
-                lineColor={0,0,255},
-                lineThickness=0.5,
-                textString="TWout")}));
+                textString="P")}));
       end HRBPlant;
 
       model DigitalPI
@@ -1760,135 +1730,52 @@ Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model
         parameter Real CSmin "Control signal saturation lower bound";
         parameter Real CSstart(
           min=CSmin,
-          max=CSmax) = 0 "Control signal initial value";
+          max=CSmax) = 0 "Control signal start value";
         parameter Boolean StartSteadyState=false
           "True=steady state initial equations activated";
-        parameter Boolean useMANswitch = false "Use MANswitch input connector";
-        parameter Boolean useTRKswitch = false "Use TRKswitch input connector";
-        parameter Boolean useMANport = false "Use MANport input connector";
-        parameter Boolean useTRKport = false "Use TRKport input connector";
 
-        Real SP "Set-Point (input)";
-        Real PV "Process Value (input)";
-        discrete Real CS(start=CSstart) "Control Signal (output)";
-        Boolean Man;
-        Boolean Trk;
-        discrete Real CSwind
-          "Control Signal auxiliary variable for anti-wind up";
+        discrete Real e "Sampled error signal";
+        discrete Real e_int(start = CSstart/Kp*Ti) "Integrated error";
+        discrete Real e_int_wind
+          "Integrated error before anti-windup filtering";
+        discrete Real CSwind "Control signal before anti-windup filtering";
         parameter Modelica.SIunits.Time Ts=samplePeriod "Sampling Time";
-        parameter Real alpha=(Kp*b*2*Ti + Kp*Ts)/(2*Ti);
-        parameter Real beta=(-Kp*b*2*Ti + Kp*Ts)/(2*Ti);
-        parameter Real gamma=(-Kp*2*Ti - Kp*Ts)/(2*Ti);
-        parameter Real delta=(Kp*2*Ti - Kp*Ts)/(2*Ti);
       public
-        Modelica.Blocks.Interfaces.RealInput SPport annotation (Placement(
-              transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-        Modelica.Blocks.Interfaces.RealOutput CSport annotation (Placement(
+        Modelica.Blocks.Interfaces.RealInput SP annotation (Placement(
+              transformation(extent={{-120,40},{-80,80}},  rotation=0),
+              iconTransformation(extent={{-120,40},{-80,80}})));
+        Modelica.Blocks.Interfaces.RealOutput CS annotation (Placement(
               transformation(extent={{80,-20},{120,20}}, rotation=0)));
-        Modelica.Blocks.Interfaces.RealInput PVport annotation (Placement(
+        Modelica.Blocks.Interfaces.RealInput PV annotation (Placement(
               transformation(extent={{-120,-80},{-80,-40}}, rotation=0)));
-        Modelica.Blocks.Interfaces.BooleanInput MANswitch if useMANswitch annotation (Placement(
-              transformation(extent={{-110,40},{-90,60}}, rotation=0)));
-        Modelica.Blocks.Interfaces.RealInput MANport if useMANport annotation (Placement(
-              transformation(
-              origin={60,100},
-              extent={{-20,-20},{20,20}},
-              rotation=270)));
-        Modelica.Blocks.Interfaces.BooleanInput TRKswitch if useTRKswitch annotation (Placement(
-              transformation(extent={{-110,76},{-90,96}}, rotation=0)));
-        Modelica.Blocks.Interfaces.RealInput TRKport if useTRKport annotation (Placement(
-              transformation(
-              origin={-8,100},
-              extent={{-20,-20},{20,20}},
-              rotation=270)));
-      protected
-        Modelica.Blocks.Interfaces.BooleanInput MANswitch_internal;
-        Modelica.Blocks.Interfaces.RealInput MANport_internal;
-        Modelica.Blocks.Interfaces.BooleanInput TRKswitch_internal;
-        Modelica.Blocks.Interfaces.RealInput TRKport_internal;
-
       equation
-        if not useMANswitch then
-          MANswitch_internal = false;
-        end if;
-
-        if not useTRKswitch then
-          TRKswitch_internal = false;
-        end if;
-
-        if not useMANport then
-          MANport_internal = 0;
-        end if;
-
-        if not useTRKport then
-          TRKport_internal = 0;
-        end if;
-
         when {initial(),sampleTrigger} then
-          Man = MANswitch_internal;
-          Trk = TRKswitch_internal;
-          if Man then
-            if MANport_internal >= CSmax then
-              CS = CSmax;
-              CSport = CSmax;
-            elseif MANport_internal <= CSmin then
-              CS = CSmin;
-              CSport = CSmin;
-            else
-              CS = MANport_internal;
-              CSport = MANport_internal;
-            end if;
+          e = SP - PV;
+          e_int_wind = pre(e_int) + Ts*e;
+          CSwind = Kp*(e_int_wind/Ti + e);
+          if CSwind > CSmax then
+            CS = CSmax;
+            e_int = (CS/Kp - e)*Ti;
+          elseif CSwind < CSmin then
+            CS = CSmin;
+            e_int = (CS/Kp - e)*Ti;
           else
-            if (Trk and not Man) then
-              if TRKport_internal >= CSmax then
-                CS = CSmax;
-                CSport = CSmax;
-              elseif TRKport_internal <= CSmin then
-                CS = CSmin;
-                CSport = CSmin;
-              else
-                CS = TRKport_internal;
-                CSport = TRKport_internal;
-              end if;
-            else
-              if CSwind >= CSmax then
-                CS = CSmax;
-                CSport = CSmax;
-              elseif CSwind <= CSmin then
-                CS = CSmin;
-                CSport = CSmin;
-              else
-                CS = CSwind;
-                CSport = CS;
-              end if;
-            end if;
+            CS = CSwind;
+            e_int = e_int_wind;
           end if;
-          CSwind = pre(CS) + alpha*SP + beta*pre(SP) + gamma*PV + delta*pre(PV);
-          SP = SPport;
-          PV = PVport;
         end when;
-
-        connect(MANport, MANport_internal);
-        connect(MANswitch, MANswitch_internal);
-        connect(TRKport, TRKport_internal);
-        connect(TRKswitch, TRKswitch_internal);
 
       initial equation
         if StartSteadyState then
-          pre(CS) = CS;
-          pre(PV) = PV;
-          pre(SP) = SP;
+          pre(e_int) = e_int;
         end if;
 
         annotation (
-          Icon(graphics={
-              Text(extent={{-56,36},{16,-34}}, textString="SP"),
-              Text(extent={{-58,-38},{14,-108}}, textString="PV"),
-              Text(extent={{62,-16},{134,-86}}, textString="CS"),
-              Text(extent={{28,86},{104,24}}, textString="MANp"),
-              Text(extent={{-56,86},{20,24}}, textString="TRKp"),
-              Text(extent={{-88,104},{-50,70}}, textString="TRK"),
-              Text(extent={{-88,66},{-50,32}}, textString="MAN")}),
+          Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
+               graphics={
+              Text(extent={{-56,96},{14,28}},  textString="SP"),
+              Text(extent={{-58,-28},{14,-98}},  textString="PV"),
+              Text(extent={{70,-20},{134,-86}}, textString="CS")}),
           Diagram(graphics),
           Documentation(info="<html>
 This is the model of a digital PI controller, complete with auto/man and tracking functionalies.
@@ -1904,6 +1791,7 @@ This is the model of a digital PI controller, complete with auto/man and trackin
 
     package Simulators "Simulation models for the HRB example"
         extends Modelica.Icons.ExamplesPackage;
+
 
       model OpenLoopSimulator
 
@@ -1963,17 +1851,41 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-",     info=
-        "<html>
-This model allows to simulate an open loop transient, starting from the guess initial conditions set inside the HRB model.</p>
-<p>Simulate for 150 s. After about 50 s, the plant reaches a steady state. At time t = 50 s, the water valve is closed by 10%. At time t = 100 s, the gas flow rate is increased by 100%.
+",     info="<html>
+<p>This model allows to simulate an open loop transient, using start attributes to select the initial values of the state variables. After about 50s, the plant reaches a steady state. </p>
+<p>At time t = 50 s, the water valve is closed by 10&percnt;. At time t = 100 s, the gas flow rate is increased by 10&percnt;.</p>
+<p>The simulator is provided with external inputs to apply changes to the system input. If the system is simulated alone, these are taken to be zero by default, so the step responses can be computed. If the system is linearized at time t = 45, the A,B,C,D matrices of the linearized model around the initial steady state can be obtained.</p>
 </html>"));
       end OpenLoopSimulator;
 
+      model OpenLoopSimulatorSS
+        extends OpenLoopSimulator(Plant(Boiler(
+              GasSide(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+              TubeWalls(initOpt=ThermoPower.Choices.Init.Options.steadyState),
+              WaterSide(initOpt=ThermoPower.Choices.Init.Options.steadyState))));
+        annotation (
+          Diagram(graphics),
+          experiment(StopTime=150, Tolerance=1e-006),
+          Documentation(revisions="<html>
+<ul>
+<li><i>25 Apr 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+Casella</a>:<br>
+    First release.</li>
+</ul>
+</html>
+",     info="<html>
+<p>This model is the same as OpenLoopSimulator, except that it starts directly from a steady state. This requires the solution of a system of nonlinear equations, which might lead to some numerical problems. If the solver is successful, the first relaxation transient of OpenLoopSimulator, which has no physical meaning, is avoided. </p>
+<p>At time t = 50 s, the water valve is closed by 10&percnt;. At time t = 100 s, the gas flow rate is increased by 10&percnt;. </p>
+<p>The simulator is provided with external inputs to apply changes to the system input. If the system is simulated alone, these are taken to be zero by default, so the step responses can be computed. If the system is linearized at t = 0, the A,B,C,D matrices of the linearized model around the steady state can be obtained.</p>
+</html>"));
+      end OpenLoopSimulatorSS;
+
       model OpenLoopSimulatorHtc
-        extends OpenLoopSimulator(Plant(Boiler(gamma_nom(fixed=false))));
+        extends OpenLoopSimulatorSS(Plant(Boiler(gamma_nom = gamma_nom)));
+        parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_nom(fixed = false, start = 150);
       initial equation
-        Plant.GasOut.T = Modelica.SIunits.Conversions.from_degC(125);
+        Plant.GasOut.T = Modelica.SIunits.Conversions.from_degC(140);
         annotation (Documentation(revisions="<html>
 <ul>
 <li><i>25 Apr 2005</i>
@@ -1982,15 +1894,16 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>
-",     info=
-        "<html>
-This model extends <tt>OpenLoopSimulatorSS</tt>, by computing the heat transfer coefficient to obtain an initial value of the gas outlet temperature equal to 125 degrees Celsius. This is performed by setting the <tt>fixed</tt> attribute of the <tt>Plant.Boiler.gamma_nom</tt> parameter to <tt>false</tt>, and by adding a corresponding initial equation to set the desired value of <tt>Plant.GasOut.T.</tt></p>
-<p>Simulate for 150 s. The transient starts at steady state, with the desired values of the heat transfer coefficient and gas outlet temperature. At time t = 50 s, the water valve is closed by 10%. At time t = 100 s, the gas flow rate is increased by 100%.
+",     info="<html>
+<p>This example shows how to use a Modelica model to solve for some unknown parameters. In this case, the nominal heat transfer coefficient <code>Plant.Boiler.gamma_nom</code> is computed in order to obtain an initial value of the gas outlet temperature equal to 125 degrees Celsius. Note that steady-state initial conditions are required to make the computation meaningful.</p>
+<p>This is performed by defining a <code>gamma_nom</code> parameter at the top level, with a<code>fixed = false</code> attribute (meaning that its value is a unknown) and with a <code>start = 150</code> attribute to provide a reasonable initial guess for the solver. This parameter is then used to override the value of <code>Plant.Boiler.gamma_nom</code>. In order to obtain a closed initialization problem, a corresponding initial equation to set the desired value of <code>Plant.GasOut.T is added.</code> </p>
+<p>The transient starts at steady state, with the desired values of the heat transfer coefficient and gas outlet temperature. At time t = 50 s, the water valve is closed by 10&percnt;. At time t = 100 s, the gas flow rate is increased by 10&percnt;. </p>
 </html>"), experiment(StopTime=150));
       end OpenLoopSimulatorHtc;
 
       model OpenLoopSimulatorSimplified
-        extends OpenLoopSimulator(Plant(
+        extends OpenLoopSimulatorSS(
+                                  Plant(
             redeclare package WaterMedium = Media.LiquidWaterConstant,
             redeclare package GasMedium =
                 Modelica.Media.IdealGases.MixtureGases.CombustionAir (fixedX=
@@ -2145,6 +2058,39 @@ Casella</a>:<br>
 </html>
 "));
       end ClosedLoopDigitalSimulatorSimplified;
+
+      model TestPI "Test model for digital PI controller"
+        ThermoPower.Examples.HRB.Models.DigitalPI digitalPI(
+          Kp=4,
+          Ti=8,
+          CSmax=1,
+          CSmin=-1,
+          samplePeriod=1)
+          annotation (Placement(transformation(extent={{-20,0},{0,20}})));
+        Modelica.Blocks.Continuous.Integrator integrator(k=0.1)
+          annotation (Placement(transformation(extent={{40,0},{60,20}})));
+        Modelica.Blocks.Sources.TimeTable timeTable(table=[0,0; 1,0; 1,1; 40,1;
+              40,1.2; 80,1.2; 80,0; 200.0,0.0])
+          annotation (Placement(transformation(extent={{-76,6},{-56,26}})));
+      equation
+        connect(digitalPI.CS, integrator.u) annotation (Line(
+            points={{0,10},{38,10}},
+            color={0,0,127},
+            smooth=Smooth.None));
+        connect(integrator.y, digitalPI.PV) annotation (Line(
+            points={{61,10},{80,10},{80,-22},{-32,-22},{-32,4},{-20,4}},
+            color={0,0,127},
+            smooth=Smooth.None));
+        connect(timeTable.y, digitalPI.SP) annotation (Line(
+            points={{-55,16},{-20,16}},
+            color={0,0,127},
+            smooth=Smooth.None));
+        annotation (
+          Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                  -100},{100,100}}), graphics),
+          experiment(StopTime=120),
+          __Dymola_experimentSetupOutput);
+      end TestPI;
     end Simulators;
     annotation (Documentation(revisions="<html>
 <ul>
