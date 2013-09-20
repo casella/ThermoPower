@@ -1,5 +1,6 @@
 within ;
 package ThermoPower "Open library for thermal power plant simulation"
+extends Modelica.Icons.Package;
 import Modelica.Math.*;
 import Modelica.SIunits.*;
 
