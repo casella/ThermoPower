@@ -690,7 +690,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
   package HeatTransfer "Heat transfer models"
     model IdealHeatTransfer
-      "Delta T across the boundary layer is zero (infinite heat transfer coeffficient)"
+      "Delta T across the boundary layer is zero (infinite h.t.c.)"
       extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature=false);
        Medium.Temperature T[Nf] "Fluid temperature";
     equation
@@ -741,7 +741,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
     end ConstantThermalConductance;
 
     model FlowDependentHeatTransferCoefficient
-      "Flow-dependent heat transfer coefficient, gamma = gamma_nom*(w/wnom)^alpha"
+      "Flow-dependent h.t.c. gamma = gamma_nom*(w/wnom)^alpha"
       extends BaseClasses.DistributedHeatTransferFV;
 
        parameter CoefficientOfHeatTransfer gamma_nom
@@ -778,7 +778,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
     end FlowDependentHeatTransferCoefficient;
 
     model FlowDependentThermalConductance
-      "Flow-dependent global thermal conductance (UA value), UA = UAnom*(w/wnom)^alpha"
+      "Flow-dependent global thermal conductance UA = UAnom*(w/wnom)^alpha"
       extends FlowDependentHeatTransferCoefficient(
         final gamma_nom = UAnom/(omega*L*Nt));
        parameter Modelica.SIunits.ThermalConductance UAnom
@@ -834,7 +834,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end DittusBoelter;
 
-    model HeatTransfer2phDB
+    model HeatTransfer2phDB "Dittus-Boelter 1-phase, constant h.t.c. 2-phase"
       extends BaseClasses.DistributedHeatTransferFV(
         final useAverageTemperature,
         redeclare replaceable package Medium =
@@ -2271,7 +2271,6 @@ This package contains models to compute the material properties needed to model 
 </html>"));
   end ConvHT2N_htc;
 
-
   model CounterCurrent
     "Counter-current heat transfer adaptor for 1D heat transfer"
     extends Icons.HeatFlow;
@@ -2613,9 +2612,6 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 </html>
 "),   Diagram(graphics));
   end HeatFlowDistribution;
-
-
-
 
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components related to heat transfer phenomena.
