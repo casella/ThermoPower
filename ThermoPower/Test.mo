@@ -4928,7 +4928,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
       Water.Flow1DFV hexFVb(
-        Nw=Nnodes-1,
         Nt=1,
         L=Lhex,
         wnom=whex,
@@ -4944,7 +4943,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         A=Aext,
         omega=omegaext,
-        Dhyd=Dehex)  annotation (Placement(transformation(
+        Dhyd=Dehex,
+        N=Nnodes)    annotation (Placement(transformation(
             extent={{-10,-10},{10,10}},
             rotation=180,
             origin={-8,28})));
@@ -4968,7 +4968,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         A=Aint,
         dpnom=1000)
         annotation (Placement(transformation(extent={{-18,-82},{2,-62}})));
-      Thermal.CounterCurrentFV counterCurrentFV(N=Nnodes, counterCurrent=true)
+      Thermal.CounterCurrentFV counterCurrentFV(Nw=Nnodes - 1)
         annotation (Placement(transformation(extent={{-18,-10},{2,10}})));
       Thermal.MetalTubeFV metalTubeFV(
         Nw=Nnodes - 1,
@@ -8240,7 +8240,6 @@ Casella</a>:<br>
       der(p) = 0;
       annotation (
         experiment(
-          StopTime=600,
           __Dymola_NumberOfIntervals=1000,
           Tolerance=1e-008),
         Documentation(info="<html>
@@ -8276,7 +8275,6 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 24
       hout = 4e5;
       der(p) = 0;
       annotation (
-        experiment(StopTime=30, Tolerance=1e-008),
         Documentation(info="<html>
 The moving boundary evaporator model is still incomplete, and it fails at t = 12.
 </html>"));
@@ -8827,7 +8825,6 @@ Algorithm Tolerance = 1e-6
           Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
                   {100,100}}),
                   graphics),
-          experiment(StopTime=200, Tolerance=1e-006),
           Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes). <br>
 This model represent the fluid side of a heat exchanger with convective exchange with an external source of given temperature. The operating fluid is liquid water.<br>
@@ -8955,7 +8952,6 @@ Algorithm Tolerance = 1e-6
           annotation (Line(points={{-69,40},{-54,40},{-54,6}}, color={0,0,127}));
         annotation (
           Diagram(graphics),
-          experiment(StopTime=2, Tolerance=1e-006),
           Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes).<br>
 This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. <br>
@@ -9146,7 +9142,6 @@ Algorithm Tolerance = 1e-6
           Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
                   {100,100}}),
                   graphics),
-          experiment(StopTime=900, Tolerance=1e-006),
           Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, model uses finite volumes).<br>
 This model represent the two fluid sides of a heat exchanger in counterflow configuration. The operating fluid is liquid water.<br>
@@ -9353,7 +9348,6 @@ Algorithm Tolerance = 1e-6
           Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
                   -100},{100,100}}),
                   graphics),
-          experiment(StopTime=900, Tolerance=1e-006),
           Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, model uses finite volumes).<br>
 This model represent the two fluid sides of a heat exchanger in counterflow configuration. The two sides are divided by a metal wall. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. <br>
@@ -9564,7 +9558,6 @@ Algorithm Tolerance = 1e-6
           Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
                   {100,100}}),
                   graphics),
-          experiment(StopTime=200, Tolerance=1e-006),
           Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes). <br>
 This model represent the fluid side of a heat exchanger with convective exchange with an external source of given temperature. The operating fluid is liquid water.<br>
@@ -9589,7 +9582,7 @@ Algorithm Tolerance = 1e-6
     end OldTests;
   end DistributedParameterComponents;
 
-  package ElectricalElements "Test for Electrical package elements"
+  package ElectricalComponents "Test for Electrical package components"
     model TestElectrical1
       parameter Power Pn=10e6 "Nominal generator power";
       parameter Time Ta=10 "Turbine acceleration time";
@@ -9996,10 +9989,10 @@ Algorithm Tolerance = 1e-6
       Modelica.Mechanics.Rotational.Sources.Torque torque_b(useSupport=false)
         annotation (Placement(transformation(extent={{86,-70},{66,-50}},
               rotation=0)));
-      ThermoPower.Test.ElectricalElements.StaticController controller_A(droop=
+      ThermoPower.Test.ElectricalComponents.StaticController controller_A(droop=
             0.05, CVnom=1e7/157.08) annotation (Placement(transformation(extent=
                {{-40,20},{-60,40}}, rotation=0)));
-      ThermoPower.Test.ElectricalElements.StaticController controller_b(droop=
+      ThermoPower.Test.ElectricalComponents.StaticController controller_b(droop=
             0.05, CVnom=1e7/157.08) annotation (Placement(transformation(extent=
                {{40,20},{60,40}}, rotation=0)));
       Modelica.Blocks.Sources.Step step_a(
@@ -10089,7 +10082,7 @@ Algorithm Tolerance = 1e-6
 </html>"),
         __Dymola_experimentSetupOutput(equdistant=false));
     end TestN2GControl;
-  end ElectricalElements;
+  end ElectricalComponents;
 
   annotation (Documentation(info="<HTML>
 This package contains test cases for the ThermoPower library.

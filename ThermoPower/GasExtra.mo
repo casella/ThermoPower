@@ -322,6 +322,8 @@ This model adds the performance characteristics to the Compressor_Base model, by
         p0=12.5e5,
         w0=0.357) annotation (Placement(transformation(extent={{-38,42},{-18,62}},
               rotation=0)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(GTunit1.shaft_b, Inertia1.flange_a) annotation (Line(points={{
               19.36,-2},{26.68,-2},{26.68,-16},{34,-16}}, color={0,0,0}));
@@ -409,6 +411,8 @@ double tabHI(12,4)   # table for HI_iso=h(ZLPout_iso,Tsync)
       Modelica.Blocks.Sources.BooleanStep BooleanStep1(startTime=1, startValue=
             true) annotation (Placement(transformation(extent={{38,36},{58,56}},
               rotation=0)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(SourceW1.flange, GTunit.Fuel_in) annotation (Line(points={{-56,56},
               {-50,56},{-50,30.12}}, color={159,159,223}));
@@ -513,14 +517,16 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         Tstart=691,
         wnom=0.3) annotation (Placement(transformation(extent={{-22,22},{-2,42}},
               rotation=0)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ConstantSpeed1.flange, Compressor11_1.shaft_a) annotation (Line(
-            points={{-72,0},{-60,0},{-60,21.9},{-46.5,21.9}}, color={0,0,0}));
+            points={{-72,0},{-60,0},{-60,22},{-46,22}},       color={0,0,0}));
       connect(Compressor11_1.shaft_b, Inertia1.flange_a) annotation (Line(
-            points={{-33.6,21.9},{-33.6,15.95},{-20,15.95},{-20,4}}, color={0,0,
+            points={{-34,22},{-34,15.95},{-20,15.95},{-20,4}},       color={0,0,
               0}));
       connect(Turbine_low1.shaft_a, Inertia1.flange_b)
-        annotation (Line(points={{8.97,22},{0,22},{0,4}}, color={0,0,0}));
+        annotation (Line(points={{10.4,22},{0,22},{0,4}}, color={0,0,0}));
       connect(Turbine_low1.outlet, PressDrop1.inlet)
         annotation (Line(points={{25.8,30},{34,30}}, color={159,159,223}));
       connect(PressDrop1.outlet, SinkP1.flange)
@@ -553,7 +559,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         annotation (Placement(transformation(extent={{-20,-6},{0,14}}, rotation=
                0)));
 
-      ThermoPower.Gas.Compressor_low Compressor1(
+      ThermoPower.GasExtra.Compressor_low Compressor1(
         redeclare package Medium = Medium,
         pstart_in=0.35e5,
         pstart_out=8.3e5,
@@ -563,7 +569,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         fileName="D:/mati_nuovo/ThermoPower/table/Compr_low.txt",
         Ndesign=523.3) annotation (Placement(transformation(extent={{-50,12},{-30,
                 32}}, rotation=0)));
-      Gas.Turbine_low Turbine_low1(
+      GasExtra.Turbine_low Turbine_low1(
         redeclare package Medium = Medium,
         Tstart_in=691,
         Tstart_out=560,
@@ -610,11 +616,13 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
             origin={-60,12},
             extent={{-10,-10},{10,10}},
             rotation=270)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
-      connect(Compressor1.shaft_b, Inertia1.flange_a) annotation (Line(points={
-              {-33.6,21.9},{-33.6,15.95},{-20,15.95},{-20,4}}, color={0,0,0}));
+      connect(Compressor1.shaft_b, Inertia1.flange_a) annotation (Line(points={{-34,22},
+              {-34,15.95},{-20,15.95},{-20,4}},                color={0,0,0}));
       connect(Turbine_low1.shaft_a, Inertia1.flange_b)
-        annotation (Line(points={{8.97,22},{0,22},{0,4}}, color={0,0,0}));
+        annotation (Line(points={{10.4,22},{0,22},{0,4}}, color={0,0,0}));
       connect(Turbine_low1.outlet, PressDrop1.inlet)
         annotation (Line(points={{25.8,30},{34,30}}, color={159,159,223}));
       connect(PressDrop1.outlet, SinkP1.flange)
@@ -627,8 +635,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         annotation (Line(points={{-32,30},{-22,30}}, color={159,159,223}));
       connect(PressDrop3.outlet, Turbine_low1.inlet)
         annotation (Line(points={{-2,30},{8.2,30}}, color={159,159,223}));
-      connect(Damper1.flange_a, Compressor1.shaft_a) annotation (Line(points={{
-              -60,22},{-54,22},{-54,21.9},{-46.5,21.9}}, color={0,0,0}));
+      connect(Damper1.flange_a, Compressor1.shaft_a) annotation (Line(points={{-60,22},
+              {-54,22},{-54,22},{-46,22}},               color={0,0,0}));
       connect(Damper1.flange_b, Fixed1.flange)
         annotation (Line(points={{-60,2},{-60,-4}}, color={0,0,0}));
     initial equation
@@ -668,6 +676,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         p0=12.5e5,
         w0=0.357) annotation (Placement(transformation(extent={{-38,42},{-18,62}},
               rotation=0)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(GTunit1.shaft_b, Inertia1.flange_a) annotation (Line(points={{
               19.36,-2},{26.68,-2},{26.68,-16},{34,-16}}, color={0,0,0}));
@@ -736,22 +746,21 @@ public */
       Gas.PressDropLin PressDropLin1(redeclare package Medium = Medium, R=8e5/
             100) annotation (Placement(transformation(extent={{16,26},{36,46}},
               rotation=0)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     initial equation
       Inertia1.w = 523.3;
     equation
       //  assert(Compressor.beta>=1, "the model works in unstable conditions");
       connect(SourceP1.flange, Compressor.inlet) annotation (Line(points={{-40,
               40},{-30,40},{-30,22},{-22,22}}, color={159,159,223}));
-      connect(Compressor.shaft_b, Inertia1.flange_a) annotation (Line(points={{
-              -7.6,13.9},{-7.6,13.95},{12,13.95},{12,14}}, color={0,0,0}));
+      connect(Compressor.shaft_b, Inertia1.flange_a) annotation (Line(points={{-8,14},
+              {-8,13.95},{12,13.95},{12,14}},              color={0,0,0}));
       connect(Compressor.outlet, PressDropLin1.inlet) annotation (Line(points={
               {-6,22},{4,22},{4,36},{16,36}}, color={159,159,223}));
       connect(PressDropLin1.outlet, SinkP1.flange)
         annotation (Line(points={{36,36},{62,36}}, color={159,159,223}));
-      annotation (
-        experiment(StopTime=2),
-        experimentSetupOutput,
-        Documentation(info="<html>
+      annotation (Documentation(info="<html>
 This model test the <tt>Compressor</tt> model with an inertial load. Boundary conditions and data refer to an turbojet engine at 11.000 m.
 <p>Simulate for 2 seconds. The compressor slows down.
 </html>"));
@@ -798,6 +807,8 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         p0=13.27e5,
         w0=0.317) annotation (Placement(transformation(extent={{-38,40},{-18,60}},
               rotation=0)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(GTunit1.shaft_b, Inertia1.flange_a) annotation (Line(points={{
               7.54,10},{26.68,10},{26.68,-16},{34,-16}}, color={0,0,0}));
@@ -839,19 +850,19 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         fileName="D:/mati_nuovo/tabelle/comprGTT.mat",
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.file) annotation (
           Placement(transformation(extent={{-24,4},{-4,24}}, rotation=0)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     initial equation
       Inertia1.w = Modelica.SIunits.Conversions.from_rpm(4923);
+
     equation
       connect(SourceP1.flange, Compressor.inlet) annotation (Line(points={{-40,
               40},{-30,40},{-30,22},{-22,22}}, color={159,159,223}));
-      connect(Compressor.shaft_b, Inertia1.flange_a) annotation (Line(points={{
-              -7.6,13.9},{-7.6,13.95},{12,13.95},{12,14}}, color={0,0,0}));
+      connect(Compressor.shaft_b, Inertia1.flange_a) annotation (Line(points={{-8,14},
+              {-8,13.95},{12,13.95},{12,14}},              color={0,0,0}));
       connect(Compressor.outlet, SinkP1.flange) annotation (Line(points={{-6,22},
               {-6,31},{10,31},{10,40}}, color={159,159,223}));
-      annotation (
-        experiment(StopTime=2),
-        experimentSetupOutput,
-        Documentation(info="<html>
+      annotation (Documentation(info="<html>
 This model test the <tt>Compressor</tt> model with an inertial load. Boundary conditions and data refer to an turbojet engine at 11.000 m.
 <p>Simulate for 2 seconds. The compressor slows down.
 </html>"));
@@ -910,13 +921,15 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         wnom=158.5,
         Tstart=1267.33) annotation (Placement(transformation(extent={{-60,28},{
                 -40,48}}, rotation=0)));
+      inner System system(allowFlowReversal=false)
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Turbine.outlet, SinkP1.flange)
         annotation (Line(points={{-7.8,38},{14,38}}, color={159,159,223}));
-      connect(Turbine.shaft_b, Inertia1.flange_a) annotation (Line(points={{-8.43,
-              30},{-4,30},{-4,6},{4,6}}, color={0,0,0}));
-      connect(ConstantSpeed1.flange, Turbine.shaft_a) annotation (Line(points={
-              {-28,2},{-26,2},{-26,30},{-21.57,30}}, color={0,0,0}));
+      connect(Turbine.shaft_b, Inertia1.flange_a) annotation (Line(points={{-9.6,30},
+              {-4,30},{-4,6},{4,6}},     color={0,0,0}));
+      connect(ConstantSpeed1.flange, Turbine.shaft_a) annotation (Line(points={{-28,2},
+              {-26,2},{-26,30},{-20.4,30}},          color={0,0,0}));
       connect(SourceP1.flange, PressDrop1.inlet)
         annotation (Line(points={{-74,38},{-60,38}}, color={159,159,223}));
       connect(PressDrop1.outlet, Turbine.inlet)
