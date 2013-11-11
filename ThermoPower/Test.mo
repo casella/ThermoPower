@@ -4026,7 +4026,7 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
                               SourceP1(
         redeclare package Medium = ThermoPower.Media.Air,
         p0=1.011e5,
-        T=288.15) annotation (Placement(transformation(extent={{-90,-4},{-70,16}},
+        T=288.15) annotation (Placement(transformation(extent={{-92,-4},{-72,16}},
               rotation=0)));
       ThermoPower.Gas.SinkPressure
                             SinkP1(
@@ -4040,9 +4040,11 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
       ThermoPower.Gas.SourceMassFlow
                               SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
+        w0=0.317,
+        p0=1327000,
         T=291.44,
-        p0=13.27e5,
-        w0=0.317) annotation (Placement(transformation(extent={{-40,24},{-20,44}},
+        use_in_w0=true)
+                  annotation (Placement(transformation(extent={{-40,24},{-20,44}},
               rotation=0)));
       Gas.PressDrop PressDrop1(
         redeclare package Medium = ThermoPower.Media.Air,
@@ -4056,8 +4058,8 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
       Modelica.Blocks.Sources.Step Step1(
         height=-0.1,
         offset=0.317,
-        startTime=1) annotation (Placement(transformation(extent={{-70,50},{-50,
-                70}}, rotation=0)));
+        startTime=1) annotation (Placement(transformation(extent={{-70,52},{-50,
+                72}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -4066,7 +4068,7 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
           color={159,159,223},
           thickness=0.5));
       connect(SourceP1.flange, PressDrop1.inlet) annotation (Line(
-          points={{-70,6},{-70,8},{-76,6},{-60,6}},
+          points={{-72,6},{-72,6},{-60,6}},
           color={159,159,223},
           thickness=0.5));
       connect(PressDrop1.outlet, GT.Air_in) annotation (Line(
@@ -4081,8 +4083,8 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
           points={{9.6,0},{60,0}},
           color={0,0,0},
           thickness=0.5));
-      connect(Step1.y, SourceW1.in_w0) annotation (Line(points={{-49,60},{-36,
-              60},{-36,39}}, color={0,0,127}));
+      connect(Step1.y, SourceW1.in_w0) annotation (Line(points={{-49,62},{-36,
+              62},{-36,39}}, color={0,0,127}));
       annotation (experiment(StopTime=2), Documentation(info="<html>
 This model tests <tt>GTunit_ISO</tt>.
 
