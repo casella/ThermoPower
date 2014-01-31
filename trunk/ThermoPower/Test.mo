@@ -5464,7 +5464,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         use_in_h=true,
         p0=6000000)   annotation (Placement(transformation(extent={{-60,-70},{-40,-50}},
                        rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{10,-40},{30,-20}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -6670,7 +6671,9 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare package Medium = Medium,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
+        dpnom=1000,
+        pstart=1000000)
+                    annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
               rotation=0)));
       ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.4/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
@@ -6708,7 +6711,8 @@ Casella</a>:<br>
                 78}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-40,40},{-20,60}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{0,20},{20,40}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -6819,7 +6823,9 @@ Algorithm Tolerance = 1e-9
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare package Medium = Medium,
         avoidInletEnthalpyDerivative=true,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
+        dpnom=1000,
+        pstart=1000000)
+                    annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
               rotation=0)));
       ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.4/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
@@ -6856,7 +6862,8 @@ Algorithm Tolerance = 1e-9
                 78}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-40,40},{-20,60}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{0,20},{20,40}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -7091,7 +7098,9 @@ Algorithm Tolerance = 1e-9
         redeclare package Medium = Medium,
         hstartin=3.2e6,
         hstartout=3.26e6,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
+        dpnom=1000,
+        pstart=1000000)
+                    annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
               rotation=0)));
       ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.2/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
@@ -7129,7 +7138,8 @@ Algorithm Tolerance = 1e-9
                 78}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-40,40},{-20,60}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{0,20},{20,40}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -7471,7 +7481,8 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
                 -80,80}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-66,40},{-46,60}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{10,-40},{30,-20}}, rotation=0)));
       Thermal.MetalTube Tube(
         N=Nnodes,
@@ -7626,7 +7637,8 @@ Algorithm Tolerance = 1e-8
                 94}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-40,60},{-20,80}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{0,-20},{20,0}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp hIn1(
         duration=30,
@@ -7778,7 +7790,8 @@ Algorithm Tolerance = 1e-7
                 -80,80}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-66,40},{-46,60}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{10,-40},{30,-20}}, rotation=0)));
       Thermal.MetalTube Tube(
         N=Nnodes,
@@ -7930,7 +7943,8 @@ Algorithm Tolerance = 1e-8
                 96}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-40,60},{-20,80}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{0,-20},{20,0}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp hIn1(
         duration=30,
@@ -8089,7 +8103,8 @@ Algorithm Tolerance = 1e-7
                 74}}, rotation=0)));
       Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(extent=
                {{-50,40},{-30,60}}, rotation=0)));
-      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1) annotation (
+      Modelica.Blocks.Sources.Ramp xValve(height=0, offset=1,
+        duration=1)                                           annotation (
           Placement(transformation(extent={{0,-20},{20,0}}, rotation=0)));
       Thermal.MetalTube MetalWall(
         N=Nnodes,
