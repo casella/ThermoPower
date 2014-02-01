@@ -1015,8 +1015,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
   equation
-    assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
     // Friction factor selection
     omega_hyd = 4*A/Dhyd;
@@ -1298,8 +1296,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Real AA1;
     Real dMdt[N - 1] "Derivative of fluid mass in each volume";
   equation
-    assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
     omega_hyd = 4*A/Dhyd;
     // Friction factor selection
@@ -1642,8 +1638,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real YY[N, N];
 
   equation
-    assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
 
     // Selection of representative pressure variable
@@ -4445,8 +4439,6 @@ This model is not yet complete
     DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
   equation
-    assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
     // Friction factor selection
     omega_hyd = 4*A/Dhyd;
@@ -4759,8 +4751,6 @@ This model is not yet complete
     Real AA1;
     Real dMdt[N - 1] "Derivative of fluid mass in each volume";
   equation
-    assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
     omega_hyd = 4*A/Dhyd;
     // Friction factor selection
@@ -5511,8 +5501,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real YY[N, N];
 
   equation
-    assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
 
     // Selection of representative pressure variable
@@ -6711,6 +6699,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       final parameter Real dzdx=H/L "Slope" annotation (Evaluate=true);
       final parameter Length l=L/(N - 1) "Length of a single volume"
         annotation (Evaluate=true);
+    equation
+        assert(FFtype == FFtypes.NoFriction or dpnom > 0,
+        "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
+
       annotation (
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
