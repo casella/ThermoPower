@@ -899,7 +899,7 @@ Casella</a>:<br>
         dpnom=1000,
         pstart=6000000,
         redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(gamma=3000))
                         annotation (Placement(transformation(extent={{-38,20},{
                 -18,40}}, rotation=0)));
@@ -948,7 +948,7 @@ Casella</a>:<br>
         dpnom=10000,
         pstart=5600000,
         redeclare
-          ThermoPower.Water.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
           heatTransfer(gamma=3000))
                         annotation (Placement(transformation(extent={{22,20},{
                 42,40}}, rotation=0)));
@@ -1106,7 +1106,8 @@ Casella</a>:<br>
 <p>The geometric parameters are already set. The start values set in the model parameters are guess values around the nominal full load steady state (60 bar drum pressure).
 <p><b>This model cannot be simulated alone</b>, as the boundary conditions (feedwater flowrate and enthalpy, steam valve opening, power to the risers and power to the superheater) are not set. See the <tt>CiseSim2States</tt> model instead.
 </HTML>
-", revisions="<html>
+",     revisions=
+             "<html>
 <ul>
 <li><i>19 Apr 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
