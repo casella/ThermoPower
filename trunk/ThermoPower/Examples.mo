@@ -1709,11 +1709,7 @@ Casella</a>:<br>
 ",     info=
           "<html>
 Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model.
-</html>"),experiment(
-            StopTime=1200,
-            NumberOfIntervals=1000,
-            Tolerance=1e-007),
-          Icon(coordinateSystem(
+</html>"),Icon(coordinateSystem(
               preserveAspectRatio=false,
               extent={{-100,-100},{100,100}},
               initialScale=0.1), graphics={
