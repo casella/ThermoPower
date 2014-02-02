@@ -3030,7 +3030,6 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
               preserveAspectRatio=false,
               extent={{-300,-200},{300,200}},
               initialScale=0.1), graphics),
-          experiment(StopTime=5000, Tolerance=1e-006),
           Icon(coordinateSystem(
               preserveAspectRatio=false,
               extent={{-100,-100},{100,100}},
