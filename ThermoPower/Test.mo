@@ -3311,11 +3311,12 @@ This models tests the Valve model in different operating conditions. The valve f
       Gas.Valve V6(
         redeclare package Medium = Medium,
         CheckValve=false,
-        Tstart=500,
-        pnom=5e5,
-        dpnom=1.5e5,
         Av=12e-4,
-        CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.Av,
+        pnom=500000,
+        dpnom=150000,
+        wnom=0.5,
+        Tstart=500)                                  annotation (Placement(
             transformation(extent={{-50,-60},{-30,-40}}, rotation=0)));
       Modelica.Blocks.Sources.Step S7(
         offset=1,
@@ -3329,21 +3330,23 @@ This models tests the Valve model in different operating conditions. The valve f
                 -10}}, rotation=0)));
       Gas.Valve V7(
         redeclare package Medium = Medium,
-        Tstart=500,
-        dpnom=0.5e5,
         CheckValve=false,
-        pnom=3.5e5,
         Kv=102,
-        CvData=ThermoPower.Choices.Valve.CvTypes.Kv) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.Kv,
+        pnom=350000,
+        dpnom=50000,
+        wnom=0.5,
+        Tstart=500)                                  annotation (Placement(
             transformation(extent={{-10,-60},{10,-40}}, rotation=0)));
       Gas.Valve V8(
         redeclare package Medium = Medium,
-        Tstart=500,
-        pnom=3e5,
-        dpnom=1e5,
         Cv=122,
         CheckValve=true,
-        CvData=ThermoPower.Choices.Valve.CvTypes.Cv) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
+        pnom=300000,
+        dpnom=100000,
+        wnom=0.5,
+        Tstart=500)                                  annotation (Placement(
             transformation(extent={{30,-60},{50,-40}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine1(
         freqHz=0.5,
