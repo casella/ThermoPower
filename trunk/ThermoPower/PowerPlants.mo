@@ -1923,156 +1923,109 @@ package PowerPlants "Models of thermoelectrical power plants components"
         annotation (Icon(coordinateSystem(
               preserveAspectRatio=false,
               extent={{-500,-200},{500,200}},
-              initialScale=0.1), graphics={
-                                           Rectangle(
+              initialScale=0.1), graphics={Rectangle(
                       extent={{-500,200},{500,-200}},
                       lineColor={170,170,255},
                       fillColor={230,230,230},
-                      fillPattern=FillPattern.Solid),
-                                                     Text(
+                      fillPattern=FillPattern.Solid),Text(
                       extent={{-210,-140},{-110,-160}},
                       lineColor={0,0,255},
                       lineThickness=0.5,
-                      textString="Rh"),
-                                       Line(points={{380,202},{380,-100}},
-                color={0,0,255}),
-                                 Line(points={{340,-100},{344,-110},{356,-120},
-                {364,-120},{376,-110},{380,-100}}, color={0,0,255}),
-                                                                    Line(points=
-                 {{340,202},{340,-100}}, color={0,0,255}),
-                                                          Line(points={{300,202},
-                {300,-100}}, color={0,0,255}),
-                                              Line(points={{260,-100},{264,-110},
+                      textString="Rh"),Line(points={{380,202},{380,-100}},
+                color={0,0,255}),Line(points={{340,-100},{344,-110},{356,-120},
+                {364,-120},{376,-110},{380,-100}}, color={0,0,255}),Line(points=
+                 {{340,202},{340,-100}}, color={0,0,255}),Line(points={{300,202},
+                {300,-100}}, color={0,0,255}),Line(points={{260,-100},{264,-110},
                 {276,-120},{284,-120},{296,-110},{300,-100}}, color={0,0,255}),
-                Line(points={{260,202},{260,-100}}, color={0,0,255}),
-                                                                     Line(
-                points={{80,200},{80,-100}}, color={0,0,255}),
-                                                              Line(points={{40,
+                Line(points={{260,202},{260,-100}}, color={0,0,255}),Line(
+                points={{80,200},{80,-100}}, color={0,0,255}),Line(points={{40,
                 -100},{44,-110},{56,-120},{64,-120},{76,-110},{80,-100}}, color=
-                 {0,0,255}),
-                            Line(points={{40,202},{40,-100}}, color={0,0,255}),
-                Line(points={{0,200},{0,-100}}, color={0,0,255}),
-                                                                 Line(points={{
+                 {0,0,255}),Line(points={{40,202},{40,-100}}, color={0,0,255}),
+                Line(points={{0,200},{0,-100}}, color={0,0,255}),Line(points={{
                 -40,-100},{-36,-110},{-24,-120},{-16,-120},{-4,-110},{0,-100}},
-                color={0,0,255}),
-                                 Line(points={{-40,200},{-40,-100}}, color={0,0,
-                255}),
-                      Line(points={{-220,200},{-220,-100}}, color={0,0,255}),
+                color={0,0,255}),Line(points={{-40,200},{-40,-100}}, color={0,0,
+                255}),Line(points={{-220,200},{-220,-100}}, color={0,0,255}),
                 Line(points={{-260,-100},{-256,-110},{-244,-120},{-236,-120},{-224,
-                -110},{-220,-100}}, color={0,0,255}),
-                                                     Line(points={{-260,200},{-260,
-                -100}}, color={0,0,255}),
-                                         Line(points={{-300,202},{-300,-100}},
-                color={0,0,255}),
-                                 Line(points={{-340,-100},{-336,-110},{-324,-120},
-                {-316,-120},{-304,-110},{-300,-100}}, color={0,0,255}),
-                                                                       Line(
-                points={{-340,200},{-340,-100}}, color={0,0,255}),
-                                                                  Line(points={
+                -110},{-220,-100}}, color={0,0,255}),Line(points={{-260,200},{-260,
+                -100}}, color={0,0,255}),Line(points={{-300,202},{-300,-100}},
+                color={0,0,255}),Line(points={{-340,-100},{-336,-110},{-324,-120},
+                {-316,-120},{-304,-110},{-300,-100}}, color={0,0,255}),Line(
+                points={{-340,200},{-340,-100}}, color={0,0,255}),Line(points={
                 {-300,-200},{-300,-140},{-380,-140},{-380,204},{-378,200}},
-                color={0,0,255}),
-                                 Line(points={{-130,-140},{-80,-140},{-80,-140},
-                {-80,204},{-78,200}}, color={0,0,255}),
-                                                       Line(points={{300,-200},
+                color={0,0,255}),Line(points={{-130,-140},{-80,-140},{-80,-140},
+                {-80,204},{-78,200}}, color={0,0,255}),Line(points={{300,-200},
                 {300,-140},{220,-140},{220,204},{222,200}}, color={0,0,255}),
                 Line(points={{-192,100},{-180,114},{-164,120},{-156,120},{-140,
-                114},{-130,100}}, color={0,0,255}),
-                                                   Line(points={{-130,100},{-130,
-                -198}}, color={0,0,255}),
-                                         Line(points={{-190,100},{-190,-198}},
-                color={0,0,255}),
-                                 Line(
+                114},{-130,100}}, color={0,0,255}),Line(points={{-130,100},{-130,
+                -198}}, color={0,0,255}),Line(points={{-190,100},{-190,-198}},
+                color={0,0,255}),Line(
                       points={{-500,80},{500,80}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,60},{500,60}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,40},{500,40}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,100},{500,100}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,0},{500,0}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,-20},{500,-20}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,-40},{500,-40}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,20},{500,20}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,-80},{500,-80}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,-100},{500,-100}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Line(
+                      thickness=0.5),Line(
                       points={{-500,-60},{500,-60}},
                       color={170,170,255},
                       pattern=LinePattern.Dash,
-                      thickness=0.5),
-                                     Polygon(points={{-386,138},{-374,138},{-380,
-                122},{-386,138}}, lineColor={0,0,255}),
-                                                       Polygon(points={{-346,
+                      thickness=0.5),Polygon(points={{-386,138},{-374,138},{-380,
+                122},{-386,138}}, lineColor={0,0,255}),Polygon(points={{-346,
                 144},{-334,144},{-340,160},{-346,144}}, lineColor={0,0,255}),
                 Polygon(points={{-306,138},{-294,138},{-300,122},{-306,138}},
-                lineColor={0,0,255}),
-                                     Polygon(points={{-266,144},{-254,144},{-260,
-                160},{-266,144}}, lineColor={0,0,255}),
-                                                       Polygon(points={{-226,
+                lineColor={0,0,255}),Polygon(points={{-266,144},{-254,144},{-260,
+                160},{-266,144}}, lineColor={0,0,255}),Polygon(points={{-226,
                 138},{-214,138},{-220,122},{-226,138}}, lineColor={0,0,255}),
                 Polygon(points={{-86,138},{-74,138},{-80,122},{-86,138}},
-                lineColor={0,0,255}),
-                                     Polygon(points={{-46,144},{-34,144},{-40,
-                160},{-46,144}}, lineColor={0,0,255}),
-                                                      Polygon(points={{-6,138},
-                {6,138},{0,122},{-6,138}}, lineColor={0,0,255}),
-                                                                Polygon(points=
+                lineColor={0,0,255}),Polygon(points={{-46,144},{-34,144},{-40,
+                160},{-46,144}}, lineColor={0,0,255}),Polygon(points={{-6,138},
+                {6,138},{0,122},{-6,138}}, lineColor={0,0,255}),Polygon(points=
                 {{34,144},{46,144},{40,160},{34,144}}, lineColor={0,0,255}),
                 Polygon(points={{74,138},{86,138},{80,122},{74,138}}, lineColor=
-                 {0,0,255}),
-                            Polygon(points={{214,138},{226,138},{220,122},{214,
-                138}}, lineColor={0,0,255}),
-                                            Polygon(points={{254,144},{266,144},
-                {260,160},{254,144}}, lineColor={0,0,255}),
-                                                           Polygon(points={{294,
+                 {0,0,255}),Polygon(points={{214,138},{226,138},{220,122},{214,
+                138}}, lineColor={0,0,255}),Polygon(points={{254,144},{266,144},
+                {260,160},{254,144}}, lineColor={0,0,255}),Polygon(points={{294,
                 138},{306,138},{300,122},{294,138}}, lineColor={0,0,255}),
                 Polygon(points={{334,144},{346,144},{340,160},{334,144}},
-                lineColor={0,0,255}),
-                                     Polygon(points={{374,138},{386,138},{380,
-                122},{374,138}}, lineColor={0,0,255}),
-                                                      Polygon(points={{-196,-144},
+                lineColor={0,0,255}),Polygon(points={{374,138},{386,138},{380,
+                122},{374,138}}, lineColor={0,0,255}),Polygon(points={{-196,-144},
                 {-184,-144},{-190,-160},{-196,-144}}, lineColor={0,0,255}),
                 Polygon(points={{-136,-170},{-124,-170},{-130,-154},{-136,-170}},
-                lineColor={0,0,255}),
-                                     Polygon(points={{-136,-124},{-124,-124},{-130,
-                -108},{-136,-124}}, lineColor={0,0,255}),
-                                                         Polygon(points={{-98,-146},
+                lineColor={0,0,255}),Polygon(points={{-136,-124},{-124,-124},{-130,
+                -108},{-136,-124}}, lineColor={0,0,255}),Polygon(points={{-98,-146},
                 {-98,-134},{-114,-140},{-98,-146}}, lineColor={0,0,255}),
                 Ellipse(
                       extent={{-134,-136},{-126,-144}},
@@ -15244,7 +15197,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
               extent={{-5,-20},{5,20}},
               rotation=180)));
       public
-        Modelica.Blocks.Sources.Constant com_valveHP annotation (Placement(
+        Modelica.Blocks.Sources.Constant com_valveHP(k=1)
+                                                     annotation (Placement(
               transformation(extent={{92,-10},{72,10}}, rotation=0)));
       public
         Modelica.Blocks.Sources.Constant com_valveLP(k=1) annotation (Placement(
@@ -15301,7 +15255,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=0.5,
             color={0,0,255}));
         connect(com_valveHP.y, actuators.Opening_valveHP) annotation (Line(
-              points={{71,0},{54,0},{54,-40},{37,-40},{37,-40}}, color={0,0,127}));
+              points={{71,0},{54,0},{54,-40},{37,-40}},          color={0,0,127}));
         connect(com_valveIP.y, actuators.Opening_valveIP)
           annotation (Line(points={{71,-40},{37,-40}}, color={0,0,127}));
         connect(com_valveLP.y, actuators.Opening_valveLP) annotation (Line(
