@@ -5450,7 +5450,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       parameter Real Cfhex=0.005;
       Water.ValveLin             valve(Kv=0.05/60e5) annotation (Placement(
             transformation(extent={{30,-70},{50,-50}}, rotation=0)));
-      Water.SinkPressure      Sink(p0=0) annotation (Placement(transformation(
+      Water.SinkPressure      Sink(p0=10000)
+                                         annotation (Placement(transformation(
               extent={{70,-70},{90,-50}}, rotation=0)));
       Modelica.Blocks.Sources.Step hIn(
         height=0,
@@ -5483,30 +5484,21 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare ThermoPower.Thermal.HeatTransfer.HeatTransfer2phDB
-                                                      heatTransfer(
-          Nf=Nnodes,
-          A=Ahex,
-          Dhyd=2*rhex,
-          omega=omegahex,
-          L=Lhex,
-          redeclare package Medium = Medium,
-          fluidState=hexFV.fluidState,
-          w=hexFV.w*ones(Nnodes),
-          gamma_b=30000),
+          heatTransfer(gamma_b=30000),
         dpnom=1000)
         annotation (Placement(transformation(extent={{-20,-70},{0,-50}})));
       Thermal.MetalTubeFV metalTubeFV(
-        N=Nnodes,
         L=Lhex,
         rint=rhex,
         rhomcm=7000*680,
         lambda=20,
         rext=rhex + 2*thhex,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nw=Nnodes - 1,
         Tstart1=510,
         TstartN=510)
         annotation (Placement(transformation(extent={{-20,-26},{0,-6}})));
-      Thermal.TempSource1DlinFV tempSource1DlinFV(N=Nnodes)
+      Thermal.TempSource1DlinFV tempSource1DlinFV(Nw=Nnodes - 1)
         annotation (Placement(transformation(extent={{-20,6},{0,26}})));
       Modelica.Blocks.Sources.Ramp extTemp1(
         duration=100,
