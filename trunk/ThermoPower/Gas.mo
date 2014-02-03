@@ -2402,7 +2402,7 @@ This model extends the CombustionChamber Base model, with the definition of the 
       annotation (Placement(transformation(extent={{-12,30},{8,50}}, rotation=0)));
     Real N_T "Referred speed ";
     Real N_T_design "Referred design velocity";
-    Real phic(final unit="(kg/s)*(T^0.5)/Pa") "Flow number ";
+    Real phic "Flow number ";
     Real beta(start=integer(size(tablePhic, 1)/2)) "Number of beta line";
 
   equation
@@ -3359,7 +3359,6 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 
   package BaseClasses
   end BaseClasses;
-
 
   model SourceP "Pressure source for gas flows"
     extends Icons.Gas.SourceP;
