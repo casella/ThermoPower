@@ -1872,7 +1872,7 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter CvTypes CvData=CvTypes.Av "Selection of flow coefficient";
     parameter Area Av(
       fixed=if CvData == CvTypes.Av then true else false,
-      start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom)) = 0
+      start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
       "Av (metric) flow coefficient" annotation (Dialog(group=
             "Flow Coefficient", enable=(CvData == CvTypes.Av)));
     parameter Real Kv(unit="m3/h") = 0 "Kv (metric) flow coefficient"
