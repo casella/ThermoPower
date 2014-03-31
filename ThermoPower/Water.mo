@@ -7486,7 +7486,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       Diagram(graphics));
   end SinkW;
 
-  model ThroughW2 "Prescribes the flow rate across the component"
+  model ThroughW "Prescribes the flow rate across the component"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
@@ -7534,7 +7534,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </ul>
 </html>"),
       Diagram(graphics));
-  end ThroughW2;
+  end ThroughW;
 
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
