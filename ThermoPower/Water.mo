@@ -469,23 +469,22 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.ThermodynamicState state "Thermodynamic state of the fluid";
     parameter MassFlowRate wnom "Nominal mass flowrate";
     parameter FFtypes FFtype=FFtypes.Kf "Friction Factor Type";
-    parameter Real Kf(
-      fixed=if FFtype == FFtypes.Kf then true else false,
-      unit="Pa.kg/(m3.kg2/s2)") "Hydraulic resistance coefficient";
-    parameter Pressure dpnom=0 "Nominal pressure drop";
-    parameter Density rhonom=0 "Nominal density";
+    parameter Real Kf = 0 "Hydraulic resistance coefficient (DP = Kf*w^2/rho)"
+      annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kf)));
+    parameter Pressure dpnom "Nominal pressure drop";
+    parameter Density rhonom=0 "Nominal density"
+      annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.OpPoint)));
     parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity2/2)";
     parameter Area A=0 "Cross-section";
     parameter Real wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
+    final parameter Real Kf_a(fixed = false)
+      "Actual hydraulic resistance coefficient";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
     function squareReg = ThermoPower.Functions.squareReg;
-  protected
-    parameter Real Kfl(fixed=false) "Linear friction coefficient";
-  public
     Medium.Density rho "Fluid density";
     MassFlowRate w "Flow rate at the inlet";
     Pressure pin "Inlet pressure";
@@ -498,16 +497,18 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
              else 0), redeclare package Medium = Medium) annotation (Placement(
           transformation(extent={{80,-20},{120,20}}, rotation=0)));
   initial equation
-    // Set Kf if FFtype <> FFtypes.Kf
-    if FFtype == FFtypes.OpPoint then
-      Kf = dpnom*rhonom/wnom^2*Kfc;
+    if FFtype == FFtypes.Kf then
+      Kf_a = Kf*Kfc;
+    elseif FFtype == FFtypes.OpPoint then
+      Kf_a = dpnom*rhonom/wnom^2*Kfc;
     elseif FFtype == FFtypes.Kinetic then
-      Kf = K/(2*A^2)*Kfc;
+      Kf_a = K/(2*A^2)*Kfc;
+    else
+      Kf_a = 0;
+      assert(false, "Unsupported FFtype");
     end if;
-    Kfl = wnom*wnf*Kf "Linear friction factor";
   equation
-    assert(dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
+    assert(dpnom > 0, "Please set a non-negative value for dpnom");
     // Fluid properties
   /*
   if not allowFlowReversal then
@@ -520,11 +521,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         wnom*wnf);
   end if;
   */
-      state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
+    state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
 
     rho = Medium.density(state) "Fluid density";
-    pin - pout = homotopy(smooth(1, Kf*squareReg(w, wnom*wnf))/rho, dpnom/wnom*
-      w) "Flow characteristics";
+    pin - pout = homotopy(smooth(1, Kf_a*squareReg(w, wnom*wnf))/rho,
+                                 dpnom/wnom*w) "Flow characteristics";
     inlet.m_flow + outlet.m_flow = 0 "Mass  balance";
     // Energy balance
     inlet.h_outflow = inStream(outlet.h_outflow);
@@ -6633,19 +6634,25 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       parameter Position H=0 "Elevation of outlet over inlet";
       parameter Area A "Cross-sectional area (single tube)";
       parameter Length omega "Perimeter of heat transfer surface (single tube)";
-      parameter MassFlowRate wnom "Nominal mass flowrate (total)";
-      parameter FFtypes FFtype=FFtypes.NoFriction "Friction Factor Type"
-        annotation (Evaluate=true);
-      parameter Real Kfnom(
-        unit="Pa.kg/(m3.kg2/s2)",
-        min=0) = 0 "Nominal hydraulic resistance coefficient";
-      parameter Pressure dpnom=0 "Nominal pressure drop (friction term only!)";
-      parameter Density rhonom=0 "Nominal inlet density";
       parameter Length Dhyd = omega/pi "Hydraulic Diameter (single tube)";
-      parameter Real Cfnom=0 "Nominal Fanning friction factor";
-      parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
+      parameter MassFlowRate wnom "Nominal mass flowrate (total)";
+      parameter FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
+        "Friction Factor Type"
+        annotation (Evaluate=true);
+      parameter Pressure dpnom "Nominal pressure drop (friction term only!)";
+      parameter Real Kfnom = 0
+        "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)"
+       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
+      parameter Density rhonom=0 "Nominal inlet density"
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint)));
+      parameter Real Cfnom=0 "Nominal Fanning friction factor"
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
+      parameter Real e=0 "Relative roughness (ratio roughness/diameter)"
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)));
+      parameter Real Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
-        "Inertial phenomena accounted for" annotation (Evaluate=true);
+        "Inertial phenomena accounted for"
+        annotation (Evaluate=true);
       parameter HCtypes HydraulicCapacitance=HCtypes.Downstream
         "Location of the hydraulic capacitance";
       parameter Boolean avoidInletEnthalpyDerivative=true
@@ -6673,7 +6680,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         annotation (Dialog(tab="Initialisation"));
       parameter Real wnf=0.02
         "Fraction of nominal flow rate at which linear friction equals turbulent friction";
-      parameter Real Kfc=1 "Friction factor correction coefficient";
       parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
         "Initialisation option" annotation (Dialog(tab="Initialisation"));
       constant Real g=Modelica.Constants.g_n;
