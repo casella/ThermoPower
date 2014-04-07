@@ -6637,7 +6637,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
         annotation (Evaluate=true);
-      parameter Pressure dpnom "Nominal pressure drop (friction term only!)";
+      parameter Pressure dpnom = 0
+        "Nominal pressure drop (friction term only!)";
       parameter Real Kfnom = 0
         "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)"
        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
