@@ -866,64 +866,11 @@ package Gas "Models of components with ideal gases as working fluid"
   end Mixer;
 
   model Flow1DFV "1-dimensional fluid flow model for gas (finite volumes)"
-    extends Icons.Gas.Tube;
-    import ThermoPower.Choices.Flow1D.FFtypes;
-    import ThermoPower.Choices.Flow1D.HCtypes;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
-      annotation(choicesAllMatching = true);
-    parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
-    final parameter Integer Nw = N - 1
-      "Number of volumes on the wall interface";
-    parameter Integer Nt=1 "Number of tubes in parallel";
-    parameter Distance L "Tube length";
-    parameter Position H=0 "Elevation of outlet over inlet";
-    parameter Area A "Cross-sectional area (single tube)";
-    parameter Length omega "Perimeter of heat transfer surface (single tube)";
-    parameter Length Dhyd "Hydraulic Diameter (single tube)";
-    parameter MassFlowRate wnom "Nominal mass flowrate (total)";
-    parameter FFtypes FFtype "Friction Factor Type";
-    parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient";
-    parameter Pressure dpnom=0 "Nominal pressure drop";
-    parameter Density rhonom=0 "Nominal inlet density";
-    parameter Real Cfnom=0 "Nominal Fanning friction factor";
-    parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
-    parameter Boolean DynamicMomentum=false "Inertial phenomena accounted for"
-      annotation (Evaluate=true);
-    parameter Boolean UniformComposition=true
-      "Uniform gas composition is assumed" annotation (Evaluate=true);
-    parameter Boolean QuasiStatic=false
-      "Quasi-static model (mass, energy and momentum static balances"
-      annotation (Evaluate=true);
-    parameter HCtypes HydraulicCapacitance=HCtypes.Downstream
-      "1: Upstream, 2: Downstream";
-    parameter Boolean avoidInletEnthalpyDerivative=true
-      "Avoid inlet enthalpy derivative";
-    parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
-    outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart=1e5 "Pressure start value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstartbar=300
-      "Avarage temperature start value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstartin=Tstartbar
-      "Inlet temperature start value" annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstartout=Tstartbar
-      "Outlet temperature start value" annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstart[N]=linspace(
-          Tstartin,
-          Tstartout,
-          N) "Start value of temperature vector (initialized by default)"
-      annotation (Dialog(tab="Initialisation"));
-    final parameter Velocity unom=10 "Nominal velocity for simplified equation";
-    parameter Real wnf=0.01
-      "Fraction of nominal flow rate at which linear friction equals turbulent friction";
-    parameter Real Kfc=1 "Friction factor correction coefficient";
-    parameter MassFraction Xstart[nX]=Medium.reference_X
-      "Start gas composition" annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
-    function squareReg = ThermoPower.Functions.squareReg;
+    extends BaseClasses.Flow1DBase;
+
+    Thermal.DHTVolumes wall(N=Nw) annotation (Dialog(enable=false),
+        Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
+
     replaceable Thermal.HeatTransfer.IdealHeatTransfer heatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
@@ -933,21 +880,6 @@ package Gas "Models of components with ideal gases as working fluid"
       final w=w*ones(N), final fluidState=gas.state) "Heat transfer model"
       annotation(choicesAllMatching = true);
 
-  protected
-    parameter Integer nXi=Medium.nXi "number of independent mass fractions";
-    parameter Integer nX=Medium.nX "total number of mass fractions";
-    constant Real g=Modelica.Constants.g_n;
-  public
-    FlangeA infl(redeclare package Medium = Medium, m_flow(start=wnom, min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-    FlangeB outfl(redeclare package Medium = Medium, m_flow(start=-wnom, max=
-            if allowFlowReversal then +Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
-             0)));
-    Thermal.DHTVolumes wall(N=Nw) annotation (Dialog(enable=false),
-        Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
-  public
     Medium.BaseProperties gas[N] "Gas nodal properties";
     Pressure Dpfric "Pressure drop due to friction";
     Length omega_hyd "Wet perimeter (single tube)";
@@ -973,7 +905,6 @@ package Gas "Models of components with ideal gases as working fluid"
     Mass Mtot "Gas Mass (total)";
     Real Q "Total heat flow through the wall (all Nt tubes)";
   protected
-    parameter Real dzdx=H/L "Slope";
     parameter Length l=L/(N - 1) "Length of a single volume";
     Density rhobar[N - 1] "Fluid average density";
     SpecificVolume vbar[N - 1] "Fluid average specific volume";
@@ -995,28 +926,32 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.DerDensityByPressure dddp[N] "Derivative of density by pressure";
     Real dddX[N, nX](each unit="kg/m3") "Derivative of density by composition";
   equation
-    assert(FFtype == FFtypes.NoFriction or dpnom > 0,
+    assert(FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction or dpnom > 0,
       "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
     // Friction factor selection
     omega_hyd = 4*A/Dhyd;
-    if FFtype == FFtypes.Kfnom then
+    if FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom then
       Kf = Kfnom*Kfc;
       Cf = 2*Kf*A^3/(omega_hyd*L);
-    elseif FFtype == FFtypes.OpPoint then
+    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint then
       Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
       Cf = 2*Kf*A^3/(omega_hyd*L);
-    elseif FFtype == FFtypes.Cfnom then
+    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom then
       Kf = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
       Cf = Cfnom*Kfc;
-    elseif FFtype == FFtypes.Colebrook then
+    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook then
       Cf = f_colebrook(
           w,
           Dhyd/A,
           e,
           Medium.dynamicViscosity(gas[integer(N/2)].state))*Kfc;
       Kf = Cf*omega_hyd*L/(2*A^3);
-    elseif FFtype == FFtypes.NoFriction then
+    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction then
+      Cf = 0;
+      Kf = 0;
+    else
+      assert(false, "Unsupported FFtype");
       Cf = 0;
       Kf = 0;
     end if;
@@ -1028,8 +963,9 @@ package Gas "Models of components with ideal gases as working fluid"
 
     sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpfric = 0 "Momentum balance";
-    Dpfric = (if FFtype == FFtypes.NoFriction then 0 else homotopy((smooth(1,
-      Kf*squareReg(w, wnom/Nt*wnf))*sum(vbar)/(N - 1)), dpnom/(wnom/Nt)*w))
+    Dpfric = (if FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction then 0
+              else homotopy((smooth(1, Kf*squareReg(w, wnom/Nt*wnf))*sum(vbar)/(N - 1)),
+                             dpnom/(wnom/Nt)*w))
       "Pressure drop due to friction";
     for j in 1:N - 1 loop
       if not QuasiStatic then
@@ -1121,7 +1057,7 @@ package Gas "Models of components with ideal gases as working fluid"
     end for;
 
     // Selection of representative pressure and flow rate variables
-    if HydraulicCapacitance == HCtypes.Upstream then
+    if HydraulicCapacitance ==ThermoPower.Choices.Flow1D.HCtypes.Upstream then
       p = infl.p;
       w = -outfl.m_flow/Nt;
     else
@@ -3358,6 +3294,97 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
   end FanMech;
 
   package BaseClasses
+    partial model Flow1DBase
+      "Basic interface for 1-dimensional water/steam fluid flow models"
+      extends Icons.Gas.Tube;
+      import ThermoPower.Choices.Flow1D.FFtypes;
+      import ThermoPower.Choices.Flow1D.HCtypes;
+      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+        annotation(choicesAllMatching = true);
+      parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
+      final parameter Integer Nw = N - 1
+        "Number of volumes on the wall interface";
+      parameter Integer Nt=1 "Number of tubes in parallel";
+      parameter Distance L "Tube length";
+      parameter Position H=0 "Elevation of outlet over inlet";
+      parameter Area A "Cross-sectional area (single tube)";
+      parameter Length omega "Perimeter of heat transfer surface (single tube)";
+      parameter Length Dhyd "Hydraulic Diameter (single tube)";
+      parameter MassFlowRate wnom "Nominal mass flowrate (total)";
+      parameter FFtypes FFtype "Friction Factor Type";
+      parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient";
+      parameter Pressure dpnom=0 "Nominal pressure drop";
+      parameter Density rhonom=0 "Nominal inlet density";
+      parameter Real Cfnom=0 "Nominal Fanning friction factor";
+      parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
+      parameter Boolean DynamicMomentum=false
+        "Inertial phenomena accounted for"
+        annotation (Evaluate=true);
+      parameter Boolean UniformComposition=true
+        "Uniform gas composition is assumed" annotation (Evaluate=true);
+      parameter Boolean QuasiStatic=false
+        "Quasi-static model (mass, energy and momentum static balances"
+        annotation (Evaluate=true);
+      parameter HCtypes HydraulicCapacitance=HCtypes.Downstream
+        "1: Upstream, 2: Downstream";
+      parameter Boolean avoidInletEnthalpyDerivative=true
+        "Avoid inlet enthalpy derivative";
+      parameter Boolean allowFlowReversal=system.allowFlowReversal
+        "= true to allow flow reversal, false restricts to design direction";
+      outer ThermoPower.System system "System wide properties";
+      parameter Pressure pstart=1e5 "Pressure start value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter AbsoluteTemperature Tstartbar=300
+        "Avarage temperature start value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter AbsoluteTemperature Tstartin=Tstartbar
+        "Inlet temperature start value" annotation (Dialog(tab="Initialisation"));
+      parameter AbsoluteTemperature Tstartout=Tstartbar
+        "Outlet temperature start value" annotation (Dialog(tab="Initialisation"));
+      parameter AbsoluteTemperature Tstart[N]=linspace(
+            Tstartin,
+            Tstartout,
+            N) "Start value of temperature vector (initialized by default)"
+        annotation (Dialog(tab="Initialisation"));
+      final parameter Velocity unom=10
+        "Nominal velocity for simplified equation";
+      parameter Real wnf=0.01
+        "Fraction of nominal flow rate at which linear friction equals turbulent friction";
+      parameter Real Kfc=1 "Friction factor correction coefficient";
+      parameter MassFraction Xstart[nX]=Medium.reference_X
+        "Start gas composition" annotation (Dialog(tab="Initialisation"));
+      parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
+        "Initialisation option" annotation (Dialog(tab="Initialisation"));
+      function squareReg = ThermoPower.Functions.squareReg;
+    protected
+      parameter Integer nXi=Medium.nXi "number of independent mass fractions";
+      parameter Integer nX=Medium.nX "total number of mass fractions";
+    public
+      FlangeA infl(redeclare package Medium = Medium, m_flow(start=wnom, min=if
+              allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+         Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+      FlangeB outfl(redeclare package Medium = Medium, m_flow(start=-wnom, max=
+              if allowFlowReversal then +Modelica.Constants.inf else 0))
+        annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
+               0)));
+    equation
+        assert(FFtype == FFtypes.NoFriction or dpnom > 0,
+        "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
+      annotation (
+        Documentation(info="<HTML>
+Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
+</HTML>
+",     revisions="<html>
+<ul>
+<li><i>7 Apr 2014</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Added base class.</li>
+
+</ul>
+</html>"),
+        Diagram(graphics),
+        Icon(graphics));
+    end Flow1DBase;
   end BaseClasses;
 
   model SourceP "Pressure source for gas flows"
