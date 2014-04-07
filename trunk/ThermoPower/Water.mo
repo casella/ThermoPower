@@ -6625,8 +6625,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         annotation(choicesAllMatching = true);
       extends Icons.Water.Tube;
       constant Real pi = Modelica.Constants.pi;
-      import ThermoPower.Choices.Flow1D.FFtypes;
-      import ThermoPower.Choices.Flow1D.HCtypes;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
       parameter Integer Nw = N - 1 "Number of volumes on the wall interface";
       parameter Integer Nt = 1 "Number of tubes in parallel";
@@ -6636,7 +6634,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       parameter Length omega "Perimeter of heat transfer surface (single tube)";
       parameter Length Dhyd = omega/pi "Hydraulic Diameter (single tube)";
       parameter MassFlowRate wnom "Nominal mass flowrate (total)";
-      parameter FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
+      parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
         annotation (Evaluate=true);
       parameter Pressure dpnom "Nominal pressure drop (friction term only!)";
@@ -6653,7 +6651,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       parameter Boolean DynamicMomentum=false
         "Inertial phenomena accounted for"
         annotation (Evaluate=true);
-      parameter HCtypes HydraulicCapacitance=HCtypes.Downstream
+      parameter ThermoPower.Choices.Flow1D.HCtypes HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream
         "Location of the hydraulic capacitance";
       parameter Boolean avoidInletEnthalpyDerivative=true
         "Avoid inlet enthalpy derivative";
@@ -6706,7 +6704,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       final parameter Length l=L/(N - 1) "Length of a single volume"
         annotation (Evaluate=true);
     equation
-        assert(FFtype == FFtypes.NoFriction or dpnom > 0,
+        assert(FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
 
       annotation (
