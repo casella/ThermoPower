@@ -3024,11 +3024,10 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
                 -40}}, rotation=0)));
       Gas.Valve Valve2(
         redeclare package Medium = Medium,
-        dpnom=1.5e5,
-        pnom=2.5e5,
-        Av=20e-4,
         wnom=1,
-        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
+        pnom=250000,
+        dpnom=150000)                                     annotation (Placement(
             transformation(extent={{40,-60},{60,-40}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine2(
         phase=0,
