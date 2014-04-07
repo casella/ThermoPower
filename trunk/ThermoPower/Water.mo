@@ -475,7 +475,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Density rhonom=0 "Nominal density"
       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.OpPoint)));
     parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity2/2)";
+      annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kinetic)));
     parameter Area A=0 "Cross-section";
+      annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kinetic)));
     parameter Real wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
