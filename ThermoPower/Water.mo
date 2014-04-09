@@ -475,9 +475,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Density rhonom=0 "Nominal density"
       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.OpPoint)));
     parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity2/2)";
-      annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kinetic)));
     parameter Area A=0 "Cross-section";
-      annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kinetic)));
     parameter Real wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
     parameter Real Kfc=1 "Friction factor correction coefficient";
@@ -537,7 +535,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     pin = inlet.p;
     pout = outlet.p;
     dp = pin - pout;
-    annotation (
+      annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kinetic)),
+                 Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kinetic)),
       Icon(graphics={Text(extent={{-100,-50},{100,-82}}, textString="%name")}),
       Documentation(info="<HTML>
 <p>The pressure drop across the inlet and outlet connectors is computed according to a turbulent friction model, i.e. is proportional to the squared velocity of the fluid. The friction coefficient can be specified directly, or by giving an operating point, or as a multiple of the kinetic pressure. In the latter two cases, the correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit some experimental operating point.</p>
@@ -6740,45 +6739,51 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 
     partial model ValveBase "Base model for valves"
       extends Icons.Water.Valve;
-      import ThermoPower.Choices.Valve.CvTypes;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
       Medium.ThermodynamicState fluidState(p(start=pin_start));
-      parameter CvTypes CvData=CvTypes.Av "Selection of flow coefficient";
+      parameter ThermoPower.Choices.Valve.CvTypes CvData=ThermoPower.Choices.Valve.CvTypes.Av
+        "Selection of flow coefficient";
       parameter Area Av(
-        fixed=if CvData == CvTypes.Av then true else false,
+        fixed=if CvData == ThermoPower.Choices.Valve.CvTypes.Av then true else false,
         start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
-        "Av (metric) flow coefficient" annotation (Dialog(group=
-              "Flow Coefficient", enable=(CvData == CvTypes.Av)));
+        "Av (metric) flow coefficient"
+        annotation (Dialog(group="Flow Coefficient",
+                           enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Av)));
       parameter Real Kv(unit="m3/h") = 0 "Kv (metric) flow coefficient"
-        annotation (Dialog(group="Flow Coefficient", enable=(CvData == CvTypes.Kv)));
-      parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]" annotation (
-          Dialog(group="Flow Coefficient", enable=(CvData == CvTypes.Cv)));
+        annotation (Dialog(group="Flow Coefficient",
+                           enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Kv)));
+      parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]"
+        annotation (Dialog(group="Flow Coefficient",
+                           enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Cv)));
       parameter Pressure pnom "Nominal inlet pressure"
         annotation (Dialog(group="Nominal operating point"));
       parameter Pressure dpnom "Nominal pressure drop"
         annotation (Dialog(group="Nominal operating point"));
       parameter MassFlowRate wnom "Nominal mass flowrate"
         annotation (Dialog(group="Nominal operating point"));
-      parameter Density rhonom=1000 "Nominal density" annotation (Dialog(group=
-              "Nominal operating point", enable=(CvData == CvTypes.OpPoint)));
-      parameter Real thetanom=1 "Nominal valve opening" annotation (Dialog(
-            group="Nominal operating point", enable=(CvData == CvTypes.OpPoint)));
+      parameter Density rhonom=1000 "Nominal density"
+        annotation (Dialog(group="Nominal operating point",
+                           enable=(CvData == ThermoPower.Choices.Valve.CvTypes.OpPoint)));
+      parameter Real thetanom=1 "Nominal valve opening"
+        annotation (Dialog(group="Nominal operating point",
+                           enable=(CvData == ThermoPower.Choices.Valve.CvTypes.OpPoint)));
       parameter Power Qnom=0 "Nominal heat loss to ambient"
         annotation (Dialog(group="Nominal operating point"), Evaluate=true);
       parameter Boolean CheckValve=false "Reverse flow stopped";
       parameter Real b=0.01 "Regularisation factor";
       replaceable function FlowChar = Functions.ValveCharacteristics.linear
         constrainedby Functions.ValveCharacteristics.baseFun
-        "Flow characteristic" annotation (choicesAllMatching=true);
+        "Flow characteristic"
+        annotation (choicesAllMatching=true);
       parameter Boolean allowFlowReversal=system.allowFlowReversal
         "= true to allow flow reversal, false restricts to design direction";
       outer ThermoPower.System system "System wide properties";
-      final parameter Pressure pin_start=pnom "Inlet pressure start value"
+      parameter Pressure pin_start=pnom "Inlet pressure start value"
         annotation (Dialog(tab="Initialisation"));
-      final parameter Pressure pout_start=pnom - dpnom
-        "Inlet pressure start value" annotation (Dialog(tab="Initialisation"));
+      parameter Pressure pout_start=pnom - dpnom "Inlet pressure start value"
+        annotation (Dialog(tab="Initialisation"));
       MassFlowRate w "Mass flow rate";
       LiquidDensity rho "Inlet density";
       Medium.Temperature Tin;
@@ -6804,9 +6809,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
             extent={{-20,-20},{20,20}},
             rotation=270)));
     initial equation
-      if CvData == CvTypes.Kv then
+      if CvData == ThermoPower.Choices.Valve.CvTypes.Kv then
         Av = 2.7778e-5*Kv;
-      elseif CvData == CvTypes.Cv then
+      elseif CvData == ThermoPower.Choices.Valve.CvTypes.Cv then
         Av = 2.4027e-5*Cv;
       end if;
       // assert(CvData>=0 and CvData<=3, "Invalid CvData");
