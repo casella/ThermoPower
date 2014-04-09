@@ -590,88 +590,6 @@ Casella</a>:<br>
 </html>"));
     end TestThroughMassFlow;
 
-    model TwoTanks "Test case for Tank and Flow1D"
-
-      ThermoPower.Water.Tank Tank2(
-        A=0.1,
-        redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph,
-        ystart=1,
-        pext=100000,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
-          Placement(transformation(extent={{20,-4},{40,16}}, rotation=0)));
-      Water.Flow1Dfem Pipe(
-        N=5,
-        L=1,
-        omega=0.314,
-        Dhyd=0.1,
-        A=0.01,
-        rhonom=1000,
-        wnom=40,
-        wnf=0.01,
-        Cfnom=0.005,
-        DynamicMomentum=true,
-        redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        alpha=1,
-        dpnom=20,
-        initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) annotation (
-          Placement(transformation(extent={{-20,-10},{0,10}}, rotation=0)));
-      ThermoPower.Water.Tank Tank1(
-        A=0.1,
-        redeclare package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph,
-        ystart=0.5,
-        pext=100000,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
-          Placement(transformation(extent={{-60,-4},{-40,16}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
-                                Plug1(w0=0) annotation (Placement(
-            transformation(extent={{-100,-10},{-80,10}}, rotation=0)));
-      ThermoPower.Water.SinkMassFlow
-                              Plug2(w0=0) annotation (Placement(transformation(
-              extent={{60,-10},{80,10}}, rotation=0)));
-      inner System system
-        annotation (Placement(transformation(extent={{80,80},{100,100}})));
-    equation
-      connect(Pipe.outfl, Tank2.inlet) annotation (Line(
-          points={{0,0},{22,0}},
-          color={0,0,255},
-          thickness=0.5));
-      connect(Tank1.outlet, Pipe.infl) annotation (Line(
-          points={{-42,0},{-32,0},{-20,0}},
-          color={0,0,255},
-          thickness=0.5));
-      connect(Plug1.flange, Tank1.inlet) annotation (Line(
-          points={{-80,0},{-70,0},{-58,0}},
-          color={0,0,255},
-          thickness=0.5));
-      connect(Tank2.outlet, Plug2.flange) annotation (Line(
-          points={{38,0},{60,0}},
-          color={0,0,255},
-          thickness=0.5));
-    initial equation
-      Tank1.h = 2e5;
-      Tank1.y = 2;
-      Tank2.h = 1e5;
-      Tank2.y = 1;
-      annotation (
-        Diagram(graphics={Text(
-                  extent={{-92,-64},{78,-76}},
-                  lineColor={0,0,255},
-                  textString="Flow1D: not supported reversal flow")}),
-        experiment(StopTime=20, Tolerance=1e-006),
-        Documentation(info="<HTML>
-<p>This model tests the <tt>Tank</tt> model and the <tt>Flow1D</tt> model in reversing flow conditions.</p>
-<p>Simulate the model for 20 s: flow oscillations arise from the combination of inertial effects in the pipe and from the hydraulic capacitance of the tanks. The temperature within the pipe evolves accordingly. </p>
-</HTML>", revisions="<html>
-<ul>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
-Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"),
-        __Dymola_experimentSetupOutput(equdistant=false));
-    end TwoTanks;
 
     model TestValves "Test cases for valves"
 
@@ -1057,20 +975,18 @@ Casella</a>:<br>
                               Sink(p0=1e5) annotation (Placement(transformation(
               extent={{70,-10},{90,10}}, rotation=0)));
       ThermoPower.Water.ValveLiq V1(
-        dpnom=2e5,
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        pnom=5e5,
-        Av=1e-4,
-        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
+        pnom=500000,
+        dpnom=200000)                                     annotation (Placement(
             transformation(extent={{-50,-10},{-30,10}}, rotation=0)));
       ThermoPower.Water.ValveLiq V2(
-        dpnom=1e5,
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        pnom=3e5,
-        Av=1e-4,
-        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
+        pnom=300000,
+        dpnom=100000)                                     annotation (Placement(
             transformation(extent={{-10,-10},{10,10}}, rotation=0)));
       Modelica.Blocks.Sources.Step Cmd1(
         height=0,
@@ -1083,12 +999,11 @@ Casella</a>:<br>
         startTime=0.3) annotation (Placement(transformation(extent={{-30,20},{-10,
                 40}}, rotation=0)));
       ThermoPower.Water.ValveLiq V3(
-        dpnom=1e5,
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        pnom=2e5,
-        Av=1e-4,
-        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
+        pnom=200000,
+        dpnom=100000)                                     annotation (Placement(
             transformation(extent={{30,-10},{50,10}}, rotation=0)));
       Modelica.Blocks.Sources.Step Cmd3(
         height=-1,
@@ -1121,7 +1036,9 @@ Casella</a>:<br>
       connect(Cmd3.y, V3.theta)
         annotation (Line(points={{31,30},{40,30},{40,8}}, color={0,0,127}));
       annotation (
-        Diagram(graphics),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}),
+                graphics),
         experiment(StopTime=1, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>This model tests the <tt>ValveLiq</tt> model in zero flowrate conditions.</p>
