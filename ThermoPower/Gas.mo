@@ -2620,7 +2620,7 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     extends TurbineBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
     parameter Boolean NominalCondition=true
-      "true: K is evalueted from design operation; false: K is set as a parameter";
+      "true: K is evaluated from design operating point; false: K is set as a parameter";
     parameter AngularVelocity Ndesign "Design velocity";
     parameter Real tableEta[:, :]=fill(
           0,
@@ -2632,8 +2632,9 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     parameter Boolean fixedEta=true "true:eta is a parameter,
       false:eta is calculated from table";
     parameter Real eta_nom=0.8 "Nominal efficiency value";
-    parameter Real K(fixed=if (NominalCondition == false) then true else false)=
-         4.75e-3 "Stodola's constant";
+    parameter Real K(fixed=if (NominalCondition == false) then true else false)
+      "Stodola's constant"
+       annotation(Dialog(enable=not NominalCondition));
     parameter Real wnom "Nominal massflowrate";
 
     Real N_T "Referred speed";
