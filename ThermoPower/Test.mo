@@ -2792,12 +2792,11 @@ This model tests the <tt>Header</tt> model.
                 50}}, rotation=0)));
       Gas.Valve Valve1(
         redeclare package Medium = Medium,
-        Tstart=400,
-        dpnom=2e5,
-        pnom=3e5,
         wnom=wext,
-        Av=5e-4,
-        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
+        pnom=300000,
+        dpnom=200000,
+        Tstart=400)                                       annotation (Placement(
             transformation(extent={{40,-10},{60,10}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp Ramp1(
         offset=wext,
@@ -7460,7 +7459,8 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
       ThermoPower.Water.ValveLin valve(Kv=0.05/60e5) annotation (Placement(
             transformation(extent={{30,-70},{50,-50}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              Sink(p0=0) annotation (Placement(transformation(
+                              Sink(p0=1000)
+                                         annotation (Placement(transformation(
               extent={{70,-70},{90,-50}}, rotation=0)));
       Modelica.Blocks.Sources.Step hIn(
         height=0,
@@ -10035,7 +10035,8 @@ Algorithm Tolerance = 1e-6
             transformation(extent={{-70,20},{-90,40}}, rotation=0)));
       Modelica.Blocks.Continuous.FirstOrder filter_b(y_start=1e7/157.08,
           initType=if SSInit then Modelica.Blocks.Types.Init.SteadyState else
-            Modelica.Blocks.Types.Init.NoInit) annotation (Placement(
+            Modelica.Blocks.Types.Init.NoInit,
+        T=1)                                   annotation (Placement(
             transformation(extent={{70,20},{90,40}}, rotation=0)));
     equation
       connect(generator_b.powerConnection, network.powerConnection_b)
