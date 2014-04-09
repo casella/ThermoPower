@@ -3265,7 +3265,6 @@ This is a simple model of a steam plant.
     extends Modelica.Icons.Package;
 
     model Plant
-    protected
       parameter Real tableEtaC[6, 4]=[0, 95, 100, 105; 1, 82.5e-2, 81e-2,
           80.5e-2; 2, 84e-2, 82.9e-2, 82e-2; 3, 83.2e-2, 82.2e-2, 81.5e-2; 4,
           82.5e-2, 81.2e-2, 79e-2; 5, 79.5e-2, 78e-2, 76.5e-2];
@@ -3280,8 +3279,7 @@ This is a simple model of a steam plant.
       parameter Real tableEtaT[5, 4]=[1, 90, 100, 110; 2.36, 89e-2, 89.5e-2,
           89.3e-2; 2.88, 90e-2, 90.6e-2, 90.5e-2; 3.56, 90.5e-2, 90.6e-2,
           90.5e-2; 4.46, 90.2e-2, 90.3e-2, 90e-2];
-    public
-      Electrical.Generator generator(         initOpt=ThermoPower.Choices.Init.Options.steadyState, J=30)
+      Electrical.Generator generator(initOpt=ThermoPower.Choices.Init.Options.steadyState, J=30)
         annotation (Placement(transformation(extent={{92,-80},{132,-40}},
               rotation=0)));
       Electrical.NetworkGrid_Pmax network(
@@ -3294,7 +3292,6 @@ This is a simple model of a steam plant.
           Placement(transformation(extent={{-210,-10},{-190,10}}, rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput generatedPower annotation (
           Placement(transformation(extent={{196,-10},{216,10}}, rotation=0)));
-    public
       Gas.Compressor compressor(
         redeclare package Medium = Media.Air,
         tablePhic=tablePhicC,
@@ -3355,12 +3352,12 @@ This is a simple model of a steam plant.
       Gas.PressDrop PressDrop1(
         redeclare package Medium = Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
-        A=1,
-        pstart=8.11e5,
-        dpnom=0.26e5,
         wnom=102,
-        Tstart=1370,
-        rhonom=2) annotation (Placement(transformation(
+        rhonom=2,
+        dpnom=26000,
+        pstart=811000,
+        Tstart=1370)
+                  annotation (Placement(transformation(
             origin={0,8},
             extent={{-10,-10},{10,10}},
             rotation=270)));
@@ -3390,11 +3387,11 @@ This is a simple model of a steam plant.
         y_start=56.8e6,
         initType=Modelica.Blocks.Types.Init.SteadyState) annotation (Placement(
             transformation(extent={{146,-118},{162,-102}}, rotation=0)));
-      PowerPlants.HRSG.Components.StateReader_gas stateInletCC(redeclare
-          package Medium = Media.Air) annotation (Placement(transformation(
+      PowerPlants.HRSG.Components.StateReader_gas stateInletCC(
+        redeclare package Medium = Media.Air) annotation (Placement(transformation(
               extent={{-100,30},{-80,50}}, rotation=0)));
-      PowerPlants.HRSG.Components.StateReader_gas stateOutletCC(redeclare
-          package Medium = Media.FlueGas) annotation (Placement(transformation(
+      PowerPlants.HRSG.Components.StateReader_gas stateOutletCC(
+        redeclare package Medium = Media.FlueGas) annotation (Placement(transformation(
               extent={{-24,30},{-4,50}}, rotation=0)));
       inner System system(allowFlowReversal=false)
         annotation (Placement(transformation(extent={{158,160},{178,180}})));
