@@ -1574,7 +1574,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
                 rotation=0)));
         Modelica.Blocks.Interfaces.RealInput ValveOpening annotation (Placement(
               transformation(extent={{-170,-90},{-150,-70}}, rotation=0),
-              iconTransformation(extent={{-110,-68},{-90,-48}})));
+              iconTransformation(extent={{-110,-70},{-90,-50}})));
         Modelica.Blocks.Interfaces.RealOutput WaterOut_T annotation (Placement(
               transformation(extent={{160,-50},{180,-30}}, rotation=0),
               iconTransformation(extent={{94,-30},{114,-10}})));
@@ -1586,7 +1586,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
               iconTransformation(extent={{92,50},{112,70}})));
         Modelica.Blocks.Interfaces.RealOutput GasIn_T annotation (Placement(
               transformation(extent={{160,30},{180,50}}, rotation=0),
-              iconTransformation(extent={{92,10},{112,30}})));
+              iconTransformation(extent={{94,10},{114,30}})));
         Modelica.Blocks.Interfaces.RealInput GasFlowRate annotation (Placement(
               transformation(extent={{-170,70},{-150,90}}, rotation=0),
               iconTransformation(extent={{-110,50},{-90,70}})));
@@ -1944,8 +1944,8 @@ This is the model of a digital PI controller, complete with auto/man and trackin
       model OpenLoopSimulator "Open loop plant simulator"
 
         Models.HRBPlant
-                 Plant annotation (Placement(transformation(extent={{-10,-26},{
-                  70,54}}, rotation=0)));
+                 Plant annotation (Placement(transformation(extent={{-10,-40},{
+                  70,40}}, rotation=0)));
         Modelica.Blocks.Sources.Step ValveOpening(
           height=-0.1,
           offset=1,
@@ -1967,7 +1967,8 @@ This is the model of a digital PI controller, complete with auto/man and trackin
             Placement(transformation(extent={{-108,-70},{-88,-50}},rotation=0),
               iconTransformation(extent={{-108,-70},{-88,-50}})));
         Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(
-                extent={{-46,-16},{-26,4}}, rotation=0)));
+                extent={{-44,-34},{-24,-14}},
+                                            rotation=0)));
         Modelica.Blocks.Interfaces.RealOutput TGoutOutput annotation (Placement(
               transformation(extent={{92,50},{112,70}}, rotation=0),
               iconTransformation(extent={{92,50},{112,70}})));
@@ -1976,28 +1977,30 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         inner System system
           annotation (Placement(transformation(extent={{40,80},{60,100}})));
       equation
-        connect(Plant.GasOut_T, TGoutOutput) annotation (Line(points={{70.8,38},
-                {80,38},{80,60},{102,60}}, color={0,0,127}));
-        connect(Plant.WaterOut_T, TWoutOutput) annotation (Line(points={{71.6,6},{80,6},
-                {80,-60},{100,-60}},        color={0,0,127}));
+        connect(Plant.GasOut_T, TGoutOutput) annotation (Line(points={{70.8,24},
+                {80,24},{80,60},{102,60}}, color={0,0,127}));
+        connect(Plant.WaterOut_T, TWoutOutput) annotation (Line(points={{71.6,-8},
+                {80,-8},{80,-60},{100,-60}},color={0,0,127}));
         connect(Add1.u2, GasFlowRate.y)
           annotation (Line(points={{-48,28},{-67,28}}, color={0,0,127}));
         connect(Add1.u1, GasFlowRateInput) annotation (Line(points={{-48,40},{
                 -60,40},{-60,60},{-98,60}},
                                          color={0,0,127}));
         connect(Plant.GasFlowRate, Add1.y)
-          annotation (Line(points={{-10,38},{-18,38},{-18,34},{-25,34}},
+          annotation (Line(points={{-10,24},{-18,24},{-18,34},{-25,34}},
                                                        color={0,0,127}));
         connect(Plant.ValveOpening, Add2.y)
-          annotation (Line(points={{-10,-9.2},{-18,-9.2},{-18,-6},{-25,-6}},
+          annotation (Line(points={{-10,-24},{-18,-24},{-18,-24},{-23,-24}},
                                                        color={0,0,127}));
-        connect(Add2.u2, ValveOpening.y) annotation (Line(points={{-48,-12},{-60,
-                -12},{-60,-30},{-67,-30}}, color={0,0,127}));
+        connect(Add2.u2, ValveOpening.y) annotation (Line(points={{-46,-30},{
+                -60,-30},{-67,-30}},       color={0,0,127}));
         connect(Add2.u1, ValveOpeningInput)
-          annotation (Line(points={{-48,0},{-74,0},{-74,-60},{-98,-60}},
+          annotation (Line(points={{-46,-18},{-74,-18},{-74,-60},{-98,-60}},
                                                       color={0,0,127}));
         annotation (
-          Diagram(graphics),
+          Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                  -100},{100,100}}),
+                  graphics),
           experiment(StopTime=300, Tolerance=1e-006),
           Documentation(revisions="<html>
 <ul>
