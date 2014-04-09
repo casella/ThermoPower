@@ -1961,26 +1961,30 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         Modelica.Blocks.Math.Add Add1 annotation (Placement(transformation(
                 extent={{-46,24},{-26,44}}, rotation=0)));
         Modelica.Blocks.Interfaces.RealInput GasFlowRateInput annotation (
-            Placement(transformation(extent={{-110,70},{-90,90}}, rotation=0)));
+            Placement(transformation(extent={{-108,50},{-88,70}}, rotation=0),
+              iconTransformation(extent={{-108,50},{-88,70}})));
         Modelica.Blocks.Interfaces.RealInput ValveOpeningInput annotation (
-            Placement(transformation(extent={{-110,-10},{-90,10}}, rotation=0)));
+            Placement(transformation(extent={{-108,-70},{-88,-50}},rotation=0),
+              iconTransformation(extent={{-108,-70},{-88,-50}})));
         Modelica.Blocks.Math.Add Add2 annotation (Placement(transformation(
                 extent={{-46,-16},{-26,4}}, rotation=0)));
         Modelica.Blocks.Interfaces.RealOutput TGoutOutput annotation (Placement(
-              transformation(extent={{90,70},{110,90}}, rotation=0)));
+              transformation(extent={{92,50},{112,70}}, rotation=0),
+              iconTransformation(extent={{92,50},{112,70}})));
         Modelica.Blocks.Interfaces.RealOutput TWoutOutput annotation (Placement(
               transformation(extent={{90,-70},{110,-50}}, rotation=0)));
         inner System system
           annotation (Placement(transformation(extent={{40,80},{60,100}})));
       equation
-        connect(Plant.GasOut_T, TGoutOutput) annotation (Line(points={{70.8,38},{80,38},
-                {80,80},{100,80}},         color={0,0,127}));
+        connect(Plant.GasOut_T, TGoutOutput) annotation (Line(points={{70.8,38},
+                {80,38},{80,60},{102,60}}, color={0,0,127}));
         connect(Plant.WaterOut_T, TWoutOutput) annotation (Line(points={{71.6,6},{80,6},
                 {80,-60},{100,-60}},        color={0,0,127}));
         connect(Add1.u2, GasFlowRate.y)
           annotation (Line(points={{-48,28},{-67,28}}, color={0,0,127}));
-        connect(Add1.u1, GasFlowRateInput) annotation (Line(points={{-48,40},{-60,
-                40},{-60,80},{-100,80}}, color={0,0,127}));
+        connect(Add1.u1, GasFlowRateInput) annotation (Line(points={{-48,40},{
+                -60,40},{-60,60},{-98,60}},
+                                         color={0,0,127}));
         connect(Plant.GasFlowRate, Add1.y)
           annotation (Line(points={{-10,38},{-18,38},{-18,34},{-25,34}},
                                                        color={0,0,127}));
@@ -1990,7 +1994,8 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         connect(Add2.u2, ValveOpening.y) annotation (Line(points={{-48,-12},{-60,
                 -12},{-60,-30},{-67,-30}}, color={0,0,127}));
         connect(Add2.u1, ValveOpeningInput)
-          annotation (Line(points={{-48,0},{-100,0}}, color={0,0,127}));
+          annotation (Line(points={{-48,0},{-74,0},{-74,-60},{-98,-60}},
+                                                      color={0,0,127}));
         annotation (
           Diagram(graphics),
           experiment(StopTime=300, Tolerance=1e-006),
@@ -2010,7 +2015,10 @@ Casella</a>:<br>
 <p>This model allows to simulate an open loop transient, using start attributes to select the initial values of the state variables. After about 50s, the plant reaches a steady state. </p>
 <p>At time t =100 s, the water valve is closed by 10&percnt;. At time t = 200 s, the gas flow rate is increased by 10&percnt;.</p>
 <p>The simulator is provided with external inputs to apply changes to the system input. If the system is simulated alone, these are taken to be zero by default, so the step responses can be computed. If the system is linearized at time t = 99, the A,B,C,D matrices of the linearized model around the initial steady state can be obtained.</p>
-</html>"),__Dymola_experimentSetupOutput);
+</html>"),__Dymola_experimentSetupOutput,
+          Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                  {100,100}}), graphics={Rectangle(extent={{-100,100},{100,-100}},
+                  lineColor={0,0,255})}));
       end OpenLoopSimulator;
 
       model OpenLoopSimulatorSS
