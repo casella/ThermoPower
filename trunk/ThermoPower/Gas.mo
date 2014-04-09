@@ -1800,24 +1800,27 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model Valve "Valve for gas flow"
     extends Icons.Gas.Valve;
-    import ThermoPower.Choices.Valve.CvTypes;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
-      annotation(choicesAllMatching = true);
+      annotation (choicesAllMatching=true);
     Medium.BaseProperties gas(
       p(start=pin_start),
       T(start=Tstart),
       Xi(start=Xstart[1:Medium.nXi]),
       d(start=pnom/(8314/30*Tstart)));
-    parameter CvTypes CvData=CvTypes.Av "Selection of flow coefficient";
+    parameter ThermoPower.Choices.Valve.CvTypes CvData=
+      ThermoPower.Choices.Valve.CvTypes.Av "Selection of flow coefficient";
     parameter Area Av(
-      fixed=if CvData == CvTypes.Av then true else false,
+      fixed=if CvData == ThermoPower.Choices.Valve.CvTypes.Av then true else false,
       start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
-      "Av (metric) flow coefficient" annotation (Dialog(group=
-            "Flow Coefficient", enable=(CvData == CvTypes.Av)));
+      "Av (metric) flow coefficient"
+      annotation (Dialog(group="Flow Coefficient",
+                         enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Av)));
     parameter Real Kv(unit="m3/h") = 0 "Kv (metric) flow coefficient"
-      annotation (Dialog(group="Flow Coefficient", enable=(CvData == CvTypes.Kv)));
-    parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]" annotation (Dialog(
-          group="Flow Coefficient", enable=(CvData == CvTypes.Cv)));
+      annotation (Dialog(group="Flow Coefficient",
+                         enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Kv)));
+    parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]"
+      annotation (Dialog(group="Flow Coefficient",
+                         enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Cv)));
     parameter Pressure pnom "Nominal inlet pressure"
       annotation (Dialog(group="Nominal operating point"));
     parameter Pressure dpnom "Nominal pressure drop"
@@ -1882,14 +1885,14 @@ package Gas "Models of components with ideal gases as working fluid"
           extent={{-10,-10},{10,10}},
           rotation=270)));
   initial equation
-    if CvData == CvTypes.Kv then
+    if CvData == ThermoPower.Choices.Valve.CvTypes.Kv then
       Av = 2.7778e-5*Kv;
-    elseif CvData == CvTypes.Cv then
+    elseif CvData == ThermoPower.Choices.Valve.CvTypes.Cv then
       Av = 2.4027e-5*Cv;
     end if;
     // assert(CvData>=0 and CvData<=3, "Invalid CvData");
 
-    if CvData == CvTypes.OpPoint then
+    if CvData == ThermoPower.Choices.Valve.CvTypes.OpPoint then
       // Determination of Av by the nominal operating point conditions
       Fxt_nom = Fxt_full*xtfun(thetanom);
       x_nom = dpnom/pnom;
@@ -3325,7 +3328,6 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       parameter Real Cfnom=0 "Nominal Fanning friction factor"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
       parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)));
       parameter Real Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
         "Inertial phenomena accounted for"
@@ -3379,7 +3381,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     equation
         assert(FFtype == FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
-      annotation (
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)),
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
 </HTML>
