@@ -3633,17 +3633,17 @@ This model test the Turbine model with an inertial load. Boundary conditions and
               rotation=0)));
       Gas.TurbineStodola Turbine1(
         redeclare package Medium = Medium,
-        pstart_in=7.85e5,
-        pstart_out=1.52e5,
-        Tstart_in=1270,
-        Tstart_out=883,
-        K=4.75e-3,
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix,
         tableEta=tableEta,
         fixedEta=true,
         Ndesign=523.3,
+        wnom=104,
         Tdes_in=1400,
-        wnom=104) annotation (Placement(transformation(extent={{-20,-20},{20,20}},
+        pstart_in=785000,
+        pstart_out=152000,
+        Tstart_in=1270,
+        Tstart_out=883)
+                  annotation (Placement(transformation(extent={{-20,-20},{20,20}},
               rotation=0)));
       Gas.SinkPressure
                 SinkP1(
@@ -3666,11 +3666,11 @@ This model test the Turbine model with an inertial load. Boundary conditions and
           color={159,159,223},
           thickness=0.5));
       connect(Turbine1.shaft_b, Inertia1.flange_a) annotation (Line(
-          points={{12,0},{16,0},{16,0},{30,0}},
+          points={{12,0},{16,0},{30,0}},
           color={0,0,0},
           thickness=0.5));
       connect(ConstantSpeed1.flange, Turbine1.shaft_a) annotation (Line(
-          points={{-30,0},{-14,0},{-14,0},{-12,0}},
+          points={{-30,0},{-14,0},{-12,0}},
           color={0,0,0},
           thickness=0.5));
       annotation (
