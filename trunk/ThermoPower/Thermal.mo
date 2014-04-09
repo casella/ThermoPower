@@ -752,8 +752,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
         "Fraction of nominal flow rate below which the heat transfer is not reduced";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
        Power Q "Total heat flow through lateral boundary";
-       CoefficientOfHeatTransfer gamma "Actual heat transfer coefficient";
-       Real w_wnom(final unit = "1")
+       CoefficientOfHeatTransfer gamma(start = gamma_nom)
+        "Actual heat transfer coefficient";
+       Real w_wnom(start = 1, final unit = "1")
         "Ratio between actual and nominal flow rate";
     equation
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
