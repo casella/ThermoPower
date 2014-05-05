@@ -512,7 +512,7 @@ Casella</a>:<br>
               textString="P")}));
     end CISEPlant;
 
-    model CISESim
+    partial model CISESim
       "CISE Plant model with boundary conditions and initial steady-state computation"
       parameter MassFlowRate wfeed_offset(fixed=false, start = 6.0e-2)
         "Offset of feedwater flow rate";
@@ -679,8 +679,6 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 </html>"),
-        experiment(StopTime=1200, Tolerance=1e-006),
-        experimentSetupOutput,
         Icon(coordinateSystem(extent={{-160,-160},{200,160}})));
     end CISESim;
 
