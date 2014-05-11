@@ -590,7 +590,6 @@ Casella</a>:<br>
 </html>"));
     end TestThroughMassFlow;
 
-
     model TestValves "Test cases for valves"
 
       ThermoPower.Water.SourcePressure
@@ -6578,7 +6577,7 @@ Casella</a>:<br>
       parameter Real Cfhex=0.005;
       Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
       Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr "Mass balance error";
+      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
 
       Water.Flow1D2ph hex(
         N=Nnodes,
@@ -6728,7 +6727,7 @@ Algorithm Tolerance = 1e-9
       parameter Real Cfhex=0.005;
       Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
       Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr "Mass balance error";
+      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
 
       Water.Flow1D2ph hex(
         N=Nnodes,
@@ -6867,7 +6866,7 @@ Algorithm Tolerance = 1e-9
       parameter Real Cfhex=0.005;
       Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
       Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr "Mass balance error";
+      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
 
       Water.Flow1D2ph hex(
         N=Nnodes,
@@ -7004,7 +7003,7 @@ Algorithm Tolerance = 1e-9
       parameter Real Cfhex=0.005;
       Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
       Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr "Mass balance error";
+      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
 
       Water.Flow1D2ph hex(
         N=Nnodes,
