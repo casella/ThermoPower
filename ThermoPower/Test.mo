@@ -5107,7 +5107,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       Time tau = dMtot_dp/dw_dp "time constant of pressure transient";
       Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
       Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr "Mass balance error";
+      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
 
       Gas.SourceMassFlow Source(
         redeclare package Medium = Medium,
