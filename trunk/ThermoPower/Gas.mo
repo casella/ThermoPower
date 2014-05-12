@@ -1834,11 +1834,12 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean CheckValve=false "Reverse flow stopped";
     parameter Real b=0.01 "Regularisation factor";
 
-    replaceable function FlowChar = Functions.ValveCharacteristics.linear
+    replaceable function FlowChar =
+        ThermoPower.Functions.ValveCharacteristics.linear
       constrainedby Functions.ValveCharacteristics.baseFun
       "Flow characteristic" annotation (choicesAllMatching=true);
     parameter Real Fxt_full=0.5 "Fk*xt critical ratio at full opening";
-    replaceable function xtfun = Functions.ValveCharacteristics.one
+    replaceable function xtfun = ThermoPower.Functions.ValveCharacteristics.one
       constrainedby Functions.ValveCharacteristics.baseFun
       "Critical ratio characteristic";
     parameter Boolean allowFlowReversal=system.allowFlowReversal

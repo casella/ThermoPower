@@ -6773,8 +6773,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         annotation (Dialog(group="Nominal operating point"), Evaluate=true);
       parameter Boolean CheckValve=false "Reverse flow stopped";
       parameter Real b=0.01 "Regularisation factor";
-      replaceable function FlowChar = Functions.ValveCharacteristics.linear
-        constrainedby Functions.ValveCharacteristics.baseFun
+      replaceable function FlowChar =
+          ThermoPower.Functions.ValveCharacteristics.linear
+        constrainedby ThermoPower.Functions.ValveCharacteristics.baseFun
         "Flow characteristic"
         annotation (choicesAllMatching=true);
       parameter Boolean allowFlowReversal=system.allowFlowReversal
