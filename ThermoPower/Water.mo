@@ -3812,7 +3812,7 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
         Modelica.Media.Interfaces.PartialTwoPhaseMedium);
     import ThermoPower.Choices.Valve.CvTypes;
     parameter Real Flnom=0.9 "Liquid pressure recovery factor";
-    replaceable function Flfun = Functions.ValveCharacteristics.one
+    replaceable function Flfun = ThermoPower.Functions.ValveCharacteristics.one
       constrainedby Functions.ValveCharacteristics.baseFun
       "Pressure recovery characteristic";
     MassFlowRate w "Mass flowrate";
