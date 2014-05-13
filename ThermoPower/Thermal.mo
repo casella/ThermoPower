@@ -756,13 +756,16 @@ The swapping is performed if the counterCurrent parameter is true (default value
         "Actual heat transfer coefficient";
        Real w_wnom(start = 1, final unit = "1")
         "Ratio between actual and nominal flow rate";
+       Real w_wnom_reg "Regularized ratio between actual and nominal flow rate";
     equation
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities at low flows
       w_wnom = abs(w[1])/wnom
         "Inlet flow rate used for the computation of the conductance";
-      gamma = gamma_nom*Functions.smoothSat(w_wnom, beta, 1e9, beta/2)^alpha;
+      w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2);
+      gamma = homotopy(gamma_nom*w_wnom_reg^alpha,
+                       gamma_nom);
 
       for j in 1:Nw loop
          Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
