@@ -6767,8 +6767,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         annotation (Dialog(group="Nominal operating point",
                            enable=(CvData == ThermoPower.Choices.Valve.CvTypes.OpPoint)));
       parameter Real thetanom=1 "Nominal valve opening"
-        annotation (Dialog(group="Nominal operating point",
-                           enable=(CvData == ThermoPower.Choices.Valve.CvTypes.OpPoint)));
+        annotation (Dialog(group="Nominal operating point"));
       parameter Power Qnom=0 "Nominal heat loss to ambient"
         annotation (Dialog(group="Nominal operating point"), Evaluate=true);
       parameter Boolean CheckValve=false "Reverse flow stopped";
