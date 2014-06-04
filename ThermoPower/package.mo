@@ -14,6 +14,7 @@ model System "System wide properties"
   annotation (
     defaultComponentName="system",
     defaultComponentPrefixes="inner",
+    missingInnerMessage="The System object is missing, please drag it on the top layer of your model",
     Icon(graphics={Polygon(
           points={{-100,60},{-60,100},{60,100},{100,60},{100,-60},{60,-100},{-60,
               -100},{-100,-60},{-100,60}},
@@ -2297,6 +2298,7 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
 <p>These models are meant to be used as simplified boundary conditions for a thermal power plant model, rather than for fully modular description of three-phase networks. Specialized libraries should be used for this purpose; bear in mind, however, that full three-phase models of electrical machinery and power lines could make the power plant simulation substantially heavier, if special numeric integration strategies are not adopted.
 </html>"));
 end Electrical;
+
 
 type HydraulicConductance = Real (final quantity="HydraulicConductance", final
       unit="(kg/s)/Pa");
