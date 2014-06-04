@@ -63,9 +63,9 @@ package Water "Models of components with water/steam as working fluid"
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
-    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_h = false
-      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"));
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     Pressure p "Actual pressure";
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
@@ -140,9 +140,9 @@ package Water "Models of components with water/steam as working fluid"
     parameter SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
-    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_h = false
-      "Use connector input for the specific enthalpy"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     Pressure p "Actual pressure";
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
@@ -219,9 +219,9 @@ package Water "Models of components with water/steam as working fluid"
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
-                                                                                annotation(Dialog(group="External inputs"));
+                                                                                annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_h = false
-      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"));
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
@@ -296,9 +296,9 @@ package Water "Models of components with water/steam as working fluid"
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
-                                                                                annotation(Dialog(group="External inputs"));
+                                                                                annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_h = false
-      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"));
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
@@ -371,7 +371,7 @@ package Water "Models of components with water/steam as working fluid"
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
-                                                                                annotation(Dialog(group="External inputs"));
+                                                                                annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if

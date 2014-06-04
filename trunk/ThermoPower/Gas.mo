@@ -62,11 +62,11 @@ package Gas "Models of components with ideal gases as working fluid"
       "Nominal gas composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
-    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
-      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_X = false
-      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
 
     outer ThermoPower.System system "System wide properties";
 
@@ -160,11 +160,11 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter HydraulicResistance R=0 "Hydraulic Resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
-    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"));
+    parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
-      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_X = false
-      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
 
     outer ThermoPower.System system "System wide properties";
 
@@ -257,11 +257,11 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false
-      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"));
+      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
-      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_X = false
-      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
 
     MassFlowRate w "Nominal mass flow rate";
@@ -358,11 +358,11 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false
-      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"));
+      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
-      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_X = false
-      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"));
+      "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
 
     MassFlowRate w "Nominal mass flow rate";
@@ -450,7 +450,7 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false
-      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"));
+      "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
 
     MassFlowRate w "Mass flow rate";
