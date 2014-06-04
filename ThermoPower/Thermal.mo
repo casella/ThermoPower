@@ -2617,6 +2617,7 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 "),   Diagram(graphics));
   end HeatFlowDistribution;
 
+  function linspaceExt = ThermoPower.Functions.linspaceExt;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components related to heat transfer phenomena.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
