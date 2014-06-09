@@ -2300,15 +2300,6 @@ Casella</a> and <a> Luca Savoldelli </a>:<br>
 end Electrical;
 
 
-
-
-
-
-
-
-
-
-
 type HydraulicConductance = Real (final quantity="HydraulicConductance", final
       unit="(kg/s)/Pa");
 
@@ -2340,12 +2331,12 @@ annotation (
   Documentation(info="<html>
 <h2>General Information</h2>
 <p>The ThermoPower library is an open-source <a href=\"http://www.modelica.org/libraries\">Modelica library</a>for the dynamic modelling of thermal power plants and energy conversion systems. It provides basic components for system-level modelling, in particular for the study of control systems in traditional and innovative power plants and energy conversion systems.</p>
-<p>The library is hosted by <a href=\"http://sourceforge.net/projects/thermopower/\">sourceforge.net</a> and has been under continuous development at Politecnico di Milano since 2002. It has been applied to the dynamic modelling of steam generators, combined-cycle power plants, III- and IV-generation nuclear power plants, direct steam generation solar plants, organic Rankine cycle plants, and cryogenic circuits for nuclear fusion applications. The main author is Francesco Casella, with contributions from Alberto Leva, Matilde Ratti, Luca Savoldelli, Roberto Bonifetto, Stefano Boni, Leonardo Pierobon, and many others. The library is licensed under the <b><a href=\"http://www.modelica.org/licenses/ModelicaLicense2\">Modelica License 2</a></b>. The library has been developed as a tool for research in the field of energy system control at the Dipartimento di Elettronica, Informazione e Bioingegneria of Politecnico di Milano and progressively enhanced as new projects were undertaken there. It has been released as open source for the benefit of the community, but without any guarantee of support or completeness of documentation.</p>
+<p>The libray has been under continuous development at Politecnico di Milano since 2002. It has been applied to the dynamic modelling of steam generators, combined-cycle power plants, III- and IV-generation nuclear power plants, direct steam generation solar plants, organic Rankine cycle plants, and cryogenic circuits for nuclear fusion applications. The main author is Francesco Casella, with contributions from Alberto Leva, Matilde Ratti, Luca Savoldelli, Roberto Bonifetto, Stefano Boni, Leonardo Pierobon, and many others. The library is licensed under the <b><a href=\"http://www.modelica.org/licenses/ModelicaLicense2\">Modelica License 2</a></b>. The library has been developed as a tool for research in the field of energy system control at the Dipartimento di Elettronica, Informazione e Bioingegneria of Politecnico di Milano and progressively enhanced as new projects were undertaken there. It has been released as open source for the benefit of the community, but without any guarantee of support or completeness of documentation.</p>
 <p>The latest released version is 3.1 Beta 0. which uses Modelica 3.2 revision 2 and Modelica Standard Library 3.2.1. If you have used the development version of ThermoPower since 2011 to develop your models, then they should run with version 3.1 of the library with little or no modification.</p>
-<p>At some point in the future, changes will be introduced to improve the handling of initial conditions, that will not be backwards compatible. These changes will be incorporated in version 3.2.</p>
-<p>The library has been mainly developed using the tool <a href=\"http://www.dynasim.se\">Dymola</a>, but it is designed to also run with <a href=\"https://openmodelica.org\">OpenModelica</a> and with any other tool that fully supports Modelica 3.2 revision 2 or later. If you want to use OpenModelica with ThermoPower, we suggest to use the latest nighly build, as this will ensure the widest possible coverage of models.</p>
-<p>You can access the latest development revision by anonymous SVN checkout from this URL:<br><br><a href=\"svn://svn.code.sf.net/p/thermopower/svn/trunk\">http://svn.code.sf.net/p/thermopower/svn/trunk</a><br><br>If you are running Windows, we recommend using the excellent <a href=\"http://tortoisesvn.net/\">TortoiseSVN</a> client to checkout the library.</p>
-<p>Please note that since 2013 the structure of the Flow1D models, which are the backbone of heat exchanger models, has been revised for greater flexibility and ease of use. New thermal ports are used, and the heat transfer model is now a replaceable model embedded in the Flow1D mode. Old Flow1D models (with their thermal counterparts) have been kept in the library for backwards compatibility, but they are deprecated and should not be used to build new models. They are identified by an obsolete marker on the icon.</p>
+<p>At some point in the future, changes might be introduced to improve the handling of initial conditions, that could break your models developed with ThermoPower 3.1. These changes will be incorporated in version 3.2.</p>
+<p>The library has been mainly developed using the tool <a href=\"http://www.dynasim.se\">Dymola</a>, but it is designed to also run with any other tool that fully supports Modelica 3.2 revision 2 or later. The current coverage of the library by the latest nightly build of the <a href=\"https://openmodelica.org\">OpenModelica</a> compiler is reported <a href=\"https://test.openmodelica.org/libraries/ThermoPower/BuildModelRecursive.html\"> here</a>.</p>
+<p>You can download the released versions from the <a href=\"https://github.com/modelica-3rdparty/ThermoPower\">GitHub mirror</a>. The current development version of the source code can be checked out anonymously using an SVN client using this URL:<br><br><a href=\"svn://svn.code.sf.net/p/thermopower/svn/trunk\">http://svn.code.sf.net/p/thermopower/svn/trunk</a><br><br>If you are running Windows, we recommend using the excellent <a href=\"http://tortoisesvn.net/\">TortoiseSVN</a> to do so.</p>
+<p>Please note that since 2013 the structure of the Flow1D models, which are the backbone of heat exchanger models, has been revised for greater flexibility and ease of use. New thermal ports are used and the heat transfer model is embedded inside the Flow1D model as a replaceable model. Old Flow1D models (with their thermal counterparts) have been kept in the library for backwards compatibility, but they are deprecated and should not be used to build new models. They are identified by an obsolete marker on the icon. Also the old source and sink components using the deprecated cardinality operator are kept for backwards compatibility, but have been replaced by new components using conditional input connectors.</p>
 <p>If you want to get involved in the development, or you need some further information, please contact the main developer <a href=\"mailto://francesco.casella@polimi.it\">francesco.casella@polimi.it</a>.</p>
 <h2>References</h2>
 <p>A general description of the library and on the modelling principles can be found in the papers: </p>
@@ -2382,10 +2373,10 @@ annotation (
 <h2>Release notes:</h2>
 <p><b>Version 3.1</b></p>
 <p>
-This is a major new release, that has been in the making for 5 years. The new release is not compatible with 2.1. However, models built using the development version after 2011 should compile with little or no adjustments. It has many new features:
+This is a major new release, that has been in the making for 5 years. The new release is not compatible with 2.1. However, models built using the development version of the library after 2011 should compile with little or no adjustments. It has many new features:
 <ul>
   <li>Use of Modelica 3.2.1 revision 2 and Modelica Standard Libary 3.2.1, ensuring full compatibility with all compliant Modelica tools</li>
-  <li>Tested with Dymola and OpenModelica. There are still a few limitations left when using OpenModelica, please ensure you use the latest nightly build of the tool.</li>
+  <li>Tested with Dymola and OpenModelica./li>
   <li>Use of stream connectors, compatible with the Modelica.Fluid library, allowing multiple-way connections (see <a href=\"http://dx.doi.org/10.3384/ecp09430078\">paper</a>).</li>
   <li>Use of the homotopy operator for improved convegence of steady-state initialization problems(see <a href=\"https://www.modelica.org/events/modelica2011/Proceedings/pages/papers/04_2_ID_131_a_fv.pdf\">paper</a>).</li>
   <li>Improved Flow1D models with embedded replaceable heat transfer models, allowing a much easier customization of heat transfer correlations</li>
