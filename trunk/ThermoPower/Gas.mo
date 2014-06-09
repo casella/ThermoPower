@@ -3401,6 +3401,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   end BaseClasses;
 
   model SourceP "Pressure source for gas flows"
+    extends Modelica.Icons.ObsoleteModel;
     extends Icons.Gas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
@@ -3483,6 +3484,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   end SourceP;
 
   model SinkP "Pressure sink for gas flows"
+    extends Modelica.Icons.ObsoleteModel;
     extends Icons.Gas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
@@ -3562,6 +3564,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   end SinkP;
 
   model SourceW "Flowrate source for gas flows"
+    extends Modelica.Icons.ObsoleteModel;
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
@@ -3645,7 +3648,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   end SourceW;
 
   model SinkW "Flowrate sink for gas flows"
-
+    extends Modelica.Icons.ObsoleteModel;
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     Medium.BaseProperties gas(
@@ -3730,6 +3733,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   end SinkW;
 
   model ThroughW "Prescribes the flow rate across the component"
+    extends Modelica.Icons.ObsoleteModel;
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     parameter MassFlowRate w0=0 "Nominal mass flowrate";
@@ -3786,6 +3790,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   end ThroughW;
 
   model Flow1D "1-dimensional fluid flow model for gas (finite volumes)"
+    extends Modelica.Icons.ObsoleteModel;
     extends Icons.Gas.Tube;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
