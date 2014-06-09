@@ -1535,6 +1535,7 @@ This package contains models to compute the material properties needed to model 
   end HThtc_in;
 
   connector DHT "Distributed Heat Terminal"
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N(min=1) = 2 "Number of nodes";
     AbsoluteTemperature T[N] "Temperature at the nodes";
     flow HeatFlux phi[N] "Heat flux at the nodes";
@@ -1558,6 +1559,7 @@ This package contains models to compute the material properties needed to model 
   end DHThtc_in;
 
   model DHThtc_DHT "DHThtc to DHT adapter"
+    extends Modelica.Icons.ObsoleteModel;
 
     DHT DHT_port(N=N) annotation (Placement(transformation(extent={{100,40},{
               120,-40}}, rotation=0)));
@@ -1586,6 +1588,7 @@ This package contains models to compute the material properties needed to model 
   end DHThtc_DHT;
 
   model HT_DHT "HT to DHT adaptor"
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=1 "Number of nodes on DHT side";
     parameter Area exchangeSurface "Area of heat transfer surface";
     HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
@@ -1632,6 +1635,7 @@ This package contains models to compute the material properties needed to model 
   end HT_DHT;
 
   model HThtc_DHThtc "HThtc to DHThtc adaptor"
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=1 "Number of nodes on DHT side";
     parameter Area exchangeSurface "Heat exchange surface";
     HThtc_in HT_port annotation (Placement(transformation(extent={{-140,-20},{-100,
@@ -1674,10 +1678,12 @@ This package contains models to compute the material properties needed to model 
 
   model HeatSource1Dhtc "Distributed Heat Flow Source"
     extends HeatSource1D(redeclare Thermal.DHThtc_in wall);
+    extends Modelica.Icons.ObsoleteModel;
   end HeatSource1Dhtc;
 
   model HeatSource1D "Distributed Heat Flow Source"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=2 "Number of nodes";
     parameter Integer Nt=1 "Number of tubes";
     parameter Length L "Source length";
@@ -1713,6 +1719,7 @@ This package contains models to compute the material properties needed to model 
 
   model TempSource1D "Distributed Temperature Source"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=2 "Number of nodes";
     replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
@@ -1745,6 +1752,7 @@ This package contains models to compute the material properties needed to model 
 
   model TempSource1Dlin "Linearly Distributed Temperature Source"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=2 "Number of nodes";
     replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
@@ -1781,6 +1789,7 @@ This package contains models to compute the material properties needed to model 
 
   model ConvHT "1D Convective heat transfer"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=2 "Number of Nodes";
     parameter CoefficientOfHeatTransfer gamma
       "Constant heat transfer coefficient";
@@ -1809,6 +1818,8 @@ This package contains models to compute the material properties needed to model 
   model ConvHTLumped_htc
     "Lumped parameter convective heat transfer between a HT and a HThtc"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
+
     HT otherside annotation (Placement(transformation(extent={{-40,-20},{40,-40}},
             rotation=0)));
     HThtc_in fluidside annotation (Placement(transformation(extent={{-40,20},{
@@ -1836,6 +1847,7 @@ This package contains models to compute the material properties needed to model 
   model ConvHT2N
     "1D Convective heat transfer between two DHT connectors with a different number of nodes"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N1(min=1) = 2 "Number of nodes on side 1";
     parameter Integer N2(min=1) = 2 "Number of nodes on side 2";
     parameter CoefficientOfHeatTransfer gamma
@@ -2033,6 +2045,7 @@ This package contains models to compute the material properties needed to model 
 
   model ConvHT_htc "1D Convective heat transfer between a DHT and a DHT_htc"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=2 "Number of Nodes";
 
     DHT otherside(N=N) annotation (Placement(transformation(extent={{-40,-40},{
@@ -2075,6 +2088,7 @@ This package contains models to compute the material properties needed to model 
   model ConvHT2N_htc
     "1D Convective heat transfer between two DHT connectors with a different number of nodes"
     extends ThermoPower.Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N1(min=1) = 2 "Number of nodes on side 1";
     parameter Integer N2(min=1) = 2 "Number of nodes on side 2";
     ThermoPower.Thermal.DHThtc_in side1(N=N1) annotation (Placement(
@@ -2278,6 +2292,7 @@ This package contains models to compute the material properties needed to model 
   model CounterCurrent
     "Counter-current heat transfer adaptor for 1D heat transfer"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=2 "Number of Nodes";
     parameter Boolean counterCurrent=true
       "Swap temperature and flux vector order";
@@ -2328,6 +2343,8 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
   model MetalWall
     extends MetalWallFEM;
+    extends Modelica.Icons.ObsoleteModel;
+
     annotation (
       Icon(graphics={
           Text(
@@ -2370,6 +2387,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
   model MetalTube "Cylindrical metal tube - 1 radial node and N axial nodes"
     extends MetalTubeFEM;
+    extends Modelica.Icons.ObsoleteModel;
 
     annotation (
       Icon(graphics={
