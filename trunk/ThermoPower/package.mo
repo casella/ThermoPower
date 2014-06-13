@@ -2375,7 +2375,7 @@ annotation (
 <p>
 This is a major new release, that has been in the making for 5 years. The new release is not compatible with 2.1. However, models built using the development version of the library after 2011 should compile with little or no adjustments. It has many new features:
 <ul>
-  <li>Use of Modelica 3.2.1 revision 2 and Modelica Standard Libary 3.2.1, ensuring full compatibility with all compliant Modelica tools</li>
+  <li>Use of Modelica 3.2 revision 2 and Modelica Standard Library 3.2.1, ensuring full compatibility with all compliant Modelica tools</li>
   <li>Tested with Dymola and OpenModelica./li>
   <li>Use of stream connectors, compatible with the Modelica.Fluid library, allowing multiple-way connections (see <a href=\"http://dx.doi.org/10.3384/ecp09430078\">paper</a>).</li>
   <li>Use of the homotopy operator for improved convegence of steady-state initialization problems(see <a href=\"https://www.modelica.org/events/modelica2011/Proceedings/pages/papers/04_2_ID_131_a_fv.pdf\">paper</a>).</li>
