@@ -9521,6 +9521,86 @@ Algorithm Tolerance = 1e-6
 </html>"));
       end TestFlow1DDB;
     end OldTests;
+
+    model TestWalls "Test various wall models"
+      Thermal.MetalWallFV wall1(
+        Nw=2,
+        M=1,
+        cm=500,
+        Tstartbar=293.15)
+        annotation (Placement(transformation(extent={{-50,32},{-30,52}})));
+      Thermal.HeatSource1DFV internalFlowSource1(Nw=2)
+        annotation (Placement(transformation(extent={{-50,46},{-30,66}})));
+      Thermal.HeatSource1DFV externalFlowSource1(Nw=2)
+        annotation (Placement(transformation(extent={{-50,34},{-30,14}})));
+      Modelica.Blocks.Sources.Step powerInternal1(
+        startTime=0,
+        height=1000,
+        offset=0)
+        annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
+      Modelica.Blocks.Sources.Step powerExternal1
+        annotation (Placement(transformation(extent={{-80,0},{-60,20}})));
+      Thermal.MetalWallFV wall2(
+        Nw=2,
+        M=1,
+        cm=500,
+        WallRes=true,
+        UA_ext=200,
+        UA_int=800,
+        Tstartbar=293.15)
+        annotation (Placement(transformation(extent={{30,32},{50,52}})));
+      Thermal.TempSource1DFV internalFlowSource2(Nw=2)
+        annotation (Placement(transformation(extent={{30,46},{50,66}})));
+      Thermal.TempSource1DFV externalFlowSource2(Nw=2)
+        annotation (Placement(transformation(extent={{30,34},{50,14}})));
+      Modelica.Blocks.Sources.Step temperatureInternal2(
+        startTime=0,
+        height=10,
+        offset=293.15)
+        annotation (Placement(transformation(extent={{0,60},{20,80}})));
+      Modelica.Blocks.Sources.Constant temperatureExternal2(k=293.15)
+        annotation (Placement(transformation(extent={{0,0},{20,20}})));
+    equation
+      connect(wall1.ext, externalFlowSource1.wall) annotation (Line(
+          points={{-40,38.9},{-40,27}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(internalFlowSource1.wall, wall1.int) annotation (Line(
+          points={{-40,53},{-40,45}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(powerInternal1.y, internalFlowSource1.power) annotation (Line(
+          points={{-59,70},{-40,70},{-40,60}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(powerExternal1.y, externalFlowSource1.power) annotation (Line(
+          points={{-59,10},{-40,10},{-40,20}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(wall2.ext, externalFlowSource2.wall) annotation (Line(
+          points={{40,38.9},{40,27}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(internalFlowSource2.wall, wall2.int) annotation (Line(
+          points={{40,53},{40,45}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(temperatureExternal2.y, externalFlowSource2.temperature)
+        annotation (Line(
+          points={{21,10},{40,10},{40,20}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(temperatureInternal2.y, internalFlowSource2.temperature)
+        annotation (Line(
+          points={{21,70},{40,70},{40,60}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}), graphics),
+        experiment(StopTime=5, Tolerance=1e-006),
+        __Dymola_experimentSetupOutput);
+    end TestWalls;
   end DistributedParameterComponents;
 
   package ElectricalComponents "Test for Electrical package components"
