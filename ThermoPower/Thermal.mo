@@ -255,7 +255,7 @@ package Thermal "Thermal models of heat transfer"
     parameter Length rext "External radius (single tube)";
     parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
     parameter ThermalConductivity lambda "Thermal conductivity";
-    parameter Boolean WallRes=true "Wall conduction resistance accounted for";
+    parameter Boolean WallRes=true "Wall thermal resistance accounted for";
     parameter Temperature Tstartbar=300 "Avarage temperature"
       annotation (Dialog(tab="Initialisation"));
     parameter Temperature Tstart1=Tstartbar
@@ -444,6 +444,13 @@ package Thermal "Thermal models of heat transfer"
     parameter Modelica.SIunits.Mass M "Mass";
     parameter Modelica.SIunits.SpecificHeatCapacity cm
       "Specific heat capacity of metal";
+    parameter Boolean WallRes=false "Wall thermal resistance accounted for";
+    parameter Modelica.SIunits.ThermalConductance UA_ext = 0
+      "Equivalent thermal conductance of outer half-wall"
+      annotation(Dialog(enable = WallRes));
+    parameter Modelica.SIunits.ThermalConductance UA_int = UA_ext
+      "Equivalent thermal conductance of inner half-wall"
+      annotation(Dialog(enable = WallRes));
     parameter Temperature Tstartbar=300 "Average temperature"
       annotation (Dialog(tab="Initialisation"));
     parameter Temperature Tstart1=Tstartbar
@@ -467,9 +474,15 @@ package Thermal "Thermal models of heat transfer"
        annotation (Placement(transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
   equation
     (cm*M/Nw)*der(Tvol) = int.Q + ext.Q "Energy balance";
-    // No temperature gradients across the thickness
-    ext.T = Tvol;
-    int.T = Tvol;
+    if WallRes then
+      assert(UA_int > 0 and UA_ext > 0, "Assign postive values to UA_int, UA_ext");
+      ext.Q = (ext.T-Tvol)*UA_ext/Nw;
+      int.Q = (int.T-Tvol)*UA_int/Nw;
+    else
+      // No temperature gradients across the thickness
+      ext.T = Tvol;
+      int.T = Tvol;
+    end if;
   initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
@@ -498,26 +511,24 @@ package Thermal "Thermal models of heat transfer"
             extent={{-138,-60},{142,-100}},
             lineColor={191,95,0},
             textString="%name")}),
-      Documentation(info="<HTML>
-<p>This is the model of a cylindrical tube of solid material.
-<p>The heat capacity (which is lumped at the center of the tube thickness) is accounted for, as well as the thermal resistance due to the finite heat conduction coefficient. Longitudinal heat conduction is neglected.
-<p><b>Modelling options</b></p>
-<p>The following options are available:
+      Documentation(info="<html>
+<p>Finite volumes 1D model of a generic wall for 1D heat exchangers.</p>
+<p>The heat capacity of the wall is accounted for, and lumped half-way between the inner and outer surfaces.</p>
+<p>The thermal resistance of the wall is optionally accounted for by setting WallRes = true; in that case, the total heat conductance of the outer and inner half-layers of the wall must then be set. For a flat (or approximately flat) wall with surface S, thickness d and conductivity lambda, both parameters are equal to 2*S*lambda/d.</p>
+<h4>Modelling options</h4>
+<p>The following options are available: </p>
 <ul>
-<li><tt>WallRes = false</tt>: the thermal resistance of the tube wall is neglected.
-<li><tt>WallRes = true</tt>: the thermal resistance of the tube wall is accounted for.
+<li><code>WallRes = false</code>: the thermal resistance of the wall is neglected. </li>
+<li><code>WallRes = true</code>: the thermal resistance of the wall is accounted for. </li>
 </ul>
-</HTML>", revisions="<html>
+</html>", revisions="<html>
 <ul>
-<li><i>30 May 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Initialisation support added.</li>
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
+<li>11 Jul 2014 by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>Added support for wall resistance.</li>
+<li><i>30 May 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>Initialisation support added.</li>
+<li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>First release. </li>
 </ul>
-</html>
-"),   Diagram(graphics));
+</html>"),
+      Diagram(graphics));
   end MetalWallFV;
 
   model MetalWallFEM "Generic metal wall - 1 radial node and N axial nodes"
