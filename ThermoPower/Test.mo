@@ -8662,6 +8662,178 @@ Algorithm Tolerance = 1e-6
         __Dymola_experimentSetupOutput(doublePrecision=true, equdistant=false));
     end TestFlow1DfemJ;
 
+    model TestWalls "Test various wall models"
+      Thermal.MetalWallFV wall1(
+        Nw=2,
+        M=1,
+        cm=500,
+        Tstartbar=293.15)
+        annotation (Placement(transformation(extent={{-50,32},{-30,52}})));
+      Thermal.HeatSource1DFV internalFlowSource1(Nw=2)
+        annotation (Placement(transformation(extent={{-50,46},{-30,66}})));
+      Thermal.HeatSource1DFV externalFlowSource1(Nw=2)
+        annotation (Placement(transformation(extent={{-50,34},{-30,14}})));
+      Modelica.Blocks.Sources.Step powerInternal1(
+        startTime=0,
+        height=1000,
+        offset=0)
+        annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
+      Modelica.Blocks.Sources.Step powerExternal1
+        annotation (Placement(transformation(extent={{-80,0},{-60,20}})));
+      Thermal.MetalWallFV wall2(
+        Nw=2,
+        M=1,
+        cm=500,
+        WallRes=true,
+        UA_ext=200,
+        UA_int=800,
+        Tstartbar=293.15)
+        annotation (Placement(transformation(extent={{30,32},{50,52}})));
+      Thermal.TempSource1DFV internalFlowSource2(Nw=2)
+        annotation (Placement(transformation(extent={{30,46},{50,66}})));
+      Thermal.TempSource1DFV externalFlowSource2(Nw=2)
+        annotation (Placement(transformation(extent={{30,34},{50,14}})));
+      Modelica.Blocks.Sources.Step temperatureInternal2(
+        startTime=0,
+        height=10,
+        offset=293.15)
+        annotation (Placement(transformation(extent={{0,60},{20,80}})));
+      Modelica.Blocks.Sources.Constant temperatureExternal2(k=293.15)
+        annotation (Placement(transformation(extent={{0,0},{20,20}})));
+    equation
+      connect(wall1.ext, externalFlowSource1.wall) annotation (Line(
+          points={{-40,38.9},{-40,27}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(internalFlowSource1.wall, wall1.int) annotation (Line(
+          points={{-40,53},{-40,45}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(powerInternal1.y, internalFlowSource1.power) annotation (Line(
+          points={{-59,70},{-40,70},{-40,60}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(powerExternal1.y, externalFlowSource1.power) annotation (Line(
+          points={{-59,10},{-40,10},{-40,20}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(wall2.ext, externalFlowSource2.wall) annotation (Line(
+          points={{40,38.9},{40,27}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(internalFlowSource2.wall, wall2.int) annotation (Line(
+          points={{40,53},{40,45}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(temperatureExternal2.y, externalFlowSource2.temperature)
+        annotation (Line(
+          points={{21,10},{40,10},{40,20}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(temperatureInternal2.y, internalFlowSource2.temperature)
+        annotation (Line(
+          points={{21,70},{40,70},{40,60}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}), graphics),
+        experiment(StopTime=5, Tolerance=1e-006),
+        __Dymola_experimentSetupOutput);
+    end TestWalls;
+
+    model TestHeatTransfer2phDB "Test of two-phase heat transfer components"
+      replaceable package Medium = Modelica.Media.Water.StandardWater
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium;
+
+      parameter Integer Nf(min=2) = 6 "Number of nodes on the fluid side";
+      parameter Integer Nw = 5 "Number of nodes on the wallside";
+      parameter Integer Nt(min=1) = 1 "Number of tubes in parallel";
+      parameter Distance L = 2 "Tube length";
+      parameter Area A = 1e-3 "Cross-sectional area (single tube)";
+      parameter Length omega = 1e-3
+        "Wet perimeter of heat transfer surface (single tube)";
+      parameter Length Dhyd = 1e-4 "Hydraulic Diameter (single tube)";
+      parameter MassFlowRate wnom = 10 "Nominal mass flow rate (single tube)";
+      parameter Boolean useAverageTemperature = true
+        "= true to use average temperature for heat transfer";
+
+      parameter Medium.AbsolutePressure p = 1e6;
+      parameter Medium.SpecificEnthalpy h_liq = 1e5;
+      parameter Medium.SpecificEnthalpy h_vap = 3.2e6;
+      parameter Real u(unit = "1/s") = 1 "For unit consistency";
+
+      replaceable ThermoPower.Thermal.HeatTransfer.HeatTransfer2phDB heatTransfer
+        constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
+        redeclare package Medium = Medium,
+        final Nf=Nf, final Nw = Nw, final Nt = Nt,
+        final L = L, final A = A, final Dhyd = Dhyd,
+        final omega = omega, final wnom = wnom/Nt,
+        final w=w, final fluidState=fluidState);
+
+      ThermoPower.Thermal.TempSource1DFV tempSource(Nw = Nw);
+
+      Medium.SpecificEnthalpy h1, h2;
+      Medium.SpecificEnthalpy h[Nf];
+      Medium.ThermodynamicState fluidState[Nf];
+      Medium.MassFlowRate w[Nf];
+      Modelica.SIunits.Power Q[Nw] = -tempSource.wall.Q;
+    equation
+      h1 = if time < 2 then h_liq else
+           if time < 3 then h_liq + (h_vap-h_liq)*u*(time-2) else
+           if time < 4 then h_vap else
+           h_vap + (h_liq-h_vap)*u*(time-4);
+      h2 = if time < 1 then h_liq + (h_vap-h_liq)*u*time else
+           if time < 3 then h_vap else
+           if time < 4 then h_vap + (h_liq-h_vap)*u*(time-3) else
+           h_liq;
+      h = linspace(h1,h2,Nf);
+      for i in 1:Nf loop
+        fluidState[i] = Medium.setState_ph(p,h[i]);
+      end for;
+      w = ones(Nf)*wnom*(
+            if time < 1 then 1 else
+            if time < 1.5 then 1-(time-1)*2 else
+            if time < 2 then (time-1.5)*2 else
+            1);
+      connect(tempSource.wall, heatTransfer.wall);
+      tempSource.temperature = 800;
+      annotation (experiment(
+          StopTime=5,
+          __Dymola_NumberOfIntervals=50000,
+          Tolerance=1e-006), __Dymola_experimentSetupOutput,
+        Documentation(info="<html>
+<p>The test demonstrates that the computed heat flows change continuously with the node enthalpies and the flow rate, as required to guarantee the existence and uniqueness of the DAE solution.</p>
+</html>", revisions="<html>
+<ul>
+    <li><i>15 Lug 2014</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    First release.</li>
+</ul>
+</html>"));
+    end TestHeatTransfer2phDB;
+
+    model TestFlowDependentHeatTransferCoefficient2ph
+      "Test of two-phase heat transfer components"
+      extends TestHeatTransfer2phDB(
+        redeclare Thermal.HeatTransfer.FlowDependentHeatTransferCoefficient2ph
+           heatTransfer(alpha = 0.8,
+                        gamma_nom_liq = 2000,
+                        gamma_nom_2ph = 5000,
+                        gamma_nom_vap = 3000));
+      annotation (experiment(
+          StopTime=5,
+          __Dymola_NumberOfIntervals=50000,
+          Tolerance=1e-006), __Dymola_experimentSetupOutput,
+        Documentation(revisions="<html>
+<ul>
+    <li><i>15 Lug 2014</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    First release.</li>
+</ul>
+</html>", info="<html>
+<p>The test demonstrates that the computed heat flows change continuously with the node enthalpies and the flow rate, as required to guarantee the existence and uniqueness of the DAE solution.</p>
+</html>"));
+    end TestFlowDependentHeatTransferCoefficient2ph;
+
     package OldTests "Contains tests for old Flow1D components"
       model TestFlow1Db "Test case for Flow1D"
         package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
@@ -9521,86 +9693,6 @@ Algorithm Tolerance = 1e-6
 </html>"));
       end TestFlow1DDB;
     end OldTests;
-
-    model TestWalls "Test various wall models"
-      Thermal.MetalWallFV wall1(
-        Nw=2,
-        M=1,
-        cm=500,
-        Tstartbar=293.15)
-        annotation (Placement(transformation(extent={{-50,32},{-30,52}})));
-      Thermal.HeatSource1DFV internalFlowSource1(Nw=2)
-        annotation (Placement(transformation(extent={{-50,46},{-30,66}})));
-      Thermal.HeatSource1DFV externalFlowSource1(Nw=2)
-        annotation (Placement(transformation(extent={{-50,34},{-30,14}})));
-      Modelica.Blocks.Sources.Step powerInternal1(
-        startTime=0,
-        height=1000,
-        offset=0)
-        annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
-      Modelica.Blocks.Sources.Step powerExternal1
-        annotation (Placement(transformation(extent={{-80,0},{-60,20}})));
-      Thermal.MetalWallFV wall2(
-        Nw=2,
-        M=1,
-        cm=500,
-        WallRes=true,
-        UA_ext=200,
-        UA_int=800,
-        Tstartbar=293.15)
-        annotation (Placement(transformation(extent={{30,32},{50,52}})));
-      Thermal.TempSource1DFV internalFlowSource2(Nw=2)
-        annotation (Placement(transformation(extent={{30,46},{50,66}})));
-      Thermal.TempSource1DFV externalFlowSource2(Nw=2)
-        annotation (Placement(transformation(extent={{30,34},{50,14}})));
-      Modelica.Blocks.Sources.Step temperatureInternal2(
-        startTime=0,
-        height=10,
-        offset=293.15)
-        annotation (Placement(transformation(extent={{0,60},{20,80}})));
-      Modelica.Blocks.Sources.Constant temperatureExternal2(k=293.15)
-        annotation (Placement(transformation(extent={{0,0},{20,20}})));
-    equation
-      connect(wall1.ext, externalFlowSource1.wall) annotation (Line(
-          points={{-40,38.9},{-40,27}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      connect(internalFlowSource1.wall, wall1.int) annotation (Line(
-          points={{-40,53},{-40,45}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      connect(powerInternal1.y, internalFlowSource1.power) annotation (Line(
-          points={{-59,70},{-40,70},{-40,60}},
-          color={0,0,127},
-          smooth=Smooth.None));
-      connect(powerExternal1.y, externalFlowSource1.power) annotation (Line(
-          points={{-59,10},{-40,10},{-40,20}},
-          color={0,0,127},
-          smooth=Smooth.None));
-      connect(wall2.ext, externalFlowSource2.wall) annotation (Line(
-          points={{40,38.9},{40,27}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      connect(internalFlowSource2.wall, wall2.int) annotation (Line(
-          points={{40,53},{40,45}},
-          color={255,127,0},
-          smooth=Smooth.None));
-      connect(temperatureExternal2.y, externalFlowSource2.temperature)
-        annotation (Line(
-          points={{21,10},{40,10},{40,20}},
-          color={0,0,127},
-          smooth=Smooth.None));
-      connect(temperatureInternal2.y, internalFlowSource2.temperature)
-        annotation (Line(
-          points={{21,70},{40,70},{40,60}},
-          color={0,0,127},
-          smooth=Smooth.None));
-      annotation (
-        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
-                {100,100}}), graphics),
-        experiment(StopTime=5, Tolerance=1e-006),
-        __Dymola_experimentSetupOutput);
-    end TestWalls;
   end DistributedParameterComponents;
 
   package ElectricalComponents "Test for Electrical package components"
