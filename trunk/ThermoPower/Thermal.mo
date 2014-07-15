@@ -699,7 +699,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
 </html>"));
   end ConvHTLumped;
 
-  package HeatTransfer "Heat transfer models"
+  package HeatTransferFV "Heat transfer models for FV components"
     model IdealHeatTransfer
       "Delta T across the boundary layer is zero (infinite h.t.c.)"
       extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature=false);
@@ -1126,7 +1126,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
                 graphics),
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end FlowDependentHeatTransferCoefficient2ph;
-  end HeatTransfer;
+  end HeatTransferFV;
 
   package MaterialProperties "Thermal and mechanical properties of materials"
     package Interfaces

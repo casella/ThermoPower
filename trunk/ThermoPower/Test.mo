@@ -4430,7 +4430,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         hstartout=hs,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=gamma),
         Nt=Nt,
         dpnom=1000)
@@ -4522,7 +4522,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Thermal.HeatTransfer.IdealHeatTransfer heatTransfer,
+        redeclare ThermoPower.Thermal.HeatTransferFV.IdealHeatTransfer
+          heatTransfer,
         Nt=Nt,
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
@@ -4670,7 +4671,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=800),
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         A=Aext,
@@ -4693,7 +4694,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=800),
         A=Aint,
         omega=omegahex,
@@ -4856,7 +4857,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=800),
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         A=Aext,
@@ -4880,7 +4881,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=800),
         omega=omegaint,
         A=Aint,
@@ -5008,8 +5009,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        redeclare ThermoPower.Thermal.HeatTransfer.DittusBoelter
-          heatTransfer(useAverageTemperature=true),
+        redeclare ThermoPower.Thermal.HeatTransferFV.DittusBoelter heatTransfer(
+            useAverageTemperature=true),
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,10}},
                       rotation=0)));
       Thermal.TempSource1DFV
@@ -5268,16 +5269,15 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
       Medium.ThermodynamicState fluidState[Nnodes];
 
-      Thermal.HeatTransfer.HeatTransfer2phDB
-                              HeatTransfer(
+      Thermal.HeatTransferFV.HeatTransfer2phDB HeatTransfer(
         Nf=Nnodes,
-        Nw=Nnodes-1,
-        Nt = 1,
+        Nw=Nnodes - 1,
+        Nt=1,
         A=Across,
         Dhyd=0.06,
         omega=0.188496,
         L=10,
-        wnom = wnom,
+        wnom=wnom,
         redeclare package Medium = Medium,
         fluidState=fluidState,
         w=w,
@@ -5400,7 +5400,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        redeclare ThermoPower.Thermal.HeatTransfer.HeatTransfer2phDB
+        redeclare ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB
           heatTransfer(gamma_b=30000),
         dpnom=1000)
         annotation (Placement(transformation(extent={{-20,-70},{0,-50}})));
@@ -8763,13 +8763,20 @@ Algorithm Tolerance = 1e-6
       parameter Medium.SpecificEnthalpy h_vap = 3.2e6;
       parameter Real u(unit = "1/s") = 1 "For unit consistency";
 
-      replaceable ThermoPower.Thermal.HeatTransfer.HeatTransfer2phDB heatTransfer
-        constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
+      replaceable ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB
+        heatTransfer constrainedby
+        ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
         redeclare package Medium = Medium,
-        final Nf=Nf, final Nw = Nw, final Nt = Nt,
-        final L = L, final A = A, final Dhyd = Dhyd,
-        final omega = omega, final wnom = wnom/Nt,
-        final w=w, final fluidState=fluidState);
+        final Nf=Nf,
+        final Nw=Nw,
+        final Nt=Nt,
+        final L=L,
+        final A=A,
+        final Dhyd=Dhyd,
+        final omega=omega,
+        final wnom=wnom/Nt,
+        final w=w,
+        final fluidState=fluidState);
 
       ThermoPower.Thermal.TempSource1DFV tempSource(Nw = Nw);
 
@@ -8814,12 +8821,13 @@ Algorithm Tolerance = 1e-6
 
     model TestFlowDependentHeatTransferCoefficient2ph
       "Test of two-phase heat transfer components"
-      extends TestHeatTransfer2phDB(
-        redeclare Thermal.HeatTransfer.FlowDependentHeatTransferCoefficient2ph
-           heatTransfer(alpha = 0.8,
-                        gamma_nom_liq = 2000,
-                        gamma_nom_2ph = 5000,
-                        gamma_nom_vap = 3000));
+      extends TestHeatTransfer2phDB(redeclare
+          Thermal.HeatTransferFV.FlowDependentHeatTransferCoefficient2ph
+          heatTransfer(
+          alpha=0.8,
+          gamma_nom_liq=2000,
+          gamma_nom_2ph=5000,
+          gamma_nom_vap=3000));
       annotation (experiment(
           StopTime=5,
           __Dymola_NumberOfIntervals=50000,

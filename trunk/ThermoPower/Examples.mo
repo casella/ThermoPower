@@ -51,7 +51,7 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=1800),
         dpnom=1000,
         pstart=6000000) annotation (Placement(transformation(
@@ -79,7 +79,7 @@ package Examples "Application examples"
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=10000),
         dpnom=3000,
         pstart=6118000) annotation (Placement(transformation(
@@ -106,7 +106,7 @@ package Examples "Application examples"
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=10000),
         dpnom=17000,
         pstart=6000000) annotation (Placement(transformation(
@@ -137,7 +137,7 @@ package Examples "Application examples"
         dpnom=2000,
         pstart=6000000,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=3000))
                         annotation (Placement(transformation(extent={{-54,80},{
                 -24,110}}, rotation=0)));
@@ -160,9 +160,8 @@ package Examples "Application examples"
         initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP,
         dpnom=170000,
         pstart=5900000,
-        redeclare ThermoPower.Thermal.HeatTransfer.HeatTransfer2phDB
-                                                                   heatTransfer(
-            gamma_b=20000))
+        redeclare ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB
+          heatTransfer(gamma_b=20000))
                         annotation (Placement(transformation(extent={{-6,80},{
                 24,110}}, rotation=0)));
       Water.Flow1DFV2ph
@@ -187,7 +186,7 @@ package Examples "Application examples"
         dpnom=1000,
         pstart=5600000,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=3000))
                         annotation (Placement(transformation(extent={{44,80},{
                 74,110}}, rotation=0)));
@@ -897,7 +896,7 @@ Casella</a>:<br>
         dpnom=1000,
         pstart=6000000,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=3000))
                         annotation (Placement(transformation(extent={{-38,20},{
                 -18,40}}, rotation=0)));
@@ -919,8 +918,8 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        redeclare ThermoPower.Thermal.HeatTransfer.HeatTransfer2phDB
-                                                                   heatTransfer,
+        redeclare ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB
+          heatTransfer,
         dpnom=170000,
         pstart=5900000) annotation (Placement(transformation(extent={{-8,20},{
                 12,40}}, rotation=0)));
@@ -946,7 +945,7 @@ Casella</a>:<br>
         dpnom=10000,
         pstart=5600000,
         redeclare
-          ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
           heatTransfer(gamma=3000))
                         annotation (Placement(transformation(extent={{22,20},{
                 42,40}}, rotation=0)));
@@ -1405,7 +1404,8 @@ Casella</a>:<br>
           hstartin=1e5,
           hstartout=2.7e5,
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-          redeclare ThermoPower.Thermal.HeatTransfer.DittusBoelter heatTransfer,
+          redeclare ThermoPower.Thermal.HeatTransferFV.DittusBoelter
+            heatTransfer,
           initOpt=ThermoPower.Choices.Init.Options.noInit,
           dpnom=1000) annotation (Placement(
               transformation(extent={{-20,-70},{20,-30}}, rotation=0)));
@@ -1433,7 +1433,7 @@ Casella</a>:<br>
           FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
           QuasiStatic=StaticGasBalances,
           redeclare
-            ThermoPower.Thermal.HeatTransfer.FlowDependentHeatTransferCoefficient
+            ThermoPower.Thermal.HeatTransferFV.FlowDependentHeatTransferCoefficient
             heatTransfer(gamma_nom=gamma_nom, alpha=0.6),
           initOpt=ThermoPower.Choices.Init.Options.noInit,
           Tstartin=670,
@@ -2423,7 +2423,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           Cfnom=Cfnom_F,
           FluidPhaseStart=FluidPhaseStart,
           redeclare
-            ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+            ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
             heatTransfer(gamma=gamma_F))   annotation (Placement(transformation(
                 extent={{-20,-76},{20,-36}}, rotation=0)));
 
@@ -2458,7 +2458,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           Cfnom=Cfnom_G,
           FFtype=FFtype_G,
           redeclare
-            ThermoPower.Thermal.HeatTransfer.ConstantHeatTransferCoefficient
+            ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
             heatTransfer(gamma=gamma_G))
                            annotation (Placement(transformation(extent={{-20,60},
                   {20,20}}, rotation=0)));

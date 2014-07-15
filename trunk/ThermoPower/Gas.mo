@@ -871,14 +871,20 @@ package Gas "Models of components with ideal gases as working fluid"
     Thermal.DHTVolumes wall(N=Nw) annotation (Dialog(enable=false),
         Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
 
-    replaceable Thermal.HeatTransfer.IdealHeatTransfer heatTransfer
+    replaceable Thermal.HeatTransferFV.IdealHeatTransfer heatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
-      final Nf=N, final Nw = Nw, final Nt = Nt,
-      final L = L, final A = A, final Dhyd = Dhyd,
-      final omega = omega, final wnom = wnom/Nt,
-      final w=w*ones(N), final fluidState=gas.state) "Heat transfer model"
-      annotation(choicesAllMatching = true);
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final omega=omega,
+      final wnom=wnom/Nt,
+      final w=w*ones(N),
+      final fluidState=gas.state) "Heat transfer model"
+      annotation (choicesAllMatching=true);
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     Pressure Dpfric "Pressure drop due to friction";
