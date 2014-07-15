@@ -994,14 +994,20 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Mass M "Fluid mass (single tube)";
     Mass Mtot "Fluid mass (total)";
     Real dMdt[N - 1] "Time derivative of mass in each cell between two nodes";
-    replaceable Thermal.HeatTransfer.IdealHeatTransfer heatTransfer constrainedby
-      ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
+    replaceable Thermal.HeatTransferFV.IdealHeatTransfer heatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
-      final Nf=N, final Nw = Nw, final Nt = Nt,
-      final L = L, final A = A, final Dhyd = Dhyd,
-      final omega = omega, final wnom = wnom/Nt,
-      final w=w*ones(N), final fluidState=fluidState) "Heat transfer model"
-      annotation(choicesAllMatching = true);
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final omega=omega,
+      final wnom=wnom/Nt,
+      final w=w*ones(N),
+      final fluidState=fluidState) "Heat transfer model"
+      annotation (choicesAllMatching=true);
 
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -1223,14 +1229,20 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
-    replaceable Thermal.HeatTransfer.IdealHeatTransfer heatTransfer constrainedby
-      ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
+    replaceable Thermal.HeatTransferFV.IdealHeatTransfer heatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
       redeclare package Medium = Medium,
-      final Nf=N, final Nw = Nw, final Nt = Nt,
-      final L = L, final A = A, final Dhyd = Dhyd,
-      final omega = omega, final wnom = wnom/Nt,
-      final w=w*ones(N), final fluidState=fluidState) "Heat transfer model"
-      annotation(choicesAllMatching = true);
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final omega=omega,
+      final wnom=wnom/Nt,
+      final w=w*ones(N),
+      final fluidState=fluidState) "Heat transfer model"
+      annotation (choicesAllMatching=true);
 
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -7241,7 +7253,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </html>
 "));
   end Flow1Dfem2ph;
-
 
   model SourceP "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
