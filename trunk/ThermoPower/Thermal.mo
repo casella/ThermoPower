@@ -771,9 +771,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
     equation
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
-      // Computation of actual UA value, with smooth lower saturation to avoid numerical singularities at low flows
+      // Computation of actual heat transfer coefficient with smooth lower saturation to avoid numerical singularities at low flows
       w_wnom = abs(w[1])/wnom
-        "Inlet flow rate used for the computation of the conductance";
+        "Inlet flow rate used for the computation of the h.t.c.";
       w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2);
       gamma = homotopy(gamma_nom*w_wnom_reg^alpha,
                        gamma_nom);
@@ -998,6 +998,134 @@ The swapping is performed if the counterCurrent parameter is true (default value
                 graphics),
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end HeatTransfer2phDB;
+
+    model FlowDependentHeatTransferCoefficient2ph
+      "Separate h.t.c.'s for each phase, each changing as (w/w_nom)^alpha"
+      extends BaseClasses.DistributedHeatTransferFV(
+        final useAverageTemperature,
+        redeclare replaceable package Medium =
+            Modelica.Media.Interfaces.PartialTwoPhaseMedium);
+       parameter CoefficientOfHeatTransfer gamma_nom_liq
+        "Nominal heat transfer coefficient, liquid phase";
+       parameter CoefficientOfHeatTransfer gamma_nom_2ph
+        "Nominal average heat transfer coefficient, 2-phase";
+       parameter CoefficientOfHeatTransfer gamma_nom_vap
+        "Nominal heat transfer coefficient, vapour phase";
+       parameter Real alpha(final unit="1") = 0.8
+        "Exponent in the flow-dependency law";
+       parameter Real beta(final unit="1") = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is not reduced";
+       CoefficientOfHeatTransfer gamma_liq
+        "Actual heat transfer coefficient, liquid phase";
+       CoefficientOfHeatTransfer gamma_2ph
+        "Actual heat transfer coefficient, 2-phase";
+       CoefficientOfHeatTransfer gamma_vap
+        "Actual heat transfer coefficient, vapour phase";
+       Real w_wnom(start = 1, final unit = "1")
+        "Ratio between actual and nominal flow rate";
+       Real w_wnom_reg "Regularized w/wnom ratio";
+
+      parameter CoefficientOfHeatTransfer gamma_b=20000
+        "Coefficient of heat transfer in the 2-phase region";
+
+      Real state[Nw] "Indicator of phase configuration";
+      Real alpha_l[Nw](each unit = "1")
+        "Normalized position of liquid phase boundary";
+      Real alpha_v[Nw](each unit = "1")
+        "Normalized position of vapour phase boundary";
+      Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
+      Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
+      Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
+      Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+      Medium.Temperature Ts "Saturated water temperature";
+      Medium.SaturationProperties sat "Properties of saturated fluid";
+      Medium.AbsolutePressure p "Fluid pressure for property calculations";
+      Power Q "Total heat flow through lateral boundary";
+
+    equation
+      assert(Nw == Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
+
+      // Computation of actual h.t.c.'s
+      w_wnom = abs(w[1])/wnom
+        "Inlet flow rate used for the computation of the h.t.c.";
+      w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2)
+        "Regularized w/wnom ratio";
+      gamma_liq = homotopy(gamma_nom_liq*w_wnom_reg^alpha,
+                           gamma_nom_liq);
+      gamma_2ph = homotopy(gamma_nom_2ph*w_wnom_reg^alpha,
+                           gamma_nom_2ph);
+      gamma_vap = homotopy(gamma_nom_vap*w_wnom_reg^alpha,
+                           gamma_nom_vap);
+
+      // Saturated fluid property calculations
+      p = Medium.pressure(fluidState[1]);
+      sat = Medium.setSat_p(p);
+      Ts = sat.Tsat;
+      hl = Medium.bubbleEnthalpy(sat);
+      hv = Medium.dewEnthalpy(sat);
+
+      // Fluid property calculations at nodes
+      for j in 1:Nf loop
+        h[j] = Medium.specificEnthalpy(fluidState[j]);
+      end for;
+
+      for j in 1:Nw loop
+         if noEvent(h[j] < hl and h[j + 1] < hl) then  // liquid
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*Nt*gamma_liq;
+           state[j] = 0;
+           alpha_l[j] = 0;
+           alpha_v[j] = 0;
+         elseif noEvent(h[j] > hv and h[j + 1]> hv) then  // vapour
+           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*Nt*gamma_vap;
+           state[j] = 1;
+           alpha_l[j] = 0;
+           alpha_v[j] = 0;
+         elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
+           wall.Q[j] = alpha_l[j]      *(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_liq +
+                       (1 - alpha_l[j])*(wall.T[j] - Ts)           *omega*l*Nt*gamma_2ph;
+           state[j] = 2;
+           alpha_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
+           alpha_v[j] = 0;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then // 2-phase
+           wall.Q[j] = (wall.T[j] - Ts)*omega*l*Nt*gamma_2ph;
+           state[j] = 3;
+           alpha_l[j] = 0;
+           alpha_v[j] = 0;
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then // 2-phase --> vapour
+           wall.Q[j] = alpha_v[j]      *(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_vap +
+                       (1 - alpha_v[j])*(wall.T[j] - Ts)               *omega*l*Nt*gamma_2ph;
+           state[j] = 4;
+           alpha_l[j] = 0;
+           alpha_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
+         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then // 2-phase --> liquid
+           wall.Q[j] = alpha_l[j]      *(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_liq +
+                       (1 - alpha_l[j])*(wall.T[j] - Ts)               *omega*l*Nt*gamma_2ph;
+           state[j] = 5;
+           alpha_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
+           alpha_v[j] = 0;
+         else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then        // vapour --> 2-phase
+           wall.Q[j] = alpha_v[j]      *(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_vap +
+                       (1 - alpha_v[j])*(wall.T[j] - Ts)           *omega*l*Nt*gamma_2ph;
+           state[j] = 6;
+           alpha_l[j] = 0;
+           alpha_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
+         end if;
+
+         if useAverageTemperature then
+           Tvolbar[j] = (T[j] + T[j + 1])/2;
+         else
+           Tvolbar[j] = T[j + 1];
+         end if;
+      end for;
+
+      Q = sum(wall.Q);
+
+       annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end FlowDependentHeatTransferCoefficient2ph;
   end HeatTransfer;
 
   package MaterialProperties "Thermal and mechanical properties of materials"
