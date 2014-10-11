@@ -751,7 +751,8 @@ Casella</a>:<br>
       ThermoPower.Water.SinkPressure
                               SinkP1 annotation (Placement(transformation(
               extent={{40,30},{60,50}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
             transformation(extent={{-40,60},{-20,80}}, rotation=0)));
       ThermoPower.Water.ValveLiqChoked ValveLiqChocked(
         dpnom=2e5,
@@ -784,7 +785,8 @@ Casella</a>:<br>
         CheckValve=false,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
             transformation(extent={{-10,-50},{10,-30}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant2 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant2(k=1)
+                                                 annotation (Placement(
             transformation(extent={{-40,-20},{-20,0}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine2(
         amplitude=49.5e5,
@@ -849,7 +851,8 @@ Casella</a>:<br>
       ThermoPower.Water.SinkPressure
                               SinkP1(p0=3e5) annotation (Placement(
             transformation(extent={{40,50},{60,70}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
             transformation(extent={{-90,10},{-70,30}}, rotation=0)));
       Water.ValveLiq ValveLiq1(
         dpnom=2e5,
@@ -2210,21 +2213,21 @@ Algorithm Tolerance = 1e-6
 
     model TestST1
       package Medium = Modelica.Media.Water.StandardWater;
-      parameter MassFlowRate w=1;
-      parameter Pressure pin=60e5;
-      parameter Pressure pcond=0.08e5;
-      parameter PerUnit eta_iso=0.92;
-      parameter PerUnit eta_mech=0.98;
-      parameter AngularVelocity omega=314;
-      parameter SpecificEnthalpy hin=2.949e6;
-      parameter SpecificEnthalpy hout_iso=2.240e6;
-      parameter SpecificEnthalpy hout=hin - eta_iso*(hin - hout_iso);
-      parameter Power Pnet=eta_iso*eta_mech*w*(hin - hout_iso);
-      parameter Torque tau=0.8*Pnet/omega;
-      parameter Time Ta=10 "Turbine acceleration time";
-      parameter MomentOfInertia J=Pnet*Ta/omega^2;
-      parameter HydraulicResistance Kv=1/2e5;
-      parameter PerUnit theta0(fixed=false, start = 1);
+      parameter Medium.MassFlowRate w=1;
+      parameter Medium.AbsolutePressure pin=60e5;
+      parameter Medium.AbsolutePressure pcond=0.08e5;
+      parameter SI.PerUnit eta_iso=0.92;
+      parameter SI.PerUnit eta_mech=0.98;
+      parameter SI.AngularVelocity omega=314;
+      parameter SI.SpecificEnthalpy hin=2.949e6;
+      parameter SI.SpecificEnthalpy hout_iso=2.240e6;
+      parameter SI.SpecificEnthalpy hout=hin - eta_iso*(hin - hout_iso);
+      parameter SI.Power Pnet=eta_iso*eta_mech*w*(hin - hout_iso);
+      parameter SI.Torque tau=0.8*Pnet/omega;
+      parameter SI.Time Ta=10 "Turbine acceleration time";
+      parameter SI.MomentOfInertia J=Pnet*Ta/omega^2;
+      parameter Units.HydraulicResistance Kv=1/2e5;
+      parameter SI.PerUnit theta0(fixed=false, start = 1);
 
       Water.SteamTurbineUnit ST(
         hpFraction=0.63,
@@ -2327,21 +2330,21 @@ Algorithm Tolerance = 1e-4
 
     model TestST2
       package Medium = Modelica.Media.Water.StandardWater;
-      parameter MassFlowRate w=1;
-      parameter Pressure pin=60e5;
-      parameter Pressure pcond=0.08e5;
-      parameter PerUnit eta_iso=0.92;
-      parameter PerUnit eta_mech=0.98;
-      parameter AngularVelocity omega=314;
-      parameter SpecificEnthalpy hin=2.949e6;
-      parameter SpecificEnthalpy hout_iso=2.240e6;
-      parameter SpecificEnthalpy hout=hin - eta_iso*(hin - hout_iso);
-      parameter Power Pnet=eta_iso*eta_mech*w*(hin - hout_iso);
-      parameter Torque tau=0.8*Pnet/omega;
-      parameter Time Ta=10 "Turbine acceleration time";
-      parameter MomentOfInertia J=Pnet*Ta/omega^2;
-      parameter HydraulicResistance Kv=1/2e5;
-      parameter PerUnit theta0=0.3;
+      parameter Medium.MassFlowRate w=1;
+      parameter Medium.AbsolutePressure pin=60e5;
+      parameter Medium.AbsolutePressure pcond=0.08e5;
+      parameter SI.PerUnit eta_iso=0.92;
+      parameter SI.PerUnit eta_mech=0.98;
+      parameter SI.AngularVelocity omega=314;
+      parameter Medium.SpecificEnthalpy hin=2.949e6;
+      parameter Medium.SpecificEnthalpy hout_iso=2.240e6;
+      parameter Medium.SpecificEnthalpy hout=hin - eta_iso*(hin - hout_iso);
+      parameter SI.Power Pnet=eta_iso*eta_mech*w*(hin - hout_iso);
+      parameter SI.Torque tau=0.8*Pnet/omega;
+      parameter SI.Time Ta=10 "Turbine acceleration time";
+      parameter SI.MomentOfInertia J=Pnet*Ta/omega^2;
+      parameter Units.HydraulicResistance Kv=1/2e5;
+      parameter SI.PerUnit theta0=0.3;
 
       Water.SteamTurbineUnit ST(
         hpFraction=0.63,
@@ -3602,7 +3605,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
     end TestGasTurbineStodola;
 
     model TestTurboJetInertia
-      parameter SpecificEnthalpy HH(fixed=false, start=40e6)
+      parameter SI.SpecificEnthalpy HH(fixed=false, start=40e6)
         "Fuel lower heat value";
     protected
       parameter Real tableEtaC[6, 4]=[0, 95, 100, 105; 1, 82.5e-2, 81e-2,
@@ -4248,7 +4251,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       parameter Modelica.SIunits.EnergyFlowRate W=41800*whex
         "Height of power step";
 
-      Time tau "Transport time delay";
+      SI.Time tau "Transport time delay";
       ThermoPower.Water.SourceMassFlow fluidSource(
         p0=phex,
         h=hinhex,
@@ -4504,7 +4507,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       Real gamma = Medium.specificHeatCapacityCp(hex.fluidState[1])/Medium.specificHeatCapacityCv(hex.fluidState[1]) "cp/cv";
       Real dMtot_dp = hex.Mtot/(hex.p*gamma) "compressibility";
       Real dw_dp = valve.Kv "sensitivity of valve flow to pressure";
-      Time tau = dMtot_dp/dw_dp "time constant of pressure transient";
+      SI.Time tau = dMtot_dp/dw_dp "time constant of pressure transient";
 
       Water.Flow1DFV
                    hex(
@@ -5087,28 +5090,28 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       replaceable package Medium = Modelica.Media.IdealGases.SingleGases.N2
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=10 "number of Nodes";
-      parameter Modelica.SIunits.Length Lhex=200 "total length";
-      parameter Modelica.SIunits.Diameter Dihex=0.02 "internal diameter";
-      parameter Modelica.SIunits.Radius rhex=Dihex/2 "internal radius";
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex
+      parameter SI.Length Lhex=200 "total length";
+      parameter SI.Diameter Dihex=0.02 "internal diameter";
+      parameter SI.Radius rhex=Dihex/2 "internal radius";
+      parameter SI.Length omegahex=Modelica.Constants.pi*Dihex
         "internal perimeter";
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2
+      parameter SI.Area Ahex=Modelica.Constants.pi*rhex^2
         "internal cross section";
       parameter Real Cfhex=0.005 "friction coefficient";
-      parameter Modelica.SIunits.MassFlowRate whex=0.05
+      parameter SI.MassFlowRate whex=0.05
         "nominal (and initial) mass flow rate";
-      parameter Modelica.SIunits.Pressure phex=3e5 "initial pressure";
-      parameter Temperature Tinhex=300 "initial inlet temperature";
-      parameter Temperature Touthex=300 "initial outlet temperature";
+      parameter SI.Pressure phex=3e5 "initial pressure";
+      parameter SI.Temperature Tinhex=300 "initial inlet temperature";
+      parameter SI.Temperature Touthex=300 "initial outlet temperature";
       // parameter Temperature deltaT=10 "height of temperature step";
-      parameter Modelica.SIunits.EnergyFlowRate W=500 "height of power step";
+      parameter SI.EnergyFlowRate W=500 "height of power step";
       Real gamma = Medium.specificHeatCapacityCp(hex.gas[1].state)/Medium.specificHeatCapacityCv(hex.gas[1].state) "cp/cv";
       Real dMtot_dp = hex.Mtot/(hex.p*gamma) "compressibility";
       Real dw_dp = valve.Kv "sensitivity of valve flow to pressure";
-      Time tau = dMtot_dp/dw_dp "time constant of pressure transient";
-      Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
-      Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
+      SI.Time tau = dMtot_dp/dw_dp "time constant of pressure transient";
+      SI.Mass Mhex "Mass in the heat exchanger";
+      SI.Mass Mbal "Mass resulting from the mass balance";
+      SI.Mass Merr(min = -1e9) "Mass balance error";
 
       Gas.SourceMassFlow Source(
         redeclare package Medium = Medium,
@@ -5260,13 +5263,13 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     model TestHeatTransfer2phDBa "Test case for HeatTransfer2phDB"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       parameter Integer Nnodes = 10;
-      parameter SpecificEnthalpy hstartin = 1e5;
-      SpecificEnthalpy hstartout = (1e5+0.001) + 3.4e6*time;
-      SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
-      parameter Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
-      parameter AbsolutePressure p = 3e6;
-      parameter MassFlowRate wnom = 2;
-      parameter MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
+      parameter Medium.SpecificEnthalpy hstartin = 1e5;
+      Medium.SpecificEnthalpy hstartout = (1e5+0.001) + 3.4e6*time;
+      Medium.SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
+      parameter SI.Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
+      parameter Medium.AbsolutePressure p = 3e6;
+      parameter Medium.MassFlowRate wnom = 2;
+      parameter Medium.MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
       Medium.ThermodynamicState fluidState[Nnodes];
 
       Thermal.HeatTransferFV.HeatTransfer2phDB HeatTransfer(
@@ -5352,19 +5355,19 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       // number of Nodes
       parameter Integer Nnodes=15;
       // total length
-      parameter Length Lhex=20;
+      parameter SI.Length Lhex=20;
       // internal diameter
-      parameter Diameter Dhex=0.01;
+      parameter SI.Diameter Dhex=0.01;
       // wall thickness
-      parameter Thickness thhex=0.002;
+      parameter SI.Thickness thhex=0.002;
       // internal radius
-      parameter Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Length omegahex=pi*Dhex;
+      parameter SI.Length omegahex=pi*Dhex;
       // internal cross section
-      parameter Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
-      parameter Real Cfhex=0.005;
+      parameter SI.PerUnit Cfhex=0.005;
       Water.ValveLin             valve(Kv=0.05/60e5) annotation (Placement(
             transformation(extent={{30,-70},{50,-50}}, rotation=0)));
       Water.SinkPressure      Sink(p0=10000)
@@ -5491,34 +5494,34 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
-      parameter Modelica.SIunits.Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      parameter SI.Diameter Dihex=0.02;
       // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      parameter SI.Radius rhex=Dihex/2;
       // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      parameter SI.Length omegahex=Modelica.Constants.pi*Dihex;
       // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      parameter SI.Area Ahex=Modelica.Constants.pi*rhex^2;
       // friction coefficient
       parameter Real Cfhex=0.005;
       // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.31;
+      parameter SI.MassFlowRate whex=0.31;
       // initial pressure
-      parameter Modelica.SIunits.Pressure phex=2e5;
+      parameter SI.Pressure phex=2e5;
       // initial inlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
+      parameter SI.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
+      parameter SI.SpecificEnthalpy houthex=1e5;
 
       //height of enthalpy step
-      parameter Modelica.SIunits.SpecificEnthalpy deltah=41800;
+      parameter SI.SpecificEnthalpy deltah=41800;
 
       //height of power step
-      parameter Modelica.SIunits.EnergyFlowRate W=41800*whex;
+      parameter SI.EnergyFlowRate W=41800*whex;
 
       // transport time delay
-      Time tau;
+      SI.Time tau;
       ThermoPower.Water.SourceMassFlow
                                 Fluid_Source(
         p0=phex,
@@ -5562,7 +5565,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         offset=whex,
         startTime=50) annotation (Placement(transformation(extent={{-100,20},{-80,
                 40}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1 annotation (Placement(
+      Modelica.Blocks.Sources.Constant Constant1(k=1)
+                                                 annotation (Placement(
             transformation(extent={{-10,70},{10,90}}, rotation=0)));
       Modelica.Blocks.Sources.Step InSpecEnthalpy(
         height=deltah,
@@ -6562,22 +6566,22 @@ Casella</a>:<br>
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
-      parameter Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Diameter Dhex=0.06;
+      parameter SI.Diameter Dhex=0.06;
       // wall thickness
-      parameter Thickness thhex=0;
+      parameter SI.Thickness thhex=0;
       // internal radius
-      parameter Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Length omegahex=Dhex;
+      parameter SI.Length omegahex=Dhex;
       // internal cross section
-      parameter Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
-      parameter Real Cfhex=0.005;
-      Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
-      Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
+      parameter SI.PerUnit Cfhex=0.005;
+      SI.Mass Mhex "Mass in the heat exchanger";
+      SI.Mass Mbal "Mass resulting from the mass balance";
+      SI.Mass Merr(min = -1e9) "Mass balance error";
 
       Water.Flow1D2ph hex(
         N=Nnodes,
@@ -6712,22 +6716,22 @@ Algorithm Tolerance = 1e-9
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
-      parameter Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Diameter Dhex=0.06;
+      parameter SI.Diameter Dhex=0.06;
       // wall thickness
-      parameter Thickness thhex=0;
+      parameter SI.Thickness thhex=0;
       // internal radius
-      parameter Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Length omegahex=Dhex;
+      parameter SI.Length omegahex=Dhex;
       // internal cross section
-      parameter Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
-      parameter Real Cfhex=0.005;
-      Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
-      Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
+      parameter SI.PerUnit Cfhex=0.005;
+      SI.Mass Mhex "Mass in the heat exchanger";
+      SI.Mass Mbal "Mass resulting from the mass balance";
+      SI.Mass Merr(min = -1e9) "Mass balance error";
 
       Water.Flow1D2ph hex(
         N=Nnodes,
@@ -6851,22 +6855,22 @@ Algorithm Tolerance = 1e-9
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
-      parameter Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Diameter Dhex=0.06;
+      parameter SI.Diameter Dhex=0.06;
       // wall thickness
-      parameter Thickness thhex=0;
+      parameter SI.Thickness thhex=0;
       // internal radius
-      parameter Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Length omegahex=Dhex;
+      parameter SI.Length omegahex=Dhex;
       // internal cross section
-      parameter Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
-      parameter Real Cfhex=0.005;
-      Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
-      Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
+      parameter SI.PerUnit Cfhex=0.005;
+      SI.Mass Mhex "Mass in the heat exchanger";
+      SI.Mass Mbal "Mass resulting from the mass balance";
+      SI.Mass Merr(min = -1e9) "Mass balance error";
 
       Water.Flow1D2ph hex(
         N=Nnodes,
@@ -6988,22 +6992,22 @@ Algorithm Tolerance = 1e-9
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
-      parameter Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Diameter Dhex=0.06;
+      parameter SI.Diameter Dhex=0.06;
       // wall thickness
-      parameter Thickness thhex=0;
+      parameter SI.Thickness thhex=0;
       // internal radius
-      parameter Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Length omegahex=Dhex;
+      parameter SI.Length omegahex=Dhex;
       // internal cross section
-      parameter Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
-      parameter Real Cfhex=0.005;
-      Modelica.SIunits.Mass Mhex "Mass in the heat exchanger";
-      Modelica.SIunits.Mass Mbal "Mass resulting from the mass balance";
-      Modelica.SIunits.Mass Merr(min = -1e9) "Mass balance error";
+      parameter SI.PerUnit Cfhex=0.005;
+      SI.Mass Mhex "Mass in the heat exchanger";
+      SI.Mass Mbal "Mass resulting from the mass balance";
+      SI.Mass Merr(min = -1e9) "Mass balance error";
 
       Water.Flow1D2ph hex(
         N=Nnodes,
@@ -7138,11 +7142,9 @@ Algorithm Tolerance = 1e-9
       package Medium = ThermoPower.Water.StandardWater;
       package SmoothMedium = Medium (final smoothModel=true);
       parameter Integer N=2;
-      constant Modelica.SIunits.Pressure pzero=10
-        "Small deltap for calculations";
-      constant Modelica.SIunits.Pressure pc=Medium.fluidConstants[1].criticalPressure;
-      constant Modelica.SIunits.SpecificEnthalpy hzero=1e-3
-        "Small value for deltah";
+      constant SI.Pressure pzero=10 "Small deltap for calculations";
+      constant SI.Pressure pc=Medium.fluidConstants[1].criticalPressure;
+      constant SI.SpecificEnthalpy hzero=1e-3 "Small value for deltah";
       SmoothMedium.BaseProperties fluid[N]
         "Properties of the fluid at the nodes";
       Medium.SaturationProperties sat "Properties of saturated fluid";
@@ -7154,29 +7156,27 @@ Algorithm Tolerance = 1e-9
       Medium.SpecificEnthalpy h[N] "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hl "Saturated liquid temperature";
       Medium.SpecificEnthalpy hv "Saturated vapour temperature";
-      Real x[N] "Steam quality";
+      SI.PerUnit x[N] "Steam quality";
       Medium.Density rho[N] "Fluid density";
-      ThermoPower.LiquidDensity rhol "Saturated liquid density";
-      ThermoPower.GasDensity rhov "Saturated vapour density";
+      Units.LiquidDensity rhol "Saturated liquid density";
+      Units.GasDensity rhov "Saturated vapour density";
       // protected
-      Modelica.SIunits.DerEnthalpyByPressure dhldp
+      SI.DerEnthalpyByPressure dhldp
         "Derivative of saturated liquid enthalpy by pressure";
-      Modelica.SIunits.DerEnthalpyByPressure dhvdp
+      SI.DerEnthalpyByPressure dhvdp
         "Derivative of saturated vapour enthalpy by pressure";
-      ThermoPower.Density rhobar[N - 1] "Fluid average density";
-      Modelica.SIunits.DerDensityByPressure drdp[N]
-        "Derivative of density by pressure";
-      Modelica.SIunits.DerDensityByPressure drbdp[N - 1]
+      Medium.Density rhobar[N - 1] "Fluid average density";
+      SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
+      SI.DerDensityByPressure drbdp[N - 1]
         "Derivative of average density by pressure";
-      Modelica.SIunits.DerDensityByPressure drldp
+      SI.DerDensityByPressure drldp
         "Derivative of saturated liquid density by pressure";
-      Modelica.SIunits.DerDensityByPressure drvdp
+      SI.DerDensityByPressure drvdp
         "Derivative of saturated vapour density by pressure";
-      Modelica.SIunits.DerDensityByEnthalpy drdh[N]
-        "Derivative of density by enthalpy";
-      Modelica.SIunits.DerDensityByEnthalpy drbdh1[N - 1]
+      SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
+      SI.DerDensityByEnthalpy drbdh1[N - 1]
         "Derivative of average density by left enthalpy";
-      Modelica.SIunits.DerDensityByEnthalpy drbdh2[N - 1]
+      SI.DerDensityByEnthalpy drbdh2[N - 1]
         "Derivative of average density by right enthalpy";
       Real AA;
       Real AA1;
@@ -7341,19 +7341,19 @@ This model checks the dynamic mass balance equations of Flow1D2ph, by prescribin
       // number of Nodes
       parameter Integer Nnodes=8;
       // total length
-      parameter Length Lhex=20;
+      parameter SI.Length Lhex=20;
       // internal diameter
-      parameter Diameter Dhex=0.01;
+      parameter SI.Diameter Dhex=0.01;
       // wall thickness
-      parameter Thickness thhex=0.002;
+      parameter SI.Thickness thhex=0.002;
       // internal radius
-      parameter Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Length omegahex=pi*Dhex;
+      parameter SI.Length omegahex=pi*Dhex;
       // internal cross section
-      parameter Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
-      parameter Real Cfhex=0.005;
+      parameter SI.PerUnit Cfhex=0.005;
       Water.Flow1D2phDB hex(
         N=Nnodes,
         L=Lhex,
@@ -7504,17 +7504,17 @@ Algorithm Tolerance = 1e-8
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
-      parameter Modelica.SIunits.Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dhex=0.02;
+      parameter SI.Diameter Dhex=0.02;
       // wall thickness
-      parameter Modelica.SIunits.Thickness thhex=0;
+      parameter SI.Thickness thhex=0;
       // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Dhex;
+      parameter SI.Length omegahex=Dhex;
       // internal cross section
-      parameter Modelica.SIunits.Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
       parameter Real Cfhex=0.005;
       Water.Flow1D2phDB hex(
@@ -7652,19 +7652,19 @@ Algorithm Tolerance = 1e-7
       // number of Nodes
       parameter Integer Nnodes=8;
       // total length
-      parameter Length Lhex=20;
+      parameter SI.Length Lhex=20;
       // internal diameter
-      parameter Diameter Dhex=0.01;
+      parameter SI.Diameter Dhex=0.01;
       // wall thickness
-      parameter Thickness thhex=0.002;
+      parameter SI.Thickness thhex=0.002;
       // internal radius
-      parameter Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Length omegahex=pi*Dhex;
+      parameter SI.Length omegahex=pi*Dhex;
       // internal cross section
-      parameter Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
-      parameter Real Cfhex=0.005;
+      parameter SI.PerUnit Cfhex=0.005;
       Water.Flow1D2phChen hex(
         N=Nnodes,
         L=Lhex,
@@ -7812,17 +7812,17 @@ Algorithm Tolerance = 1e-8
       // number of Nodes
       parameter Integer Nnodes=10;
       // total length
-      parameter Modelica.SIunits.Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dhex=0.02;
+      parameter SI.Diameter Dhex=0.02;
       // wall thickness
-      parameter Modelica.SIunits.Thickness thhex=0;
+      parameter SI.Thickness thhex=0;
       // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Dhex;
+      parameter SI.Length omegahex=Dhex;
       // internal cross section
-      parameter Modelica.SIunits.Area Ahex=pi*rhex^2;
+      parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
       parameter Real Cfhex=0.005;
       Water.Flow1D2phChen hex(
@@ -7960,23 +7960,23 @@ Algorithm Tolerance = 1e-7
       // number of Nodes
       parameter Integer Nnodes=11;
       // total length
-      parameter Modelica.SIunits.Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dhex=0.03;
+      parameter SI.Diameter Dhex=0.03;
       // wall thickness
-      parameter Modelica.SIunits.Thickness thhex=1e-3;
+      parameter SI.Thickness thhex=1e-3;
       // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dhex/2;
+      parameter SI.Radius rhex=Dhex/2;
       // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dhex;
+      parameter SI.Length omegahex=Modelica.Constants.pi*Dhex;
       // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      parameter SI.Area Ahex=Modelica.Constants.pi*rhex^2;
       // friction factor
-      parameter Real Cfhex=0.005;
+      parameter SI.PerUnit Cfhex=0.005;
 
-      parameter Modelica.SIunits.SpecificEnthalpy hin=6e5;
-      parameter Modelica.SIunits.Pressure phex=1e6;
-      parameter Modelica.SIunits.MassFlowRate whex=1;
+      parameter SI.SpecificEnthalpy hin=6e5;
+      parameter SI.Pressure phex=1e6;
+      parameter SI.MassFlowRate whex=1;
 
       Water.Flow1Dfem2ph hex(
         N=Nnodes,
@@ -8114,12 +8114,12 @@ Algorithm Tolerance = 1e-6
       "Extended Flow1D model with mass & energy balance computation"
 
       extends Water.Flow1D;
-      SpecificEnergy Etot;
-      SpecificEnergy Evol[N - 1];
-      Mass Mtot;
-      Mass Mvol[N - 1];
-      Real balM;
-      Real balE;
+      SI.SpecificEnergy Etot;
+      SI.SpecificEnergy Evol[N - 1];
+      SI.Mass Mtot;
+      SI.Mass Mvol[N - 1];
+      SI.MassFlowRate balM;
+      SI.Power balE;
     equation
       for j in 1:N - 1 loop
         Mvol[j] = A*l*rhobar[j];
@@ -8147,7 +8147,7 @@ Casella</a>:<br>
     end Flow1D_check;
 
     model TestEvaporatorTemp
-      extends Water.EvaporatorBase(
+      extends Water.BaseClasses.EvaporatorBase(
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         L=30,
         A=1e-4,
@@ -8160,7 +8160,7 @@ Casella</a>:<br>
         hstartout=2.9e6,
         csilstart=0.2*L,
         csivstart=0.8*L);
-      Temperature Text "External temperature";
+      SI.Temperature Text "External temperature";
       parameter Real K(fixed=false, start=1.2e3);
     equation
       Text = 700 - 2*min(max(time - 1, 0), 70) + 2*min(max(time - 300, 0), 70);
@@ -8190,7 +8190,7 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 24
     end TestEvaporatorTemp;
 
     model TestEvaporatorFlux
-      extends Water.EvaporatorBase(
+      extends Water.BaseClasses.EvaporatorBase(
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         L=30,
         A=1e-4,
@@ -8226,31 +8226,31 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
       // number of Nodes
       parameter Integer Nnodes=6;
       // total length
-      parameter Modelica.SIunits.Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      parameter SI.Diameter Dihex=0.02;
       // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      parameter SI.Radius rhex=Dihex/2;
       // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      parameter SI.Length omegahex=Modelica.Constants.pi*Dihex;
       // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      parameter SI.Area Ahex=Modelica.Constants.pi*rhex^2;
       // friction coefficient
-      parameter Real Cfhex=0.005;
+      parameter SI.PerUnit Cfhex=0.005;
       // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.3;
+      parameter SI.MassFlowRate whex=0.3;
       // initial pressure
-      parameter Modelica.SIunits.Pressure phex=2e5;
+      parameter SI.Pressure phex=2e5;
       // initial inlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
+      parameter SI.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
+      parameter SI.SpecificEnthalpy houthex=1e5;
 
       //height of enthalpy step
-      parameter Modelica.SIunits.SpecificEnthalpy deltah=41800;
+      parameter SI.SpecificEnthalpy deltah=41800;
 
       //height of power step
-      parameter Modelica.SIunits.EnergyFlowRate W=41800*whex;
+      parameter SI.EnergyFlowRate W=41800*whex;
 
       ThermoPower.Water.SourceMassFlow
                                 Fluid_Source(
@@ -8342,31 +8342,31 @@ Algorithm Tolerance = 1e-6
       // number of Nodes
       parameter Integer Nnodes=6;
       // total length
-      parameter Modelica.SIunits.Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      parameter SI.Diameter Dihex=0.02;
       // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      parameter SI.Radius rhex=Dihex/2;
       // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      parameter SI.Length omegahex=Modelica.Constants.pi*Dihex;
       // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      parameter SI.Area Ahex=Modelica.Constants.pi*rhex^2;
       // friction coefficient
-      parameter Real Cfhex=0.005;
+      parameter SI.PerUnit Cfhex=0.005;
       // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.3;
+      parameter SI.MassFlowRate whex=0.3;
       // initial pressure
-      parameter Modelica.SIunits.Pressure phex=2e5;
+      parameter SI.Pressure phex=2e5;
       // initial inlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
+      parameter SI.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
-      parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
+      parameter SI.SpecificEnthalpy houthex=1e5;
 
       //height of enthalpy step
-      parameter Modelica.SIunits.SpecificEnthalpy deltah=41800;
+      parameter SI.SpecificEnthalpy deltah=41800;
 
       //height of power step
-      parameter Modelica.SIunits.EnergyFlowRate W=41800*whex;
+      parameter SI.EnergyFlowRate W=41800*whex;
 
       ThermoPower.Water.SinkPressure
                               sink1(h=hinhex, p0=100000) annotation (Placement(
@@ -8432,36 +8432,36 @@ Algorithm Tolerance = 1e-6
       // number of Nodes
       parameter Integer Nnodes=11;
       // total length
-      parameter Modelica.SIunits.Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      parameter SI.Diameter Dihex=0.02;
       // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      parameter SI.Radius rhex=Dihex/2;
       // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      parameter SI.Length omegahex=Modelica.Constants.pi*Dihex;
       // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      parameter SI.Area Ahex=Modelica.Constants.pi*rhex^2;
       // friction coefficient
-      parameter Real Cfhex=0.05;
+      parameter SI.PerUnit Cfhex=0.05;
       // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.3;
+      parameter SI.MassFlowRate whex=0.3;
       // initial pressure
-      parameter Modelica.SIunits.Pressure phex=30e5;
+      parameter SI.Pressure phex=30e5;
       // initial temperature
-      parameter Modelica.SIunits.Temperature Thex=700;
+      parameter SI.Temperature Thex=700;
       // initial specific enthalpy
-      final parameter Modelica.SIunits.SpecificEnthalpy hhex=
+      final parameter SI.SpecificEnthalpy hhex=
           Medium.specificEnthalpy_pT(phex, Thex);
       // initial density
-      final parameter Modelica.SIunits.Density rhohex=Medium.density_pT(phex,
+      final parameter SI.Density rhohex=Medium.density_pT(phex,
           Thex);
       // Cv of fluid
-      final parameter Modelica.SIunits.SpecificHeatCapacity cv=
+      final parameter SI.SpecificHeatCapacity cv=
           Medium.specificHeatCapacityCv(Medium.setState_pT(phex, Thex));
       //height of power step
-      parameter Modelica.SIunits.EnergyFlowRate W=100;
+      parameter SI.EnergyFlowRate W=100;
       // approx. prediction of flow rate from the outlet (neglects heat carried out by flow rate -> overestimate)
-      final parameter Modelica.SIunits.MassFlowRate wout=0.5*rhohex/Thex*Ahex*
+      final parameter SI.MassFlowRate wout=0.5*rhohex/Thex*Ahex*
           Lhex*W/(rhohex*Ahex*Lhex*cv);
 
       ThermoPower.Water.SinkPressure
@@ -8549,36 +8549,36 @@ Algorithm Tolerance = 1e-6
       // number of Nodes
       parameter Integer Nnodes=11;
       // total length
-      parameter Modelica.SIunits.Length Lhex=10;
+      parameter SI.Length Lhex=10;
       // internal diameter
-      parameter Modelica.SIunits.Diameter Dihex=0.02;
+      parameter SI.Diameter Dihex=0.02;
       // internal radius
-      parameter Modelica.SIunits.Radius rhex=Dihex/2;
+      parameter SI.Radius rhex=Dihex/2;
       // internal perimeter
-      parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex;
+      parameter SI.Length omegahex=Modelica.Constants.pi*Dihex;
       // internal cross section
-      parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2;
+      parameter SI.Area Ahex=Modelica.Constants.pi*rhex^2;
       // friction coefficient
-      parameter Real Cfhex=0.05;
+      parameter SI.PerUnit Cfhex=0.05;
       // nominal (and initial) mass flow rate
-      parameter Modelica.SIunits.MassFlowRate whex=0.03;
+      parameter SI.MassFlowRate whex=0.03;
       // initial pressure
-      parameter Modelica.SIunits.Pressure phex=30e5;
+      parameter SI.Pressure phex=30e5;
       // initial temperature
-      parameter Modelica.SIunits.Temperature Thex=700;
+      parameter SI.Temperature Thex=700;
       // initial specific enthalpy
-      final parameter Modelica.SIunits.SpecificEnthalpy hhex=
+      final parameter SI.SpecificEnthalpy hhex=
           Medium.specificEnthalpy_pT(phex, Thex);
       // initial density
-      final parameter Modelica.SIunits.Density rhohex=Medium.density_pT(phex,
+      final parameter SI.Density rhohex=Medium.density_pT(phex,
           Thex);
       // Cv of fluid
-      final parameter Modelica.SIunits.SpecificHeatCapacity cv=
+      final parameter SI.SpecificHeatCapacity cv=
           Medium.specificHeatCapacityCv(Medium.setState_pT(phex, Thex));
       //height of power step
-      parameter Modelica.SIunits.EnergyFlowRate W=100;
+      parameter SI.EnergyFlowRate W=100;
       // approx. prediction of flow rate from the outlet (neglects heat carried out by flow rate -> overestimate)
-      final parameter Modelica.SIunits.MassFlowRate wout=0.5*rhohex/Thex*Ahex*
+      final parameter SI.MassFlowRate wout=0.5*rhohex/Thex*Ahex*
           Lhex*W/(rhohex*Ahex*Lhex*cv);
 
       ThermoPower.Water.SinkPressure
@@ -8749,12 +8749,13 @@ Algorithm Tolerance = 1e-6
       parameter Integer Nf(min=2) = 6 "Number of nodes on the fluid side";
       parameter Integer Nw = 5 "Number of nodes on the wallside";
       parameter Integer Nt(min=1) = 1 "Number of tubes in parallel";
-      parameter Distance L = 2 "Tube length";
-      parameter Area A = 1e-3 "Cross-sectional area (single tube)";
-      parameter Length omega = 1e-3
+      parameter SI.Distance L = 2 "Tube length";
+      parameter SI.Area A = 1e-3 "Cross-sectional area (single tube)";
+      parameter SI.Length omega = 1e-3
         "Wet perimeter of heat transfer surface (single tube)";
-      parameter Length Dhyd = 1e-4 "Hydraulic Diameter (single tube)";
-      parameter MassFlowRate wnom = 10 "Nominal mass flow rate (single tube)";
+      parameter SI.Length Dhyd = 1e-4 "Hydraulic Diameter (single tube)";
+      parameter SI.MassFlowRate wnom = 10
+        "Nominal mass flow rate (single tube)";
       parameter Boolean useAverageTemperature = true
         "= true to use average temperature for heat transfer";
 
@@ -8784,7 +8785,7 @@ Algorithm Tolerance = 1e-6
       Medium.SpecificEnthalpy h[Nf];
       Medium.ThermodynamicState fluidState[Nf];
       Medium.MassFlowRate w[Nf];
-      Modelica.SIunits.Power Q[Nw] = -tempSource.wall.Q;
+      SI.Power Q[Nw] = -tempSource.wall.Q;
     equation
       h1 = if time < 2 then h_liq else
            if time < 3 then h_liq + (h_vap-h_liq)*u*(time-2) else
@@ -8991,7 +8992,7 @@ Algorithm Tolerance = 1e-6
         // initial specific enthalpy
         parameter Modelica.SIunits.SpecificEnthalpy hs=3e6;
         // Time constant
-        Time tau;
+        SI.Time tau;
 
         Water.Flow1D hex(
           N=Nnodes,
@@ -9705,18 +9706,19 @@ Algorithm Tolerance = 1e-6
 
   package ElectricalComponents "Test for Electrical package components"
     model TestElectrical1
-      parameter Power Pn=10e6 "Nominal generator power";
-      parameter Time Ta=10 "Turbine acceleration time";
+      parameter SI.Power Pn=10e6 "Nominal generator power";
+      parameter SI.Time Ta=10 "Turbine acceleration time";
       parameter Integer Np=2 "Number of generator poles";
-      parameter Frequency f0=50 "Nominal network frequency";
-      parameter AngularVelocity omegan_el=2*pi*f0
+      parameter SI.Frequency f0=50 "Nominal network frequency";
+      parameter SI.AngularVelocity omegan_el=2*pi*f0
         "Nominal electrical angular velocity";
-      parameter AngularVelocity omegan_m=omegan_el/Np
+      parameter SI.AngularVelocity omegan_m=omegan_el/Np
         "Nominal mechanical angular velocity";
-      parameter MomentOfInertia Je=Pn*Ta/omegan_el^2
+      parameter SI.MomentOfInertia Je=Pn*Ta/omegan_el^2
         "Moment of inertia referred to electrical angles";
-      parameter MomentOfInertia Jm=Np^2*Je "Mechanical moment of inertia";
-      parameter Time Topen=10 "Time of breaker opening";
+      parameter SI.MomentOfInertia Jm=Np^2*Je "Mechanical moment of inertia";
+      parameter SI.Time Topen=10 "Time of breaker opening";
+      constant Real pi = Modelica.Constants.pi;
       Electrical.Generator generator annotation (Placement(transformation(
               extent={{20,-10},{40,10}}, rotation=0)));
       Electrical.Load load(Wn=Pn) annotation (Placement(transformation(extent={
@@ -9727,8 +9729,6 @@ Algorithm Tolerance = 1e-6
       Modelica.Mechanics.Rotational.Sources.Torque primeMover(useSupport=false)
         annotation (Placement(transformation(extent={{-40,-10},{-20,10}},
               rotation=0)));
-      import Modelica.Constants.*;
-
       Modelica.Blocks.Sources.Step Step1(
         height=-Pn/omegan_m,
         offset=Pn/omegan_m,
@@ -9779,18 +9779,19 @@ Algorithm Tolerance = 1e-6
     end TestElectrical1;
 
     model TestElectrical2
-      parameter Power Pn=10e6 "Nominal generator power";
-      parameter Time Ta=10 "Turbine acceleration time";
+      parameter SI.Power Pn=10e6 "Nominal generator power";
+      parameter SI.Time Ta=10 "Turbine acceleration time";
       parameter Integer Np=2 "Number of generator poles";
-      parameter Frequency f0=50 "Nominal network frequency";
-      parameter AngularVelocity omegan_el=2*pi*f0
+      parameter SI.Frequency f0=50 "Nominal network frequency";
+      parameter SI.AngularVelocity omegan_el=2*pi*f0
         "Nominal electrical angular velocity";
-      parameter AngularVelocity omegan_m=omegan_el/Np
+      parameter SI.AngularVelocity omegan_m=omegan_el/Np
         "Nominal mechanical angular velocity";
-      parameter MomentOfInertia Je=Pn*Ta/omegan_el^2
+      parameter SI.MomentOfInertia Je=Pn*Ta/omegan_el^2
         "Moment of inertia referred to electrical angles";
-      parameter MomentOfInertia Jm=Np^2*Je "Mechanical moment of inertia";
-      parameter Time Topen=10 "Time of breaker opening";
+      parameter SI.MomentOfInertia Jm=Np^2*Je "Mechanical moment of inertia";
+      constant Real pi = Modelica.Constants.pi;
+      parameter SI.Time Topen=10 "Time of breaker opening";
       Electrical.Generator generator annotation (Placement(transformation(
               extent={{10,-10},{30,10}}, rotation=0)));
       Electrical.Load load(Wn=Pn) annotation (Placement(transformation(extent={
@@ -9801,7 +9802,6 @@ Algorithm Tolerance = 1e-6
       Modelica.Mechanics.Rotational.Sources.Torque primeMover(useSupport=false)
         annotation (Placement(transformation(extent={{-58,-10},{-38,10}},
               rotation=0)));
-      import Modelica.Constants.*;
 
       Modelica.Blocks.Sources.Step GenTorque(
         height=-0.1*Pn/omegan_m,

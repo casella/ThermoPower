@@ -5,7 +5,7 @@ package Media "Medium models for the ThermoPower library"
   package GenericGas
     extends Modelica.Media.Interfaces.PartialMedium(nXi=0);
     redeclare record extends ThermodynamicState
-      Pressure p;
+      AbsolutePressure p;
       Temperature T;
       // MassFraction X[nXi];
     end ThermodynamicState;

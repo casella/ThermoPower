@@ -55,10 +55,10 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=p0),
       T(start=T),
       Xi(start=Xnom[1:Medium.nXi]));
-    parameter Pressure p0=101325 "Nominal pressure";
-    parameter HydraulicResistance R=0 "Hydraulic resistance";
-    parameter AbsoluteTemperature T=300 "Nominal temperature";
-    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+    parameter SI.Pressure p0=101325 "Nominal pressure";
+    parameter Units.HydraulicResistance R=0 "Hydraulic resistance";
+    parameter Medium.Temperature T=300 "Nominal temperature";
+    parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -153,11 +153,11 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=p0),
       T(start=T),
       Xi(start=Xnom[1:Medium.nXi]));
-    parameter Pressure p0=101325 "Nominal pressure";
-    parameter AbsoluteTemperature T=300 "Nominal temperature";
-    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+    parameter Medium.AbsolutePressure p0=101325 "Nominal pressure";
+    parameter Medium.Temperature T=300 "Nominal temperature";
+    parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
-    parameter HydraulicResistance R=0 "Hydraulic Resistance";
+    parameter Units.HydraulicResistance R=0 "Hydraulic Resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
@@ -248,12 +248,12 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=p0),
       T(start=T),
       Xi(start=Xnom[1:Medium.nXi]));
-    parameter Pressure p0=101325 "Nominal pressure";
-    parameter AbsoluteTemperature T=300 "Nominal temperature";
-    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+    parameter Medium.AbsolutePressure p0=101325 "Nominal pressure";
+    parameter Medium.Temperature T=300 "Nominal temperature";
+    parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
-    parameter MassFlowRate w0=0 "Nominal mass flowrate";
-    parameter HydraulicConductance G=0 "HydraulicConductance";
+    parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Units.HydraulicConductance G=0 "HydraulicConductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false
@@ -264,7 +264,7 @@ package Gas "Models of components with ideal gases as working fluid"
       "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
 
-    MassFlowRate w "Nominal mass flow rate";
+    Medium.MassFlowRate w "Nominal mass flow rate";
 
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
@@ -349,12 +349,12 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=p0),
       T(start=T),
       Xi(start=Xnom[1:Medium.nXi]));
-    parameter Pressure p0=101325 "Nominal pressure";
-    parameter AbsoluteTemperature T=300 "Nominal Temperature";
-    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+    parameter Medium.AbsolutePressure p0=101325 "Nominal pressure";
+    parameter Medium.Temperature T=300 "Nominal Temperature";
+    parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
-    parameter MassFlowRate w0=0 "Nominal mass flowrate";
-    parameter HydraulicConductance G=0 "Hydraulic Conductance";
+    parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Units.HydraulicConductance G=0 "Hydraulic Conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false
@@ -365,7 +365,7 @@ package Gas "Models of components with ideal gases as working fluid"
       "Use connector input for the composition"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
 
-    MassFlowRate w "Nominal mass flow rate";
+    Medium.MassFlowRate w "Nominal mass flow rate";
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
@@ -446,14 +446,14 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
-    parameter MassFlowRate w0=0 "Nominal mass flow rate";
+    parameter Medium.MassFlowRate w0=0 "Nominal mass flow rate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     parameter Boolean use_in_w0 = false
       "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
 
-    MassFlowRate w "Mass flow rate";
+    Medium.MassFlowRate w "Mass flow rate";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -513,26 +513,26 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
-    parameter Volume V "Inner volume";
+    parameter SI.Volume V "Inner volume";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart=1e5 "Pressure start value"
+    parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstart=300 "Temperature start value"
+    parameter Medium.Temperature Tstart=300 "Temperature start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
+    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
 
-    Mass M "Total mass";
-    InternalEnergy E "Total internal energy";
+    SI.Mass M "Total mass";
+    SI.InternalEnergy E "Total internal energy";
     Medium.SpecificEnthalpy hi "Inlet specific enthalpy";
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
     Medium.MassFraction Xi_i[Medium.nXi] "Inlet composition";
     Medium.MassFraction Xi_o[Medium.nXi] "Outlet composition";
-    Time Tr "Residence Time";
+    SI.Time Tr "Residence Time";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -616,32 +616,32 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
-    parameter AbsoluteTemperature Tmstart=300 "Metal wall start temperature";
-    parameter Volume V "Inner volume";
-    parameter Area S=0 "Inner surface";
-    parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
+    parameter Medium.Temperature Tmstart=300 "Metal wall start temperature";
+    parameter SI.Volume V "Inner volume";
+    parameter SI.Area S=0 "Inner surface";
+    parameter SI.CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
       annotation (Evaluate=true);
-    parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
+    parameter SI.HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart=1e5 "Pressure start value"
+    parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstart=300 "Temperature start value"
+    parameter Medium.Temperature Tstart=300 "Temperature start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
+    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
 
-    Mass M "Gas total mass";
-    InternalEnergy E "Gas total energy";
+    SI.Mass M "Gas total mass";
+    SI.InternalEnergy E "Gas total energy";
     Medium.SpecificEnthalpy hi "Inlet specific enthalpy";
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
     Medium.MassFraction Xi_i[Medium.nXi] "Inlet composition";
     Medium.MassFraction Xi_o[Medium.nXi] "Outlet composition";
-    AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
-    Time Tr "Residence Time";
+    SI.Temperature Tm(start=Tmstart) "Wall temperature";
+    SI.Time Tr "Residence Time";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -737,35 +737,35 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
       Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
-    parameter Volume V "Inner volume";
-    parameter Area S=0 "Inner surface";
-    parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
+    parameter SI.Volume V "Inner volume";
+    parameter SI.Area S=0 "Inner surface";
+    parameter SI.CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
       annotation (Evaluate=true);
-    parameter HeatCapacity Cm=0 "Metal heat capacity" annotation (Evaluate=true);
+    parameter SI.HeatCapacity Cm=0 "Metal heat capacity" annotation (Evaluate=true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart=1e5 "Pressure start value"
+    parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstart=300 "Temperature start value"
+    parameter Medium.Temperature Tstart=300 "Temperature start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
+    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tmstart=Tstart "Metal wall start temperature"
+    parameter Medium.Temperature Tmstart=Tstart "Metal wall start temperature"
       annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
 
-    Mass M "Gas total mass";
-    InternalEnergy E "Gas total energy";
-    AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
+    SI.Mass M "Gas total mass";
+    SI.InternalEnergy E "Gas total energy";
+    SI.Temperature Tm(start=Tmstart) "Wall temperature";
     Medium.SpecificEnthalpy hi1 "Inlet 1 specific enthalpy";
     Medium.SpecificEnthalpy hi2 "Inlet 2 specific enthalpy";
     Medium.SpecificEnthalpy ho "Outlet specific enthalpy";
     Medium.MassFraction Xi1[Medium.nXi] "Inlet 1 composition";
     Medium.MassFraction Xi2[Medium.nXi] "Inlet 2 composition";
     Medium.MassFraction Xo[Medium.nXi] "Outlet composition";
-    Time Tr "Residence time";
+    SI.Time Tr "Residence time";
 
     FlangeA in1(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -887,45 +887,45 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (choicesAllMatching=true);
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
-    Pressure Dpfric "Pressure drop due to friction";
-    Length omega_hyd "Wet perimeter (single tube)";
+    SI.Pressure Dpfric "Pressure drop due to friction";
+    SI.Length omega_hyd "Wet perimeter (single tube)";
     Real Kf "Friction factor";
     Real Kfl "Linear friction factor";
     Real dwdt "Time derivative of mass flow rate";
-    Real Cf "Fanning friction factor";
-    MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
-    AbsoluteTemperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))/
+    SI.PerUnit Cf "Fanning friction factor";
+    Medium.MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
+    Medium.Temperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))/
           (N - 1)*(Tstartout - Tstartin), each stateSelect=StateSelect.prefer)
       "Temperature state variables";
-    AbsoluteTemperature Tin(start=Tstartin);
-    Real Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
+    Medium.Temperature Tin(start=Tstartin);
+    Medium.MassFraction Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
         each stateSelect=StateSelect.prefer) "Composition state variables";
-    MassFlowRate wbar[N - 1](each start=wnom/Nt);
-    Power Q_single[Nw]
+    Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt);
+    SI.Power Q_single[Nw]
       "Heat flows entering the volumes from the lateral boundary (single tube)";
-    Velocity u[N] "Fluid velocity";
-    Pressure p(start=pstart, stateSelect=StateSelect.prefer);
-    Time Tr "Residence time";
-    Mass M "Gas Mass (single tube)";
-    Mass Mtot "Gas Mass (total)";
+    SI.Velocity u[N] "Fluid velocity";
+    Medium.AbsolutePressure p(start=pstart, stateSelect=StateSelect.prefer);
+    SI.Time Tr "Residence time";
+    SI.Mass M "Gas Mass (single tube)";
+    SI.Mass Mtot "Gas Mass (total)";
     Real Q "Total heat flow through the wall (all Nt tubes)";
   protected
-    parameter Length l=L/(N - 1) "Length of a single volume";
-    Density rhobar[N - 1] "Fluid average density";
-    SpecificVolume vbar[N - 1] "Fluid average specific volume";
-    DerDensityByPressure drbdp[N - 1]
+    parameter SI.Length l=L/(N - 1) "Length of a single volume";
+    Medium.Density rhobar[N - 1] "Fluid average density";
+    SI.SpecificVolume vbar[N - 1] "Fluid average specific volume";
+    Medium.DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
-    DerDensityByTemperature drbdT1[N - 1]
+    Medium.DerDensityByTemperature drbdT1[N - 1]
       "Derivative of average density by left temperature";
-    DerDensityByTemperature drbdT2[N - 1]
+    Medium.DerDensityByTemperature drbdT2[N - 1]
       "Derivative of average density by right temperature";
     Real drbdX1[N - 1, nX](each unit="kg/m3")
       "Derivative of average density by left composition";
     Real drbdX2[N - 1, nX](each unit="kg/m3")
       "Derivative of average density by right composition";
     Medium.SpecificHeatCapacity cvbar[N - 1] "Average cv";
-    Real dMdt[N - 1] "Derivative of mass in a finite volume";
+    SI.MassFlowRate dMdt[N - 1] "Derivative of mass in a finite volume";
     Medium.SpecificHeatCapacity cv[N];
     Medium.DerDensityByTemperature dddT[N]
       "Derivative of density by temperature";
@@ -1168,7 +1168,7 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.FlowJoin;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
-    constant MassFlowRate wzero=1e-9
+    constant Medium.MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -1267,7 +1267,7 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.FlowSplit;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
-    constant MassFlowRate wzero=1e-9
+    constant Medium.MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -1363,7 +1363,7 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.Tube;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
-    parameter HydraulicResistance R "Hydraulic resistance";
+    parameter Units.HydraulicResistance R "Hydraulic resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -1410,37 +1410,38 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=pstart),
       T(start=Tstart),
       Xi(start=Xstart[1:Medium.nXi]));
-    parameter MassFlowRate wnom "Nominal mass flowrate";
-    parameter Pressure dpnom "Nominal pressure drop";
+    parameter Medium.MassFlowRate wnom "Nominal mass flowrate";
+    parameter SI.Pressure dpnom "Nominal pressure drop";
     parameter ThermoPower.Choices.PressDrop.FFtypes FFtype= ThermoPower.Choices.PressDrop.FFtypes.Kf
       "Friction factor type";
     parameter Real Kf = 0 "Hydraulic resistance coefficient (DP = Kf*w^2/rho)"
       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kf)));
-    parameter Density rhonom=0 "Nominal density"
+    parameter Medium.Density rhonom=0 "Nominal density"
       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.OpPoint)));
-    parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity2/2)"
+    parameter SI.PerUnit K=0
+      "Kinetic resistance coefficient (DP=K*rho*velocity2/2)"
       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kinetic)));
-    parameter Area A=0 "Cross-section"
+    parameter SI.Area A=0 "Cross-section"
       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kinetic)));
-    parameter Real wnf=0.01
+    parameter SI.PerUnit wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
-    parameter Real Kfc=1 "Friction factor correction coefficient";
+    parameter SI.PerUnit Kfc=1 "Friction factor correction coefficient";
     final parameter Real Kf_a(fixed = false)
       "Actual hydraulic resistance coefficient";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart=101325 "Start pressure value"
+    parameter Medium.AbsolutePressure pstart=101325 "Start pressure value"
       annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstart=300 "Start temperature value"
+    parameter Medium.Temperature Tstart=300 "Start temperature value"
       annotation (Dialog(tab="Initialisation"));
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
+    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
     function squareReg = ThermoPower.Functions.squareReg;
-    MassFlowRate w "Mass flow rate in the inlet";
-    Pressure pin "Inlet pressure";
-    Pressure pout "Outlet pressure";
-    Pressure dp "Pressure drop";
+    Medium.MassFlowRate w "Mass flow rate in the inlet";
+    Medium.AbsolutePressure pin "Inlet pressure";
+    Medium.AbsolutePressure pout "Outlet pressure";
+    SI.Pressure dp "Pressure drop";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(start=wnom, min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -1715,7 +1716,7 @@ package Gas "Models of components with ideal gases as working fluid"
        Placement(transformation(extent={{40,-60},{80,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealOutput q "Volume flow rate" annotation (
         Placement(transformation(extent={{56,50},{76,70}}, rotation=0)));
-    MassFlowRate w "Mass flow rate";
+    Medium.MassFlowRate w "Mass flow rate";
   equation
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
     inlet.p = outlet.p "Momentum balance";
@@ -1759,11 +1760,11 @@ package Gas "Models of components with ideal gases as working fluid"
     extends Icons.Gas.Valve;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
-    parameter HydraulicConductance Kv "Hydraulic conductance";
+    parameter Units.HydraulicConductance Kv "Hydraulic conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    MassFlowRate w "Mass flowrate";
+    Medium.MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
@@ -1815,7 +1816,7 @@ package Gas "Models of components with ideal gases as working fluid"
       d(start=pnom/(8314/30*Tstart)));
     parameter ThermoPower.Choices.Valve.CvTypes CvData=
       ThermoPower.Choices.Valve.CvTypes.Av "Selection of flow coefficient";
-    parameter Area Av(
+    parameter SI.Area Av(
       fixed=if CvData == ThermoPower.Choices.Valve.CvTypes.Av then true else false,
       start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
       "Av (metric) flow coefficient"
@@ -1827,51 +1828,54 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]"
       annotation (Dialog(group="Flow Coefficient",
                          enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Cv)));
-    parameter Pressure pnom "Nominal inlet pressure"
+    parameter Medium.AbsolutePressure pnom "Nominal inlet pressure"
       annotation (Dialog(group="Nominal operating point"));
-    parameter Pressure dpnom "Nominal pressure drop"
+    parameter Medium.AbsolutePressure dpnom "Nominal pressure drop"
       annotation (Dialog(group="Nominal operating point"));
-    parameter MassFlowRate wnom=0 "Nominal mass flowrate"
+    parameter Medium.MassFlowRate wnom "Nominal mass flowrate"
       annotation (Dialog(group="Nominal operating point"));
-    parameter Density rhonom=1000 "Nominal density" annotation (Dialog(group=
+    parameter Medium.Density rhonom=1000 "Nominal density" annotation (Dialog(group=
             "Nominal operating point", enable=(CvData == CvTypes.OpPoint)));
-    parameter Real thetanom=1 "Nominal valve opening" annotation (Dialog(group=
+    parameter SI.PerUnit thetanom=1 "Nominal valve opening" annotation (Dialog(group=
             "Nominal operating point", enable=(CvData == CvTypes.OpPoint)));
     parameter Boolean CheckValve=false "Reverse flow stopped";
-    parameter Real b=0.01 "Regularisation factor";
+    parameter SI.PerUnit b=0.01 "Regularisation factor";
 
     replaceable function FlowChar =
         ThermoPower.Functions.ValveCharacteristics.linear
       constrainedby Functions.ValveCharacteristics.baseFun
       "Flow characteristic" annotation (choicesAllMatching=true);
-    parameter Real Fxt_full=0.5 "Fk*xt critical ratio at full opening";
+    parameter SI.PerUnit Fxt_full=0.5 "Fk*xt critical ratio at full opening";
     replaceable function xtfun = ThermoPower.Functions.ValveCharacteristics.one
       constrainedby Functions.ValveCharacteristics.baseFun
       "Critical ratio characteristic";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pin_start=pnom "Inlet pressure start value"
+    parameter Medium.AbsolutePressure pin_start=pnom
+      "Inlet pressure start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter Pressure pout_start=pnom - dpnom "Inlet pressure start value"
+    parameter Medium.AbsolutePressure pout_start=pnom - dpnom
+      "Inlet pressure start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstart=300 "Start temperature"
+    parameter Medium.Temperature Tstart=300 "Start temperature"
       annotation (Dialog(tab="Initialisation"));
-    parameter MassFraction Xstart[Medium.nX]=Medium.reference_X
+    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
-    MassFlowRate w "Mass Flow Rate";
-    Pressure dp "Pressure drop";
-    Real Fxt;
-    Real x "Pressure drop ratio";
-    Real xs "Saturated pressure drop ratio";
-    Real Y "Compressibility factor";
+    Medium.MassFlowRate w "Mass Flow Rate";
+    SI.Pressure dp "Pressure drop";
+    SI.PerUnit Fxt;
+    SI.PerUnit x "Pressure drop ratio";
+    SI.PerUnit xs "Saturated pressure drop ratio";
+    SI.PerUnit Y "Compressibility factor";
     Medium.AbsolutePressure p "Inlet pressure";
   protected
     function sqrtR = Functions.sqrtReg (delta=b*dpnom);
-    parameter Real Fxt_nom(fixed=false) "Nominal Fxt";
-    parameter Real x_nom(fixed=false) "Nominal pressure drop ratio";
-    parameter Real xs_nom(fixed=false) "Nominal saturated pressure drop ratio";
-    parameter Real Y_nom(fixed=false) "Nominal compressibility factor";
+    parameter SI.PerUnit Fxt_nom(fixed=false) "Nominal Fxt";
+    parameter SI.PerUnit x_nom(fixed=false) "Nominal pressure drop ratio";
+    parameter SI.PerUnit xs_nom(fixed=false)
+      "Nominal saturated pressure drop ratio";
+    parameter SI.PerUnit Y_nom(fixed=false) "Nominal compressibility factor";
 
   public
     FlangeA inlet(
@@ -1985,11 +1989,11 @@ package Gas "Models of components with ideal gases as working fluid"
   end Valve;
 
   function f_colebrook "Fanning friction factor for water/steam flows"
-    input MassFlowRate w;
+    input SI.MassFlowRate w;
     input Real D_A;
     input Real e;
-    input DynamicViscosity mu;
-    output Real f;
+    input SI.DynamicViscosity mu;
+    output SI.PerUnit f;
   protected
     Real Re;
   algorithm
@@ -2012,22 +2016,22 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
     replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
     replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
-    parameter Volume V "Inner volume";
-    parameter Area S=0 "Inner surface";
-    parameter CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
+    parameter SI.Volume V "Inner volume";
+    parameter SI.Area S=0 "Inner surface";
+    parameter SI.CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
       annotation (Evaluate=true);
-    parameter HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
-    parameter Temperature Tmstart=300 "Metal wall start temperature"
+    parameter SI.HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
+    parameter SI.Temperature Tmstart=300 "Metal wall start temperature"
       annotation (Dialog(tab="Initialisation"));
-    parameter SpecificEnthalpy HH "Lower Heating value of fuel";
+    parameter SI.SpecificEnthalpy HH "Lower Heating value of fuel";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart=101325 "Pressure start value"
+    parameter Air.AbsolutePressure pstart=101325 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstart=300 "Temperature start value"
+    parameter Air.Temperature Tstart=300 "Temperature start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter MassFraction Xstart[Exhaust.nX]=Exhaust.reference_X
+    parameter Air.MassFraction Xstart[Exhaust.nX]=Exhaust.reference_X
       "Start flue gas composition" annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
@@ -2035,16 +2039,16 @@ package Gas "Models of components with ideal gases as working fluid"
       p(start=pstart),
       T(start=Tstart),
       Xi(start=Xstart[1:Exhaust.nXi]));
-    Mass M "Gas total mass";
-    Mass MX[Exhaust.nXi] "Partial flue gas masses";
-    InternalEnergy E "Gas total energy";
-    AbsoluteTemperature Tm(start=Tmstart) "Wall temperature";
+    SI.Mass M "Gas total mass";
+    SI.Mass MX[Exhaust.nXi] "Partial flue gas masses";
+    SI.InternalEnergy E "Gas total energy";
+    SI.Temperature Tm(start=Tmstart) "Wall temperature";
     Air.SpecificEnthalpy hia "Air specific enthalpy";
     Fuel.SpecificEnthalpy hif "Fuel specific enthalpy";
     Exhaust.SpecificEnthalpy ho "Outlet specific enthalpy";
-    Power HR "Heat rate";
+    SI.Power HR "Heat rate";
 
-    Time Tr "Residence time";
+    SI.Time Tr "Residence time";
     FlangeA ina(redeclare package Medium = Air, m_flow(min=if allowFlowReversal
              then -Modelica.Constants.inf else 0)) "inlet air" annotation (
         Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
@@ -2139,11 +2143,11 @@ This is the model-base of a Combustion Chamber, with a constant volume.
       redeclare package Exhaust = Media.FlueGas "O2, Ar, H2O, CO2, N2");
     Real wcomb(final quantity="MolarFlowRate", unit="mol/s")
       "Molar Combustion rate (CH4)";
-    Real lambda
+    SI.PerUnit lambda
       "Stoichiometric ratio (>1 if air flow is greater than stoichiometric)";
   protected
-    Real ina_X[Air.nXi]=inStream(ina.Xi_outflow);
-    Real inf_X[Fuel.nXi]=inStream(inf.Xi_outflow);
+    Air.MassFraction ina_X[Air.nXi]=inStream(ina.Xi_outflow);
+    Fuel.MassFraction inf_X[Fuel.nXi]=inStream(inf.Xi_outflow);
 
   equation
     wcomb = inf.m_flow*inf_X[3]/Fuel.data[3].MM "Combustion molar flow rate";
@@ -2181,21 +2185,20 @@ This model extends the CombustionChamber Base model, with the definition of the 
       annotation(choicesAllMatching = true);
     parameter Boolean explicitIsentropicEnthalpy=true
       "isentropicEnthalpy function used";
-    parameter Real eta_mech=0.98 "mechanical efficiency";
-    parameter Modelica.SIunits.Pressure pstart_in "inlet start pressure"
+    parameter SI.PerUnit eta_mech=0.98 "mechanical efficiency";
+    parameter Medium.AbsolutePressure pstart_in "inlet start pressure"
       annotation (Dialog(tab="Initialisation"));
-    parameter Modelica.SIunits.Pressure pstart_out "outlet start pressure"
+    parameter Medium.AbsolutePressure pstart_out "outlet start pressure"
       annotation (Dialog(tab="Initialisation"));
-    parameter ThermoPower.AbsoluteTemperature Tdes_in
-      "inlet design temperature";
+    parameter Medium.Temperature Tdes_in "inlet design temperature";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter ThermoPower.AbsoluteTemperature Tstart_in=Tdes_in
-      "inlet start temperature" annotation (Dialog(tab="Initialisation"));
-    parameter ThermoPower.AbsoluteTemperature Tstart_out
-      "outlet start temperature" annotation (Dialog(tab="Initialisation"));
-    parameter Modelica.SIunits.MassFraction Xstart[Medium.nX]=Medium.reference_X
+    parameter Medium.Temperature Tstart_in=Tdes_in "inlet start temperature"
+                                annotation (Dialog(tab="Initialisation"));
+    parameter Medium.Temperature Tstart_out "outlet start temperature"
+                                 annotation (Dialog(tab="Initialisation"));
+    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "start gas composition" annotation (Dialog(tab="Initialisation"));
     Medium.BaseProperties gas_in(
       p(start=pstart_in),
@@ -2210,13 +2213,13 @@ This model extends the CombustionChamber Base model, with the definition of the 
     Medium.SpecificEntropy s_in "Inlet specific entropy";
     Medium.AbsolutePressure pout(start=pstart_out) "Outlet pressure";
 
-    Modelica.SIunits.MassFlowRate w "Gas flow rate";
-    Modelica.SIunits.Angle phi "shaft rotation angle";
-    Modelica.SIunits.AngularVelocity omega "shaft angular velocity";
-    Modelica.SIunits.Torque tau "net torque acting on the compressor";
+    Medium.MassFlowRate w "Gas flow rate";
+    SI.Angle phi "shaft rotation angle";
+    SI.AngularVelocity omega "shaft angular velocity";
+    SI.Torque tau "net torque acting on the compressor";
 
-    Real eta "isentropic efficiency";
-    Real PR "pressure ratio";
+    SI.PerUnit eta "isentropic efficiency";
+    SI.PerUnit PR "pressure ratio";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -2312,7 +2315,7 @@ This model extends the CombustionChamber Base model, with the definition of the 
   model Compressor "Gas compressor"
     extends CompressorBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
-    parameter AngularVelocity Ndesign "Design velocity";
+    parameter SI.AngularVelocity Ndesign "Design velocity";
     parameter Real tablePhic[:, :]=fill(
           0,
           0,
@@ -2326,7 +2329,7 @@ This model extends the CombustionChamber Base model, with the definition of the 
           0,
           2) "Table for eta(N_T,beta)";
     parameter String fileName="noName" "File where matrix is stored";
-    parameter TableTypes Table
+    parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
     Modelica.Blocks.Tables.CombiTable2D Eta(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
@@ -2413,21 +2416,20 @@ This model adds the performance characteristics to the Compressor_Base model, by
       annotation(choicesAllMatching = true);
     parameter Boolean explicitIsentropicEnthalpy=true
       "isentropicEnthalpy function used";
-    parameter Real eta_mech=0.98 "mechanical efficiency";
-    parameter ThermoPower.AbsoluteTemperature Tdes_in
-      "inlet design temperature";
+    parameter SI.PerUnit eta_mech=0.98 "mechanical efficiency";
+    parameter Medium.Temperature Tdes_in "inlet design temperature";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Modelica.SIunits.Pressure pstart_in "inlet start pressure"
+    parameter Medium.AbsolutePressure pstart_in "inlet start pressure"
       annotation (Dialog(tab="Initialisation"));
-    parameter Modelica.SIunits.Pressure pstart_out "outlet start pressure"
+    parameter Medium.AbsolutePressure pstart_out "outlet start pressure"
       annotation (Dialog(tab="Initialisation"));
-    parameter ThermoPower.AbsoluteTemperature Tstart_in=Tdes_in
-      "inlet start temperature" annotation (Dialog(tab="Initialisation"));
-    parameter ThermoPower.AbsoluteTemperature Tstart_out
-      "outlet start temperature" annotation (Dialog(tab="Initialisation"));
-    parameter Modelica.SIunits.MassFraction Xstart[Medium.nX]=Medium.reference_X
+    parameter Medium.Temperature Tstart_in=Tdes_in "inlet start temperature"
+                                annotation (Dialog(tab="Initialisation"));
+    parameter Medium.Temperature Tstart_out "outlet start temperature"
+                                 annotation (Dialog(tab="Initialisation"));
+    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "start gas composition" annotation (Dialog(tab="Initialisation"));
 
     Medium.BaseProperties gas_in(
@@ -2439,16 +2441,16 @@ This model adds the performance characteristics to the Compressor_Base model, by
       T(start=Tstart_out),
       Xi(start=Xstart[1:Medium.nXi]));
 
-    Modelica.SIunits.Angle phi "shaft rotation angle";
-    Modelica.SIunits.Torque tau "net torque acting on the turbine";
-    Modelica.SIunits.AngularVelocity omega "shaft angular velocity";
-    Modelica.SIunits.MassFlowRate w "Gas flow rate";
+    SI.Angle phi "shaft rotation angle";
+    SI.Torque tau "net torque acting on the turbine";
+    SI.AngularVelocity omega "shaft angular velocity";
+    Medium.MassFlowRate w "Gas flow rate";
     Medium.SpecificEntropy s_in "Inlet specific entropy";
     Medium.SpecificEnthalpy hout_iso "Outlet isentropic enthalpy";
     Medium.SpecificEnthalpy hout "Outlet enthalpy";
     Medium.AbsolutePressure pout(start=pstart_out) "Outlet pressure";
-    Real PR "pressure ratio";
-    Real eta "isoentropic efficiency";
+    SI.PerUnit PR "pressure ratio";
+    SI.PerUnit eta "isoentropic efficiency";
 
     Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
         Placement(transformation(extent={{-72,-12},{-48,12}}, rotation=0)));
@@ -2543,7 +2545,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
   model Turbine "Gas Turbine"
     extends TurbineBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
-    parameter AngularVelocity Ndesign "Design speed";
+    parameter SI.AngularVelocity Ndesign "Design speed";
     parameter Real tablePhic[:, :]=fill(
           0,
           0,
@@ -2553,7 +2555,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
           0,
           2) "Table for eta(N_T,PR)";
     parameter String fileName="NoName" "File where matrix is stored";
-    parameter TableTypes Table
+    parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
 
     Real N_T "Referred speed";
@@ -2628,21 +2630,21 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     import ThermoPower.Choices.TurboMachinery.TableTypes;
     parameter Boolean NominalCondition=true
       "true: K is evaluated from design operating point; false: K is set as a parameter";
-    parameter AngularVelocity Ndesign "Design velocity";
+    parameter SI.AngularVelocity Ndesign "Design velocity";
     parameter Real tableEta[:, :]=fill(
           0,
           2,
           2) "Table for eta(N_T,PR)";
     parameter String fileName="NoName" "File where matrix is stored";
-    parameter TableTypes Table
+    parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
     parameter Boolean fixedEta=true "true:eta is a parameter,
       false:eta is calculated from table";
-    parameter Real eta_nom=0.8 "Nominal efficiency value";
+    parameter SI.PerUnit eta_nom=0.8 "Nominal efficiency value";
     parameter Real K(fixed=if (NominalCondition == false) then true else false)
       "Stodola's constant"
        annotation(Dialog(enable=not NominalCondition));
-    parameter Real wnom "Nominal massflowrate";
+    parameter Medium.MassFlowRate wnom "Nominal mass flow rate";
 
     Real N_T "Referred speed";
     Real N_T_design "Referred design speed";
@@ -2716,14 +2718,14 @@ This model extends the Turbine_Base model with the calculation of the performanc
     replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
     parameter Modelica.SIunits.Pressure pstart "start pressure value"
       annotation (Dialog(tab="Initialisation"));
-    parameter ThermoPower.AbsoluteTemperature Tstart "start temperature value"
+    parameter Exhaust.Temperature Tstart "start temperature value"
       annotation (Dialog(tab="Initialisation"));
     parameter Modelica.SIunits.MassFraction Xstart[Air.nX]=Air.reference_X
       "start gas composition" annotation (Dialog(tab="Initialisation"));
-    constant Modelica.SIunits.Pressure pnom=1.013e5 "ISO reference pressure";
-    constant AbsoluteTemperature Tnom=288.15 "ISO reference temperature";
-    parameter SpecificEnthalpy HH "Lower Heating value";
-    parameter Real eta_mech=0.95 "mechanical efficiency";
+    constant Exhaust.AbsolutePressure pnom=1.013e5 "ISO reference pressure";
+    constant Air.Temperature Tnom=288.15 "ISO reference temperature";
+    parameter SI.SpecificEnthalpy HH "Lower Heating value";
+    parameter SI.PerUnit eta_mech=0.95 "mechanical efficiency";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -2733,27 +2735,25 @@ This model extends the Turbine_Base model with the calculation of the performanc
       T(start=Tstart),
       Xi(start=Xstart[1:Air.nXi]));
 
-    Modelica.SIunits.MassFlowRate wia "Air mass flow";
-    Modelica.SIunits.MassFlowRate wia_ISO
-      "Air mass flow, referred to ISO conditions";
-    Modelica.SIunits.MassFlowRate wif "Fuel mass flow";
-    Modelica.SIunits.MassFlowRate wout "FlueGas mass flow";
+    Air.MassFlowRate wia "Air mass flow";
+    Air.MassFlowRate wia_ISO "Air mass flow, referred to ISO conditions";
+    Fuel.MassFlowRate wif "Fuel mass flow";
+    Exhaust.MassFlowRate wout "FlueGas mass flow";
     Air.SpecificEnthalpy hia "Air specific enthalpy";
     Fuel.SpecificEnthalpy hif "Fuel specific enthalpy";
     Exhaust.SpecificEnthalpy hout "FlueGas specific enthalpy";
 
-    Modelica.SIunits.Angle phi "shaft rotation angle";
-    Modelica.SIunits.Torque tau "net torque acting on the turbine";
-    Modelica.SIunits.AngularVelocity omega "shaft angular velocity";
-    Modelica.SIunits.Power ZLPout "zero_loss power output";
-    Modelica.SIunits.Power ZLPout_ISO
-      "zero_loss power output, referred to ISO conditions ";
-    Modelica.SIunits.Power Pout "Net power output";
-    Modelica.SIunits.Power HI "Heat input";
-    Modelica.SIunits.Power HI_ISO "Heat input, referred to ISO conditions";
-    Real PR "pressure ratio";
-    Modelica.SIunits.Pressure pc "combustion pressure";
-    Modelica.SIunits.Pressure pin "inlet pressure";
+    SI.Angle phi "shaft rotation angle";
+    SI.Torque tau "net torque acting on the turbine";
+    SI.AngularVelocity omega "shaft angular velocity";
+    SI.Power ZLPout "zero_loss power output";
+    SI.Power ZLPout_ISO "zero_loss power output, referred to ISO conditions ";
+    SI.Power Pout "Net power output";
+    SI.Power HI "Heat input";
+    SI.Power HI_ISO "Heat input, referred to ISO conditions";
+    SI.PerUnit PR "pressure ratio";
+    Exhaust.AbsolutePressure pc "combustion pressure";
+    Air.AbsolutePressure pin "inlet pressure";
 
     FlangeA Air_in(redeclare package Medium = Air,m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -2892,7 +2892,7 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
           0,
           4) "Table with unit data";
     parameter String fileName="noName" "File where matrix is stored";
-    parameter TableTypes Table
+    parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
     Modelica.Blocks.Tables.CombiTable1Ds OperatingPoint(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
@@ -2950,7 +2950,7 @@ This model adds the performance characteristics to the GTunit_base model, when o
   model GTunit "Gas Turbine"
     extends GTunitExhaustBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
-    parameter Modelica.SIunits.AngularVelocity omega_sync=314
+    parameter SI.AngularVelocity omega_sync=314
       "synchronous value of the shaft speed";
     parameter Real tableHI[:, :]=fill(
           0,
@@ -2965,7 +2965,7 @@ This model adds the performance characteristics to the GTunit_base model, when o
           0,
           2) "Table for wia_ISO=h(ZLPout_ISO,Tsync)";
     parameter String fileName="noName" "File where matrix is stored";
-    parameter TableTypes Table
+    parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
     Modelica.Blocks.Tables.CombiTable2D PowerOut(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
@@ -2989,7 +2989,7 @@ This model adds the performance characteristics to the GTunit_base model, when o
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-10,-24},{10,-4}}, rotation=
              0)));
-    AbsoluteTemperature Tsync
+    SI.Temperature Tsync
       "temperature corresponding to omega referred in synchronous conditions";
   equation
     Tsync = (omega_sync/omega)^2*gas.T;
@@ -3047,14 +3047,13 @@ The packages Medium are redeclared and a mass balance determines the composition
 
   partial model FanBase "Base model for fans"
     extends Icons.Gas.Fan;
-    import Modelica.SIunits.Conversions.NonSIunits.*;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       "Medium model"
       annotation(choicesAllMatching = true);
     Medium.BaseProperties inletFluid(h(start=hstart))
       "Fluid properties at the inlet";
     replaceable function flowCharacteristic =
-        Functions.FanCharacteristics.quadraticFlow
+      Functions.FanCharacteristics.baseFlow
       "Head vs. q_flow characteristic at nominal speed and density" annotation (
        Dialog(group="Characteristics"), choicesAllMatching=true);
     parameter Boolean usePowerCharacteristic=false
@@ -3074,55 +3073,56 @@ The packages Medium are redeclared and a mass balance determines the composition
         choicesAllMatching=true);
     parameter Integer Np0(min=1) = 1 "Nominal number of fans in parallel";
     parameter Real bladePos0=1 "Nominal blade position";
-    parameter Density rho0=1.229 "Nominal Gas Density"
+    parameter Medium.Density rho0=1.229 "Nominal Gas Density"
       annotation (Dialog(group="Characteristics"));
-    parameter AngularVelocity_rpm n0=1500 "Nominal rotational speed"
+    parameter NonSI.AngularVelocity_rpm n0=1500 "Nominal rotational speed"
       annotation (Dialog(group="Characteristics"));
-    parameter Volume V=0 "Fan Internal Volume" annotation (Evaluate=true);
+    parameter SI.Volume V=0 "Fan Internal Volume" annotation (Evaluate=true);
     parameter Boolean CheckValve=false "Reverse flow stopped";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter VolumeFlowRate q_single_start=q_single0
+    parameter SI.VolumeFlowRate q_single_start=q_single0
       "Volume Flow Rate Start Value (single pump)"
       annotation (Dialog(tab="Initialisation"));
-    parameter SpecificEnthalpy hstart=1e5 "Fluid Specific Enthalpy Start Value"
+    parameter Medium.SpecificEnthalpy hstart=1e5
+      "Fluid Specific Enthalpy Start Value"
       annotation (Dialog(tab="Initialisation"));
-    parameter Density rho_start=rho0 "Inlet Density start value"
+    parameter Medium.Density rho_start=rho0 "Inlet Density start value"
       annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
-    parameter MassFlowRate w0 "Nominal mass flow rate"
+    parameter Medium.MassFlowRate w0 "Nominal mass flow rate"
       annotation (Dialog(group="Characteristics"));
-    parameter Pressure dp0 "Nominal pressure increase"
+    parameter SI.Pressure dp0 "Nominal pressure increase"
       annotation (Dialog(group="Characteristics"));
-    final parameter VolumeFlowRate q_single0=w0/(Np0*rho0)
+    final parameter SI.VolumeFlowRate q_single0=w0/(Np0*rho0)
       "Nominal volume flow rate (single pump)";
-    final parameter SpecificEnergy H0=dp0/(rho0) "Nominal specific energy";
+    final parameter SI.SpecificEnergy H0=dp0/(rho0) "Nominal specific energy";
   protected
     function df_dqflow = der(flowCharacteristic, q_flow);
   public
-    MassFlowRate w_single(start=q_single_start*rho_start)
+    Medium.MassFlowRate w_single(start=q_single_start*rho_start)
       "Mass flow rate (single fan)";
-    MassFlowRate w=Np*w_single "Mass flow rate (total)";
-    VolumeFlowRate q_single "Volume flow rate (single fan)";
-    VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
-    Pressure dp "Outlet pressure minus inlet pressure";
-    SpecificEnergy H "Specific energy";
+    Medium.MassFlowRate w=Np*w_single "Mass flow rate (total)";
+    SI.VolumeFlowRate q_single "Volume flow rate (single fan)";
+    SI.VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
+    SI.Pressure dp "Outlet pressure minus inlet pressure";
+    SI.SpecificEnergy H "Specific energy";
     Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
     Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";
     Medium.SpecificEnthalpy hout(start=hstart) "Enthalpy of outgoing fluid";
-    LiquidDensity rho "Gas density";
+    Units.LiquidDensity rho "Gas density";
     Medium.Temperature Tin "Gas inlet temperature";
-    AngularVelocity_rpm n "Shaft r.p.m.";
+    NonSI.AngularVelocity_rpm n "Shaft r.p.m.";
     Real bladePos "Blade position";
     Integer Np(min=1) "Number of fans in parallel";
-    Power W_single "Power Consumption (single fan)";
-    Power W=Np*W_single "Power Consumption (total)";
-    constant Power W_eps=1e-8
+    SI.Power W_single "Power Consumption (single fan)";
+    SI.Power W=Np*W_single "Power Consumption (total)";
+    constant SI.Power W_eps=1e-8
       "Small coefficient to avoid numerical singularities";
-    constant AngularVelocity_rpm n_eps=1e-6;
-    Real eta "Fan efficiency";
+    constant NonSI.AngularVelocity_rpm n_eps=1e-6;
+    SI.PerUnit eta "Fan efficiency";
     Real s "Auxiliary Variable";
     FlangeA infl(
       h_outflow(start=hstart),
@@ -3276,8 +3276,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 
   model FanMech
     extends FanBase;
-    Angle phi "Shaft angle";
-    AngularVelocity omega "Shaft angular velocity";
+    SI.Angle phi "Shaft angle";
+    SI.AngularVelocity omega "Shaft angular velocity";
     Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort annotation (
         Placement(transformation(extent={{78,6},{108,36}}, rotation=0)));
   equation
@@ -3319,23 +3319,24 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       final parameter Integer Nw = N - 1
         "Number of volumes on the wall interface";
       parameter Integer Nt=1 "Number of tubes in parallel";
-      parameter Distance L "Tube length";
-      parameter Position H=0 "Elevation of outlet over inlet";
-      parameter Area A "Cross-sectional area (single tube)";
-      parameter Length omega "Perimeter of heat transfer surface (single tube)";
-      parameter Length Dhyd "Hydraulic Diameter (single tube)";
-      parameter MassFlowRate wnom "Nominal mass flowrate (total)";
+      parameter SI.Distance L "Tube length";
+      parameter SI.Position H=0 "Elevation of outlet over inlet";
+      parameter SI.Area A "Cross-sectional area (single tube)";
+      parameter SI.Length omega
+        "Perimeter of heat transfer surface (single tube)";
+      parameter SI.Length Dhyd "Hydraulic Diameter (single tube)";
+      parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
         annotation(Evaluate=true);
-      parameter Pressure dpnom = 0 "Nominal pressure drop";
+      parameter SI.Pressure dpnom = 0 "Nominal pressure drop";
       parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
-      parameter Density rhonom=0 "Nominal inlet density"
+      parameter Medium.Density rhonom=0 "Nominal inlet density"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint)));
-      parameter Real Cfnom=0 "Nominal Fanning friction factor"
+      parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
-      parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
+      parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
       parameter Real Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
         "Inertial phenomena accounted for"
@@ -3352,25 +3353,25 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       parameter Boolean allowFlowReversal=system.allowFlowReversal
         "= true to allow flow reversal, false restricts to design direction";
       outer ThermoPower.System system "System wide properties";
-      parameter Pressure pstart=1e5 "Pressure start value"
+      parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
         annotation (Dialog(tab="Initialisation"));
-      parameter AbsoluteTemperature Tstartbar=300
+      parameter Medium.Temperature Tstartbar=300
         "Avarage temperature start value"
         annotation (Dialog(tab="Initialisation"));
-      parameter AbsoluteTemperature Tstartin=Tstartbar
+      parameter Medium.Temperature Tstartin=Tstartbar
         "Inlet temperature start value" annotation (Dialog(tab="Initialisation"));
-      parameter AbsoluteTemperature Tstartout=Tstartbar
+      parameter Medium.Temperature Tstartout=Tstartbar
         "Outlet temperature start value" annotation (Dialog(tab="Initialisation"));
-      parameter AbsoluteTemperature Tstart[N]=linspace(
+      parameter Medium.Temperature Tstart[N]=linspace(
             Tstartin,
             Tstartout,
             N) "Start value of temperature vector (initialized by default)"
         annotation (Dialog(tab="Initialisation"));
-      final parameter Velocity unom=10
+      final parameter SI.Velocity unom=10
         "Nominal velocity for simplified equation";
       parameter Real wnf=0.01
         "Fraction of nominal flow rate at which linear friction equals turbulent friction";
-      parameter MassFraction Xstart[nX]=Medium.reference_X
+      parameter Medium.MassFraction Xstart[nX]=Medium.reference_X
         "Start gas composition" annotation (Dialog(tab="Initialisation"));
       parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
         "Initialisation option" annotation (Dialog(tab="Initialisation"));
@@ -3414,10 +3415,10 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       p(start=p0),
       T(start=T),
       Xi(start=Xnom[1:Medium.nXi]));
-    parameter Pressure p0=101325 "Nominal pressure";
-    parameter HydraulicResistance R=0 "Hydraulic resistance";
-    parameter AbsoluteTemperature T=300 "Nominal temperature";
-    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+    parameter Medium.AbsolutePressure p0=101325 "Nominal pressure";
+    parameter Units.HydraulicResistance R=0 "Hydraulic resistance";
+    parameter Medium.Temperature T=300 "Nominal temperature";
+    parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
@@ -3497,11 +3498,11 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       p(start=p0),
       T(start=T),
       Xi(start=Xnom[1:Medium.nXi]));
-    parameter Pressure p0=101325 "Nominal pressure";
-    parameter AbsoluteTemperature T=300 "Nominal temperature";
-    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+    parameter Medium.AbsolutePressure p0=101325 "Nominal pressure";
+    parameter Medium.Temperature T=300 "Nominal temperature";
+    parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
-    parameter HydraulicResistance R=0 "Hydraulic Resistance";
+    parameter Units.HydraulicResistance R=0 "Hydraulic Resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -3577,17 +3578,17 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       p(start=p0),
       T(start=T),
       Xi(start=Xnom[1:Medium.nXi]));
-    parameter Pressure p0=101325 "Nominal pressure";
-    parameter AbsoluteTemperature T=300 "Nominal temperature";
-    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+    parameter Medium.AbsolutePressure p0=101325 "Nominal pressure";
+    parameter Medium.Temperature T=300 "Nominal temperature";
+    parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
-    parameter MassFlowRate w0=0 "Nominal mass flowrate";
-    parameter HydraulicConductance G=0 "HydraulicConductance";
+    parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Units.HydraulicConductance G=0 "HydraulicConductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
 
-    MassFlowRate w;
+    Medium.MassFlowRate w;
 
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
@@ -3661,17 +3662,17 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       p(start=p0),
       T(start=T),
       Xi(start=Xnom[1:Medium.nXi]));
-    parameter Pressure p0=101325 "Nominal pressure";
-    parameter AbsoluteTemperature T=300 "Nominal Temperature";
-    parameter MassFraction Xnom[Medium.nX]=Medium.reference_X
+    parameter Medium.AbsolutePressure p0=101325 "Nominal pressure";
+    parameter Medium.Temperature T=300 "Nominal Temperature";
+    parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
-    parameter MassFlowRate w0=0 "Nominal mass flowrate";
-    parameter HydraulicConductance G=0 "Hydraulic Conductance";
+    parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Units.HydraulicConductance G=0 "Hydraulic Conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
 
-    MassFlowRate w;
+    Medium.MassFlowRate w;
     Modelica.Blocks.Interfaces.RealInput in_w0 annotation (Placement(
           transformation(
           origin={-60,50},
@@ -3742,7 +3743,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     extends Modelica.Icons.ObsoleteModel;
     extends Icons.Gas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
-    parameter MassFlowRate w0=0 "Nominal mass flowrate";
+    parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -3759,7 +3760,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
           extent={{-10,-10},{10,10}},
           rotation=270)));
 
-    MassFlowRate w "Mass flow rate";
+    Medium.MassFlowRate w "Mass flow rate";
 
   equation
     inlet.m_flow + outlet.m_flow = 0 "Mass balance";
@@ -3803,18 +3804,19 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
     parameter Integer Nt=1 "Number of tubes in parallel";
-    parameter Distance L "Tube length";
-    parameter Position H=0 "Elevation of outlet over inlet";
-    parameter Area A "Cross-sectional area (single tube)";
-    parameter Length omega "Perimeter of heat transfer surface (single tube)";
-    parameter Length Dhyd "Hydraulic Diameter (single tube)";
-    parameter MassFlowRate wnom "Nominal mass flowrate (total)";
+    parameter SI.Distance L "Tube length";
+    parameter SI.Position H=0 "Elevation of outlet over inlet";
+    parameter SI.Area A "Cross-sectional area (single tube)";
+    parameter SI.Length omega
+      "Perimeter of heat transfer surface (single tube)";
+    parameter SI.Length Dhyd "Hydraulic Diameter (single tube)";
+    parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
     parameter FFtypes FFtype "Friction Factor Type";
     parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient";
-    parameter Pressure dpnom=0 "Nominal pressure drop";
-    parameter Density rhonom=0 "Nominal inlet density";
-    parameter Real Cfnom=0 "Nominal Fanning friction factor";
-    parameter Real e=0 "Relative roughness (ratio roughness/diameter)";
+    parameter Medium.AbsolutePressure dpnom=0 "Nominal pressure drop";
+    parameter Medium.Density rhonom=0 "Nominal inlet density";
+    parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor";
+    parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
     parameter Boolean DynamicMomentum=false "Inertial phenomena accounted for"
       annotation (Evaluate=true);
     parameter Boolean UniformComposition=true
@@ -3829,25 +3831,26 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Pressure pstart=1e5 "Pressure start value"
+    parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstartbar=300
+    parameter Medium.Temperature Tstartbar=300
       "Avarage temperature start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstartin=Tstartbar
+    parameter Medium.Temperature Tstartin=Tstartbar
       "Inlet temperature start value" annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstartout=Tstartbar
+    parameter Medium.Temperature Tstartout=Tstartbar
       "Outlet temperature start value" annotation (Dialog(tab="Initialisation"));
-    parameter AbsoluteTemperature Tstart[N]=linspace(
+    parameter Medium.Temperature Tstart[N]=linspace(
           Tstartin,
           Tstartout,
           N) "Start value of temperature vector (initialized by default)"
       annotation (Dialog(tab="Initialisation"));
-    final parameter Velocity unom=10 "Nominal velocity for simplified equation";
-    parameter Real wnf=0.01
+    final parameter SI.Velocity unom=10
+      "Nominal velocity for simplified equation";
+    parameter SI.PerUnit wnf=0.01
       "Fraction of nominal flow rate at which linear friction equals turbulent friction";
-    parameter Real Kfc=1 "Friction factor correction coefficient";
-    parameter MassFraction Xstart[nX]=Medium.reference_X
+    parameter SI.PerUnit Kfc=1 "Friction factor correction coefficient";
+    parameter Medium.MassFraction Xstart[nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
@@ -3855,7 +3858,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
   protected
     parameter Integer nXi=Medium.nXi "number of independent mass fractions";
     parameter Integer nX=Medium.nX "total number of mass fractions";
-    constant Real g=Modelica.Constants.g_n;
+    constant SI.Acceleration g=Modelica.Constants.g_n;
   public
     FlangeA infl(redeclare package Medium = Medium, m_flow(start=wnom, min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -3870,37 +3873,37 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     // Xi(start=fill(Xstart[1:nXi],N)),
     // X(start=fill(Xstart,N)),
-    Pressure Dpfric "Pressure drop due to friction";
-    Length omega_hyd "Wet perimeter (single tube)";
+    SI.Pressure Dpfric "Pressure drop due to friction";
+    SI.Length omega_hyd "Wet perimeter (single tube)";
     Real Kf "Friction factor";
     Real Kfl "Linear friction factor";
     Real dwdt "Time derivative of mass flow rate";
-    Real Cf "Fanning friction factor";
-    MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
-    AbsoluteTemperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))/
-          (N - 1)*(Tstartout - Tstartin), each stateSelect=StateSelect.prefer)
-      "Temperature state variables";
-    AbsoluteTemperature Tin(start=Tstartin);
-    Real Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
+    SI.PerUnit Cf "Fanning friction factor";
+    Medium.MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
+    Medium.Temperature Ttilde[N - 1](
+      start=ones(N - 1)*Tstartin + (1:(N - 1))/(N - 1)*(Tstartout - Tstartin),
+      each stateSelect=StateSelect.prefer) "Temperature state variables";
+    Medium.Temperature Tin(start=Tstartin);
+    Medium.MassFraction Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
         each stateSelect=StateSelect.prefer) "Composition state variables";
-    MassFlowRate wbar[N - 1](each start=wnom/Nt);
-    Velocity u[N] "Fluid velocity";
-    Pressure p(start=pstart, stateSelect=StateSelect.prefer);
-    Time Tr "Residence time";
-    Mass M "Gas Mass";
-    Real Q "Total heat flow through the wall (all Nt tubes)";
+    Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt);
+    SI.Velocity u[N] "Fluid velocity";
+    Medium.AbsolutePressure p(start=pstart, stateSelect=StateSelect.prefer);
+    SI.Time Tr "Residence time";
+    SI.Mass M "Gas Mass";
+    SI.Power Q "Total heat flow through the wall (all Nt tubes)";
   protected
-    parameter Real dzdx=H/L "Slope";
-    parameter Length l=L/(N - 1) "Length of a single volume";
-    Density rhobar[N - 1] "Fluid average density";
-    SpecificVolume vbar[N - 1] "Fluid average specific volume";
-    HeatFlux phibar[N - 1] "Average heat flux";
-    DerDensityByPressure drbdp[N - 1]
+    parameter SI.PerUnit dzdx=H/L "Slope";
+    parameter SI.Length l=L/(N - 1) "Length of a single volume";
+    Medium.Density rhobar[N - 1] "Fluid average density";
+    SI.SpecificVolume vbar[N - 1] "Fluid average specific volume";
+    SI.HeatFlux phibar[N - 1] "Average heat flux";
+    Medium.DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
-    DerDensityByTemperature drbdT1[N - 1]
+    Medium.DerDensityByTemperature drbdT1[N - 1]
       "Derivative of average density by left temperature";
-    DerDensityByTemperature drbdT2[N - 1]
+    Medium.DerDensityByTemperature drbdT2[N - 1]
       "Derivative of average density by right temperature";
     Real drbdX1[N - 1, nX](each unit="kg/m3")
       "Derivative of average density by left composition";

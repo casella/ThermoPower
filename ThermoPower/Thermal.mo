@@ -6,8 +6,8 @@ package Thermal "Thermal models of heat transfer"
     "Thermal port for lumped parameter heat transfer";
   connector DHTNodes "Distributed Heat Terminal"
     parameter Integer N(min=1) = 2 "Number of nodes";
-    AbsoluteTemperature T[N] "Temperature at the nodes";
-    flow HeatFlux phi[N] "Heat flux at the nodes";
+    SI.Temperature T[N] "Temperature at the nodes";
+    flow SI.HeatFlux phi[N] "Heat flux at the nodes";
     annotation (Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
@@ -17,8 +17,8 @@ package Thermal "Thermal models of heat transfer"
 
   connector DHTVolumes "Distributed Heat Terminal"
     parameter Integer N "Number of volumes";
-    AbsoluteTemperature T[N] "Temperature at the volumes";
-    flow Power Q[N] "Heat flow at the volumes";
+    SI.Temperature T[N] "Temperature at the volumes";
+    flow SI.Power Q[N] "Heat flow at the volumes";
     annotation (Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
@@ -51,7 +51,7 @@ package Thermal "Thermal models of heat transfer"
 
   model HT_DHTNodes "HT to DHT adaptor"
     parameter Integer N=1 "Number of nodes on DHT side";
-    parameter Area exchangeSurface "Area of heat transfer surface";
+    parameter SI.Area exchangeSurface "Area of heat transfer surface";
     HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
             rotation=0)));
     DHT DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
@@ -100,7 +100,7 @@ package Thermal "Thermal models of heat transfer"
     // TO BE ADAPTED!!!
 
     parameter Integer N=1 "Number of nodes on DHT side";
-    parameter Area exchangeSurface "Area of heat transfer surface";
+    parameter SI.Area exchangeSurface "Area of heat transfer surface";
     HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
             rotation=0)));
     DHT DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
@@ -250,28 +250,28 @@ package Thermal "Thermal models of heat transfer"
     extends Icons.MetalWall;
     parameter Integer Nw = 1 "Number of volumes on the wall ports";
     parameter Integer Nt = 1 "Number of tubes in parallel";
-    parameter Length L "Tube length";
-    parameter Length rint "Internal radius (single tube)";
-    parameter Length rext "External radius (single tube)";
+    parameter SI.Length L "Tube length";
+    parameter SI.Length rint "Internal radius (single tube)";
+    parameter SI.Length rext "External radius (single tube)";
     parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
-    parameter ThermalConductivity lambda "Thermal conductivity";
+    parameter SI.ThermalConductivity lambda "Thermal conductivity";
     parameter Boolean WallRes=true "Wall thermal resistance accounted for";
-    parameter Temperature Tstartbar=300 "Avarage temperature"
+    parameter SI.Temperature Tstartbar=300 "Avarage temperature"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart1=Tstartbar
+    parameter SI.Temperature Tstart1=Tstartbar
       "Temperature start value - first volume"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature TstartN=Tstartbar
+    parameter SI.Temperature TstartN=Tstartbar
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
-   parameter Temperature Tvolstart[Nw]=
+   parameter SI.Temperature Tvolstart[Nw]=
      Functions.linspaceExt(Tstart1, TstartN, Nw);
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
     //AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
-    AbsoluteTemperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
-    Area Am "Area of the metal tube cross-section";
+    SI.Temperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
+    SI.Area Am "Area of the metal tube cross-section";
     ThermoPower.Thermal.DHTVolumes int(final N=Nw, T(start=Tvolstart))
       "Internal surface"
        annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=0)));
@@ -346,21 +346,21 @@ package Thermal "Thermal models of heat transfer"
   model MetalTubeFEM "Cylindrical metal tube - 1 radial node and N axial nodes"
     extends Icons.MetalWall;
     parameter Integer N(min=1) = 2 "Number of nodes";
-    parameter Length L "Tube length";
-    parameter Length rint "Internal radius (single tube)";
-    parameter Length rext "External radius (single tube)";
+    parameter SI.Length L "Tube length";
+    parameter SI.Length rint "Internal radius (single tube)";
+    parameter SI.Length rext "External radius (single tube)";
     parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
-    parameter ThermalConductivity lambda "Thermal conductivity";
+    parameter SI.ThermalConductivity lambda "Thermal conductivity";
     parameter Boolean WallRes=true "Wall conduction resistance accounted for";
-    parameter Temperature Tstartbar=300 "Avarage temperature"
+    parameter SI.Temperature Tstartbar=300 "Avarage temperature"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart1=Tstartbar
+    parameter SI.Temperature Tstart1=Tstartbar
       "Temperature start value - first node"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature TstartN=Tstartbar
+    parameter SI.Temperature TstartN=Tstartbar
       "Temperature start value - last node"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart[N]=Functions.linspaceExt(
+    parameter SI.Temperature Tstart[N]=Functions.linspaceExt(
           Tstart1,
           TstartN,
           N) "Start value of temperature vector (initialized by default)"
@@ -368,8 +368,8 @@ package Thermal "Thermal models of heat transfer"
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
-    AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
-    Area Am "Area of the metal tube cross-section";
+    SI.Temperature T[N](start=Tstart) "Node temperatures";
+    SI.Area Am "Area of the metal tube cross-section";
     DHT int(N=N, T(start=Tstart)) "Internal surface" annotation (Placement(
           transformation(extent={{-40,20},{40,40}}, rotation=0)));
     DHT ext(N=N, T(start=Tstart)) "External surface" annotation (Placement(
@@ -441,31 +441,30 @@ package Thermal "Thermal models of heat transfer"
   model MetalWallFV "Generic metal wall model with Nw finite volumes"
     extends ThermoPower.Icons.MetalWall;
     parameter Integer Nw = 1 "Number of volumes on the wall ports";
-    parameter Modelica.SIunits.Mass M "Mass";
-    parameter Modelica.SIunits.SpecificHeatCapacity cm
-      "Specific heat capacity of metal";
+    parameter SI.Mass M "Mass";
+    parameter SI.SpecificHeatCapacity cm "Specific heat capacity of metal";
     parameter Boolean WallRes=false "Wall thermal resistance accounted for";
-    parameter Modelica.SIunits.ThermalConductance UA_ext = 0
+    parameter SI.ThermalConductance UA_ext = 0
       "Equivalent thermal conductance of outer half-wall"
       annotation(Dialog(enable = WallRes));
-    parameter Modelica.SIunits.ThermalConductance UA_int = UA_ext
+    parameter SI.ThermalConductance UA_int = UA_ext
       "Equivalent thermal conductance of inner half-wall"
       annotation(Dialog(enable = WallRes));
-    parameter Temperature Tstartbar=300 "Average temperature"
+    parameter SI.Temperature Tstartbar=300 "Average temperature"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart1=Tstartbar
+    parameter SI.Temperature Tstart1=Tstartbar
       "Temperature start value - first volume"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature TstartN=Tstartbar
+    parameter SI.Temperature TstartN=Tstartbar
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tvolstart[Nw]=
+    parameter SI.Temperature Tvolstart[Nw]=
       Functions.linspaceExt(Tstart1, TstartN, Nw);
     parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
     //ThermoPower.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
-    AbsoluteTemperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
+    Units.AbsoluteTemperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
     ThermoPower.Thermal.DHTVolumes int(final N=Nw, T(start=Tvolstart))
       "Internal surface"
        annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=0)));
@@ -534,20 +533,19 @@ package Thermal "Thermal models of heat transfer"
   model MetalWallFEM "Generic metal wall - 1 radial node and N axial nodes"
     extends ThermoPower.Icons.MetalWall;
     parameter Integer N(min=1) = 2 "Number of nodes";
-    parameter Modelica.SIunits.Mass M "Mass";
-    parameter Modelica.SIunits.Area Sint "Internal surface";
-    parameter Modelica.SIunits.Area Sext "External surface";
-    parameter Modelica.SIunits.SpecificHeatCapacity cm
-      "Specific heat capacity of metal";
-    parameter Temperature Tstartbar=300 "Avarage temperature"
+    parameter SI.Mass M "Mass";
+    parameter SI.Area Sint "Internal surface";
+    parameter SI.Area Sext "External surface";
+    parameter SI.SpecificHeatCapacity cm "Specific heat capacity of metal";
+    parameter SI.Temperature Tstartbar=300 "Avarage temperature"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart1=Tstartbar
+    parameter SI.Temperature Tstart1=Tstartbar
       "Temperature start value - first node"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature TstartN=Tstartbar
+    parameter SI.Temperature TstartN=Tstartbar
       "Temperature start value - last node"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstart[N]=Functions.linspaceExt(
+    parameter SI.Temperature Tstart[N]=Functions.linspaceExt(
           Tstart1,
           TstartN,
           N) "Start value of temperature vector (initialized by default)"
@@ -555,7 +553,7 @@ package Thermal "Thermal models of heat transfer"
     parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
-    ThermoPower.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
+    Units.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
     ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface"
       annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=
               0)));
@@ -678,7 +676,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
   model ConvHTLumped "Lumped parameter convective heat transfer"
     extends Icons.HeatFlow;
-    parameter ThermalConductance G "Constant thermal conductance";
+    parameter SI.ThermalConductance G "Constant thermal conductance";
     HT side1 annotation (Placement(transformation(extent={{-40,20},{40,40}},
             rotation=0)));
     HT side2 annotation (Placement(transformation(extent={{-40,-20},{40,-42}},
@@ -715,10 +713,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
     model ConstantHeatTransferCoefficient "Constant heat transfer coefficient"
       extends BaseClasses.DistributedHeatTransferFV;
 
-       parameter CoefficientOfHeatTransfer gamma
+       parameter SI.CoefficientOfHeatTransfer gamma
         "Constant heat transfer coefficient";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-       Power Q "Total heat flow through lateral boundary";
+       SI.Power Q "Total heat flow through lateral boundary";
 
     equation
       assert(Nw ==  Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
@@ -742,7 +740,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       extends ConstantHeatTransferCoefficient(
         final gamma = UA/(omega*L*Nt));
 
-      parameter Modelica.SIunits.ThermalConductance UA
+      parameter SI.ThermalConductance UA
         "Global thermal conductance (UA value), for Nt tubes";
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
@@ -755,19 +753,19 @@ The swapping is performed if the counterCurrent parameter is true (default value
       "Flow-dependent h.t.c. gamma = gamma_nom*(w/wnom)^alpha"
       extends BaseClasses.DistributedHeatTransferFV;
 
-       parameter CoefficientOfHeatTransfer gamma_nom
+       parameter SI.CoefficientOfHeatTransfer gamma_nom
         "Nominal heat transfer coefficient";
-       parameter Real alpha(final unit="1")
-        "Exponent in the flow-dependency law";
-       parameter Real beta(final unit="1") = 0.1
+       parameter SI.PerUnit alpha "Exponent in the flow-dependency law";
+       parameter SI.PerUnit beta = 0.1
         "Fraction of nominal flow rate below which the heat transfer is not reduced";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-       Power Q "Total heat flow through lateral boundary";
-       CoefficientOfHeatTransfer gamma(start = gamma_nom)
+       SI.Power Q "Total heat flow through lateral boundary";
+       SI.CoefficientOfHeatTransfer gamma(start = gamma_nom)
         "Actual heat transfer coefficient";
-       Real w_wnom(start = 1, final unit = "1")
+       SI.PerUnit w_wnom(start = 1, final unit = "1")
         "Ratio between actual and nominal flow rate";
-       Real w_wnom_reg "Regularized ratio between actual and nominal flow rate";
+       SI.PerUnit w_wnom_reg
+        "Regularized ratio between actual and nominal flow rate";
     equation
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
@@ -796,9 +794,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
       "Flow-dependent global thermal conductance UA = UAnom*(w/wnom)^alpha"
       extends FlowDependentHeatTransferCoefficient(
         final gamma_nom = UAnom/(omega*L*Nt));
-       parameter Modelica.SIunits.ThermalConductance UAnom
+       parameter SI.ThermalConductance UAnom
         "Nominal global thermal conductance (UA value), for Nt tubes";
-      Modelica.SIunits.ThermalConductance UA = gamma*omega*L*Nt;
+      SI.ThermalConductance UA = gamma*omega*L*Nt;
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
@@ -808,15 +806,15 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
     model DittusBoelter "Dittus-Boelter heat transfer correlation"
       extends BaseClasses.DistributedHeatTransferFV;
-      CoefficientOfHeatTransfer gamma[Nf]
+      SI.CoefficientOfHeatTransfer gamma[Nf]
         "Heat transfer coefficients at the nodes";
-      CoefficientOfHeatTransfer gamma_vol[Nw]
+      SI.CoefficientOfHeatTransfer gamma_vol[Nw]
         "Heat transfer coefficients at the volumes";
       Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
       Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
       Medium.ThermalConductivity k[Nf] "Thermal conductivity";
       Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
-      Power Q "Total heat flow through lateral boundary";
+      SI.Power Q "Total heat flow through lateral boundary";
 
     equation
       assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
@@ -855,21 +853,21 @@ The swapping is performed if the counterCurrent parameter is true (default value
         redeclare replaceable package Medium =
             Modelica.Media.Interfaces.PartialTwoPhaseMedium);
 
-      parameter CoefficientOfHeatTransfer gamma_b=20000
+      parameter SI.CoefficientOfHeatTransfer gamma_b=20000
         "Coefficient of heat transfer in the 2-phase region";
 
       Real state[Nw] "Indicator of phase configuration";
-      Real alpha_l[Nw](each unit = "1")
+      SI.PerUnit alpha_l[Nw](each unit = "1")
         "Normalized position of liquid phase boundary";
-      Real alpha_v[Nw](each unit = "1")
+      SI.PerUnit alpha_v[Nw](each unit = "1")
         "Normalized position of vapour phase boundary";
-      CoefficientOfHeatTransfer gamma1ph[Nf]
+      SI.CoefficientOfHeatTransfer gamma1ph[Nf]
         "Heat transfer coefficient for 1-phase fluid";
-      CoefficientOfHeatTransfer gamma_bubble
+      SI.CoefficientOfHeatTransfer gamma_bubble
         "Heat transfer coefficient for 1-phase fluid at liquid phase boundary";
-      CoefficientOfHeatTransfer gamma_dew
+      SI.CoefficientOfHeatTransfer gamma_dew
         "Heat transfer coefficient for 1-phase fluid at vapour phase boundary";
-      CoefficientOfHeatTransfer gamma2ph = gamma_b
+      SI.CoefficientOfHeatTransfer gamma2ph = gamma_b
         "Heat transfer coefficient for 2-phase mixture";
       Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
@@ -892,7 +890,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.ThermalConductivity k_dew "Thermal conductivity at dew point";
       Medium.SpecificHeatCapacity cp_dew
         "Heat capacity at constant pressure at dew point";
-      Power Q "Total heat flow through lateral boundary";
+      SI.Power Q "Total heat flow through lateral boundary";
 
     equation
       assert(Nw == Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
@@ -1005,34 +1003,31 @@ The swapping is performed if the counterCurrent parameter is true (default value
         final useAverageTemperature,
         redeclare replaceable package Medium =
             Modelica.Media.Interfaces.PartialTwoPhaseMedium);
-       parameter CoefficientOfHeatTransfer gamma_nom_liq
+       parameter SI.CoefficientOfHeatTransfer gamma_nom_liq
         "Nominal heat transfer coefficient, liquid phase";
-       parameter CoefficientOfHeatTransfer gamma_nom_2ph
+       parameter SI.CoefficientOfHeatTransfer gamma_nom_2ph
         "Nominal average heat transfer coefficient, 2-phase";
-       parameter CoefficientOfHeatTransfer gamma_nom_vap
+       parameter SI.CoefficientOfHeatTransfer gamma_nom_vap
         "Nominal heat transfer coefficient, vapour phase";
-       parameter Real alpha(final unit="1") = 0.8
-        "Exponent in the flow-dependency law";
-       parameter Real beta(final unit="1") = 0.1
+       parameter SI.PerUnit alpha = 0.8 "Exponent in the flow-dependency law";
+       parameter SI.PerUnit beta = 0.1
         "Fraction of nominal flow rate below which the heat transfer is not reduced";
-       CoefficientOfHeatTransfer gamma_liq
+       SI.CoefficientOfHeatTransfer gamma_liq
         "Actual heat transfer coefficient, liquid phase";
-       CoefficientOfHeatTransfer gamma_2ph
+       SI.CoefficientOfHeatTransfer gamma_2ph
         "Actual heat transfer coefficient, 2-phase";
-       CoefficientOfHeatTransfer gamma_vap
+       SI.CoefficientOfHeatTransfer gamma_vap
         "Actual heat transfer coefficient, vapour phase";
-       Real w_wnom(start = 1, final unit = "1")
+       SI.PerUnit w_wnom(start = 1, final unit = "1")
         "Ratio between actual and nominal flow rate";
-       Real w_wnom_reg "Regularized w/wnom ratio";
+       SI.PerUnit w_wnom_reg "Regularized w/wnom ratio";
 
-      parameter CoefficientOfHeatTransfer gamma_b=20000
+      parameter SI.CoefficientOfHeatTransfer gamma_b=20000
         "Coefficient of heat transfer in the 2-phase region";
 
       Real state[Nw] "Indicator of phase configuration";
-      Real alpha_l[Nw](each unit = "1")
-        "Normalized position of liquid phase boundary";
-      Real alpha_v[Nw](each unit = "1")
-        "Normalized position of vapour phase boundary";
+      SI.PerUnit alpha_l[Nw] "Normalized position of liquid phase boundary";
+      SI.PerUnit alpha_v[Nw] "Normalized position of vapour phase boundary";
       Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
       Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
@@ -1040,7 +1035,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.Temperature Ts "Saturated water temperature";
       Medium.SaturationProperties sat "Properties of saturated fluid";
       Medium.AbsolutePressure p "Fluid pressure for property calculations";
-      Power Q "Total heat flow through lateral boundary";
+      SI.Power Q "Total heat flow through lateral boundary";
 
     equation
       assert(Nw == Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
@@ -1156,14 +1151,14 @@ The swapping is performed if the counterCurrent parameter is true (default value
           "Thermal conductivity of the material";
 
         // Material thermodynamic state
-        Temperature T "Material temperature";
+        connector InputTemperature = input SI.Temperature;
+        InputTemperature T "Material temperature";
       end PartialMaterial;
     end Interfaces;
 
     package Common "Implementation of material property models"
       model MaterialTable
         "Material property model based on table data and polynomial interpolations"
-        import Modelica.SIunits.*;
 
         import Poly =
           ThermoPower.Thermal.MaterialProperties.Functions.Polynomials_Temp;
@@ -1174,36 +1169,23 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
         // Tables defining temperature dependent properties of material
       protected
-        constant ModulusOfElasticity[:, :] tableYoungModulus=fill(
-                  0,
-                  0,
-                  0) "Table for youngModulus(T)";
-        constant Stress[:, :] tableYieldStress=fill(
-                  0,
-                  0,
-                  0) "Table for yieldStress(T)";
-        constant Stress[:, :] tableUltimateStress=fill(
-                  0,
-                  0,
-                  0) "Table for ultimateStress(T)";
-        constant SpecificHeatCapacity[:, :] tableSpecificHeatCapacity=fill(
-                  0,
-                  0,
-                  0) "Table for cp(T)";
-        constant LinearExpansionCoefficient[:, :]
-          tableLinearExpansionCoefficient=fill(
-                  0,
-                  0,
-                  0) "Table for alfa(T)";
-        constant ThermalConductivity[:, :] tableThermalConductivity=fill(
-                  0,
-                  0,
-                  0) "Table for kappa(T)";
+        constant SI.ModulusOfElasticity[:, :] tableYoungModulus=fill(0, 0, 0)
+          "Table for youngModulus(T)";
+        constant SI.Stress[:, :] tableYieldStress=fill(0, 0, 0)
+          "Table for yieldStress(T)";
+        constant SI.Stress[:, :] tableUltimateStress=fill(0, 0, 0)
+          "Table for ultimateStress(T)";
+        constant SI.SpecificHeatCapacity[:, :] tableSpecificHeatCapacity=fill(0, 0, 0)
+          "Table for cp(T)";
+        constant SI.LinearExpansionCoefficient[:, :]
+          tableLinearExpansionCoefficient=fill(0, 0,0) "Table for alfa(T)";
+        constant SI.ThermalConductivity[:, :] tableThermalConductivity=fill(0, 0, 0)
+          "Table for kappa(T)";
         // Functions to interpolate table data
       public
         constant Integer npol=2 "degree of polynomial used for fitting";
       protected
-        final constant ModulusOfElasticity poly_youngModulus[:]=if size(
+        final constant SI.ModulusOfElasticity poly_youngModulus[:]=if size(
             tableYoungModulus, 1) > 1 then Poly.fitting(
                   tableYoungModulus[:, 1],
                   tableYoungModulus[:, 2],
@@ -1629,21 +1611,21 @@ This package contains models to compute the material properties needed to model 
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
         "Medium model";
       input Medium.ThermodynamicState fluidState[Nf];
-      input MassFlowRate w[Nf];
+      input Medium.MassFlowRate w[Nf];
       ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
                 40}}, rotation=0)));
       parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side";
       parameter Integer Nw "Number of nodes on the wallside";
       parameter Integer Nt(min=1) "Number of tubes in parallel";
-      parameter Distance L "Tube length";
-      parameter Area A "Cross-sectional area (single tube)";
-      parameter Length omega
+      parameter SI.Distance L "Tube length";
+      parameter SI.Area A "Cross-sectional area (single tube)";
+      parameter SI.Length omega
         "Wet perimeter of heat transfer surface (single tube)";
-      parameter Length Dhyd "Hydraulic Diameter (single tube)";
-      parameter MassFlowRate wnom "Nominal mass flow rate (single tube)";
+      parameter SI.Length Dhyd "Hydraulic Diameter (single tube)";
+      parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)";
       parameter Boolean useAverageTemperature = true
         "= true to use average temperature for heat transfer";
-      final parameter Length l=L/(Nw) "Length of a single volume";
+      final parameter SI.Length l=L/(Nw) "Length of a single volume";
 
       Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
 
@@ -1664,20 +1646,20 @@ This package contains models to compute the material properties needed to model 
   connector HThtc
     "Thermal port for lumped parameter heat transfer with outgoing heat transfer coefficient"
     extends HT;
-    output ThermalConductance G "Thermal conductance";
+    output SI.ThermalConductance G "Thermal conductance";
   end HThtc;
 
   connector HThtc_in
     "Thermal port for lumped parameter heat transfer with incoming heat transfer coefficient"
     extends HT;
-    input ThermalConductance G "Thermal conductance";
+    input SI.ThermalConductance G "Thermal conductance";
   end HThtc_in;
 
   connector DHT "Distributed Heat Terminal"
     extends Modelica.Icons.ObsoleteModel;
     parameter Integer N(min=1) = 2 "Number of nodes";
-    AbsoluteTemperature T[N] "Temperature at the nodes";
-    flow HeatFlux phi[N] "Heat flux at the nodes";
+    SI.Temperature T[N] "Temperature at the nodes";
+    flow SI.HeatFlux phi[N] "Heat flux at the nodes";
     annotation (Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
@@ -1688,13 +1670,13 @@ This package contains models to compute the material properties needed to model 
   connector DHThtc
     "Distributed Heat Terminal with heat transfer coefficient output"
     extends DHT;
-    output CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
+    output SI.CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
   end DHThtc;
 
   connector DHThtc_in
     "Distributed Heat Terminal with heat transfer coefficient input"
     extends DHT;
-    input CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
+    input SI.CoefficientOfHeatTransfer gamma[N] "Heat transfer coefficient";
   end DHThtc_in;
 
   model DHThtc_DHT "DHThtc to DHT adapter"
@@ -1729,7 +1711,7 @@ This package contains models to compute the material properties needed to model 
   model HT_DHT "HT to DHT adaptor"
     extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=1 "Number of nodes on DHT side";
-    parameter Area exchangeSurface "Area of heat transfer surface";
+    parameter SI.Area exchangeSurface "Area of heat transfer surface";
     HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
             rotation=0)));
     DHT DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
@@ -1776,7 +1758,7 @@ This package contains models to compute the material properties needed to model 
   model HThtc_DHThtc "HThtc to DHThtc adaptor"
     extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=1 "Number of nodes on DHT side";
-    parameter Area exchangeSurface "Heat exchange surface";
+    parameter SI.Area exchangeSurface "Heat exchange surface";
     HThtc_in HT_port annotation (Placement(transformation(extent={{-140,-20},{-100,
               22}}, rotation=0)));
     DHThtc DHT_port(final N=1) annotation (Placement(transformation(extent={{
@@ -1825,8 +1807,8 @@ This package contains models to compute the material properties needed to model 
     extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=2 "Number of nodes";
     parameter Integer Nt=1 "Number of tubes";
-    parameter Length L "Source length";
-    parameter Length omega "Source perimeter (single tube)";
+    parameter SI.Length L "Source length";
+    parameter SI.Length omega "Source perimeter (single tube)";
     replaceable Thermal.DHT wall(N=N) annotation (Placement(transformation(
             extent={{-40,-40},{40,-20}}, rotation=0)));
     Modelica.Blocks.Interfaces.RealInput power annotation (Placement(
@@ -1930,7 +1912,7 @@ This package contains models to compute the material properties needed to model 
     extends Icons.HeatFlow;
     extends Modelica.Icons.ObsoleteModel;
     parameter Integer N=2 "Number of Nodes";
-    parameter CoefficientOfHeatTransfer gamma
+    parameter SI.CoefficientOfHeatTransfer gamma
       "Constant heat transfer coefficient";
 
     DHT side1(N=N) annotation (Placement(transformation(extent={{-40,20},{40,40}},
@@ -1989,7 +1971,7 @@ This package contains models to compute the material properties needed to model 
     extends Modelica.Icons.ObsoleteModel;
     parameter Integer N1(min=1) = 2 "Number of nodes on side 1";
     parameter Integer N2(min=1) = 2 "Number of nodes on side 2";
-    parameter CoefficientOfHeatTransfer gamma
+    parameter SI.CoefficientOfHeatTransfer gamma
       "Constant heat transfer coefficient";
 
     DHT side1(N=N1) annotation (Placement(transformation(extent={{-40,20},{40,
@@ -2581,31 +2563,31 @@ The swapping is performed if the counterCurrent parameter is true (default value
     parameter Integer Nr=2 "Number of radial nodes";
     parameter NodeDistribution nodeDistribution=ThermoPower.Choices.CylinderFourier.NodeDistribution.uniform
       "Node distribution";
-    parameter Length rint "Internal radius";
-    parameter Length rext "External radius";
-    parameter Temperature Tstartint=300
+    parameter SI.Length rint "Internal radius";
+    parameter SI.Length rext "External radius";
+    parameter SI.Temperature Tstartint=300
       "Temperature start value at rint (first node)"
       annotation (Dialog(tab="Initialisation"));
-    parameter Temperature Tstartext=300
+    parameter SI.Temperature Tstartext=300
       "Temperature start value at rext (last node)"
       annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
 
-    Length r[Nr](fixed=false) "Node radii";
+    SI.Length r[Nr](fixed=false) "Node radii";
   protected
-    Length r1_2[Nr - 1](fixed=false) "Slice mean radii";
-    Length r_lin[Nr](fixed=false) "Linearly distributed radii";
+    SI.Length r1_2[Nr - 1](fixed=false) "Slice mean radii";
+    SI.Length r_lin[Nr](fixed=false) "Linearly distributed radii";
     Real A[Nr](fixed=false);
     Real B[Nr](fixed=false);
     Real C[Nr](fixed=false);
 
   public
-    Temperature T[Nr](start=linspace(
+    SI.Temperature T[Nr](start=linspace(
             Tstartint,
             Tstartext,
             Nr)) "Nodal temperatures";
-    Temperature Tm "Mean temperature";
+    SI.Temperature Tm "Mean temperature";
     MaterialModel metal[Nr] "Metal properties at the nodes";
 
     ThermoPower.Thermal.DHT internalBoundary(final N=1) annotation (Placement(
@@ -2733,9 +2715,10 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 
   model HeatFlowDistribution "Same heat flow through two different surfaces"
     extends Icons.HeatFlow;
+    extends Modelica.Icons.ObsoleteModel;
     parameter Integer N(min=1) = 2 "Number of nodes";
-    parameter Area A1=1 "Side 1 surface area" annotation (Evaluate=true);
-    parameter Area A2=1 "Side 2 surface area" annotation (Evaluate=true);
+    parameter SI.Area A1=1 "Side 1 surface area" annotation (Evaluate=true);
+    parameter SI.Area A2=1 "Side 2 surface area" annotation (Evaluate=true);
 
     DHT side1(N=N) "Area of side 1 surface" annotation (Placement(
           transformation(extent={{-40,20},{40,40}}, rotation=0)));
@@ -2774,7 +2757,10 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
 "),   Diagram(graphics));
   end HeatFlowDistribution;
 
-  function linspaceExt = ThermoPower.Functions.linspaceExt;
+  function linspaceExt
+     extends ThermoPower.Functions.linspaceExt;
+     extends Modelica.Icons.ObsoleteModel;
+  end linspaceExt;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components related to heat transfer phenomena.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
