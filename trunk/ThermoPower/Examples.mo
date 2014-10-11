@@ -513,12 +513,12 @@ Casella</a>:<br>
 
     partial model CISESim
       "CISE Plant model with boundary conditions and initial steady-state computation"
-      parameter MassFlowRate wfeed_offset(fixed=false, start = 6.0e-2)
+      parameter SI.MassFlowRate wfeed_offset(fixed=false, start = 6.0e-2)
         "Offset of feedwater flow rate";
       parameter Real ValveOpening_offset(fixed=false, start = 0.4)
         "Offset of valve opening";
-      parameter Pressure InitialDrumPressure=5.9359e+006;
-      parameter Length InitialDrumLevel=-0.091;
+      parameter SI.Pressure InitialDrumPressure=5.9359e+006;
+      parameter SI.Length InitialDrumLevel=-0.091;
 
       Modelica.Blocks.Sources.Constant Qsh(k=4928) annotation (Placement(
             transformation(extent={{40,-140},{60,-120}}, rotation=0)));
@@ -865,10 +865,10 @@ Casella</a>:<br>
     model CISEPlant2States "Simplified model of the CISE lab steam generator"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi=Modelica.Constants.pi;
-      parameter Length r=0.115 "Drum diameter";
-      parameter Length H=1.455 "Drum height";
-      Pressure DrumPressure;
-      Length DrumLevel;
+      parameter SI.Length r=0.115 "Drum diameter";
+      parameter SI.Length H=1.455 "Drum height";
+      SI.Pressure DrumPressure;
+      SI.Length DrumLevel;
       Water.SourceMassFlow
                     FeedWater(h=1.1059e6,
         use_in_w0=true,
@@ -1133,12 +1133,12 @@ Casella</a>:<br>
 
     model CISESim2States
       "CISE plant reduced model with boundary conditions and initial steady-state computation"
-      parameter MassFlowRate wfeed_offset(fixed=false, start = 6.0e-2)
+      parameter SI.MassFlowRate wfeed_offset(fixed=false, start = 6.0e-2)
         "Offset of feedwater flow rate";
       parameter Real ValveOpening_offset(fixed=false, start = 0.4)
         "Offset of valve opening";
-      parameter Pressure InitialDrumPressure=5.9359e+006;
-      parameter Length InitialDrumLevel=-0.091;
+      parameter SI.Pressure InitialDrumPressure=5.9359e+006;
+      parameter SI.Length InitialDrumLevel=-0.091;
       CISEPlant2States Plant annotation (Placement(transformation(extent={{100,
                 -20},{160,40}}, rotation=0)));
       Modelica.Blocks.Sources.Constant Qsh(k=4928) annotation (Placement(
@@ -1367,19 +1367,19 @@ Casella</a>:<br>
         parameter Boolean StaticGasBalances=false;
         parameter Integer Nr = 2 "Number of tube rows";
         parameter Integer Nt = 2 "Number of parallel tubes in each row";
-        parameter Length Lt "Length of a tube in a row";
-        parameter Length Dint "Internal diameter of each tube";
-        parameter Length Dext "External diameter of each tube";
-        parameter Density rhom "Density of the tube metal walls";
-        parameter SpecificHeatCapacity cm
+        parameter SI.Length Lt "Length of a tube in a row";
+        parameter SI.Length Dint "Internal diameter of each tube";
+        parameter SI.Length Dext "External diameter of each tube";
+        parameter SI.Density rhom "Density of the tube metal walls";
+        parameter SI.SpecificHeatCapacity cm
           "Specific heat capacity of the tube metal walls";
-        parameter Area Sb "Cross-section of the boiler (including tubes)";
-        final parameter Area Sb_net = Sb - Nr*Nt*Dext*pi*Lt
+        parameter SI.Area Sb "Cross-section of the boiler (including tubes)";
+        final parameter SI.Area Sb_net = Sb - Nr*Nt*Dext*pi*Lt
           "Net cross-section of the boiler";
-        parameter Length Lb "Length of the boiler";
-        parameter Area St=Dext*pi*Lt*Nt*Nr
+        parameter SI.Length Lb "Length of the boiler";
+        parameter SI.Area St=Dext*pi*Lt*Nt*Nr
           "Total area of the heat exchange surface";
-        parameter CoefficientOfHeatTransfer gamma_nom=150
+        parameter SI.CoefficientOfHeatTransfer gamma_nom=150
           "Nominal heat transfer coefficient";
 
         Gas.FlangeA gasIn(redeclare package Medium = GasMedium) annotation (
@@ -1521,7 +1521,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
           Modelica.Media.Interfaces.PartialMedium;
         replaceable package WaterMedium = Modelica.Media.Water.WaterIF97_ph
           constrainedby Modelica.Media.Interfaces.PartialMedium;
-        parameter Time Ts=4 "Temperature sensor time constant";
+        parameter SI.Time Ts=4 "Temperature sensor time constant";
         Models.HeatExchanger
                       Boiler(
           redeclare package GasMedium = GasMedium,
@@ -1741,7 +1741,7 @@ Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model
         discrete Real e_int_wind
           "Integrated error before anti-windup filtering";
         discrete Real CSwind "Control signal before anti-windup filtering";
-        final parameter Modelica.SIunits.Time Ts=samplePeriod "Sampling Time";
+        final parameter SI.Time Ts=samplePeriod "Sampling Time";
       public
         Modelica.Blocks.Interfaces.RealInput SP annotation (Placement(
               transformation(extent={{-120,40},{-80,80}},  rotation=0),
@@ -1803,42 +1803,39 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         parameter Integer N=2 "Number of node of the gas side";
 
         //Nominal parameter
-        parameter Modelica.SIunits.MassFlowRate gasNomFlowRate
+        parameter SI.MassFlowRate gasNomFlowRate
           "Nominal flow rate through the gas side";
-        parameter Modelica.SIunits.MassFlowRate fluidNomFlowRate
+        parameter SI.MassFlowRate fluidNomFlowRate
           "Nominal flow rate through the fluid side";
-        parameter Modelica.SIunits.Pressure gasNomPressure
+        parameter SI.Pressure gasNomPressure
           "Nominal pressure in the gas side inlet";
-        parameter Modelica.SIunits.Pressure fluidNomPressure
+        parameter SI.Pressure fluidNomPressure
           "Nominal pressure in the fluid side inlet";
 
         //Physical Parameter
-        parameter Modelica.SIunits.Area exchSurface
+        parameter SI.Area exchSurface
           "Exchange surface between gas - metal tube";
-        parameter Modelica.SIunits.Volume gasVol "Gas volume";
-        parameter Modelica.SIunits.Volume fluidVol "Fluid volume";
-        parameter Modelica.SIunits.Volume metalVol
-          "Volume of the metal part in the tubes";
-        parameter Modelica.SIunits.Density rhom "Metal density";
-        parameter Modelica.SIunits.SpecificHeatCapacity cm
+        parameter SI.Volume gasVol "Gas volume";
+        parameter SI.Volume fluidVol "Fluid volume";
+        parameter SI.Volume metalVol "Volume of the metal part in the tubes";
+        parameter SI.Density rhom "Metal density";
+        parameter SI.SpecificHeatCapacity cm
           "Specific heat capacity of the metal";
 
         //Start value
-        parameter Modelica.SIunits.Temperature Tstart
-          "Average gas temperature start value"
+        parameter SI.Temperature Tstart "Average gas temperature start value"
           annotation (Dialog(tab="Initialization"));
         parameter Boolean SSInit=false "Steady-state initialization"
           annotation (Dialog(tab="Initialization"));
-        parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma
+        parameter SI.CoefficientOfHeatTransfer gamma
           "Constant heat transfer coefficient in the gas side";
         parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
           "Friction Factor Type, gas side";
         parameter Real Kfnom_G=0
           "Nominal hydraulic resistance coefficient, gas side";
-        parameter Modelica.SIunits.Pressure dpnom_G=0
+        parameter SI.Pressure dpnom_G=0
           "Nominal pressure drop, gas side (friction term only!)";
-        parameter Modelica.SIunits.Density rhonom_G=0
-          "Nominal inlet density, gas side";
+        parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
         parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
         parameter Boolean gasQuasiStatic=false
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
@@ -1892,7 +1889,7 @@ This is the model of a digital PI controller, complete with auto/man and trackin
 
         Modelica.Blocks.Interfaces.RealOutput voidFraction annotation (Placement(
               transformation(extent={{96,50},{116,70}}, rotation=0)));
-        final parameter Modelica.SIunits.Distance L=1 "Tube length";
+        final parameter SI.Distance L=1 "Tube length";
       equation
         voidFraction = 1 - water.Vld/water.Vd;
         connect(heatTransfer_ext.side2, adapter.DHT_port) annotation (Line(points=
@@ -2331,63 +2328,58 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         parameter Integer N_F=2 "Number of node of the fluid side";
 
         //Nominal parameter
-        parameter Modelica.SIunits.MassFlowRate gasNomFlowRate
+        parameter SI.MassFlowRate gasNomFlowRate
           "Nominal flow rate through the gas side";
-        parameter Modelica.SIunits.MassFlowRate fluidNomFlowRate
+        parameter SI.MassFlowRate fluidNomFlowRate
           "Nominal flow rate through the fluid side";
-        parameter Modelica.SIunits.Pressure gasNomPressure
+        parameter SI.Pressure gasNomPressure
           "Nominal pressure in the gas side inlet";
-        parameter Modelica.SIunits.Pressure fluidNomPressure
+        parameter SI.Pressure fluidNomPressure
           "Nominal pressure in the fluid side inlet";
 
         //Physical Parameter
-        parameter Modelica.SIunits.Area exchSurface_G
+        parameter SI.Area exchSurface_G
           "Exchange surface between gas - metal tube";
-        parameter Modelica.SIunits.Area exchSurface_F
+        parameter SI.Area exchSurface_F
           "Exchange surface between metal tube - fluid";
-        parameter Modelica.SIunits.Area extSurfaceTub
-          "Total external surface of the tubes";
-        parameter Modelica.SIunits.Volume gasVol "Gas volume";
-        parameter Modelica.SIunits.Volume fluidVol "Fluid volume";
-        parameter Modelica.SIunits.Volume metalVol
-          "Volume of the metal part in the tubes";
+        parameter SI.Area extSurfaceTub "Total external surface of the tubes";
+        parameter SI.Volume gasVol "Gas volume";
+        parameter SI.Volume fluidVol "Fluid volume";
+        parameter SI.Volume metalVol "Volume of the metal part in the tubes";
         parameter Real rhomcm "Metal heat capacity per unit volume [J/m^3.K]";
-        parameter Modelica.SIunits.ThermalConductivity lambda
+        parameter SI.ThermalConductivity lambda
           "Thermal conductivity of the metal (density by specific heat capacity)";
 
         //Start values
 
-        parameter Modelica.SIunits.Temperature Tstart_G
-          "Average gas temperature start value"
+        parameter SI.Temperature Tstart_G "Average gas temperature start value"
           annotation (Dialog(tab="Initialization"));
-        parameter Modelica.SIunits.Temperature Tstart_M
+        parameter SI.Temperature Tstart_M
           "Average metal wall temperature start value"
           annotation (Dialog(tab="Initialization"));
         parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
           "Initialization fluid phase" annotation (Dialog(tab="Initialization"));
         parameter Boolean SSInit=false "Steady-state initialization"
           annotation (Dialog(tab="Initialization"));
-        parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_G
+        parameter SI.CoefficientOfHeatTransfer gamma_G
           "Constant heat transfer coefficient in the gas side";
-        parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_F
+        parameter SI.CoefficientOfHeatTransfer gamma_F
           "Constant heat transfer coefficient in the fluid side";
         parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
           "Friction Factor Type, gas side";
         parameter Real Kfnom_G=0
           "Nominal hydraulic resistance coefficient, gas side";
-        parameter Modelica.SIunits.Pressure dpnom_G=0
+        parameter SI.Pressure dpnom_G=0
           "Nominal pressure drop, gas side (friction term only!)";
-        parameter Modelica.SIunits.Density rhonom_G=0
-          "Nominal inlet density, gas side";
+        parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
         parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
         parameter Choices.Flow1D.FFtypes FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
           "Friction Factor Type, fluid side";
         parameter Real Kfnom_F=0
           "Nominal hydraulic resistance coefficient, fluid side";
-        parameter Modelica.SIunits.Pressure dpnom_F=0
+        parameter SI.Pressure dpnom_F=0
           "Nominal pressure drop, fluid side (friction term only!)";
-        parameter Modelica.SIunits.Density rhonom_F=0
-          "Nominal inlet density, fluid side";
+        parameter SI.Density rhonom_F=0 "Nominal inlet density, fluid side";
         parameter Real Cfnom_F=0 "Nominal Fanning friction factor, fluid side";
         parameter Choices.Flow1D.HCtypes HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream
           "Location of the hydraulic capacitance, fluid side";
@@ -2468,7 +2460,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           annotation (Placement(transformation(extent={{-20,-8},{20,32}},
                 rotation=0)));
 
-        final parameter Modelica.SIunits.Distance L=1 "Tube length";
+        final parameter SI.Distance L=1 "Tube length";
       equation
         connect(gasFlow.infl, gasIn) annotation (Line(
             points={{-20,40},{-100,40},{-100,0}},
@@ -3063,9 +3055,9 @@ This is a simple model of a steam plant.
 
       model PID "PID controller with anti-windup"
         parameter Real Kp "Proportional gain (normalised units)";
-        parameter Modelica.SIunits.Time Ti "Integral time";
+        parameter SI.Time Ti "Integral time";
         parameter Boolean integralAction = true "Use integral action";
-        parameter Modelica.SIunits.Time Td=0 "Derivative time";
+        parameter SI.Time Td=0 "Derivative time";
         parameter Real Nd=1 "Derivative action up to Nd / Td rad/s";
         parameter Real Ni=1
           "Ni*Ti is the time constant of anti-windup compensation";
