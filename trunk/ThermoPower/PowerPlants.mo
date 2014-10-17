@@ -12608,7 +12608,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Characteristich curve of efficiency";
         parameter Real eta_iso_nom=0.92 "Nominal isentropic efficiency";
         parameter Real x=0.5 "Degree of reaction";
-        parameter Length Rm "Mean ray";
+        parameter SI.Length Rm "Mean ray";
         parameter Integer n "Number of stages";
 
         //Variable
