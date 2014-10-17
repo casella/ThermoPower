@@ -868,11 +868,13 @@ package Gas "Models of components with ideal gases as working fluid"
   model Flow1DFV "1-dimensional fluid flow model for gas (finite volumes)"
     extends BaseClasses.Flow1DBase;
 
-    Thermal.DHTVolumes wall(N=Nw) annotation (Dialog(enable=false),
-        Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
+    Thermal.DHTVolumes wall(N=Nw)
+      annotation (Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
 
-    replaceable Thermal.HeatTransferFV.IdealHeatTransfer heatTransfer
-      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
+    replaceable model HeatTransfer = Thermal.HeatTransferFV.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
+      annotation (choicesAllMatching=true);
+    HeatTransfer heatTransfer(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
@@ -883,8 +885,7 @@ package Gas "Models of components with ideal gases as working fluid"
       final omega=omega,
       final wnom=wnom/Nt,
       final w=w*ones(N),
-      final fluidState=gas.state) "Heat transfer model"
-      annotation (choicesAllMatching=true);
+      final fluidState=gas.state) "Instantiated heat transfer model";
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     SI.Pressure Dpfric "Pressure drop due to friction";
