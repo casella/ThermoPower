@@ -597,8 +597,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Medium.Temperature Tmstart=300
       "Metal wall temperature start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
+    parameter Choices.Init.Options initOpt=system.initOpt
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+    annotation (Dialog(tab="Initialisation"));
+
     FlangeA inlet(
       h_outflow(start=hstart),
       redeclare package Medium = Medium,
@@ -663,9 +667,17 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      h = hstart;
+      if (Cm > 0 and gamma > 0) then
+        Tm = Tmstart;
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
       der(h) = 0;
-      if (not Medium.singleState) then
+      if (not Medium.singleState and not noInitialPressure) then
         der(p) = 0;
       end if;
       if (Cm > 0 and gamma > 0) then
