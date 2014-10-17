@@ -64,11 +64,14 @@ package Choices "Choice enumerations for ThermoPower models"
   package Init "Options for initialisation"
     type Options = enumeration(
         noInit "No initial equations",
-        steadyState "Steady-state initialisation",
-        steadyStateNoP "Steady-state initialisation except pressures",
-        steadyStateNoT "Steady-state initialisation except temperatures",
+        fixedState "Fixed initial state variables",
+        steadyState "Steady-state initialization",
+        steadyStateNoP
+          "Steady-state initialization except pressures (deprecated)",
+        steadyStateNoT
+          "Steady-state initialization except temperatures (deprecated)",
         steadyStateNoPT
-          "Steady-state initialisation except pressures and temperatures")
+          "Steady-state initialization except pressures and temperatures (deprecated)")
       "Type, constants and menu choices to select the initialisation options";
   end Init;
 
