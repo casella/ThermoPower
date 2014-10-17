@@ -10,8 +10,8 @@ model System "System wide properties and defaults"
   parameter Boolean allowFlowReversal=true
     "= false to restrict to design flow direction (flangeA -> flangeB)"
     annotation (Evaluate=true);
-  parameter Choices.Init.Options initType = ThermoPower.Choices.Init.Options.fixedState;
-  parameter ThermoPower.Choices.System.Dynamics Dynamics=ThermoPower.Choices.System.Dynamics.DynamicFreeInitial;
+  parameter Choices.Init.Options initOpt = ThermoPower.Choices.Init.Options.fixedState;
+  // parameter ThermoPower.Choices.System.Dynamics Dynamics=ThermoPower.Choices.System.Dynamics.DynamicFreeInitial;
   annotation (
     defaultComponentName="system",
     defaultComponentPrefixes="inner",
