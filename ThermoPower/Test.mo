@@ -4432,9 +4432,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         hstartin=hs,
         hstartout=hs,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        redeclare
-          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
-          heatTransfer(gamma=gamma),
+        redeclare model HeatTransfer =
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=gamma),
         Nt=Nt,
         dpnom=1000)
         annotation (Placement(transformation(extent={{-22,-22},{-2,-2}})));
@@ -4525,8 +4524,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare ThermoPower.Thermal.HeatTransferFV.IdealHeatTransfer
-          heatTransfer,
         Nt=Nt,
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
@@ -4673,9 +4670,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare
-          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
-          heatTransfer(gamma=800),
+        redeclare model HeatTransfer =
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=800),
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         A=Aext,
         omega=omegahex)
@@ -4696,9 +4692,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare
-          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
-          heatTransfer(gamma=800),
+        redeclare model HeatTransfer =
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=800),
         A=Aint,
         omega=omegahex,
         dpnom=1000)
@@ -4859,9 +4854,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare
-          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
-          heatTransfer(gamma=800),
+        redeclare model HeatTransfer =
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=800),
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         A=Aext,
         omega=omegaext,
@@ -4883,9 +4877,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
-        redeclare
-          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
-          heatTransfer(gamma=800),
+        redeclare model HeatTransfer =
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=800),
         omega=omegaint,
         A=Aint,
         dpnom=1000)
@@ -5012,8 +5005,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        redeclare ThermoPower.Thermal.HeatTransferFV.DittusBoelter heatTransfer(
-            useAverageTemperature=true),
+        redeclare model HeatTransfer =
+          ThermoPower.Thermal.HeatTransferFV.DittusBoelter(useAverageTemperature=true),
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,10}},
                       rotation=0)));
       Thermal.TempSource1DFV

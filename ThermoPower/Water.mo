@@ -998,8 +998,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.Mass Mtot "Fluid mass (total)";
     SI.MassFlowRate dMdt[N - 1]
       "Time derivative of mass in each cell between two nodes";
-    replaceable Thermal.HeatTransferFV.IdealHeatTransfer heatTransfer
-      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
+    replaceable model HeatTransfer = Thermal.HeatTransferFV.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
+      annotation (choicesAllMatching=true);
+    HeatTransfer heatTransfer(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
@@ -1010,11 +1012,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       final omega=omega,
       final wnom=wnom/Nt,
       final w=w*ones(N),
-      final fluidState=fluidState) "Heat transfer model"
-      annotation (choicesAllMatching=true);
+      final fluidState=fluidState) "Instantiated heat transfer model";
 
-    ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
-            false), Placement(transformation(extent={{-40,40},{40,60}},
+    ThermoPower.Thermal.DHTVolumes wall(final N=Nw)
+      annotation (Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
   protected
     Medium.Density rhobar[N - 1] "Fluid average density";
@@ -1233,8 +1234,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
-    replaceable Thermal.HeatTransferFV.IdealHeatTransfer heatTransfer
-      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV(
+    replaceable model HeatTransfer = Thermal.HeatTransferFV.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
+      annotation (choicesAllMatching=true);
+    HeatTransfer heatTransfer(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
@@ -1245,8 +1248,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       final omega=omega,
       final wnom=wnom/Nt,
       final w=w*ones(N),
-      final fluidState=fluidState) "Heat transfer model"
-      annotation (choicesAllMatching=true);
+      final fluidState=fluidState) "Instantiated heat transfer model";
 
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -4334,9 +4336,6 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
         m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf
                else 0)) annotation (Placement(transformation(extent={{80,-20},{
                 120,20}}, rotation=0)));
-    //   replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
-    //           false), Placement(transformation(extent={{-40,40},{40,60}},
-    //           rotation=0)));
       SI.Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
       SI.Time Tr "Residence time";
       final parameter SI.PerUnit dzdx=H/L "Slope" annotation (Evaluate=true);

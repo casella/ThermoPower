@@ -1608,23 +1608,34 @@ This package contains models to compute the material properties needed to model 
     partial model DistributedHeatTransferFV
       "Base class for distributed heat transfer models - finite volumes"
       extends ThermoPower.Icons.HeatFlow;
-      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
-        "Medium model";
       input Medium.ThermodynamicState fluidState[Nf];
       input Medium.MassFlowRate w[Nf];
+        parameter Boolean useAverageTemperature = true
+        "= true to use average temperature for heat transfer";
       ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
                 40}}, rotation=0)));
-      parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side";
-      parameter Integer Nw "Number of nodes on the wallside";
-      parameter Integer Nt(min=1) "Number of tubes in parallel";
-      parameter SI.Distance L "Tube length";
-      parameter SI.Area A "Cross-sectional area (single tube)";
+      // The medium model and the following parameters will be set by the Flow1D
+      // models at instantiation not by end users
+      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+        "Medium model"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter Integer Nw "Number of nodes on the wall side"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter Integer Nt(min=1) "Number of tubes in parallel"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.Distance L "Tube length"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.Area A "Cross-sectional area (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       parameter SI.Length omega
-        "Wet perimeter of heat transfer surface (single tube)";
-      parameter SI.Length Dhyd "Hydraulic Diameter (single tube)";
-      parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)";
-      parameter Boolean useAverageTemperature = true
-        "= true to use average temperature for heat transfer";
+        "Wet perimeter of heat transfer surface (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.Length Dhyd "Hydraulic Diameter (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       final parameter SI.Length l=L/(Nw) "Length of a single volume";
 
       Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
