@@ -5396,8 +5396,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        redeclare ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB
-          heatTransfer(gamma_b=30000),
+        redeclare model HeatTransfer =
+          ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB (gamma_b=30000),
         dpnom=1000)
         annotation (Placement(transformation(extent={{-20,-70},{0,-50}})));
       Thermal.MetalTubeFV metalTubeFV(
