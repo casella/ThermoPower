@@ -2817,33 +2817,60 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     in2.p = out.p;
 
     // Energy balance
-    out.h_outflow = homotopy(if (in2.m_flow < 0 and rev_in2) then inStream(in1.h_outflow)
-       else if (in1.m_flow < 0 and rev_in1) then inStream(in1.h_outflow) else (
-      inStream(in1.h_outflow)*(in1.m_flow + wzero) + inStream(in1.h_outflow)*(
-      in2.m_flow + wzero))/(in1.m_flow + 2*wzero + in2.m_flow), (inStream(in1.h_outflow)
-      *(in1.m_flow + wzero) + inStream(in1.h_outflow)*(in2.m_flow + wzero))/(
-      in1.m_flow + 2*wzero + in2.m_flow));
-    in1.h_outflow = homotopy(if (in2.m_flow < 0 and rev_in2) then inStream(out.h_outflow)
-       else if (out.m_flow < 0 or not rev_out) then inStream(in1.h_outflow)
-       else (inStream(out.h_outflow)*(out.m_flow + wzero) + inStream(in1.h_outflow)
-      *(in2.m_flow + wzero))/(out.m_flow + 2*wzero + in2.m_flow), inStream(out.h_outflow));
-    in2.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(out.h_outflow)
-       else if (out.m_flow < 0 or not rev_out) then inStream(in1.h_outflow)
-       else (inStream(out.h_outflow)*(out.m_flow + wzero) + inStream(in1.h_outflow)
-      *(in1.m_flow + wzero))/(out.m_flow + 2*wzero + in1.m_flow), inStream(out.h_outflow));
+    out.h_outflow = homotopy(
+      if (in2.m_flow < 0 and rev_in2) then
+        inStream(in1.h_outflow)
+      else if (in1.m_flow < 0 and rev_in1) then
+         inStream(in2.h_outflow)
+      else
+        (inStream(in1.h_outflow)*(in1.m_flow + wzero) +
+         inStream(in2.h_outflow)*(in2.m_flow + wzero))/
+        (in1.m_flow + 2*wzero + in2.m_flow),
+      (inStream(in1.h_outflow)*(in1.m_flow + wzero) +
+       inStream(in2.h_outflow)*(in2.m_flow + wzero))/
+      (in1.m_flow + 2*wzero + in2.m_flow));
+
+    in1.h_outflow = homotopy(
+      if (in2.m_flow < 0 and rev_in2) then
+        inStream(out.h_outflow)
+      else if (out.m_flow < 0 or not rev_out) then
+        inStream(in2.h_outflow)
+      else
+        (inStream(out.h_outflow)*(out.m_flow + wzero) +
+         inStream(in2.h_outflow)*(in2.m_flow + wzero))/
+        (out.m_flow + 2*wzero + in2.m_flow),
+      inStream(out.h_outflow));
+
+    in2.h_outflow = homotopy(
+      if (in1.m_flow < 0 and rev_in1) then
+        inStream(out.h_outflow)
+      else if (out.m_flow < 0 or not rev_out) then
+        inStream(in1.h_outflow)
+      else
+        (inStream(out.h_outflow)*(out.m_flow + wzero) +
+         inStream(in1.h_outflow)*(in1.m_flow + wzero))/
+        (out.m_flow + 2*wzero + in1.m_flow),
+      inStream(out.h_outflow));
+
     //Check flow direction
-    assert(not checkFlowDirection or ((rev_in1 or in1.m_flow >= 0) and (rev_in2
-       or in2.m_flow >= 0) and (rev_out or out.m_flow <= 0)),
+    assert(not checkFlowDirection or
+      ((rev_in1 or in1.m_flow >= 0) and
+       (rev_in2 or in2.m_flow >= 0) and
+       (rev_out or out.m_flow <= 0)),
       "Flow reversal not supported");
     annotation (
       Icon(graphics),
-      Documentation(info="<HTML>
-<p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p><b>Modelling options</b></p>
-<p> If <tt>rev_in1</tt>, <tt>rev_in2</tt> or <tt>rev_out</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
-<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
-</HTML>", revisions="<html>
+      Documentation(info="<html>
+<p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.</p>
+<p>Since stream connectors are used in the library, this component is actually not necessary to handle a three-way connection. It can be used for a finer tuning of the simplified model for initialization using homotopy, in particularly hard-to-initialize systems, and it is included in the library for backwards compatibility.</p>
+<h4>Modelling options</h4>
+<p>If <code>rev_in1</code>, <code>rev_in2</code> or <code>rev_out</code> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <code>checkFlowDirection</code>.</p>
+<p>If <code>checkFlowDirection</code> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
+</html>", revisions="<html>
 <ul>
+<li><i>30 Oct 2014</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Bug fixing.</li>
 <li><i>23 May 2008</i>
     by <a>Luca Savoldelli</a>:<br>
        Allow flows reversal option added.</li>
@@ -2891,34 +2918,58 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     out1.p = in1.p;
     out2.p = in1.p;
     // Energy balance
-    out1.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(
-      out2.h_outflow) else if (out2.m_flow < 0 or not rev_out2) then inStream(
-      in1.h_outflow) else (inStream(in1.h_outflow)*(in1.m_flow + wzero) +
-      inStream(out2.h_outflow)*(out2.m_flow + wzero))/(in1.m_flow + 2*wzero +
-      out2.m_flow), inStream(in1.h_outflow));
-    out2.h_outflow = homotopy(if (in1.m_flow < 0 and rev_in1) then inStream(
-      out1.h_outflow) else if (out1.m_flow < 0 or not rev_out1) then inStream(
-      in1.h_outflow) else (inStream(in1.h_outflow)*(in1.m_flow + wzero) +
-      inStream(out1.h_outflow)*(out1.m_flow + wzero))/(in1.m_flow + 2*wzero +
-      out1.m_flow), inStream(in1.h_outflow));
-    in1.h_outflow = homotopy(if (out1.m_flow < 0 or not rev_out1) then inStream(
-      out2.h_outflow) else if (out2.m_flow < 0 or not rev_out2) then inStream(
-      out1.h_outflow) else (inStream(out1.h_outflow)*(out1.m_flow + wzero) +
-      inStream(out2.h_outflow)*(out2.m_flow + wzero))/(out1.m_flow + 2*wzero +
-      out2.m_flow), inStream(out1.h_outflow));
+    out1.h_outflow = homotopy(
+      if (in1.m_flow < 0 and rev_in1) then
+        inStream(out2.h_outflow)
+      else if (out2.m_flow < 0 or not rev_out2) then
+        inStream(in1.h_outflow)
+      else
+        (inStream(in1.h_outflow)*(in1.m_flow + wzero) +
+         inStream(out2.h_outflow)*(out2.m_flow + wzero))/
+        (in1.m_flow + 2*wzero + out2.m_flow),
+      inStream(in1.h_outflow));
+
+    out2.h_outflow = homotopy(
+      if (in1.m_flow < 0 and rev_in1) then
+        inStream(out1.h_outflow)
+      else if (out1.m_flow < 0 or not rev_out1) then
+        inStream(in1.h_outflow)
+      else
+        (inStream(in1.h_outflow)*(in1.m_flow + wzero) +
+         inStream(out1.h_outflow)*(out1.m_flow + wzero))/
+        (in1.m_flow + 2*wzero + out1.m_flow),
+      inStream(in1.h_outflow));
+
+    in1.h_outflow = homotopy(
+      if (out1.m_flow < 0 or not rev_out1) then
+         inStream(out2.h_outflow)
+      else if (out2.m_flow < 0 or not rev_out2) then
+         inStream(out1.h_outflow)
+      else
+        (inStream(out1.h_outflow)*(out1.m_flow + wzero) +
+         inStream(out2.h_outflow)*(out2.m_flow + wzero))/
+        (out1.m_flow + 2*wzero + out2.m_flow),
+      inStream(in1.h_outflow));
+
     //Check flow direction
-    assert(not checkFlowDirection or ((rev_in1 or in1.m_flow >= 0) and (
-      rev_out1 or out1.m_flow <= 0) and (rev_out2 or out2.m_flow <= 0)),
+    assert(not checkFlowDirection or
+     ((rev_in1 or in1.m_flow >= 0) and
+      (rev_out1 or out1.m_flow <= 0) and
+      (rev_out2 or out2.m_flow <= 0)),
       "Flow reversal not supported");
     annotation (
       Icon(graphics),
-      Documentation(info="<HTML>
-<p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p><b>Modelling options</b></p>
-<p> If <tt>rev_in1</tt>, <tt>rev_out1</tt> or <tt>rev_out2</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
-<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
-</HTML>", revisions="<html>
+      Documentation(info="<html>
+<p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets. </p>
+<p>Since stream connectors are used in the library, this component is actually not necessary to handle a three-way connection. It can be used for a finer tuning of the simplified model for initialization using homotopy, in particularly hard-to-initialize systems, and it is included in the library for backwards compatibility.</p>
+<h4>Modelling options</h4>
+<p>If <code>rev_in1</code>, <code>rev_out1</code> or <code>rev_out2</code> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <code>checkFlowDirection</code>.</p>
+<p>If <code>checkFlowDirection</code> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
+</html>", revisions="<html>
 <ul>
+<li><i>30 Oct 2014</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Bug fixing.</li>
 <li><i>23 May 2008</i>
     by <a>Luca Savoldelli</a>:<br>
        Allow flows reversal option added.</li>
