@@ -1200,56 +1200,96 @@ package Gas "Models of components with ideal gases as working fluid"
     inlet2.p = outlet.p;
 
     // Energy balance
-    outlet.h_outflow = homotopy(if (inlet2.m_flow < 0 and rev_inlet2) then
-      inStream(inlet1.h_outflow) else if (inlet1.m_flow < 0 and rev_inlet1)
-       then inStream(inlet1.h_outflow) else (inStream(inlet1.h_outflow)*(inlet1.m_flow
-       + wzero) + inStream(inlet1.h_outflow)*(inlet2.m_flow + wzero))/(inlet1.m_flow
-       + 2*wzero + inlet2.m_flow), (inStream(inlet1.h_outflow)*(inlet1.m_flow
-       + wzero) + inStream(inlet1.h_outflow)*(inlet2.m_flow + wzero))/(inlet1.m_flow
-       + 2*wzero + inlet2.m_flow));
-    inlet1.h_outflow = homotopy(if (inlet2.m_flow < 0 and rev_inlet2) then
-      inStream(outlet.h_outflow) else if (outlet.m_flow < 0 or not rev_outlet)
-       then inStream(inlet1.h_outflow) else (inStream(outlet.h_outflow)*(outlet.m_flow
-       + wzero) + inStream(inlet1.h_outflow)*(inlet2.m_flow + wzero))/(outlet.m_flow
-       + 2*wzero + inlet2.m_flow), inStream(outlet.h_outflow));
-    inlet2.h_outflow = homotopy(if (inlet1.m_flow < 0 and rev_inlet1) then
-      inStream(outlet.h_outflow) else if (outlet.m_flow < 0 or not rev_outlet)
-       then inStream(inlet1.h_outflow) else (inStream(outlet.h_outflow)*(outlet.m_flow
-       + wzero) + inStream(inlet1.h_outflow)*(inlet1.m_flow + wzero))/(outlet.m_flow
-       + 2*wzero + inlet1.m_flow), inStream(outlet.h_outflow));
+    outlet.h_outflow = homotopy(
+      if (inlet2.m_flow < 0 and rev_inlet2) then
+        inStream(inlet1.h_outflow)
+      else if (inlet1.m_flow < 0 and rev_inlet1) then
+        inStream(inlet1.h_outflow)
+      else
+        (inStream(inlet1.h_outflow)*(inlet1.m_flow+ wzero) +
+         inStream(inlet2.h_outflow)*(inlet2.m_flow + wzero))/
+        (inlet1.m_flow + 2*wzero + inlet2.m_flow),
+      (inStream(inlet1.h_outflow)*(inlet1.m_flow + wzero) +
+       inStream(inlet2.h_outflow)*(inlet2.m_flow + wzero))/
+      (inlet1.m_flow + 2*wzero + inlet2.m_flow));
+
+    inlet1.h_outflow = homotopy(
+      if (inlet2.m_flow < 0 and rev_inlet2) then
+        inStream(outlet.h_outflow)
+      else if (outlet.m_flow < 0 or not rev_outlet) then
+        inStream(inlet2.h_outflow)
+      else
+        (inStream(outlet.h_outflow)*(outlet.m_flow + wzero) +
+         inStream(inlet2.h_outflow)*(inlet2.m_flow + wzero))/
+        (outlet.m_flow + 2*wzero + inlet2.m_flow),
+      inStream(outlet.h_outflow));
+
+    inlet2.h_outflow = homotopy(
+      if (inlet1.m_flow < 0 and rev_inlet1) then
+        inStream(outlet.h_outflow)
+      else if (outlet.m_flow < 0 or not rev_outlet) then
+        inStream(inlet1.h_outflow)
+      else
+        (inStream(outlet.h_outflow)*(outlet.m_flow + wzero) +
+         inStream(inlet1.h_outflow)*(inlet1.m_flow + wzero))/
+        (outlet.m_flow + 2*wzero + inlet1.m_flow),
+      inStream(outlet.h_outflow));
 
     // Independent component mass balances
-    outlet.Xi_outflow = homotopy(if (inlet2.m_flow < 0 and rev_inlet2) then
-      inStream(inlet1.Xi_outflow) else if (inlet1.m_flow < 0 and rev_inlet1)
-       then inStream(inlet1.Xi_outflow) else (inStream(inlet1.Xi_outflow)*(
-      inlet1.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet2.m_flow +
-      wzero))/(inlet1.m_flow + 2*wzero + inlet2.m_flow), (inStream(inlet1.Xi_outflow)
-      *(inlet1.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet2.m_flow +
-      wzero))/(inlet1.m_flow + 2*wzero + inlet2.m_flow));
-    inlet1.Xi_outflow = homotopy(if (inlet2.m_flow < 0 and rev_inlet2) then
-      inStream(outlet.Xi_outflow) else if (outlet.m_flow < 0 or not rev_outlet)
-       then inStream(inlet1.Xi_outflow) else (inStream(outlet.Xi_outflow)*(
-      outlet.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet2.m_flow +
-      wzero))/(outlet.m_flow + 2*wzero + inlet2.m_flow), inStream(outlet.Xi_outflow));
-    inlet2.Xi_outflow = homotopy(if (inlet1.m_flow < 0 and rev_inlet1) then
-      inStream(outlet.Xi_outflow) else if (outlet.m_flow < 0 or not rev_outlet)
-       then inStream(inlet1.Xi_outflow) else (inStream(outlet.Xi_outflow)*(
-      outlet.m_flow + wzero) + inStream(inlet1.Xi_outflow)*(inlet1.m_flow +
-      wzero))/(outlet.m_flow + 2*wzero + inlet1.m_flow), inStream(outlet.Xi_outflow));
+    outlet.Xi_outflow = homotopy(
+      if (inlet2.m_flow < 0 and rev_inlet2) then
+        inStream(inlet1.Xi_outflow)
+      else if (inlet1.m_flow < 0 and rev_inlet1) then
+        inStream(inlet2.Xi_outflow)
+      else
+        (inStream(inlet1.Xi_outflow)*(inlet1.m_flow + wzero) +
+         inStream(inlet2.Xi_outflow)*(inlet2.m_flow + wzero))/
+        (inlet1.m_flow + 2*wzero + inlet2.m_flow),
+      (inStream(inlet1.Xi_outflow)*(inlet1.m_flow + wzero) +
+       inStream(inlet2.Xi_outflow)*(inlet2.m_flow + wzero))/
+      (inlet1.m_flow + 2*wzero + inlet2.m_flow));
+
+    inlet1.Xi_outflow = homotopy(
+      if (inlet2.m_flow < 0 and rev_inlet2) then
+        inStream(outlet.Xi_outflow)
+      else if (outlet.m_flow < 0 or not rev_outlet) then
+         inStream(inlet2.Xi_outflow)
+      else
+         (inStream(outlet.Xi_outflow)*(outlet.m_flow + wzero) +
+          inStream(inlet2.Xi_outflow)*(inlet2.m_flow + wzero))/
+         (outlet.m_flow + 2*wzero + inlet2.m_flow),
+      inStream(outlet.Xi_outflow));
+
+    inlet2.Xi_outflow = homotopy(
+      if (inlet1.m_flow < 0 and rev_inlet1) then
+        inStream(outlet.Xi_outflow)
+      else if (outlet.m_flow < 0 or not rev_outlet) then
+        inStream(inlet1.Xi_outflow)
+      else
+        (inStream(outlet.Xi_outflow)*(outlet.m_flow + wzero) +
+         inStream(inlet1.Xi_outflow)*(inlet1.m_flow + wzero))/
+        (outlet.m_flow + 2*wzero + inlet1.m_flow),
+      inStream(outlet.Xi_outflow));
 
     //Check flow direction
-    assert(not checkFlowDirection or ((rev_inlet1 or inlet1.m_flow >= 0) and (
-      rev_inlet2 or inlet2.m_flow >= 0) and (rev_outlet or outlet.m_flow <= 0)),
+    assert(not checkFlowDirection or
+     ((rev_inlet1 or inlet1.m_flow >= 0) and
+      (rev_inlet2 or inlet2.m_flow >= 0) and
+      (rev_outlet or outlet.m_flow <= 0)),
       "Flow reversal not supported");
     annotation (
       Icon(graphics),
       Documentation(info="<html>
-<p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p><b>Modelling options</b></p>
-<p> If <tt>rev_inlet1</tt>, <tt>rev_inlet2</tt> or <tt>rev_outlet</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
-<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
+<p>This component allows to join two separate flows into one. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets. </p>
+<p>Since stream connectors are used in the library, this component is actually not necessary to handle a three-way connection. It can be used for a finer tuning of the simplified model for initialization using homotopy, in particularly hard-to-initialize systems, and it is included in the library for backwards compatibility.</p>
+<h4>Modelling options</h4>
+<p>If <code>rev_inlet1</code>, <code>rev_inlet2</code> or <code>rev_outlet</code> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <code>checkFlowDirection</code>.</p>
+<p>If <code>checkFlowDirection</code> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
 </html>", revisions="<html>
 <ul>
+<li><i>30 Oct 2014</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Bug fixing.</li>
 <li><i>23 May 2008</i>
     by <a>Luca Savoldelli</a>:<br>
        Allow flows reversal option added.</li>
@@ -1300,52 +1340,91 @@ package Gas "Models of components with ideal gases as working fluid"
     outlet2.p = inlet.p;
 
     // Energy balance
-    outlet1.h_outflow = homotopy(if (inlet.m_flow < 0 and rev_inlet) then
-      inStream(outlet2.h_outflow) else if (outlet2.m_flow < 0 or not
-      rev_outlet2) then inStream(inlet.h_outflow) else (inStream(inlet.h_outflow)
-      *(inlet.m_flow + wzero) + inStream(outlet2.h_outflow)*(outlet2.m_flow +
-      wzero))/(inlet.m_flow + 2*wzero + outlet2.m_flow), inStream(inlet.h_outflow));
-    outlet2.h_outflow = homotopy(if (inlet.m_flow < 0 and rev_inlet) then
-      inStream(outlet1.h_outflow) else if (outlet1.m_flow < 0 or not
-      rev_outlet1) then inStream(inlet.h_outflow) else (inStream(inlet.h_outflow)
-      *(inlet.m_flow + wzero) + inStream(outlet1.h_outflow)*(outlet1.m_flow +
-      wzero))/(inlet.m_flow + 2*wzero + outlet1.m_flow), inStream(inlet.h_outflow));
-    inlet.h_outflow = homotopy(if (outlet1.m_flow < 0 or not rev_outlet1) then
-      inStream(outlet2.h_outflow) else if (outlet2.m_flow < 0 or not
-      rev_outlet2) then inStream(outlet1.h_outflow) else (inStream(outlet1.h_outflow)
-      *(outlet1.m_flow + wzero) + inStream(outlet2.h_outflow)*(outlet2.m_flow
-       + wzero))/(outlet1.m_flow + 2*wzero + outlet2.m_flow), inStream(outlet1.h_outflow));
+    outlet1.h_outflow = homotopy(
+      if (inlet.m_flow < 0 and rev_inlet) then
+        inStream(outlet2.h_outflow)
+      else if (outlet2.m_flow < 0 or not rev_outlet2) then
+        inStream(inlet.h_outflow)
+      else
+        (inStream(inlet.h_outflow)*(inlet.m_flow + wzero) +
+         inStream(outlet2.h_outflow)*(outlet2.m_flow + wzero))/
+        (inlet.m_flow + 2*wzero + outlet2.m_flow),
+      inStream(inlet.h_outflow));
+
+    outlet2.h_outflow = homotopy(
+      if (inlet.m_flow < 0 and rev_inlet) then
+        inStream(outlet1.h_outflow)
+      else if (outlet1.m_flow < 0 or not rev_outlet1) then
+        inStream(inlet.h_outflow)
+      else
+        (inStream(inlet.h_outflow)*(inlet.m_flow + wzero) +
+         inStream(outlet1.h_outflow)*(outlet1.m_flow + wzero))/
+        (inlet.m_flow + 2*wzero + outlet1.m_flow),
+      inStream(inlet.h_outflow));
+
+    inlet.h_outflow = homotopy(
+      if (outlet1.m_flow < 0 or not rev_outlet1) then
+        inStream(outlet2.h_outflow)
+      else if (outlet2.m_flow < 0 or not rev_outlet2) then
+        inStream(outlet1.h_outflow)
+      else
+        (inStream(outlet1.h_outflow)*(outlet1.m_flow + wzero) +
+         inStream(outlet2.h_outflow)*(outlet2.m_flow + wzero))/
+        (outlet1.m_flow + 2*wzero + outlet2.m_flow),
+      inStream(outlet1.h_outflow));
 
     // Independent component mass balances
-    outlet1.Xi_outflow = homotopy(if (inlet.m_flow < 0 and rev_inlet) then
-      inStream(outlet2.Xi_outflow) else if (outlet2.m_flow < 0 or not
-      rev_outlet2) then inStream(inlet.Xi_outflow) else (inStream(inlet.Xi_outflow)
-      *(inlet.m_flow + wzero) + inStream(outlet2.Xi_outflow)*(outlet2.m_flow +
-      wzero))/(inlet.m_flow + 2*wzero + outlet2.m_flow), inStream(inlet.Xi_outflow));
-    outlet2.Xi_outflow = homotopy(if (inlet.m_flow < 0 and rev_inlet) then
-      inStream(outlet1.Xi_outflow) else if (outlet1.m_flow < 0 or not
-      rev_outlet1) then inStream(inlet.Xi_outflow) else (inStream(inlet.Xi_outflow)
-      *(inlet.m_flow + wzero) + inStream(outlet1.Xi_outflow)*(outlet1.m_flow +
-      wzero))/(inlet.m_flow + 2*wzero + outlet1.m_flow), inStream(inlet.Xi_outflow));
-    inlet.Xi_outflow = homotopy(if (outlet1.m_flow < 0 or not rev_outlet1)
-       then inStream(outlet2.Xi_outflow) else if (outlet2.m_flow < 0 or not
-      rev_outlet2) then inStream(outlet1.Xi_outflow) else (inStream(outlet1.Xi_outflow)
-      *(outlet1.m_flow + wzero) + inStream(outlet2.Xi_outflow)*(outlet2.m_flow
-       + wzero))/(outlet1.m_flow + 2*wzero + outlet2.m_flow), inStream(outlet1.Xi_outflow));
+    outlet1.Xi_outflow = homotopy(
+      if (inlet.m_flow < 0 and rev_inlet) then
+        inStream(outlet2.Xi_outflow)
+      else if (outlet2.m_flow < 0 or not rev_outlet2) then
+        inStream(inlet.Xi_outflow)
+      else
+        (inStream(inlet.Xi_outflow)*(inlet.m_flow + wzero) +
+         inStream(outlet2.Xi_outflow)*(outlet2.m_flow + wzero))/
+        (inlet.m_flow + 2*wzero + outlet2.m_flow),
+      inStream(inlet.Xi_outflow));
+
+    outlet2.Xi_outflow = homotopy(
+      if (inlet.m_flow < 0 and rev_inlet) then
+        inStream(outlet1.Xi_outflow)
+      else if (outlet1.m_flow < 0 or not rev_outlet1) then
+        inStream(inlet.Xi_outflow)
+      else
+        (inStream(inlet.Xi_outflow)*(inlet.m_flow + wzero) +
+         inStream(outlet1.Xi_outflow)*(outlet1.m_flow + wzero))/
+        (inlet.m_flow + 2*wzero + outlet1.m_flow),
+      inStream(inlet.Xi_outflow));
+
+    inlet.Xi_outflow = homotopy(
+      if (outlet1.m_flow < 0 or not rev_outlet1) then
+        inStream(outlet2.Xi_outflow)
+      else if (outlet2.m_flow < 0 or not rev_outlet2) then
+        inStream(outlet1.Xi_outflow)
+      else
+        (inStream(outlet1.Xi_outflow)*(outlet1.m_flow + wzero) +
+         inStream(outlet2.Xi_outflow)*(outlet2.m_flow + wzero))/
+        (outlet1.m_flow + 2*wzero + outlet2.m_flow),
+      inStream(outlet1.Xi_outflow));
 
     //Check flow direction
-    assert(not checkFlowDirection or ((rev_inlet or inlet.m_flow >= 0) and (
-      rev_outlet1 or outlet1.m_flow <= 0) and (rev_outlet2 or outlet2.m_flow
-       <= 0)), "Flow reversal not supported");
+    assert(not checkFlowDirection or
+     ((rev_inlet or inlet.m_flow >= 0) and
+      (rev_outlet1 or outlet1.m_flow <= 0) and
+      (rev_outlet2 or outlet2.m_flow <= 0)), "Flow reversal not supported");
     annotation (
       Icon(graphics),
       Documentation(info="<html>
-<p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.
-<p><b>Modelling options</b></p>
-<p> If <tt>rev_inlet</tt>, <tt>rev_outlet1</tt> or <tt>rev_outlet2</tt> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <tt>checkFlowDirection</tt>.</p>
-<p>If <tt>checkFlowDirection</tt> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
+<p>This component allows to split a single flow in two ones. The model is based on mass and energy balance equations, without any mass or energy buildup, and without any pressure drop between the inlet and the outlets.</p>
+<p>Since stream connectors are used in the library, this component is actually not necessary to handle a three-way connection. It can be used for a finer tuning of the simplified model for initialization using homotopy, in particularly hard-to-initialize systems, and it is included in the library for backwards compatibility.</p>
+<h4>Modelling options</h4>
+<p>If <code>rev_inlet</code>, <code>rev_outlet1</code> or <code>rev_outlet2</code> is true, the respective flows reversal is allowed. If at least ona among these parameters is false, it is possible to set <code>checkFlowDirection</code>.</p>
+<p>If <code>checkFlowDirection</code> is true, when the flow reversal happen where it is not allowed, the error message is showed.</p>
 </html>", revisions="<html>
 <ul>
+<li><i>30 Oct 2014</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Bug fixing.</li>
 <li><i>23 May 2008</i>
     by <a>Luca Savoldelli</a>:<br>
        Allow flows reversal option added.</li>
