@@ -8449,13 +8449,21 @@ Algorithm Tolerance = 1e-6
       final parameter SI.Density rhohex=Medium.density_pT(phex,
           Thex);
       // Cv of fluid
-      final parameter SI.SpecificHeatCapacity cv=
-          Medium.specificHeatCapacityCv(Medium.setState_pT(phex, Thex));
+      final parameter SI.SpecificHeatCapacity cp=
+          Medium.specificHeatCapacityCp(Medium.setState_pT(phex, Thex));
       //height of power step
       parameter SI.EnergyFlowRate W=100;
-      // approx. prediction of flow rate from the outlet (neglects heat carried out by flow rate -> overestimate)
-      final parameter SI.MassFlowRate wout=0.5*rhohex/Thex*Ahex*
-          Lhex*W/(rhohex*Ahex*Lhex*cv);
+      // prediction of the flow rate going out the pipe from each side
+      // Approximated value of drho/dT, assuming ideal gas
+      final parameter Real drho_dT = rhohex/Thex;
+      // Initial mass
+      final parameter SI.Mass M = rhohex*Ahex*Lhex;
+      // Approximated value of temperature derivative (isobaric expansion)
+      final parameter Real dT_dt = W/(cp*M);
+      // Approximated dM/dT = V*drho_dT*dT_dt
+      final parameter SI.MassFlowRate dM_dT = Ahex*Lhex*drho_dT*dT_dt;
+      // Approximated value of flow rate at each end
+      final parameter SI.MassFlowRate wout=0.5*dM_dT;
 
       ThermoPower.Water.SinkPressure
                               sink1(p0=phex, h=hhex) annotation (Placement(
@@ -8514,27 +8522,19 @@ Algorithm Tolerance = 1e-6
           StartTime=-10,
           StopTime=10,
           Tolerance=1e-006),
-        Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
-During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
-<ul>
-    <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
-</ul>
-<p>
-Simulation Interval = [0...80] sec <br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</p>
-</HTML>", revisions="<html>
+        Documentation(info="<html>
+<p>The model is designed to test the coupling between the mass and energy balance equations in the component <code>Flow1Dfem</code> (fluid side of a heat exchanger, finite element method).</p>
+<p>The pipe is connected to two pressure source at the same pressure, with initial conditions corresponding to superheated steam @ 30 bar, 700 K. </p>
+<p>At time t = 0, a constant uniform heat flux is applied to the lateral boundary of the pipe. The steam heats up and expands uniformly; since the configuration is symmetric, there is a backflow in the left half of the pipe and a forward flow on the right half of the pipe. The parameter wout is an analytical estimate of the flow rate going out each end of the pipe, which is in a good agreement with the actual solution.</p>
+</html>", revisions="<html>
 <ul>
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"),
-        __Dymola_experimentSetupOutput(doublePrecision=true, equdistant=false));
+        __Dymola_experimentSetupOutput(doublePrecision=true, equdistant=false),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                100}}), graphics));
     end TestFlow1DfemK;
 
     model TestFlow1DfemJ "Test case for Flow1Dfem"
