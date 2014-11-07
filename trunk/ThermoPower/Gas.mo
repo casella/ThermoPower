@@ -1204,7 +1204,7 @@ package Gas "Models of components with ideal gases as working fluid"
       if (inlet2.m_flow < 0 and rev_inlet2) then
         inStream(inlet1.h_outflow)
       else if (inlet1.m_flow < 0 and rev_inlet1) then
-        inStream(inlet1.h_outflow)
+        inStream(inlet2.h_outflow)
       else
         (inStream(inlet1.h_outflow)*(inlet1.m_flow+ wzero) +
          inStream(inlet2.h_outflow)*(inlet2.m_flow + wzero))/
