@@ -25,12 +25,12 @@ package Examples "Application examples"
         gv=150,
         hlstart=1.15e5,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
-          Placement(transformation(extent={{-120,24},{-60,84}}, rotation=0)));
+          Placement(transformation(extent={{-120,6},{-60,66}},  rotation=0)));
       Water.SourceMassFlow
                     FeedWater(h=1.1059e6,
         use_in_w0=true,
         use_in_h=true)                    annotation (Placement(transformation(
-              extent={{-176,34},{-146,64}}, rotation=0)));
+              extent={{-176,16},{-146,46}}, rotation=0)));
       Water.Flow1DFV2ph
                       Downcomer(
         redeclare package Medium = Medium,
@@ -54,8 +54,8 @@ package Examples "Application examples"
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=1800),
         dpnom=1000,
         pstart=6000000) annotation (Placement(transformation(
-            origin={-167,-67},
-            extent={{-15,-15},{15,15}},
+            origin={-149,-60},
+            extent={{-20,-19},{20,19}},
             rotation=270)));
       Water.Flow1DFV2ph
                       Risers(
@@ -81,8 +81,8 @@ package Examples "Application examples"
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=10000),
         dpnom=3000,
         pstart=6118000) annotation (Placement(transformation(
-            origin={-19,-125},
-            extent={{-15,15},{15,-15}},
+            origin={-22,-129},
+            extent={{-19,18},{19,-18}},
             rotation=90)));
       Water.Flow1DFV2ph
                       Pipe2Drum(
@@ -107,12 +107,12 @@ package Examples "Application examples"
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=10000),
         dpnom=17000,
         pstart=6000000) annotation (Placement(transformation(
-            origin={-19,-17},
-            extent={{-15,15},{15,-15}},
+            origin={-22,-25},
+            extent={{-19,18},{19,-18}},
             rotation=90)));
       Water.SinkMassFlow
-                  Blowdown(w0=0) annotation (Placement(transformation(extent={{
-                -80,-20},{-50,10}}, rotation=0)));
+                  Blowdown(w0=0) annotation (Placement(transformation(extent={{-80,-38},
+                {-50,-8}},          rotation=0)));
       Water.Flow1DFV
                    Pipe2SH(
         redeclare package Medium = Medium,
@@ -135,8 +135,8 @@ package Examples "Application examples"
         pstart=6000000,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000))
-                        annotation (Placement(transformation(extent={{-54,80},{
-                -24,110}}, rotation=0)));
+                        annotation (Placement(transformation(extent={{-56,44},{
+                -18,80}},  rotation=0)));
       Water.Flow1DFV2ph SH(
         redeclare package Medium = Medium,
         Nt=1,
@@ -158,8 +158,8 @@ package Examples "Application examples"
         pstart=5900000,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB(gamma_b=20000))
-                        annotation (Placement(transformation(extent={{-6,80},{
-                24,110}}, rotation=0)));
+                        annotation (Placement(transformation(extent={{-4,44},{
+                32,80}},  rotation=0)));
       Water.Flow1DFV2ph
                       Pipe2Valve(
         redeclare package Medium = Medium,
@@ -183,28 +183,28 @@ package Examples "Application examples"
         pstart=5600000,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000))
-                        annotation (Placement(transformation(extent={{44,80},{
-                74,110}}, rotation=0)));
+                        annotation (Placement(transformation(extent={{48,44},{
+                86,80}},  rotation=0)));
       Water.ValveVap Valve(
         redeclare package Medium = Medium,
         pnom=54.497e5,
         wnom=2*0.06,
         Av=2.7e-5,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av,
-        dpnom=4899700) annotation (Placement(transformation(extent={{92,80},{
-                122,110}}, rotation=0)));
+        dpnom=4899700) annotation (Placement(transformation(extent={{100,44},{
+                136,80}},  rotation=0)));
       Water.SinkPressure
-                  Sink(p0=5.5e5) annotation (Placement(transformation(extent={{
-                138,80},{168,110}}, rotation=0)));
+                  Sink(p0=5.5e5) annotation (Placement(transformation(extent={{156,48},
+                {186,78}},          rotation=0)));
       Thermal.HeatSource1DFV
                            HeatSourceSH(Nw=4)
-             annotation (Placement(transformation(extent={{-6,126},{24,156}},
+             annotation (Placement(transformation(extent={{-8,102},{38,138}},
               rotation=0)));
       Thermal.HeatSource1DFV
                            HeatSourceRisers(Nw=6)
              annotation (Placement(transformation(
-            origin={39,-125},
-            extent={{-15,-15},{15,15}},
+            origin={42,-130},
+            extent={{-20,-18},{20,18}},
             rotation=270)));
       Water.Header HeaderLower(
         redeclare package Medium = Medium,
@@ -216,7 +216,7 @@ package Examples "Application examples"
         Tmstart=540,
         pstart=61.18e5,
         initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) annotation (
-          Placement(transformation(extent={{-140,-180},{-110,-150}}, rotation=0)));
+          Placement(transformation(extent={{-128,-186},{-88,-146}},  rotation=0)));
       Water.Header HeaderUpper(
         redeclare package Medium = Medium,
         V=8.372e-4,
@@ -228,8 +228,8 @@ package Examples "Application examples"
         hstart=1.6e6,
         initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) annotation (
           Placement(transformation(
-            origin={-19,-71},
-            extent={{-15,-15},{15,15}},
+            origin={-21,-78},
+            extent={{-16,-17},{16,17}},
             rotation=90)));
       Thermal.MetalTubeFV
                         DowncomerWall(
@@ -244,8 +244,8 @@ package Examples "Application examples"
         Tstart1=540,
         TstartN=540)                                          annotation (
           Placement(transformation(
-            origin={-144,-67},
-            extent={{-15,-16},{15,16}},
+            origin={-123,-60},
+            extent={{-20,-17},{20,17}},
             rotation=90)));
       Thermal.MetalTubeFV
                         RisersWalls(
@@ -261,8 +261,8 @@ package Examples "Application examples"
         Tstart1=548,
         TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={5,-125},
-            extent={{-15,-15},{15,15}},
+            origin={1,-129},
+            extent={{-19,-17},{19,17}},
             rotation=90)));
       Thermal.MetalTubeFV
                         Pipe2DrumWall(
@@ -277,8 +277,8 @@ package Examples "Application examples"
         Tstart1=548,
         TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={3,-17},
-            extent={{-15,-15},{15,15}},
+            origin={-1.77636e-015,-25},
+            extent={{-21,-16},{21,16}},
             rotation=90)));
       Thermal.MetalTubeFV
                         Pipe2SHWall(
@@ -293,8 +293,8 @@ package Examples "Application examples"
         Tstart1=548,
         TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={-39,115},
-            extent={{-15,-15},{15,15}},
+            origin={-36,86},
+            extent={{-20,-18},{20,18}},
             rotation=180)));
       Thermal.MetalTubeFV
                         SHWall(
@@ -309,8 +309,8 @@ package Examples "Application examples"
         Tstart1=551,
         TstartN=551)                                          annotation (
           Placement(transformation(
-            origin={9,115},
-            extent={{-15,-15},{15,15}},
+            origin={15,86},
+            extent={{-21,-18},{21,18}},
             rotation=180)));
       Thermal.MetalTubeFV
                         Pipe2ValveWall(
@@ -325,8 +325,8 @@ package Examples "Application examples"
         Tstart1=548,
         TstartN=548)                                          annotation (
           Placement(transformation(
-            origin={59,115},
-            extent={{-15,-15},{15,15}},
+            origin={67,87},
+            extent={{-21,-19},{21,19}},
             rotation=180)));
       Water.PressDrop PressDrop(
         redeclare package Medium = Medium,
@@ -336,132 +336,135 @@ package Examples "Application examples"
         A=5.62e-5,
         Kfc=2,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
-        dpnom=1) annotation (Placement(transformation(extent={{-76,-180},{-46,-150}},
+        dpnom=1) annotation (Placement(transformation(extent={{-70,-180},{-40,
+                -150}},
               rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput DrumPressure annotation (Placement(
-            transformation(extent={{200,20},{220,40}}, rotation=0),
+            transformation(extent={{162,-14},{182,6}}, rotation=0),
             iconTransformation(extent={{90,20},{110,40}})));
       Modelica.Blocks.Interfaces.RealOutput DrumLevel annotation (Placement(
-            transformation(extent={{200,-40},{220,-20}}, rotation=0),
+            transformation(extent={{162,-48},{182,-28}}, rotation=0),
             iconTransformation(extent={{90,-50},{110,-30}})));
       Modelica.Blocks.Interfaces.RealInput FeedWaterFlow annotation (Placement(
-            transformation(extent={{-210,90},{-190,110}}, rotation=0),
+            transformation(extent={{-192,48},{-172,68}},  rotation=0),
             iconTransformation(extent={{-120,72},{-102,89}})));
       Modelica.Blocks.Interfaces.RealInput RiserPower annotation (Placement(
-            transformation(extent={{210,-130},{190,-110}}, rotation=0),
+            transformation(extent={{86,-140},{66,-120}},   rotation=0),
             iconTransformation(extent={{-120,-48},{-102,-30}})));
       Modelica.Blocks.Interfaces.RealInput ValveOpening annotation (Placement(
-            transformation(extent={{210,90},{190,110}}, rotation=0),
+            transformation(extent={{152,92},{132,112}}, rotation=0),
             iconTransformation(extent={{-120,-9},{-102,9}})));
       Modelica.Blocks.Interfaces.RealInput SHPower annotation (Placement(
-            transformation(extent={{210,150},{190,170}}, rotation=0),
+            transformation(extent={{54,130},{34,150}},   rotation=0),
             iconTransformation(extent={{-120,-88},{-103,-71}})));
       Modelica.Blocks.Interfaces.RealInput FeedWaterEnthalpy annotation (
-          Placement(transformation(extent={{-210,150},{-190,170}}, rotation=0),
+          Placement(transformation(extent={{-190,76},{-170,96}},   rotation=0),
             iconTransformation(extent={{-120,31},{-102,49}})));
       inner System system(allowFlowReversal=false)
-        annotation (Placement(transformation(extent={{-120,160},{-100,180}})));
+        annotation (Placement(transformation(extent={{146,-130},{184,-94}})));
     equation
       connect(Pipe2Drum.infl, HeaderUpper.outlet) annotation (Line(
-          points={{-19,-32},{-19,-56}},
+          points={{-22,-44},{-21,-44},{-21,-62}},
           color={0,0,255},
           thickness=0.5));
       connect(HeaderUpper.inlet, Risers.outfl) annotation (Line(
-          points={{-19,-86.15},{-19,-110}},
+          points={{-21,-94.16},{-21,-94.16},{-21,-110},{-22,-110}},
           color={0,0,255},
           thickness=0.5));
       connect(SH.outfl, Pipe2Valve.infl) annotation (Line(
-          points={{24,95},{44,95}},
+          points={{32,62},{48,62}},
           color={0,0,255},
           thickness=0.5));
       connect(Valve.outlet, Sink.flange) annotation (Line(
-          points={{122,95},{138,95}},
+          points={{136,62},{136,62},{136,63},{156,63}},
           color={0,0,255},
           thickness=0.5));
       connect(Pipe2Valve.outfl, Valve.inlet) annotation (Line(
-          points={{74,95},{92,95}},
+          points={{86,62},{100,62}},
           color={0,0,255},
           thickness=0.5));
       connect(HeaderLower.outlet, PressDrop.inlet) annotation (Line(
-          points={{-110,-165},{-76,-165}},
+          points={{-88,-166},{-86,-166},{-86,-165},{-70,-165}},
           color={0,0,255},
           thickness=0.5));
       connect(PressDrop.outlet, Risers.infl) annotation (Line(
-          points={{-46,-165},{-19,-165},{-19,-140}},
+          points={{-40,-165},{-22,-165},{-22,-148}},
           color={0,0,255},
           thickness=0.5));
-      connect(RisersWalls.ext, HeatSourceRisers.wall) annotation (Line(points={{9.65,
-              -125},{34.5,-125}},        color={255,127,0}));
+      connect(RisersWalls.ext, HeatSourceRisers.wall) annotation (Line(points={{6.27,
+              -129},{36.6,-129},{36.6,-130}},
+                                         color={255,127,0}));
       DrumPressure = Drum.p;
       DrumLevel = Drum.y;
       connect(Blowdown.flange, Drum.blowdown) annotation (Line(
-          points={{-80,-5},{-90,-5},{-90,24.6}},
+          points={{-80,-23},{-90,-23},{-90,6.6}},
           thickness=0.5,
           color={0,0,255}));
       connect(SH.infl, Pipe2SH.outfl) annotation (Line(
-          points={{-6,95},{-24,95}},
+          points={{-4,62},{-4,62},{-18,62}},
           thickness=0.5,
           color={0,0,255}));
       connect(HeaderLower.inlet, Downcomer.outfl) annotation (Line(
-          points={{-140.15,-165},{-167,-165},{-167,-82}},
+          points={{-128.2,-166},{-149,-166},{-149,-80}},
           thickness=0.5,
           color={0,0,255}));
       connect(Downcomer.infl, Drum.downcomer) annotation (Line(
-          points={{-167,-52},{-111,33}},
+          points={{-149,-40},{-111,15}},
           thickness=0.5,
           color={0,0,255}));
       connect(Pipe2Drum.outfl, Drum.riser) annotation (Line(
-          points={{-19,-2},{-66.6,36.9}},
+          points={{-22,-6},{-66.6,18.9}},
           thickness=0.5,
           color={0,0,255}));
       connect(Pipe2SH.infl, Drum.steam) annotation (Line(
-          points={{-54,95},{-72.6,75}},
+          points={{-56,62},{-72.6,57}},
           thickness=0.5,
           color={0,0,255}));
       connect(FeedWater.flange, Drum.feedwater) annotation (Line(
-          points={{-146,49},{-119.1,49.5}},
+          points={{-146,31},{-119.1,31.5}},
           thickness=0.5,
           color={0,0,255}));
-      connect(FeedWaterEnthalpy, FeedWater.in_h) annotation (Line(points={{-200,
-              160},{-155,160},{-155,58}}, color={0,0,127}));
-      connect(FeedWaterFlow, FeedWater.in_w0) annotation (Line(points={{-200,
-              100},{-167,100},{-167,58}}, color={0,0,127}));
-      connect(RiserPower, HeatSourceRisers.power) annotation (Line(points={{200,
-              -120},{120,-120},{120,-125},{45,-125}}, color={0,0,127}));
-      connect(ValveOpening, Valve.theta) annotation (Line(points={{200,100},{
-              174,100},{174,130},{107,130},{107,107}}, color={0,0,127}));
-      connect(SHPower, HeatSourceSH.power) annotation (Line(points={{200,160},{
-              106,160},{9,160},{9,147}},           color={0,0,127}));
+      connect(FeedWaterEnthalpy, FeedWater.in_h) annotation (Line(points={{-180,86},
+              {-155,86},{-155,40}},       color={0,0,127}));
+      connect(FeedWaterFlow, FeedWater.in_w0) annotation (Line(points={{-182,58},
+              {-167,58},{-167,40}},       color={0,0,127}));
+      connect(RiserPower, HeatSourceRisers.power) annotation (Line(points={{76,-130},
+              {76,-130},{49.2,-130}},                 color={0,0,127}));
+      connect(ValveOpening, Valve.theta) annotation (Line(points={{142,102},{
+              142,102},{118,102},{118,76.4}},          color={0,0,127}));
+      connect(SHPower, HeatSourceSH.power) annotation (Line(points={{44,140},{
+              44,140},{15,140},{15,127.2}},        color={0,0,127}));
       connect(SHWall.ext, HeatSourceSH.wall)
-        annotation (Line(points={{9,119.65},{9,136.5}}, color={255,127,0}));
+        annotation (Line(points={{15,91.58},{15,91.58},{15,114.6}},
+                                                        color={255,127,0}));
       connect(Downcomer.wall, DowncomerWall.int) annotation (Line(
-          points={{-159.5,-67},{-148.8,-67}},
+          points={{-139.5,-60},{-128.1,-60}},
           color={255,127,0},
           smooth=Smooth.None));
       connect(Risers.wall, RisersWalls.int) annotation (Line(
-          points={{-11.5,-125},{0.5,-125}},
+          points={{-13,-129},{-4.1,-129}},
           color={255,127,0},
           smooth=Smooth.None));
       connect(Pipe2Drum.wall, Pipe2DrumWall.int) annotation (Line(
-          points={{-11.5,-17},{-1.5,-17}},
+          points={{-13,-25},{-4.8,-25}},
           color={255,127,0},
           smooth=Smooth.None));
       connect(SHWall.int, SH.wall) annotation (Line(
-          points={{9,110.5},{9,102.5}},
+          points={{15,80.6},{15,71},{14,71}},
           color={255,127,0},
           smooth=Smooth.None));
       connect(Pipe2SHWall.int, Pipe2SH.wall) annotation (Line(
-          points={{-39,110.5},{-39,102.5}},
+          points={{-36,80.6},{-36,71},{-37,71}},
           color={255,127,0},
           smooth=Smooth.None));
       connect(Pipe2ValveWall.int, Pipe2Valve.wall) annotation (Line(
-          points={{59,110.5},{59,102.5}},
+          points={{67,81.3},{67,71}},
           color={255,127,0},
           smooth=Smooth.None));
       annotation (
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
-            extent={{-200,-200},{200,200}},
+            extent={{-220,-200},{200,180}},
             initialScale=0.1), graphics),
         Documentation(info="<HTML>
 <p>This is the model of the CISE steam generation plant described in the paper: F. Casella, A. Leva, \"Modelica open library for power plant simulation: design and experimental validation\", <i>Proceedings of the 2003 Modelica Conference</i>, Link&ouml eping, Sweden, 2003.
