@@ -6173,7 +6173,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       max=1) = 0 "Mass Lumping Coefficient";
     parameter Real wnf_bc=0.01
       "Fraction of the nominal total mass flow rate for FEM regularization";
-    parameter Boolean regularizeBoundaryConditions = true
+    parameter Boolean regularizeBoundaryConditions = false
       "Regularize boundary condition matrices";
     constant Real g=Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
