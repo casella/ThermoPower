@@ -6406,18 +6406,20 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     // boundary condition matrices
     // step change is regularized, no negative undershoot
-    C[1, 1] = Functions.stepReg(
-        infl.m_flow - wnom*wnf_bc,
-        (1 - alpha_sgn/2)*w[1],
-        0,
-        wnom*wnf_bc);
-    C[N, N] = Functions.stepReg(
-        outfl.m_flow - wnom*wnf_bc,
-        -(1 + alpha_sgn/2)*w[N],
-        0,
-        wnom*wnf_bc);
-    //  C[1, 1] = if infl.m_flow >= 0 then (1 - alpha_sgn/2)*w[1] else 0;
-    //  C[N, N] = if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*w[N] else 0;
+    /*
+  C[1, 1] = Functions.stepReg(
+      infl.m_flow - wnom*wnf_bc,
+      (1 - alpha_sgn/2)*w[1],
+      0,
+      wnom*wnf_bc);
+  C[N, N] = Functions.stepReg(
+      outfl.m_flow - wnom*wnf_bc,
+      -(1 + alpha_sgn/2)*w[N],
+      0,
+      wnom*wnf_bc);
+*/
+    C[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*w[1] else 0);
+    C[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*w[N] else 0);
     C[N, 1] = 0;
     C[1, N] = 0;
     if (N > 2) then
@@ -6430,18 +6432,21 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end for;
     end if;
 
-    K[1, 1] = Functions.stepReg(
-        infl.m_flow - wnom*wnf_bc,
-        (1 - alpha_sgn/2)*inStream(infl.h_outflow),
-        0,
-        wnom*wnf_bc);
-    K[N, N] = Functions.stepReg(
-        outfl.m_flow - wnom*wnf_bc,
-        -(1 + alpha_sgn/2)*inStream(outfl.h_outflow),
-        0,
-        wnom*wnf_bc);
-    //  K[1, 1] = if infl.m_flow >= 0 then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0;
-    //  K[N, N] = if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 0;
+    /*
+  K[1, 1] = Functions.stepReg(
+      infl.m_flow - wnom*wnf_bc,
+      (1 - alpha_sgn/2)*inStream(infl.h_outflow),
+      0,
+      wnom*wnf_bc);
+  K[N, N] = Functions.stepReg(
+      outfl.m_flow - wnom*wnf_bc,
+      -(1 + alpha_sgn/2)*inStream(outfl.h_outflow),
+      0,
+      wnom*wnf_bc);
+ */
+     K[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0);
+
+     K[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 0);
     K[N, 1] = 0;
     K[1, N] = 0;
     if (N > 2) then
