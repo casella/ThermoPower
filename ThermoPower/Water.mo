@@ -6173,6 +6173,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       max=1) = 0 "Mass Lumping Coefficient";
     parameter Real wnf_bc=0.01
       "Fraction of the nominal total mass flow rate for FEM regularization";
+    parameter Boolean regularizeBoundaryConditions = true
+      "Regularize boundary condition matrices";
     constant Real g=Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
       "The number of nodes is even";
@@ -6405,21 +6407,21 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     // boundary condition matrices
-    // step change is regularized, no negative undershoot
-    /*
-  C[1, 1] = Functions.stepReg(
-      infl.m_flow - wnom*wnf_bc,
-      (1 - alpha_sgn/2)*w[1],
-      0,
-      wnom*wnf_bc);
-  C[N, N] = Functions.stepReg(
-      outfl.m_flow - wnom*wnf_bc,
-      -(1 + alpha_sgn/2)*w[N],
-      0,
-      wnom*wnf_bc);
-*/
-    C[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*w[1] else 0);
-    C[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*w[N] else 0);
+    if regularizeBoundaryConditions then
+      C[1, 1] = Functions.stepReg(
+        infl.m_flow - wnom*wnf_bc,
+        (1 - alpha_sgn/2)*w[1],
+        0,
+        wnom*wnf_bc);
+      C[N, N] = Functions.stepReg(
+        outfl.m_flow - wnom*wnf_bc,
+        -(1 + alpha_sgn/2)*w[N],
+        0,
+        wnom*wnf_bc);
+    else
+      C[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*w[1] else 0);
+      C[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*w[N] else 0);
+    end if;
     C[N, 1] = 0;
     C[1, N] = 0;
     if (N > 2) then
@@ -6432,21 +6434,22 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end for;
     end if;
 
-    /*
-  K[1, 1] = Functions.stepReg(
-      infl.m_flow - wnom*wnf_bc,
-      (1 - alpha_sgn/2)*inStream(infl.h_outflow),
-      0,
-      wnom*wnf_bc);
-  K[N, N] = Functions.stepReg(
-      outfl.m_flow - wnom*wnf_bc,
-      -(1 + alpha_sgn/2)*inStream(outfl.h_outflow),
-      0,
-      wnom*wnf_bc);
- */
-     K[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0);
+    if regularizeBoundaryConditions then
+      K[1, 1] = Functions.stepReg(
+        infl.m_flow - wnom*wnf_bc,
+        (1 - alpha_sgn/2)*inStream(infl.h_outflow),
+        0,
+        wnom*wnf_bc);
+      K[N, N] = Functions.stepReg(
+        outfl.m_flow - wnom*wnf_bc,
+        -(1 + alpha_sgn/2)*inStream(outfl.h_outflow),
+        0,
+        wnom*wnf_bc);
+    else
+      K[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0);
+      K[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 0);
+    end if;
 
-     K[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 0);
     K[N, 1] = 0;
     K[1, N] = 0;
     if (N > 2) then
