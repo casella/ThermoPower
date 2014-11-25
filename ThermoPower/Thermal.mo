@@ -758,6 +758,8 @@ The swapping is performed if the counterCurrent parameter is true (default value
        parameter SI.PerUnit alpha "Exponent in the flow-dependency law";
        parameter SI.PerUnit beta = 0.1
         "Fraction of nominal flow rate below which the heat transfer is not reduced";
+       parameter SI.MassFlowRate wnom_ht = wnom
+        "Nominal flow rate for heat transfer correlation (single tube)";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
        SI.Power Q "Total heat flow through lateral boundary";
        SI.CoefficientOfHeatTransfer gamma(start = gamma_nom)
@@ -770,7 +772,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       // Computation of actual heat transfer coefficient with smooth lower saturation to avoid numerical singularities at low flows
-      w_wnom = abs(w[1])/wnom
+      w_wnom = abs(w[1])/wnom_ht
         "Inlet flow rate used for the computation of the h.t.c.";
       w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2);
       gamma = homotopy(gamma_nom*w_wnom_reg^alpha,
@@ -1003,6 +1005,8 @@ The swapping is performed if the counterCurrent parameter is true (default value
         final useAverageTemperature,
         redeclare replaceable package Medium =
             Modelica.Media.Interfaces.PartialTwoPhaseMedium);
+       parameter SI.MassFlowRate wnom_ht = wnom
+        "Nominal flow rate for heat transfer correlation (single tube)";
        parameter SI.CoefficientOfHeatTransfer gamma_nom_liq
         "Nominal heat transfer coefficient, liquid phase";
        parameter SI.CoefficientOfHeatTransfer gamma_nom_2ph
@@ -1041,7 +1045,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       assert(Nw == Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       // Computation of actual h.t.c.'s
-      w_wnom = abs(w[1])/wnom
+      w_wnom = abs(w[1])/wnom_ht
         "Inlet flow rate used for the computation of the h.t.c.";
       w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2)
         "Regularized w/wnom ratio";
@@ -1634,8 +1638,7 @@ This package contains models to compute the material properties needed to model 
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       parameter SI.Length Dhyd "Hydraulic Diameter (single tube)"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
-      parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)"
-        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)";
       final parameter SI.Length l=L/(Nw) "Length of a single volume";
 
       Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
