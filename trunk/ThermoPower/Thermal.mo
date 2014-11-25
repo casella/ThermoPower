@@ -1638,7 +1638,8 @@ This package contains models to compute the material properties needed to model 
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       parameter SI.Length Dhyd "Hydraulic Diameter (single tube)"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
-      parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)";
+      parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       final parameter SI.Length l=L/(Nw) "Length of a single volume";
 
       Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
