@@ -269,9 +269,12 @@ package Thermal "Thermal models of heat transfer"
     parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
+    final parameter SI.Area Am = (rext^2 - rint^2)*pi
+      "Area of the metal tube cross-section";
+    final parameter SI.HeatCapacity Cm = Nt*L*Am*rhomcm "Total heat capacity";
     //AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
     SI.Temperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
-    SI.Area Am "Area of the metal tube cross-section";
+
     ThermoPower.Thermal.DHTVolumes int(final N=Nw, T(start=Tvolstart))
       "Internal surface"
        annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=0)));
@@ -280,7 +283,6 @@ package Thermal "Thermal models of heat transfer"
        annotation (Placement(transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
   equation
     assert(rext > rint, "External radius must be greater than internal radius");
-    Am = (rext^2 - rint^2)*pi "Area of the metal cross section";
     (L/Nw*Nt)*rhomcm*Am*der(Tvol) = int.Q + ext.Q "Energy balance";
     if WallRes then
       // Thermal resistance of the tube walls accounted for
@@ -443,6 +445,7 @@ package Thermal "Thermal models of heat transfer"
     parameter Integer Nw = 1 "Number of volumes on the wall ports";
     parameter SI.Mass M "Mass";
     parameter SI.SpecificHeatCapacity cm "Specific heat capacity of metal";
+    parameter SI.HeatCapacity Cm = M*cm "Heat capacity of the wall";
     parameter Boolean WallRes=false "Wall thermal resistance accounted for";
     parameter SI.ThermalConductance UA_ext = 0
       "Equivalent thermal conductance of outer half-wall"
@@ -472,7 +475,7 @@ package Thermal "Thermal models of heat transfer"
       "External surface"
        annotation (Placement(transformation(extent={{-40,-42},{40,-20}}, rotation=0)));
   equation
-    (cm*M/Nw)*der(Tvol) = int.Q + ext.Q "Energy balance";
+    (Cm/Nw)*der(Tvol) = int.Q + ext.Q "Energy balance";
     if WallRes then
       assert(UA_int > 0 and UA_ext > 0, "Assign postive values to UA_int, UA_ext");
       ext.Q = (ext.T-Tvol)*UA_ext/Nw;
@@ -537,6 +540,7 @@ package Thermal "Thermal models of heat transfer"
     parameter SI.Area Sint "Internal surface";
     parameter SI.Area Sext "External surface";
     parameter SI.SpecificHeatCapacity cm "Specific heat capacity of metal";
+    parameter SI.HeatCapacity Cm = M*cm "Heat capacity of the wall";
     parameter SI.Temperature Tstartbar=300 "Avarage temperature"
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Temperature Tstart1=Tstartbar
@@ -561,7 +565,7 @@ package Thermal "Thermal models of heat transfer"
       annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
             rotation=0)));
   equation
-    (cm*M)*der(T) = Sint*int.phi + Sext*ext.phi "Energy balance";
+    Cm*der(T) = Sint*int.phi + Sext*ext.phi "Energy balance";
     // No temperature gradients across the thickness
     int.T = T;
     ext.T = T;
