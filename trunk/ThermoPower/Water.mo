@@ -1289,7 +1289,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
                                           /*, stateSelect=StateSelect.prefer*/
     SI.Pressure dpf[N - 1] "Pressure drop due to friction between two nodes";
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
-    Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt);
+    Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt)
+      "Average mass flow rates (single tube)";
     SI.Power Q_single[Nw]
       "Heat flows entering the volumes from the lateral boundary (single tube)";
     SI.Velocity u[N] "Fluid velocity";
