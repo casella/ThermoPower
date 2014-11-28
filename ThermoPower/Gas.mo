@@ -898,6 +898,8 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.Temperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))/
           (N - 1)*(Tstartout - Tstartin), each stateSelect=StateSelect.prefer)
       "Temperature state variables";
+    Medium.Temperature T[N] "Node temperatures";
+    Medium.SpecificEnthalpy h[N] "Node specific enthalpies";
     Medium.Temperature Tin(start=Tstartin);
     Medium.MassFraction Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
@@ -1044,6 +1046,8 @@ package Gas "Models of components with ideal gases as working fluid"
     for j in 1:N loop
       u[j] = w/(gas[j].d*A) "Gas velocity";
       gas[j].p = p;
+      gas[j].T = T[j];
+      gas[j].h = h[j];
     end for;
     // Fluid property computations
     for j in 1:N loop
