@@ -6176,6 +6176,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       "Fraction of the nominal total mass flow rate for FEM regularization";
     parameter Boolean regularizeBoundaryConditions = false
       "Regularize boundary condition matrices";
+    parameter Boolean idealGasDensityDistribution = false
+      "Assume ideal-gas-type density distributions for mass balances";
     constant Real g=Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
       "The number of nodes is even";
@@ -6201,6 +6203,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
+    Real dvdt[N] "Time derivatives of specific volume";
 
     Real Y[N, N];
     Real M[N, N];
@@ -6300,6 +6303,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       drdp[j] = if Medium.singleState then 0 else Medium.density_derp_h(
         fluidState[j]);
       drdh[j] = Medium.density_derh_p(fluidState[j]);
+      dvdt[j] = -1/rho[j]^2*(drdp[j]*der(p) + drdh[j]*der(h[j]));
       v[j] = 1/rho[j];
       u[j] = w[j]/(rho[j]*A);
     end for;
@@ -6315,9 +6319,20 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     alpha_sgn = alpha*sign(infl.m_flow - outfl.m_flow);
 
     for i in 1:N - 1 loop
-      (w[i + 1] - w[i]) = -A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[
-        i])*(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i + 1])))
-        "Mass balance equations";
+      if idealGasDensityDistribution then
+        (w[i + 1] - w[i]) = noEvent(
+          if abs((v[i+1]-v[i])/v[i]) < 1e-7 then
+             2*A*l/(v[i]+v[i+1])^2*(dvdt[i]+dvdt[i+1])
+          else
+             -A*l/(v[i+1]-v[i])*(
+              (dvdt[i+1]*v[i]-dvdt[i]*v[i+1])/(v[i+1]*v[i]) -
+              (dvdt[i+1]-dvdt[i])/(v[i+1]-v[i])*log(v[i+1]/v[i])));
+      else
+      (w[i + 1] - w[i]) = -A*l*(
+        der(p)*1/2*(drdp[i + 1] + drdp[i]) +
+        1/6*(der(h[i])*(2*drdh[i] + drdh[i + 1]) +
+             der(h[i + 1])*(drdh[i] + 2*drdh[i + 1]))) "Mass balance equations";
+      end if;
     end for;
 
     // Energy equation FEM matrices
