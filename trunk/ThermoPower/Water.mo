@@ -4403,7 +4403,8 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       SI.Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
       SI.Time Tr "Residence time";
       final parameter SI.PerUnit dzdx=H/L "Slope" annotation (Evaluate=true);
-      final parameter SI.Length l=L/(N - 1) "Length of a single volume"
+      final parameter SI.Length l=L/(N - 1) "Length of a single volume";
+      final parameter SI.Volume V = Nt*A*L "Total volume (all Nt tubes)";
         annotation (Evaluate=true);
     equation
         assert(FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction or dpnom > 0,
