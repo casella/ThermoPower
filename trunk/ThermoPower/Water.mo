@@ -1133,7 +1133,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     // Boundary conditions
     win = infl.m_flow/Nt;
     wout = -outfl.m_flow/Nt;
-    Q_single = wall.Q/Nt;
+    Q_single = heatTransfer.Qvol/Nt;
     assert(HydraulicCapacitance == HCtypes.Upstream or
              HydraulicCapacitance == HCtypes.Middle or
              HydraulicCapacitance == HCtypes.Downstream,
@@ -1515,7 +1515,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
-    Q_single = wall.Q/Nt;
+    Q_single = heatTransfer.Qvol/Nt;
     infl.h_outflow = htilde[1];
     outfl.h_outflow = htilde[N - 1];
     h[1] = inStream(infl.h_outflow);
@@ -4405,12 +4405,11 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       final parameter SI.PerUnit dzdx=H/L "Slope" annotation (Evaluate=true);
       final parameter SI.Length l=L/(N - 1) "Length of a single volume";
       final parameter SI.Volume V = Nt*A*L "Total volume (all Nt tubes)";
-        annotation (Evaluate=true);
     equation
         assert(FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
 
-      annotation (
+        annotation (Evaluate=true,
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
 </HTML>

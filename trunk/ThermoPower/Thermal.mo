@@ -735,6 +735,28 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end ConstantHeatTransferCoefficient;
 
+    partial model ConstantHeatTransferCoefficientTwoGrids
+      "Constant heat transfer coefficient - different grids for fluid and wall side"
+      extends BaseClasses.DistributedHeatTransferFV(
+        final useAverageTemperature = true,
+        Qvol=Qv);
+
+       parameter SI.CoefficientOfHeatTransfer gamma
+        "Constant heat transfer coefficient";
+       Medium.Temperature Tv[Nf-1] "Fluid temperature in the volumes";
+       SI.Power Qv[Nf-1] "Heat flows entering the volumes";
+    equation
+      for j in 1:Nw loop
+         Tv[j] = (T[j] + T[j + 1])/2;
+         Qw[j] = (Tw[j] - Tv[j])*omega*l*gamma*Nt;
+      end for;
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantHeatTransferCoefficientTwoGrids;
+
     model ConstantThermalConductance
       "Constant global thermal conductance (UA value)"
       extends ConstantHeatTransferCoefficient(
@@ -1609,7 +1631,7 @@ This package contains models to compute the material properties needed to model 
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
-      parameter Integer Nw "Number of nodes on the wall side"
+      parameter Integer Nw = Nf - 1 "Number of nodes on the wall side"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       parameter Integer Nt(min=1) "Number of tubes in parallel"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
@@ -1629,6 +1651,7 @@ This package contains models to compute the material properties needed to model 
       Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
       Medium.Temperature Tw[Nw] "Temperatures of the wall volumes";
       SI.Power Qw[Nw] "Heat flows entering from the wall volumes";
+      SI.Power Qvol[Nf-1] = Qw "Heat flows going to the fluid volumes";
       SI.Power Q "Total heat flow through lateral boundary";
 
     equation
