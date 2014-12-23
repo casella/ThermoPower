@@ -1077,7 +1077,7 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     // Boundary conditions
-    Q_single = wall.Q/Nt;
+    Q_single = heatTransfer.Qvol/Nt;
     infl.h_outflow = gas[1].h;
     outfl.h_outflow = gas[N].h;
     infl.Xi_outflow = gas[1].Xi;
