@@ -751,12 +751,16 @@ The swapping is performed if the counterCurrent parameter is true (default value
        Medium.Temperature Tv[Nf-1] "Fluid temperature in the volumes";
        SI.Power Qv[Nf-1] "Heat flows entering the volumes";
        final parameter SI.PerUnit Hv[min(Nw,Nv),Nv] = getH(Nv,Nw)
-        "Sums heat flows on fluid side onto coarser grid";
+        "Sums heat flows on fluid side onto coarser grid"
+        annotation(Evaluate = true);
        final parameter SI.PerUnit Hw[min(Nw,Nv),Nw] = getH(Nw,Nv)
-        "Sums heat flows on wall side onto coarser grid";
+        "Sums heat flows on wall side onto coarser grid"
+        annotation(Evaluate = true);
        final parameter SI.PerUnit G[max(Nw,Nv), min(Nw,Nv)] = getH(max(Nw,Nv), min(Nw,Nv))
-        "Maps temperatures on coarser grid onto finer grid";
+        "Maps temperatures on coarser grid onto finer grid"
+        annotation(Evaluate = true);
 
+    protected
        function getH
          input Integer N1;
          input Integer N2;
