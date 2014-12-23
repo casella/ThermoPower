@@ -743,12 +743,53 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
        parameter SI.CoefficientOfHeatTransfer gamma
         "Constant heat transfer coefficient";
+       final parameter Integer Nv = Nf - 1
+        "Number of volumes on the fluid side";
+       final parameter SI.Length lw = L/Nw "Length of volumes on the wall side";
+       final parameter SI.Length lv = L/Nv
+        "Length of volumes on the fluid side";
        Medium.Temperature Tv[Nf-1] "Fluid temperature in the volumes";
        SI.Power Qv[Nf-1] "Heat flows entering the volumes";
+       final parameter SI.PerUnit Hv[min(Nw,Nv),Nv] = getH(Nv,Nw)
+        "Sums heat flows on fluid side onto coarser grid";
+       final parameter SI.PerUnit Hw[min(Nw,Nv),Nw] = getH(Nw,Nv)
+        "Sums heat flows on wall side onto coarser grid";
+       final parameter SI.PerUnit G[max(Nw,Nv), min(Nw,Nv)] = getH(max(Nw,Nv), min(Nw,Nv))
+        "Maps temperatures on coarser grid onto finer grid";
+
+       function getH
+         input Integer N1;
+         input Integer N2;
+         output SI.PerUnit H[min(N1,N2),N1];
+      protected
+          Integer D;
+       algorithm
+         assert(rem(N1,N2) == 0 or rem(N2,N1)==0,
+          "Please choose grids so that the number of wall volumes is a (sub)multiple of the fluid volumes");
+         H := zeros(min(N1,N2),N1);
+         D := div(N1,N2);
+         if N1 > min(N1,N2) then
+           for i in 1:N2 loop
+             for j in 1:D loop
+               H[i,N2*D+j] :=1;
+             end for;
+           end for;
+         else
+           H := identity(N1);
+         end if;
+       end getH;
+
     equation
-      for j in 1:Nw loop
+      Hv*Qv = Hw*Qw "Energy balance on coarser grid";
+      if Nw >= Nv then
+        Qw = omega*lw*gamma*(Tw - G*Tv)
+          "Convective heat transfer on finer grid";
+      else
+        Qv = omega*lv*gamma*(Tv - G*Tw)
+          "Convective heat transfer on finer grid";
+      end if;
+      for j in 1:Nv loop
          Tv[j] = (T[j] + T[j + 1])/2;
-         Qw[j] = (Tw[j] - Tv[j])*omega*l*gamma*Nt;
       end for;
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
