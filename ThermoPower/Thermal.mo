@@ -720,17 +720,13 @@ The swapping is performed if the counterCurrent parameter is true (default value
        parameter SI.CoefficientOfHeatTransfer gamma
         "Constant heat transfer coefficient";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-       SI.Power Q "Total heat flow through lateral boundary";
-
     equation
       assert(Nw ==  Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       for j in 1:Nw loop
          Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
-         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma*Nt;
+         Qw[j] = (Tw[j] - Tvol[j])*omega*l*gamma*Nt;
       end for;
-
-      Q = sum(wall.Q);
 
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
@@ -765,7 +761,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
        parameter SI.MassFlowRate wnom_ht = wnom
         "Nominal flow rate for heat transfer correlation (single tube)";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
-       SI.Power Q "Total heat flow through lateral boundary";
        SI.CoefficientOfHeatTransfer gamma(start = gamma_nom)
         "Actual heat transfer coefficient";
        SI.PerUnit w_wnom(start = 1, final unit = "1")
@@ -784,11 +779,8 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
       for j in 1:Nw loop
          Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
-         wall.Q[j] = (wall.T[j] - Tvol[j])*gamma*omega*l*Nt;
+         Qw[j] = (Tw[j] - Tvol[j])*gamma*omega*l*Nt;
       end for;
-
-      Q = sum(wall.Q);
-
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
@@ -820,7 +812,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
       Medium.ThermalConductivity k[Nf] "Thermal conductivity";
       Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
-      SI.Power Q "Total heat flow through lateral boundary";
 
     equation
       assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
@@ -841,11 +832,8 @@ The swapping is performed if the counterCurrent parameter is true (default value
       for j in 1:Nw loop
          Tvol[j]      = if useAverageTemperature then (T[j] + T[j + 1])/2       else T[j + 1];
          gamma_vol[j] = if useAverageTemperature then (gamma[j] + gamma[j+1])/2 else gamma[j+1];
-         wall.Q[j] = (wall.T[j] - Tvol[j])*omega*l*gamma_vol[j]*Nt;
+         Qw[j] = (Tw[j] - Tvol[j])*omega*l*gamma_vol[j]*Nt;
       end for;
-
-      Q = sum(wall.Q);
-
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
@@ -951,37 +939,37 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
       for j in 1:Nw loop
          if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then  // 1-phase liquid or vapour
-           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
+           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
            state[j] = 1;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
          elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then          // liquid --> 2-phase
-           wall.Q[j] = alpha_l[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*((gamma1ph[j] + gamma_bubble)/2) +
-                       (1 - alpha_l[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = alpha_l[j]*      (Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*((gamma1ph[j] + gamma_bubble)/2) +
+                   (1 - alpha_l[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 2;
            alpha_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
            alpha_v[j] = 0;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
-           wall.Q[j] = (wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = (Tw[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 3;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                // 2-phase --> vapour
-           //wall.Q[j] = alpha_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alpha_v[j])*(wall.T[j] - Ts)*omega*l*gamma2ph;
-           wall.Q[j] = alpha_v[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_dew + gamma1ph[j+1])/2 +
-                       (1 - alpha_v[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           //Qw[j] = alpha_v[j]*(Tw[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alpha_v[j])*(Tw[j] - Ts)*omega*l*gamma2ph;
+           Qw[j] = alpha_v[j]*      (Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_dew + gamma1ph[j+1])/2 +
+                   (1 - alpha_v[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 4;
            alpha_l[j] = 0;
            alpha_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                // 2-phase --> liquid
-           wall.Q[j] = alpha_l[j]*(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_bubble + gamma1ph[j+1])/2 +
-                       (1 - alpha_l[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = alpha_l[j]*      (Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_bubble + gamma1ph[j+1])/2 +
+                   (1 - alpha_l[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 5;
            alpha_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
            alpha_v[j] = 0;
          else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then        // vapour --> 2-phase
-           wall.Q[j] = alpha_v[j]*(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*(gamma1ph[j] + gamma_dew)/2 +
-                       (1 - alpha_v[j])*(wall.T[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = alpha_v[j]*      (Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*(gamma1ph[j] + gamma_dew)/2 +
+                   (1 - alpha_v[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph;
            state[j] = 6;
            alpha_l[j] = 0;
            alpha_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
@@ -993,9 +981,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
            Tvolbar[j] = T[j + 1];
          end if;
       end for;
-
-      Q = sum(wall.Q);
-
        annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
                 100}}),
@@ -1043,8 +1028,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.Temperature Ts "Saturated water temperature";
       Medium.SaturationProperties sat "Properties of saturated fluid";
       Medium.AbsolutePressure p "Fluid pressure for property calculations";
-      SI.Power Q "Total heat flow through lateral boundary";
-
     equation
       assert(Nw == Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
@@ -1074,41 +1057,41 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
       for j in 1:Nw loop
          if noEvent(h[j] < hl and h[j + 1] < hl) then  // liquid
-           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*Nt*gamma_liq;
+           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*gamma_liq;
            state[j] = 0;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
          elseif noEvent(h[j] > hv and h[j + 1]> hv) then  // vapour
-           wall.Q[j] = (wall.T[j] - Tvolbar[j])*omega*l*Nt*gamma_vap;
+           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*gamma_vap;
            state[j] = 1;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
          elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
-           wall.Q[j] = alpha_l[j]      *(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_liq +
-                       (1 - alpha_l[j])*(wall.T[j] - Ts)           *omega*l*Nt*gamma_2ph;
+           Qw[j] = alpha_l[j]      *(Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_liq +
+                   (1 - alpha_l[j])*(Tw[j] - Ts)           *omega*l*Nt*gamma_2ph;
            state[j] = 2;
            alpha_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
            alpha_v[j] = 0;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then // 2-phase
-           wall.Q[j] = (wall.T[j] - Ts)*omega*l*Nt*gamma_2ph;
+           Qw[j] = (Tw[j] - Ts)*omega*l*Nt*gamma_2ph;
            state[j] = 3;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then // 2-phase --> vapour
-           wall.Q[j] = alpha_v[j]      *(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_vap +
-                       (1 - alpha_v[j])*(wall.T[j] - Ts)               *omega*l*Nt*gamma_2ph;
+           Qw[j] = alpha_v[j]      *(Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_vap +
+                   (1 - alpha_v[j])*(Tw[j] - Ts)               *omega*l*Nt*gamma_2ph;
            state[j] = 4;
            alpha_l[j] = 0;
            alpha_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then // 2-phase --> liquid
-           wall.Q[j] = alpha_l[j]      *(wall.T[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_liq +
-                       (1 - alpha_l[j])*(wall.T[j] - Ts)               *omega*l*Nt*gamma_2ph;
+           Qw[j] = alpha_l[j]      *(Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_liq +
+                   (1 - alpha_l[j])*(Tw[j] - Ts)               *omega*l*Nt*gamma_2ph;
            state[j] = 5;
            alpha_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
            alpha_v[j] = 0;
          else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then        // vapour --> 2-phase
-           wall.Q[j] = alpha_v[j]      *(wall.T[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_vap +
-                       (1 - alpha_v[j])*(wall.T[j] - Ts)           *omega*l*Nt*gamma_2ph;
+           Qw[j] = alpha_v[j]      *(Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_vap +
+                   (1 - alpha_v[j])*(Tw[j] - Ts)           *omega*l*Nt*gamma_2ph;
            state[j] = 6;
            alpha_l[j] = 0;
            alpha_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
@@ -1120,9 +1103,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
            Tvolbar[j] = T[j + 1];
          end if;
       end for;
-
-      Q = sum(wall.Q);
-
        annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
                 100}}),
@@ -1647,11 +1627,18 @@ This package contains models to compute the material properties needed to model 
       final parameter SI.Length l=L/(Nw) "Length of a single volume";
 
       Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
+      Medium.Temperature Tw[Nw] "Temperatures of the wall volumes";
+      SI.Power Qw[Nw] "Heat flows entering from the wall volumes";
+      SI.Power Q "Total heat flow through lateral boundary";
 
     equation
       for j in 1:Nf loop
         T[j] = Medium.temperature(fluidState[j]);
       end for;
+      Tw = wall.T;
+      Qw = wall.Q;
+      Q = sum(wall.Q);
+
     end DistributedHeatTransferFV;
 
     partial model HeatExchangerTopologyData
