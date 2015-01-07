@@ -5273,94 +5273,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 </html>"));
     end TestGasFlow1DFV_D;
 
-    model TestHeatTransfer2phDBa "Test case for HeatTransfer2phDB"
-      package Medium = Modelica.Media.Water.WaterIF97_ph;
-      parameter Integer Nnodes = 10;
-      parameter Medium.SpecificEnthalpy hstartin = 1e5;
-      Medium.SpecificEnthalpy hstartout = (1e5+0.001) + 3.4e6*time;
-      Medium.SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
-      parameter SI.Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
-      parameter Medium.AbsolutePressure p = 3e6;
-      parameter Medium.MassFlowRate wnom = 2;
-      parameter Medium.MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
-      Medium.ThermodynamicState fluidState[Nnodes];
 
-      Thermal.HeatTransferFV.HeatTransfer2phDB HeatTransfer(
-        Nf=Nnodes,
-        Nw=Nnodes - 1,
-        Nt=1,
-        A=Across,
-        Dhyd=0.06,
-        omega=0.188496,
-        L=10,
-        wnom=wnom,
-        redeclare package Medium = Medium,
-        fluidState=fluidState,
-        w=w,
-        gamma_b=30000)
-        annotation (Placement(transformation(extent={{-18,-40},{18,-10}})));
-      Thermal.TempSource1DFV TempSource(Nw=Nnodes - 1)
-        annotation (Placement(transformation(extent={{-14,0},{14,26}})));
-      Modelica.Blocks.Sources.Constant Temperature_const(k=873.15)
-                                                 annotation (Placement(
-            transformation(extent={{-62,56},{-42,76}},rotation=0)));
-    equation
-      connect(TempSource.wall, HeatTransfer.wall) annotation (Line(
-          points={{0,9.1},{0,-20.5}},
-          color={255,127,0},
-          smooth=Smooth.None));
-
-      for j in 1:Nnodes loop
-        fluidState[j] = Medium.setState_ph(p, h[j]);
-      end for;
-      connect(Temperature_const.y, TempSource.temperature) annotation (Line(
-          points={{-41,66},{0,66},{0,18.2}},
-          color={0,0,127},
-          smooth=Smooth.None));
-      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
-                -100},{100,100}}), graphics),
-        Diagram(graphics),
-        experiment(
-          StartTime=0.1,
-          __Dymola_NumberOfIntervals=10000,
-          Tolerance=1e-006),
-        Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the evaporation process, using water as a test medium.</p>
-<p>The wall temperature is fixed and uniform. The fluid enthalpy spatial distribution is linear: the inlet condition is subcooled fluid, while the outlet condition is progressively increased from subcooled to superheated. The ensuing heat flows do not show any discontinuity when the phase boundaries cross the volume boundaries.</p>
-<p>Simulation Interval = [0...1] sec </p>
-</html>", revisions="<html>
-<ul>
-    <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
-    First release.</li>
-</ul>
-</html>"),
-        __Dymola_experimentSetupOutput);
-    end TestHeatTransfer2phDBa;
-
-    model TestHeatTransfer2phDBb "Test case for HeatTransfer2phDB"
-      extends TestHeatTransfer2phDBa(
-        hstartin = 3.5e6,
-        hstartout = (3.5e6+0.001) - 3.4e6*time);
-
-      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
-                -100},{100,100}}), graphics),
-        Diagram(graphics),
-        experiment(
-          StartTime=0.1,
-          __Dymola_NumberOfIntervals=10000,
-          Tolerance=1e-006),
-        Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the condensation process, using water as a test medium.</p>
-<p>The wall temperature is fixed and uniform. The fluid enthalpy spatial distribution is linear: the inlet condition is subcooled fluid, while the outlet condition is progressively increased from subcooled to superheated. The ensuing heat flows do not show any discontinuity when the phase boundaries cross the volume boundaries.</p>
-<p>Simulation Interval = [0...1] sec </p>
-</html>", revisions="<html>
-<ul>
-    <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
-    First release.</li>
-</ul>
-</html>"),
-        __Dymola_experimentSetupOutput);
-    end TestHeatTransfer2phDBb;
 
     model TestFlow1DFV2ph
        package Medium = Modelica.Media.Water.WaterIF97_ph;
@@ -8595,6 +8508,95 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
 </ul>
 </html>"));
     end TestHeatTransfer2phDB;
+
+    model TestHeatTransfer2phDBa "Test case for HeatTransfer2phDB"
+      package Medium = Modelica.Media.Water.WaterIF97_ph;
+      parameter Integer Nnodes = 10;
+      parameter Medium.SpecificEnthalpy hstartin = 1e5;
+      Medium.SpecificEnthalpy hstartout = (1e5+0.001) + 3.4e6*time;
+      Medium.SpecificEnthalpy h[Nnodes] = linspace(hstartin,hstartout,Nnodes);
+      parameter SI.Area Across = 2.827e-3; // r = 0.03 [m] , A = pi*r^2
+      parameter Medium.AbsolutePressure p = 3e6;
+      parameter Medium.MassFlowRate wnom = 2;
+      parameter Medium.MassFlowRate w[Nnodes] = wnom*ones(Nnodes);
+      Medium.ThermodynamicState fluidState[Nnodes];
+
+      Thermal.HeatTransferFV.HeatTransfer2phDB HeatTransfer(
+        Nf=Nnodes,
+        Nw=Nnodes - 1,
+        Nt=1,
+        A=Across,
+        Dhyd=0.06,
+        omega=0.188496,
+        L=10,
+        wnom=wnom,
+        redeclare package Medium = Medium,
+        fluidState=fluidState,
+        w=w,
+        gamma_b=30000)
+        annotation (Placement(transformation(extent={{-18,-40},{18,-10}})));
+      Thermal.TempSource1DFV TempSource(Nw=Nnodes - 1)
+        annotation (Placement(transformation(extent={{-14,0},{14,26}})));
+      Modelica.Blocks.Sources.Constant Temperature_const(k=873.15)
+                                                 annotation (Placement(
+            transformation(extent={{-62,56},{-42,76}},rotation=0)));
+    equation
+      connect(TempSource.wall, HeatTransfer.wall) annotation (Line(
+          points={{0,9.1},{0,-20.5}},
+          color={255,127,0},
+          smooth=Smooth.None));
+
+      for j in 1:Nnodes loop
+        fluidState[j] = Medium.setState_ph(p, h[j]);
+      end for;
+      connect(Temperature_const.y, TempSource.temperature) annotation (Line(
+          points={{-41,66},{0,66},{0,18.2}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics),
+        Diagram(graphics),
+        experiment(
+          StartTime=0.1,
+          __Dymola_NumberOfIntervals=10000,
+          Tolerance=1e-006),
+        Documentation(info="<html>
+<p>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the evaporation process, using water as a test medium.</p>
+<p>The wall temperature is fixed and uniform. The fluid enthalpy spatial distribution is linear: the inlet condition is subcooled fluid, while the outlet condition is progressively increased from subcooled to superheated. The ensuing heat flows do not show any discontinuity when the phase boundaries cross the volume boundaries.</p>
+<p>Simulation Interval = [0...1] sec </p>
+</html>", revisions="<html>
+<ul>
+    <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
+    First release.</li>
+</ul>
+</html>"),
+        __Dymola_experimentSetupOutput);
+    end TestHeatTransfer2phDBa;
+
+    model TestHeatTransfer2phDBb "Test case for HeatTransfer2phDB"
+      extends TestHeatTransfer2phDBa(
+        hstartin = 3.5e6,
+        hstartout = (3.5e6+0.001) - 3.4e6*time);
+
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics),
+        Diagram(graphics),
+        experiment(
+          StartTime=0.1,
+          __Dymola_NumberOfIntervals=10000,
+          Tolerance=1e-006),
+        Documentation(info="<html>
+<p>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the condensation process, using water as a test medium.</p>
+<p>The wall temperature is fixed and uniform. The fluid enthalpy spatial distribution is linear: the inlet condition is subcooled fluid, while the outlet condition is progressively increased from subcooled to superheated. The ensuing heat flows do not show any discontinuity when the phase boundaries cross the volume boundaries.</p>
+<p>Simulation Interval = [0...1] sec </p>
+</html>", revisions="<html>
+<ul>
+    <li><i>3 May 2013</i> by <a href=\"mailto:stefanoboni@hotmail.it\">Stefano Boni</a>:<br>
+    First release.</li>
+</ul>
+</html>"),
+        __Dymola_experimentSetupOutput);
+    end TestHeatTransfer2phDBb;
 
     model TestFlowDependentHeatTransferCoefficient2ph
       "Test of two-phase heat transfer components"
