@@ -1178,6 +1178,139 @@ The swapping is performed if the counterCurrent parameter is true (default value
     end FlowDependentHeatTransferCoefficient2ph;
   end HeatTransferFV;
 
+  package HeatTransferFEM "Heat transfer models for FEM components"
+    model IdealHeatTransfer
+      "Delta T across the boundary layer is zero (infinite h.t.c.)"
+      extends BaseClasses.DistributedHeatTransferFEM;
+    equation
+      assert(Nw ==  Nf, "Number of nodes Nw on wall side should be equal to number of nodes on the fluid side Nf");
+
+      T = Tw "Ideal infinite heat transfer";
+    end IdealHeatTransfer;
+
+    model ConstantHeatTransferCoefficient "Constant heat transfer coefficient"
+      extends BaseClasses.DistributedHeatTransferFEM;
+
+      parameter SI.CoefficientOfHeatTransfer gamma
+        "Constant heat transfer coefficient";
+    equation
+      assert(Nw ==  Nf, "Number of nodes Nw on wall side should be equal to number of nodes on the fluid side Nf");
+
+      for j in 1:Nw loop
+         phi_w[j] = (Tw[j] - T[j])*gamma;
+      end for;
+
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantHeatTransferCoefficient;
+
+
+    model ConstantThermalConductance
+      "Constant global thermal conductance (UA value)"
+      extends ConstantHeatTransferCoefficient(
+        final gamma = UA/(omega*L*Nt));
+
+      parameter SI.ThermalConductance UA
+        "Global thermal conductance (UA value), for Nt tubes";
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end ConstantThermalConductance;
+
+    model FlowDependentHeatTransferCoefficient
+      "Flow-dependent h.t.c. gamma = gamma_nom*(w/wnom)^alpha"
+      extends BaseClasses.DistributedHeatTransferFEM;
+
+       parameter SI.CoefficientOfHeatTransfer gamma_nom
+        "Nominal heat transfer coefficient";
+       parameter SI.PerUnit alpha "Exponent in the flow-dependency law";
+       parameter SI.PerUnit beta = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is not reduced";
+       parameter SI.MassFlowRate wnom_ht = wnom
+        "Nominal flow rate for heat transfer correlation (single tube)";
+       SI.CoefficientOfHeatTransfer gamma(start = gamma_nom)
+        "Actual heat transfer coefficient";
+       SI.PerUnit w_wnom(start = 1, final unit = "1")
+        "Ratio between actual and nominal flow rate";
+       SI.PerUnit w_wnom_reg
+        "Regularized ratio between actual and nominal flow rate";
+    equation
+      assert(Nw ==  Nf, "Number of nodes Nw on wall side should be equal to number of nodes on the fluid side Nf");
+
+      // Computation of actual heat transfer coefficient with smooth lower saturation to avoid numerical singularities at low flows
+      w_wnom = abs(w[1])/wnom_ht
+        "Inlet flow rate used for the computation of the h.t.c.";
+      w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2);
+      gamma = homotopy(gamma_nom*w_wnom_reg^alpha,
+                       gamma_nom);
+
+      for j in 1:Nw loop
+         phi_w[j] = (Tw[j] - T[j])*gamma;
+      end for;
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end FlowDependentHeatTransferCoefficient;
+
+    model FlowDependentThermalConductance
+      "Flow-dependent global thermal conductance UA = UAnom*(w/wnom)^alpha"
+      extends FlowDependentHeatTransferCoefficient(
+        final gamma_nom = UAnom/(omega*L*Nt));
+       parameter SI.ThermalConductance UAnom
+        "Nominal global thermal conductance (UA value), for Nt tubes";
+      SI.ThermalConductance UA = gamma*omega*L*Nt;
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end FlowDependentThermalConductance;
+
+    model DittusBoelter "Dittus-Boelter heat transfer correlation"
+      extends BaseClasses.DistributedHeatTransferFEM;
+      SI.CoefficientOfHeatTransfer gamma[Nf]
+        "Heat transfer coefficients at the nodes";
+      Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
+      Medium.ThermalConductivity k[Nf] "Thermal conductivity";
+      Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+
+    equation
+      assert(Nw ==  Nf, "Number of nodes Nw on wall side should be equal to number of nodes on the fluid side Nf");
+
+      // Fluid properties and heat transfer coefficients at the nodes
+      for j in 1:Nf loop
+        mu[j] = Medium.dynamicViscosity(fluidState[j]);
+        k[j] = Medium.thermalConductivity(fluidState[j]);
+        cp[j] = Medium.heatCapacity_cp(fluidState[j]);
+        gamma[j] = Water.f_dittus_boelter(
+          w[j],
+          Dhyd,
+          A,
+          mu[j],
+          k[j],
+          cp[j]);
+      end for;
+
+      for j in 1:Nw loop
+         phi_w[j] = (Tw[j] - T[j])*gamma[j];
+      end for;
+      annotation (
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
+                100,100}}),
+                graphics),
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+    end DittusBoelter;
+
+
+  end HeatTransferFEM;
+
   package MaterialProperties "Thermal and mechanical properties of materials"
     package Interfaces
       "This package provides interfaces for material property models"
@@ -1708,6 +1841,53 @@ This package contains models to compute the material properties needed to model 
       Q = sum(wall.Q);
 
     end DistributedHeatTransferFV;
+
+    partial model DistributedHeatTransferFEM
+      "Base class for distributed heat transfer models - finite elements"
+      extends ThermoPower.Icons.HeatFlow;
+      input Medium.ThermodynamicState fluidState[Nf];
+      input Medium.MassFlowRate w[Nf];
+      ThermoPower.Thermal.DHTNodes wall(final N=Nw) annotation (Placement(transformation(extent={{-40,20},{40,
+                40}}, rotation=0)));
+      // The medium model and the following parameters will be set by the Flow1D
+      // models at instantiation not by end users
+      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+        "Medium model"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter Integer Nw = Nf "Number of nodes on the wall side"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter Integer Nt(min=1) "Number of tubes in parallel"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.Distance L "Tube length"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.Area A "Cross-sectional area (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.Length omega
+        "Wet perimeter of heat transfer surface (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.Length Dhyd "Hydraulic Diameter (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)"
+        annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
+      final parameter SI.Length l=L/(Nw) "Length of a single volume";
+
+      Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
+      Medium.Temperature Tw[Nw] "Temperatures of the wall volumes";
+      SI.HeatFlux phi_w[Nw] "Heat fluxes entering from the wall connector";
+      SI.HeatFlux phi_f[Nf] = phi_w "Heat fluxes going to the fluid nodes";
+      // SI.Power Q "Total heat flow through lateral boundary";
+
+    equation
+      for j in 1:Nf loop
+        T[j] = Medium.temperature(fluidState[j]);
+      end for;
+      Tw = wall.T;
+      phi_w = wall.phi;
+      // Q = sum(wall.Q);
+
+    end DistributedHeatTransferFEM;
 
     partial model HeatExchangerTopologyData
       "Base class for heat exchanger topology data"
