@@ -2072,22 +2072,42 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
   model Flow1DFEM2ph
     "1-dimensional fluid flow model for water/steam (finite elements)"
-    import Modelica.Math.*;
-    import ThermoPower.Choices.Flow1D.FFtypes;
-    import ThermoPower.Choices.Flow1D.HCtypes;
-    extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
-          StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
-    replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
+    extends BaseClasses.Flow1DBase(
+      Nw = N,
+      redeclare replaceable package Medium = StandardWater
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium
+        "Medium model");
+      replaceable model HeatTransfer =
+        Thermal.HeatTransferFEM.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFEM
+      annotation (choicesAllMatching=true);
+    HeatTransfer heatTransfer(
+      redeclare package Medium = Medium,
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final omega=omega,
+      final wnom=wnom/Nt,
+      final w=w,
+      final fluidState=fluidState) "Instantiated heat transfer model";
+
+    ThermoPower.Thermal.DHTNodes wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
+
+    import ThermoPower.Choices.Flow1D.FFtypes;
+    import ThermoPower.Choices.Flow1D.HCtypes;
+
     parameter Real alpha(
       min=0,
       max=2) = 1 "Numerical stabilization coefficient";
     parameter Real ML(
       min=0,
       max=1) = 0.2 "Mass Lumping Coefficient";
-    constant Real g=Modelica.Constants.g_n;
+    constant SI.Acceleration g = Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
       "The number of nodes is even";
     constant SI.Pressure pzero=10 "Small deltap for calculations";
@@ -2267,9 +2287,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     //  (Ts,rhol,rhov,hl,hv,drl_dp,drv_dp,drl_dh,drv_dh,dhl,dhv,drl,drv) =
     //  propsat_p_2der(noEvent(min(p, pc - pzero)));
 
-    sat.psat = p;
-    sat.Tsat = Medium.saturationTemperature(p);
-    Ts = sat.Tsat;
+    sat = Medium.setSat_p(p);
+    Ts = Medium.saturationTemperature_sat(sat);
     bubble = Medium.setBubbleState(sat);
     dew = Medium.setDewState(sat);
     rhol = Medium.bubbleDensity(sat);
@@ -2306,14 +2325,11 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       x[j] = noEvent(min(max((h[j] - hl)/(hv - hl), 0), 1));
     end for;
 
-    //Wall energy flux and  temperature
-    T = wall.T;
-    phi = wall.phi;
-
     //Boundary Values
-
     h[1] = infl.h_outflow;
     h[N] = outfl.h_outflow;
+    phi = heatTransfer.phi_f;
+    connect(wall, heatTransfer.wall);
 
     alpha_sgn = alpha*sign(infl.m_flow - outfl.m_flow);
 
