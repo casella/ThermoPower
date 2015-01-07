@@ -1642,7 +1642,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       min=0,
       max=1) = 0 "Mass Lumping Coefficient";
     parameter SI.PerUnit wnf_bc=0.01
-      "Fraction of the nominal total mass flow rate for FEM regularization";
+      "Fraction of the nominal total mass flow rate for boundary condition FEM regularization";
+    parameter SI.PerUnit wnf_alpha = 0.01
+      "Fraction of the nominal total mass flow rate for stabilization parameter regularization";
     parameter Boolean regularizeBoundaryConditions = false
       "Regularize boundary condition matrices";
     parameter Boolean idealGasDensityDistribution = false
@@ -1684,7 +1686,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real C[N, N];
     Real K[N, N];
 
-    Real alpha_sgn;
+    Real alpha_sgn[N];
 
     Real YY[N, N];
 
@@ -1784,7 +1786,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     // Boundary values of heat flux
     phi = heatTransfer.phi_f;
 
-    alpha_sgn = alpha*sign(infl.m_flow - outfl.m_flow);
+    // Stabilization parameters depending of flow direction
+    for i in 1:N loop
+      alpha_sgn[i] = alpha*tanh(w[i]/(wnf_alpha*wnom/Nt));
+    end for;
 
     for i in 1:N - 1 loop
       if idealGasDensityDistribution then
@@ -1805,24 +1810,25 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end for;
 
     // Energy equation FEM matrices
-    Y[1, 1] = rho[1]*((-l/12)*(2*alpha_sgn - 3)) + rho[2]*((-l/12)*(alpha_sgn
-       - 1));
-    Y[1, 2] = rho[1]*((-l/12)*(alpha_sgn - 1)) + rho[2]*((-l/12)*(2*alpha_sgn
-       - 1));
-    Y[N, N] = rho[N - 1]*((l/12)*(alpha_sgn + 1)) + rho[N]*((l/12)*(2*alpha_sgn
-       + 3));
-    Y[N, N - 1] = rho[N - 1]*((l/12)*(2*alpha_sgn + 1)) + rho[N]*((l/12)*(
-      alpha_sgn + 1));
+    Y[1, 1] =   rho[1]*  (l/12)*(3 - 2*alpha_sgn[1]) +
+                rho[2]*  (l/12)*(1 - alpha_sgn[1]);
+    Y[1, 2] =   rho[1]*  (l/12)*(1 - alpha_sgn[1]) +
+                rho[2]*  (l/12)*(1 - 2*alpha_sgn[1]);
+    Y[N, N-1] = rho[N-1]*(l/12)*(1 + 2*alpha_sgn[N]) +
+                rho[N]*  (l/12)*(1 + alpha_sgn[N]);
+    Y[N, N] =   rho[N-1]*(l/12)*(1 + alpha_sgn[N]) +
+                rho[N]*  (l/12)*(3 + 2*alpha_sgn[N]);
     if N > 2 then
       for i in 2:N - 1 loop
-        Y[i, i - 1] = rho[i - 1]*((l/12)*(2*alpha_sgn + 1)) + rho[i]*((l/12)*(
-          alpha_sgn + 1));
-        Y[i, i] = rho[i - 1]*((l/12)*(alpha_sgn + 1)) + rho[i]*(l/2) + rho[i +
-          1]*(-(l/12)*(alpha_sgn - 1));
-        Y[i, i + 1] = rho[i]*((-l/12)*(alpha_sgn - 1)) + rho[i + 1]*((-l/12)*(2
-          *alpha_sgn - 1));
-        Y[1, i + 1] = 0;
-        Y[N, i - 1] = 0;
+        Y[i, i-1] = rho[i-1]*(l/12)*(1 + 2*alpha_sgn[i]) +
+                    rho[i]*  (l/12)*(1 + alpha_sgn[i]);
+        Y[i, i]   = rho[i-1]*(l/12)*(1 + alpha_sgn[i]) +
+                    rho[i]*  (l/12)*6 +
+                    rho[i+1]*(l/12)*(1 - alpha_sgn[i]);
+        Y[i, i+1] = rho[i]*  (l/12)*(1 - alpha_sgn[i]) +
+                    rho[i+1]*(l/12)*(1 - 2*alpha_sgn[i]);
+        Y[1, i+1] = 0;
+        Y[N, i-1] = 0;
         for j in 1:(i - 2) loop
           Y[i, j] = 0;
         end for;
@@ -1838,17 +1844,17 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end for;
     end for;
 
-    M[1, 1] = l/3 - l*alpha_sgn/4;
-    M[N, N] = l/3 + l*alpha_sgn/4;
-    M[1, 2] = l/6 - l*alpha_sgn/4;
-    M[N, (N - 1)] = l/6 + l*alpha_sgn/4;
+    M[1, 1]   = (4 - 3*alpha_sgn[1])*l/12;
+    M[1, 2]   = (2 - 3*alpha_sgn[1])*l/12;
+    M[N, N-1] = (2 + 3*alpha_sgn[N])*l/12;
+    M[N, N]   = (4 + 3*alpha_sgn[N])*l/12;
     if N > 2 then
       for i in 2:N - 1 loop
-        M[i, i - 1] = l/6 + l*alpha_sgn/4;
-        M[i, i] = 2*l/3;
-        M[i, i + 1] = l/6 - l*alpha_sgn/4;
-        M[1, i + 1] = 0;
-        M[N, i - 1] = 0;
+        M[i, i-1] = (2 + 3*alpha_sgn[i])*l/12;
+        M[i, i]   = 8*l/12;
+        M[i, i+1] = (2 - 3*alpha_sgn[i])*l/12;
+        M[1, i+1] = 0;
+        M[N, i-1] = 0;
         for j in 1:(i - 2) loop
           M[i, j] = 0;
         end for;
@@ -1858,18 +1864,18 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end for;
     end if;
 
-    B[1, 1] = (-1/3 + alpha_sgn/4)*w[1] + (-1/6 + alpha_sgn/4)*w[2];
-    B[1, 2] = (1/3 - alpha_sgn/4)*w[1] + (1/6 - alpha_sgn/4)*w[2];
-    B[N, N] = (1/6 + alpha_sgn/4)*w[N - 1] + (1/3 + alpha_sgn/4)*w[N];
-    B[N, N - 1] = (-1/(6) - alpha_sgn/4)*w[N - 1] + (-1/3 - alpha_sgn/4)*w[N];
+    B[1, 1] =   (w[1]*   (3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12;
+    B[1, 2] =   (w[1]*   (4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12;
+    B[N, N] =   (w[N-1]* (2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12;
+    B[N, N-1] = (-w[N-1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12;
     if N > 2 then
       for i in 2:N - 1 loop
-        B[i, i - 1] = (-1/6 - alpha_sgn/4)*w[i - 1] + (-1/3 - alpha_sgn/4)*w[i];
-        B[i, i] = (1/6 + alpha_sgn/4)*w[i - 1] + (alpha_sgn/2)*w[i] + (-1/6 +
-          alpha_sgn/4)*w[i + 1];
-        B[i, i + 1] = (1/3 - alpha_sgn/4)*w[i] + (1/6 - alpha_sgn/4)*w[i + 1];
-        B[1, i + 1] = 0;
-        B[N, i - 1] = 0;
+        B[i, i-1] = (-w[i-1]*(2 + 3*alpha_sgn[i])  - w[i]*(4 + 3*alpha_sgn[i]))/12;
+        B[i, i]   = (w[i-1] *(2 + 3* alpha_sgn[i]) + w[i]*6*alpha_sgn[i] +
+                     w[i+1] *(3*alpha_sgn[i] - 2))/12;
+        B[i, i+1] = (w[i]*(4 - 3*alpha_sgn[i]) + w[i+1]*(2 - 3*alpha_sgn[i]))/12;
+        B[1, i+1] = 0;
+        B[N, i-1] = 0;
         for j in 1:(i - 2) loop
           B[i, j] = 0;
         end for;
@@ -1882,8 +1888,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     if Medium.singleState then
       G = zeros(N) "No influence of pressure";
     else
-      G[1] = l/2*(1 - alpha_sgn);
-      G[N] = l/2*(1 + alpha_sgn);
+      G[1] = l/2*(1 - alpha_sgn[1]);
+      G[N] = l/2*(1 + alpha_sgn[1]);
       if N > 2 then
         for i in 2:N - 1 loop
           G[i] = l;
@@ -1895,17 +1901,17 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     if regularizeBoundaryConditions then
       C[1, 1] = Functions.stepReg(
         infl.m_flow - wnom*wnf_bc,
-        (1 - alpha_sgn/2)*w[1],
+        (1 - alpha_sgn[1]/2)*w[1],
         0,
         wnom*wnf_bc);
       C[N, N] = Functions.stepReg(
         outfl.m_flow - wnom*wnf_bc,
-        -(1 + alpha_sgn/2)*w[N],
+        -(1 + alpha_sgn[N]/2)*w[N],
         0,
         wnom*wnf_bc);
     else
-      C[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*w[1] else 0);
-      C[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*w[N] else 0);
+      C[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*w[1] else 0);
+      C[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*w[N] else 0);
     end if;
     C[N, 1] = 0;
     C[1, N] = 0;
@@ -1922,17 +1928,17 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     if regularizeBoundaryConditions then
       K[1, 1] = Functions.stepReg(
         infl.m_flow - wnom*wnf_bc,
-        (1 - alpha_sgn/2)*inStream(infl.h_outflow),
+        (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow),
         0,
         wnom*wnf_bc);
       K[N, N] = Functions.stepReg(
         outfl.m_flow - wnom*wnf_bc,
-        -(1 + alpha_sgn/2)*inStream(outfl.h_outflow),
+        -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow),
         0,
         wnom*wnf_bc);
     else
-      K[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0);
-      K[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 0);
+      K[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow) else 0);
+      K[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow) else 0);
     end if;
     K[N, 1] = 0;
     K[1, N] = 0;
