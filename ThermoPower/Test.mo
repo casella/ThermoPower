@@ -5633,7 +5633,7 @@ Algorithm Tolerance = 1e-6
 </html>"));
     end TestFlow1DSlowFast;
 
-    model TestFlow1DfemA "Test case for Flow1Dfem"
+    model TestFlow1DFEMA "Test case for Flow1DFEM"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
@@ -5678,7 +5678,7 @@ Algorithm Tolerance = 1e-6
             transformation(extent={{64,-10},{84,10}}, rotation=0)));
       ThermoPower.Water.ValveLin Valve(Kv=3e-6) annotation (Placement(
             transformation(extent={{12,-10},{32,10}}, rotation=0)));
-      Water.Flow1Dfem hex(
+      Water.Flow1DFEM hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -5697,7 +5697,7 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-48,-6},{-28,14}},
               rotation=0)));
-      ThermoPower.Thermal.HeatSource1D HeatSource1D1(
+      Thermal.HeatSource1DFEM          HeatSource1D1(
         N=Nnodes,
         L=Lhex,
         omega=omegahex) annotation (Placement(transformation(extent={{-20,22},{
@@ -5772,13 +5772,17 @@ Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
+</ul>
+<ul>
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
-    end TestFlow1DfemA;
+    end TestFlow1DFEMA;
 
-    model TestFlow1DfemB "Test case for Flow1Dfem"
+    model TestFlow1DFEMB "Test case for Flow1DFEM"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
@@ -5800,7 +5804,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.Pressure phex=3e5;
       // initial inlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
-      Water.Flow1Dfem hex(
+      Water.Flow1DFEM hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -5815,11 +5819,14 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=10000)
+        dpnom=10000,
+        redeclare model HeatTransfer =
+            ThermoPower.Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient
+            (gamma=400))
         annotation (Placement(transformation(extent={{-20,-10},{0,10}},
               rotation=0)));
-      ThermoPower.Thermal.TempSource1D TempSource(N=Nnodes) annotation (
-          Placement(transformation(extent={{-20,30},{0,50}}, rotation=0)));
+      Thermal.TempSource1DFEM          TempSource(N=Nnodes) annotation (
+          Placement(transformation(extent={{-20,10},{0,30}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin1(Kv=2*whex/phex) annotation (
           Placement(transformation(extent={{10,-10},{30,10}}, rotation=0)));
       ThermoPower.Water.SourceMassFlow
@@ -5834,13 +5841,12 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Step Temperature(
         height=10,
         offset=297,
-        startTime=20) annotation (Placement(transformation(extent={{-50,50},{-30,
-                70}}, rotation=0)));
+        startTime=20) annotation (Placement(transformation(extent={{-50,30},{
+                -30,50}},
+                      rotation=0)));
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
             transformation(extent={{-10,70},{10,90}}, rotation=0)));
-      ThermoPower.Thermal.ConvHT ConvEx(N=Nnodes, gamma=400) annotation (
-          Placement(transformation(extent={{-20,10},{0,30}}, rotation=0)));
       ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
@@ -5854,10 +5860,6 @@ Algorithm Tolerance = 1e-6
           points={{0,0},{10,0}},
           thickness=0.5,
           color={0,0,255}));
-      connect(ConvEx.side1, TempSource.wall)
-        annotation (Line(points={{-10,23},{-10,37}}, color={255,127,0}));
-      connect(hex.wall, ConvEx.side2)
-        annotation (Line(points={{-10,5},{-10,16.9}}, color={255,127,0}));
       connect(T_in.inlet, FluidSource.flange) annotation (Line(
           points={{-46,0},{-60,0}},
           thickness=0.5,
@@ -5874,12 +5876,18 @@ Algorithm Tolerance = 1e-6
           points={{56,0},{70,0}},
           thickness=0.5,
           color={0,0,255}));
-      connect(Temperature.y, TempSource.temperature) annotation (Line(points={{
-              -29,60},{-10,60},{-10,44}}, color={0,0,127}));
+      connect(Temperature.y, TempSource.temperature) annotation (Line(points={{-29,40},
+              {-10,40},{-10,24}},         color={0,0,127}));
       connect(Constant1.y, ValveLin1.cmd)
         annotation (Line(points={{11,80},{20,80},{20,8}}, color={0,0,127}));
+      connect(TempSource.wall, hex.wall) annotation (Line(
+          points={{-10,17},{-10,5}},
+          color={255,127,0},
+          smooth=Smooth.None));
       annotation (
-        Diagram(graphics),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}),
+                graphics),
         experiment(StopTime=200, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method). <br>
@@ -5898,13 +5906,17 @@ Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
+</ul>
+<ul>
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
-    end TestFlow1DfemB;
+    end TestFlow1DFEMB;
 
-    model TestFlow1DfemC "Test case for Flow1Dfem"
+    model TestFlow1DFEMC "Test case for Flow1Dfem"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
@@ -5926,7 +5938,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.Pressure phex=1e5;
       // initial specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy hs=1e5;
-      Water.Flow1Dfem hex(
+      Water.Flow1DFEM hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -5968,13 +5980,6 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
             transformation(extent={{10,50},{30,70}}, rotation=0)));
-      ThermoPower.Thermal.HeatSource1D HeatSource1D1(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (Placement(transformation(extent={{-20,20},{
-                0,40}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant2(k=0) annotation (Placement(
-            transformation(extent={{-40,40},{-20,60}}, rotation=0)));
       ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
@@ -5988,8 +5993,6 @@ Algorithm Tolerance = 1e-6
           points={{60,0},{70,0}},
           color={0,0,255},
           thickness=0.5));
-      connect(HeatSource1D1.wall, hex.wall)
-        annotation (Line(points={{-10,27},{-10,5}}, color={255,127,0}));
       connect(SourceW1.flange, T_in.inlet) annotation (Line(
           points={{-58,0},{-46,0}},
           color={0,0,255},
@@ -6008,8 +6011,6 @@ Algorithm Tolerance = 1e-6
           thickness=0.5));
       connect(Ramp1.y, SourceW1.in_w0)
         annotation (Line(points={{-79,36},{-72,36},{-72,6}}, color={0,0,127}));
-      connect(Constant2.y, HeatSource1D1.power) annotation (Line(points={{-19,
-              50},{-10,50},{-10,34}}, color={0,0,127}));
       connect(Constant1.y, ValveLin1.cmd)
         annotation (Line(points={{31,60},{50,60},{50,8}}, color={0,0,127}));
       annotation (
@@ -6033,13 +6034,17 @@ Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
+</ul>
+<ul>
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
-    end TestFlow1DfemC;
+    end TestFlow1DFEMC;
 
-    model TestFlow1DfemD "Test case for Flow1Dfem"
+    model TestFlow1DFEMD "Test case for Flow1DFEM"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
@@ -6061,7 +6066,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.Pressure phex=0.2e5;
       // initial specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy hs=3e6;
-      Water.Flow1Dfem hex(
+      Water.Flow1DFEM hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -6085,9 +6090,10 @@ Algorithm Tolerance = 1e-6
           Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
       ThermoPower.Water.SinkPressure
                               FluidSink(
-        p0=0,
         R=100,
-        h=3e6) annotation (Placement(transformation(extent={{76,-10},{96,10}},
+        h=3e6,
+        p0=5000)
+               annotation (Placement(transformation(extent={{76,-10},{96,10}},
               rotation=0)));
       ThermoPower.Water.ValveLin ValveLin1(Kv=1e-7) annotation (Placement(
             transformation(extent={{40,-10},{60,10}}, rotation=0)));
@@ -6099,13 +6105,6 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
             transformation(extent={{20,40},{40,60}}, rotation=0)));
-      ThermoPower.Thermal.HeatSource1D HeatSource1D1(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (Placement(transformation(extent={{-20,20},{
-                0,40}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant ExtPower(k=0) annotation (Placement(
-            transformation(extent={{-50,40},{-30,60}}, rotation=0)));
       Water.SensP SensP annotation (Placement(transformation(extent={{12,4},{32,
                 24}}, rotation=0)));
       inner System system
@@ -6123,14 +6122,10 @@ Algorithm Tolerance = 1e-6
           points={{-40,0},{-20,0}},
           color={0,0,255},
           thickness=0.5));
-      connect(HeatSource1D1.wall, hex.wall)
-        annotation (Line(points={{-10,27},{-10,5}}, color={255,127,0}));
       connect(SensP.flange, ValveLin1.inlet)
         annotation (Line(points={{22,10},{40,10},{40,0}}));
       connect(MassFlowRateStep.y, MassFlowRateSource.in_w0)
         annotation (Line(points={{-65,30},{-54,30},{-54,6}}, color={0,0,127}));
-      connect(ExtPower.y, HeatSource1D1.power) annotation (Line(points={{-29,50},
-              {-10,50},{-10,34}}, color={0,0,127}));
       connect(Constant1.y, ValveLin1.cmd)
         annotation (Line(points={{41,50},{50,50},{50,8}}, color={0,0,127}));
       annotation (
@@ -6152,13 +6147,17 @@ Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
+</ul>
+<ul>
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
 </html>"));
-    end TestFlow1DfemD;
+    end TestFlow1DFEMD;
 
-    model TestFlow1DfemE "Test case for Flow1Dfem"
+    model TestFlow1DFEME "Test case for Flow1DFEM"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=21;
@@ -6182,7 +6181,7 @@ Algorithm Tolerance = 1e-6
       parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
-      Water.Flow1Dfem hexA(
+      Water.Flow1DFEM hexA(
         redeclare package Medium = Medium,
         N=Nnodes,
         Nt=1,
@@ -6215,7 +6214,7 @@ Algorithm Tolerance = 1e-6
             transformation(extent={{20,-50},{40,-30}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{-30,40},{-50,60}}, rotation=0)));
-      Water.Flow1Dfem hexB(
+      Water.Flow1DFEM hexB(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -6229,7 +6228,10 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=10000)
+        dpnom=10000,
+        redeclare model HeatTransfer =
+            ThermoPower.Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient
+            (gamma=400))
         annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation=
                0)));
       ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = Medium)
@@ -6252,16 +6254,15 @@ Algorithm Tolerance = 1e-6
       ThermoPower.Water.SourceMassFlow
                                 SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
          Placement(transformation(extent={{60,40},{40,60}}, rotation=0)));
-      ThermoPower.Thermal.ConvHT ConvExCF(N=Nnodes, gamma=400) annotation (
-          Placement(transformation(extent={{-20,-16},{0,4}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{46,-46},{66,-26}},
               rotation=0)));
       ThermoPower.Water.SensT SensT_B_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-54,44},{-74,64}},
               rotation=0)));
-      Thermal.CounterCurrent CounterCurrent1(N=Nnodes) annotation (Placement(
-            transformation(extent={{-20,10},{0,30}}, rotation=0)));
+      Thermal.CounterCurrentFEM
+                             CounterCurrent1(N=Nnodes) annotation (Placement(
+            transformation(extent={{-20,-10},{0,10}},rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -6305,20 +6306,23 @@ Algorithm Tolerance = 1e-6
           points={{-58,50},{-50,50}},
           color={0,0,255},
           thickness=0.5));
-      connect(ConvExCF.side2, hexA.wall)
-        annotation (Line(points={{-10,-9.1},{-10,-35}}, color={255,127,0}));
       connect(hexB.wall, CounterCurrent1.side1)
-        annotation (Line(points={{-10,45},{-10,23}}, color={255,127,0}));
-      connect(CounterCurrent1.side2, ConvExCF.side1)
-        annotation (Line(points={{-10,16.9},{-10,-3}}, color={255,127,0}));
+        annotation (Line(points={{-10,45},{-10,26},{-10,3}},
+                                                     color={255,127,0}));
       connect(SideA_InSpecEnth.y, SideA_MassFlowRate.in_h) annotation (Line(
             points={{-73,-10},{-64,-10},{-64,-34}}, color={0,0,127}));
       connect(Constant1.y, ValveLin2.cmd) annotation (Line(points={{-49,80},{-40,
               80},{-40,58}}, color={0,0,127}));
       connect(Constant2.y, ValveLin1.cmd) annotation (Line(points={{25,-10},{30,
               -10},{30,-32}}, color={0,0,127}));
+      connect(CounterCurrent1.side2, hexA.wall) annotation (Line(
+          points={{-10,-3.1},{-10,-35}},
+          color={255,127,0},
+          smooth=Smooth.None));
       annotation (
-        Diagram(graphics),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}),
+                graphics),
         experiment(StopTime=900, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
@@ -6338,6 +6342,8 @@ Algorithm Tolerance = 1e-6
 </p>
 </HTML>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
 <li><i>20 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
@@ -6346,10 +6352,11 @@ Casella</a>:<br>
     First release.</li>
 </ul>
 
-</html>"));
-    end TestFlow1DfemE;
+</html>
+"));
+    end TestFlow1DFEME;
 
-    model TestFlow1DfemF "Test case for Flow1Dfem"
+    model TestFlow1DFEMF "Test case for Flow1DFEM"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
@@ -6373,7 +6380,7 @@ Casella</a>:<br>
       parameter Modelica.SIunits.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
-      Water.Flow1Dfem hexA(
+      Water.Flow1DFEM hexA(
         redeclare package Medium = Medium,
         N=Nnodes,
         Nt=1,
@@ -6388,13 +6395,12 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=10000)
+        dpnom=10000,
+        redeclare model HeatTransfer =
+            ThermoPower.Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient
+            (gamma=400))
         annotation (Placement(transformation(extent={{-20,-60},{0,-40}},
               rotation=0)));
-      ThermoPower.Thermal.ConvHT ConvHTc1(N=Nnodes, gamma=400) annotation (
-          Placement(transformation(extent={{-20,18},{0,38}}, rotation=0)));
-      ThermoPower.Thermal.ConvHT ConvHTe1(N=Nnodes, gamma=400) annotation (
-          Placement(transformation(extent={{-20,-36},{0,-16}}, rotation=0)));
       ThermoPower.Water.SinkPressure
                               SideA_FluidSink annotation (Placement(
             transformation(extent={{70,-60},{90,-40}}, rotation=0)));
@@ -6410,7 +6416,7 @@ Casella</a>:<br>
             transformation(extent={{20,-60},{40,-40}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{-30,40},{-50,60}}, rotation=0)));
-      Water.Flow1Dfem hexB(
+      Water.Flow1DFEM hexB(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -6424,10 +6430,13 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=10000)
+        dpnom=10000,
+        redeclare model HeatTransfer =
+            ThermoPower.Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient
+            (gamma=400))
         annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation=
                0)));
-      ThermoPower.Thermal.MetalTube MetalWall(
+      Thermal.MetalTubeFEM          MetalWall(
         N=Nnodes,
         L=Lhex,
         lambda=20,
@@ -6464,8 +6473,9 @@ Casella</a>:<br>
       ThermoPower.Water.SensT SensT_B_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-54,44},{-74,64}},
               rotation=0)));
-      Thermal.CounterCurrent CounterCurrent1(N=Nnodes) annotation (Placement(
-            transformation(extent={{-20,0},{0,20}}, rotation=0)));
+      Thermal.CounterCurrentFEM
+                             CounterCurrent1(N=Nnodes) annotation (Placement(
+            transformation(extent={{-20,24},{0,44}},rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -6485,10 +6495,6 @@ Casella</a>:<br>
           points={{-30,50},{-20,50}},
           color={0,0,255},
           thickness=0.5));
-      connect(ConvHTc1.side1, hexB.wall)
-        annotation (Line(points={{-10,31},{-10,45}}, color={255,127,0}));
-      connect(hexA.wall, ConvHTe1.side2)
-        annotation (Line(points={{-10,-45},{-10,-29.1}}, color={255,127,0}));
       connect(SensT_B_in.outlet, hexB.infl) annotation (Line(
           points={{14,50},{0,50}},
           color={0,0,255},
@@ -6497,8 +6503,6 @@ Casella</a>:<br>
           points={{40,50},{26,50}},
           color={0,0,255},
           thickness=0.5));
-      connect(MetalWall.int, ConvHTe1.side1)
-        annotation (Line(points={{-10,-13},{-10,-23}}, color={255,127,0}));
       connect(SensT_A_out.inlet, ValveLin1.outlet) annotation (Line(
           points={{50,-50},{40,-50}},
           color={0,0,255},
@@ -6515,18 +6519,27 @@ Casella</a>:<br>
           points={{-58,50},{-50,50}},
           color={0,0,255},
           thickness=0.5));
-      connect(ConvHTc1.side2, CounterCurrent1.side1)
-        annotation (Line(points={{-10,24.9},{-10,13}}, color={255,127,0}));
       connect(CounterCurrent1.side2, MetalWall.ext)
-        annotation (Line(points={{-10,6.9},{-10,-6.9}}, color={255,127,0}));
+        annotation (Line(points={{-10,30.9},{-10,10},{-10,-6.9}},
+                                                        color={255,127,0}));
       connect(SideA_InSpecEnth.y, SideA_MassFlowRate.in_h) annotation (Line(
             points={{-75,-24},{-68,-24},{-68,-44}}, color={0,0,127}));
       connect(Constant2.y, ValveLin1.cmd) annotation (Line(points={{25,-30},{30,
               -30},{30,-42}}, color={0,0,127}));
       connect(Constant1.y, ValveLin2.cmd) annotation (Line(points={{-49,80},{-40,
               80},{-40,58}}, color={0,0,127}));
+      connect(hexB.wall, CounterCurrent1.side1) annotation (Line(
+          points={{-10,45},{-10,37}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(MetalWall.int, hexA.wall) annotation (Line(
+          points={{-10,-13},{-10,-45}},
+          color={255,127,0},
+          smooth=Smooth.None));
       annotation (
-        Diagram(graphics),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}),
+                graphics),
         experiment(StopTime=900, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
@@ -6542,6 +6555,8 @@ Integration Algorithm = DASSL <br>
 Algorithm Tolerance = 1e-6
 </HTML>", revisions="<html>
 <ul>
+<li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
 <li><i>20 Dec 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
 Casella</a>:<br>
@@ -6551,7 +6566,7 @@ Casella</a>:<br>
 </ul>
 
 </html>"));
-    end TestFlow1DfemF;
+    end TestFlow1DFEMF;
 
     model TestFlow1D2phA "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
