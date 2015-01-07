@@ -1156,7 +1156,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     connect(wall,heatTransfer.wall);
 
-    Q = sum(heatTransfer.wall.Q) "Total heat flow through lateral boundary";
+    Q = heatTransfer.Q "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Fluid mass (single tube)";
     Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
@@ -1523,7 +1523,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     connect(wall,heatTransfer.wall);
 
-    Q = sum(heatTransfer.wall.Q) "Total heat flow through lateral boundary";
+    Q = heatTransfer.Q "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Fluid mass (single tube)";
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
