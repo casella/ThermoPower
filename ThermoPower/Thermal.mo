@@ -214,6 +214,75 @@ package Thermal "Thermal models of heat transfer"
             textString="%name")}));
   end TempSource1DlinFV;
 
+  model TempSource1DFEM "Distributed Temperature Source for FEM models"
+    extends Icons.HeatFlow;
+    parameter Integer N=2 "Number of nodes";
+    Thermal.DHTNodes wall(N=N) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput temperature annotation (Placement(
+          transformation(
+          origin={0,40},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    for i in 1:N loop
+      wall.T[i] = temperature;
+    end for;
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-100,-46},{100,-70}},
+            lineColor={191,95,0},
+            textString="%name")}),
+      Documentation(info="<HTML>
+<p>Model of an ideal 1D uniform temperature source. The actual temperature is provided by the <tt>temperature</tt> signal connector.
+</HTML>", revisions="<html>
+<ul>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
+  end TempSource1DFEM;
+
+  model TempSource1DlinFEM
+    "Linearly Distributed Temperature Source for FEM models"
+    extends Icons.HeatFlow;
+    parameter Integer N=2 "Number of nodes";
+    Thermal.DHTNodes wall(N=N) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput temperature_node1 annotation (
+        Placement(transformation(
+          origin={-40,30},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+    Modelica.Blocks.Interfaces.RealInput temperature_nodeN annotation (
+        Placement(transformation(
+          origin={40,28},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    wall.T = linspace(
+        temperature_node1,
+        temperature_nodeN,
+        N);
+    annotation (
+      Documentation(info="<HTML>
+<p>Model of an ideal 1D temperature source with a linear distribution. The values of the temperature at the two ends of the source are provided by the <tt>temperature_node1</tt> and <tt>temperature_nodeN</tt> signal connectors.
+</HTML>", revisions="<html>
+<ul>
+<li><i>10 Jan 2004</i>
+    by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"),   Icon(graphics={Text(
+            extent={{-100,-46},{100,-72}},
+            lineColor={191,95,0},
+            textString="%name")}));
+  end TempSource1DlinFEM;
+
   model HeatSource1DFV "Distributed Heat Flow Source for Finite Volume models"
     extends Icons.HeatFlow;
     parameter Integer Nw = 1 "Number of volumes on the wall port";
@@ -245,6 +314,41 @@ package Thermal "Thermal models of heat transfer"
 </html>
 "));
   end HeatSource1DFV;
+
+  model HeatSource1DFEM "Distributed Heat Flow Source for FEM models"
+    extends Icons.HeatFlow;
+    parameter Integer N=2 "Number of nodes";
+    parameter Integer Nt=1 "Number of tubes";
+    parameter SI.Length L "Source length";
+    parameter SI.Length omega "Source perimeter (single tube)";
+    Thermal.DHTNodes wall(N=N) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput power annotation (Placement(
+          transformation(
+          origin={0,40},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    for i in 1:N loop
+      wall.phi[i] = -power/(omega*L*Nt);
+    end for;
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-100,-44},{100,-68}},
+            lineColor={191,95,0},
+            textString="%name")}),
+      Documentation(info="<HTML>
+<p>Model of an ideal tubular heat flow source, with uniform heat flux. The actual heating power is provided by the <tt>power</tt> signal connector.
+</HTML>", revisions="<html>
+<ul>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
+  end HeatSource1DFEM;
 
   model MetalTubeFV "Cylindrical metal tube model with Nw finite volumes"
     extends Icons.MetalWall;
