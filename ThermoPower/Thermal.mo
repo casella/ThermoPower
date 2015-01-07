@@ -705,7 +705,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
     model IdealHeatTransfer
       "Delta T across the boundary layer is zero (infinite h.t.c.)"
       extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature=false);
-       Medium.Temperature T[Nf] "Fluid temperature";
     equation
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
