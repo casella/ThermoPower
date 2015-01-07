@@ -5084,7 +5084,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 
     model TestWaterFlow1DFV_A_Fast "Test case for Flow1DFV"
        extends TestWaterFlow1DFV_A(
-         redeclare package Medium=
+         redeclare package Medium =
             Modelica.Media.CompressibleLiquids.LinearWater_pT_Ambient);
       // package Medium = Media.LiquidWaterConstant;
     annotation (
@@ -5272,10 +5272,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 <p>Same as <code>TestGasFlow1D_B</code>, but with QuasiStatic = true; the model is purely algebraic (no mass and energy storage). </p>
 </html>"));
     end TestGasFlow1DFV_D;
-
-
-
-
 
     model TestWaterFlow1DFEM_A "Test case for Flow1DFEM"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
@@ -7264,8 +7260,8 @@ Algorithm Tolerance = 1e-9
         __Dymola_experimentSetupOutput(equdistant=false));
     end TestWaterFlow1DFV2ph_D;
 
-    model CheckFlow1D2phMassBalance
-      "Checks Flow1D2ph equations for mass conservation"
+    model CheckFlow1DFV2phMassBalance
+      "Checks Flow1DFV2ph equations for mass conservation"
       package Medium = ThermoPower.Water.StandardWater;
       package SmoothMedium = Medium (final smoothModel=true);
       parameter Integer N=2;
@@ -7457,10 +7453,10 @@ Algorithm Tolerance = 1e-9
           __Dymola_NumberOfIntervals=5000,
           Tolerance=1e-009),
         Documentation(info="<html>
-This model checks the dynamic mass balance equations of Flow1D2ph, by prescribing enthalpy and pressure values that will ensure complete coverage of the different cases.
+This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescribing enthalpy and pressure values that will ensure complete coverage of the different cases.
 </html>"),
         __Dymola_experimentSetupOutput);
-    end CheckFlow1D2phMassBalance;
+    end CheckFlow1DFV2phMassBalance;
 
     model TestFlow1D2phDB "Test case for Flow1D2phDB"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
@@ -8272,83 +8268,6 @@ Casella</a>:<br>
 </ul>
 </html>"));
     end Flow1D_check;
-
-    model TestEvaporatorTemp
-      extends Water.BaseClasses.EvaporatorBase(
-        redeclare package Medium = Modelica.Media.Water.StandardWater,
-        L=30,
-        A=1e-4,
-        omega=1e-2,
-        Dhyd=1e-3,
-        wnom=0.1,
-        FFtype=0,
-        pstartin=10e5,
-        hstartin=8e5,
-        hstartout=2.9e6,
-        csilstart=0.2*L,
-        csivstart=0.8*L);
-      SI.Temperature Text "External temperature";
-      parameter Real K(fixed=false, start=1.2e3);
-    equation
-      Text = 700 - 2*min(max(time - 1, 0), 70) + 2*min(max(time - 300, 0), 70);
-      Ql = K*(Text - fluid_in.T)*csil/L*(1 - min(max(time - 100, 0), 160)/200
-         + min(max(time - 400, 0), 200)/200);
-      Qb = K*(Text - sat.Tsat)*(csiv - csil)/L*(1 - min(max(time - 100, 0), 160)
-        /200 + min(max(time - 400, 0), 200)/200);
-      Qv = K*(Text - fluid_out.T)*(L - csiv)/L*(1 - min(max(time - 100, 0), 160)
-        /200 + min(max(time - 400, 0), 200)/200);
-      hin = 8e5;
-      win = 0.1;
-      wout = 0.1/60e5*p;
-    initial equation
-      der(csil) = 0;
-      der(csiv) = 0;
-      der(hout) = 0;
-      hout = 2.9e6;
-      der(p) = 0;
-      annotation (
-        experiment(
-          __Dymola_NumberOfIntervals=1000,
-          Tolerance=1e-008),
-        Documentation(info="<html>
-The moving boundary evaporator model is still incomplete, and it fails at t = 245.
-</html>"),
-        __Dymola_experimentSetupOutput);
-    end TestEvaporatorTemp;
-
-    model TestEvaporatorFlux
-      extends Water.BaseClasses.EvaporatorBase(
-        redeclare package Medium = Modelica.Media.Water.StandardWater,
-        L=30,
-        A=1e-4,
-        omega=1e-2,
-        Dhyd=1e-3,
-        wnom=0.1,
-        FFtype=0,
-        pstartin=10e5,
-        hstartin=4e5,
-        hstartout=4e5,
-        csilstart=0,
-        csivstart=0);
-    equation
-      Ql = 2.5e5*csil/L*min(max(time - 10, 0), 100);
-      Qb = 2.5e5*(csiv - csil)/L*min(max(time - 10, 0), 100);
-      Qv = 2.5e5*(L - csiv)/L*min(max(time - 10, 0), 100);
-      hin = 4e5;
-      win = 0.1;
-      wout = 0.1/10e5*p;
-    initial equation
-      csil = L;
-      csiv = L;
-      hout = 4e5;
-      der(p) = 0;
-      annotation (
-        Documentation(info="<html>
-The moving boundary evaporator model is still incomplete, and it fails at t = 12.
-</html>"));
-    end TestEvaporatorFlux;
-
-
 
 
 
@@ -9480,6 +9399,80 @@ Algorithm Tolerance = 1e-6
 </ul>
 </html>"));
       end TestFlow1DDB;
+
+      model TestEvaporatorTemp
+        extends Water.BaseClasses.EvaporatorBase(
+          redeclare package Medium = Modelica.Media.Water.StandardWater,
+          L=30,
+          A=1e-4,
+          omega=1e-2,
+          Dhyd=1e-3,
+          wnom=0.1,
+          FFtype=0,
+          pstartin=10e5,
+          hstartin=8e5,
+          hstartout=2.9e6,
+          csilstart=0.2*L,
+          csivstart=0.8*L);
+        SI.Temperature Text "External temperature";
+        parameter Real K(fixed=false, start=1.2e3);
+      equation
+        Text = 700 - 2*min(max(time - 1, 0), 70) + 2*min(max(time - 300, 0), 70);
+        Ql = K*(Text - fluid_in.T)*csil/L*(1 - min(max(time - 100, 0), 160)/200
+           + min(max(time - 400, 0), 200)/200);
+        Qb = K*(Text - sat.Tsat)*(csiv - csil)/L*(1 - min(max(time - 100, 0), 160)
+          /200 + min(max(time - 400, 0), 200)/200);
+        Qv = K*(Text - fluid_out.T)*(L - csiv)/L*(1 - min(max(time - 100, 0), 160)
+          /200 + min(max(time - 400, 0), 200)/200);
+        hin = 8e5;
+        win = 0.1;
+        wout = 0.1/60e5*p;
+      initial equation
+        der(csil) = 0;
+        der(csiv) = 0;
+        der(hout) = 0;
+        hout = 2.9e6;
+        der(p) = 0;
+        annotation (
+          experiment(
+            __Dymola_NumberOfIntervals=1000,
+            Tolerance=1e-008),
+          Documentation(info="<html>
+The moving boundary evaporator model is still incomplete, and it fails at t = 245.
+</html>"),__Dymola_experimentSetupOutput);
+      end TestEvaporatorTemp;
+
+      model TestEvaporatorFlux
+        extends Water.BaseClasses.EvaporatorBase(
+          redeclare package Medium = Modelica.Media.Water.StandardWater,
+          L=30,
+          A=1e-4,
+          omega=1e-2,
+          Dhyd=1e-3,
+          wnom=0.1,
+          FFtype=0,
+          pstartin=10e5,
+          hstartin=4e5,
+          hstartout=4e5,
+          csilstart=0,
+          csivstart=0);
+      equation
+        Ql = 2.5e5*csil/L*min(max(time - 10, 0), 100);
+        Qb = 2.5e5*(csiv - csil)/L*min(max(time - 10, 0), 100);
+        Qv = 2.5e5*(L - csiv)/L*min(max(time - 10, 0), 100);
+        hin = 4e5;
+        win = 0.1;
+        wout = 0.1/10e5*p;
+      initial equation
+        csil = L;
+        csiv = L;
+        hout = 4e5;
+        der(p) = 0;
+        annotation (
+          Documentation(info="<html>
+The moving boundary evaporator model is still incomplete, and it fails at t = 12.
+</html>"));
+      end TestEvaporatorFlux;
     end OldTests;
   end DistributedParameterComponents;
 
