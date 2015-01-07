@@ -912,7 +912,7 @@ package Gas "Models of components with ideal gases as working fluid"
     SI.Time Tr "Residence time";
     SI.Mass M "Gas Mass (single tube)";
     SI.Mass Mtot "Gas Mass (total)";
-    Real Q "Total heat flow through the wall (all Nt tubes)";
+    SI.Power Q "Total heat flow through the wall (all Nt tubes)";
   protected
     parameter SI.Length l=L/(N - 1) "Length of a single volume";
     Medium.Density rhobar[N - 1] "Fluid average density";
@@ -1027,7 +1027,7 @@ package Gas "Models of components with ideal gases as working fluid"
         cvbar[j] = 0;
       end if;
     end for;
-    Q = Nt*sum(Q_single) "Total heat flow through the lateral boundary";
+    Q = heatTransfer.Q "Total heat flow through the lateral boundary";
     if Medium.fixedX then
       Xtilde = fill(Medium.reference_X, 1);
     elseif QuasiStatic then
