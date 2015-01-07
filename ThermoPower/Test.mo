@@ -4229,7 +4229,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     "Tests for thermo-hydraulic distributed parameter components"
 
     model TestWaterFlow1DFV_A "Test case for Water.Flow1DFV"
-      package Medium = Modelica.Media.Water.WaterIF97_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97_ph;
       parameter Integer Nnodes=20 "Number of nodes";
       parameter Modelica.SIunits.Length Lhex=10 "Total length";
       parameter Modelica.SIunits.Diameter Dihex=0.02 "Internal diameter";
@@ -4257,13 +4257,15 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         h=hinhex,
         w0=whex,
         use_in_w0=true,
-        use_in_h=true)
+        use_in_h=true,
+        redeclare package Medium = Medium)
                  annotation (Placement(transformation(extent={{-78,-10},{-58,10}},
               rotation=0)));
-      ThermoPower.Water.SinkPressure fluidSink(p0=phex/2)
-                                                    annotation (Placement(
+      ThermoPower.Water.SinkPressure fluidSink(p0=phex/2, redeclare package
+          Medium = Medium)                          annotation (Placement(
             transformation(extent={{70,-10},{90,10}}, rotation=0)));
-      ThermoPower.Water.ValveLin valve(Kv=3e-6) annotation (Placement(
+      ThermoPower.Water.ValveLin valve(Kv=3e-6, redeclare package Medium =
+            Medium)                             annotation (Placement(
             transformation(extent={{10,-10},{30,10}}, rotation=0)));
       Water.Flow1DFV
                    hex(
@@ -4277,11 +4279,12 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         DynamicMomentum=false,
         hstartin=hinhex,
         hstartout=houthex,
-        redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         pstart=phex,
-        dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
+        dpnom=1000,
+        redeclare package Medium = Medium)
+                    annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
       ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
@@ -5079,6 +5082,23 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 </html>"));
     end TestWaterFlow1DFV_DB;
 
+    model TestWaterFlow1DFV_A_Fast "Test case for Flow1DFV"
+       extends TestWaterFlow1DFV_A(
+         redeclare package Medium=
+            Modelica.Media.CompressibleLiquids.LinearWater_pT_Ambient);
+      // package Medium = Media.LiquidWaterConstant;
+    annotation (
+        Diagram(graphics),
+        experiment(StopTime=80, Tolerance=1e-006),
+        Documentation(info="<html>
+<p>Same as TestWaterFllow1DFV_A with simpler medium model.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>First release.</li>
+</ul>
+</html>"));
+    end TestWaterFlow1DFV_A_Fast;
+
     model TestGasFlow1DFV_A "Test case for Gas.Flow1DFV"
       replaceable package Medium = Modelica.Media.IdealGases.SingleGases.N2
         constrainedby Modelica.Media.Interfaces.PartialMedium;
@@ -5480,158 +5500,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         __Dymola_experimentSetupOutput);
     end TestFlow1DFV2ph;
 
-    model TestFlow1DSlowFast "Test case for Flow1D"
-      package Medium=Modelica.Media.Water.WaterIF97OnePhase_ph;
-      // package Medium = Media.LiquidWaterConstant;
-
-      // number of Nodes
-      parameter Integer Nnodes=20;
-      // total length
-      parameter SI.Length Lhex=10;
-      // internal diameter
-      parameter SI.Diameter Dihex=0.02;
-      // internal radius
-      parameter SI.Radius rhex=Dihex/2;
-      // internal perimeter
-      parameter SI.Length omegahex=Modelica.Constants.pi*Dihex;
-      // internal cross section
-      parameter SI.Area Ahex=Modelica.Constants.pi*rhex^2;
-      // friction coefficient
-      parameter Real Cfhex=0.005;
-      // nominal (and initial) mass flow rate
-      parameter SI.MassFlowRate whex=0.31;
-      // initial pressure
-      parameter SI.Pressure phex=2e5;
-      // initial inlet specific enthalpy
-      parameter SI.SpecificEnthalpy hinhex=1e5;
-      // initial outlet specific enthalpy
-      parameter SI.SpecificEnthalpy houthex=1e5;
-
-      //height of enthalpy step
-      parameter SI.SpecificEnthalpy deltah=41800;
-
-      //height of power step
-      parameter SI.EnergyFlowRate W=41800*whex;
-
-      // transport time delay
-      SI.Time tau;
-      ThermoPower.Water.SourceMassFlow
-                                Fluid_Source(
-        p0=phex,
-        h=hinhex,
-        w0=whex,
-        redeclare package Medium = Medium,
-        use_in_w0=true,
-        use_in_h=true)                     annotation (Placement(transformation(
-              extent={{-76,-10},{-56,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
-                              Fluid_Sink(p0=phex/2, redeclare package Medium =
-            Medium) annotation (Placement(transformation(extent={{70,-10},{90,
-                10}}, rotation=0)));
-      ThermoPower.Water.ValveLin Valve(Kv=3e-6, redeclare package Medium =
-            Medium) annotation (Placement(transformation(extent={{10,-10},{30,
-                10}}, rotation=0)));
-      Water.Flow1D hex(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex,
-        Dhyd=Dihex,
-        A=Ahex,
-        wnom=whex,
-        DynamicMomentum=false,
-        hstartin=hinhex,
-        hstartout=houthex,
-        redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
-          Placement(transformation(extent={{-20,-10},{0,10}}, rotation=0)));
-      ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
-              rotation=0)));
-      ThermoPower.Thermal.HeatSource1D HeatSource1D1(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (Placement(transformation(extent={{-20,22},{
-                0,42}}, rotation=0)));
-      Modelica.Blocks.Sources.Step MassFlowRate(
-        height=-0.02,
-        offset=whex,
-        startTime=50) annotation (Placement(transformation(extent={{-100,20},{-80,
-                40}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1(k=1)
-                                                 annotation (Placement(
-            transformation(extent={{-10,70},{10,90}}, rotation=0)));
-      Modelica.Blocks.Sources.Step InSpecEnthalpy(
-        height=deltah,
-        offset=hinhex,
-        startTime=1) annotation (Placement(transformation(extent={{-90,50},{-70,
-                70}}, rotation=0)));
-      Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation (
-         Placement(transformation(extent={{-40,50},{-20,70}}, rotation=0)));
-      ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
-               0)));
-      inner System system
-        annotation (Placement(transformation(extent={{80,80},{100,100}})));
-    equation
-      tau = sum(hex.rho)/Nnodes*Lhex*Ahex/whex;
-      connect(hex.outfl, Valve.inlet) annotation (Line(
-          points={{0,0},{10,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(T_in.outlet, hex.infl) annotation (Line(
-          points={{-34,0},{-20,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(Fluid_Source.flange, T_in.inlet) annotation (Line(
-          points={{-56,0},{-46,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(HeatSource1D1.wall, hex.wall)
-        annotation (Line(points={{-10,29},{-10,5}}, color={255,127,0}));
-      connect(T_out.outlet, Fluid_Sink.flange) annotation (Line(
-          points={{56,0},{70,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(Valve.outlet, T_out.inlet) annotation (Line(
-          points={{30,0},{44,0}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(MassFlowRate.y, Fluid_Source.in_w0)
-        annotation (Line(points={{-79,30},{-70,30},{-70,6}}, color={0,0,127}));
-      connect(InSpecEnthalpy.y, Fluid_Source.in_h)
-        annotation (Line(points={{-69,60},{-62,60},{-62,6}}, color={0,0,127}));
-      connect(ExtPower.y, HeatSource1D1.power) annotation (Line(points={{-19,60},
-              {-10,60},{-10,36}}, color={0,0,127}));
-      connect(Constant1.y, Valve.cmd)
-        annotation (Line(points={{11,80},{20,80},{20,8}}, color={0,0,127}));
-      annotation (
-        Diagram(graphics),
-        experiment(StopTime=80, Tolerance=1e-006),
-        Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>Flow1D</tt> (fluid side of a heat exchanger, finite volumes).<br>
-This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<p>
-Different media models can be employed; incompressible medium models avoid fast pressure states.<p>
-During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
-<ul>
-    <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
-    <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
-    <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
-</ul>
-<p>
-Simulation Interval = [0...80] sec <br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</p>
-</HTML>", revisions="<html>
-<ul>
-    <li><i>24 Sep 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-    Adapted to multiple media models.
-    <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
-    First release.</li>
-</ul>
-</html>"));
-    end TestFlow1DSlowFast;
 
     model TestFlow1DFEM_A "Test case for Flow1DFEM"
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
