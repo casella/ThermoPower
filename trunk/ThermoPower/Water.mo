@@ -1612,8 +1612,23 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
   model Flow1DFEM
     "1-dimensional fluid flow model for water/steam (finite elements)"
-    extends BaseClasses.Flow1DBase;
-    replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
+    extends BaseClasses.Flow1DBase(Nw = N);
+    replaceable model HeatTransfer = Thermal.HeatTransferFEM.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFEM
+      annotation (choicesAllMatching=true);
+    HeatTransfer heatTransfer(
+      redeclare package Medium = Medium,
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final omega=omega,
+      final wnom=wnom/Nt,
+      final w=w,
+      final fluidState=fluidState) "Instantiated heat transfer model";
+    ThermoPower.Thermal.DHTNodes wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
     import ThermoPower.Choices.Flow1D.FFtypes;
@@ -1648,7 +1663,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     SI.Pressure Dpstat "Pressure drop due to static head";
     Medium.MassFlowRate w[N](each start=wnom/Nt) "Mass flowrate (single tube)";
     SI.Velocity u[N] "Fluid velocity";
-    SI.HeatFlux phi[N] "External heat flux";
+    SI.HeatFlux phi[N] "Heat flux entering the fluid";
     Medium.Temperature T[N] "Fluid temperature";
     Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
     Medium.Density rho[N] "Fluid density";
@@ -1762,13 +1777,12 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       u[j] = w[j]/(rho[j]*A);
     end for;
 
-    //Wall energy flux and  temperature
-    T = wall.T;
-    phi = wall.phi;
-
     //Boundary Values of outflowing fluid enthalpies
     h[1] = infl.h_outflow;
     h[N] = outfl.h_outflow;
+
+    // Boundary values of heat flux
+    phi = heatTransfer.phi_f;
 
     alpha_sgn = alpha*sign(infl.m_flow - outfl.m_flow);
 
@@ -1970,6 +1984,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     else
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
+
+    connect(wall,heatTransfer.wall);
 
     Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
     Mtot = Nt*D*rho*A "Total mass of fluid";
