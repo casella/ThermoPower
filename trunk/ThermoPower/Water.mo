@@ -1612,7 +1612,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
   model Flow1DFEM
     "1-dimensional fluid flow model for water/steam (finite elements)"
-
     extends BaseClasses.Flow1DBase;
     replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -1629,6 +1628,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       max=1) = 0 "Mass Lumping Coefficient";
     parameter SI.PerUnit wnf_bc=0.01
       "Fraction of the nominal total mass flow rate for FEM regularization";
+    parameter Boolean regularizeBoundaryConditions = false
+      "Regularize boundary condition matrices";
+    parameter Boolean idealGasDensityDistribution = false
+      "Assume ideal-gas-type density distributions for mass balances";
     constant SI.Acceleration g=Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
       "The number of nodes is even";
@@ -1654,6 +1657,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
+    Real dvdt[N] "Time derivatives of specific volume";
 
     Real Y[N, N];
     Real M[N, N];
@@ -1753,6 +1757,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       drdp[j] = if Medium.singleState then 0 else Medium.density_derp_h(
         fluidState[j]);
       drdh[j] = Medium.density_derh_p(fluidState[j]);
+      dvdt[j] = -1/rho[j]^2*(drdp[j]*der(p) + drdh[j]*der(h[j]));
       v[j] = 1/rho[j];
       u[j] = w[j]/(rho[j]*A);
     end for;
@@ -1768,9 +1773,21 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     alpha_sgn = alpha*sign(infl.m_flow - outfl.m_flow);
 
     for i in 1:N - 1 loop
-      (w[i + 1] - w[i]) = -A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[
-        i])*(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i + 1])))
-        "Mass balance equations";
+      if idealGasDensityDistribution then
+        (w[i + 1] - w[i]) = noEvent(
+          if abs((v[i+1]-v[i])/v[i]) < 1e-7 then
+             2*A*l/(v[i]+v[i+1])^2*(dvdt[i]+dvdt[i+1])
+          else
+             -A*l/(v[i+1]-v[i])*(
+              (dvdt[i+1]*v[i]-dvdt[i]*v[i+1])/(v[i+1]*v[i]) -
+              (dvdt[i+1]-dvdt[i])/(v[i+1]-v[i])*log(v[i+1]/v[i])))
+          "Mass balance equations";
+      else
+      (w[i + 1] - w[i]) = -A*l*(
+        der(p)*1/2*(drdp[i + 1] + drdp[i]) +
+        1/6*(der(h[i])*(2*drdh[i] + drdh[i + 1]) +
+             der(h[i + 1])*(drdh[i] + 2*drdh[i + 1]))) "Mass balance equations";
+      end if;
     end for;
 
     // Energy equation FEM matrices
@@ -1861,19 +1878,21 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     // boundary condition matrices
-    // step change is regularized, no negative undershoot
-    C[1, 1] = Functions.stepReg(
+    if regularizeBoundaryConditions then
+      C[1, 1] = Functions.stepReg(
         infl.m_flow - wnom*wnf_bc,
         (1 - alpha_sgn/2)*w[1],
         0,
         wnom*wnf_bc);
-    C[N, N] = Functions.stepReg(
+      C[N, N] = Functions.stepReg(
         outfl.m_flow - wnom*wnf_bc,
         -(1 + alpha_sgn/2)*w[N],
         0,
         wnom*wnf_bc);
-    //  C[1, 1] = if infl.m_flow >= 0 then (1 - alpha_sgn/2)*w[1] else 0;
-    //  C[N, N] = if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*w[N] else 0;
+    else
+      C[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*w[1] else 0);
+      C[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*w[N] else 0);
+    end if;
     C[N, 1] = 0;
     C[1, N] = 0;
     if (N > 2) then
@@ -1886,18 +1905,21 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end for;
     end if;
 
-    K[1, 1] = Functions.stepReg(
+    if regularizeBoundaryConditions then
+      K[1, 1] = Functions.stepReg(
         infl.m_flow - wnom*wnf_bc,
         (1 - alpha_sgn/2)*inStream(infl.h_outflow),
         0,
         wnom*wnf_bc);
-    K[N, N] = Functions.stepReg(
+      K[N, N] = Functions.stepReg(
         outfl.m_flow - wnom*wnf_bc,
         -(1 + alpha_sgn/2)*inStream(outfl.h_outflow),
         0,
         wnom*wnf_bc);
-    //  K[1, 1] = if infl.m_flow >= 0 then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0;
-    //  K[N, N] = if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 0;
+    else
+      K[1, 1] = noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn/2)*inStream(infl.h_outflow) else 0);
+      K[N, N] = noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn/2)*inStream(outfl.h_outflow) else 0);
+    end if;
     K[N, 1] = 0;
     K[1, N] = 0;
     if (N > 2) then
