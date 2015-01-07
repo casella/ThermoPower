@@ -6542,6 +6542,8 @@ Casella</a>:<br>
 <p>At time t = 0, the two pressures start to increase, so that the fluid is compressed into the pipe. Since the configuration is symmetric, there is a forward flow in the left half of the pipe and a backward flow on the right half of the pipe. The parameter wout is an analytical estimate of the flow rate going out each end of the pipe, which is in a good agreement with the actual solution.</p>
 </html>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
     <li><i>23 Aug 2011</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     First release.</li>
 </ul>
@@ -6549,7 +6551,7 @@ Casella</a>:<br>
         __Dymola_experimentSetupOutput(doublePrecision=true, equdistant=false));
     end TestWaterFlow1DFEM_J;
 
-    model TestFlow1DFV2ph
+    model TestWaterFlow1DFV2ph
        package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -6685,9 +6687,9 @@ Casella</a>:<br>
           __Dymola_NumberOfIntervals=5000,
           Tolerance=1e-008),
         __Dymola_experimentSetupOutput);
-    end TestFlow1DFV2ph;
+    end TestWaterFlow1DFV2ph;
 
-    model TestFlow1D2phA "Test case for Flow1D2ph"
+    model TestWaterFlow1DFV2ph_A "Test case for Flow1DFV2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -6710,7 +6712,8 @@ Casella</a>:<br>
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Water.Flow1D2ph hex(
+      Water.Flow1DFV2ph
+                      hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -6730,10 +6733,8 @@ Casella</a>:<br>
       ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.4/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
                 -10}}, rotation=0)));
-      ThermoPower.Thermal.HeatSource1D heatSource(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (Placement(transformation(extent={{-20,0},{0,
+      Thermal.HeatSource1DFV           heatSource(Nw=Nnodes - 1)
+                        annotation (Placement(transformation(extent={{-20,0},{0,
                 20}}, rotation=0)));
       ThermoPower.Water.SinkPressure
                               Sink(redeclare package Medium = Medium, p0=100000)
@@ -6809,23 +6810,19 @@ Casella</a>:<br>
           StopTime=250,
           __Dymola_NumberOfIntervals=2000,
           Tolerance=1e-009),
-        Documentation(info="<HTML>
-<p>The model is designed to test the component  <tt>Flow1D2ph</tt> when used as an evaporator.<br>
-This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water.<br>
-During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant:
+        Documentation(info="<html>
+<p>The model is designed to test the component <code>Flow1D2ph</code> when used as an evaporator.</p><p>This model represent the fluid side of a once-through boiler with an applied external heat flow. The operating fluid is water.</p><p>During the simulation, the inlet specific enthalpy and heat flux are changed, while maintaining the inlet flowrate constant: </p>
 <ul>
-    <li>t=0 s. The initial state of the water is subcooled liquid.
-    <li>t=10 s. Ramp increase of the applied heat flow. The water starts boiling and is blown out of the outlet, whose pressure and flowrate undergo a transient increase. At the end of the transient the outlet fluid is in superheated vapour state.</li>
-    <li>t=100 s. Step increase of the inlet enthalpy</li>
-    <li>t=150 s. The heat flow is brought back to zero. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li>
+<li>t=0 s. The initial state of the water is subcooled liquid. </li>
+<li>t=10 s. Ramp increase of the applied heat flow. The water starts boiling and is blown out of the outlet, whose pressure and flowrate undergo a transient increase. At the end of the transient the outlet fluid is in superheated vapour state. </li>
+<li>t=100 s. Step increase of the inlet enthalpy </li>
+<li>t=150 s. The heat flow is brought back to zero. The vapour collapses, causing a suddend decrease in the outlet pressure and flowrate, until the liquid fills again the entire boiler. At that instant, the flowrate rises again rapidly to the inlet values.</li>
 </ul>
-<p>
-Simulation Interval = [0...250] sec <br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-9
-</p>
-</HTML>", revisions="<html>
+<p>Simulation Interval = [0...250] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-9</p>
+</html>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
     <li><i>26 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Parameters updated.</li>
     <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -6835,9 +6832,9 @@ Algorithm Tolerance = 1e-9
 </ul>
 </html>"),
         __Dymola_experimentSetupOutput(equdistant=false));
-    end TestFlow1D2phA;
+    end TestWaterFlow1DFV2ph_A;
 
-    model TestFlow1D2phB "Test case for Flow1D2ph"
+    model TestWaterFlow1DFV2ph_B "Test case for Flow1DFV2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -6860,7 +6857,8 @@ Algorithm Tolerance = 1e-9
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Water.Flow1D2ph hex(
+      Water.Flow1DFV2ph
+                      hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -6882,10 +6880,8 @@ Algorithm Tolerance = 1e-9
       ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.4/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
                 -10}}, rotation=0)));
-      ThermoPower.Thermal.HeatSource1D heatSource(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (Placement(transformation(extent={{-20,0},{0,
+      Thermal.HeatSource1DFV           heatSource(Nw=Nnodes - 1)
+                        annotation (Placement(transformation(extent={{-20,0},{0,
                 20}}, rotation=0)));
       ThermoPower.Water.SinkPressure
                               Sink(p0=1e5, redeclare package Medium = Medium)
@@ -6969,14 +6965,16 @@ Algorithm Tolerance = 1e-9
 </p>
 </HTML>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
     <li><i>27 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Created.</li>
 </ul>
 </html>"),
         __Dymola_experimentSetupOutput(equdistant=false));
-    end TestFlow1D2phB;
+    end TestWaterFlow1DFV2ph_B;
 
-    model TestFlow1D2phC "Test case for Flow1D2ph"
+    model TestWaterFlow1DFV2ph_C "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -6999,7 +6997,8 @@ Algorithm Tolerance = 1e-9
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Water.Flow1D2ph hex(
+      Water.Flow1DFV2ph
+                      hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -7015,10 +7014,8 @@ Algorithm Tolerance = 1e-9
         hstartout=6e5,
         dpnom=1000) annotation (Placement(transformation(extent={{-10,-30},{10,
                 -10}}, rotation=0)));
-      ThermoPower.Thermal.HeatSource1D heatSource(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (Placement(transformation(extent={{-10,0},{
+      Thermal.HeatSource1DFV           heatSource(Nw=Nnodes - 1)
+                        annotation (Placement(transformation(extent={{-10,0},{
                 10,20}}, rotation=0)));
       ThermoPower.Water.SinkPressure
                               Sink(redeclare package Medium = Medium, p0=11e5)
@@ -7102,6 +7099,8 @@ Algorithm Tolerance = 1e-9
 </p>
 </HTML>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
     <li><i>26 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Parameters updated.</li>
     <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -7111,9 +7110,9 @@ Algorithm Tolerance = 1e-9
 </ul>
 </html>"),
         __Dymola_experimentSetupOutput(equdistant=false));
-    end TestFlow1D2phC;
+    end TestWaterFlow1DFV2ph_C;
 
-    model TestFlow1D2phD "Test case for Flow1D2ph"
+    model TestWaterFlow1DFV2ph_D "Test case for Flow1D2ph"
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -7136,7 +7135,8 @@ Algorithm Tolerance = 1e-9
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Water.Flow1D2ph hex(
+      Water.Flow1DFV2ph
+                      hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -7157,10 +7157,8 @@ Algorithm Tolerance = 1e-9
       ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.2/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
                 -10}}, rotation=0)));
-      ThermoPower.Thermal.HeatSource1D heatSource(
-        N=Nnodes,
-        L=Lhex,
-        omega=omegahex) annotation (Placement(transformation(extent={{-20,0},{0,
+      Thermal.HeatSource1DFV           heatSource(Nw=Nnodes - 1)
+                        annotation (Placement(transformation(extent={{-20,0},{0,
                 20}}, rotation=0)));
       ThermoPower.Water.SinkPressure
                               Sink(p0=1e5, redeclare package Medium = Medium)
@@ -7253,6 +7251,8 @@ Algorithm Tolerance = 1e-9
 </p>
 </HTML>", revisions="<html>
 <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    Updated to new FEM model.</li>
     <li><i>26 Jul 2007</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
     Parameters updated.</li>
     <li><i>10 Dec 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
@@ -7262,7 +7262,7 @@ Algorithm Tolerance = 1e-9
 </ul>
 </html>"),
         __Dymola_experimentSetupOutput(equdistant=false));
-    end TestFlow1D2phD;
+    end TestWaterFlow1DFV2ph_D;
 
     model CheckFlow1D2phMassBalance
       "Checks Flow1D2ph equations for mass conservation"
