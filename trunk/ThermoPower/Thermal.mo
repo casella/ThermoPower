@@ -727,9 +727,12 @@ package Thermal "Thermal models of heat transfer"
     "Connects two DHTVolumes ports according to a selected heat exchanger topology"
     extends Icons.HeatFlow;
     parameter Integer Nw "Number of volumes";
-    replaceable HeatExchangerTopologies.CoCurrentFlow HET
-      constrainedby ThermoPower.Thermal.BaseClasses.HeatExchangerTopologyData(final Nw = Nw)
+    replaceable model HeatExchangerTopology =
+        HeatExchangerTopologies.CoCurrentFlow
+      constrainedby ThermoPower.Thermal.BaseClasses.HeatExchangerTopologyData
       annotation(choicesAllMatching=true);
+
+    HeatExchangerTopology HET(final Nw = Nw);
 
     Thermal.DHTVolumes side1(final N=Nw) annotation (Placement(transformation(extent={{-40,20},
               {40,40}}, rotation=0)));
@@ -750,7 +753,8 @@ package Thermal "Thermal models of heat transfer"
   model CounterCurrentFV
     "Connects two DHTVolume ports according to a counter-current flow configuration"
     extends ThermoPower.Thermal.HeatExchangerTopologyFV(
-      redeclare HeatExchangerTopologies.CounterCurrentFlow HET);
+      redeclare model HeatExchangerTopology =
+          HeatExchangerTopologies.CounterCurrentFlow);
     annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
               {100,100}}),
                      graphics={
