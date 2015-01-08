@@ -1958,7 +1958,7 @@ This package contains models to compute the material properties needed to model 
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
-      parameter Integer Nw = Nf - 1 "Number of nodes on the wall side"
+      parameter Integer Nw = Nf - 1 "Number of volumes on the wall side"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       parameter Integer Nt(min=1) "Number of tubes in parallel"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
