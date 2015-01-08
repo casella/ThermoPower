@@ -886,7 +886,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end ConstantHeatTransferCoefficient;
 
-    partial model ConstantHeatTransferCoefficientTwoGrids
+    model ConstantHeatTransferCoefficientTwoGrids
       "Constant heat transfer coefficient - different grids for fluid and wall side"
       extends BaseClasses.DistributedHeatTransferFV(
         final useAverageTemperature = true,
@@ -1358,7 +1358,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end ConstantHeatTransferCoefficient;
 
-
     model ConstantThermalConductance
       "Constant global thermal conductance (UA value)"
       extends ConstantHeatTransferCoefficient(
@@ -1458,7 +1457,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
                 graphics),
         Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
     end DittusBoelter;
-
 
   end HeatTransferFEM;
 
