@@ -368,15 +368,16 @@ package Thermal "Thermal models of heat transfer"
     parameter SI.Temperature TstartN=Tstartbar
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
-   parameter SI.Temperature Tvolstart[Nw]=
-     Functions.linspaceExt(Tstart1, TstartN, Nw);
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter SI.Temperature Tvolstart[Nw]=
+      Functions.linspaceExt(Tstart1, TstartN, Nw);
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
     final parameter SI.Area Am = (rext^2 - rint^2)*pi
       "Area of the metal tube cross-section";
     final parameter SI.HeatCapacity Cm = Nt*L*Am*rhomcm "Total heat capacity";
-    //AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
+    outer ThermoPower.System system "System wide properties";
     SI.Temperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
 
     ThermoPower.Thermal.DHTVolumes int(final N=Nw, T(start=Tvolstart))
@@ -402,6 +403,8 @@ package Thermal "Thermal models of heat transfer"
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      Tvol = Tvolstart;
     elseif initOpt == Choices.Init.Options.steadyState then
       der(Tvol) = zeros(Nw);
     elseif initOpt == Choices.Init.Options.steadyStateNoT then
@@ -471,9 +474,10 @@ package Thermal "Thermal models of heat transfer"
           TstartN,
           N) "Start value of temperature vector (initialized by default)"
       annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
+    parameter Choices.Init.Options initOpt = system.initOpt
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
+    outer ThermoPower.System system "System wide properties";
     SI.Temperature T[N](start=Tstart) "Node temperatures";
     SI.Area Am "Area of the metal tube cross-section";
     DHT int(N=N, T(start=Tstart)) "Internal surface" annotation (Placement(
@@ -497,6 +501,8 @@ package Thermal "Thermal models of heat transfer"
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      T = Tstart;
     elseif initOpt == Choices.Init.Options.steadyState then
       der(T) = zeros(N);
     elseif initOpt == Choices.Init.Options.steadyStateNoT then
@@ -567,10 +573,10 @@ package Thermal "Thermal models of heat transfer"
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Temperature Tvolstart[Nw]=
       Functions.linspaceExt(Tstart1, TstartN, Nw);
-    parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
+    parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
-    //ThermoPower.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
+    outer ThermoPower.System system "System wide properties";
     Units.AbsoluteTemperature Tvol[Nw](start=Tvolstart) "Volume temperatures";
     ThermoPower.Thermal.DHTVolumes int(final N=Nw, T(start=Tvolstart))
       "Internal surface"
@@ -592,6 +598,8 @@ package Thermal "Thermal models of heat transfer"
   initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      Tvol = Tvolstart;
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
       der(Tvol) = zeros(Nw);
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyStateNoT then
@@ -658,9 +666,10 @@ package Thermal "Thermal models of heat transfer"
           TstartN,
           N) "Start value of temperature vector (initialized by default)"
       annotation (Dialog(tab="Initialisation"));
-    parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
+    parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
+    outer ThermoPower.System system "System wide properties";
     Units.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
     ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface"
       annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=
@@ -676,6 +685,8 @@ package Thermal "Thermal models of heat transfer"
   initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      T = Tstart;
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
       der(T) = zeros(N);
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyStateNoT then
