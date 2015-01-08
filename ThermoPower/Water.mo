@@ -598,10 +598,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Metal wall temperature start value"
       annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=system.initOpt
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
-    annotation (Dialog(tab="Initialisation"));
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     FlangeA inlet(
       h_outflow(start=hstart),
@@ -766,8 +767,13 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Medium.Temperature Tmstart=300
       "Metal wall temperature start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
     FlangeA in1(
       h_outflow(start=hstart),
       redeclare package Medium = Medium,
@@ -838,11 +844,20 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Residence time";
 
   initial equation
+    // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      h = hstart;
+      if (Cm > 0 and gamma > 0) then
+        Tm = Tmstart;
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
       der(h) = 0;
-      if (not Medium.singleState) then
+      if (not Medium.singleState and not noInitialPressure) then
         der(p) = 0;
       end if;
       if (Cm > 0 and gamma > 0) then
@@ -917,8 +932,12 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{60,-80},{100,-40}}, rotation=0)));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
   equation
     // Set liquid properties
     liquidState = Medium.setState_ph(pext, h);
@@ -942,9 +961,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        y = ystart;
+      end if;
+      h = hstart;
     elseif initOpt == Choices.Init.Options.steadyState then
+      if not noInitialPressure then
+        der(y) = 0;
+      end if;
       der(h) = 0;
-      der(y) = 0;
     else
       assert(false, "Unsupported initialisation option");
     end if;
@@ -1163,13 +1189,19 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      htilde = hstart[2:N];
     elseif initOpt == Choices.Init.Options.steadyState then
       der(htilde) = zeros(N - 1);
-      if (not Medium.singleState) then
+      if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(htilde) = zeros(N - 1);
+      assert(false, "initOpt = steadyStateNoP deprecated, use steadyState and noInitialPressure",AssertionLevel.warning);
     elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState then
       der(p) = 0;
     else
@@ -1531,13 +1563,19 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      htilde = hstart[2:N];
     elseif initOpt == Choices.Init.Options.steadyState then
       der(htilde) = zeros(N - 1);
-      if (not Medium.singleState) then
+      if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(htilde) = zeros(N - 1);
+      assert(false, "initOpt = steadyStateNoP deprecated, use steadyState and noInitialPressure",AssertionLevel.warning);
     elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState then
       der(p) = 0;
     else
@@ -2000,13 +2038,19 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      h = hstart;
     elseif initOpt == Choices.Init.Options.steadyState then
       der(h) = zeros(N);
-      if (not Medium.singleState) then
+      if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(h) = zeros(N);
+      assert(false, "initOpt = steadyStateNoP deprecated, use steadyState and noInitialPressure",AssertionLevel.warning);
     elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState then
       der(p) = 0;
     else
@@ -2775,13 +2819,21 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      h = hstart;
     elseif initOpt == Choices.Init.Options.steadyState then
       der(h) = zeros(N);
-      if (not Medium.singleState) then
+      if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       der(h) = zeros(N);
+      assert(false, "initOpt = steadyStateNoP deprecated, use steadyState and noInitialPressure",AssertionLevel.warning);
+    elseif initOpt == Choices.Init.Options.steadyStateNoT and not Medium.singleState then
+      der(p) = 0;
     else
       assert(false, "Unsupported initialisation option");
     end if;
@@ -3226,11 +3278,14 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     parameter SI.Height zl0
       "Height of water reference level over inlet/outlet connectors";
-    parameter SI.Height zl_start "Water start level (relative to reference)";
-    parameter Medium.SpecificEnthalpy hl_start "Water start specific enthalpy";
-    parameter SI.Pressure pg_start "Gas start pressure";
-    parameter Units.AbsoluteTemperature Tg_start=300 "Gas start temperature";
-
+    parameter SI.Height zl_start "Water start level (relative to reference)"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Medium.SpecificEnthalpy hl_start "Water start specific enthalpy"
+      annotation (Dialog(tab="Initialisation"));
+    parameter SI.Pressure pg_start "Gas start pressure"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Units.AbsoluteTemperature Tg_start=300 "Gas start temperature"
+      annotation (Dialog(tab="Initialisation"));
     parameter SI.CoefficientOfHeatTransfer gamma_ex=50
       "Water-Gas heat transfer coefficient";
     parameter SI.Temperature Tgin=300 "Inlet gas temperature";
@@ -3241,8 +3296,12 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option";
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
   protected
     constant SI.Acceleration g=Modelica.Constants.g_n;
     constant Real R=Modelica.Constants.R "Universal gas constant";
@@ -3329,11 +3388,18 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      zl = zl_start;
+      Tg = Tg_start;
+      hl = hl_start;
+      if not noInitialPressure then
+        pg = pg_start;
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
       zl = zl_start;
       der(Tg) = 0;
       der(hl) = 0;
-      der(Vl) = 0;
+      der(pg) = 0;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
       zl = zl_start;
       der(Tg) = 0;
@@ -3391,8 +3457,12 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Volume Vldstart "Start value of drum water volume"
       annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     Medium.SaturationProperties sat "Saturation conditions";
     FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
@@ -3458,8 +3528,15 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      Vld = Vldstart;
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(p) = 0;
+      if not noInitialPressure then
+        der(p) = 0;
+      end if;
       der(Vld) = 0;
     else
       assert(false, "Unsupported initialisation option");
@@ -3528,10 +3605,17 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     parameter Medium.SpecificEnthalpy hvstart=Medium.dewEnthalpy(Medium.setSat_p(
         pstart)) "Vapour enthalpy start value"
       annotation (Dialog(tab="Initialisation"));
+    parameter Medium.Temperature Tmstart = Medium.saturationTemperature(pstart)
+      "Wall temperature start value"
+      annotation (Dialog(tab="Initialisation"));
     parameter SI.Length ystart=0 "Start level value"
       annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
     constant SI.Acceleration g=Modelica.Constants.g_n;
     constant Real pi=Modelica.Constants.pi;
 
@@ -3565,7 +3649,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     Medium.MassFlowRate wev "Mass flowrate of bulk evaporation";
     Medium.Temperature Tl "Liquid temperature";
     Medium.Temperature Tv "Vapour temperature";
-    Units.AbsoluteTemperature Tm(start=Medium.saturationTemperature(pstart),
+    Units.AbsoluteTemperature Tm(start=Tmstart,
         stateSelect=if Cm > 0 then StateSelect.prefer else StateSelect.default)
       "Wall temperature";
     Medium.Temperature Ts "Saturated water temperature";
@@ -3729,6 +3813,16 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      hl = hlstart;
+      hv = hvstart;
+      y = ystart;
+      if Cm > 0 and (gl > 0 or gv > 0) then
+        Tm = Tmstart;
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
       der(p) = 0;
       der(hl) = 0;
@@ -4288,7 +4382,7 @@ Input variables changed. This function now computes the heat transfer coefficien
       annotation (Dialog(tab="Initialization"));
     parameter Medium.SpecificEnthalpy hstartout "Outlet enthalpy start value"
       annotation (Dialog(tab="Initialization"));
-    parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.steadyState
+    parameter ThermoPower.Choices.Init.Options initOpt=system.initOpt
       "Initialization option" annotation (Dialog(tab="Initialization"));
     Medium.ThermodynamicState fluidState_in(p(start=pstartin),h(start=hstartin));
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -4443,8 +4537,12 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
         annotation (Dialog(tab="Initialisation"));
       parameter SI.PerUnit wnf=0.02
         "Fraction of nominal flow rate at which linear friction equals turbulent friction";
-      parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-        "Initialisation option" annotation (Dialog(tab="Initialisation"));
+      parameter Choices.Init.Options initOpt=system.initOpt
+        "Initialisation option"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Boolean noInitialPressure=false
+        "Remove initial equation on pressure"
+        annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
       constant SI.Acceleration g=Modelica.Constants.g_n;
       function squareReg = ThermoPower.Functions.squareReg;
 
@@ -4681,8 +4779,12 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       parameter Medium.SpecificEnthalpy hstart=1e5
         "Specific Enthalpy Start Value"
         annotation (Dialog(tab="Initialisation"));
-      parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-        "Initialisation option" annotation (Dialog(tab="Initialisation"));
+      parameter Choices.Init.Options initOpt=system.initOpt
+        "Initialisation option"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Boolean noInitialPressure=false
+        "Remove initial equation on pressure"
+        annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
       constant SI.Acceleration g=Modelica.Constants.g_n;
       parameter Medium.MassFlowRate w0 "Nominal mass flow rate"
         annotation (Dialog(group="Characteristics"));
@@ -4801,6 +4903,10 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     initial equation
       if initOpt == Choices.Init.Options.noInit then
         // do nothing
+      elseif initOpt == Choices.Init.Options.fixedState then
+        if V > 0 then
+          h = hstart;
+        end if;
       elseif initOpt == Choices.Init.Options.steadyState then
         if V > 0 then
           der(h) = 0;
