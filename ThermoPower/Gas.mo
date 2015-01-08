@@ -523,8 +523,12 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(tab="Initialisation"));
     parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Total mass";
     SI.InternalEnergy E "Total internal energy";
@@ -576,8 +580,16 @@ package Gas "Models of components with ideal gases as working fluid"
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        gas.p = pstart;
+      end if;
+      gas.T = Tstart;
+      gas.Xi = Xstart[1:Medium.nXi];
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(gas.p) = 0;
+      if not noInitialPressure then
+        der(gas.p) = 0;
+      end if;
       der(gas.T) = 0;
       der(gas.Xi) = zeros(Medium.nXi);
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
@@ -631,8 +643,12 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(tab="Initialisation"));
     parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Gas total mass";
     SI.InternalEnergy E "Gas total energy";
@@ -690,8 +706,19 @@ package Gas "Models of components with ideal gases as working fluid"
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        gas.p = pstart;
+      end if;
+      gas.T = Tstart;
+      gas.Xi = Xstart[1:Medium.nXi];
+      if (Cm > 0 and gamma > 0) then
+        Tm  = Tmstart;
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(gas.p) = 0;
+      if not noInitialPressure then
+        der(gas.p) = 0;
+      end if;
       der(gas.T) = 0;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
@@ -753,8 +780,12 @@ package Gas "Models of components with ideal gases as working fluid"
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
     parameter Medium.Temperature Tmstart=Tstart "Metal wall start temperature"
       annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Gas total mass";
     SI.InternalEnergy E "Gas total energy";
@@ -826,8 +857,19 @@ package Gas "Models of components with ideal gases as working fluid"
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        gas.p = pstart;
+      end if;
+      gas.T = Tstart;
+      gas.Xi = Xstart[1:Medium.nXi];
+      if (Cm > 0 and gamma > 0) then
+        Tm  = Tmstart;
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(gas.p) = 0;
+      if not noInitialPressure then
+        der(gas.p) = 0;
+      end if;
       der(gas.T) = 0;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
@@ -1100,8 +1142,13 @@ package Gas "Models of components with ideal gases as working fluid"
   initial equation
     if initOpt == Choices.Init.Options.noInit or QuasiStatic then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      Ttilde = Tstart[2:N];
     elseif initOpt == Choices.Init.Options.steadyState then
-      if (not Medium.singleState) then
+      if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
       end if;
       der(Ttilde) = zeros(N - 1);
@@ -2117,8 +2164,13 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(tab="Initialisation"));
     parameter Air.MassFraction Xstart[Exhaust.nX]=Exhaust.reference_X
       "Start flue gas composition" annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
     Exhaust.BaseProperties fluegas(
       p(start=pstart),
       T(start=Tstart),
@@ -2182,8 +2234,16 @@ package Gas "Models of components with ideal gases as working fluid"
     // Initial conditions
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        fluegas.p = pstart;
+      end if;
+      fluegas.T = Tstart;
+      fluegas.Xi = Xstart[1:Exhaust.nXi];
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(fluegas.p) = 0;
+      if not noInitialPressure then
+        der(fluegas.p) = 0;
+      end if;
       der(fluegas.T) = 0;
       der(fluegas.Xi) = zeros(Exhaust.nXi);
       if (Cm > 0 and gamma > 0) then
@@ -3174,7 +3234,7 @@ The packages Medium are redeclared and a mass balance determines the composition
       annotation (Dialog(tab="Initialisation"));
     parameter Medium.Density rho_start=rho0 "Inlet Density start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
+    parameter Choices.Init.Options initOpt=system.initOption
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     parameter Medium.MassFlowRate w0 "Nominal mass flow rate"
       annotation (Dialog(group="Characteristics"));
@@ -3320,7 +3380,11 @@ The packages Medium are redeclared and a mass balance determines the composition
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
-    elseif initOpt == Choices.Init.Options.steadyState then
+   elseif initOpt == Choices.Init.Options.fixedState then
+     if V > 0 then
+       h = hstart;
+     end if;
+   elseif initOpt == Choices.Init.Options.steadyState then
       if V > 0 then
         der(h) = 0;
       end if;
@@ -3457,8 +3521,13 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
         "Fraction of nominal flow rate at which linear friction equals turbulent friction";
       parameter Medium.MassFraction Xstart[nX]=Medium.reference_X
         "Start gas composition" annotation (Dialog(tab="Initialisation"));
-      parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
-        "Initialisation option" annotation (Dialog(tab="Initialisation"));
+      parameter Choices.Init.Options initOpt=system.initOpt
+        "Initialisation option"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Boolean noInitialPressure=false
+        "Remove initial equation on pressure"
+        annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
       function squareReg = ThermoPower.Functions.squareReg;
     protected
       parameter Integer nXi=Medium.nXi "number of independent mass fractions";
