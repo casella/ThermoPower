@@ -4061,13 +4061,13 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     SI.Pressure dpEff "Effective pressure drop";
   initial equation
     if CvData == CvTypes.OpPoint then
-      wnom = FlowChar(theta)*Av*sqrt(rhonom)*sqrtR(dpnom)
+      wnom = FlowChar(thetanom)*Av*sqrt(rhonom)*sqrtR(dpnom)
         "Determination of Av by the operating point";
     end if;
   equation
     pv = Medium.saturationPressure(Tin);
     Ff = 0.96 - 0.28*sqrt(pv/Medium.fluidConstants[1].criticalPressure);
-    Fl = Flnom*Flfun(theta);
+    Fl = Flnom*Flfun(theta_act);
     dpEff = if outlet.p < (1 - Fl^2)*inlet.p + Ff*Fl^2*pv then Fl^2*(inlet.p -
       Ff*pv) else inlet.p - outlet.p
       "Effective pressure drop, accounting for possible choked conditions";
