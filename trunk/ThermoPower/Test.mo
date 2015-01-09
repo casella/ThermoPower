@@ -1645,7 +1645,8 @@ Casella</a>:<br>
       ThermoPower.Water.ValveLin ValveLin1(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,-20},{30,0}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SinkP1(p0=3e5) annotation (Placement(
+                              SinkP1(p0=300000, use_in_p0=true)
+                                             annotation (Placement(
             transformation(extent={{50,-20},{70,0}}, rotation=0)));
       /*
   ThermoPower.Water.Pump Pump1(
@@ -1754,7 +1755,8 @@ Schiavo</a>:<br>
       ThermoPower.Water.ValveLin ValveLin1(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,40},{30,60}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SinkP1(p0=3e5) annotation (Placement(
+                              SinkP1(p0=300000, use_in_p0=true)
+                                             annotation (Placement(
             transformation(extent={{50,40},{70,60}}, rotation=0)));
       Water.PumpNPSH Pump1(
         rho0=1000,
@@ -1790,7 +1792,8 @@ Schiavo</a>:<br>
       ThermoPower.Water.ValveLin ValveLin2(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,-10},{30,10}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SinkP2(p0=3e5) annotation (Placement(
+                              SinkP2(p0=300000, use_in_p0=true)
+                                             annotation (Placement(
             transformation(extent={{50,-10},{70,10}}, rotation=0)));
       Water.PumpNPSH Pump2(
         rho0=1000,
@@ -1814,7 +1817,8 @@ Schiavo</a>:<br>
       ThermoPower.Water.ValveLin ValveLin3(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,-60},{30,-40}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SinkP3(p0=3e5) annotation (Placement(
+                              SinkP3(p0=300000, use_in_p0=true)
+                                             annotation (Placement(
             transformation(extent={{50,-60},{70,-40}}, rotation=0)));
       Water.PumpNPSH Pump3(
         rho0=1000,
@@ -1909,7 +1913,6 @@ Algorithm Tolerance = 1e-6
         n0=100,
         V=0.001,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        initOpt=ThermoPower.Choices.Init.Options.noInit,
         redeclare function flowCharacteristic =
             ThermoPower.Functions.PumpCharacteristics.quadraticFlow (q_nom={0,
                 0.001,0.0015}, head_nom={60,30,0}),
@@ -1919,7 +1922,8 @@ Algorithm Tolerance = 1e-6
                 0.001,0.0015}, W_nom={350,500,600}),
         wstart=0,
         w0=1,
-        dp0=2e5) annotation (Placement(transformation(extent={{-40,-2},
+        dp0=200000)
+                 annotation (Placement(transformation(extent={{-40,-2},
                 {-20,18}}, rotation=0)));
       ThermoPower.Water.SourcePressure
                                 Source annotation (Placement(transformation(
