@@ -3977,7 +3977,8 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
     parameter Real Fxt_full=0.5 "Fk*xt critical ratio at full opening";
     replaceable function xtfun = Functions.ValveCharacteristics.one
       constrainedby Functions.ValveCharacteristics.baseFun
-      "Critical ratio characteristic";
+      "Critical ratio characteristic"
+      annotation(choicesAllMatching = true);
     Real x "Pressure drop ratio";
     Real xs "Saturated pressure drop ratio";
     Real Y "Compressibility factor";
@@ -4603,7 +4604,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         annotation(choicesAllMatching = true);
       Medium.ThermodynamicState fluidState(p(start=pin_start));
       parameter ThermoPower.Choices.Valve.CvTypes CvData=ThermoPower.Choices.Valve.CvTypes.Av
-        "Selection of flow coefficient";
+        "Selection of flow coefficient"
+       annotation (Dialog(group="Flow Coefficient"));
       parameter SI.Area Av(
         fixed=if CvData == ThermoPower.Choices.Valve.CvTypes.Av then true else false,
         start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
