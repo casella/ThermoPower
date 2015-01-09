@@ -922,7 +922,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
        final parameter SI.PerUnit Hw[min(Nw,Nv),Nw] = getH(Nw,Nv)
         "Sums heat flows on wall side onto coarser grid"
         annotation(Evaluate = true);
-       final parameter SI.PerUnit G[max(Nw,Nv), min(Nw,Nv)] = getH(max(Nw,Nv), min(Nw,Nv))
+       final parameter SI.PerUnit Gv[max(Nw,Nv), Nv] = getH(min(Nw,Nv), max(Nw,Nv))
+        "Maps temperatures on coarser grid onto finer grid"
+        annotation(Evaluate = true);
+       final parameter SI.PerUnit Gw[max(Nw,Nv), Nw] = getH(min(Nw,Nv), max(Nw,Nv))
         "Maps temperatures on coarser grid onto finer grid"
         annotation(Evaluate = true);
 
@@ -941,7 +944,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
          if N1 > min(N1,N2) then
            for i in 1:N2 loop
              for j in 1:D loop
-               H[i,N2*D+j] :=1;
+               H[i,(i-1)*D+j] :=1;
              end for;
            end for;
          else
@@ -952,10 +955,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
     equation
       Hv*Qv = Hw*Qw "Energy balance on coarser grid";
       if Nw >= Nv then
-        Qw = omega*lw*gamma*(Tw - G*Tv)
+        Qw = omega*lw*gamma*(Tw - Gv*Tv)
           "Convective heat transfer on finer grid";
       else
-        Qv = omega*lv*gamma*(Tv - G*Tw)
+        Qv = omega*lv*gamma*(Tv - Gw*Tw)
           "Convective heat transfer on finer grid";
       end if;
       for j in 1:Nv loop
