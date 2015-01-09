@@ -749,20 +749,18 @@ Casella</a>:<br>
                                 SourceP1(p0=5e5, h=400e3) annotation (Placement(
             transformation(extent={{-50,30},{-30,50}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SinkP1(use_in_p0=false)
+                              SinkP1(use_in_p0=true)
                                      annotation (Placement(transformation(
               extent={{40,30},{60,50}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1(k=1)
-                                                 annotation (Placement(
-            transformation(extent={{-40,60},{-20,80}}, rotation=0)));
       ThermoPower.Water.ValveLiqChoked ValveLiqChocked(
-        dpnom=2e5,
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         Av=5e-5,
         CheckValve=false,
-        pnom=5e5,
-        CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.Av,
+        useThetaInput=false,
+        pnom=500000,
+        dpnom=200000)                                annotation (Placement(
             transformation(extent={{-10,30},{10,50}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine1(
         amplitude=2.5e5,
@@ -775,20 +773,19 @@ Casella</a>:<br>
                                 SourceP2(p0=60e5, h=2.9e6) annotation (
           Placement(transformation(extent={{-50,-50},{-30,-30}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SinkP2(p0=1e5) annotation (Placement(
+                              SinkP2(p0=100000, use_in_p0=true)
+                                             annotation (Placement(
             transformation(extent={{40,-50},{60,-30}}, rotation=0)));
       ThermoPower.Water.ValveVap ValveVap(
-        dpnom=30e5,
-        pnom=60e5,
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         Av=1e-4,
         CheckValve=false,
-        CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
+        CvData=ThermoPower.Choices.Valve.CvTypes.Av,
+        useThetaInput=false,
+        pnom=6000000,
+        dpnom=3000000)                               annotation (Placement(
             transformation(extent={{-10,-50},{10,-30}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant2(k=1)
-                                                 annotation (Placement(
-            transformation(extent={{-40,-20},{-20,0}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine2(
         amplitude=49.5e5,
         freqHz=0.5,
@@ -815,12 +812,8 @@ Casella</a>:<br>
           points={{10,-40},{40,-40}},
           thickness=0.5,
           color={0,0,255}));
-      connect(Constant1.y, ValveLiqChocked.theta)
-        annotation (Line(points={{-19,70},{0,70},{0,48}}, color={0,0,127}));
       connect(Sine1.y, SinkP1.in_p0)
         annotation (Line(points={{31,70},{46,70},{46,48.8}}, color={0,0,127}));
-      connect(Constant2.y, ValveVap.theta)
-        annotation (Line(points={{-19,-10},{0,-10},{0,-32}}, color={0,0,127}));
       connect(Sine2.y, SinkP2.in_p0) annotation (Line(points={{31,-10},{46,-10},
               {46,-31.2}}, color={0,0,127}));
       annotation (
