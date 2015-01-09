@@ -1644,9 +1644,8 @@ Casella</a>:<br>
             transformation(extent={{-80,-20},{-60,0}}, rotation=0)));
       ThermoPower.Water.ValveLin Valve(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,-20},{30,0}}, rotation=0)));
-      ThermoPower.Water.SinkPressure Sink(use_in_p0=true, p0=300000)
-        annotation (Placement(transformation(extent={{50,-20},{70,0}}, rotation
-              =0)));
+      ThermoPower.Water.SinkPressure Sink(use_in_p0=true, p0=300000) annotation (
+          Placement(transformation(extent={{50,-20},{70,0}}, rotation=0)));
       /*
   ThermoPower.Water.Pump Pump1(
     rho0=1000,
@@ -1675,16 +1674,16 @@ Casella</a>:<br>
         usePowerCharacteristic=true,
         n0=1500,
         redeclare function flowCharacteristic =
-            ThermoPower.Functions.PumpCharacteristics.quadraticFlow (q_nom={0,
-                0.001,0.0015}, head_nom={60,30,0}),
+            ThermoPower.Functions.PumpCharacteristics.quadraticFlow (q_nom={0,0.001,
+                0.0015}, head_nom={60,30,0}),
         redeclare function powerCharacteristic =
-            ThermoPower.Functions.PumpCharacteristics.quadraticPower (q_nom={0,
-                0.001,0.0015}, W_nom={350,500,600}),
+            ThermoPower.Functions.PumpCharacteristics.quadraticPower (q_nom={0,0.001,
+                0.0015}, W_nom={350,500,600}),
         wstart=0,
         w0=1,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        dp0=300000) annotation (Placement(transformation(extent={{-40,-22},{-20,
-                -2}}, rotation=0)));
+        dp0=300000) annotation (Placement(transformation(extent={{-40,-22},{-20,-2}},
+              rotation=0)));
 
       Modelica.Blocks.Sources.Ramp Ramp(
         duration=4,
@@ -1718,7 +1717,9 @@ Casella</a>:<br>
       connect(Step.y, Valve.cmd)
         annotation (Line(points={{1,20},{20,20},{20,-2}}, color={0,0,127}));
       annotation (
-        Diagram(graphics),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                100}}),
+                graphics),
         experiment(StopTime=10, Tolerance=1e-006),
         Documentation(info="<HTML>
 <p>This model tests the <tt>Pump</tt> model with the check valve option active. Two pumps in parallel are simulated.

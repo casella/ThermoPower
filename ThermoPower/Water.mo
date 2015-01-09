@@ -4865,13 +4865,11 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
             origin={28,80},
             extent={{-10,-10},{10,10}},
             rotation=270)));
-    equation
-      // Number of pumps in parallel
-      Np = in_Np;
-      if cardinality(in_Np) == 0 then
-        in_Np = Np0 "Number of pumps selected by parameter";
-      end if;
+    protected
+      Modelica.Blocks.Interfaces.IntegerInput int_Np
+        "Internal connector with number of parallel pumps";
 
+    equation
       // Flow equations
       q_single = w_single/homotopy(rho, rho0);
       head = dp/(homotopy(rho, rho0)*g);
@@ -4925,6 +4923,13 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         0 = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single
           "Energy balance";
       end if;
+
+      // Number of pumps in parallel
+      connect(in_Np, int_Np);
+      if not use_in_Np then
+        int_Np = Np0;
+      end if;
+      Np = int_Np;
 
     initial equation
       if initOpt == Choices.Init.Options.noInit then
