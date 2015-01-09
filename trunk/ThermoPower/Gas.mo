@@ -2006,6 +2006,7 @@ package Gas "Models of components with ideal gases as working fluid"
     SI.PerUnit x "Pressure drop ratio";
     SI.PerUnit xs "Saturated pressure drop ratio";
     SI.PerUnit Y "Compressibility factor";
+    SI.PerUnit theta_act "Actual valve opening";
     Medium.AbsolutePressure p "Inlet pressure";
   protected
     function sqrtR = Functions.sqrtReg (delta=b*dpnom);
@@ -2014,7 +2015,7 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter SI.PerUnit xs_nom(fixed=false)
       "Nominal saturated pressure drop ratio";
     parameter SI.PerUnit Y_nom(fixed=false) "Nominal compressibility factor";
-    Modelica.Blocks.Interfaces.RealInput theta_act
+    Modelica.Blocks.Interfaces.RealInput theta_int
       "Protected connector for conditional input connector handling";
   public
     FlangeA inlet(
@@ -2089,11 +2090,11 @@ package Gas "Models of components with ideal gases as working fluid"
     inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
 
     // Valve opening
-    connect(theta, theta_act); // automatically removed if theta is disabled
+    connect(theta, theta_int); // automatically removed if theta is disabled
     if not useThetaInput then
-      theta_act = theta_fix;   // provide actual opening value from parameter
+      theta_int = theta_fix;   // provide actual opening value from parameter
     end if;
-
+    theta_act = theta_int;
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
       Diagram(graphics),
