@@ -3145,7 +3145,7 @@ This models tests the Valve model in different operating conditions. The valve f
                   SourceP1(
         redeclare package Medium = Medium,
         T=500,
-        p0=5e5) annotation (Placement(transformation(extent={{-90,10},{-70,30}},
+        p0=5e5) annotation (Placement(transformation(extent={{-90,40},{-70,60}},
               rotation=0)));
       Gas.SinkPressure
                 SinkP1(
@@ -3153,7 +3153,7 @@ This models tests the Valve model in different operating conditions. The valve f
         p0=250000,
         T=350,
         use_in_p0=true)
-                  annotation (Placement(transformation(extent={{70,10},{90,30}},
+                  annotation (Placement(transformation(extent={{70,40},{90,60}},
               rotation=0)));
       Gas.Valve V1(
         redeclare package Medium = Medium,
@@ -3163,12 +3163,12 @@ This models tests the Valve model in different operating conditions. The valve f
         pnom=5e5,
         Cv=165,
         CvData=ThermoPower.Choices.Valve.CvTypes.Cv) annotation (Placement(
-            transformation(extent={{-50,10},{-30,30}}, rotation=0)));
+            transformation(extent={{-50,40},{-30,60}}, rotation=0)));
       Modelica.Blocks.Sources.Step S2(
         offset=1,
         startTime=6,
-        height=-0.5) annotation (Placement(transformation(extent={{-70,40},{-50,
-                60}}, rotation=0)));
+        height=-0.5) annotation (Placement(transformation(extent={{-70,70},{-50,
+                90}}, rotation=0)));
       Gas.Valve V2(
         redeclare package Medium = Medium,
         dpnom=1e5,
@@ -3177,7 +3177,7 @@ This models tests the Valve model in different operating conditions. The valve f
         pnom=4e5,
         Av=30e-4,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
-            transformation(extent={{-10,10},{10,30}}, rotation=0)));
+            transformation(extent={{-10,40},{10,60}}, rotation=0)));
       Gas.Valve V3(
         redeclare package Medium = Medium,
         wnom=0.5,
@@ -3186,28 +3186,28 @@ This models tests the Valve model in different operating conditions. The valve f
         pnom=3e5,
         Kv=132,
         CvData=ThermoPower.Choices.Valve.CvTypes.Kv) annotation (Placement(
-            transformation(extent={{30,10},{50,30}}, rotation=0)));
+            transformation(extent={{30,40},{50,60}}, rotation=0)));
       Modelica.Blocks.Sources.Step S3(
         offset=1,
         height=-0.3,
-        startTime=3) annotation (Placement(transformation(extent={{-30,40},{-10,
-                60}}, rotation=0)));
+        startTime=3) annotation (Placement(transformation(extent={{-30,70},{-10,
+                90}}, rotation=0)));
       Modelica.Blocks.Sources.Step S4(
         offset=1,
         startTime=1,
-        height=-0.6) annotation (Placement(transformation(extent={{10,40},{30,
-                60}}, rotation=0)));
+        height=-0.6) annotation (Placement(transformation(extent={{10,70},{30,
+                90}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine2(
         freqHz=0.5,
         offset=4e5,
-        amplitude=2e5) annotation (Placement(transformation(extent={{46,40},{66,
-                60}}, rotation=0)));
+        amplitude=2e5) annotation (Placement(transformation(extent={{46,70},{66,
+                90}}, rotation=0)));
 
       Gas.SourcePressure
                   SourceP2(
         redeclare package Medium = Medium,
         T=500,
-        p0=5e5) annotation (Placement(transformation(extent={{-90,-60},{-70,-40}},
+        p0=5e5) annotation (Placement(transformation(extent={{-90,-30},{-70,-10}},
               rotation=0)));
       Gas.SinkPressure
                 SinkP2(
@@ -3215,13 +3215,13 @@ This models tests the Valve model in different operating conditions. The valve f
         p0=200000,
         T=350,
         use_in_p0=true)
-                annotation (Placement(transformation(extent={{70,-60},{90,-40}},
+                annotation (Placement(transformation(extent={{70,-30},{90,-10}},
               rotation=0)));
       Modelica.Blocks.Sources.Step S6(
         offset=1,
         startTime=6,
-        height=-0.3) annotation (Placement(transformation(extent={{-70,-30},{-50,
-                -10}}, rotation=0)));
+        height=-0.3) annotation (Placement(transformation(extent={{-70,0},{-50,
+                20}},  rotation=0)));
       Gas.Valve V6(
         redeclare package Medium = Medium,
         CheckValve=false,
@@ -3231,17 +3231,17 @@ This models tests the Valve model in different operating conditions. The valve f
         dpnom=150000,
         wnom=0.5,
         Tstart=500)                                  annotation (Placement(
-            transformation(extent={{-50,-60},{-30,-40}}, rotation=0)));
+            transformation(extent={{-50,-30},{-30,-10}}, rotation=0)));
       Modelica.Blocks.Sources.Step S7(
         offset=1,
         startTime=1,
-        height=-0.5) annotation (Placement(transformation(extent={{-30,-30},{-10,
-                -10}}, rotation=0)));
+        height=-0.5) annotation (Placement(transformation(extent={{-30,0},{-10,
+                20}},  rotation=0)));
       Modelica.Blocks.Sources.Step S8(
         offset=1,
         startTime=3,
-        height=-0.5) annotation (Placement(transformation(extent={{10,-30},{30,
-                -10}}, rotation=0)));
+        height=-0.5) annotation (Placement(transformation(extent={{10,0},{30,20}},
+                       rotation=0)));
       Gas.Valve V7(
         redeclare package Medium = Medium,
         CheckValve=false,
@@ -3251,7 +3251,7 @@ This models tests the Valve model in different operating conditions. The valve f
         dpnom=50000,
         wnom=0.5,
         Tstart=500)                                  annotation (Placement(
-            transformation(extent={{-10,-60},{10,-40}}, rotation=0)));
+            transformation(extent={{-10,-30},{10,-10}}, rotation=0)));
       Gas.Valve V8(
         redeclare package Medium = Medium,
         Cv=122,
@@ -3261,68 +3261,104 @@ This models tests the Valve model in different operating conditions. The valve f
         dpnom=100000,
         wnom=0.5,
         Tstart=500)                                  annotation (Placement(
-            transformation(extent={{30,-60},{50,-40}}, rotation=0)));
+            transformation(extent={{30,-30},{50,-10}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine1(
         freqHz=0.5,
         amplitude=2e5,
-        offset=4e5) annotation (Placement(transformation(extent={{46,-30},{66,-10}},
+        offset=4e5) annotation (Placement(transformation(extent={{46,0},{66,20}},
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Gas.SourcePressure
+                  SourceP3(
+        redeclare package Medium = Medium,
+        T=500,
+        p0=5e5) annotation (Placement(transformation(extent={{-90,-80},{-70,-60}},
+              rotation=0)));
+      Gas.SinkPressure
+                SinkP3(
+        redeclare package Medium = Medium,
+        p0=200000,
+        T=350,
+        use_in_p0=false)
+                annotation (Placement(transformation(extent={{70,-80},{90,-60}},
+              rotation=0)));
+      Gas.Valve V9(
+        redeclare package Medium = Medium,
+        CheckValve=false,
+        Av=12e-4,
+        CvData=ThermoPower.Choices.Valve.CvTypes.Av,
+        wnom=0.5,
+        useThetaInput=false,
+        pnom=500000,
+        dpnom=150000,
+        Tstart=500)                                  annotation (Placement(
+            transformation(extent={{-10,-80},{10,-60}},  rotation=0)));
     equation
-      connect(S2.y, V1.theta) annotation (Line(points={{-49,50},{-40,50},{-40,
-              27.2}}, color={0,0,127}));
+      connect(S2.y, V1.theta) annotation (Line(points={{-49,80},{-40,80},{-40,
+              57.2}}, color={0,0,127}));
       connect(V1.outlet, V2.inlet) annotation (Line(
-          points={{-30,20},{-10,20}},
+          points={{-30,50},{-10,50}},
           color={159,159,223},
           thickness=0.5));
       connect(S3.y, V2.theta)
-        annotation (Line(points={{-9,50},{0,50},{0,27.2}}, color={0,0,127}));
+        annotation (Line(points={{-9,80},{0,80},{0,57.2}}, color={0,0,127}));
       connect(S4.y, V3.theta)
-        annotation (Line(points={{31,50},{40,50},{40,27.2}}, color={0,0,127}));
+        annotation (Line(points={{31,80},{40,80},{40,57.2}}, color={0,0,127}));
       connect(V3.outlet, SinkP1.flange) annotation (Line(
-          points={{50,20},{70,20}},
+          points={{50,50},{70,50}},
           color={159,159,223},
           thickness=0.5));
       connect(V2.outlet, V3.inlet) annotation (Line(
-          points={{10,20},{30,20}},
+          points={{10,50},{30,50}},
           color={159,159,223},
           thickness=0.5));
-      connect(Sine2.y, SinkP1.in_p0) annotation (Line(points={{67,50},{74,50},{
-              74,25.95},{73.55,25.95}}, color={0,0,127}));
+      connect(Sine2.y, SinkP1.in_p0) annotation (Line(points={{67,80},{74,80},{
+              74,55.95},{73.55,55.95}}, color={0,0,127}));
       connect(SourceP1.flange, V1.inlet) annotation (Line(
-          points={{-70,20},{-50,20}},
+          points={{-70,50},{-50,50}},
           color={159,159,223},
           thickness=0.5));
-      connect(S6.y, V6.theta) annotation (Line(points={{-49,-20},{-40,-20},{-40,
-              -42.8}}, color={0,0,127}));
+      connect(S6.y, V6.theta) annotation (Line(points={{-49,10},{-40,10},{-40,
+              -12.8}}, color={0,0,127}));
       connect(V6.outlet, V7.inlet) annotation (Line(
-          points={{-30,-50},{-10,-50}},
+          points={{-30,-20},{-10,-20}},
           color={159,159,223},
           thickness=0.5));
       connect(V7.outlet, V8.inlet) annotation (Line(
-          points={{10,-50},{30,-50}},
+          points={{10,-20},{30,-20}},
           color={159,159,223},
           thickness=0.5));
       connect(V8.outlet, SinkP2.flange) annotation (Line(
-          points={{50,-50},{70,-50}},
+          points={{50,-20},{70,-20}},
           color={159,159,223},
           thickness=0.5));
-      connect(S8.y, V8.theta) annotation (Line(points={{31,-20},{40,-20},{40,-42.8}},
+      connect(S8.y, V8.theta) annotation (Line(points={{31,10},{40,10},{40,
+              -12.8}},
             color={0,0,127}));
-      connect(S7.y, V7.theta) annotation (Line(points={{-9,-20},{0,-20},{0,-42.8}},
+      connect(S7.y, V7.theta) annotation (Line(points={{-9,10},{0,10},{0,-12.8}},
             color={0,0,127}));
-      connect(Sine1.y, SinkP2.in_p0) annotation (Line(points={{67,-20},{74,-20},
-              {74,-44.05},{73.55,-44.05}}, color={0,0,127}));
+      connect(Sine1.y, SinkP2.in_p0) annotation (Line(points={{67,10},{74,10},{
+              74,-14.05},{73.55,-14.05}},  color={0,0,127}));
       connect(SourceP2.flange, V6.inlet) annotation (Line(
-          points={{-70,-50},{-50,-50}},
+          points={{-70,-20},{-50,-20}},
           color={159,159,223},
           thickness=0.5));
+      connect(SourceP3.flange, V9.inlet) annotation (Line(
+          points={{-70,-70},{-10,-70}},
+          color={159,159,223},
+          smooth=Smooth.None));
+      connect(V9.outlet, SinkP3.flange) annotation (Line(
+          points={{10,-70},{70,-70}},
+          color={159,159,223},
+          smooth=Smooth.None));
       annotation (experiment(StopTime=10), Documentation(info="<html>
 This model tests the <tt>Valve</tt> model, in each possible configuration, i.e. with all the <tt>CvData</tt> options except <tt>OpPoint</tt>, as well as <tt>CheckValve</tt>.
 
 <p>Simulate for 10 s. At time t=1, t=3 and t=6 the valves are partially closed.
-</html>"));
+</html>"),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}), graphics));
     end TestGasValve;
 
     model TestCompressorConstSpeed
