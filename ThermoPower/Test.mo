@@ -8269,8 +8269,6 @@ Casella</a>:<br>
 </html>"));
     end Flow1D_check;
 
-
-
     model TestWalls "Test various wall models"
       Thermal.MetalWallFV wall1(
         Nw=2,
@@ -9474,6 +9472,128 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
 </html>"));
       end TestEvaporatorFlux;
     end OldTests;
+
+    model TestConstantHeatTransferTwoGrid
+
+      replaceable package Medium = Modelica.Media.Water.StandardWater
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium;
+
+      parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side";
+      parameter Integer Nw = 1 "Number of nodes on the wallside";
+      parameter Integer Nt(min=1) = 1 "Number of tubes in parallel";
+      parameter SI.Distance L = 2 "Tube length";
+      parameter SI.Area A = 1e-3 "Cross-sectional area (single tube)";
+      parameter SI.Length omega = 1e-3
+        "Wet perimeter of heat transfer surface (single tube)";
+      parameter SI.Length Dhyd = 1e-4 "Hydraulic Diameter (single tube)";
+      parameter SI.MassFlowRate wnom = 10
+        "Nominal mass flow rate (single tube)";
+
+      parameter Medium.AbsolutePressure p = 1e6;
+      parameter Medium.SpecificEnthalpy h_vap = 3.2e6;
+      parameter Real u(unit = "1/s") = 1 "For unit consistency";
+
+      Medium.SpecificEnthalpy h[Nf];
+      Medium.ThermodynamicState fluidState[Nf];
+
+      ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+        constantHeatTransferCoefficientTwoGrids(
+          redeclare package Medium = Medium,
+          gamma=1,
+          Nf=Nf,
+          Nw=Nw,
+          Nt=Nt,
+          L=L,
+          A=A,
+          omega=omega,
+          Dhyd=Dhyd,
+          wnom=wnom)
+        annotation (Placement(transformation(extent={{-14,-2},{6,18}})));
+
+      Thermal.TempSource1DFV tempSource1DFV(Nw=Nw)
+        annotation (Placement(transformation(extent={{-14,18},{6,38}})));
+      Modelica.Blocks.Sources.Constant const(k=400)
+        annotation (Placement(transformation(extent={{-32,40},{-12,60}})));
+    equation
+      h=ones(Nf)*h_vap;
+      for i in 1:Nf loop
+        fluidState[i] = Medium.setState_ph(p,h[i]);
+      end for;
+
+      connect(const.y, tempSource1DFV.temperature) annotation (Line(
+          points={{-11,50},{-4,50},{-4,32}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(tempSource1DFV.wall, constantHeatTransferCoefficientTwoGrids.wall)
+        annotation (Line(
+          points={{-4,25},{-4,11}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics));
+    end TestConstantHeatTransferTwoGrid;
+
+    model TestConstantHeatTransfer
+
+      replaceable package Medium = Modelica.Media.Water.StandardWater
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium;
+
+      parameter Integer Nf(min=2) = 4 "Number of nodes on the fluid side";
+      parameter Integer Nw = Nf-1 "Number of volumes on the wallside";
+      parameter Integer Nt(min=1) = 1 "Number of tubes in parallel";
+      parameter SI.Distance L = 2 "Tube length";
+      parameter SI.Area A = 1e-3 "Cross-sectional area (single tube)";
+      parameter SI.Length omega = 1e-3
+        "Wet perimeter of heat transfer surface (single tube)";
+      parameter SI.Length Dhyd = 1e-4 "Hydraulic Diameter (single tube)";
+      parameter SI.MassFlowRate wnom = 10
+        "Nominal mass flow rate (single tube)";
+
+      parameter Medium.AbsolutePressure p = 1e6;
+      parameter Medium.SpecificEnthalpy h_vap = 3.2e6;
+      parameter Real u(unit = "1/s") = 1 "For unit consistency";
+
+      Medium.SpecificEnthalpy h[Nf];
+      Medium.ThermodynamicState fluidState[Nf];
+
+      ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+        constantHeatTransferCoefficient(
+          redeclare package Medium = Medium,
+          gamma=1,
+          Nf=Nf,
+          Nw=Nw,
+          Nt=Nt,
+          L=L,
+          A=A,
+          omega=omega,
+          Dhyd=Dhyd,
+          wnom=wnom,
+          useAverageTemperature=true,
+          final fluidState=fluidState)
+        annotation (Placement(transformation(extent={{-14,-2},{6,18}})));
+
+      Thermal.TempSource1DFV tempSource1DFV(Nw=Nw)
+        annotation (Placement(transformation(extent={{-14,18},{6,38}})));
+      Modelica.Blocks.Sources.Constant const(k=400)
+        annotation (Placement(transformation(extent={{-32,40},{-12,60}})));
+    equation
+      h=ones(Nf)*h_vap;
+      for i in 1:Nf loop
+        fluidState[i] = Medium.setState_ph(p,h[i]);
+      end for;
+
+      connect(const.y, tempSource1DFV.temperature) annotation (Line(
+          points={{-11,50},{-4,50},{-4,32}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(tempSource1DFV.wall, constantHeatTransferCoefficient.wall)
+        annotation (Line(
+          points={{-4,25},{-4,11}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics));
+    end TestConstantHeatTransfer;
   end DistributedParameterComponents;
 
   package ElectricalComponents "Test for Electrical package components"
