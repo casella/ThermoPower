@@ -2193,7 +2193,8 @@ This characteristic is such that the relative change of the flow coefficient is 
     algorithm
       // Flow equation (example N=3): H = c[1] + q_flow*c[2] + q_flow^2*c[3];
       // Note: the implementation is numerically efficient only for low values of Na
-      H := sum(q_flow^(i - 1)*c[i] for i in 1:N);
+      // Note: the first term has been removed to avoid getting 0^0 at zero flow rate
+      H := c[1] + sum(q_flow^(i - 1)*c[i] for i in 2:N);
     end polynomialFlow;
 
     function constantEfficiency "Constant efficiency characteristic"
