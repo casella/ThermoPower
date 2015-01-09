@@ -3940,10 +3940,10 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 
   equation
     if CheckValve then
-      w = homotopy(FlowChar(theta)*Av*sqrt(rho)*smooth(0, if dp >= 0 then sqrtR(
-        dp) else 0), theta/thetanom*wnom/dpnom*(inlet.p - outlet.p));
+      w = homotopy(FlowChar(theta_act)*Av*sqrt(rho)*smooth(0, if dp >= 0 then sqrtR(
+        dp) else 0), theta_act/thetanom*wnom/dpnom*(inlet.p - outlet.p));
     else
-      w = homotopy(FlowChar(theta)*Av*sqrt(rho)*sqrtR(dp), theta/thetanom*wnom/
+      w = homotopy(FlowChar(theta_act)*Av*sqrt(rho)*sqrtR(dp), theta_act/thetanom*wnom/
         dpnom*(inlet.p - outlet.p));
     end if;
     annotation (
@@ -4006,15 +4006,15 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
   equation
     p = homotopy(if not allowFlowReversal then inlet.p else noEvent(if dp >= 0
        then inlet.p else outlet.p), inlet.p);
-    Fxt = Fxt_full*xtfun(theta);
+    Fxt = Fxt_full*xtfun(theta_act);
     x = dp/p;
     xs = smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else x);
     Y = 1 - abs(xs)/(3*Fxt);
     if CheckValve then
-      w = homotopy(FlowChar(theta)*Av*Y*sqrt(rho)*smooth(0, if xs >= 0 then
-        sqrtR(p*xs) else 0), theta/thetanom*wnom/dpnom*(inlet.p - outlet.p));
+      w = homotopy(FlowChar(theta_act)*Av*Y*sqrt(rho)*smooth(0, if xs >= 0 then
+        sqrtR(p*xs) else 0), theta_act/thetanom*wnom/dpnom*(inlet.p - outlet.p));
     else
-      w = homotopy(FlowChar(theta)*Av*Y*sqrt(rho)*sqrtR(p*xs), theta/thetanom*
+      w = homotopy(FlowChar(theta_act)*Av*Y*sqrt(rho)*sqrtR(p*xs), theta_act/thetanom*
         wnom/dpnom*(inlet.p - outlet.p));
     end if;
     annotation (
@@ -4071,10 +4071,10 @@ Extends the <tt>ValveBase</tt> model (see the corresponding documentation for co
       Ff*pv) else inlet.p - outlet.p
       "Effective pressure drop, accounting for possible choked conditions";
     if CheckValve then
-      w = homotopy(FlowChar(theta)*Av*sqrt(rho)*(if dpEff >= 0 then sqrtR(dpEff)
-         else 0), theta/thetanom*wnom/dpnom*(inlet.p - outlet.p));
+      w = homotopy(FlowChar(theta_act)*Av*sqrt(rho)*(if dpEff >= 0 then sqrtR(dpEff)
+         else 0), theta_act/thetanom*wnom/dpnom*(inlet.p - outlet.p));
     else
-      w = homotopy(FlowChar(theta)*Av*sqrt(rho)*sqrtR(dpEff), theta/thetanom*
+      w = homotopy(FlowChar(theta_act)*Av*sqrt(rho)*sqrtR(dpEff), theta_act/thetanom*
         wnom/dpnom*(inlet.p - outlet.p));
     end if;
     annotation (
@@ -4475,6 +4475,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
   end SteamTurbineUnit;
 
   package BaseClasses "Contains partial models"
+    extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
       "Basic interface for 1-dimensional water/steam fluid flow models"
       replaceable package Medium = StandardWater constrainedby
@@ -4615,6 +4616,12 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]"
         annotation (Dialog(group="Flow Coefficient",
                            enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Cv)));
+      parameter Boolean useThetaInput = true
+        "Use the input connector for the valve opening"
+        annotation(Dialog(group = "Valve Opening"), choices(checkBox = true));
+      parameter SI.PerUnit theta_fix = 1
+        "Fixed opening value when the input connector not used"
+        annotation(Dialog(group= "Valve Opening", enable = not useThetaInput));
       parameter Medium.AbsolutePressure pnom "Nominal inlet pressure"
         annotation (Dialog(group="Nominal operating point"));
       parameter SI.Pressure dpnom "Nominal pressure drop"
@@ -4663,11 +4670,16 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         p(start=pout_start),
         redeclare package Medium = Medium) annotation (Placement(transformation(
               extent={{80,-20},{120,20}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput theta "Valve opening in per unit"
+      Modelica.Blocks.Interfaces.RealInput theta if useThetaInput
+        "Valve opening in per unit"
         annotation (Placement(transformation(
             origin={0,80},
             extent={{-20,-20},{20,20}},
             rotation=270)));
+    protected
+      Modelica.Blocks.Interfaces.RealInput theta_act
+        "Protected connector for conditional input connector handling";
+
     initial equation
       if CvData == ThermoPower.Choices.Valve.CvTypes.Kv then
         Av = 2.7778e-5*Kv;
@@ -4689,6 +4701,12 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       inlet.h_outflow = inStream(outlet.h_outflow) - Qnom/wnom;
 
       dp = inlet.p - outlet.p "Definition of dp";
+
+      // Valve opening
+      connect(theta, theta_act); // automatically removed if theta is disabled
+      if not useThetaInput then
+        theta_act = theta_fix;   // provide actual opening value from parameter
+      end if;
       annotation (
         Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
         Diagram(graphics),
