@@ -4657,6 +4657,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Units.LiquidDensity rho "Inlet density";
       Medium.Temperature Tin;
       SI.Pressure dp "Pressure drop across the valve";
+      SI.PerUnit theta_act "Actual valve opening";
     protected
       function sqrtR = Functions.sqrtReg (delta=b*dpnom);
     public
@@ -4679,7 +4680,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
             extent={{-20,-20},{20,20}},
             rotation=270)));
     protected
-      Modelica.Blocks.Interfaces.RealInput theta_act
+      Modelica.Blocks.Interfaces.RealInput theta_int
         "Protected connector for conditional input connector handling";
 
     initial equation
@@ -4705,10 +4706,11 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       dp = inlet.p - outlet.p "Definition of dp";
 
       // Valve opening
-      connect(theta, theta_act); // automatically removed if theta is disabled
+      connect(theta, theta_int); // automatically removed if theta is disabled
       if not useThetaInput then
-        theta_act = theta_fix;   // provide actual opening value from parameter
+        theta_int = theta_fix;   // provide actual opening value from parameter
       end if;
+      theta_act = theta_int;
       annotation (
         Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
         Diagram(graphics),
@@ -4785,6 +4787,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
             group="Characteristics", enable=not usePowerCharacteristic),
           choicesAllMatching=true);
       parameter Integer Np0(min=1) = 1 "Nominal number of pumps in parallel";
+      parameter Boolean use_in_Np = false
+        "Use connector input for the pressure"
+        annotation(Dialog(group="External inputs"), choices(checkBox=true));
       parameter Units.LiquidDensity rho0=1000 "Nominal Liquid Density"
         annotation (Dialog(group="Characteristics"));
       parameter NonSI.AngularVelocity_rpm n0 "Nominal rotational speed"
@@ -4854,7 +4859,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
               allowFlowReversal then +Modelica.Constants.inf else 0))
         annotation (Placement(transformation(extent={{40,50},{80,90}}, rotation=
                0)));
-      Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps"
+      Modelica.Blocks.Interfaces.IntegerInput in_Np if use_in_Np
+        "Number of  parallel pumps"
         annotation (Placement(transformation(
             origin={28,80},
             extent={{-10,-10},{10,10}},
