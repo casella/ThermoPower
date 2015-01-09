@@ -3464,8 +3464,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
         annotation(choicesAllMatching = true);
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
-      final parameter Integer Nw = N - 1
-        "Number of volumes on the wall interface";
+      parameter Integer Nw = N - 1 "Number of volumes on the wall interface";
       parameter Integer Nt=1 "Number of tubes in parallel";
       parameter SI.Distance L "Tube length";
       parameter SI.Position H=0 "Elevation of outlet over inlet";
