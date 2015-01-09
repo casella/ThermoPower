@@ -1037,6 +1037,11 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
     model DittusBoelter "Dittus-Boelter heat transfer correlation"
       extends BaseClasses.DistributedHeatTransferFV;
+      parameter Boolean heating=true
+        "true if fluid is heated, false if fluid is cooled";
+      parameter Real Re_min=10000 "Minimum Reynolds number";
+      final parameter Real Pr_min=0.7 "Minimum Prandtl number";
+      final parameter Real Pr_max=160 "Maximum Prandtl number";
       SI.CoefficientOfHeatTransfer gamma[Nf]
         "Heat transfer coefficients at the nodes";
       SI.CoefficientOfHeatTransfer gamma_vol[Nw]
@@ -1045,6 +1050,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
       Medium.ThermalConductivity k[Nf] "Thermal conductivity";
       Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
+      SI.PerUnit Re[Nf] "Reynolds number";
+      SI.PerUnit Pr[Nf] "Prandtl numbers";
+      SI.PerUnit Re_l[Nf] "Reynolds number limited to validity range";
+      SI.PerUnit Pr_l[Nf] "Prandtl number limited to validity range";
 
     equation
       assert(Nw == Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
@@ -1053,13 +1062,24 @@ The swapping is performed if the counterCurrent parameter is true (default value
         mu[j] = Medium.dynamicViscosity(fluidState[j]);
         k[j] = Medium.thermalConductivity(fluidState[j]);
         cp[j] = Medium.heatCapacity_cp(fluidState[j]);
-        gamma[j] = Water.f_dittus_boelter(
-          w[j],
-          Dhyd,
-          A,
-          mu[j],
-          k[j],
-          cp[j]);
+        Re[j] = abs(w[j]*Dhyd/(A*mu[j]));
+        Pr[j] = cp[j]*mu[j]/k[j];
+        Re_l[j] = Functions.smoothSat(
+              Re[j],
+              Re_min,
+              1e9,
+              Re_min/2);
+        Pr_l[j] = Functions.smoothSat(
+              Pr[j],
+              Pr_min,
+              Pr_max,
+              Pr_min/2,
+              Pr_max/10);
+        if heating then
+          gamma[j] = 0.023*k[j]/Dhyd*Re_l[j]^0.8*Pr_l[j]^0.4;
+        else
+          gamma[j] = 0.023*k[j]/Dhyd*Re_l[j]^0.8*Pr_l[j]^0.3;
+        end if;
       end for;
 
       for j in 1:Nw loop
@@ -1440,12 +1460,20 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
     model DittusBoelter "Dittus-Boelter heat transfer correlation"
       extends BaseClasses.DistributedHeatTransferFEM;
+      parameter Boolean heating=true
+        "true if fluid is heated, false if fluid is cooled";
+      parameter Real Re_min=10000 "Minimum Reynolds number";
+      final parameter Real Pr_min=0.7 "Minimum Prandtl number";
+      final parameter Real Pr_max=160 "Maximum Prandtl number";
       SI.CoefficientOfHeatTransfer gamma[Nf]
         "Heat transfer coefficients at the nodes";
       Medium.DynamicViscosity mu[Nf] "Dynamic viscosity";
       Medium.ThermalConductivity k[Nf] "Thermal conductivity";
       Medium.SpecificHeatCapacity cp[Nf] "Heat capacity at constant pressure";
-
+      SI.PerUnit Re[Nf] "Reynolds number";
+      SI.PerUnit Pr[Nf] "Prandtl numbers";
+      SI.PerUnit Re_l[Nf] "Reynolds number limited to validity range";
+      SI.PerUnit Pr_l[Nf] "Prandtl number limited to validity range";
     equation
       assert(Nw ==  Nf, "Number of nodes Nw on wall side should be equal to number of nodes on the fluid side Nf");
 
@@ -1454,13 +1482,24 @@ The swapping is performed if the counterCurrent parameter is true (default value
         mu[j] = Medium.dynamicViscosity(fluidState[j]);
         k[j] = Medium.thermalConductivity(fluidState[j]);
         cp[j] = Medium.heatCapacity_cp(fluidState[j]);
-        gamma[j] = Water.f_dittus_boelter(
-          w[j],
-          Dhyd,
-          A,
-          mu[j],
-          k[j],
-          cp[j]);
+        Re[j] = abs(w[j]*Dhyd/(A*mu[j]));
+        Pr[j] = cp[j]*mu[j]/k[j];
+        Re_l[j] = Functions.smoothSat(
+              Re[j],
+              Re_min,
+              1e9,
+              Re_min/2);
+        Pr_l[j] = Functions.smoothSat(
+              Pr[j],
+              Pr_min,
+              Pr_max,
+              Pr_min/2,
+              Pr_max/10);
+        if heating then
+          gamma[j] = 0.023*k[j]/Dhyd*Re_l[j]^0.8*Pr_l[j]^0.4;
+        else
+          gamma[j] = 0.023*k[j]/Dhyd*Re_l[j]^0.8*Pr_l[j]^0.3;
+        end if;
       end for;
 
       for j in 1:Nw loop
