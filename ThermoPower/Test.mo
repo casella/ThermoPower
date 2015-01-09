@@ -851,16 +851,15 @@ Casella</a>:<br>
       ThermoPower.Water.SinkPressure
                               SinkP1(p0=3e5) annotation (Placement(
             transformation(extent={{40,50},{60,70}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant1(k=1)
-                                                 annotation (Placement(
-            transformation(extent={{-90,10},{-70,30}}, rotation=0)));
       Water.ValveLiq ValveLiq1(
-        dpnom=2e5,
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        pnom=5e5,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av,
-        Av=7.2e-5) annotation (Placement(transformation(extent={{-10,50},{10,70}},
+        Av=7.2e-5,
+        useThetaInput=false,
+        pnom=500000,
+        dpnom=200000)
+                   annotation (Placement(transformation(extent={{-10,50},{10,70}},
               rotation=0)));
       ThermoPower.Water.SourcePressure
                                 SourceP2(p0=5e5, h=2e5) annotation (Placement(
@@ -869,12 +868,14 @@ Casella</a>:<br>
                               SinkP2(p0=3e5) annotation (Placement(
             transformation(extent={{40,10},{60,30}}, rotation=0)));
       Water.ValveLiq ValveLiq2(
-        dpnom=2e5,
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        pnom=5e5,
         CvData=ThermoPower.Choices.Valve.CvTypes.Kv,
-        Kv=2.592) annotation (Placement(transformation(extent={{-10,10},{10,30}},
+        Kv=2.592,
+        useThetaInput=false,
+        pnom=500000,
+        dpnom=200000)
+                  annotation (Placement(transformation(extent={{-10,10},{10,30}},
               rotation=0)));
       ThermoPower.Water.SourcePressure
                                 SourceP3(p0=5e5, h=2e5) annotation (Placement(
@@ -883,12 +884,14 @@ Casella</a>:<br>
                               SinkP3(p0=3e5) annotation (Placement(
             transformation(extent={{40,-30},{60,-10}}, rotation=0)));
       Water.ValveLiq ValveLiq3(
-        dpnom=2e5,
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        pnom=5e5,
         CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
-        Cv=2.997) annotation (Placement(transformation(extent={{-10,-30},{10,-10}},
+        Cv=2.997,
+        useThetaInput=false,
+        pnom=500000,
+        dpnom=200000)
+                  annotation (Placement(transformation(extent={{-10,-30},{10,-10}},
               rotation=0)));
       ThermoPower.Water.SourcePressure
                                 SourceP4(p0=5e5, h=2e5) annotation (Placement(
@@ -897,12 +900,14 @@ Casella</a>:<br>
                               SinkP4(p0=3e5) annotation (Placement(
             transformation(extent={{40,-70},{60,-50}}, rotation=0)));
       Water.ValveLiq ValveLiq4(
-        dpnom=2e5,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        pnom=5e5,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
         wnom=1.012,
-        rhonom=989) annotation (Placement(transformation(extent={{-10,-70},{10,
+        rhonom=989,
+        useThetaInput=false,
+        pnom=500000,
+        dpnom=200000)
+                    annotation (Placement(transformation(extent={{-10,-70},{10,
                 -50}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -915,8 +920,6 @@ Casella</a>:<br>
           points={{-30,60},{-10,60}},
           thickness=0.5,
           color={0,0,255}));
-      connect(Constant1.y, ValveLiq1.theta) annotation (Line(points={{-69,20},{
-              -60,20},{-60,80},{0,80},{0,68}}, color={0,0,127}));
       connect(ValveLiq2.outlet, SinkP2.flange) annotation (Line(
           points={{10,20},{40,20}},
           thickness=0.5,
@@ -925,8 +928,6 @@ Casella</a>:<br>
           points={{-30,20},{-10,20}},
           thickness=0.5,
           color={0,0,255}));
-      connect(Constant1.y, ValveLiq2.theta) annotation (Line(points={{-69,20},{
-              -60,20},{-60,40},{0,40},{0,28}}, color={0,0,127}));
       connect(ValveLiq3.outlet, SinkP3.flange) annotation (Line(
           points={{10,-20},{40,-20}},
           thickness=0.5,
@@ -935,8 +936,6 @@ Casella</a>:<br>
           points={{-30,-20},{-10,-20}},
           thickness=0.5,
           color={0,0,255}));
-      connect(Constant1.y, ValveLiq3.theta) annotation (Line(points={{-69,20},{
-              -60,20},{-60,0},{0,0},{0,-12}}, color={0,0,127}));
       connect(ValveLiq4.outlet, SinkP4.flange) annotation (Line(
           points={{10,-60},{40,-60}},
           thickness=0.5,
@@ -945,8 +944,6 @@ Casella</a>:<br>
           points={{-30,-60},{-10,-60}},
           thickness=0.5,
           color={0,0,255}));
-      connect(Constant1.y, ValveLiq4.theta) annotation (Line(points={{-69,20},{
-              -60,20},{-60,-40},{0,-40},{0,-52}}, color={0,0,127}));
       annotation (
         Diagram(graphics),
         experiment(StopTime=4, Tolerance=1e-006),
@@ -9473,20 +9470,18 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
       end TestEvaporatorFlux;
     end OldTests;
 
-    model TestConstantHeatTransferTwoGrid_Wcoarce
+    model TestConstantHeatTransferTwoGrid
 
       replaceable package Medium = Modelica.Media.Water.StandardWater
         constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium;
 
-      parameter Integer Nf(min=2) = 7 "Number of nodes on the fluid side";
-      parameter Integer Nw = 3 "Number of nodes on the wallside";
+      parameter Integer Nf(min=2) = 2 "Number of nodes on the fluid side";
+      parameter Integer Nw = 1 "Number of nodes on the wallside";
       parameter Integer Nt(min=1) = 1 "Number of tubes in parallel";
-      parameter SI.Distance L = Nf-1 "Tube length";
+      parameter SI.Distance L = 2 "Tube length";
       parameter SI.Area A = 1e-3 "Cross-sectional area (single tube)";
-      parameter SI.Length omega = 1
+      parameter SI.Length omega = 1e-3
         "Wet perimeter of heat transfer surface (single tube)";
-      parameter SI.CoefficientOfHeatTransfer gamma = 1
-        "Constant heat transfer coefficient";
       parameter SI.Length Dhyd = 1e-4 "Hydraulic Diameter (single tube)";
       parameter SI.MassFlowRate wnom = 10
         "Nominal mass flow rate (single tube)";
@@ -9495,64 +9490,107 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
       parameter Medium.SpecificEnthalpy h_vap = 3.2e6;
       parameter Real u(unit = "1/s") = 1 "For unit consistency";
 
-      parameter SI.Temperature Tw_start = 300+273.15;
-      parameter SI.Temperature Tw_end = 320+273.15;
-      parameter SI.Temperature Tf_start = 300+273.15;
-      parameter SI.Temperature Tf_end = 360+273.15;
-
-      Medium.Temperature Tf[Nf];
+      Medium.SpecificEnthalpy h[Nf];
       Medium.ThermodynamicState fluidState[Nf];
-      Medium.MassFlowRate w[Nf];
 
       ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
         constantHeatTransferCoefficientTwoGrids(
-        redeclare package Medium = Medium,
-        gamma=gamma,
-        Nf=Nf,
-        Nw=Nw,
-        Nt=Nt,
-        L=L,
-        A=A,
-        omega=omega,
-        Dhyd=Dhyd,
-        wnom=wnom,
-        w=w,
-        final fluidState=fluidState)
-        annotation (Placement(transformation(extent={{-28,-2},{-8,18}})));
+          redeclare package Medium = Medium,
+          gamma=1,
+          Nf=Nf,
+          Nw=Nw,
+          Nt=Nt,
+          L=L,
+          A=A,
+          omega=omega,
+          Dhyd=Dhyd,
+          wnom=wnom)
+        annotation (Placement(transformation(extent={{-14,-2},{6,18}})));
 
-      Thermal.TempSource1DlinFV tempSource1DlinFV(
-         temperature_1=Tw_start,
-         temperature_Nw=Tw_end,
-         Nw=Nw)
-        annotation (Placement(transformation(extent={{-28,20},{-8,40}})));
+      Thermal.TempSource1DFV tempSource1DFV(Nw=Nw)
+        annotation (Placement(transformation(extent={{-14,18},{6,38}})));
+      Modelica.Blocks.Sources.Constant const(k=400)
+        annotation (Placement(transformation(extent={{-32,40},{-12,60}})));
     equation
-      w=ones(Nf)*wnom;
-      Tf=Functions.linspaceExt(Tf_start,Tf_end,Nf);
-
+      h=ones(Nf)*h_vap;
       for i in 1:Nf loop
-        fluidState[i] = Medium.setState_pT(p,Tf[i]);
+        fluidState[i] = Medium.setState_ph(p,h[i]);
       end for;
 
-      connect(tempSource1DlinFV.wall, constantHeatTransferCoefficientTwoGrids.wall)
+      connect(const.y, tempSource1DFV.temperature) annotation (Line(
+          points={{-11,50},{-4,50},{-4,32}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(tempSource1DFV.wall, constantHeatTransferCoefficientTwoGrids.wall)
         annotation (Line(
-          points={{-18,27},{-18,11}},
+          points={{-4,25},{-4,11}},
           color={255,127,0},
           smooth=Smooth.None));
       annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
-                -100},{100,100}}), graphics), experiment(StopTime=10));
-    end TestConstantHeatTransferTwoGrid_Wcoarce;
+                -100},{100,100}}), graphics));
+    end TestConstantHeatTransferTwoGrid;
 
-    model TestConstantHeatTransferTwoGrid_Fcoarce
-      extends TestConstantHeatTransferTwoGrid_Wcoarce(
-        Nf=4,
-        Nw=6,
-        L=Nw,
-        Tf_start = 295+273.15,
-        Tf_end = 325+273.15,
-        Tw_start = 305+273.15,
-        Tw_end = 355+273.15);
-      annotation (experiment(StopTime=10));
-    end TestConstantHeatTransferTwoGrid_Fcoarce;
+    model TestConstantHeatTransfer
+
+      replaceable package Medium = Modelica.Media.Water.StandardWater
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium;
+
+      parameter Integer Nf(min=2) = 4 "Number of nodes on the fluid side";
+      parameter Integer Nw = Nf-1 "Number of volumes on the wallside";
+      parameter Integer Nt(min=1) = 1 "Number of tubes in parallel";
+      parameter SI.Distance L = 2 "Tube length";
+      parameter SI.Area A = 1e-3 "Cross-sectional area (single tube)";
+      parameter SI.Length omega = 1e-3
+        "Wet perimeter of heat transfer surface (single tube)";
+      parameter SI.Length Dhyd = 1e-4 "Hydraulic Diameter (single tube)";
+      parameter SI.MassFlowRate wnom = 10
+        "Nominal mass flow rate (single tube)";
+
+      parameter Medium.AbsolutePressure p = 1e6;
+      parameter Medium.SpecificEnthalpy h_vap = 3.2e6;
+      parameter Real u(unit = "1/s") = 1 "For unit consistency";
+
+      Medium.SpecificEnthalpy h[Nf];
+      Medium.ThermodynamicState fluidState[Nf];
+
+      ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+        constantHeatTransferCoefficient(
+          redeclare package Medium = Medium,
+          gamma=1,
+          Nf=Nf,
+          Nw=Nw,
+          Nt=Nt,
+          L=L,
+          A=A,
+          omega=omega,
+          Dhyd=Dhyd,
+          wnom=wnom,
+          useAverageTemperature=true,
+          final fluidState=fluidState)
+        annotation (Placement(transformation(extent={{-14,-2},{6,18}})));
+
+      Thermal.TempSource1DFV tempSource1DFV(Nw=Nw)
+        annotation (Placement(transformation(extent={{-14,18},{6,38}})));
+      Modelica.Blocks.Sources.Constant const(k=400)
+        annotation (Placement(transformation(extent={{-32,40},{-12,60}})));
+    equation
+      h=ones(Nf)*h_vap;
+      for i in 1:Nf loop
+        fluidState[i] = Medium.setState_ph(p,h[i]);
+      end for;
+
+      connect(const.y, tempSource1DFV.temperature) annotation (Line(
+          points={{-11,50},{-4,50},{-4,32}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(tempSource1DFV.wall, constantHeatTransferCoefficient.wall)
+        annotation (Line(
+          points={{-4,25},{-4,11}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}}), graphics));
+    end TestConstantHeatTransfer;
   end DistributedParameterComponents;
 
   package ElectricalComponents "Test for Electrical package components"
