@@ -749,7 +749,8 @@ Casella</a>:<br>
                                 SourceP1(p0=5e5, h=400e3) annotation (Placement(
             transformation(extent={{-50,30},{-30,50}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SinkP1 annotation (Placement(transformation(
+                              SinkP1(use_in_p0=false)
+                                     annotation (Placement(transformation(
               extent={{40,30},{60,50}}, rotation=0)));
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
