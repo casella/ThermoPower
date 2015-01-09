@@ -1912,7 +1912,8 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     algorithm
       // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
       // Note: the implementation is numerically efficient only for low values of N
-      head := sum(q_flow^(i - 1)*c[i] for i in 1:N);
+      // Note: the first term has been removed to avoid getting 0^0 at zero flow rate
+      head := c[1] + sum(q_flow^(i - 1)*c[i] for i in 2:N);
     end polynomialFlow;
 
     function constantPower "Constant power consumption characteristic"
@@ -1988,7 +1989,8 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     algorithm
       // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
       // Note: the implementation is numerically efficient only for low values of N
-      head := sum(q_flow^(i - 1)*c[i] for i in 1:N);
+      // Note: the first term has been removed to avoid getting 0^0 at zero flow rate
+      head := c[1] + sum(q_flow^(i - 1)*c[i] for i in 2:N);
     end polynomialFlow_rel;
 
     function polynomialEfficiency_rel
@@ -2013,7 +2015,8 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
     algorithm
       // Flow equation (example N=3): head = c[1] + q_flow*c[2] + q_flow^2*c[3];
       // Note: the implementation is numerically efficient only for low values of N
-      eta := sum(q_flow^(i - 1)*c[i] for i in 1:N);
+      // Note: the first term has been removed to avoid getting 0^0 at zero flow rate
+      eta := c[1] + sum(q_flow^(i - 1)*c[i] for i in 2:N);
     end polynomialEfficiency_rel;
 
     partial function baseFlow_rel
