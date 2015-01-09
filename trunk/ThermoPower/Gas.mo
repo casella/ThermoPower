@@ -1959,6 +1959,12 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Real Cv=0 "Cv (US) flow coefficient [USG/min]"
       annotation (Dialog(group="Flow Coefficient",
                          enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Cv)));
+    parameter Boolean useThetaInput = true
+      "Use the input connector for the valve opening"
+      annotation(Dialog(group = "Valve Opening"), choices(checkBox = true));
+    parameter SI.PerUnit theta_fix = 1
+      "Fixed opening value when the input connector not used"
+      annotation(Dialog(group= "Valve Opening", enable = not useThetaInput));
     parameter Medium.AbsolutePressure pnom "Nominal inlet pressure"
       annotation (Dialog(group="Nominal operating point"));
     parameter Medium.AbsolutePressure dpnom "Nominal pressure drop"
@@ -2007,7 +2013,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter SI.PerUnit xs_nom(fixed=false)
       "Nominal saturated pressure drop ratio";
     parameter SI.PerUnit Y_nom(fixed=false) "Nominal compressibility factor";
-
+    Modelica.Blocks.Interfaces.RealInput theta_act
+      "Protected connector for conditional input connector handling";
   public
     FlangeA inlet(
       redeclare package Medium = Medium,
@@ -2021,7 +2028,7 @@ package Gas "Models of components with ideal gases as working fluid"
              else 0),
       p(start=pout_start)) annotation (Placement(transformation(extent={{80,-20},
               {120,20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput theta annotation (Placement(
+    Modelica.Blocks.Interfaces.RealInput theta if useThetaInput annotation (Placement(
           transformation(
           origin={0,72},
           extent={{-10,-10},{10,10}},
@@ -2058,17 +2065,17 @@ package Gas "Models of components with ideal gases as working fluid"
     gas.Xi = inStream(inlet.Xi_outflow);
 
     p = noEvent(if inlet.p >= outlet.p then inlet.p else outlet.p);
-    Fxt = Fxt_full*xtfun(theta);
+    Fxt = Fxt_full*xtfun(theta_act);
     dp = inlet.p - outlet.p;
     x = dp/p;
     xs = noEvent(smooth(0, if x < -Fxt then -Fxt else if x > Fxt then Fxt else
       x));
     Y = noEvent(1 - abs(xs)/(3*Fxt));
     if CheckValve then
-      w = homotopy(FlowChar(theta)*Av*Y*sqrt(gas.d)*noEvent(smooth(0, if xs >=
-        0 then sqrtR(p*xs) else 0)), theta/thetanom*dpnom/wnom*dp);
+      w = homotopy(FlowChar(theta_act)*Av*Y*sqrt(gas.d)*noEvent(smooth(0, if xs >=
+        0 then sqrtR(p*xs) else 0)), theta_act/thetanom*dpnom/wnom*dp);
     else
-      w = homotopy(FlowChar(theta)*Av*Y*sqrt(gas.d)*sqrtR(p*xs), theta/thetanom
+      w = homotopy(FlowChar(theta_act)*Av*Y*sqrt(gas.d)*sqrtR(p*xs), theta_act/thetanom
         *dpnom/wnom*dp);
     end if;
 
@@ -2079,6 +2086,12 @@ package Gas "Models of components with ideal gases as working fluid"
     // Mass balances of independent components
     inlet.Xi_outflow = inStream(outlet.Xi_outflow);
     inStream(inlet.Xi_outflow) = outlet.Xi_outflow;
+
+    // Valve opening
+    connect(theta, theta_act); // automatically removed if theta is disabled
+    if not useThetaInput then
+      theta_act = theta_fix;   // provide actual opening value from parameter
+    end if;
 
     annotation (
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
@@ -3456,6 +3469,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
   end FanMech;
 
   package BaseClasses
+    extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
       "Basic interface for 1-dimensional water/steam fluid flow models"
       extends Icons.Gas.Tube;
