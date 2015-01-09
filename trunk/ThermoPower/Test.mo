@@ -1642,12 +1642,11 @@ Casella</a>:<br>
       ThermoPower.Water.SourcePressure
                                 Source(p0=1e5, h=1.5e5) annotation (Placement(
             transformation(extent={{-80,-20},{-60,0}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=1e-5) annotation (Placement(
+      ThermoPower.Water.ValveLin Valve(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,-20},{30,0}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
-                              SinkP1(p0=300000, use_in_p0=true)
-                                             annotation (Placement(
-            transformation(extent={{50,-20},{70,0}}, rotation=0)));
+      ThermoPower.Water.SinkPressure Sink(use_in_p0=true, p0=300000)
+        annotation (Placement(transformation(extent={{50,-20},{70,0}}, rotation
+              =0)));
       /*
   ThermoPower.Water.Pump Pump1(
     rho0=1000,
@@ -1666,7 +1665,7 @@ Casella</a>:<br>
     initOpt=ThermoPower.Choices.Init.Options.steadyState)
                         annotation (extent=[-54,26; -34,46]);
 */
-      Water.PumpNPSH Pump1(
+      Water.PumpNPSH Pump(
         rho0=1000,
         hstart=1e5,
         V=0.01,
@@ -1687,13 +1686,13 @@ Casella</a>:<br>
         dp0=300000) annotation (Placement(transformation(extent={{-40,-22},{-20,
                 -2}}, rotation=0)));
 
-      Modelica.Blocks.Sources.Ramp Ramp1(
+      Modelica.Blocks.Sources.Ramp Ramp(
         duration=4,
         startTime=4,
         height=6e5,
         offset=1e5) annotation (Placement(transformation(extent={{20,40},{40,60}},
               rotation=0)));
-      Modelica.Blocks.Sources.Ramp Step1(
+      Modelica.Blocks.Sources.Ramp Step(
         height=1,
         startTime=1,
         offset=1e-6,
@@ -1702,21 +1701,21 @@ Casella</a>:<br>
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
-      connect(ValveLin1.outlet, SinkP1.flange) annotation (Line(
+      connect(Valve.outlet, Sink.flange) annotation (Line(
           points={{30,-10},{50,-10}},
           color={0,0,255},
           thickness=0.5));
-      connect(Source.flange, Pump1.infl) annotation (Line(
+      connect(Source.flange, Pump.infl) annotation (Line(
           points={{-60,-10},{-38,-10}},
           color={0,0,255},
           thickness=0.5));
-      connect(Pump1.outfl, ValveLin1.inlet) annotation (Line(
+      connect(Pump.outfl, Valve.inlet) annotation (Line(
           points={{-24,-5},{-8,-5},{-8,-10},{10,-10}},
           color={0,0,255},
           thickness=0.5));
-      connect(Ramp1.y, SinkP1.in_p0)
+      connect(Ramp.y, Sink.in_p0)
         annotation (Line(points={{41,50},{56,50},{56,-1.2}}, color={0,0,127}));
-      connect(Step1.y, ValveLin1.cmd)
+      connect(Step.y, Valve.cmd)
         annotation (Line(points={{1,20},{20,20},{20,-2}}, color={0,0,127}));
       annotation (
         Diagram(graphics),
@@ -1890,14 +1889,11 @@ Schiavo</a>:<br>
       annotation (
         Diagram(graphics),
         experiment(StopTime=10, Tolerance=1e-006),
-        Documentation(info="<HTML>
-<p>This model tests three <tt>Pump</tt> models with different flow caratteristcs and with the check valve option active. Two pumps in parallel are simulated.
-<p>The valve is opened at time t=1s. The sink pressure is then increased so as to operate the pump in all the possible working conditions, including stopped flow.
-<p>
-Simulation Interval = [0...10] sec <br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</HTML>", revisions="<html>
+        Documentation(info="<html>
+<p>This model tests three <code>Pump</code> models with different flow characteristics and with the check valve option active. Two pumps in parallel are simulated. </p>
+<p>The valve is opened at time t=1s. The sink pressure is then increased so as to operate the pump in all the possible working conditions, including stopped flow. </p>
+<p>Simulation Interval = [0...10] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
+</html>", revisions="<html>
 <ul>
 <li><i>3 Dec 2008</i>
     by <a>Luca Savoldelli</a>:<br>
