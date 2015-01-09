@@ -1757,7 +1757,9 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
          else if x > xmax - dxmax then
            xmax - dxmax + dxmax*(x - xmax + dxmax)/(dxmax^4 + (x - xmax + dxmax)^4)^0.25
          else x;
-    annotation (smoothOrder=4, InLine=true);
+    annotation (smoothOrder=4, InLine=true,
+                normallyConstant = xmin, normallyConstant = xmax,
+                normallyConstant = dxmin, normallyConstant = dxmax);
   end smoothSat;
 
   function linspaceExt "Extended linspace function handling also the N=1 case"
