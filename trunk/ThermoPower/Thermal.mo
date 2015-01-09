@@ -916,16 +916,13 @@ The swapping is performed if the counterCurrent parameter is true (default value
         "Length of volumes on the fluid side";
        Medium.Temperature Tv[Nf-1] "Fluid temperature in the volumes";
        SI.Power Qv[Nf-1] "Heat flows entering the volumes";
-       final parameter SI.PerUnit Hv[min(Nw,Nv),Nv] = getH(Nv,Nw)
+       final parameter SI.PerUnit Hv[min(Nw,Nv),Nv] = getH(Nw,Nv)
         "Sums heat flows on fluid side onto coarser grid"
         annotation(Evaluate = true);
-       final parameter SI.PerUnit Hw[min(Nw,Nv),Nw] = getH(Nw,Nv)
+       final parameter SI.PerUnit Hw[min(Nw,Nv),Nw] = getH(Nv,Nw)
         "Sums heat flows on wall side onto coarser grid"
         annotation(Evaluate = true);
-       final parameter SI.PerUnit Gv[max(Nw,Nv), Nv] = getH(min(Nw,Nv), max(Nw,Nv))
-        "Maps temperatures on coarser grid onto finer grid"
-        annotation(Evaluate = true);
-       final parameter SI.PerUnit Gw[max(Nw,Nv), Nw] = getH(min(Nw,Nv), max(Nw,Nv))
+       final parameter SI.PerUnit G[max(Nw,Nv),min(Nw,Nv)] = transpose(getH(min(Nw,Nv),max(Nw,Nv)))
         "Maps temperatures on coarser grid onto finer grid"
         annotation(Evaluate = true);
 
@@ -933,32 +930,32 @@ The swapping is performed if the counterCurrent parameter is true (default value
        function getH
          input Integer N1;
          input Integer N2;
-         output SI.PerUnit H[min(N1,N2),N1];
+         output SI.PerUnit H[min(N1,N2),N2];
       protected
           Integer D;
        algorithm
          assert(rem(N1,N2) == 0 or rem(N2,N1)==0,
           "Please choose grids so that the number of wall volumes is a (sub)multiple of the fluid volumes");
-         H := zeros(min(N1,N2),N1);
-         D := div(N1,N2);
-         if N1 > min(N1,N2) then
-           for i in 1:N2 loop
+         H := zeros(min(N1,N2),N2);
+         D := div(N2,N1);
+         if N2 > min(N1,N2) then
+           for i in 1:N1 loop
              for j in 1:D loop
                H[i,(i-1)*D+j] :=1;
              end for;
            end for;
          else
-           H := identity(N1);
+           H := identity(N2);
          end if;
        end getH;
 
     equation
       Hv*Qv = Hw*Qw "Energy balance on coarser grid";
       if Nw >= Nv then
-        Qw = omega*lw*gamma*(Tw - Gv*Tv)
+        Qw = omega*lw*gamma*(Tw - G*Tv)
           "Convective heat transfer on finer grid";
       else
-        Qv = omega*lv*gamma*(Tv - Gw*Tw)
+        Qv = omega*lv*gamma*(Tv - G*Tw)
           "Convective heat transfer on finer grid";
       end if;
       for j in 1:Nv loop
