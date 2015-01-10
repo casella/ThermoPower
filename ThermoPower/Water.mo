@@ -4108,20 +4108,27 @@ li><i>1 Jul 2004</i>
 
   model Pump "Centrifugal pump with ideally controlled speed"
     extends BaseClasses.PumpBase;
-    parameter NonSI.AngularVelocity_rpm n_const=n0 "Constant rotational speed";
-    Modelica.Blocks.Interfaces.RealInput in_n "RPM" annotation (Placement(
+    parameter NonSI.AngularVelocity_rpm n_const=n0 "Constant rotational speed"
+      annotation(Dialog(enable = not use_in_n));
+    Modelica.Blocks.Interfaces.RealInput in_n if use_in_n "RPM" annotation (Placement(
           transformation(
           origin={-26,80},
           extent={{-10,-10},{10,10}},
           rotation=270)));
+    parameter Boolean use_in_n = false
+      "Use connector input for the rotational speed"
+      annotation(Dialog(group="External inputs"), choices(checkBox=true));
+  protected
+    Modelica.Blocks.Interfaces.RealInput in_n_int
+      "Internal connector for rotational speed";
   equation
-    n = in_n "Rotational speed";
-    if cardinality(in_n) == 0 then
-      in_n = n_const "Rotational speed provided by parameter";
+    connect(in_n, in_n_int);
+    if not use_in_n then
+      in_n_int = n_const "Rotational speed provided by parameter";
     end if;
+    n = in_n_int "Rotational speed";
     annotation (
-      Icon(graphics={Text(extent={{-58,94},{-30,74}}, textString="n"), Text(
-              extent={{-10,102},{18,82}}, textString="Np")}),
+      Icon(graphics),
       Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
               100,100}}),
               graphics),
@@ -4846,6 +4853,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Integer Np(min=1) "Number of pumps in parallel";
       SI.Power W_single "Power Consumption (single pump)";
       SI.Power W=Np*W_single "Power Consumption (total)";
+      SI.Power Qloss = 0 "Heat loss (single pump)";
       constant SI.Power W_eps=1e-8
         "Small coefficient to avoid numerical singularities";
       constant NonSI.AngularVelocity_rpm n_eps=1e-6;
@@ -4918,9 +4926,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       infl.m_flow + outfl.m_flow = 0 "Mass balance";
       if V > 0 then
         (rho*V*der(h)) = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin +
-          W_single "Energy balance";
+          W_single - Qloss "Energy balance";
       else
-        0 = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single
+        0 = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single - Qloss
           "Energy balance";
       end if;
 
