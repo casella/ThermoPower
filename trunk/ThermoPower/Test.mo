@@ -1682,7 +1682,9 @@ Casella</a>:<br>
         wstart=0,
         w0=1,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        dp0=300000) annotation (Placement(transformation(extent={{-40,-22},{-20,-2}},
+        dp0=300000,
+        use_in_n=true)
+                    annotation (Placement(transformation(extent={{-40,-22},{-20,-2}},
               rotation=0)));
 
       Modelica.Blocks.Sources.Ramp Ramp(
@@ -1699,6 +1701,14 @@ Casella</a>:<br>
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Modelica.Blocks.Sources.Ramp Ramp1(
+        duration=4,
+        height=1000,
+        offset=1500,
+        startTime=10)
+                    annotation (Placement(transformation(extent={{-82,30},{-62,
+                50}},
+              rotation=0)));
     equation
       connect(Valve.outlet, Sink.flange) annotation (Line(
           points={{30,-10},{50,-10}},
@@ -1716,9 +1726,13 @@ Casella</a>:<br>
         annotation (Line(points={{41,50},{56,50},{56,-1.2}}, color={0,0,127}));
       connect(Step.y, Valve.cmd)
         annotation (Line(points={{1,20},{20,20},{20,-2}}, color={0,0,127}));
+      connect(Ramp1.y, Pump.in_n) annotation (Line(
+          points={{-61,40},{-32.6,40},{-32.6,-4}},
+          color={0,0,127},
+          smooth=Smooth.None));
       annotation (
-        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
-                100}}),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+                {100,100}}),
                 graphics),
         experiment(StopTime=10, Tolerance=1e-006),
         Documentation(info="<HTML>
