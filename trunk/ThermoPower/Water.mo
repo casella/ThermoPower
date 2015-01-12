@@ -1022,7 +1022,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flow rate (single tube)";
     Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt)
       "Average flow rate through volumes (single tube)";
-    SI.Power Q_single[Nw]
+    SI.Power Q_single[N-1]
       "Heat flows entering the volumes from the lateral boundary (single tube)";
   //   MassFlowRate wstar[N];
     SI.Velocity u[N] "Fluid velocity";
