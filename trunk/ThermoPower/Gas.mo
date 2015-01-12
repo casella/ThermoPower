@@ -947,7 +947,7 @@ package Gas "Models of components with ideal gases as working fluid"
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
         each stateSelect=StateSelect.prefer) "Composition state variables";
     Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt);
-    SI.Power Q_single[Nw]
+    SI.Power Q_single[N-1]
       "Heat flows entering the volumes from the lateral boundary (single tube)";
     SI.Velocity u[N] "Fluid velocity";
     Medium.AbsolutePressure p(start=pstart, stateSelect=StateSelect.prefer);
