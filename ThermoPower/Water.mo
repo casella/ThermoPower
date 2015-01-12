@@ -512,7 +512,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       assert(false, "Unsupported FFtype");
     end if;
   equation
-    assert(dpnom > 0, "Please set a non-negative value for dpnom");
+    assert(dpnom > 0, "Please set a positive value for dpnom");
+    assert(rhonom > 0 or FFtype <> FFtypes.OpPoint, "Please set a positive value for rhonom");
     // Fluid properties
   /*
   if not allowFlowReversal then

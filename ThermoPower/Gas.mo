@@ -1593,8 +1593,8 @@ package Gas "Models of components with ideal gases as working fluid"
       assert(false, "Unsupported FFtype");
     end if;
   equation
-    assert(dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
+    assert(dpnom > 0, "Please set a positive value for dpnom");
+    assert(rhonom > 0 or FFtype <> FFtypes.OpPoint, "Please set a positive value for rhonom");
     // Set fluid properties
     gas.p = homotopy(if not allowFlowReversal then pin else if inlet.m_flow >=
       0 then pin else pout, pin);
