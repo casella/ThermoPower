@@ -2894,10 +2894,14 @@ package PowerPlants "Models of thermoelectrical power plants components"
       model HE "Heat Exchanger fluid - gas"
         extends Interfaces.HeatExchanger;
 
-        parameter SI.CoefficientOfHeatTransfer gamma_G
-          "Constant heat transfer coefficient in the gas side";
-        parameter SI.CoefficientOfHeatTransfer gamma_F
-          "Constant heat transfer coefficient in the fluid side";
+        replaceable model HeatTransfer_F =
+            Thermal.HeatTransferFV.IdealHeatTransfer
+        constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
+        annotation (choicesAllMatching=true);
+        replaceable model HeatTransfer_G =
+            Thermal.HeatTransferFV.IdealHeatTransfer
+        constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
+        annotation (choicesAllMatching=true);
         parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
           "Friction Factor Type, gas side";
         parameter Real Kfnom_G=0
@@ -2915,12 +2919,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter SI.PerUnit Cfnom_F=0 "Nominal Fanning friction factor";
         parameter Choices.Flow1D.HCtypes HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream
           "Location of the hydraulic capacitance, fluid side";
-        parameter Boolean counterCurrent=true "Counter-current flow";
         parameter Boolean gasQuasiStatic=false
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         constant Real pi=Modelica.Constants.pi;
+        final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)"
+          annotation (Dialog(tab="Initialization"));
 
-        Water.Flow1D fluidFlow(
+        Water.Flow1DFV fluidFlow(
           Nt=1,
           N=N_F,
           wnom=fluidNomFlowRate,
@@ -2937,21 +2944,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
           rhonom=rhonom_F,
           Cfnom=Cfnom_F,
           FluidPhaseStart=FluidPhaseStart,
-          pstart=pstart_F) annotation (Placement(transformation(extent={{-10,-60},
-                  {10,-40}}, rotation=0)));
-        Thermal.ConvHT convHT(N=N_F, gamma=gamma_F) annotation (Placement(
-              transformation(extent={{-10,-40},{10,-20}}, rotation=0)));
-        Thermal.MetalTube metalTube(
-          rhomcm=rhomcm,
-          lambda=lambda,
-          N=N_F,
-          initOpt=if SSInit then Options.steadyState else Options.noInit,
-          L=exchSurface_F^2/(fluidVol*pi*4),
-          rint=fluidVol*4/exchSurface_F/2,
-          WallRes=false,
-          rext=(metalVol + fluidVol)*4/extSurfaceTub/2,
-          Tstartbar=Tstartbar_M) annotation (Placement(transformation(extent={{
-                  -10,-6},{10,-26}}, rotation=0)));
+          pstart=pstart_F,
+          redeclare model HeatTransfer = HeatTransfer_F)
+          annotation (Placement(transformation(extent={{-10,-66},{10,
+                  -46}},     rotation=0)));
+
         Gas.Flow1DFV gasFlow(
           Dhyd=1,
           wnom=gasNomFlowRate,
@@ -2968,56 +2965,58 @@ package PowerPlants "Models of thermoelectrical power plants components"
           dpnom=dpnom_G,
           rhonom=rhonom_G,
           Cfnom=Cfnom_G,
-          Tstartbar=Tstartbar_G) annotation (Placement(transformation(extent={{
-                  -12,58},{12,38}}, rotation=0)));
-        Thermal.CounterCurrent cC(N=N_F, counterCurrent=counterCurrent)
-          annotation (Placement(transformation(extent={{-10,-10},{10,10}},
-                rotation=0)));
-        Thermal.HeatFlowDistribution heatFlowDistribution(
-          N=N_F,
-          A1=exchSurface_G,
-          A2=extSurfaceTub) annotation (Placement(transformation(extent={{-10,4},
-                  {10,24}}, rotation=0)));
-        Thermal.ConvHT2N convHT2N(
-          N1=N_G,
-          N2=N_F,
-          gamma=gamma_G) annotation (Placement(transformation(extent={{-10,20},
-                  {10,40}}, rotation=0)));
+          Tstartbar=Tstartbar_G,
+          Nw=N_F - 1,
+          redeclare model HeatTransfer = HeatTransfer_G)
+          annotation (Placement(transformation(extent={{-12,66},
+                  {12,46}},         rotation=0)));
 
-        final parameter SI.Distance L=1 "Tube length";
-        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
-          "Fluid phase (only for initialization!)"
-          annotation (Dialog(tab="Initialization"));
+        Thermal.MetalTubeFV metalTube(
+          Nw=N_F - 1,
+          L=exchSurface_F^2/(fluidVol*pi*4),
+          rint=fluidVol*4/exchSurface_F/2,
+          rext=(metalVol + fluidVol)*4/extSurfaceTub/2,
+          rhomcm=rhomcm,
+          lambda=lambda,
+          WallRes=false)
+          annotation (Placement(transformation(extent={{-10,-24},{10,-4}})));
+
+        Thermal.HeatExchangerTopologyFV heatExchangerTopology(
+          Nw=N_F - 1, redeclare model HeatExchangerTopology =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
+          annotation (Placement(transformation(extent={{-10,6},{10,26}})));
       equation
-        connect(fluidFlow.wall, convHT.side2)
-          annotation (Line(points={{0,-45},{0,-33.1}}, color={255,127,0}));
         connect(gasFlow.infl, gasIn) annotation (Line(
-            points={{-12,48},{-100,48},{-100,0}},
+            points={{-12,56},{-100,56},{-100,0}},
             color={159,159,223},
             thickness=0.5));
         connect(gasFlow.outfl, gasOut) annotation (Line(
-            points={{12,48},{100,48},{100,0}},
+            points={{12,56},{100,56},{100,0}},
             color={159,159,223},
             thickness=0.5));
         connect(fluidFlow.outfl, waterOut) annotation (Line(
-            points={{10,-50},{40,-50},{40,-100},{0,-100}},
+            points={{10,-56},{40,-56},{40,-100},{0,-100}},
             thickness=0.5,
             color={0,0,255}));
         connect(fluidFlow.infl, waterIn) annotation (Line(
-            points={{-10,-50},{-40,-50},{-40,100},{0,100}},
+            points={{-10,-56},{-40,-56},{-40,100},{0,100}},
             thickness=0.5,
             color={0,0,255}));
-        connect(heatFlowDistribution.side2, cC.side1)
-          annotation (Line(points={{0,10.9},{0,3}}, color={255,127,0}));
-        connect(convHT2N.side1, gasFlow.wall)
-          annotation (Line(points={{0,33},{0,43}}, color={255,127,0}));
-        connect(heatFlowDistribution.side1, convHT2N.side2)
-          annotation (Line(points={{0,17},{0,26.9}}, color={255,127,0}));
-        connect(metalTube.int, convHT.side1)
-          annotation (Line(points={{0,-19},{0,-27}}, color={255,127,0}));
-        connect(metalTube.ext, cC.side2)
-          annotation (Line(points={{0,-12.9},{0,-3.1}}, color={255,127,0}));
-        annotation (Diagram(graphics));
+        connect(metalTube.ext, fluidFlow.wall) annotation (Line(
+            points={{0,-17.1},{0,-51}},
+            color={255,127,0},
+            smooth=Smooth.None));
+        connect(heatExchangerTopology.side2, metalTube.int) annotation (Line(
+            points={{0,12.9},{0,-11}},
+            color={255,127,0},
+            smooth=Smooth.None));
+        connect(heatExchangerTopology.side1, gasFlow.wall) annotation (Line(
+            points={{0,19},{0,51}},
+            color={255,127,0},
+            smooth=Smooth.None));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                  -100},{100,100}}),
+                            graphics));
       end HE;
 
       model HE2ph "Heat Exchanger fluid - gas (2phases)"
@@ -4699,6 +4698,154 @@ package PowerPlants "Models of thermoelectrical power plants components"
                       fillColor={0,0,127},
                       fillPattern=FillPattern.Solid)}), Diagram(graphics));
       end PumpFilter;
+
+      model zzOld_HE "Heat Exchanger fluid - gas"
+        extends Interfaces.HeatExchanger;
+
+        parameter SI.CoefficientOfHeatTransfer gamma_G
+          "Constant heat transfer coefficient in the gas side";
+        parameter SI.CoefficientOfHeatTransfer gamma_F
+          "Constant heat transfer coefficient in the fluid side";
+        parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
+          "Friction Factor Type, gas side";
+        parameter Real Kfnom_G=0
+          "Nominal hydraulic resistance coefficient, gas side";
+        parameter SI.Pressure dpnom_G=0
+          "Nominal pressure drop, gas side (friction term only!)";
+        parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
+        parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gas side";
+        parameter Choices.Flow1D.FFtypes FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
+          "Friction Factor Type, fluid side";
+        parameter Real Kfnom_F=0 "Nominal hydraulic resistance coefficient";
+        parameter SI.Pressure dpnom_F=0
+          "Nominal pressure drop fluid side (friction term only!)";
+        parameter SI.Density rhonom_F=0 "Nominal inlet density fluid side";
+        parameter SI.PerUnit Cfnom_F=0 "Nominal Fanning friction factor";
+        parameter Choices.Flow1D.HCtypes HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream
+          "Location of the hydraulic capacitance, fluid side";
+        parameter Boolean counterCurrent=true "Counter-current flow";
+        parameter Boolean gasQuasiStatic=false
+          "Quasi-static model of the flue gas (mass, energy and momentum static balances";
+        constant Real pi=Modelica.Constants.pi;
+
+        Water.Flow1D fluidFlow(
+          Nt=1,
+          N=N_F,
+          wnom=fluidNomFlowRate,
+          initOpt=if SSInit then Options.steadyState else Options.noInit,
+          redeclare package Medium = FluidMedium,
+          L=exchSurface_F^2/(fluidVol*pi*4),
+          A=(fluidVol*4/exchSurface_F)^2/4*pi,
+          omega=fluidVol*4/exchSurface_F*pi,
+          Dhyd=fluidVol*4/exchSurface_F,
+          FFtype=FFtype_F,
+          HydraulicCapacitance=HCtype_F,
+          Kfnom=Kfnom_F,
+          dpnom=dpnom_F,
+          rhonom=rhonom_F,
+          Cfnom=Cfnom_F,
+          FluidPhaseStart=FluidPhaseStart,
+          pstart=pstart_F) annotation (Placement(transformation(extent={{-10,-60},
+                  {10,-40}}, rotation=0)));
+        Thermal.ConvHT convHT(N=N_F, gamma=gamma_F) annotation (Placement(
+              transformation(extent={{-10,-40},{10,-20}}, rotation=0)));
+        Thermal.MetalTube metalTube(
+          rhomcm=rhomcm,
+          lambda=lambda,
+          N=N_F,
+          initOpt=if SSInit then Options.steadyState else Options.noInit,
+          L=exchSurface_F^2/(fluidVol*pi*4),
+          rint=fluidVol*4/exchSurface_F/2,
+          WallRes=false,
+          rext=(metalVol + fluidVol)*4/extSurfaceTub/2,
+          Tstartbar=Tstartbar_M) annotation (Placement(transformation(extent={{
+                  -10,-6},{10,-26}}, rotation=0)));
+        Gas.Flow1DFV gasFlow(
+          Dhyd=1,
+          wnom=gasNomFlowRate,
+          N=N_G,
+          initOpt=if SSInit then Options.steadyState else Options.noInit,
+          redeclare package Medium = FlueGasMedium,
+          QuasiStatic=gasQuasiStatic,
+          pstart=pstart_G,
+          L=L,
+          A=gasVol/L,
+          omega=exchSurface_G/L,
+          FFtype=FFtype_G,
+          Kfnom=Kfnom_G,
+          dpnom=dpnom_G,
+          rhonom=rhonom_G,
+          Cfnom=Cfnom_G,
+          Tstartbar=Tstartbar_G) annotation (Placement(transformation(extent={{
+                  -12,58},{12,38}}, rotation=0)));
+        Thermal.CounterCurrent cC(N=N_F, counterCurrent=counterCurrent)
+          annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+                rotation=0)));
+        Thermal.HeatFlowDistribution heatFlowDistribution(
+          N=N_F,
+          A1=exchSurface_G,
+          A2=extSurfaceTub) annotation (Placement(transformation(extent={{-10,4},
+                  {10,24}}, rotation=0)));
+        Thermal.ConvHT2N convHT2N(
+          N1=N_G,
+          N2=N_F,
+          gamma=gamma_G) annotation (Placement(transformation(extent={{-10,20},
+                  {10,40}}, rotation=0)));
+
+        final parameter SI.Distance L=1 "Tube length";
+        parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
+          "Fluid phase (only for initialization!)"
+          annotation (Dialog(tab="Initialization"));
+      equation
+        connect(fluidFlow.wall, convHT.side2)
+          annotation (Line(points={{0,-45},{0,-33.1}}, color={255,127,0}));
+        connect(gasFlow.infl, gasIn) annotation (Line(
+            points={{-12,48},{-100,48},{-100,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(gasFlow.outfl, gasOut) annotation (Line(
+            points={{12,48},{100,48},{100,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(fluidFlow.outfl, waterOut) annotation (Line(
+            points={{10,-50},{40,-50},{40,-100},{0,-100}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(fluidFlow.infl, waterIn) annotation (Line(
+            points={{-10,-50},{-40,-50},{-40,100},{0,100}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(heatFlowDistribution.side2, cC.side1)
+          annotation (Line(points={{0,10.9},{0,3}}, color={255,127,0}));
+        connect(convHT2N.side1, gasFlow.wall)
+          annotation (Line(points={{0,33},{0,36},{-2,36},{-2,38},{0,38},{0,43}},
+                                                   color={255,127,0}));
+        connect(heatFlowDistribution.side1, convHT2N.side2)
+          annotation (Line(points={{0,17},{0,26.9}}, color={255,127,0}));
+        connect(metalTube.int, convHT.side1)
+          annotation (Line(points={{0,-19},{0,-27}}, color={255,127,0}));
+        connect(metalTube.ext, cC.side2)
+          annotation (Line(points={{0,-12.9},{0,-3.1}}, color={255,127,0}));
+        annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent=
+                  {{-100,-100},{100,100}}),
+                            graphics));
+      end zzOld_HE;
+
+      model pippo
+        Gas.Flow1DFV flow1DFV(
+          L=1,
+          A=0.5,
+          omega=1,
+          Dhyd=1,
+          wnom=10,
+          dpnom=100000,
+          redeclare model HeatTransfer =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=100))
+          annotation (Placement(transformation(extent={{-6,2},{14,22}})));
+        inner System system
+          annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
+      end pippo;
     end Components;
 
     package Control
@@ -8570,7 +8717,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
           N_G=3,
-          N_F=6,
           exchSurface_G=20335,
           exchSurface_F=1451.506,
           extSurfaceTub=1803.043,
@@ -8587,7 +8733,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gamma_F=gamma_F,
           Tstartbar_G=Tstart_G,
           Tstartbar_M=Tstart_M,
-          SSInit=SSInit) annotation (Placement(transformation(extent={{-20,-20},
+          SSInit=SSInit,
+          N_F=6)         annotation (Placement(transformation(extent={{-20,-20},
                   {20,20}}, rotation=0)));
         //Start value
         parameter SI.Temperature Tstart_G=(Tstart_G_In + Tstart_G_Out)/2;
@@ -8680,7 +8827,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           "Nominal flow rate through the fluid side";
         parameter SI.Pressure fluidNomPressure=29.5e5
           "Nominal pressure in the fluid side inlet";
-        parameter SI.CoefficientOfHeatTransfer gamma_G(fixed=false) = 33
+        parameter SI.CoefficientOfHeatTransfer gamma_G=33
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F=4000
           "Constant heat transfer coefficient in the fluid side";
@@ -8702,8 +8849,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
         Components.HE hE(
           redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
-          N_G=3,
-          N_F=7,
           exchSurface_G=2314.8,
           exchSurface_F=450.218,
           extSurfaceTub=504.652,
@@ -8716,12 +8861,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
           Tstartbar_G=Tstart_G,
           Tstartbar_M=Tstart_M,
           SSInit=SSInit,
-          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam)
+          FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          N_G=4,
+          redeclare model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F),
+          redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G),
+          N_F=7)
           annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
         //Start value
