@@ -335,7 +335,7 @@ package Examples "Application examples"
         K=3,
         A=5.62e-5,
         Kfc=2,
-        FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
+        FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic,
         dpnom=1) annotation (Placement(transformation(extent={{-70,-180},{-40,
                 -150}},
               rotation=0)));
