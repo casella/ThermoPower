@@ -336,7 +336,8 @@ package Examples "Application examples"
         A=5.62e-5,
         Kfc=2,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic,
-        dpnom=1) annotation (Placement(transformation(extent={{-70,-180},{-40,
+        dpnom=80000)
+                 annotation (Placement(transformation(extent={{-70,-180},{-40,
                 -150}},
               rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput DrumPressure annotation (Placement(
