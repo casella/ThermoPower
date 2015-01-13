@@ -9515,7 +9515,8 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
       end TestEvaporatorFlux;
     end OldTests;
 
-    model TestConstantHeatTransferTwoGrid_Wcoarce
+    model TestConstantHeatTransferTwoGrid_Wcoarse
+      "Test of the ConstantHeatTransferTwoGrid component with coarser grid on the wall side"
 
       replaceable package Medium = Modelica.Media.Water.StandardWater
         constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium;
@@ -9582,10 +9583,11 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
           smooth=Smooth.None));
       annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
                 -100},{100,100}}), graphics), experiment(StopTime=10));
-    end TestConstantHeatTransferTwoGrid_Wcoarce;
+    end TestConstantHeatTransferTwoGrid_Wcoarse;
 
-    model TestConstantHeatTransferTwoGrid_Fcoarce
-      extends TestConstantHeatTransferTwoGrid_Wcoarce(
+    model TestConstantHeatTransferTwoGrid_Fcoarse
+      "Test of the ConstantHeatTransferTwoGrid component with coarser grid on the wall side"
+      extends TestConstantHeatTransferTwoGrid_Wcoarse(
         Nf=4,
         Nw=6,
         L=Nw,
@@ -9594,7 +9596,7 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
         Tw_start = 305+273.15,
         Tw_end = 355+273.15);
       annotation (experiment(StopTime=10));
-    end TestConstantHeatTransferTwoGrid_Fcoarce;
+    end TestConstantHeatTransferTwoGrid_Fcoarse;
   end DistributedParameterComponents;
 
   package ElectricalComponents "Test for Electrical package components"
