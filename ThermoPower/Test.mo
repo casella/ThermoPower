@@ -2250,7 +2250,10 @@ Algorithm Tolerance = 1e-6
       Water.SourcePressure
                     SourceP1(p0=pin, h=hin) annotation (Placement(
             transformation(extent={{-100,4},{-80,24}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=J)
+      Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=J,
+        phi(start=0, fixed=true),
+        w(fixed=true, start=omega),
+        a(start=0, fixed=true))
         annotation (Placement(transformation(extent={{30,-10},{50,10}},
               rotation=0)));
       Water.SinkPressure
@@ -2270,7 +2273,7 @@ Algorithm Tolerance = 1e-6
             transformation(extent={{60,20},{80,40}}, rotation=0)));
       Water.SensT SensT1(redeclare package Medium = Medium) annotation (
           Placement(transformation(extent={{-46,8},{-26,28}}, rotation=0)));
-      inner System system
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ST.shaft_b, Inertia1.flange_a) annotation (Line(
@@ -2289,12 +2292,6 @@ Algorithm Tolerance = 1e-6
           points={{50,0},{60,0}},
           color={0,0,0},
           thickness=0.5));
-    initial equation
-      ST.phi = 0;
-      ST.omega = omega;
-      der(ST.omega) = 0;
-
-    equation
       connect(ValveLin1.outlet, SensT1.inlet) annotation (Line(
           points={{-50,14},{-42,14}},
           thickness=0.5,
@@ -2367,7 +2364,10 @@ Algorithm Tolerance = 1e-4
       Water.SourcePressure
                     SourceP1(p0=pin, h=hin) annotation (Placement(
             transformation(extent={{-96,4},{-76,24}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=J)
+      Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=J,
+        phi(start=0, fixed=true),
+        w(start=omega, fixed=true),
+        a(start=0, fixed=true))
         annotation (Placement(transformation(extent={{30,-10},{50,10}},
               rotation=0)));
       Water.SinkPressure
@@ -2387,7 +2387,7 @@ Algorithm Tolerance = 1e-4
                 {60,10}}, rotation=0)));
       Modelica.Blocks.Sources.Constant Constant1(k=omega) annotation (Placement(
             transformation(extent={{60,20},{80,40}}, rotation=0)));
-      inner System system
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(ST.shaft_b, Inertia1.flange_a) annotation (Line(
@@ -2406,12 +2406,6 @@ Algorithm Tolerance = 1e-4
           points={{-76,14},{-60,14}},
           thickness=0.5,
           color={0,0,255}));
-    initial equation
-      ST.phi = 0;
-      der(ST.P_HP) = 0;
-      der(ST.P_LP) = 0;
-
-    equation
       connect(Speed1.flange, Inertia1.flange_b) annotation (Line(
           points={{60,0},{50,0}},
           color={0,0,0},
