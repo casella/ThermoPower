@@ -4375,7 +4375,7 @@ Input variables changed. This function now computes the heat transfer coefficien
       annotation(choicesAllMatching = true);
     extends Icons.Water.SteamTurbineUnit;
     parameter Medium.AbsolutePressure pnom "Inlet nominal pressure";
-    parameter Medium.MassFlowRate wnom "Inlet nominal flowrate";
+    parameter Medium.MassFlowRate wnom "Inlet nominal flow rate";
     parameter SI.PerUnit eta_iso "Isentropic efficiency [PerUnit]";
     parameter SI.PerUnit eta_mech=0.98 "Mechanical efficiency [PerUnit]";
     parameter SI.PerUnit hpFraction
@@ -4385,12 +4385,20 @@ Input variables changed. This function now computes the heat transfer coefficien
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
+    parameter SI.MassFlowRate wstart = wnom "Flow rate start value"
+        annotation (Dialog(tab="Initialization"));
     parameter Medium.AbsolutePressure pstartin=pnom "Inlet start pressure"
       annotation (Dialog(tab="Initialization"));
     parameter Medium.SpecificEnthalpy hstartin "Inlet enthalpy start value"
       annotation (Dialog(tab="Initialization"));
     parameter Medium.SpecificEnthalpy hstartout "Outlet enthalpy start value"
       annotation (Dialog(tab="Initialization"));
+    parameter SI.Power P_HPstart = wstart*(hstartin - hstartout)*hpFraction
+      "HP turbine power start value"
+        annotation (Dialog(tab="Initialization"));
+    parameter SI.Power P_LPstart = wstart*(hstartin - hstartout)*(1-hpFraction)
+      "LP turbine power start value"
+        annotation (Dialog(tab="Initialization"));
     parameter ThermoPower.Choices.Init.Options initOpt=system.initOpt
       "Initialization option" annotation (Dialog(tab="Initialization"));
     Medium.ThermodynamicState fluidState_in(p(start=pstartin),h(start=hstartin));
@@ -4413,8 +4421,10 @@ Input variables changed. This function now computes the heat transfer coefficien
     Medium.SpecificEnthalpy hout(start=hstartout) "Outlet enthalpy";
     Medium.SpecificEnthalpy hiso(start=hstartout) "Isentropic outlet enthalpy";
     SI.Power Pm "Mechanical power input";
-    SI.Power P_HP "Mechanical power produced by the HP turbine";
-    SI.Power P_LP "Mechanical power produced by the LP turbine";
+    SI.Power P_HP(start = P_HPstart)
+      "Mechanical power produced by the HP turbine";
+    SI.Power P_LP(start = P_LPstart)
+      "Mechanical power produced by the LP turbine";
     Modelica.Blocks.Interfaces.RealInput partialArc annotation (Placement(
           transformation(extent={{-110,-88},{-74,-52}}, rotation=0)));
   equation
@@ -4451,6 +4461,9 @@ Input variables changed. This function now computes the heat transfer coefficien
   initial equation
     if initOpt == ThermoPower.Choices.Init.Options.noInit then
       // do nothing
+    elseif initOpt == ThermoPower.Choices.Init.Options.fixedState then
+      P_HP = P_HPstart;
+      P_LP = P_LPstart;
     elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
       der(P_HP) = 0;
       der(P_LP) = 0;
