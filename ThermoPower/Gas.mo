@@ -3405,7 +3405,15 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
         "Nominal volume flow rate (single pump)";
       final parameter SI.SpecificEnergy H0=dp0/(rho0) "Nominal specific energy";
     protected
-      function df_dqflow = der(flowCharacteristic, q_flow);
+      function dH_dqflow
+        "Approximated partial derivative of flow characteristic w.r.t. flow"
+        input SI.VolumeFlowRate q_flow;
+        output Real dH;
+      algorithm
+        dH := (flowCharacteristic(1.05*q_flow) -
+              flowCharacteristic(0.95*q_flow)) / 0.1;
+      annotation(Inline = true);
+      end dH_dqflow;
     public
       Medium.MassFlowRate w_single(start=q_single_start*rho_start)
         "Mass flow rate (single fan)";
@@ -3475,15 +3483,17 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
       if noEvent(s > 0 or (not CheckValve)) then
         // Flow characteristics when check valve is open
         q_single = s;
-        H = homotopy((n/n0)^2*flowCharacteristic(q_single*n0/(n + n_eps),
-          bladePos), df_dqflow(q_single0)*(q_single - q_single0) + (2/n0*
-          flowCharacteristic(q_single0) - q_single0/n0*df_dqflow(q_single0))*(n
-           - n0) + H0);
+        H = homotopy(
+          (n/n0)^2*flowCharacteristic(q_single*n0/(n + n_eps), bladePos),
+          dH_dqflow(q_single0)*(q_single - q_single0) +
+           (2/n0*flowCharacteristic(q_single0) -
+            q_single0/n0*dH_dqflow(q_single0))*(n-n0) + H0);
       else
         // Flow characteristics when check valve is closed
-        H = homotopy((n/n0)^2*flowCharacteristic(0) - s, df_dqflow(q_single0)*(
-          q_single - q_single0) + (2/n0*flowCharacteristic(q_single0) - q_single0
-          /n0*df_dqflow(q_single0))*(n - n0) + H0);
+        H = homotopy((n/n0)^2*flowCharacteristic(0) - s,
+          dH_dqflow(q_single0)*(q_single - q_single0) +
+           (2/n0*flowCharacteristic(q_single0) -
+            q_single0/n0*dH_dqflow(q_single0))*(n - n0) + H0);
         q_single = 0;
       end if;
 
