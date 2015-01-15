@@ -3485,9 +3485,9 @@ This is a simple model of a steam plant.
       Plant plant annotation (Placement(transformation(extent={{20,-20},{60,20}},
               rotation=0)));
       Modelica.Blocks.Sources.Step fuelFlowRate(
-        offset=2.02,
         height=0.3,
-        startTime=500) annotation (Placement(transformation(extent={{-40,-10},{
+        startTime=500,
+        offset=2.13)   annotation (Placement(transformation(extent={{-40,-10},{
                 -20,10}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
