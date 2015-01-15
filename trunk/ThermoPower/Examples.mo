@@ -1377,7 +1377,7 @@ Casella</a>:<br>
         parameter SI.Area St=Dext*pi*Lt*Nt*Nr
           "Total area of the heat exchange surface";
         parameter SI.CoefficientOfHeatTransfer gamma_nom=150
-          "Nominal heat transfer coefficient";
+          "Nominal heat transfer coefficient - gas side";
 
         Gas.FlangeA gasIn(redeclare package Medium = GasMedium) annotation (
             Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
@@ -2045,8 +2045,8 @@ Casella</a>:<br>
 
       model OpenLoopSimulatorHtc
         "Open-loop plant simulator with parameter computation"
-        extends OpenLoopSimulatorSS(Plant(Boiler(gamma_nom = gamma_nom)));
-        parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_nom(fixed = false, start = 150);
+        extends OpenLoopSimulatorSS(Plant(Boiler(gamma_nom = gamma_unknown)));
+        parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_unknown(fixed = false, start = 150);
       initial equation
         Plant.GasOut.T = Modelica.SIunits.Conversions.from_degC(130);
         annotation (Documentation(revisions="<html>
@@ -2063,7 +2063,7 @@ Casella</a>:<br>
 </html>
 ",     info="<html>
 <p>This example shows how to use a Modelica model to solve for some unknown parameters, given some desired system output (please look at the Modelica textual code). In this case, the nominal heat transfer coefficient <code>Plant.Boiler.gamma_nom</code> is computed in order to obtain an initial value of the gas outlet temperature equal to 130 degrees Celsius. This can be used to match the model to known design data. Note that steady-state initial conditions are required to make the computation meaningful.</p>
-<p>This is performed by defining a <code>gamma_nom</code> parameter at the top level, with a<code>fixed = false</code> attribute (meaning that its value is a unknown) and with a <code>start = 150</code> attribute to provide a reasonable initial guess for the solver. This parameter is then used to override the value of <code>Plant.Boiler.gamma_nom</code>. In order to obtain a closed initialization problem, a corresponding initial equation to set the desired value of <code>Plant.GasOut.T is added.</code> </p>
+<p>This is performed by defining a <code>gamma_unknown</code> parameter at the top level, with a <code>fixed = false</code> attribute (meaning that its value is a unknown) and with a <code>start = 150</code> attribute to provide a reasonable initial guess for the solver. This parameter is then used to override the value of <code>Plant.Boiler.gamma_nom</code>. In order to obtain a closed initialization problem, a corresponding initial equation to set the desired value of <code>Plant.GasOut.T is added.</code> </p>
 <p>The transient starts at steady state, with the desired values of the heat transfer coefficient and gas outlet temperature. At time t = 100 s, the water valve is closed by 10&percnt;. At time t = 200 s, the gas flow rate is increased by 10&percnt;. </p>
 </html>"), experiment(StopTime=300, Tolerance=1e-006),
           __Dymola_experimentSetupOutput);
