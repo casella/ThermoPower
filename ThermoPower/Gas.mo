@@ -2158,146 +2158,9 @@ package Gas "Models of components with ideal gases as working fluid"
 </HTML>"));
   end f_colebrook;
 
-  partial model CombustionChamberBase "Combustion Chamber"
-    extends Icons.Gas.Mixer;
-    replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
-    replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
-    replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
-    parameter SI.Volume V "Inner volume";
-    parameter SI.Area S=0 "Inner surface";
-    parameter SI.CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
-      annotation (Evaluate=true);
-    parameter SI.HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
-    parameter SI.Temperature Tmstart=300 "Metal wall start temperature"
-      annotation (Dialog(tab="Initialisation"));
-    parameter SI.SpecificEnthalpy HH "Lower Heating value of fuel";
-    parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
-    outer ThermoPower.System system "System wide properties";
-    parameter Air.AbsolutePressure pstart=101325 "Pressure start value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Air.Temperature Tstart=300 "Temperature start value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Air.MassFraction Xstart[Exhaust.nX]=Exhaust.reference_X
-      "Start flue gas composition" annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=system.initOpt
-      "Initialisation option"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Boolean noInitialPressure=false
-      "Remove initial equation on pressure"
-      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
-
-    Exhaust.BaseProperties fluegas(
-      p(start=pstart),
-      T(start=Tstart),
-      Xi(start=Xstart[1:Exhaust.nXi]));
-    SI.Mass M "Gas total mass";
-    SI.Mass MX[Exhaust.nXi] "Partial flue gas masses";
-    SI.InternalEnergy E "Gas total energy";
-    SI.Temperature Tm(start=Tmstart) "Wall temperature";
-    Air.SpecificEnthalpy hia "Air specific enthalpy";
-    Fuel.SpecificEnthalpy hif "Fuel specific enthalpy";
-    Exhaust.SpecificEnthalpy ho "Outlet specific enthalpy";
-    SI.Power HR "Heat rate";
-
-    SI.Time Tr "Residence time";
-    FlangeA ina(redeclare package Medium = Air, m_flow(min=if allowFlowReversal
-             then -Modelica.Constants.inf else 0)) "inlet air" annotation (
-        Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-    FlangeA inf(redeclare package Medium = Fuel, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0))
-      "inlet fuel" annotation (Placement(transformation(extent={{-20,80},{20,
-              120}}, rotation=0)));
-    FlangeB out(redeclare package Medium = Exhaust, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) "flue gas"
-      annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
-             0)));
-  equation
-    M = fluegas.d*V "Gas mass";
-    E = fluegas.u*M "Gas energy";
-    MX = fluegas.Xi*M "Component masses";
-    HR = inf.m_flow*HH;
-    der(M) = ina.m_flow + inf.m_flow + out.m_flow "Gas mass balance";
-    der(E) = ina.m_flow*hia + inf.m_flow*hif + out.m_flow*ho + HR - gamma*S*(
-      fluegas.T - Tm) "Gas energy balance";
-    if Cm > 0 and gamma > 0 then
-      Cm*der(Tm) = gamma*S*(fluegas.T - Tm) "Metal wall energy balance";
-    else
-      Tm = fluegas.T;
-    end if;
-
-    // Set gas properties
-    out.p = fluegas.p;
-    out.h_outflow = fluegas.h;
-    out.Xi_outflow = fluegas.Xi;
-
-    // Boundary conditions
-    ina.p = fluegas.p;
-    ina.h_outflow = 0;
-    ina.Xi_outflow = Air.reference_X[1:Air.nXi];
-    inf.p = fluegas.p;
-    inf.h_outflow = 0;
-    inf.Xi_outflow = Fuel.reference_X[1:Fuel.nXi];
-    assert(ina.m_flow >= 0, "The model does not support flow reversal");
-    hia = inStream(ina.h_outflow);
-    assert(inf.m_flow >= 0, "The model does not support flow reversal");
-    hif = inStream(inf.h_outflow);
-    assert(out.m_flow <= 0, "The model does not support flow reversal");
-    ho = fluegas.h;
-
-    Tr = noEvent(M/max(abs(out.m_flow), Modelica.Constants.eps));
-  initial equation
-    // Initial conditions
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-    elseif initOpt == Choices.Init.Options.fixedState then
-      if not noInitialPressure then
-        fluegas.p = pstart;
-      end if;
-      fluegas.T = Tstart;
-      fluegas.Xi = Xstart[1:Exhaust.nXi];
-    elseif initOpt == Choices.Init.Options.steadyState then
-      if not noInitialPressure then
-        der(fluegas.p) = 0;
-      end if;
-      der(fluegas.T) = 0;
-      der(fluegas.Xi) = zeros(Exhaust.nXi);
-      if (Cm > 0 and gamma > 0) then
-        der(Tm) = 0;
-      end if;
-    elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(fluegas.T) = 0;
-      der(fluegas.Xi) = zeros(Exhaust.nXi);
-      if (Cm > 0 and gamma > 0) then
-        der(Tm) = 0;
-      end if;
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
-
-    annotation (Documentation(info="<html>
-This is the model-base of a Combustion Chamber, with a constant volume.
-<p>The metal wall temperature and the heat transfer coefficient between the wall and the fluid are uniform. The wall is thermally insulated from the outside. It has been assumed that inlet gases are premixed before entering in the volume.
-<p><b>Modelling options</b></p>
-<p>This model has three different Medium models to characterize the inlet air, fuel, and flue gas exhaust.
-<p>If <tt>gamma = 0</tt>, the thermal effects of the surrounding walls are neglected.
-</p>
-</html>", revisions="<html>
-<ul>
-<li><i>30 May 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Initialisation support added.</li>
-<li><i>31 Jan 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-    CombustionChamber model restructured using inheritance.
-<p> First release.</li>
-</ul>
-</html>
-"), Diagram(graphics));
-  end CombustionChamberBase;
 
   model CombustionChamber "Combustion Chamber"
-    extends CombustionChamberBase(
+    extends BaseClasses.CombustionChamberBase(
       redeclare package Air = Media.Air "O2, H2O, Ar, N2",
       redeclare package Fuel = Media.NaturalGas "N2, CO2, CH4",
       redeclare package Exhaust = Media.FlueGas "O2, Ar, H2O, CO2, N2");
@@ -2339,141 +2202,9 @@ This model extends the CombustionChamber Base model, with the definition of the 
 </html>"));
   end CombustionChamber;
 
-  partial model CompressorBase "Gas compressor"
-    extends ThermoPower.Icons.Gas.Compressor;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
-      annotation(choicesAllMatching = true);
-    parameter Boolean explicitIsentropicEnthalpy=true
-      "isentropicEnthalpy function used";
-    parameter SI.PerUnit eta_mech=0.98 "mechanical efficiency";
-    parameter Medium.AbsolutePressure pstart_in "inlet start pressure"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Medium.AbsolutePressure pstart_out "outlet start pressure"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Medium.Temperature Tdes_in "inlet design temperature";
-    parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
-    outer ThermoPower.System system "System wide properties";
-    parameter Medium.Temperature Tstart_in=Tdes_in "inlet start temperature"
-                                annotation (Dialog(tab="Initialisation"));
-    parameter Medium.Temperature Tstart_out "outlet start temperature"
-                                 annotation (Dialog(tab="Initialisation"));
-    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
-      "start gas composition" annotation (Dialog(tab="Initialisation"));
-    Medium.BaseProperties gas_in(
-      p(start=pstart_in),
-      T(start=Tstart_in),
-      Xi(start=Xstart[1:Medium.nXi]));
-    Medium.BaseProperties gas_iso(
-      p(start=pstart_out),
-      T(start=Tstart_out),
-      Xi(start=Xstart[1:Medium.nXi]));
-    Medium.SpecificEnthalpy hout_iso "Outlet isentropic enthalpy";
-    Medium.SpecificEnthalpy hout "Outlet enthaply";
-    Medium.SpecificEntropy s_in "Inlet specific entropy";
-    Medium.AbsolutePressure pout(start=pstart_out) "Outlet pressure";
-
-    Medium.MassFlowRate w "Gas flow rate";
-    SI.Angle phi "shaft rotation angle";
-    SI.AngularVelocity omega "shaft angular velocity";
-    SI.Torque tau "net torque acting on the compressor";
-
-    SI.PerUnit eta "isentropic efficiency";
-    SI.PerUnit PR "pressure ratio";
-
-    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{-100,60},{-60,100}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{60,60},{100,100}}, rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
-        Placement(transformation(extent={{-72,-12},{-48,12}}, rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
-        Placement(transformation(extent={{48,-12},{72,12}}, rotation=0)));
-
-  equation
-    w = inlet.m_flow;
-    assert(w >= 0, "The compressor model does not support flow reversal");
-    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
-
-    // Set inlet gas properties
-    gas_in.p = inlet.p;
-    gas_in.h = inStream(inlet.h_outflow);
-    gas_in.Xi = inStream(inlet.Xi_outflow);
-
-    // Set outlet gas properties
-    outlet.p = pout;
-    outlet.h_outflow = hout;
-    outlet.Xi_outflow = gas_in.Xi;
-
-    // Equations for reverse flow (not used)
-    inlet.h_outflow = inStream(outlet.h_outflow);
-    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
-
-    // Component mass balances
-    gas_iso.Xi = gas_in.Xi;
-
-    if explicitIsentropicEnthalpy then
-      hout_iso = Medium.isentropicEnthalpy(outlet.p, gas_in.state)
-        "Approximated isentropic enthalpy";
-      hout - gas_in.h = 1/eta*(hout_iso - gas_in.h);
-      // dummy assignments
-      s_in = 0;
-      gas_iso.p = 1e5;
-      gas_iso.T = 300;
-    else
-      // Properties of the gas after isentropic transformation
-      gas_iso.p = pout;
-      s_in = Medium.specificEntropy(gas_in.state);
-      s_in = Medium.specificEntropy(gas_iso.state);
-      hout - gas_in.h = 1/eta*(gas_iso.h - gas_in.h);
-      // dummy assignment
-      hout_iso = 0;
-    end if;
-
-    w*(hout - gas_in.h) = tau*omega*eta_mech "Energy balance";
-    PR = pout/gas_in.p "Pressure ratio";
-
-    // Mechanical boundary conditions
-    shaft_a.phi = phi;
-    shaft_b.phi = phi;
-    shaft_a.tau + shaft_b.tau = tau;
-    der(phi) = omega;
-    annotation (
-      Documentation(info="<html>
-<p>This is the base model for a compressor, including the interface and all equations except the actual computation of the performance characteristics. Reverse flow conditions are not supported.</p>
-<p>This model does not include any shaft inertia by itself; if that is needed, connect a Modelica.Mechanics.Rotational.Inertia model to one of the shaft connectors.</p>
-<p>As a base-model, it can be used both for axial and centrifugal compressors.
-<p><b>Modelling options</b></p>
-<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
-<p>The following options are available to calculate the enthalpy of the outgoing gas:
-<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is obtained by equating the specific entropy of the inlet gas <tt>gas_in</tt> and of a fictious gas state <tt>gas_iso</tt>, with the same pressure of the outgoing gas; both are computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
-</html>", revisions="<html>
-<ul>
-<li><i>13 Apr 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Medium.BaseProperties <tt>gas_out</tt>removed.</li>
-</li>
-<li><i>14 Jan 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Adapted to Modelica.Media.</li>
-<br> Compressor model restructured using inheritance.
-</li>
-<li><i>5 Mar 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>
-"),   Diagram(graphics),
-      Icon(graphics={Text(
-            extent={{-128,-60},{128,-100}},
-            lineColor={0,0,255},
-            textString="%name")}));
-  end CompressorBase;
 
   model Compressor "Gas compressor"
-    extends CompressorBase;
+    extends BaseClasses.CompressorBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
     parameter SI.AngularVelocity Ndesign "Design velocity";
     parameter Real tablePhic[:, :]=fill(
@@ -2570,140 +2301,9 @@ This model adds the performance characteristics to the Compressor_Base model, by
 </html>"));
   end Compressor;
 
-  partial model TurbineBase "Gas Turbine"
-    extends ThermoPower.Icons.Gas.Turbine;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
-      annotation(choicesAllMatching = true);
-    parameter Boolean explicitIsentropicEnthalpy=true
-      "isentropicEnthalpy function used";
-    parameter SI.PerUnit eta_mech=0.98 "mechanical efficiency";
-    parameter Medium.Temperature Tdes_in "inlet design temperature";
-    parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
-    outer ThermoPower.System system "System wide properties";
-    parameter Medium.AbsolutePressure pstart_in "inlet start pressure"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Medium.AbsolutePressure pstart_out "outlet start pressure"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Medium.Temperature Tstart_in=Tdes_in "inlet start temperature"
-                                annotation (Dialog(tab="Initialisation"));
-    parameter Medium.Temperature Tstart_out "outlet start temperature"
-                                 annotation (Dialog(tab="Initialisation"));
-    parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
-      "start gas composition" annotation (Dialog(tab="Initialisation"));
-
-    Medium.BaseProperties gas_in(
-      p(start=pstart_in),
-      T(start=Tstart_in),
-      Xi(start=Xstart[1:Medium.nXi]));
-    Medium.BaseProperties gas_iso(
-      p(start=pstart_out),
-      T(start=Tstart_out),
-      Xi(start=Xstart[1:Medium.nXi]));
-
-    SI.Angle phi "shaft rotation angle";
-    SI.Torque tau "net torque acting on the turbine";
-    SI.AngularVelocity omega "shaft angular velocity";
-    Medium.MassFlowRate w "Gas flow rate";
-    Medium.SpecificEntropy s_in "Inlet specific entropy";
-    Medium.SpecificEnthalpy hout_iso "Outlet isentropic enthalpy";
-    Medium.SpecificEnthalpy hout "Outlet enthalpy";
-    Medium.AbsolutePressure pout(start=pstart_out) "Outlet pressure";
-    SI.PerUnit PR "pressure ratio";
-    SI.PerUnit eta "isoentropic efficiency";
-
-    Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
-        Placement(transformation(extent={{-72,-12},{-48,12}}, rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
-        Placement(transformation(extent={{48,-12},{72,12}}, rotation=0)));
-    FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{-100,60},{-60,100}}, rotation=0)));
-    FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{60,60},{100,100}}, rotation=0)));
-  equation
-    w = inlet.m_flow;
-    assert(w >= 0, "The turbine model does not support flow reversal");
-    inlet.m_flow + outlet.m_flow = 0 "Mass balance";
-
-    // Set inlet gas properties
-    gas_in.p = inlet.p;
-    gas_in.h = inStream(inlet.h_outflow);
-    gas_in.Xi = inStream(inlet.Xi_outflow);
-
-    // Set outlet gas properties
-    outlet.p = pout;
-    outlet.h_outflow = hout;
-    outlet.Xi_outflow = gas_in.Xi;
-
-    // Equations for reverse flow (not used)
-    inlet.h_outflow = inStream(outlet.h_outflow);
-    inlet.Xi_outflow = inStream(outlet.Xi_outflow);
-
-    // Component mass balances
-    gas_iso.Xi = gas_in.Xi;
-
-    if explicitIsentropicEnthalpy then
-      hout_iso = Medium.isentropicEnthalpy(outlet.p, gas_in.state)
-        "Approximated isentropic enthalpy";
-      hout - gas_in.h = eta*(hout_iso - gas_in.h) "Enthalpy change";
-      //dummy assignments
-      s_in = 0;
-      gas_iso.p = 1e5;
-      gas_iso.T = 300;
-    else
-      // Properties of the gas after isentropic transformation
-      gas_iso.p = pout;
-      s_in = Medium.specificEntropy(gas_in.state);
-      s_in = Medium.specificEntropy(gas_iso.state);
-      hout - gas_in.h = eta*(gas_iso.h - gas_in.h) "Enthalpy change";
-      //dummy assignment
-      hout_iso = 0;
-    end if;
-
-    w*(hout - gas_in.h)*eta_mech = tau*omega "Energy balance";
-    PR = gas_in.p/pout "Pressure ratio";
-
-    // Mechanical boundary conditions
-    shaft_a.phi = phi;
-    shaft_b.phi = phi;
-    shaft_a.tau + shaft_b.tau = tau;
-    der(phi) = omega;
-    annotation (
-      Documentation(info="<html>
-<p>This is the base model for a turbine, including the interface and all equations except the actual computation of the performance characteristics. Reverse flow conditions are not supported.</p>
-<p>This model does not include any shaft inertia by itself; if that is needed, connect a Modelica.Mechanics.Rotational.Inertia model to one of the shaft connectors.</p>
-<p>As a base-model, it can be used both for axial and radial turbines.
-<p><b>Modelling options</b></p>
-<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
-<p>The following options are available to calculate the enthalpy of the outgoing gas:
-<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is determined by equating the specific entropy of the inlet gas <tt>gas_in</tt> and of a fictious gas state <tt>gas_iso</tt>, with the same pressure of the outgoing gas; both are computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
-</html>", revisions="<html>
-<ul>
-<li><i>13 Apr 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Medium.BaseProperties <tt>gas_out</tt>removed.</li>
-</li>
-<li><i>14 Jan 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Adapted to Modelica.Media.</li>
-<br> Turbine model restructured using inheritance.
-</li>
-<li><i>5 Mar 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"),
-      Icon(graphics={Text(
-            extent={{-128,-60},{128,-100}},
-            lineColor={0,0,255},
-            textString="%name")}),
-      Diagram(graphics));
-  end TurbineBase;
 
   model Turbine "Gas Turbine"
-    extends TurbineBase;
+    extends BaseClasses.TurbineBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
     parameter SI.AngularVelocity Ndesign "Design speed";
     parameter Real tablePhic[:, :]=fill(
@@ -2786,7 +2386,7 @@ This model adds the performance characteristics to the Turbine_Base model, by me
   end Turbine;
 
   model TurbineStodola "Gas Turbine"
-    extends TurbineBase;
+    extends BaseClasses.TurbineBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
     parameter Boolean NominalCondition=true
       "true: K is evaluated from design operating point; false: K is set as a parameter";
@@ -2871,181 +2471,10 @@ This model extends the Turbine_Base model with the calculation of the performanc
       Icon(graphics));
   end TurbineStodola;
 
-  partial model GTunitBase "Gas Turbine"
-    extends ThermoPower.Icons.Gas.GasTurbineUnit;
-    replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
-    replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
-    replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
-    parameter Modelica.SIunits.Pressure pstart "start pressure value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Exhaust.Temperature Tstart "start temperature value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Modelica.SIunits.MassFraction Xstart[Air.nX]=Air.reference_X
-      "start gas composition" annotation (Dialog(tab="Initialisation"));
-    constant Exhaust.AbsolutePressure pnom=1.013e5 "ISO reference pressure";
-    constant Air.Temperature Tnom=288.15 "ISO reference temperature";
-    parameter SI.SpecificEnthalpy HH "Lower Heating value";
-    parameter SI.PerUnit eta_mech=0.95 "mechanical efficiency";
-    parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
-    outer ThermoPower.System system "System wide properties";
 
-    Air.BaseProperties gas(
-      p(start=pstart),
-      T(start=Tstart),
-      Xi(start=Xstart[1:Air.nXi]));
-
-    Air.MassFlowRate wia "Air mass flow";
-    Air.MassFlowRate wia_ISO "Air mass flow, referred to ISO conditions";
-    Fuel.MassFlowRate wif "Fuel mass flow";
-    Exhaust.MassFlowRate wout "FlueGas mass flow";
-    Air.SpecificEnthalpy hia "Air specific enthalpy";
-    Fuel.SpecificEnthalpy hif "Fuel specific enthalpy";
-    Exhaust.SpecificEnthalpy hout "FlueGas specific enthalpy";
-
-    SI.Angle phi "shaft rotation angle";
-    SI.Torque tau "net torque acting on the turbine";
-    SI.AngularVelocity omega "shaft angular velocity";
-    SI.Power ZLPout "zero_loss power output";
-    SI.Power ZLPout_ISO "zero_loss power output, referred to ISO conditions ";
-    SI.Power Pout "Net power output";
-    SI.Power HI "Heat input";
-    SI.Power HI_ISO "Heat input, referred to ISO conditions";
-    SI.PerUnit PR "pressure ratio";
-    Exhaust.AbsolutePressure pc "combustion pressure";
-    Air.AbsolutePressure pin "inlet pressure";
-
-    FlangeA Air_in(redeclare package Medium = Air,m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{-100,20},{-80,40}}, rotation=0)));
-    FlangeA Fuel_in(redeclare package Medium = Fuel,m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{-10,62},{10,82}}, rotation=0)));
-    FlangeB FlueGas_out(redeclare package Medium = Exhaust,m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{80,20},{100,40}}, rotation=0)));
-    Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
-        Placement(transformation(extent={{88,-10},{108,10}}, rotation=0)));
-  equation
-
-    PR = pc/pin "pressure ratio";
-    HI = wif*HH "Heat input";
-    HI_ISO = HI*sqrt(Tnom/gas.T)*(pnom/gas.p)
-      "heat input, referred to ISO conditions";
-
-    0 = Air_in.m_flow + Fuel_in.m_flow + FlueGas_out.m_flow "Mass balance";
-    0 = wia*gas.h + wif*(hif + HH) + wout*hout - ZLPout "Energy balance";
-    ZLPout_ISO = ZLPout*sqrt(Tnom/gas.T)*(pnom/gas.p)
-      "Net power output, referred to ISO conditions";
-    Pout = ZLPout*eta_mech "Net power output";
-    Pout = tau*omega "Mechanical boundary condition";
-    wia_ISO = wia*sqrt(gas.T/Tnom)/(gas.p/pnom)
-      "Air mass flow, referred to ISO conditions";
-
-    // Set inlet gas properties
-    gas.p = Air_in.p;
-    gas.h = inStream(Air_in.h_outflow);
-    gas.Xi = inStream(Air_in.Xi_outflow);
-
-    // Boundary conditions
-    assert(Air_in.m_flow >= 0, "The model does not support flow reversal");
-    wia = Air_in.m_flow;
-    hia = inStream(Air_in.h_outflow);
-    Air_in.p = pin;
-    Air_in.h_outflow = 0;
-    Air_in.Xi_outflow = Air.reference_X[1:Air.nXi];
-    assert(Fuel_in.m_flow >= 0, "The model does not support flow reversal");
-    wif = Fuel_in.m_flow;
-    hif = inStream(Fuel_in.h_outflow);
-    Fuel_in.p = pc;
-    Fuel_in.h_outflow = 0;
-    Fuel_in.Xi_outflow = Fuel.reference_X[1:Fuel.nXi];
-    assert(FlueGas_out.m_flow <= 0, "The model does not support flow reversal");
-    wout = FlueGas_out.m_flow;
-    hout = FlueGas_out.h_outflow;
-    // Flue gas composition FlueGas_out.XBA to be determined by extended model
-
-    // Mechanical boundaries
-    shaft_b.phi = phi;
-    shaft_b.tau = -tau;
-    der(phi) = omega;
-
-    annotation (
-      Icon(graphics={Text(
-            extent={{-126,-60},{130,-100}},
-            lineColor={0,0,255},
-            textString="%name")}),
-      Diagram(graphics),
-      Documentation(info="<html>
-This model describes a gas turbine unit as a single model, including the interface and all equations, except the computation of the performance characteristics and of the exhaust composition.
-<p>Actual operating conditions are related to ISO standard conditions <tt>pnom</tt> and <tt>Tnom</tt> by the following relationship:
-<ul><li> HI_ISO = HI*sqrt(Tnom/gas.T)*(pnom/gas.p)</li>
-<li> ZLPout_ISO = ZLPout*sqrt(Tnom/gas.T)*(pnom/gas.p)</li>
-<li> wia_ISO = wia*pnom/gas.p*sqrt(gas.T/Tnom)</li></ul>
-<p> where <tt>HI</tt> is the heat input, <tt>ZLPout</tt> the zero loss power output and <tt>wia</tt> the air inlet flow.
-<p><b>Modelling options</b></p>
-<p>This model has three different Medium models to characterize the inlet air, fuel, and flue gas exhaust.
-</html>", revisions="<html>
-<ul>
-<li><i>19 Apr 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       GTunit model restructured using inheritance.<br>
-       First release.</li>
-</ul>
-</html>"));
-  end GTunitBase;
-
-  partial model GTunitExhaustBase
-    "Adds computation of exhaust composition to GTunitBase"
-    extends GTunitBase(
-      redeclare package Air = ThermoPower.Media.Air "O2, H2O, Ar, N2",
-      redeclare package Fuel = ThermoPower.Media.NaturalGas "N2, CO2, CH4",
-      redeclare package Exhaust = ThermoPower.Media.FlueGas
-        "O2, Ar, H2O, CO2, N2");
-    parameter Boolean constantCompositionExhaust=false
-      "Assume exhaust composition equal to reference_X";
-    Real wcomb(final quantity="MolarFlowRate", unit="mol/s")
-      "Molar Combustion rate (CH4)";
-    Real lambda
-      "Stoichiometric ratio (>1 if air flow is greater than stoichiometric)";
-  protected
-    Real Air_in_X[Air.nXi]=inStream(Air_in.Xi_outflow);
-    Real Fuel_in_X[Fuel.nXi]=inStream(Fuel_in.Xi_outflow);
-  equation
-    wcomb = wif*Fuel_in_X[3]/Fuel.data[3].MM "Combustion molar flow rate";
-    lambda = (wia*Air_in_X[1]/Air.data[1].MM)/(2*wcomb);
-    assert(lambda >= 1, "Not enough oxygen flow");
-    if constantCompositionExhaust then
-      FlueGas_out.Xi_outflow[1:Exhaust.nXi] = Exhaust.reference_X[1:Exhaust.nXi]
-        "Reference value for exhaust compostion";
-    else
-      // True mass balances
-      0 = wia*Air_in_X[1] + wout*FlueGas_out.Xi_outflow[1] - 2*wcomb*Exhaust.data[
-        1].MM "oxygen";
-      0 = wia*Air_in_X[3] + wout*FlueGas_out.Xi_outflow[2] "argon";
-      0 = wia*Air_in_X[2] + wout*FlueGas_out.Xi_outflow[3] + 2*wcomb*Exhaust.data[
-        3].MM "water";
-      0 = wout*FlueGas_out.Xi_outflow[4] + wif*Fuel_in_X[2] + wcomb*Exhaust.data[
-        4].MM "carbondioxide";
-      0 = wia*Air_in_X[4] + wout*FlueGas_out.Xi_outflow[5] + wif*Fuel_in_X[1]
-        "nitrogen";
-    end if;
-    annotation (Documentation(info="<html>
-This model extends <tt>GTunitBase</tt>, by adding the computation of the exhaust composition.
-
-<p><b>Modelling options</b></p>
-If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is computed according to the exact mass balances; otherwise, the exhaust composition is held fixed to <tt>Exhaust.reference_X</tt>.
-</html>", revisions="<html>
-<ul>
-<li><i>7 Jun 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       GTunit models further restructured.</li>
-</ul>
-</html>"));
-  end GTunitExhaustBase;
 
   model GTunit_ISO "Gas Turbine"
-    extends GTunitExhaustBase;
+    extends BaseClasses.GTunitExhaustBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
     parameter Real tableData[:, 4]=fill(
           0,
@@ -3108,7 +2537,7 @@ This model adds the performance characteristics to the GTunit_base model, when o
   end GTunit_ISO;
 
   model GTunit "Gas Turbine"
-    extends GTunitExhaustBase;
+    extends BaseClasses.GTunitExhaustBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
     parameter SI.AngularVelocity omega_sync=314
       "synchronous value of the shaft speed";
@@ -3205,241 +2634,9 @@ The packages Medium are redeclared and a mass balance determines the composition
 </html>"));
   end GTunit;
 
-  partial model FanBase "Base model for fans"
-    extends Icons.Gas.Fan;
-    replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
-      "Medium model"
-      annotation(choicesAllMatching = true);
-    Medium.BaseProperties inletFluid(h(start=hstart))
-      "Fluid properties at the inlet";
-    replaceable function flowCharacteristic =
-      Functions.FanCharacteristics.baseFlow
-      "Head vs. q_flow characteristic at nominal speed and density" annotation (
-       Dialog(group="Characteristics"), choicesAllMatching=true);
-    parameter Boolean usePowerCharacteristic=false
-      "Use powerCharacteristic (vs. efficiencyCharacteristic)"
-      annotation (Dialog(group="Characteristics"));
-    replaceable function powerCharacteristic =
-        Functions.FanCharacteristics.constantPower constrainedby
-      Functions.FanCharacteristics.basePower
-      "Power consumption vs. q_flow at nominal speed and density" annotation (
-        Dialog(group="Characteristics", enable=usePowerCharacteristic),
-        choicesAllMatching=true);
-    replaceable function efficiencyCharacteristic =
-        Functions.FanCharacteristics.constantEfficiency (eta_nom=0.8)
-      constrainedby Functions.PumpCharacteristics.baseEfficiency
-      "Efficiency vs. q_flow at nominal speed and density" annotation (Dialog(
-          group="Characteristics", enable=not usePowerCharacteristic),
-        choicesAllMatching=true);
-    parameter Integer Np0(min=1) = 1 "Nominal number of fans in parallel";
-    parameter Real bladePos0=1 "Nominal blade position";
-    parameter Medium.Density rho0=1.229 "Nominal Gas Density"
-      annotation (Dialog(group="Characteristics"));
-    parameter NonSI.AngularVelocity_rpm n0=1500 "Nominal rotational speed"
-      annotation (Dialog(group="Characteristics"));
-    parameter SI.Volume V=0 "Fan Internal Volume" annotation (Evaluate=true);
-    parameter Boolean CheckValve=false "Reverse flow stopped";
-    parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
-    outer ThermoPower.System system "System wide properties";
-    parameter SI.VolumeFlowRate q_single_start=q_single0
-      "Volume Flow Rate Start Value (single pump)"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Medium.SpecificEnthalpy hstart=1e5
-      "Fluid Specific Enthalpy Start Value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Medium.Density rho_start=rho0 "Inlet Density start value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=system.initOpt
-      "Initialisation option" annotation (Dialog(tab="Initialisation"));
-    parameter Medium.MassFlowRate w0 "Nominal mass flow rate"
-      annotation (Dialog(group="Characteristics"));
-    parameter SI.Pressure dp0 "Nominal pressure increase"
-      annotation (Dialog(group="Characteristics"));
-    final parameter SI.VolumeFlowRate q_single0=w0/(Np0*rho0)
-      "Nominal volume flow rate (single pump)";
-    final parameter SI.SpecificEnergy H0=dp0/(rho0) "Nominal specific energy";
-  protected
-    function df_dqflow = der(flowCharacteristic, q_flow);
-  public
-    Medium.MassFlowRate w_single(start=q_single_start*rho_start)
-      "Mass flow rate (single fan)";
-    Medium.MassFlowRate w=Np*w_single "Mass flow rate (total)";
-    SI.VolumeFlowRate q_single "Volume flow rate (single fan)";
-    SI.VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
-    SI.Pressure dp "Outlet pressure minus inlet pressure";
-    SI.SpecificEnergy H "Specific energy";
-    Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
-    Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";
-    Medium.SpecificEnthalpy hout(start=hstart) "Enthalpy of outgoing fluid";
-    Units.LiquidDensity rho "Gas density";
-    Medium.Temperature Tin "Gas inlet temperature";
-    NonSI.AngularVelocity_rpm n "Shaft r.p.m.";
-    Real bladePos "Blade position";
-    Integer Np(min=1) "Number of fans in parallel";
-    SI.Power W_single "Power Consumption (single fan)";
-    SI.Power W=Np*W_single "Power Consumption (total)";
-    constant SI.Power W_eps=1e-8
-      "Small coefficient to avoid numerical singularities";
-    constant NonSI.AngularVelocity_rpm n_eps=1e-6;
-    SI.PerUnit eta "Fan efficiency";
-    Real s "Auxiliary Variable";
-    FlangeA infl(
-      h_outflow(start=hstart),
-      redeclare package Medium = Medium,
-      m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=
-             0)));
-    FlangeB outfl(
-      h_outflow(start=hstart),
-      redeclare package Medium = Medium,
-      m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
-      annotation (Placement(transformation(extent={{40,52},{80,92}}, rotation=0)));
-    Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps"
-      annotation (Placement(transformation(
-          origin={28,80},
-          extent={{-10,-10},{10,10}},
-          rotation=270)));
-    Modelica.Blocks.Interfaces.RealInput in_bladePos annotation (Placement(
-          transformation(
-          origin={-40,76},
-          extent={{-10,-10},{10,10}},
-          rotation=270)));
-  equation
-    // Number of fans in parallel
-    Np = in_Np;
-    if cardinality(in_Np) == 0 then
-      in_Np = Np0 "Number of fans selected by parameter";
-    end if;
-
-    // Blade position
-    bladePos = in_bladePos;
-    if cardinality(in_bladePos) == 0 then
-      in_bladePos = bladePos0 "Blade position selected by parameter";
-    end if;
-
-    // Fluid properties (always uses the properties upstream of the inlet flange)
-    inletFluid.p = infl.p;
-    inletFluid.h = inStream(infl.h_outflow);
-    rho = inletFluid.d;
-    Tin = inletFluid.T;
-
-    // Flow equations
-    q_single = w_single/homotopy(rho, rho0);
-    H = dp/(homotopy(rho, rho0));
-    if noEvent(s > 0 or (not CheckValve)) then
-      // Flow characteristics when check valve is open
-      q_single = s;
-      H = homotopy((n/n0)^2*flowCharacteristic(q_single*n0/(n + n_eps),
-        bladePos), df_dqflow(q_single0)*(q_single - q_single0) + (2/n0*
-        flowCharacteristic(q_single0) - q_single0/n0*df_dqflow(q_single0))*(n
-         - n0) + H0);
-    else
-      // Flow characteristics when check valve is closed
-      H = homotopy((n/n0)^2*flowCharacteristic(0) - s, df_dqflow(q_single0)*(
-        q_single - q_single0) + (2/n0*flowCharacteristic(q_single0) - q_single0
-        /n0*df_dqflow(q_single0))*(n - n0) + H0);
-      q_single = 0;
-    end if;
-
-    /*
-  // Flow equations
-  q_single = w_single/rho;
-  if noEvent(s > 0 or (not CheckValve)) then
-    // Flow characteristics when check valve is open
-    q_single = s;
-    H = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps),bladePos);
-  else
-    // Flow characteristics when check valve is closed
-    H = (n/n0)^2*flowCharacteristic(0) - s;
-    q_single = 0;
-  end if;
-*/
-
-    // Power consumption
-    if usePowerCharacteristic then
-      W_single = (n/n0)^3*(rho/rho0)*powerCharacteristic(q_single*n0/(n + n_eps),
-        bladePos) "Power consumption (single fan)";
-      eta = (dp*q_single)/(W_single + W_eps) "Hydraulic efficiency";
-    else
-      eta = efficiencyCharacteristic(q_single*n0/(n + n_eps), bladePos);
-      W_single = dp*q_single/eta;
-    end if;
-
-    // Boundary conditions
-    dp = outfl.p - infl.p;
-    w = infl.m_flow "Fan total flow rate";
-    hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow) else
-      if w >= 0 then inStream(infl.h_outflow) else h, inStream(infl.h_outflow));
-    hout = homotopy(if not allowFlowReversal then h else if w >= 0 then h else
-      inStream(outfl.h_outflow), h);
-
-    // Mass balance
-    infl.m_flow + outfl.m_flow = 0 "Mass balance";
-
-    // Energy balance
-    if V > 0 then
-      (rho*V*der(h)) = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single
-        "Dynamic energy balance (single fan)";
-      outfl.h_outflow = h;
-      infl.h_outflow = h;
-    else
-      outfl.h_outflow = inStream(infl.h_outflow) + W_single/w
-        "Energy balance for w > 0";
-      infl.h_outflow = inStream(outfl.h_outflow) + W_single/w
-        "Energy balance for w < 0";
-      h = homotopy(if not allowFlowReversal then outfl.h_outflow else if w >= 0
-         then outfl.h_outflow else infl.h_outflow, outfl.h_outflow)
-        "Definition of h";
-    end if;
-
-  initial equation
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-   elseif initOpt == Choices.Init.Options.fixedState then
-     if V > 0 then
-       h = hstart;
-     end if;
-   elseif initOpt == Choices.Init.Options.steadyState then
-      if V > 0 then
-        der(h) = 0;
-      end if;
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
-
-    annotation (
-      Icon(graphics),
-      Diagram(graphics),
-      Documentation(info="<HTML>
-<p>This is the base model for the <tt>FanMech</tt> fan model.
-<p>The model describes a fan, or a group of <tt>Np</tt> identical fans, with optional blade angle regulation. The fan model is based on the theory of kinematic similarity: the fan characteristics are given for nominal operating conditions (rotational speed and fluid density), and then adapted to actual operating condition, according to the similarity equations.
-<p>In order to avoid singularities in the computation of the outlet enthalpy at zero flowrate, the thermal capacity of the fluid inside the fan body can be taken into account.
-<p>The model can either support reverse flow conditions or include a built-in check valve to avoid flow reversal.
-<p><b>Modelling options</b></p>
-<p> The nominal flow characteristic (specific energy vs. volume flow rate) is given by the the replaceable function <tt>flowCharacteristic</tt>. If the blade angles are fixed, it is possible to use implementations which ignore the <tt>bladePos</tt> input.
-<p> The fan energy balance can be specified in two alternative ways:
-<ul>
-<li><tt>usePowerCharacteristic = false</tt> (default option): the replaceable function <tt>efficiencyCharacteristic</tt> (efficiency vs. volume flow rate in nominal conditions) is used to determine the efficiency, and then the power consumption. The default is a constant efficiency of 0.8.
-<li><tt>usePowerCharacteristic = true</tt>: the replaceable function <tt>powerCharacteristic</tt> (power consumption vs. volume flow rate in nominal conditions) is used to determine the power consumption, and then the efficiency.
-</ul>
-<p>
-Several functions are provided in the package <tt>Functions.FanCharacteristics</tt> to specify the characteristics as a function of some operating points at nominal conditions.
-<p>Depending on the value of the <tt>checkValve</tt> parameter, the model either supports reverse flow conditions, or includes a built-in check valve to avoid flow reversal.
-<p>If the <tt>in_Np</tt> input connector is wired, it provides the number of fans in parallel; otherwise,  <tt>Np0</tt> parallel fans are assumed.</p>
-<p>It is possible to take into account the heat capacity of the fluid inside the fan by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
-<p>The <tt>CheckValve</tt> parameter determines whether the fan has a built-in check valve or not.
-</HTML>", revisions="<html>
-<ul>
-<li><i>10 Nov 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-      Adapted from the <tt>Water.PumpBase</tt> model.</li>
-</ul>
-</html>"));
-  end FanBase;
 
   model FanMech
-    extends FanBase;
+    extends BaseClasses.FanBase;
     SI.Angle phi "Shaft angle";
     SI.AngularVelocity omega "Shaft angular velocity";
     Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort annotation (
@@ -3574,6 +2771,817 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         Diagram(graphics),
         Icon(graphics));
     end Flow1DBase;
+
+    partial model CombustionChamberBase "Combustion Chamber"
+      extends Icons.Gas.Mixer;
+      replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
+      replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
+      replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
+      parameter SI.Volume V "Inner volume";
+      parameter SI.Area S=0 "Inner surface";
+      parameter SI.CoefficientOfHeatTransfer gamma=0
+        "Heat Transfer Coefficient"
+        annotation (Evaluate=true);
+      parameter SI.HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
+      parameter SI.Temperature Tmstart=300 "Metal wall start temperature"
+        annotation (Dialog(tab="Initialisation"));
+      parameter SI.SpecificEnthalpy HH "Lower Heating value of fuel";
+      parameter Boolean allowFlowReversal=system.allowFlowReversal
+        "= true to allow flow reversal, false restricts to design direction";
+      outer ThermoPower.System system "System wide properties";
+      parameter Air.AbsolutePressure pstart=101325 "Pressure start value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Air.Temperature Tstart=300 "Temperature start value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Air.MassFraction Xstart[Exhaust.nX]=Exhaust.reference_X
+        "Start flue gas composition" annotation (Dialog(tab="Initialisation"));
+      parameter Choices.Init.Options initOpt=system.initOpt
+        "Initialisation option"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Boolean noInitialPressure=false
+        "Remove initial equation on pressure"
+        annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
+      Exhaust.BaseProperties fluegas(
+        p(start=pstart),
+        T(start=Tstart),
+        Xi(start=Xstart[1:Exhaust.nXi]));
+      SI.Mass M "Gas total mass";
+      SI.Mass MX[Exhaust.nXi] "Partial flue gas masses";
+      SI.InternalEnergy E "Gas total energy";
+      SI.Temperature Tm(start=Tmstart) "Wall temperature";
+      Air.SpecificEnthalpy hia "Air specific enthalpy";
+      Fuel.SpecificEnthalpy hif "Fuel specific enthalpy";
+      Exhaust.SpecificEnthalpy ho "Outlet specific enthalpy";
+      SI.Power HR "Heat rate";
+
+      SI.Time Tr "Residence time";
+      FlangeA ina(redeclare package Medium = Air, m_flow(min=if allowFlowReversal
+               then -Modelica.Constants.inf else 0)) "inlet air" annotation (
+          Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+      FlangeA inf(redeclare package Medium = Fuel, m_flow(min=if
+              allowFlowReversal then -Modelica.Constants.inf else 0))
+        "inlet fuel" annotation (Placement(transformation(extent={{-20,80},{20,
+                120}}, rotation=0)));
+      FlangeB out(redeclare package Medium = Exhaust, m_flow(max=if
+              allowFlowReversal then +Modelica.Constants.inf else 0))
+        "flue gas"
+        annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
+               0)));
+    equation
+      M = fluegas.d*V "Gas mass";
+      E = fluegas.u*M "Gas energy";
+      MX = fluegas.Xi*M "Component masses";
+      HR = inf.m_flow*HH;
+      der(M) = ina.m_flow + inf.m_flow + out.m_flow "Gas mass balance";
+      der(E) = ina.m_flow*hia + inf.m_flow*hif + out.m_flow*ho + HR - gamma*S*(
+        fluegas.T - Tm) "Gas energy balance";
+      if Cm > 0 and gamma > 0 then
+        Cm*der(Tm) = gamma*S*(fluegas.T - Tm) "Metal wall energy balance";
+      else
+        Tm = fluegas.T;
+      end if;
+
+      // Set gas properties
+      out.p = fluegas.p;
+      out.h_outflow = fluegas.h;
+      out.Xi_outflow = fluegas.Xi;
+
+      // Boundary conditions
+      ina.p = fluegas.p;
+      ina.h_outflow = 0;
+      ina.Xi_outflow = Air.reference_X[1:Air.nXi];
+      inf.p = fluegas.p;
+      inf.h_outflow = 0;
+      inf.Xi_outflow = Fuel.reference_X[1:Fuel.nXi];
+      assert(ina.m_flow >= 0, "The model does not support flow reversal");
+      hia = inStream(ina.h_outflow);
+      assert(inf.m_flow >= 0, "The model does not support flow reversal");
+      hif = inStream(inf.h_outflow);
+      assert(out.m_flow <= 0, "The model does not support flow reversal");
+      ho = fluegas.h;
+
+      Tr = noEvent(M/max(abs(out.m_flow), Modelica.Constants.eps));
+    initial equation
+      // Initial conditions
+      if initOpt == Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == Choices.Init.Options.fixedState then
+        if not noInitialPressure then
+          fluegas.p = pstart;
+        end if;
+        fluegas.T = Tstart;
+        fluegas.Xi = Xstart[1:Exhaust.nXi];
+      elseif initOpt == Choices.Init.Options.steadyState then
+        if not noInitialPressure then
+          der(fluegas.p) = 0;
+        end if;
+        der(fluegas.T) = 0;
+        der(fluegas.Xi) = zeros(Exhaust.nXi);
+        if (Cm > 0 and gamma > 0) then
+          der(Tm) = 0;
+        end if;
+      elseif initOpt == Choices.Init.Options.steadyStateNoP then
+        der(fluegas.T) = 0;
+        der(fluegas.Xi) = zeros(Exhaust.nXi);
+        if (Cm > 0 and gamma > 0) then
+          der(Tm) = 0;
+        end if;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+
+      annotation (Documentation(info="<html>
+This is the model-base of a Combustion Chamber, with a constant volume.
+<p>The metal wall temperature and the heat transfer coefficient between the wall and the fluid are uniform. The wall is thermally insulated from the outside. It has been assumed that inlet gases are premixed before entering in the volume.
+<p><b>Modelling options</b></p>
+<p>This model has three different Medium models to characterize the inlet air, fuel, and flue gas exhaust.
+<p>If <tt>gamma = 0</tt>, the thermal effects of the surrounding walls are neglected.
+</p>
+</html>",   revisions="<html>
+<ul>
+<li><i>30 May 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Initialisation support added.</li>
+<li><i>31 Jan 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+    CombustionChamber model restructured using inheritance.
+<p> First release.</li>
+</ul>
+</html>
+"),   Diagram(graphics));
+    end CombustionChamberBase;
+
+    partial model CompressorBase "Gas compressor"
+      extends ThermoPower.Icons.Gas.Compressor;
+      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+        annotation(choicesAllMatching = true);
+      parameter Boolean explicitIsentropicEnthalpy=true
+        "isentropicEnthalpy function used";
+      parameter SI.PerUnit eta_mech=0.98 "mechanical efficiency";
+      parameter Medium.AbsolutePressure pstart_in "inlet start pressure"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Medium.AbsolutePressure pstart_out "outlet start pressure"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Medium.Temperature Tdes_in "inlet design temperature";
+      parameter Boolean allowFlowReversal=system.allowFlowReversal
+        "= true to allow flow reversal, false restricts to design direction";
+      outer ThermoPower.System system "System wide properties";
+      parameter Medium.Temperature Tstart_in=Tdes_in "inlet start temperature"
+                                  annotation (Dialog(tab="Initialisation"));
+      parameter Medium.Temperature Tstart_out "outlet start temperature"
+                                   annotation (Dialog(tab="Initialisation"));
+      parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
+        "start gas composition" annotation (Dialog(tab="Initialisation"));
+      Medium.BaseProperties gas_in(
+        p(start=pstart_in),
+        T(start=Tstart_in),
+        Xi(start=Xstart[1:Medium.nXi]));
+      Medium.BaseProperties gas_iso(
+        p(start=pstart_out),
+        T(start=Tstart_out),
+        Xi(start=Xstart[1:Medium.nXi]));
+      Medium.SpecificEnthalpy hout_iso "Outlet isentropic enthalpy";
+      Medium.SpecificEnthalpy hout "Outlet enthaply";
+      Medium.SpecificEntropy s_in "Inlet specific entropy";
+      Medium.AbsolutePressure pout(start=pstart_out) "Outlet pressure";
+
+      Medium.MassFlowRate w "Gas flow rate";
+      SI.Angle phi "shaft rotation angle";
+      SI.AngularVelocity omega "shaft angular velocity";
+      SI.Torque tau "net torque acting on the compressor";
+
+      SI.PerUnit eta "isentropic efficiency";
+      SI.PerUnit PR "pressure ratio";
+
+      FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
+              allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+         Placement(transformation(extent={{-100,60},{-60,100}}, rotation=0)));
+      FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
+              allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+         Placement(transformation(extent={{60,60},{100,100}}, rotation=0)));
+      Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
+          Placement(transformation(extent={{-72,-12},{-48,12}}, rotation=0)));
+      Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
+          Placement(transformation(extent={{48,-12},{72,12}}, rotation=0)));
+
+    equation
+      w = inlet.m_flow;
+      assert(w >= 0, "The compressor model does not support flow reversal");
+      inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+
+      // Set inlet gas properties
+      gas_in.p = inlet.p;
+      gas_in.h = inStream(inlet.h_outflow);
+      gas_in.Xi = inStream(inlet.Xi_outflow);
+
+      // Set outlet gas properties
+      outlet.p = pout;
+      outlet.h_outflow = hout;
+      outlet.Xi_outflow = gas_in.Xi;
+
+      // Equations for reverse flow (not used)
+      inlet.h_outflow = inStream(outlet.h_outflow);
+      inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+
+      // Component mass balances
+      gas_iso.Xi = gas_in.Xi;
+
+      if explicitIsentropicEnthalpy then
+        hout_iso = Medium.isentropicEnthalpy(outlet.p, gas_in.state)
+          "Approximated isentropic enthalpy";
+        hout - gas_in.h = 1/eta*(hout_iso - gas_in.h);
+        // dummy assignments
+        s_in = 0;
+        gas_iso.p = 1e5;
+        gas_iso.T = 300;
+      else
+        // Properties of the gas after isentropic transformation
+        gas_iso.p = pout;
+        s_in = Medium.specificEntropy(gas_in.state);
+        s_in = Medium.specificEntropy(gas_iso.state);
+        hout - gas_in.h = 1/eta*(gas_iso.h - gas_in.h);
+        // dummy assignment
+        hout_iso = 0;
+      end if;
+
+      w*(hout - gas_in.h) = tau*omega*eta_mech "Energy balance";
+      PR = pout/gas_in.p "Pressure ratio";
+
+      // Mechanical boundary conditions
+      shaft_a.phi = phi;
+      shaft_b.phi = phi;
+      shaft_a.tau + shaft_b.tau = tau;
+      der(phi) = omega;
+      annotation (
+        Documentation(info="<html>
+<p>This is the base model for a compressor, including the interface and all equations except the actual computation of the performance characteristics. Reverse flow conditions are not supported.</p>
+<p>This model does not include any shaft inertia by itself; if that is needed, connect a Modelica.Mechanics.Rotational.Inertia model to one of the shaft connectors.</p>
+<p>As a base-model, it can be used both for axial and centrifugal compressors.
+<p><b>Modelling options</b></p>
+<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
+<p>The following options are available to calculate the enthalpy of the outgoing gas:
+<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is obtained by equating the specific entropy of the inlet gas <tt>gas_in</tt> and of a fictious gas state <tt>gas_iso</tt>, with the same pressure of the outgoing gas; both are computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
+</html>",   revisions="<html>
+<ul>
+<li><i>13 Apr 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Medium.BaseProperties <tt>gas_out</tt>removed.</li>
+</li>
+<li><i>14 Jan 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Adapted to Modelica.Media.</li>
+<br> Compressor model restructured using inheritance.
+</li>
+<li><i>5 Mar 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"),     Diagram(graphics),
+        Icon(graphics={Text(
+              extent={{-128,-60},{128,-100}},
+              lineColor={0,0,255},
+              textString="%name")}));
+    end CompressorBase;
+
+    partial model TurbineBase "Gas Turbine"
+      extends ThermoPower.Icons.Gas.Turbine;
+      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+        annotation(choicesAllMatching = true);
+      parameter Boolean explicitIsentropicEnthalpy=true
+        "isentropicEnthalpy function used";
+      parameter SI.PerUnit eta_mech=0.98 "mechanical efficiency";
+      parameter Medium.Temperature Tdes_in "inlet design temperature";
+      parameter Boolean allowFlowReversal=system.allowFlowReversal
+        "= true to allow flow reversal, false restricts to design direction";
+      outer ThermoPower.System system "System wide properties";
+      parameter Medium.AbsolutePressure pstart_in "inlet start pressure"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Medium.AbsolutePressure pstart_out "outlet start pressure"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Medium.Temperature Tstart_in=Tdes_in "inlet start temperature"
+                                  annotation (Dialog(tab="Initialisation"));
+      parameter Medium.Temperature Tstart_out "outlet start temperature"
+                                   annotation (Dialog(tab="Initialisation"));
+      parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
+        "start gas composition" annotation (Dialog(tab="Initialisation"));
+
+      Medium.BaseProperties gas_in(
+        p(start=pstart_in),
+        T(start=Tstart_in),
+        Xi(start=Xstart[1:Medium.nXi]));
+      Medium.BaseProperties gas_iso(
+        p(start=pstart_out),
+        T(start=Tstart_out),
+        Xi(start=Xstart[1:Medium.nXi]));
+
+      SI.Angle phi "shaft rotation angle";
+      SI.Torque tau "net torque acting on the turbine";
+      SI.AngularVelocity omega "shaft angular velocity";
+      Medium.MassFlowRate w "Gas flow rate";
+      Medium.SpecificEntropy s_in "Inlet specific entropy";
+      Medium.SpecificEnthalpy hout_iso "Outlet isentropic enthalpy";
+      Medium.SpecificEnthalpy hout "Outlet enthalpy";
+      Medium.AbsolutePressure pout(start=pstart_out) "Outlet pressure";
+      SI.PerUnit PR "pressure ratio";
+      SI.PerUnit eta "isoentropic efficiency";
+
+      Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
+          Placement(transformation(extent={{-72,-12},{-48,12}}, rotation=0)));
+      Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
+          Placement(transformation(extent={{48,-12},{72,12}}, rotation=0)));
+      FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
+              allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+         Placement(transformation(extent={{-100,60},{-60,100}}, rotation=0)));
+      FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
+              allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+         Placement(transformation(extent={{60,60},{100,100}}, rotation=0)));
+    equation
+      w = inlet.m_flow;
+      assert(w >= 0, "The turbine model does not support flow reversal");
+      inlet.m_flow + outlet.m_flow = 0 "Mass balance";
+
+      // Set inlet gas properties
+      gas_in.p = inlet.p;
+      gas_in.h = inStream(inlet.h_outflow);
+      gas_in.Xi = inStream(inlet.Xi_outflow);
+
+      // Set outlet gas properties
+      outlet.p = pout;
+      outlet.h_outflow = hout;
+      outlet.Xi_outflow = gas_in.Xi;
+
+      // Equations for reverse flow (not used)
+      inlet.h_outflow = inStream(outlet.h_outflow);
+      inlet.Xi_outflow = inStream(outlet.Xi_outflow);
+
+      // Component mass balances
+      gas_iso.Xi = gas_in.Xi;
+
+      if explicitIsentropicEnthalpy then
+        hout_iso = Medium.isentropicEnthalpy(outlet.p, gas_in.state)
+          "Approximated isentropic enthalpy";
+        hout - gas_in.h = eta*(hout_iso - gas_in.h) "Enthalpy change";
+        //dummy assignments
+        s_in = 0;
+        gas_iso.p = 1e5;
+        gas_iso.T = 300;
+      else
+        // Properties of the gas after isentropic transformation
+        gas_iso.p = pout;
+        s_in = Medium.specificEntropy(gas_in.state);
+        s_in = Medium.specificEntropy(gas_iso.state);
+        hout - gas_in.h = eta*(gas_iso.h - gas_in.h) "Enthalpy change";
+        //dummy assignment
+        hout_iso = 0;
+      end if;
+
+      w*(hout - gas_in.h)*eta_mech = tau*omega "Energy balance";
+      PR = gas_in.p/pout "Pressure ratio";
+
+      // Mechanical boundary conditions
+      shaft_a.phi = phi;
+      shaft_b.phi = phi;
+      shaft_a.tau + shaft_b.tau = tau;
+      der(phi) = omega;
+      annotation (
+        Documentation(info="<html>
+<p>This is the base model for a turbine, including the interface and all equations except the actual computation of the performance characteristics. Reverse flow conditions are not supported.</p>
+<p>This model does not include any shaft inertia by itself; if that is needed, connect a Modelica.Mechanics.Rotational.Inertia model to one of the shaft connectors.</p>
+<p>As a base-model, it can be used both for axial and radial turbines.
+<p><b>Modelling options</b></p>
+<p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
+<p>The following options are available to calculate the enthalpy of the outgoing gas:
+<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is determined by equating the specific entropy of the inlet gas <tt>gas_in</tt> and of a fictious gas state <tt>gas_iso</tt>, with the same pressure of the outgoing gas; both are computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
+</html>",   revisions="<html>
+<ul>
+<li><i>13 Apr 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Medium.BaseProperties <tt>gas_out</tt>removed.</li>
+</li>
+<li><i>14 Jan 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Adapted to Modelica.Media.</li>
+<br> Turbine model restructured using inheritance.
+</li>
+<li><i>5 Mar 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+        Icon(graphics={Text(
+              extent={{-128,-60},{128,-100}},
+              lineColor={0,0,255},
+              textString="%name")}),
+        Diagram(graphics));
+    end TurbineBase;
+
+    partial model GTunitBase "Gas Turbine"
+      extends ThermoPower.Icons.Gas.GasTurbineUnit;
+      replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
+      replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
+      replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
+      parameter Modelica.SIunits.Pressure pstart "start pressure value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Exhaust.Temperature Tstart "start temperature value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Modelica.SIunits.MassFraction Xstart[Air.nX]=Air.reference_X
+        "start gas composition" annotation (Dialog(tab="Initialisation"));
+      constant Exhaust.AbsolutePressure pnom=1.013e5 "ISO reference pressure";
+      constant Air.Temperature Tnom=288.15 "ISO reference temperature";
+      parameter SI.SpecificEnthalpy HH "Lower Heating value";
+      parameter SI.PerUnit eta_mech=0.95 "mechanical efficiency";
+      parameter Boolean allowFlowReversal=system.allowFlowReversal
+        "= true to allow flow reversal, false restricts to design direction";
+      outer ThermoPower.System system "System wide properties";
+
+      Air.BaseProperties gas(
+        p(start=pstart),
+        T(start=Tstart),
+        Xi(start=Xstart[1:Air.nXi]));
+
+      Air.MassFlowRate wia "Air mass flow";
+      Air.MassFlowRate wia_ISO "Air mass flow, referred to ISO conditions";
+      Fuel.MassFlowRate wif "Fuel mass flow";
+      Exhaust.MassFlowRate wout "FlueGas mass flow";
+      Air.SpecificEnthalpy hia "Air specific enthalpy";
+      Fuel.SpecificEnthalpy hif "Fuel specific enthalpy";
+      Exhaust.SpecificEnthalpy hout "FlueGas specific enthalpy";
+
+      SI.Angle phi "shaft rotation angle";
+      SI.Torque tau "net torque acting on the turbine";
+      SI.AngularVelocity omega "shaft angular velocity";
+      SI.Power ZLPout "zero_loss power output";
+      SI.Power ZLPout_ISO "zero_loss power output, referred to ISO conditions ";
+      SI.Power Pout "Net power output";
+      SI.Power HI "Heat input";
+      SI.Power HI_ISO "Heat input, referred to ISO conditions";
+      SI.PerUnit PR "pressure ratio";
+      Exhaust.AbsolutePressure pc "combustion pressure";
+      Air.AbsolutePressure pin "inlet pressure";
+
+      FlangeA Air_in(redeclare package Medium = Air,m_flow(min=if
+              allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+         Placement(transformation(extent={{-100,20},{-80,40}}, rotation=0)));
+      FlangeA Fuel_in(redeclare package Medium = Fuel,m_flow(min=if
+              allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+         Placement(transformation(extent={{-10,62},{10,82}}, rotation=0)));
+      FlangeB FlueGas_out(redeclare package Medium = Exhaust,m_flow(max=if
+              allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+         Placement(transformation(extent={{80,20},{100,40}}, rotation=0)));
+      Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
+          Placement(transformation(extent={{88,-10},{108,10}}, rotation=0)));
+    equation
+
+      PR = pc/pin "pressure ratio";
+      HI = wif*HH "Heat input";
+      HI_ISO = HI*sqrt(Tnom/gas.T)*(pnom/gas.p)
+        "heat input, referred to ISO conditions";
+
+      0 = Air_in.m_flow + Fuel_in.m_flow + FlueGas_out.m_flow "Mass balance";
+      0 = wia*gas.h + wif*(hif + HH) + wout*hout - ZLPout "Energy balance";
+      ZLPout_ISO = ZLPout*sqrt(Tnom/gas.T)*(pnom/gas.p)
+        "Net power output, referred to ISO conditions";
+      Pout = ZLPout*eta_mech "Net power output";
+      Pout = tau*omega "Mechanical boundary condition";
+      wia_ISO = wia*sqrt(gas.T/Tnom)/(gas.p/pnom)
+        "Air mass flow, referred to ISO conditions";
+
+      // Set inlet gas properties
+      gas.p = Air_in.p;
+      gas.h = inStream(Air_in.h_outflow);
+      gas.Xi = inStream(Air_in.Xi_outflow);
+
+      // Boundary conditions
+      assert(Air_in.m_flow >= 0, "The model does not support flow reversal");
+      wia = Air_in.m_flow;
+      hia = inStream(Air_in.h_outflow);
+      Air_in.p = pin;
+      Air_in.h_outflow = 0;
+      Air_in.Xi_outflow = Air.reference_X[1:Air.nXi];
+      assert(Fuel_in.m_flow >= 0, "The model does not support flow reversal");
+      wif = Fuel_in.m_flow;
+      hif = inStream(Fuel_in.h_outflow);
+      Fuel_in.p = pc;
+      Fuel_in.h_outflow = 0;
+      Fuel_in.Xi_outflow = Fuel.reference_X[1:Fuel.nXi];
+      assert(FlueGas_out.m_flow <= 0, "The model does not support flow reversal");
+      wout = FlueGas_out.m_flow;
+      hout = FlueGas_out.h_outflow;
+      // Flue gas composition FlueGas_out.XBA to be determined by extended model
+
+      // Mechanical boundaries
+      shaft_b.phi = phi;
+      shaft_b.tau = -tau;
+      der(phi) = omega;
+
+      annotation (
+        Icon(graphics={Text(
+              extent={{-126,-60},{130,-100}},
+              lineColor={0,0,255},
+              textString="%name")}),
+        Diagram(graphics),
+        Documentation(info="<html>
+This model describes a gas turbine unit as a single model, including the interface and all equations, except the computation of the performance characteristics and of the exhaust composition.
+<p>Actual operating conditions are related to ISO standard conditions <tt>pnom</tt> and <tt>Tnom</tt> by the following relationship:
+<ul><li> HI_ISO = HI*sqrt(Tnom/gas.T)*(pnom/gas.p)</li>
+<li> ZLPout_ISO = ZLPout*sqrt(Tnom/gas.T)*(pnom/gas.p)</li>
+<li> wia_ISO = wia*pnom/gas.p*sqrt(gas.T/Tnom)</li></ul>
+<p> where <tt>HI</tt> is the heat input, <tt>ZLPout</tt> the zero loss power output and <tt>wia</tt> the air inlet flow.
+<p><b>Modelling options</b></p>
+<p>This model has three different Medium models to characterize the inlet air, fuel, and flue gas exhaust.
+</html>",   revisions="<html>
+<ul>
+<li><i>19 Apr 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       GTunit model restructured using inheritance.<br>
+       First release.</li>
+</ul>
+</html>"));
+    end GTunitBase;
+
+    partial model GTunitExhaustBase
+      "Adds computation of exhaust composition to GTunitBase"
+      extends BaseClasses.GTunitBase(
+        redeclare package Air = ThermoPower.Media.Air "O2, H2O, Ar, N2",
+        redeclare package Fuel = ThermoPower.Media.NaturalGas "N2, CO2, CH4",
+        redeclare package Exhaust = ThermoPower.Media.FlueGas
+          "O2, Ar, H2O, CO2, N2");
+      parameter Boolean constantCompositionExhaust=false
+        "Assume exhaust composition equal to reference_X";
+      Real wcomb(final quantity="MolarFlowRate", unit="mol/s")
+        "Molar Combustion rate (CH4)";
+      Real lambda
+        "Stoichiometric ratio (>1 if air flow is greater than stoichiometric)";
+    protected
+      Real Air_in_X[Air.nXi]=inStream(Air_in.Xi_outflow);
+      Real Fuel_in_X[Fuel.nXi]=inStream(Fuel_in.Xi_outflow);
+    equation
+      wcomb = wif*Fuel_in_X[3]/Fuel.data[3].MM "Combustion molar flow rate";
+      lambda = (wia*Air_in_X[1]/Air.data[1].MM)/(2*wcomb);
+      assert(lambda >= 1, "Not enough oxygen flow");
+      if constantCompositionExhaust then
+        FlueGas_out.Xi_outflow[1:Exhaust.nXi] = Exhaust.reference_X[1:Exhaust.nXi]
+          "Reference value for exhaust compostion";
+      else
+        // True mass balances
+        0 = wia*Air_in_X[1] + wout*FlueGas_out.Xi_outflow[1] - 2*wcomb*Exhaust.data[
+          1].MM "oxygen";
+        0 = wia*Air_in_X[3] + wout*FlueGas_out.Xi_outflow[2] "argon";
+        0 = wia*Air_in_X[2] + wout*FlueGas_out.Xi_outflow[3] + 2*wcomb*Exhaust.data[
+          3].MM "water";
+        0 = wout*FlueGas_out.Xi_outflow[4] + wif*Fuel_in_X[2] + wcomb*Exhaust.data[
+          4].MM "carbondioxide";
+        0 = wia*Air_in_X[4] + wout*FlueGas_out.Xi_outflow[5] + wif*Fuel_in_X[1]
+          "nitrogen";
+      end if;
+      annotation (Documentation(info="<html>
+This model extends <tt>GTunitBase</tt>, by adding the computation of the exhaust composition.
+
+<p><b>Modelling options</b></p>
+If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is computed according to the exact mass balances; otherwise, the exhaust composition is held fixed to <tt>Exhaust.reference_X</tt>.
+</html>",   revisions="<html>
+<ul>
+<li><i>7 Jun 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       GTunit models further restructured.</li>
+</ul>
+</html>"));
+    end GTunitExhaustBase;
+
+    partial model FanBase "Base model for fans"
+      extends Icons.Gas.Fan;
+      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
+        "Medium model"
+        annotation(choicesAllMatching = true);
+      Medium.BaseProperties inletFluid(h(start=hstart))
+        "Fluid properties at the inlet";
+      replaceable function flowCharacteristic =
+        Functions.FanCharacteristics.baseFlow
+        "Head vs. q_flow characteristic at nominal speed and density" annotation (
+         Dialog(group="Characteristics"), choicesAllMatching=true);
+      parameter Boolean usePowerCharacteristic=false
+        "Use powerCharacteristic (vs. efficiencyCharacteristic)"
+        annotation (Dialog(group="Characteristics"));
+      replaceable function powerCharacteristic =
+          Functions.FanCharacteristics.constantPower constrainedby
+        Functions.FanCharacteristics.basePower
+        "Power consumption vs. q_flow at nominal speed and density" annotation (
+          Dialog(group="Characteristics", enable=usePowerCharacteristic),
+          choicesAllMatching=true);
+      replaceable function efficiencyCharacteristic =
+          Functions.FanCharacteristics.constantEfficiency (eta_nom=0.8)
+        constrainedby Functions.PumpCharacteristics.baseEfficiency
+        "Efficiency vs. q_flow at nominal speed and density" annotation (Dialog(
+            group="Characteristics", enable=not usePowerCharacteristic),
+          choicesAllMatching=true);
+      parameter Integer Np0(min=1) = 1 "Nominal number of fans in parallel";
+      parameter Real bladePos0=1 "Nominal blade position";
+      parameter Medium.Density rho0=1.229 "Nominal Gas Density"
+        annotation (Dialog(group="Characteristics"));
+      parameter NonSI.AngularVelocity_rpm n0=1500 "Nominal rotational speed"
+        annotation (Dialog(group="Characteristics"));
+      parameter SI.Volume V=0 "Fan Internal Volume" annotation (Evaluate=true);
+      parameter Boolean CheckValve=false "Reverse flow stopped";
+      parameter Boolean allowFlowReversal=system.allowFlowReversal
+        "= true to allow flow reversal, false restricts to design direction";
+      outer ThermoPower.System system "System wide properties";
+      parameter SI.VolumeFlowRate q_single_start=q_single0
+        "Volume Flow Rate Start Value (single pump)"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Medium.SpecificEnthalpy hstart=1e5
+        "Fluid Specific Enthalpy Start Value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Medium.Density rho_start=rho0 "Inlet Density start value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter Choices.Init.Options initOpt=system.initOpt
+        "Initialisation option" annotation (Dialog(tab="Initialisation"));
+      parameter Medium.MassFlowRate w0 "Nominal mass flow rate"
+        annotation (Dialog(group="Characteristics"));
+      parameter SI.Pressure dp0 "Nominal pressure increase"
+        annotation (Dialog(group="Characteristics"));
+      final parameter SI.VolumeFlowRate q_single0=w0/(Np0*rho0)
+        "Nominal volume flow rate (single pump)";
+      final parameter SI.SpecificEnergy H0=dp0/(rho0) "Nominal specific energy";
+    protected
+      function df_dqflow = der(flowCharacteristic, q_flow);
+    public
+      Medium.MassFlowRate w_single(start=q_single_start*rho_start)
+        "Mass flow rate (single fan)";
+      Medium.MassFlowRate w=Np*w_single "Mass flow rate (total)";
+      SI.VolumeFlowRate q_single "Volume flow rate (single fan)";
+      SI.VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
+      SI.Pressure dp "Outlet pressure minus inlet pressure";
+      SI.SpecificEnergy H "Specific energy";
+      Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
+      Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";
+      Medium.SpecificEnthalpy hout(start=hstart) "Enthalpy of outgoing fluid";
+      Units.LiquidDensity rho "Gas density";
+      Medium.Temperature Tin "Gas inlet temperature";
+      NonSI.AngularVelocity_rpm n "Shaft r.p.m.";
+      Real bladePos "Blade position";
+      Integer Np(min=1) "Number of fans in parallel";
+      SI.Power W_single "Power Consumption (single fan)";
+      SI.Power W=Np*W_single "Power Consumption (total)";
+      constant SI.Power W_eps=1e-8
+        "Small coefficient to avoid numerical singularities";
+      constant NonSI.AngularVelocity_rpm n_eps=1e-6;
+      SI.PerUnit eta "Fan efficiency";
+      Real s "Auxiliary Variable";
+      FlangeA infl(
+        h_outflow(start=hstart),
+        redeclare package Medium = Medium,
+        m_flow(min=if allowFlowReversal then -Modelica.Constants.inf else 0))
+        annotation (Placement(transformation(extent={{-100,2},{-60,42}}, rotation=
+               0)));
+      FlangeB outfl(
+        h_outflow(start=hstart),
+        redeclare package Medium = Medium,
+        m_flow(max=if allowFlowReversal then +Modelica.Constants.inf else 0))
+        annotation (Placement(transformation(extent={{40,52},{80,92}}, rotation=0)));
+      Modelica.Blocks.Interfaces.IntegerInput in_Np "Number of  parallel pumps"
+        annotation (Placement(transformation(
+            origin={28,80},
+            extent={{-10,-10},{10,10}},
+            rotation=270)));
+      Modelica.Blocks.Interfaces.RealInput in_bladePos annotation (Placement(
+            transformation(
+            origin={-40,76},
+            extent={{-10,-10},{10,10}},
+            rotation=270)));
+    equation
+      // Number of fans in parallel
+      Np = in_Np;
+      if cardinality(in_Np) == 0 then
+        in_Np = Np0 "Number of fans selected by parameter";
+      end if;
+
+      // Blade position
+      bladePos = in_bladePos;
+      if cardinality(in_bladePos) == 0 then
+        in_bladePos = bladePos0 "Blade position selected by parameter";
+      end if;
+
+      // Fluid properties (always uses the properties upstream of the inlet flange)
+      inletFluid.p = infl.p;
+      inletFluid.h = inStream(infl.h_outflow);
+      rho = inletFluid.d;
+      Tin = inletFluid.T;
+
+      // Flow equations
+      q_single = w_single/homotopy(rho, rho0);
+      H = dp/(homotopy(rho, rho0));
+      if noEvent(s > 0 or (not CheckValve)) then
+        // Flow characteristics when check valve is open
+        q_single = s;
+        H = homotopy((n/n0)^2*flowCharacteristic(q_single*n0/(n + n_eps),
+          bladePos), df_dqflow(q_single0)*(q_single - q_single0) + (2/n0*
+          flowCharacteristic(q_single0) - q_single0/n0*df_dqflow(q_single0))*(n
+           - n0) + H0);
+      else
+        // Flow characteristics when check valve is closed
+        H = homotopy((n/n0)^2*flowCharacteristic(0) - s, df_dqflow(q_single0)*(
+          q_single - q_single0) + (2/n0*flowCharacteristic(q_single0) - q_single0
+          /n0*df_dqflow(q_single0))*(n - n0) + H0);
+        q_single = 0;
+      end if;
+
+      /*
+  // Flow equations
+  q_single = w_single/rho;
+  if noEvent(s > 0 or (not CheckValve)) then
+    // Flow characteristics when check valve is open
+    q_single = s;
+    H = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps),bladePos);
+  else
+    // Flow characteristics when check valve is closed
+    H = (n/n0)^2*flowCharacteristic(0) - s;
+    q_single = 0;
+  end if;
+*/
+
+      // Power consumption
+      if usePowerCharacteristic then
+        W_single = (n/n0)^3*(rho/rho0)*powerCharacteristic(q_single*n0/(n + n_eps),
+          bladePos) "Power consumption (single fan)";
+        eta = (dp*q_single)/(W_single + W_eps) "Hydraulic efficiency";
+      else
+        eta = efficiencyCharacteristic(q_single*n0/(n + n_eps), bladePos);
+        W_single = dp*q_single/eta;
+      end if;
+
+      // Boundary conditions
+      dp = outfl.p - infl.p;
+      w = infl.m_flow "Fan total flow rate";
+      hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow) else
+        if w >= 0 then inStream(infl.h_outflow) else h, inStream(infl.h_outflow));
+      hout = homotopy(if not allowFlowReversal then h else if w >= 0 then h else
+        inStream(outfl.h_outflow), h);
+
+      // Mass balance
+      infl.m_flow + outfl.m_flow = 0 "Mass balance";
+
+      // Energy balance
+      if V > 0 then
+        (rho*V*der(h)) = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single
+          "Dynamic energy balance (single fan)";
+        outfl.h_outflow = h;
+        infl.h_outflow = h;
+      else
+        outfl.h_outflow = inStream(infl.h_outflow) + W_single/w
+          "Energy balance for w > 0";
+        infl.h_outflow = inStream(outfl.h_outflow) + W_single/w
+          "Energy balance for w < 0";
+        h = homotopy(if not allowFlowReversal then outfl.h_outflow else if w >= 0
+           then outfl.h_outflow else infl.h_outflow, outfl.h_outflow)
+          "Definition of h";
+      end if;
+
+    initial equation
+      if initOpt == Choices.Init.Options.noInit then
+        // do nothing
+     elseif initOpt == Choices.Init.Options.fixedState then
+       if V > 0 then
+         h = hstart;
+       end if;
+     elseif initOpt == Choices.Init.Options.steadyState then
+        if V > 0 then
+          der(h) = 0;
+        end if;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+
+      annotation (
+        Icon(graphics),
+        Diagram(graphics),
+        Documentation(info="<HTML>
+<p>This is the base model for the <tt>FanMech</tt> fan model.
+<p>The model describes a fan, or a group of <tt>Np</tt> identical fans, with optional blade angle regulation. The fan model is based on the theory of kinematic similarity: the fan characteristics are given for nominal operating conditions (rotational speed and fluid density), and then adapted to actual operating condition, according to the similarity equations.
+<p>In order to avoid singularities in the computation of the outlet enthalpy at zero flowrate, the thermal capacity of the fluid inside the fan body can be taken into account.
+<p>The model can either support reverse flow conditions or include a built-in check valve to avoid flow reversal.
+<p><b>Modelling options</b></p>
+<p> The nominal flow characteristic (specific energy vs. volume flow rate) is given by the the replaceable function <tt>flowCharacteristic</tt>. If the blade angles are fixed, it is possible to use implementations which ignore the <tt>bladePos</tt> input.
+<p> The fan energy balance can be specified in two alternative ways:
+<ul>
+<li><tt>usePowerCharacteristic = false</tt> (default option): the replaceable function <tt>efficiencyCharacteristic</tt> (efficiency vs. volume flow rate in nominal conditions) is used to determine the efficiency, and then the power consumption. The default is a constant efficiency of 0.8.
+<li><tt>usePowerCharacteristic = true</tt>: the replaceable function <tt>powerCharacteristic</tt> (power consumption vs. volume flow rate in nominal conditions) is used to determine the power consumption, and then the efficiency.
+</ul>
+<p>
+Several functions are provided in the package <tt>Functions.FanCharacteristics</tt> to specify the characteristics as a function of some operating points at nominal conditions.
+<p>Depending on the value of the <tt>checkValve</tt> parameter, the model either supports reverse flow conditions, or includes a built-in check valve to avoid flow reversal.
+<p>If the <tt>in_Np</tt> input connector is wired, it provides the number of fans in parallel; otherwise,  <tt>Np0</tt> parallel fans are assumed.</p>
+<p>It is possible to take into account the heat capacity of the fluid inside the fan by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
+<p>The <tt>CheckValve</tt> parameter determines whether the fan has a built-in check valve or not.
+</HTML>",   revisions="<html>
+<ul>
+<li><i>10 Nov 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+      Adapted from the <tt>Water.PumpBase</tt> model.</li>
+</ul>
+</html>"));
+    end FanBase;
   end BaseClasses;
 
   model SourceP "Pressure source for gas flows"
