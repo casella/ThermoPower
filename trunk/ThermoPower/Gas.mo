@@ -1535,6 +1535,7 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model PressDrop "Pressure drop for gas flows"
     extends Icons.Gas.Tube;
+    import ThermoPower.Choices.PressDrop.FFtypes;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
