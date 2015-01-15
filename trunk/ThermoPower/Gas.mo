@@ -3250,7 +3250,7 @@ The packages Medium are redeclared and a mass balance determines the composition
       annotation (Dialog(tab="Initialisation"));
     parameter Medium.Density rho_start=rho0 "Inlet Density start value"
       annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=system.initOption
+    parameter Choices.Init.Options initOpt=system.initOpt
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     parameter Medium.MassFlowRate w0 "Nominal mass flow rate"
       annotation (Dialog(group="Characteristics"));
