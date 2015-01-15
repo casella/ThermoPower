@@ -3274,7 +3274,8 @@ This is a simple model of a steam plant.
       parameter Real tableEtaT[5, 4]=[1, 90, 100, 110; 2.36, 89e-2, 89.5e-2,
           89.3e-2; 2.88, 90e-2, 90.6e-2, 90.5e-2; 3.56, 90.5e-2, 90.6e-2,
           90.5e-2; 4.46, 90.2e-2, 90.3e-2, 90e-2];
-      Electrical.Generator generator(initOpt=ThermoPower.Choices.Init.Options.steadyState, J=30)
+      Electrical.Generator generator(initOpt=ThermoPower.Choices.Init.Options.steadyState, J=30,
+        shaft(phi(start=0, fixed=true)))
         annotation (Placement(transformation(extent={{92,-80},{132,-40}},
               rotation=0)));
       Electrical.NetworkGrid_Pmax network(
