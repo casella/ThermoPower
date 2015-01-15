@@ -1061,12 +1061,12 @@ Casella</a>:<br>
       ThermoPower.Water.Tank Tank1(
         A=0.1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        ystart=0) annotation (Placement(transformation(extent={{-50,-14},{-30,6}},
+        ystart=2) annotation (Placement(transformation(extent={{-50,-14},{-30,6}},
               rotation=0)));
       ThermoPower.Water.Tank Tank2(
         A=0.1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
-        ystart=0) annotation (Placement(transformation(extent={{30,-14},{50,6}},
+        ystart=1) annotation (Placement(transformation(extent={{30,-14},{50,6}},
               rotation=0)));
       ThermoPower.Water.ValveLiq Valve(
         dpnom=1e4,
@@ -1101,11 +1101,6 @@ Casella</a>:<br>
           points={{-70,-10},{-48,-10}},
           color={0,0,255},
           thickness=0.5));
-    initial equation
-      Tank1.y = 2;
-      Tank2.y = 1;
-
-    equation
       connect(Cmd1.y, Valve.theta)
         annotation (Line(points={{-19,30},{0,30},{0,-2}}, color={0,0,127}));
       annotation (
@@ -2671,13 +2666,12 @@ This model tests the <tt>Header</tt> model.
       parameter Real wext=10;
       Gas.Mixer Mixer1(
         redeclare package Medium = Medium,
-        Tmstart=300,
         gamma=0.8,
         S=1,
         V=3,
+        pstart=400000,
         Tstart=450,
-        pstart=4e5,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        Tmstart=300)                                          annotation (
           Placement(transformation(extent={{-38,-10},{-18,10}}, rotation=0)));
       Gas.PressDrop PressDrop1(
         redeclare package Medium = Medium,
@@ -2737,7 +2731,7 @@ This model tests the <tt>Header</tt> model.
         use_in_w0=true)
                annotation (Placement(transformation(extent={{-74,18},{-54,38}},
               rotation=0)));
-      inner System system
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
       connect(Mixer1.out, PressDrop1.inlet) annotation (Line(
@@ -3972,10 +3966,12 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
       ThermoPower.Gas.GTunit_ISO GT(
         tableData=tableData,
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix,
-        pstart=0.9735e5,
-        Tstart=285.5,
         constantCompositionExhaust=true,
-        HH=47.92e6) annotation (Placement(transformation(extent={{-30,-20},{10,
+        HH=47.92e6,
+        pstart=97350,
+        Tstart=285.5,
+        phi(start=0, fixed=true))
+                    annotation (Placement(transformation(extent={{-30,-20},{10,
                 20}}, rotation=0)));
       ThermoPower.Gas.SourcePressure
                               SourceP1(
@@ -4211,7 +4207,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         offset=1) annotation (Placement(transformation(extent={{-30,54},{-10,74}},
               rotation=0)));
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(w(start=
-              Modelica.SIunits.Conversions.from_rpm(590)), J=10000) annotation (
+              Modelica.SIunits.Conversions.from_rpm(590)), J=10000,
+        phi(fixed=true, start=0))                                   annotation (
          Placement(transformation(extent={{-20,-10},{0,10}}, rotation=0)));
       Gas.PressDrop PressDrop1(
         wnom=2000*1.229,
@@ -4220,7 +4217,9 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         redeclare package Medium = Modelica.Media.Air.SimpleAir,
         dpnom=6000) annotation (Placement(transformation(extent={{-30,20},{-10,
                 40}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Clutch Clutch1(fn_max=1e6)
+      Modelica.Mechanics.Rotational.Components.Clutch Clutch1(fn_max=1e6,
+        phi_rel(fixed=true),
+        w_rel(fixed=true))
         annotation (Placement(transformation(extent={{30,-10},{50,10}},
               rotation=0)));
       inner System system
