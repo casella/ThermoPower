@@ -5310,7 +5310,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestGasFlow1DFV_D;
 
     model TestWaterFlow1DFEM_A "Test case for Flow1DFEM"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -5340,8 +5340,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       //height of power step
       parameter Modelica.SIunits.EnergyFlowRate W=41800*whex;
 
-      ThermoPower.Water.SourceMassFlow
-                                Fluid_Source(
+      ThermoPower.Water.SourceMassFlow Fluid_Source(
+        redeclare package Medium = Medium,
         p0=phex,
         h=hinhex,
         w0=whex,
@@ -5349,10 +5349,13 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         use_in_h=true)
                  annotation (Placement(transformation(extent={{-76,-10},{-56,10}},
               rotation=0)));
-      ThermoPower.Water.SinkPressure
-                              Fluid_Sink(p0=phex/2) annotation (Placement(
+      ThermoPower.Water.SinkPressure Fluid_Sink(
+        p0=phex/2,
+        redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{64,-10},{84,10}}, rotation=0)));
-      ThermoPower.Water.ValveLin Valve(Kv=3e-6) annotation (Placement(
+      ThermoPower.Water.ValveLin Valve(
+        Kv=3e-6,
+        redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{12,-10},{32,10}}, rotation=0)));
       Water.Flow1DFEM hex(
         N=Nnodes,
@@ -5373,7 +5376,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-48,-6},{-28,14}},
               rotation=0)));
-      Thermal.HeatSource1DFEM          HeatSource1D1(
+      Thermal.HeatSource1DFEM HeatSource1D1(
         N=Nnodes,
         L=Lhex,
         omega=omegahex) annotation (Placement(transformation(extent={{-20,22},{
@@ -5459,7 +5462,7 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_A;
 
     model TestWaterFlow1DFEM_B "Test case for Flow1DFEM"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -5503,16 +5506,20 @@ Algorithm Tolerance = 1e-6
               rotation=0)));
       Thermal.TempSource1DFEM          TempSource(N=Nnodes) annotation (
           Placement(transformation(extent={{-20,10},{0,30}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=2*whex/phex) annotation (
+      ThermoPower.Water.ValveLin ValveLin1(
+        Kv=2*whex/phex,
+        redeclare package Medium = Medium) annotation (
           Placement(transformation(extent={{10,-10},{30,10}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
-                                FluidSource(
+      ThermoPower.Water.SourceMassFlow FluidSource(
+        redeclare package Medium = Medium,
         w0=whex,
         p0=phex,
         h=hs) annotation (Placement(transformation(extent={{-80,-10},{-60,10}},
               rotation=0)));
-      ThermoPower.Water.SinkPressure
-                              FluidSink(p0=phex/2, h=hs) annotation (Placement(
+      ThermoPower.Water.SinkPressure FluidSink(
+        p0=phex/2,
+        h=hs,
+        redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{70,-10},{90,10}}, rotation=0)));
       Modelica.Blocks.Sources.Step Temperature(
         height=10,
@@ -5593,7 +5600,7 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_B;
 
     model TestWaterFlow1DFEM_C "Test case for Flow1Dfem"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -5633,13 +5640,17 @@ Algorithm Tolerance = 1e-6
         dpnom=10000)
         annotation (Placement(transformation(extent={{-20,-10},{0,10}},
               rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=2*whex/phex) annotation (
+      ThermoPower.Water.ValveLin ValveLin1(
+        redeclare package Medium = Medium,
+        Kv=2*whex/phex) annotation (
           Placement(transformation(extent={{40,-10},{60,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
-                              SinkP1(h=hs, p0=4*phex) annotation (Placement(
+      ThermoPower.Water.SinkPressure SinkP1(
+        h=hs,
+        p0=4*phex,
+        redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{70,-10},{90,10}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
-                                SourceW1(
+      ThermoPower.Water.SourceMassFlow SourceW1(
+        redeclare package Medium = Medium,
         w0=whex,
         G=0,
         p0=2*phex,
@@ -5721,7 +5732,7 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_C;
 
     model TestWaterFlow1DFEM_D "Test case for Flow1DFEM"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -5760,18 +5771,22 @@ Algorithm Tolerance = 1e-6
         dpnom=10000)
         annotation (Placement(transformation(extent={{-20,-10},{0,10}},
               rotation=0)));
-      ThermoPower.Water.SourceMassFlow
-                                MassFlowRateSource(w0=whex, h=hs,
-        use_in_w0=true)                                           annotation (
+      ThermoPower.Water.SourceMassFlow MassFlowRateSource(
+        w0=whex, h=hs,
+        use_in_w0=true,
+        redeclare package Medium = Medium)
+        annotation (
           Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
-                              FluidSink(
+      ThermoPower.Water.SinkPressure FluidSink(
+        redeclare package Medium = Medium,
         R=100,
         h=3e6,
         p0=5000)
                annotation (Placement(transformation(extent={{76,-10},{96,10}},
               rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=1e-7) annotation (Placement(
+      ThermoPower.Water.ValveLin ValveLin1(
+        Kv=1e-7,
+        redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{40,-10},{60,10}}, rotation=0)));
       Modelica.Blocks.Sources.Step MassFlowRateStep(
         height=whex/10,
@@ -5834,7 +5849,7 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_D;
 
     model TestWaterFlow1DFEM_E "Test case for Flow1DFEM"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=21;
       // total length
@@ -5858,7 +5873,6 @@ Algorithm Tolerance = 1e-6
       // initial outlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
       Water.Flow1DFEM hexA(
-        redeclare package Medium = Medium,
         N=Nnodes,
         Nt=1,
         L=Lhex,
@@ -5872,26 +5886,31 @@ Algorithm Tolerance = 1e-6
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        dpnom=10000)
+        dpnom=10000,
+        redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-20,-50},{0,-30}},
               rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SideA_FluidSink annotation (Placement(
+                              SideA_FluidSink(redeclare package Medium = Medium)
+                                              annotation (Placement(
             transformation(extent={{70,-50},{90,-30}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SideB_FluidSink annotation (Placement(
+                              SideB_FluidSink(redeclare package Medium = Medium)
+                                              annotation (Placement(
             transformation(extent={{-80,40},{-100,60}}, rotation=0)));
       ThermoPower.Water.SourceMassFlow
                                 SideA_MassFlowRate(w0=whex,
         p0=300000,
-        use_in_h=true)                                              annotation (
+        use_in_h=true,
+        redeclare package Medium = Medium)                          annotation (
          Placement(transformation(extent={{-78,-50},{-58,-30}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5)) annotation (Placement(
+      ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5), redeclare package
+          Medium = Medium)                                annotation (Placement(
             transformation(extent={{20,-50},{40,-30}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) annotation (Placement(
+      ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5), redeclare package
+          Medium = Medium)                                annotation (Placement(
             transformation(extent={{-30,40},{-50,60}}, rotation=0)));
       Water.Flow1DFEM hexB(
-        redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -5907,7 +5926,8 @@ Algorithm Tolerance = 1e-6
         dpnom=10000,
         redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient
-            (gamma=400))
+            (gamma=400),
+        redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation=
                0)));
       ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = Medium)
@@ -5928,7 +5948,8 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
                0)));
       ThermoPower.Water.SourceMassFlow
-                                SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
+                                SideB_MassFlowRate(w0=whex, p0=3e5,
+        redeclare package Medium = Medium)                          annotation (
          Placement(transformation(extent={{60,40},{40,60}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{46,-46},{66,-26}},
@@ -6033,7 +6054,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_E;
 
     model TestWaterFlow1DFEM_F "Test case for Flow1DFEM"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -6057,7 +6078,6 @@ Casella</a>:<br>
       // initial outlet specific enthalpy
       parameter Modelica.SIunits.SpecificEnthalpy houthex=1e5;
       Water.Flow1DFEM hexA(
-        redeclare package Medium = Medium,
         N=Nnodes,
         Nt=1,
         L=Lhex,
@@ -6074,26 +6094,31 @@ Casella</a>:<br>
         dpnom=10000,
         redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient
-            (gamma=400))
+            (gamma=400),
+        redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-20,-60},{0,-40}},
               rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SideA_FluidSink annotation (Placement(
+                              SideA_FluidSink(redeclare package Medium = Medium)
+                                              annotation (Placement(
             transformation(extent={{70,-60},{90,-40}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              SideB_FluidSink annotation (Placement(
+                              SideB_FluidSink(redeclare package Medium = Medium)
+                                              annotation (Placement(
             transformation(extent={{-80,40},{-100,60}}, rotation=0)));
       ThermoPower.Water.SourceMassFlow
                                 SideA_MassFlowRate(w0=whex,
         p0=300000,
-        use_in_h=true)                                              annotation (
+        use_in_h=true,
+        redeclare package Medium = Medium)                          annotation (
          Placement(transformation(extent={{-82,-60},{-62,-40}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5)) annotation (Placement(
+      ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5), redeclare package
+          Medium = Medium)                                annotation (Placement(
             transformation(extent={{20,-60},{40,-40}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5)) annotation (Placement(
+      ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5), redeclare package
+          Medium = Medium)                                annotation (Placement(
             transformation(extent={{-30,40},{-50,60}}, rotation=0)));
       Water.Flow1DFEM hexB(
-        redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -6109,7 +6134,8 @@ Casella</a>:<br>
         dpnom=10000,
         redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient
-            (gamma=400))
+            (gamma=400),
+        redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation=
                0)));
       Thermal.MetalTubeFEM          MetalWall(
@@ -6141,7 +6167,8 @@ Casella</a>:<br>
         annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
                0)));
       ThermoPower.Water.SourceMassFlow
-                                SourceW1(w0=whex, p0=3e5) annotation (Placement(
+                                SourceW1(w0=whex, p0=3e5,
+        redeclare package Medium = Medium)                annotation (Placement(
             transformation(extent={{60,40},{40,60}}, rotation=0)));
       ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{46,-56},{66,-36}},
@@ -6245,7 +6272,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_F;
 
     model TestWaterFlow1DFEM_G "Test case for Flow1DFEM"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       // number of Nodes
       parameter Integer Nnodes=6;
       // total length
@@ -6280,10 +6307,13 @@ Casella</a>:<br>
         p0=phex,
         w0=whex,
         h=hinhex + deltah,
-        use_in_w0=true)    annotation (Placement(transformation(extent={{-76,-10},
+        use_in_w0=true,
+        redeclare package Medium = Medium)
+                           annotation (Placement(transformation(extent={{-76,-10},
                 {-56,10}}, rotation=0)));
       ThermoPower.Water.SinkPressure
-                              Fluid_Sink(p0=phex/2, h=hinhex) annotation (
+                              Fluid_Sink(p0=phex/2, h=hinhex,
+        redeclare package Medium = Medium)                    annotation (
           Placement(transformation(extent={{64,-10},{84,10}}, rotation=0)));
       Water.Flow1DFEM hex(
         N=Nnodes,
@@ -6296,12 +6326,13 @@ Casella</a>:<br>
         DynamicMomentum=false,
         hstartin=hinhex,
         hstartout=houthex,
-        redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.noInit,
         ML=0,
         dpnom=100000,
-        alpha=1)      annotation (Placement(transformation(extent={{-8,-10},{12,
+        alpha=1,
+        redeclare package Medium = Medium)
+                      annotation (Placement(transformation(extent={{-8,-10},{12,
                 10}}, rotation=0)));
       ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-48,-6},{-28,14}},
@@ -6357,7 +6388,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_G;
 
     model TestWaterFlow1DFEM_K "Test case for Flow1DFEM"
-      package Medium = Modelica.Media.Water.StandardWater;
+      replaceable package Medium = Modelica.Media.Water.StandardWater;
       // number of Nodes
       parameter Integer Nnodes=11;
       // total length
@@ -6402,7 +6433,8 @@ Casella</a>:<br>
       final parameter SI.MassFlowRate wout=0.5*dM_dT;
 
       ThermoPower.Water.SinkPressure
-                              sink1(p0=phex, h=hhex) annotation (Placement(
+                              sink1(p0=phex, h=hhex,
+        redeclare package Medium = Medium)           annotation (Placement(
             transformation(extent={{66,-10},{86,10}}, rotation=0)));
       Water.Flow1DFEM pipe1(
         N=Nnodes,
@@ -6413,7 +6445,6 @@ Casella</a>:<br>
         wnom=whex,
         Cfnom=Cfhex,
         DynamicMomentum=false,
-        redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Middle,
         hstartin=hhex,
@@ -6422,13 +6453,15 @@ Casella</a>:<br>
         alpha=0,
         pstart=phex,
         wnf=1,
-        dpnom=10000)
+        dpnom=10000,
+        redeclare package Medium = Medium)
                annotation (Placement(transformation(extent={{-12,-10},{8,10}},
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
       Water.SourcePressure
-                    source1(h=hhex, p0=phex)
+                    source1(h=hhex, p0=phex,
+        redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-72,-10},{-52,10}})));
       Thermal.HeatSource1DFEM
                            heatSource1D(
@@ -6478,7 +6511,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_K;
 
     model TestWaterFlow1DFEM_J "Test case for Flow1Dfem"
-      package Medium = Modelica.Media.Water.StandardWater;
+      replaceable package Medium = Modelica.Media.Water.StandardWater;
       // number of Nodes
       parameter Integer Nnodes=11;
       // total length
@@ -6512,7 +6545,8 @@ Casella</a>:<br>
 
       ThermoPower.Water.SinkPressure
                               sink1(p0=phex, h=hhex,
-        use_in_p0=true)                              annotation (Placement(
+        use_in_p0=true,
+        redeclare package Medium = Medium)           annotation (Placement(
             transformation(extent={{66,-10},{86,10}}, rotation=0)));
       Water.Flow1DFEM pipe1(
         N=Nnodes,
@@ -6523,7 +6557,6 @@ Casella</a>:<br>
         wnom=whex,
         Cfnom=Cfhex,
         DynamicMomentum=false,
-        redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Middle,
         hstartin=hhex,
@@ -6532,13 +6565,16 @@ Casella</a>:<br>
         alpha=0,
         pstart=phex,
         dpnom=10000,
-        wnf=1) annotation (Placement(transformation(extent={{-12,-10},{8,10}},
+        wnf=1,
+        redeclare package Medium = Medium)
+               annotation (Placement(transformation(extent={{-12,-10},{8,10}},
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
       Water.SourcePressure
                     source1(h=hhex, p0=phex + 150,
-        use_in_p0=true)
+        use_in_p0=true,
+        redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-72,-10},{-52,10}})));
       Modelica.Blocks.Sources.Ramp ramp(
         height=phex,
