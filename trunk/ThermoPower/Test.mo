@@ -4265,7 +4265,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     "Tests for thermo-hydraulic distributed parameter components"
 
     model TestWaterFlow1DFV_A "Test case for Water.Flow1DFV"
-      replaceable package Medium = Modelica.Media.Water.WaterIF97_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=20 "Number of nodes";
       parameter Modelica.SIunits.Length Lhex=10 "Total length";
       parameter Modelica.SIunits.Diameter Dihex=0.02 "Internal diameter";
@@ -4404,7 +4405,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_A;
 
     model TestWaterFlow1DFV_B "Test case for Water.Flow1DFV"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=10 "Number of nodes";
       parameter Integer Nt = 5 "Number of tubes";
       parameter Modelica.SIunits.Length Lhex=2 "Total length";
@@ -4526,7 +4528,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_B;
 
     model TestWaterFlow1DFV_D "Test case for Water.Flow1DFV"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=5 "number of Nodes";
       parameter Integer Nt = 10 "number of tubes in parallel";
       parameter Modelica.SIunits.Length Lhex=10 "total length";
@@ -4636,7 +4639,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_D;
 
     model TestWaterFlow1DFV_E "Test case for Water.Flow1DFV"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=20 "number of nodes";
       parameter Modelica.SIunits.Length Lhex=200 "total length";
       parameter Modelica.SIunits.Diameter Dihex=0.02
@@ -4815,7 +4819,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_E;
 
     model TestWaterFlow1DFV_F "Test case for Water.Flow1DFV"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=20 "number of nodes";
       parameter Modelica.SIunits.Length Lhex=200 "total length";
       parameter Modelica.SIunits.Diameter Dihex=0.02
@@ -5014,7 +5019,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 
     model TestWaterFlow1DFV_DB
       "Test case for Water.Flow1DFV with Dittus-Boelter heat transfer"
-      package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=10 "number of Nodes";
       parameter Modelica.SIunits.Length Lhex=10 "total length";
       parameter Modelica.SIunits.Diameter Dihex=0.02 "internal diameter";
@@ -5310,7 +5316,8 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestGasFlow1DFV_D;
 
     model TestWaterFlow1DFEM_A "Test case for Flow1DFEM"
-      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -5462,7 +5469,8 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_A;
 
     model TestWaterFlow1DFEM_B "Test case for Flow1DFEM"
-      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -5600,7 +5608,8 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_B;
 
     model TestWaterFlow1DFEM_C "Test case for Flow1Dfem"
-      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -5732,7 +5741,8 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_C;
 
     model TestWaterFlow1DFEM_D "Test case for Flow1DFEM"
-      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -5849,7 +5859,8 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_D;
 
     model TestWaterFlow1DFEM_E "Test case for Flow1DFEM"
-      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=21;
       // total length
@@ -5905,10 +5916,12 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium)                          annotation (
          Placement(transformation(extent={{-78,-50},{-58,-30}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5), redeclare package
-          Medium = Medium)                                annotation (Placement(
+          Medium =
+            Medium)                                       annotation (Placement(
             transformation(extent={{20,-50},{40,-30}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5), redeclare package
-          Medium = Medium)                                annotation (Placement(
+          Medium =
+            Medium)                                       annotation (Placement(
             transformation(extent={{-30,40},{-50,60}}, rotation=0)));
       Water.Flow1DFEM hexB(
         N=Nnodes,
@@ -6017,8 +6030,8 @@ Algorithm Tolerance = 1e-6
           color={255,127,0},
           smooth=Smooth.None));
       annotation (
-        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
-                {100,100}}),
+        Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,
+                100}}),
                 graphics),
         experiment(StopTime=900, Tolerance=1e-006),
         Documentation(info="<HTML>
@@ -6054,7 +6067,8 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_E;
 
     model TestWaterFlow1DFEM_F "Test case for Flow1DFEM"
-      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=20;
       // total length
@@ -6113,10 +6127,12 @@ Casella</a>:<br>
         redeclare package Medium = Medium)                          annotation (
          Placement(transformation(extent={{-82,-60},{-62,-40}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5), redeclare package
-          Medium = Medium)                                annotation (Placement(
+          Medium =
+            Medium)                                       annotation (Placement(
             transformation(extent={{20,-60},{40,-40}}, rotation=0)));
       ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5), redeclare package
-          Medium = Medium)                                annotation (Placement(
+          Medium =
+            Medium)                                       annotation (Placement(
             transformation(extent={{-30,40},{-50,60}}, rotation=0)));
       Water.Flow1DFEM hexB(
         N=Nnodes,
@@ -6272,7 +6288,8 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_F;
 
     model TestWaterFlow1DFEM_G "Test case for Flow1DFEM"
-      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=6;
       // total length
@@ -6388,7 +6405,8 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_G;
 
     model TestWaterFlow1DFEM_K "Test case for Flow1DFEM"
-      replaceable package Medium = Modelica.Media.Water.StandardWater;
+      replaceable package Medium = Modelica.Media.Water.StandardWater
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=11;
       // total length
@@ -6511,7 +6529,8 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_K;
 
     model TestWaterFlow1DFEM_J "Test case for Flow1Dfem"
-      replaceable package Medium = Modelica.Media.Water.StandardWater;
+      replaceable package Medium = Modelica.Media.Water.StandardWater
+        constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
       parameter Integer Nnodes=11;
       // total length
