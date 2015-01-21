@@ -1023,7 +1023,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flow rate (single tube)";
     Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt)
       "Average flow rate through volumes (single tube)";
-    SI.Power Q_single[N-1]
+    SI.Power Q_single[N-1] = heatTransfer.Qvol/Nt
       "Heat flows entering the volumes from the lateral boundary (single tube)";
   //   MassFlowRate wstar[N];
     SI.Velocity u[N] "Fluid velocity";
@@ -1123,7 +1123,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if "Pressure drop due to friction";
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*l*dzdx*sum(rhobar)
       "Pressure drop due to static head";
-    for j in 1:Nw loop
+    for j in 1:N-1 loop
       if Medium.singleState then
         A*l*rhobar[j]*der(htilde[j]) + wbar[j]*(h[j + 1] - h[j]) = Q_single[j]
           "Energy balance (pressure effects neglected)";
@@ -1160,7 +1160,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     // Boundary conditions
     win = infl.m_flow/Nt;
     wout = -outfl.m_flow/Nt;
-    Q_single = heatTransfer.Qvol/Nt;
     assert(HydraulicCapacitance == HCtypes.Upstream or
              HydraulicCapacitance == HCtypes.Middle or
              HydraulicCapacitance == HCtypes.Downstream,
@@ -1273,6 +1272,35 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 "));
   end Flow1DFV;
 
+  model Flow1DFV2w "Same as Flow1DFV with two walls and heat transfer models"
+    extends Flow1DFV(
+      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt);
+    replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
+      annotation (choicesAllMatching=true);
+    HeatTransfer heatTransfer2(
+      redeclare package Medium = Medium,
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final omega=omega,
+      final wnom=wnom/Nt,
+      final w=w*ones(N),
+      final fluidState=fluidState) "Instantiated heat transfer model";
+
+    Thermal.DHTVolumes wall2(final N=Nw)
+      annotation (Placement(transformation(extent={{-60,-60},{60,-40}},
+                                                                      rotation=0)));
+  equation
+    connect(wall2,heatTransfer2.wall);
+    annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+              -100},{100,100}}), graphics), Icon(coordinateSystem(
+            preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics));
+  end Flow1DFV2w;
+
   model Flow1DFV2ph
     "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)"
     extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
@@ -1324,7 +1352,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt)
       "Average mass flow rates (single tube)";
-    SI.Power Q_single[Nw]
+    SI.Power Q_single[N-1] = heatTransfer.Qvol/Nt
       "Heat flows entering the volumes from the lateral boundary (single tube)";
     SI.Velocity u[N] "Fluid velocity";
     Medium.Temperature T[N] "Fluid temperature";
@@ -1548,7 +1576,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     // Boundary conditions
-    Q_single = heatTransfer.Qvol/Nt;
     infl.h_outflow = htilde[1];
     outfl.h_outflow = htilde[N - 1];
     h[1] = inStream(infl.h_outflow);
@@ -1648,6 +1675,36 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </ul>
 </html>"));
   end Flow1DFV2ph;
+
+  model Flow1DFV2ph2w
+    "Same as Flow1DFV with two walls and heat transfer models"
+    extends Flow1DFV2ph(
+      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt);
+    replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
+      annotation (choicesAllMatching=true);
+    HeatTransfer heatTransfer2(
+      redeclare package Medium = Medium,
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final omega=omega,
+      final wnom=wnom/Nt,
+      final w=w*ones(N),
+      final fluidState=fluidState) "Instantiated heat transfer model";
+
+    Thermal.DHTVolumes wall2(final N=Nw)
+      annotation (Placement(transformation(extent={{-60,-60},{60,-40}},rotation=0)));
+  equation
+    connect(wall2,heatTransfer2.wall);
+    annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+              -100},{100,100}}), graphics), Icon(coordinateSystem(
+            preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics));
+
+  end Flow1DFV2ph2w;
 
   model Flow1DFEM
     "1-dimensional fluid flow model for water/steam (finite elements)"
