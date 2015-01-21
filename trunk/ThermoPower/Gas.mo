@@ -910,7 +910,7 @@ package Gas "Models of components with ideal gases as working fluid"
   model Flow1DFV "1-dimensional fluid flow model for gas (finite volumes)"
     extends BaseClasses.Flow1DBase;
 
-    Thermal.DHTVolumes wall(N=Nw)
+    Thermal.DHTVolumes wall(final N=Nw)
       annotation (Placement(transformation(extent={{-60,40},{60,60}}, rotation=0)));
 
     replaceable model HeatTransfer = Thermal.HeatTransferFV.IdealHeatTransfer
@@ -947,7 +947,7 @@ package Gas "Models of components with ideal gases as working fluid"
         start=ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]),
         each stateSelect=StateSelect.prefer) "Composition state variables";
     Medium.MassFlowRate wbar[N - 1](each start=wnom/Nt);
-    SI.Power Q_single[N-1]
+    SI.Power Q_single[N-1] = heatTransfer.Qvol/Nt
       "Heat flows entering the volumes from the lateral boundary (single tube)";
     SI.Velocity u[N] "Fluid velocity";
     Medium.AbsolutePressure p(start=pstart, stateSelect=StateSelect.prefer);
@@ -1119,7 +1119,6 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     // Boundary conditions
-    Q_single = heatTransfer.Qvol/Nt;
     infl.h_outflow = gas[1].h;
     outfl.h_outflow = gas[N].h;
     infl.Xi_outflow = gas[1].Xi;
@@ -1165,7 +1164,7 @@ package Gas "Models of components with ideal gases as working fluid"
     end if;
 
     annotation (
-      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-60},{100,-100}},textString="%name")}),
       Diagram(graphics),
       Documentation(info="<html>
 <p>This model describes the flow of a gas in a rigid tube. The basic modelling assumptions are:
@@ -1215,6 +1214,36 @@ package Gas "Models of components with ideal gases as working fluid"
 </html>"),
       DymolaStoredErrors);
   end Flow1DFV;
+
+  model Flow1DFV2w "Same as Flow1DFV with two walls and heat transfer models"
+    extends Flow1DFV(
+      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt);
+    replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
+      annotation (choicesAllMatching=true);
+    HeatTransfer heatTransfer2(
+      redeclare package Medium = Medium,
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final omega=omega,
+      final wnom=wnom/Nt,
+      final w=w*ones(N),
+      final fluidState=gas.state) "Instantiated heat transfer model";
+
+    Thermal.DHTVolumes wall2(final N=Nw)
+      annotation (Placement(transformation(extent={{-60,-60},{60,-40}},
+                                                                      rotation=0)));
+  equation
+    connect(wall2,heatTransfer2.wall);
+    annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+              -100},{100,100}}), graphics), Icon(coordinateSystem(
+            preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics));
+
+  end Flow1DFV2w;
 
   model FlowJoin "Joins two gas flows"
     extends Icons.Gas.FlowJoin;
@@ -2158,7 +2187,6 @@ package Gas "Models of components with ideal gases as working fluid"
 </HTML>"));
   end f_colebrook;
 
-
   model CombustionChamber "Combustion Chamber"
     extends BaseClasses.CombustionChamberBase(
       redeclare package Air = Media.Air "O2, H2O, Ar, N2",
@@ -2201,7 +2229,6 @@ This model extends the CombustionChamber Base model, with the definition of the 
 </ul>
 </html>"));
   end CombustionChamber;
-
 
   model Compressor "Gas compressor"
     extends BaseClasses.CompressorBase;
@@ -2300,7 +2327,6 @@ This model adds the performance characteristics to the Compressor_Base model, by
 </ul>
 </html>"));
   end Compressor;
-
 
   model Turbine "Gas Turbine"
     extends BaseClasses.TurbineBase;
@@ -2471,8 +2497,6 @@ This model extends the Turbine_Base model with the calculation of the performanc
       Icon(graphics));
   end TurbineStodola;
 
-
-
   model GTunit_ISO "Gas Turbine"
     extends BaseClasses.GTunitExhaustBase;
     import ThermoPower.Choices.TurboMachinery.TableTypes;
@@ -2633,7 +2657,6 @@ The packages Medium are redeclared and a mass balance determines the composition
 </ul>
 </html>"));
   end GTunit;
-
 
   model FanMech
     extends BaseClasses.FanBase;
