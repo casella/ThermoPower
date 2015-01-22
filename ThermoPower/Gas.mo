@@ -1242,7 +1242,6 @@ package Gas "Models of components with ideal gases as working fluid"
     annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
               -100},{100,100}}), graphics), Icon(coordinateSystem(
             preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics));
-
   end Flow1DFV2w;
 
   model FlowJoin "Joins two gas flows"

@@ -1703,7 +1703,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
               -100},{100,100}}), graphics), Icon(coordinateSystem(
             preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics));
-
   end Flow1DFV2ph2w;
 
   model Flow1DFEM
