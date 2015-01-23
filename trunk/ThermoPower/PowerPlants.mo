@@ -3825,10 +3825,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
         annotation (Diagram(graphics));
       end ParHE_Des;
 
-
-
-
-
       model DrumSensors
         extends Water.Drum;
         Modelica.Blocks.Interfaces.RealOutput p_out "Pressure sensor output"
@@ -3848,9 +3844,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
                       lineColor={0,0,0},
                       textString="y")}), Diagram(graphics));
       end DrumSensors;
-
-
-
 
       model BaseReader_water
         "Base reader for the visualization of the state in the simulation (water)"
@@ -8520,10 +8513,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 (gamma=70),
             redeclare model HeatExchangerTopology_A =
                 ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
-
             redeclare model HeatExchangerTopology_B =
                 ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow),
-
           Sh2HP_Rh2IP(
             redeclare model HeatTransfer_FA =
                 ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
@@ -8539,10 +8530,8 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 (gamma=80),
             redeclare model HeatExchangerTopology_A =
                 ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
-
             redeclare model HeatExchangerTopology_B =
                 ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow),
-
           Ec2_HP(
             redeclare model HeatTransfer_F =
                 ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
@@ -8552,7 +8541,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 (gamma=56),
             redeclare model HeatExchangerTopology =
                 ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow),
-
           Ec1HP_EcIP(
             redeclare model HeatTransfer_FA =
                 ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
@@ -8568,14 +8556,11 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 (gamma=45),
             redeclare model HeatExchangerTopology_A =
                 ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
-
             redeclare model HeatExchangerTopology_B =
                 ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow),
-
           Sh_IP(
             redeclare model HeatExchangerTopology =
                 ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
-
             redeclare model HeatTransfer_F =
                 ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
                 (gamma=4000),
@@ -8617,6 +8602,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
           Ev_LP_Tstartbar=473.15,
           Ec_LP_Tstartbar=423.15)                                                  annotation (Placement(transformation(extent={
                   {-102,-80},{98,0}}, rotation=0)));
+
       equation
         connect(ActuatorsBus, drums.ActuatorsBus) annotation (Line(points={{200,
                 100},{158,100},{158,104},{98,104}}, color={213,255,170}));
@@ -9542,14 +9528,15 @@ package PowerPlants "Models of thermoelectrical power plants components"
           N_F=7,
           Nt=1,
           redeclare model HeatExchangerTopology =
-              ThermoPower.Thermal.HeatExchangerTopologies.CoCurrentFlow)
+              ThermoPower.Thermal.HeatExchangerTopologies.CoCurrentFlow,
+          Nw_G=6)
           annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
         //Start value
         parameter SI.Temperature Tstart_G=(Tstart_G_In + Tstart_G_Out)/2;
         parameter SI.Temperature Tstart_M=(Tstart_M_In + Tstart_M_Out)/2;
         parameter Boolean SSInit=false "Steady-state initialization";
-        inner System system(allowFlowReversal=false)
+        inner System system(allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
           annotation (Placement(transformation(extent={{80,80},{100,100}})));
         Water.SourceMassFlow
                       sourseW_water(
@@ -18918,14 +18905,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fluidLPNomFlowRate_Sh=10.95,
           fluidLPNomFlowRate_Ec=89.8,
           Sh_LP(redeclare model HeatTransfer_G =
-              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
-                (
-                gamma=30)),
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=30)),
           Ec_LP(redeclare model HeatTransfer_F =
               ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
                 (
                 gamma=3000),
-          redeclare model HeatTransfer_G =
+                redeclare model HeatTransfer_G =
               ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
                 (gamma=35)),
           Ev_LP(redeclare model HeatTransfer_G =
@@ -19151,23 +19137,25 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fluidIPNomFlowRate_Ec=13.5,
           fluidLPNomFlowRate_Sh=10.95,
           fluidLPNomFlowRate_Ec=89.8,
-          Sh_LP(gamma_G=30, gamma_F=4000),
-          Sh_LP_N_F=4,
-          Ec_LP(gamma_G=35, gamma_F=3000),
-          Ev_LP(gamma_G=60, gamma_F=20000),
+          Sh_LP(redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=30)),
+          Ec_LP(redeclare model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+                (
+                gamma=3000),
+          redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=35)),
+          Ev_LP(redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+                (
+                gamma=60)),
           Sh1HP_Rh1IP(
-            gamma_G_A=70,
-            gamma_G_B=80,
-            gamma_F_A=4000,
-            gamma_F_B=4000,
             FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
             Kfnom_F_B=150,
             dpnom_F_B=0.3e5),
           Sh2HP_Rh2IP(
-            gamma_G_A=83.97,
-            gamma_G_B=80,
-            gamma_F_A=4000,
-            gamma_F_B=4000,
             FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
             Kfnom_F_B=150,
             dpnom_F_B=0.3e5),
@@ -19366,23 +19354,25 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fluidIPNomFlowRate_Ec=13.5,
           fluidLPNomFlowRate_Sh=10.95,
           fluidLPNomFlowRate_Ec=89.8,
-          Sh_LP(gamma_G=30, gamma_F=4000),
-          Sh_LP_N_F=4,
-          Ec_LP(gamma_G=35, gamma_F=3000),
-          Ev_LP(gamma_G=60, gamma_F=20000),
+          Sh_LP(redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=30)),
+          Ec_LP(redeclare model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+                (
+                gamma=3000),
+          redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=35)),
+          Ev_LP(redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+                (
+                gamma=60)),
           Sh1HP_Rh1IP(
-            gamma_G_A=70,
-            gamma_G_B=80,
-            gamma_F_A=4000,
-            gamma_F_B=4000,
             FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
             Kfnom_F_B=150,
             dpnom_F_B=0.3e5),
           Sh2HP_Rh2IP(
-            gamma_G_A=83.97,
-            gamma_G_B=80,
-            gamma_F_A=4000,
-            gamma_F_B=4000,
             FFtype_F_B=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
             Kfnom_F_B=150,
             dpnom_F_B=0.3e5),
@@ -19585,20 +19575,27 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           fluidIPNomFlowRate_Ec=13.5,
           fluidLPNomFlowRate_Sh=10.95,
           fluidLPNomFlowRate_Ec=89.8,
-          Sh_LP(gamma_G=30, gamma_F=4000),
-          Sh_LP_N_F=4,
-          Ec_LP(gamma_G=35, gamma_F=3000),
-          Ev_LP(gamma_G=60, gamma_F=20000),
-          Sh1HP_Rh1IP(
-            gamma_G_A=70,
-            gamma_G_B=70,
-            gamma_F_A=4000,
-            gamma_F_B=4000),
-          Sh2HP_Rh2IP(
-            gamma_F_A=4000,
-            gamma_F_B=4000,
-            gamma_G_A=70,
-            gamma_G_B=70)),
+          Sh_LP(redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=30)),
+          Ec_LP(redeclare model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+                (gamma=3000),
+                redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=35)),
+          Ev_LP(redeclare model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+                (gamma=60)),
+          Sh1HP_Rh1IP(redeclare model HeatTransfer_GB =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=70)),
+          Sh2HP_Rh2IP(redeclare model HeatTransfer_GA =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=70),
+                      redeclare model HeatTransfer_GB =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+                (gamma=70))),
         drums(
           fluidHPNomPressure=12211600,
           fluidIPNomPressure=2636940,
