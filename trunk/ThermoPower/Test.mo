@@ -9807,7 +9807,6 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
           smooth=Smooth.None));
       annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
                 -100},{100,100}}), graphics),
-        experiment(StopTime=1200, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
 <p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
