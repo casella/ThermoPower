@@ -1268,9 +1268,6 @@ The swapping is performed if the counterCurrent parameter is true (default value
         "Ratio between actual and nominal flow rate";
        SI.PerUnit w_wnom_reg "Regularized w/wnom ratio";
 
-      parameter SI.CoefficientOfHeatTransfer gamma_b=20000
-        "Coefficient of heat transfer in the 2-phase region";
-
       Real state[Nw] "Indicator of phase configuration";
       SI.PerUnit alpha_l[Nw] "Normalized position of liquid phase boundary";
       SI.PerUnit alpha_v[Nw] "Normalized position of vapour phase boundary";
@@ -1312,13 +1309,13 @@ The swapping is performed if the counterCurrent parameter is true (default value
          if noEvent(h[j] < hl and h[j + 1] < hl) then  // liquid
            Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*gamma_liq;
            state[j] = 0;
-           alpha_l[j] = 0;
+           alpha_l[j] = 1;
            alpha_v[j] = 0;
          elseif noEvent(h[j] > hv and h[j + 1]> hv) then  // vapour
            Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*gamma_vap;
            state[j] = 1;
            alpha_l[j] = 0;
-           alpha_v[j] = 0;
+           alpha_v[j] = 1;
          elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
            Qw[j] = alpha_l[j]      *(Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_liq +
                    (1 - alpha_l[j])*(Tw[j] - Ts)           *omega*l*Nt*gamma_2ph;
