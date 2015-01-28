@@ -9650,134 +9650,142 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
       "Test case with once-through evaporator using Dittus-Boelter 2-phase heat transfer model"
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
-      parameter Integer Nnodes=20 "number of nodes";
+      parameter Integer Nnodes=10 "number of nodes";
+      parameter SI.Length Dint= 5e-3 "Internal diameter of refrigerant tube";
+      parameter SI.Length th= 0.5e-3 "Thickness of refrigerant tube";
+      parameter SI.Length Dext = Dint + 2*th
+        "External diameter of refrigerant tube";
+      parameter SI.Length Dgas = 20e-3 "External diameter of gas tube";
+      parameter SI.Length L= 10 "Length of refrigerant tube";
+      constant Real pi = Modelica.Constants.pi;
+      SI.Temperature Tgas[:] = gasFlow.T[end:-1:1]
+        "Alias variable for direct comparisons";
+      SI.Temperature Tfluid[:] = fluidFlow.T
+        "Alias variable for direct comparisons";
+      SI.Temperature Twall[:] = tubeWall.Tvol
+        "Alias variable for direct comparisons";
+      SI.SpecificEnthalpy hl[:] = fluidFlow.hl*ones(Nnodes);
+      SI.SpecificEnthalpy hv[:] = fluidFlow.hv*ones(Nnodes);
 
-      Water.SinkPressure      SideA_FluidSink annotation (Placement(
-            transformation(extent={{74,-82},{94,-62}}, rotation=0)));
+      Water.SinkPressure fluidSink(redeclare package Medium =
+            Modelica.Media.R134a.R134a_ph, p0=3000000) annotation (Placement(
+            transformation(extent={{50,-82},{70,-62}}, rotation=0)));
       Gas.SinkPressure gasSink(redeclare package Medium = ThermoPower.Media.Air)
         annotation (Placement(transformation(extent={{-54,18},{-74,38}}, rotation=0)));
       Water.SourceMassFlow fluidSource(
-        w0=whex,
-        p0=300000,
         use_in_w0=true,
-        use_in_h=false) annotation (Placement(transformation(extent={{-70,-82},{-50,
+        use_in_h=false,
+        redeclare package Medium = Modelica.Media.R134a.R134a_ph,
+        h=250e3,
+        p0=300000)      annotation (Placement(transformation(extent={{-70,-82},{-50,
                 -62}}, rotation=0)));
-      Water.ValveLin valveFluid(Kv=whex/(2e5)) annotation (Placement(transformation(
-              extent={{18,-82},{38,-62}}, rotation=0)));
-      Water.SensT             fluid_T_in(redeclare package Medium = Medium)
+      Water.SensT             fluid_T_in(redeclare package Medium =
+            Modelica.Media.R134a.R134a_ph)
         annotation (Placement(transformation(extent={{-46,-78},{-26,-58}},
               rotation=0)));
-      Modelica.Blocks.Sources.Constant Constant2(k=1)
-                                                 annotation (Placement(
-            transformation(extent={{4,-32},{24,-12}},
-                                                    rotation=0)));
       Gas.SensT gas_T_in(redeclare package Medium = ThermoPower.Media.Air)
         annotation (Placement(transformation(extent={{34,22},{14,42}}, rotation=0)));
       Gas.SourceMassFlow gasSource(
         redeclare package Medium = ThermoPower.Media.Air,
         use_in_w0=true,
-        T=333.15) annotation (Placement(transformation(extent={{64,18},{44,38}},
+        T=423.15) annotation (Placement(transformation(extent={{64,18},{44,38}},
               rotation=0)));
-      Water.SensT             fluid_T_out(redeclare package Medium = Medium)
-        annotation (Placement(transformation(extent={{44,-78},{64,-58}},
+      Water.SensT             fluid_T_out(redeclare package Medium =
+            Modelica.Media.R134a.R134a_ph)
+        annotation (Placement(transformation(extent={{20,-78},{40,-58}},
               rotation=0)));
       Gas.SensT gas_T_out(redeclare package Medium = ThermoPower.Media.Air)
         annotation (Placement(transformation(extent={{-24,22},{-44,42}}, rotation=0)));
-      inner System system
+      inner System system(allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
       Gas.Flow1DFV gasFlow(
         Nt=1,
-        L=Lhex,
-        wnom=whex,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        pstart=phex,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+        N=Nnodes,
+        redeclare package Medium = ThermoPower.Media.Air,
+        L=L,
+        Dhyd=Dgas,
+        wnom=0.02,
+        noInitialPressure=true,
+        A=(Dgas^2 - Dext^2)/4*pi,
+        omega=Dext*pi,
         redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
-            ( gamma=800),
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
-        A=Aext,
-        omega=omegaext,
-        Dhyd=Dehex,
-        N=Nnodes,
-        redeclare package Medium = ThermoPower.Media.Air) annotation (Placement(
+            (gamma=120),
+        Tstartin=333.15,
+        Tstartout=303.15)                                 annotation (Placement(
             transformation(
             extent={{-10,-10},{10,10}},
             rotation=180,
             origin={-8,28})));
-      Water.Flow1DFV fluidEvaporator(
+      Water.Flow1DFV2ph fluidFlow(
         N=Nnodes,
-        L=Lhex,
-        Dhyd=Dihex,
-        wnom=whex,
-        Cfnom=Cfhex,
-        hstartin=hinhex,
-        hstartout=houthex,
-        redeclare package Medium = Medium,
+        Cfnom=0.005,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        pstart=phex,
+        redeclare package Medium = Modelica.Media.R134a.R134a_ph,
+        L=L,
+        A=Dint^2/4*pi,
+        omega=Dint*pi,
+        Dhyd=Dint,
+        wnom=0.005,
+        noInitialPressure=true,
+        hstartin=250e3,
+        hstartout=250e3,
+        dpnom=1000,
+        pstart=3000000,
         redeclare model HeatTransfer =
-            ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
-            ( gamma=800),
-        omega=omegaint,
-        A=Aint,
-        dpnom=1000)
+            ThermoPower.Thermal.HeatTransferFV.FlowDependentHeatTransferCoefficient2ph
+            (
+            gamma_nom_liq=800,
+            gamma_nom_2ph=8000,
+            gamma_nom_vap=800))
         annotation (Placement(transformation(extent={{-18,-82},{2,-62}})));
       Thermal.CounterCurrentFV counterCurrentFV(Nw=Nnodes - 1)
         annotation (Placement(transformation(extent={{-18,-10},{2,10}})));
-      Thermal.MetalTubeFV metalTubeFV(
+      Thermal.MetalTubeFV tubeWall(
         Nw=Nnodes - 1,
-        L=Lhex,
-        rint=rint,
-        rext=rext,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        lambda=20,
-        rhomcm=7800*500)
+        L=L,
+        rint=Dint/2,
+        rhomcm=7800*400,
+        lambda=300,
+        WallRes=false,
+        rext=Dext/2)
         annotation (Placement(transformation(extent={{-18,-20},{2,-40}})));
       Modelica.Blocks.Sources.Ramp ramp(
         height=0,
         duration=1,
-        offset=0.02)
+        offset=0.01)
         annotation (Placement(transformation(extent={{-20,62},{0,82}})));
       Modelica.Blocks.Sources.Ramp ramp1(
-        height=0,
-        duration=1,
-        offset=0.005)
+        offset=0.0025,
+        height=0.001,
+        duration=1e6)
         annotation (Placement(transformation(extent={{-98,-48},{-78,-28}})));
     equation
       connect(fluidSource.flange, fluid_T_in.inlet) annotation (Line(
           points={{-50,-72},{-42,-72}},
           thickness=0.5,
           color={0,0,255}));
-      connect(valveFluid.outlet, fluid_T_out.inlet) annotation (Line(
-          points={{38,-72},{48,-72}},
+      connect(fluid_T_out.outlet, fluidSink.flange) annotation (Line(
+          points={{36,-72},{50,-72}},
           thickness=0.5,
           color={0,0,255}));
-      connect(fluid_T_out.outlet,SideA_FluidSink. flange) annotation (Line(
-          points={{60,-72},{74,-72}},
-          thickness=0.5,
-          color={0,0,255}));
-      connect(Constant2.y, valveFluid.cmd)
-        annotation (Line(points={{25,-22},{28,-22},{28,-64}}, color={0,0,127}));
-      connect(fluid_T_in.outlet, fluidEvaporator.infl) annotation (Line(
+      connect(fluid_T_in.outlet, fluidFlow.infl) annotation (Line(
           points={{-30,-72},{-18,-72}},
-          color={0,0,255},
-          smooth=Smooth.None));
-      connect(fluidEvaporator.outfl, valveFluid.inlet) annotation (Line(
-          points={{2,-72},{18,-72}},
           color={0,0,255},
           smooth=Smooth.None));
       connect(counterCurrentFV.side1, gasFlow.wall) annotation (Line(
           points={{-8,3},{-8,23}},
           color={255,127,0},
           smooth=Smooth.None));
-      connect(counterCurrentFV.side2, metalTubeFV.ext) annotation (Line(
+      connect(counterCurrentFV.side2, tubeWall.ext) annotation (Line(
           points={{-8,-3.1},{-8,-26.9}},
           color={255,127,0},
           smooth=Smooth.None));
-      connect(metalTubeFV.int, fluidEvaporator.wall) annotation (Line(
+      connect(tubeWall.int, fluidFlow.wall) annotation (Line(
           points={{-8,-33},{-8,-67}},
           color={255,127,0},
           smooth=Smooth.None));
@@ -9804,6 +9812,10 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
       connect(ramp1.y, fluidSource.in_w0) annotation (Line(
           points={{-77,-38},{-64,-38},{-64,-66}},
           color={0,0,127},
+          smooth=Smooth.None));
+      connect(fluidFlow.outfl, fluid_T_out.inlet) annotation (Line(
+          points={{2,-72},{24,-72}},
+          color={0,0,255},
           smooth=Smooth.None));
       annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
                 -100},{100,100}}), graphics),
