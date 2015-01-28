@@ -1956,7 +1956,10 @@ Schiavo</a>:<br>
         Lm=0.1,
         kT=35,
         Jm=10,
-        dm=1) annotation (Placement(transformation(extent={{-40,-40},{-20,-20}},
+        dm=1,
+        J(phi(fixed=true, start=0), w(fixed=true, start=2e-4)),
+        L(i(fixed=true, start=0)))
+              annotation (Placement(transformation(extent={{-40,-40},{-20,-20}},
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
