@@ -4682,10 +4682,14 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Medium.ThermodynamicState fluidState(p(start=pin_start));
       parameter ThermoPower.Choices.Valve.CvTypes CvData=ThermoPower.Choices.Valve.CvTypes.Av
         "Selection of flow coefficient"
-       annotation (Dialog(group="Flow Coefficient"));
+       annotation (Dialog(group="Flow Coefficient"),
+                   Evaluate = true);
+      final parameter Boolean fixedAv=
+        (if CvData == ThermoPower.Choices.Valve.CvTypes.Av then true else false)
+        annotation(Evaluate = true);
       parameter SI.Area Av(
-        fixed=if CvData == ThermoPower.Choices.Valve.CvTypes.Av then true else false,
-        start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
+        fixed=fixedAv,
+        start=wnom/(sqrt((rhonom+1e-6)*(dpnom+1e-6)))*FlowChar(thetanom))
         "Av (metric) flow coefficient"
         annotation (Dialog(group="Flow Coefficient",
                            enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Av)));

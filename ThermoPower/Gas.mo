@@ -1976,9 +1976,13 @@ package Gas "Models of components with ideal gases as working fluid"
       d(start=pnom/(8314/30*Tstart)));
     parameter ThermoPower.Choices.Valve.CvTypes CvData=
       ThermoPower.Choices.Valve.CvTypes.Av "Selection of flow coefficient"
-      annotation (Dialog(group="Flow Coefficient"));
+      annotation (Dialog(group="Flow Coefficient"),
+                  Evaluate = true);
+    final parameter Boolean fixedAv=
+      (if CvData == ThermoPower.Choices.Valve.CvTypes.Av then true else false)
+      annotation(Evaluate = true);
     parameter SI.Area Av(
-      fixed=if CvData == ThermoPower.Choices.Valve.CvTypes.Av then true else false,
+      fixed=fixedAv,
       start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
       "Av (metric) flow coefficient"
       annotation (Dialog(group="Flow Coefficient",
