@@ -5321,7 +5321,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
-      parameter Integer Nnodes=16;
+      parameter Integer Nnodes=12;
       // total length
       parameter Modelica.SIunits.Length Lhex=10;
       // internal diameter
@@ -5474,7 +5474,7 @@ Algorithm Tolerance = 1e-6
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
-      parameter Integer Nnodes=16;
+      parameter Integer Nnodes=12;
       // total length
       parameter Modelica.SIunits.Length Lhex=200;
       // internal diameter
@@ -5613,7 +5613,7 @@ Algorithm Tolerance = 1e-6
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
-      parameter Integer Nnodes=16;
+      parameter Integer Nnodes=12;
       // total length
       parameter Modelica.SIunits.Length Lhex=200;
       // internal diameter
@@ -5746,7 +5746,7 @@ Algorithm Tolerance = 1e-6
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
-      parameter Integer Nnodes=16;
+      parameter Integer Nnodes=12;
       // total length
       parameter Modelica.SIunits.Length Lhex=10;
       // internal diameter
@@ -5864,7 +5864,7 @@ Algorithm Tolerance = 1e-6
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
-      parameter Integer Nnodes=16;
+      parameter Integer Nnodes=12;
       // total length
       parameter Modelica.SIunits.Length Lhex=200;
       // internal diameter
