@@ -8496,8 +8496,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
                 ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
                 ( gamma=46.5),
             redeclare model HeatExchangerTopology =
-                ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
-            FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.Kfnom),
+                ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow),
           Sh1HP_Rh1IP(
             redeclare model HeatTransfer_FA =
                 ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
