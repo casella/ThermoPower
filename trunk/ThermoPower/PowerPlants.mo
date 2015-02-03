@@ -8809,7 +8809,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasVol=10,
           lambda=20,
           gasNomPressure=0,
-          N_F_A=5,
           exchSurface_G_A=3636,
           exchSurface_F_A=421.844,
           extSurfaceTub_A=540.913,
@@ -8823,23 +8822,35 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_B=8.403,
           metalVol_B=2.823,
           rhomcm_B=7800*574.93,
-          counterCurrent_A=true,
           gasNomFlowRate=gasNomFlowRate,
           fluidNomFlowRate_A=fluidNomFlowRate_A,
           fluidNomFlowRate_B=fluidNomFlowRate_B,
           fluidNomPressure_A=fluidNomPressure_A,
           fluidNomPressure_B=fluidNomPressure_B,
-          gamma_G_A=gamma_G_A,
-          gamma_G_B=gamma_G_B,
-          gamma_F_A=gamma_F_A,
-          gamma_F_B=gamma_F_B,
-          counterCurrent_B=true,
           Tstartbar_G=Tstart_G,
           Tstartbar_M_A=Tstart_M_A,
           Tstartbar_M_B=Tstart_M_B,
           SSInit=SSInit,
           FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
-          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam)
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Nw_G=6,
+          N_F_A=7,
+          redeclare replaceable model HeatTransfer_FA =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              ( gamma=gamma_F_A),
+          redeclare replaceable model HeatTransfer_FB =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              ( gamma=gamma_F_B),
+          redeclare replaceable model HeatTransfer_GA =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G_A),
+          redeclare replaceable model HeatTransfer_GB =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G_B),
+          redeclare model HeatExchangerTopology_A =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
+          redeclare model HeatExchangerTopology_B =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
           annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
 
@@ -9044,30 +9055,41 @@ package PowerPlants "Models of thermoelectrical power plants components"
           fluidVol_A=4.134,
           metalVol_A=1.600,
           rhomcm_A=7800*575.22,
-          N_F_B=5,
           exchSurface_F_B=4630,
           exchSurface_G_B=900.387,
           extSurfaceTub_B=1009.250,
           fluidVol_B=8.936,
           metalVol_B=2.292,
           rhomcm_B=7850*575.64,
-          counterCurrent_A=true,
           gasNomFlowRate=gasNomFlowRate,
           fluidNomFlowRate_A=fluidNomFlowRate_A,
           fluidNomFlowRate_B=fluidNomFlowRate_B,
           fluidNomPressure_A=fluidNomPressure_A,
           fluidNomPressure_B=fluidNomPressure_B,
-          gamma_G_A=gamma_G_A,
-          gamma_G_B=gamma_G_B,
-          gamma_F_A=gamma_F_A,
-          gamma_F_B=gamma_F_B,
-          counterCurrent_B=true,
           Tstartbar_G=Tstart_G,
           Tstartbar_M_A=Tstart_M_A,
           Tstartbar_M_B=Tstart_M_B,
           SSInit=SSInit,
           FluidPhaseStart_A=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
-          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam)
+          FluidPhaseStart_B=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
+          Nw_G=6,
+          N_F_B=7,
+          redeclare model HeatTransfer_FA =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F_A),
+          redeclare model HeatTransfer_FB =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F_B),
+          redeclare model HeatTransfer_GA =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G_A),
+          redeclare model HeatTransfer_GB =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G_B),
+          redeclare model HeatExchangerTopology_A =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
+          redeclare model HeatExchangerTopology_B =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
           annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
         //Start value
@@ -9249,11 +9271,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
           Tstartbar_G=Tstart_G,
           Tstartbar_M=Tstart_M,
-          SSInit=SSInit) annotation (Placement(transformation(extent={{-20,-20},
+          SSInit=SSInit,
+          redeclare replaceable model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F),
+          redeclare replaceable model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_G),
+          redeclare model HeatExchangerTopology =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
+                         annotation (Placement(transformation(extent={{-20,-20},
                   {20,20}}, rotation=0)));
         //Start value
         parameter SI.Temperature Tstart_G=(Tstart_G_In + Tstart_G_Out)/2;
@@ -9381,12 +9410,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
           Tstartbar_G=Tstart_G,
           Tstartbar_M=Tstart_M,
           SSInit=SSInit,
-          N_F=6)         annotation (Placement(transformation(extent={{-20,-20},
+          redeclare model HeatExchangerTopology =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
+          N_F=7,
+          Nw_G=6,
+          redeclare replaceable model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F),
+          redeclare replaceable model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G))
+                         annotation (Placement(transformation(extent={{-20,-20},
                   {20,20}}, rotation=0)));
         //Start value
         parameter SI.Temperature Tstart_G=(Tstart_G_In + Tstart_G_Out)/2;
@@ -9526,9 +9563,9 @@ package PowerPlants "Models of thermoelectrical power plants components"
               (gamma=gamma_G),
           N_F=7,
           Nt=1,
+          Nw_G=6,
           redeclare model HeatExchangerTopology =
-              ThermoPower.Thermal.HeatExchangerTopologies.CoCurrentFlow,
-          Nw_G=6)
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
           annotation (Placement(transformation(extent={{-20,-20},{20,20}},
                 rotation=0)));
         //Start value
@@ -9658,11 +9695,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
           Tstartbar_G=Tstart_G,
           Tstartbar_M=Tstart_M,
-          SSInit=SSInit) annotation (Placement(transformation(extent={{-20,-20},
+          SSInit=SSInit,
+          redeclare replaceable model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              ( gamma=gamma_F),
+          redeclare replaceable model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              ( gamma=gamma_G),
+          redeclare model HeatExchangerTopology =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
+                         annotation (Placement(transformation(extent={{-20,-20},
                   {20,20}}, rotation=0)));
         //Start value
         parameter SI.Temperature Tstart_G=(Tstart_G_In + Tstart_G_Out)/2;
@@ -9846,21 +9890,33 @@ package PowerPlants "Models of thermoelectrical power plants components"
           metalVol_B=0.800,
           rhomcm_B=7900*578.05,
           SSInit=true,
-          counterCurrent_A=true,
           gasNomFlowRate=gasNomFlowRate,
           fluidNomFlowRate_A=fluidNomFlowRate_A,
           fluidNomFlowRate_B=fluidNomFlowRate_B,
           fluidNomPressure_A=fluidNomPressure_A,
           fluidNomPressure_B=fluidNomPressure_B,
-          gamma_G_A=gamma_G_A,
-          gamma_G_B=gamma_G_B,
-          gamma_F_A=gamma_F_A,
-          gamma_F_B=gamma_F_B,
-          counterCurrent_B=true,
-          gasNomPressure=100000,
           Tstartbar_G=Tstart_G,
           Tstartbar_M_A=Tstart_M_A,
-          Tstartbar_M_B=Tstart_M_B) annotation (Placement(transformation(extent=
+          Tstartbar_M_B=Tstart_M_B,
+          Nw_G=4,
+          gasNomPressure=100000,
+          redeclare model HeatTransfer_FA =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F_A),
+          redeclare model HeatTransfer_FB =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F_B),
+          redeclare model HeatTransfer_GA =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G_A),
+          redeclare model HeatTransfer_GB =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G_B),
+          redeclare model HeatExchangerTopology_A =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow,
+          redeclare model HeatExchangerTopology_B =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
+                                    annotation (Placement(transformation(extent=
                  {{-20,-20},{20,20}}, rotation=0)));
         Water.SinkPressure
                     sinkP_water_B(
@@ -10015,12 +10071,20 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
           Tstartbar_G=Tstart_G,
           SSInit=SSInit,
           FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
-          Tstartbar_M=Tstart_M) annotation (Placement(transformation(extent={{-20,
+          Tstartbar_M=Tstart_M,
+          Nw_G=6,
+          redeclare replaceable model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F),
+          redeclare replaceable model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G),
+          redeclare model HeatExchangerTopology =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
+                                annotation (Placement(transformation(extent={{-20,
                   -20},{20,20}}, rotation=0)));
         //Start value
         parameter SI.Temperature Tstart_G=(Tstart_G_In + Tstart_G_Out)/2;
@@ -10176,11 +10240,18 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomPressure=0,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
           Tstartbar_G=Tstart_G,
           Tstartbar_M=Tstart_M,
-          SSInit=SSInit) annotation (Placement(transformation(extent={{-20,-20},
+          SSInit=SSInit,
+          redeclare replaceable model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F),
+          redeclare replaceable model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_G),
+          redeclare model HeatExchangerTopology =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
+                         annotation (Placement(transformation(extent={{-20,-20},
                   {20,20}}, rotation=0)));
         Water.SensT T_waterOut(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(
@@ -10269,7 +10340,6 @@ package PowerPlants "Models of thermoelectrical power plants components"
           redeclare package FluidMedium = FluidMedium,
           redeclare package FlueGasMedium = FlueGasMedium,
           N_G=3,
-          N_F=6,
           exchSurface_G=40095.9,
           exchSurface_F=3439.389,
           extSurfaceTub=3888.449,
@@ -10281,12 +10351,21 @@ package PowerPlants "Models of thermoelectrical power plants components"
           gasNomFlowRate=585.5,
           fluidNomFlowRate=fluidNomFlowRate,
           fluidNomPressure=fluidNomPressure,
-          gamma_G=gamma_G,
-          gamma_F=gamma_F,
           SSInit=SSInit,
           Tstartbar_G=Tstart_G,
           Tstartbar_M=Tstart_M,
-          gasNomPressure=500000) annotation (Placement(transformation(extent={{
+          Nw_G=6,
+          N_F=7,
+          gasNomPressure=500000,
+          redeclare replaceable model HeatTransfer_F =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient
+              (gamma=gamma_F),
+          redeclare replaceable model HeatTransfer_G =
+              ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficientTwoGrids
+              (gamma=gamma_G),
+          redeclare model HeatExchangerTopology =
+              ThermoPower.Thermal.HeatExchangerTopologies.CounterCurrentFlow)
+                                 annotation (Placement(transformation(extent={{
                   -20,-20},{20,20}}, rotation=0)));
         //Start value
         parameter SI.Temperature Tstart_G=(Tstart_G_In + Tstart_G_Out)/2;
