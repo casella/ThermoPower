@@ -9832,7 +9832,8 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
     <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
     First release.</li>
 </ul>
-</html>"));
+</html>"),
+        experiment(StopTime=1e+006, Interval=200));
     end TestRefrigerantEvaporator;
   end DistributedParameterComponents;
 
