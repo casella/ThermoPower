@@ -24,7 +24,8 @@ package Media "Medium models for the ThermoPower library"
             Modelica.Media.IdealGases.Common.FluidData.Ar,
             Modelica.Media.IdealGases.Common.FluidData.N2},
       substanceNames={"Oxygen","Water","Argon","Nitrogen"},
-      reference_X={0.23,0.015,0.005,0.75});
+      reference_X={0.23,0.015,0.005,0.75},
+      referenceChoice=Modelica.Media.Interfaces.Choices.ReferenceEnthalpy.ZeroAt25C);
   end Air;
 
   package NaturalGas "Mixture of N2, CO2, and CH4"
@@ -38,7 +39,8 @@ package Media "Medium models for the ThermoPower library"
             Modelica.Media.IdealGases.Common.FluidData.CO2,
             Modelica.Media.IdealGases.Common.FluidData.CH4},
       substanceNames={"Nitrogen","Carbondioxide","Methane"},
-      reference_X={0.02,0.012,0.968});
+      reference_X={0.02,0.012,0.968},
+      referenceChoice=Modelica.Media.Interfaces.Choices.ReferenceEnthalpy.ZeroAt25C);
 
   end NaturalGas;
 
@@ -57,7 +59,8 @@ package Media "Medium models for the ThermoPower library"
             Modelica.Media.IdealGases.Common.FluidData.CO2,
             Modelica.Media.IdealGases.Common.FluidData.N2},
       substanceNames={"Oxygen","Argon","Water","Carbondioxide","Nitrogen"},
-      reference_X={0.23,0.02,0.01,0.04,0.7});
+      reference_X={0.23,0.02,0.01,0.04,0.7},
+      referenceChoice=Modelica.Media.Interfaces.Choices.ReferenceEnthalpy.ZeroAt25C);
 
   end FlueGas;
 
@@ -76,7 +79,8 @@ package Media "Medium models for the ThermoPower library"
             Modelica.Media.IdealGases.Common.FluidData.N2,
             Modelica.Media.IdealGases.Common.FluidData.CH4},
       substanceNames={"Oxygen","Water","Carbondioxide","Nitrogen","Methane"},
-      reference_X={0.23,0.03,0.04,0.5,0.2});
+      reference_X={0.23,0.03,0.04,0.5,0.2},
+      referenceChoice=Modelica.Media.Interfaces.Choices.ReferenceEnthalpy.ZeroAt25C);
     annotation (Documentation(info="<html>
 This Medium is a mixture of O2, H2O, CO2, N2, CH4. It has its reference composition, defined as <tt>Medium.reference_X</tt>, but only changing it, it can be reused as Air, just leading to zero the mass fraction of CH4, and as Fuel keeping only the mass fraction of CH4, as the unique gas.
 </html>"));
