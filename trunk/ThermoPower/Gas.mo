@@ -2922,8 +2922,9 @@ This is the model-base of a Combustion Chamber, with a constant volume.
 <p>The metal wall temperature and the heat transfer coefficient between the wall and the fluid are uniform. The wall is thermally insulated from the outside. It has been assumed that inlet gases are premixed before entering in the volume.
 <p><b>Modelling options</b></p>
 <p>This model has three different Medium models to characterize the inlet air, fuel, and flue gas exhaust.
-<p>If <tt>gamma = 0</tt>, the thermal effects of the surrounding walls are neglected.
-</p>
+<p>If <tt>gamma = 0</tt>, the thermal effects of the surrounding walls are neglected.</p>
+<p>There are two ways to obtain correct energy balances. The first is to explicitly set the lower heating value of the fuel <tt>HH</tt>, and use medium models that do not include the enthalpy of formation, by setting <tt>excludeEnthalpyOfFormation = true</tt>, which is the default option in Modelica.Media. As the heating value is usually provided at 25 degC temperature, it is also necessary to set <tt>referenceChoice =ReferenceEnthalpy.ZeroAt25C</tt> in all medium models for consistency. This is done in the medium models contained within <a href=\"modelica://ThermoPower.Media\">ThermoPower.Media</a>.</p>
+<p>Alternatively, one can set <tt>excludeEnthalpyOfFormation = false</tt> in all media and set <tt>HH = 0</tt>. By doing so, the heating value is automatically accounted for by the difference in the enthalpy of formation. 
 </html>",   revisions="<html>
 <ul>
 <li><i>30 May 2005</i>
