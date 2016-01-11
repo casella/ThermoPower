@@ -4552,6 +4552,83 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       Diagram(graphics));
   end SteamTurbineUnit;
 
+  package Utility "Utility models"
+
+    model ClosedSystemInit
+      "Component for the steady-state initialization of closed systems"
+      replaceable package Medium = StandardWater constrainedby
+        Modelica.Media.Interfaces.PartialMedium "Medium model"
+        annotation(choicesAllMatching = true);
+      parameter Medium.AbsolutePressure pstart "Start value of pressure";
+      parameter Boolean initEquationFromInput = false
+        "Get initial condition residual from input connector"
+        annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      parameter Boolean useHomotopy
+        "Use homotopy for residual-based initialization";
+      final parameter Medium.MassFlowRate w_b(fixed = false, start = 0)
+        "Initial balance flow rate eventually equal to zero";
+      outer ThermoPower.System system "System wide properties";
+
+      FlangeB flange(redeclare package Medium = Medium, m_flow(min = 0))
+         annotation (Placement(transformation(extent={{-20,-100},{20,-60}},
+                               rotation=0),
+                               iconTransformation(extent={{-20,-100},{20,-60}})));
+      Modelica.Blocks.Interfaces.RealInput initEquationResidual if initEquationFromInput
+        "Residual of initial equation" annotation (Placement(transformation(extent={
+                {-60,0},{-20,40}}), iconTransformation(extent={{-60,-10},{-40,10}})));
+    protected
+      Modelica.Blocks.Interfaces.RealInput initEquationResidual_int
+        "Hidden internal connector for conditional connection";
+    equation
+      0 = flange.m_flow + w_b "Mass balance";
+      flange.h_outflow = Medium.h_default
+        "Unused value as there is no flow out of the flange";
+
+      connect(initEquationResidual, initEquationResidual_int)
+        "Connects conditional input to hidden connector";
+
+      if not initEquationFromInput then
+        initEquationResidual_int = 0 "Not used";
+      end if;
+
+    initial equation
+      if initEquationFromInput then
+        if useHomotopy then
+          homotopy(initEquationResidual_int, (flange.p - pstart)/pstart) = 0
+            "Set initial value of residual to zero, simplified equation sets start value of pressure";
+        else
+          initEquationResidual_int = 0 "Set initial value of residual to zero";
+        end if;
+      else
+        flange.p = pstart "Set initial value of pressure";
+      end if;
+
+      annotation (Icon(coordinateSystem(preserveAspectRatio=false), graphics={
+            Line(
+              points={{0,0},{0,-60}},
+              color={28,108,200},
+              thickness=0.5),
+            Ellipse(
+              extent={{-40,40},{40,-40}},
+              lineColor={28,108,200},
+              fillColor={0,0,255},
+              fillPattern=FillPattern.Solid),
+            Text(
+              extent={{-32,24},{30,-24}},
+              lineColor={255,255,255},
+              lineThickness=0.5,
+              fillColor={0,0,255},
+              fillPattern=FillPattern.Solid,
+              textString="Init")}),                                  Diagram(
+            coordinateSystem(preserveAspectRatio=false)),
+        Documentation(info="<html>
+<p>This component can be used for the steady-state initialization of closed-system where all components have steady-state initial conditions. Without this component such systems would give rise to undetermined initial conditions, i.e., the amount of fluid and the initial pressures in the system would be unspecified.</p>
+<p>Connect the component to one point of the system. If <code>initEquationFromInput = false</code>, the system is initialized with pressure equal to <code>pstart</code> at the connection point.</p>
+<p>It is possible to use a generic initial equation instead of <code>p = pstart</code>, e.g., to set the initial charge of a refrigeration circuit, by setting <code>initEquationFromInput = true</code> and connecting to the input the output of a <a href=\"Modelica://Modelica.Blocks.Sources.RealExpression\">Modelica.Blocks.Sources.RealExpression</a> component, containing the residual of the initial equation. In this case, if <code>useHomotopy = true</code>, the simplified initial equation is <code>(p - pstart)/pstart = 0</code>. To ensure a smooth homotopy transformation, it is recommended to write the residual in normalized form, i.e., with values have the order of magnitude of one, as for the simplified equation.</p>
+</html>"));
+    end ClosedSystemInit;
+  end Utility;
+
   package BaseClasses "Contains partial models"
     extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
