@@ -1017,7 +1017,8 @@ package Icons "Icons for ThermoPower library"
       annotation (Icon(graphics={Rectangle(
               extent={{-80,40},{80,-40}},
               lineColor={0,0,0},
-              fillPattern=FillPattern.HorizontalCylinder)}), Diagram(graphics));
+              fillPattern=FillPattern.HorizontalCylinder,
+              fillColor={0,0,255})}),                        Diagram(graphics));
     end Tube;
 
     partial model Mixer
@@ -1153,6 +1154,7 @@ package Icons "Icons for ThermoPower library"
             Ellipse(
               extent={{-60,80},{60,-40}},
               lineColor={0,0,0},
+              fillColor={0,0,255},
               fillPattern=FillPattern.Sphere),
             Polygon(
               points={{-30,52},{-30,-8},{48,20},{-30,52}},
