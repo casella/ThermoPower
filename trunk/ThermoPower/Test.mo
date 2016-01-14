@@ -1,10 +1,12 @@
 within ThermoPower;
 package Test "Test cases for the ThermoPower models"
-  extends Modelica.Icons.Package;
+  extends Modelica.Icons.ExamplesPackage;
 
   package WaterComponents
     "Tests for lumped-parameters Water package components"
+    extends Modelica.Icons.ExamplesPackage;
     model TestMixer
+        extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.StandardWater;
       Water.SourceMassFlow
                     SourceW1(w0=0.5, h=2.8e6) annotation (Placement(
@@ -111,6 +113,7 @@ Casella</a>:<br>
     end TestMixer;
 
     model TestMixerSlowFast
+      extends Modelica.Icons.Example;
       package Medium=Modelica.Media.Water.StandardWater;
       // package Medium = Modelica.Media.Incompressible.Examples.Glycol47;
       Water.SourceMassFlow
@@ -212,6 +215,7 @@ Casella</a>:<br>
     end TestMixerSlowFast;
 
     model TestMixerSlowFastSteam
+      extends Modelica.Icons.Example;
       package Medium=Modelica.Media.Water.StandardWater;
       // package Medium = Modelica.Media.Incompressible.Examples.Glycol47;
       Water.SourceMassFlow
@@ -319,6 +323,7 @@ Casella</a>:<br>
     end TestMixerSlowFastSteam;
 
     model TestPressDrop
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.StandardWater;
       Water.SourcePressure
                     SourceP1(p0=300000) annotation (Placement(transformation(
@@ -474,6 +479,7 @@ This test model demonstrate four possible ways of setting the friction coefficie
     end TestPressDrop;
 
     model TestPressDropRev
+      extends Modelica.Icons.Example;
 
       Water.PressDrop pressDrop(
         wnom=1,
@@ -522,6 +528,7 @@ This test model demonstrate four possible ways of setting the friction coefficie
     end TestPressDropRev;
 
     model TestThroughMassFlow "Test of the ThroughMassFlow component"
+      extends Modelica.Icons.Example;
 
       Water.SourcePressure
                     SourceP1 annotation (Placement(transformation(extent={{-80,
@@ -591,6 +598,7 @@ Casella</a>:<br>
     end TestThroughMassFlow;
 
     model TestValves "Test cases for valves"
+      extends Modelica.Icons.Example;
 
       ThermoPower.Water.SourcePressure
                                 SourceP1(p0=10e5) annotation (Placement(
@@ -744,6 +752,7 @@ Casella</a>:<br>
     end TestValves;
 
     model TestValveChoked "Test case for valves in choked flow"
+      extends Modelica.Icons.Example;
 
       ThermoPower.Water.SourcePressure
                                 SourceP1(p0=5e5, h=400e3) annotation (Placement(
@@ -838,6 +847,7 @@ Casella</a>:<br>
     end TestValveChoked;
 
     model TestCoeffValve "Test case for valve with different CvData settings"
+      extends Modelica.Icons.Example;
 
       ThermoPower.Water.SourcePressure
                                 SourceP1(p0=5e5, h=2e5) annotation (Placement(
@@ -960,6 +970,7 @@ Casella</a>:<br>
     end TestCoeffValve;
 
     model ValveZeroFlow "Test case for valves with zero flowrate"
+      extends Modelica.Icons.Example;
 
       ThermoPower.Water.SourcePressure
                                 Source(p0=5e5) annotation (Placement(
@@ -1052,6 +1063,7 @@ Casella</a>:<br>
     end ValveZeroFlow;
 
     model ValveZeroFlow2 "Test case for valves with zero flowrate"
+      extends Modelica.Icons.Example;
 
       Modelica.Blocks.Sources.Step Cmd1(
         height=0,
@@ -1121,6 +1133,7 @@ Casella</a>:<br>
     end ValveZeroFlow2;
 
     model TestJoin "Test case FlowJoin and FlowSplit"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       constant Real pi=Modelica.Constants.pi;
       ThermoPower.Water.SourceMassFlow
@@ -1285,6 +1298,7 @@ Casella</a>:<br>
     end TestJoin;
 
     model TestJoinRev "Test case FlowJoin"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       constant Real pi=Modelica.Constants.pi;
       ThermoPower.Water.SourceMassFlow
@@ -1455,6 +1469,7 @@ Casella</a>:<br>
     end TestJoinRev;
 
     model TestSplitRev "Test case FlowSplit"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       constant Real pi=Modelica.Constants.pi;
       ThermoPower.Water.SinkMassFlow
@@ -1633,6 +1648,7 @@ Casella</a>:<br>
     end TestSplitRev;
 
     model WaterPump "Test case for WaterPump"
+      extends Modelica.Icons.Example;
 
       ThermoPower.Water.SourcePressure
                                 Source(p0=1e5, h=1.5e5) annotation (Placement(
@@ -1757,6 +1773,7 @@ Schiavo</a>:<br>
     end WaterPump;
 
     model WaterPumps "Test case for WaterPump"
+      extends Modelica.Icons.Example;
 
       ThermoPower.Water.SourcePressure
                                 Source1(p0=1e5, h=1.5e5) annotation (Placement(
@@ -1913,6 +1930,7 @@ Schiavo</a>:<br>
     end WaterPumps;
 
     model WaterPumpMech "Test case for WaterPumpMech"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       Water.PumpMech Pump(
         rho0=1000,
@@ -2106,6 +2124,7 @@ Schiavo</a>:<br>
     end SimpleMotor;
 
     model TestAccumulator "Simple test for Water-Gas Accumulator component"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       Water.Accumulator Accumulator1(
         hl_start=1e5,
@@ -2216,6 +2235,7 @@ Algorithm Tolerance = 1e-6
     end TestAccumulator;
 
     model TestST1
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.StandardWater;
       parameter Medium.MassFlowRate w=1;
       parameter Medium.AbsolutePressure pin=60e5;
@@ -2330,6 +2350,7 @@ Algorithm Tolerance = 1e-4
     end TestST1;
 
     model TestST2
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.StandardWater;
       parameter Medium.MassFlowRate w=1;
       parameter Medium.AbsolutePressure pin=60e5;
@@ -2440,6 +2461,7 @@ Algorithm Tolerance = 1e-4
     end TestST2;
 
     model TestTurbine "Test turbine with prescribed pressure conditions"
+      extends Modelica.Icons.Example;
 
       Water.SourcePressure
                     source(             h=3.3e6,
@@ -2501,8 +2523,10 @@ Algorithm Tolerance = 1e-4
   end WaterComponents;
 
   package GasComponents "Tests for lumped-parameters Gas package components"
+    extends Modelica.Icons.ExamplesPackage;
 
     model TestGasPlenum
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
       Gas.ValveLin ValveLin1(redeclare package Medium = Medium, Kv=2.5e-5)
         annotation (Placement(transformation(extent={{-42,-10},{-22,10}},
@@ -2582,6 +2606,7 @@ This model tests the <tt>Plenum</tt> model.
     end TestGasPlenum;
 
     model TestGasHeader
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.AirSteam;
       parameter Real Xnom[Medium.nX]={0.3,0.7};
       Gas.Header Header1(
@@ -2665,6 +2690,7 @@ This model tests the <tt>Header</tt> model.
     end TestGasHeader;
 
     model TestGasMixer
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
       parameter Real wext=10;
       Gas.Mixer Mixer1(
@@ -2774,6 +2800,7 @@ Simulate for 20 s. At time t=1 the first inlet flow rate is reduced. At time t=8
     end TestGasMixer;
 
     model TestCC
+      extends Modelica.Icons.Example;
 
       ThermoPower.Gas.SourceMassFlow
                               Wcompressor(
@@ -2858,6 +2885,7 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
     end TestCC;
 
     model TestGasPressDrop
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
       Gas.SourcePressure
                   SourceP1(
@@ -3004,6 +3032,7 @@ This model tests the <tt>PressDrop</tt>, <tt>PressDropLin</tt> and <tt>Valve</tt
     end TestGasPressDrop;
 
     model TestGasValveOpPoint
+      extends Modelica.Icons.Example;
 
       package Medium = Media.Air;
       Gas.SourcePressure
@@ -3140,6 +3169,7 @@ This models tests the Valve model in different operating conditions. The valve f
     end TestGasValveOpPoint;
 
     model TestGasValve
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
       Gas.SourcePressure
                   SourceP1(
@@ -3362,6 +3392,7 @@ This model tests the <tt>Valve</tt> model, in each possible configuration, i.e. 
     end TestGasValve;
 
     model TestCompressorConstSpeed
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
     protected
       parameter Real tableEta[6, 4]=[0, 95, 100, 105; 1, 82.5e-2, 81e-2,
@@ -3430,6 +3461,7 @@ This model test the <tt>Compressor</tt> model at constant speed.
     end TestCompressorConstSpeed;
 
     model TestCompressorInertia
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
     protected
       parameter Real tableEta[6, 4]=[0, 95, 100, 105; 1, 82.5e-2, 81e-2,
@@ -3501,6 +3533,7 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
     end TestCompressorInertia;
 
     model TestGasTurbine
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
     protected
       parameter Real tablePhic[5, 4]=[1, 90, 100, 110; 2.36, 4.68e-3, 4.68e-3,
@@ -3567,6 +3600,7 @@ This model test the Turbine model with an inertial load. Boundary conditions and
     end TestGasTurbine;
 
     model TestGasTurbineStodola
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
 
     protected
@@ -3638,6 +3672,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
     end TestGasTurbineStodola;
 
     model TestTurboJetInertia
+      extends Modelica.Icons.Example;
       parameter SI.SpecificEnthalpy HH(fixed=false, start=40e6)
         "Fuel lower heat value";
     protected
@@ -3809,6 +3844,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
     end TestTurboJetInertia;
 
     model TestTurboJetConstSpeed
+      extends Modelica.Icons.Example;
     protected
       parameter Real tableEtaC[6, 4]=[0, 95, 100, 105; 1, 82.5e-2, 81e-2,
           80.5e-2; 2, 84e-2, 82.9e-2, 82e-2; 3, 83.2e-2, 82.2e-2, 81.5e-2; 4,
@@ -3961,6 +3997,7 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at costant 
     end TestTurboJetConstSpeed;
 
     model TestGT_ISO
+      extends Modelica.Icons.Example;
 
       parameter Real tableData[8, 4]=[1.3e6, 7e6, 11.6, 18.75; 1.85e6, 8.2e6,
           12, 18.7; 2e6, 8.5e6, 12.1, 18.65; 3e6, 10.8e6, 12.7, 18.6; 3.5e6,
@@ -4047,6 +4084,7 @@ This model tests <tt>GTunit_ISO</tt>.
     end TestGT_ISO;
 
     model TestGT
+      extends Modelica.Icons.Example;
 
       parameter Real tabW[11, 4]=[0, 233.15, 288.15, 313.15; 0.485e6, 20.443,
           18.608, 17.498; 0.97e6, 20.443, 18.596, 17.483; 1.455e6, 20.443,
@@ -4165,6 +4203,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestGT;
 
     model TestFanMech
+      extends Modelica.Icons.Example;
 
       Gas.FanMech FanMech1(
         redeclare package Medium = Modelica.Media.Air.SimpleAir,
@@ -4265,8 +4304,10 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 
   package DistributedParameterComponents
     "Tests for thermo-hydraulic distributed parameter components"
+    extends Modelica.Icons.ExamplesPackage;
 
     model TestWaterFlow1DFV_A "Test case for Water.Flow1DFV"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=20 "Number of nodes";
@@ -4407,6 +4448,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_A;
 
     model TestWaterFlow1DFV_B "Test case for Water.Flow1DFV"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=10 "Number of nodes";
@@ -4530,6 +4572,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_B;
 
     model TestWaterFlow1DFV_D "Test case for Water.Flow1DFV"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=5 "number of Nodes";
@@ -4641,6 +4684,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_D;
 
     model TestWaterFlow1DFV_E "Test case for Water.Flow1DFV"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=20 "number of nodes";
@@ -4821,6 +4865,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_E;
 
     model TestWaterFlow1DFV_F "Test case for Water.Flow1DFV"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=20 "number of nodes";
@@ -5021,6 +5066,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 
     model TestWaterFlow1DFV_DB
       "Test case for Water.Flow1DFV with Dittus-Boelter heat transfer"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=10 "number of Nodes";
@@ -5144,6 +5190,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_A_Fast;
 
     model TestGasFlow1DFV_A "Test case for Gas.Flow1DFV"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.IdealGases.SingleGases.N2
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=10 "number of Nodes";
@@ -5277,6 +5324,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestGasFlow1DFV_A;
 
     model TestGasFlow1DFV_B "Test case for Gas.Flow1DFV"
+      extends Modelica.Icons.Example;
       extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DFV_A(
           redeclare package Medium =
             Modelica.Media.IdealGases.MixtureGases.CombustionAir, Source(
@@ -5318,6 +5366,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestGasFlow1DFV_D;
 
     model TestWaterFlow1DFEM_A "Test case for Flow1DFEM"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -5471,6 +5520,7 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_A;
 
     model TestWaterFlow1DFEM_B "Test case for Flow1DFEM"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -5610,6 +5660,7 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_B;
 
     model TestWaterFlow1DFEM_C "Test case for Flow1Dfem"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -5743,6 +5794,7 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_C;
 
     model TestWaterFlow1DFEM_D "Test case for Flow1DFEM"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -5861,6 +5913,7 @@ Algorithm Tolerance = 1e-6
     end TestWaterFlow1DFEM_D;
 
     model TestWaterFlow1DFEM_E "Test case for Flow1DFEM"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -6069,6 +6122,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_E;
 
     model TestWaterFlow1DFEM_F "Test case for Flow1DFEM"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -6290,6 +6344,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_F;
 
     model TestWaterFlow1DFEM_G "Test case for Flow1DFEM"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -6407,6 +6462,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_G;
 
     model TestWaterFlow1DFEM_K "Test case for Flow1DFEM"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.StandardWater
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -6531,6 +6587,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_K;
 
     model TestWaterFlow1DFEM_J "Test case for Flow1Dfem"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.StandardWater
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       // number of Nodes
@@ -6641,6 +6698,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFEM_J;
 
     model TestWaterFlow1DFV2ph
+      extends Modelica.Icons.Example;
        package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -6779,6 +6837,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFV2ph;
 
     model TestWaterFlow1DFV2ph_A "Test case for Flow1DFV2ph"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -6924,6 +6983,7 @@ Casella</a>:<br>
     end TestWaterFlow1DFV2ph_A;
 
     model TestWaterFlow1DFV2ph_B "Test case for Flow1DFV2ph"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -7064,6 +7124,7 @@ Algorithm Tolerance = 1e-9
     end TestWaterFlow1DFV2ph_B;
 
     model TestWaterFlow1DFV2ph_C "Test case for Flow1D2ph"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -7202,7 +7263,8 @@ Algorithm Tolerance = 1e-9
     end TestWaterFlow1DFV2ph_C;
 
     model TestWaterFlow1DFV2ph_D "Test case for Flow1D2ph"
-      package Medium = Modelica.Media.Water.WaterIF97_ph;
+     extends Modelica.Icons.Example;
+     package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
       parameter Integer Nnodes=10;
@@ -7355,6 +7417,7 @@ Algorithm Tolerance = 1e-9
 
     model CheckFlow1DFV2phMassBalance
       "Checks Flow1DFV2ph equations for mass conservation"
+      extends Modelica.Icons.Example;
       package Medium = ThermoPower.Water.StandardWater;
       package SmoothMedium = Medium (final smoothModel=true);
       parameter Integer N=2;
@@ -7552,6 +7615,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
     end CheckFlow1DFV2phMassBalance;
 
     model TestFlow1D2phDB "Test case for Flow1D2phDB"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -7715,6 +7779,7 @@ Algorithm Tolerance = 1e-8
     end TestFlow1D2phDB;
 
     model TestFlow1D2phDB_hf "Test case for Flow1D2ph"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph (smoothModel=true);
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -7863,6 +7928,7 @@ Algorithm Tolerance = 1e-7
     end TestFlow1D2phDB_hf;
 
     model TestFlow1D2phChen "Test case for Flow1D2phChen"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       import Modelica.Constants.*;
       // number of Nodes
@@ -8023,6 +8089,7 @@ Algorithm Tolerance = 1e-8
     end TestFlow1D2phChen;
 
     model TestFlow1D2phChen_hf "Test case for Flow1D2ph"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph (smoothModel=true);
       constant Real pi = Modelica.Constants.pi;
       // number of Nodes
@@ -8172,6 +8239,7 @@ Algorithm Tolerance = 1e-7
     end TestFlow1D2phChen_hf;
 
     model TestFlow1Dfem2ph "Test case for Flow1D2ph"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       // number of Nodes
       parameter Integer Nnodes=11;
@@ -8363,6 +8431,8 @@ Casella</a>:<br>
     end Flow1D_check;
 
     model TestWalls "Test various wall models"
+      extends Modelica.Icons.Example;
+
       Thermal.MetalWallFV wall1(
         Nw=2,
         M=1,
@@ -8443,6 +8513,7 @@ Casella</a>:<br>
     end TestWalls;
 
     model TestHeatTransfer2phDB "Test of two-phase heat transfer components"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.StandardWater
         constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium;
 
@@ -8521,6 +8592,7 @@ Casella</a>:<br>
     end TestHeatTransfer2phDB;
 
     model TestHeatTransfer2phDBa "Test case for HeatTransfer2phDB"
+      extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
       parameter Integer Nnodes = 10;
       parameter Medium.SpecificEnthalpy hstartin = 1e5;
@@ -8585,6 +8657,7 @@ Casella</a>:<br>
     end TestHeatTransfer2phDBa;
 
     model TestHeatTransfer2phDBb "Test case for HeatTransfer2phDB"
+      extends Modelica.Icons.Example;
       extends TestHeatTransfer2phDBa(
         hstartin = 3.5e6,
         hstartout = (3.5e6+0.001) - 3.4e6*time);
@@ -8633,6 +8706,8 @@ Casella</a>:<br>
     end TestFlowDependentHeatTransferCoefficient2ph;
 
     package OldTests "Contains tests for old Flow1D components"
+      extends Modelica.Icons.ExamplesPackage;
+
       model TestFlow1Db "Test case for Flow1D"
         package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
         // number of Nodes
@@ -9838,7 +9913,10 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
   end DistributedParameterComponents;
 
   package ElectricalComponents "Test for Electrical package components"
+    extends Modelica.Icons.ExamplesPackage;
+
     model TestElectrical1
+      extends Modelica.Icons.Example;
       parameter SI.Power Pn=10e6 "Nominal generator power";
       parameter SI.Time Ta=10 "Turbine acceleration time";
       parameter Integer Np=2 "Number of generator poles";
@@ -9912,6 +9990,7 @@ Algorithm Tolerance = 1e-6
     end TestElectrical1;
 
     model TestElectrical2
+      extends Modelica.Icons.Example;
       parameter SI.Power Pn=10e6 "Nominal generator power";
       parameter SI.Time Ta=10 "Turbine acceleration time";
       parameter Integer Np=2 "Number of generator poles";
@@ -10013,6 +10092,7 @@ Algorithm Tolerance = 1e-6
     end TestElectrical2;
 
     model TestNetworkGridGenerator_Pmax
+      extends Modelica.Icons.Example;
       parameter Boolean SSInit=true "Steady-state initialization";
       Electrical.Generator gen(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState
              else Choices.Init.Options.noInit) annotation (Placement(
@@ -10083,6 +10163,7 @@ Algorithm Tolerance = 1e-6
     end TestNetworkGridGenerator_Pmax;
 
     model TestNetworkGridTwoGenerators
+      extends Modelica.Icons.Example;
       parameter Boolean SSInit=true "Steady-state initialization";
       ThermoPower.Electrical.NetworkGridTwoGenerators network(
         J_a=10000,
@@ -10206,6 +10287,7 @@ Algorithm Tolerance = 1e-6
 
     model TestN2GControl
       "Test network with two generators, frequency controlled"
+      extends Modelica.Icons.Example;
       parameter Boolean SSInit=true "Steady-state initialization";
       ThermoPower.Electrical.NetworkTwoGenerators_Pmax network(
         J_a=10000,

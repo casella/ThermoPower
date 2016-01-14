@@ -3,7 +3,7 @@ package Examples "Application examples"
   extends Modelica.Icons.ExamplesPackage;
 
   package CISE "CISE plant models"
-    extends Modelica.Icons.Library;
+    extends Modelica.Icons.ExamplesPackage;
     model CISEPlant "Model of the CISE lab steam generator"
       package Medium = Modelica.Media.Water.WaterIF97_ph (smoothModel=true);
       Water.Drum Drum(
@@ -1350,7 +1350,7 @@ Casella</a>:<br>
   end CISE;
 
   package HRB "Heat recovery boiler models"
-    extends Modelica.Icons.Library;
+    extends Modelica.Icons.ExamplesPackage;
 
     package Models
       extends Modelica.Icons.Library;
@@ -1933,6 +1933,7 @@ This is the model of a digital PI controller, complete with auto/man and trackin
         extends Modelica.Icons.ExamplesPackage;
 
       model OpenLoopSimulator "Open loop plant simulator"
+        extends Modelica.Icons.Example;
 
         Models.HRBPlant
                  Plant annotation (Placement(transformation(extent={{-10,-40},{
@@ -2097,6 +2098,7 @@ Casella</a>:<br>
 
       model ClosedLoopSimulator
         "Plant simulation with analogue temperature controller"
+        extends Modelica.Icons.Example;
 
         Models.HRBPlant
                  Plant(Boiler(
@@ -2160,6 +2162,7 @@ Casella</a>:<br>
 
       model ClosedLoopDigitalSimulator
         "Plant simulation with digital temperature controller"
+        extends Modelica.Icons.Example;
 
         Models.HRBPlant
                  Plant(Boiler(
@@ -2262,6 +2265,8 @@ Casella</a>:<br>
       end ClosedLoopDigitalSimulatorSimplified;
 
       model TestPI "Test model for digital PI controller"
+        extends Modelica.Icons.Example;
+
         ThermoPower.Examples.HRB.Models.DigitalPI digitalPI(
           Kp=4,
           Ti=8,
@@ -2307,7 +2312,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
   end HRB;
 
   package RankineCycle "Steam power plant"
-    extends Modelica.Icons.Package;
+    extends Modelica.Icons.ExamplesPackage;
 
     package Models
       extends Modelica.Icons.Package;
@@ -3148,6 +3153,7 @@ This is a simple model of a steam plant.
     package Simulators "Simulation models for the Rankine cycle example"
       extends Modelica.Icons.ExamplesPackage;
       model ClosedLoop
+        extends Modelica.Icons.Example;
         package FlueGas = ThermoPower.Media.FlueGas "Flue gas model";
         package Water = ThermoPower.Water.StandardWater "Fluid model";
         Modelica.Blocks.Sources.Ramp gasFlowRate(
@@ -3257,7 +3263,7 @@ This is a simple model of a steam plant.
   end RankineCycle;
 
   package BraytonCycle "Gas power plant"
-    extends Modelica.Icons.Package;
+    extends Modelica.Icons.ExamplesPackage;
 
     model Plant
       parameter Real tableEtaC[6, 4]=[0, 95, 100, 105; 1, 82.5e-2, 81e-2,
@@ -3481,6 +3487,7 @@ This is a simple model of a steam plant.
     end Plant;
 
     model OpenLoopSimulator
+      extends Modelica.Icons.Example;
 
       Plant plant annotation (Placement(transformation(extent={{20,-20},{60,20}},
               rotation=0)));
@@ -3513,6 +3520,7 @@ This is a simple model of a steam plant.
     end OpenLoopSimulator;
 
     model ClosedLoopSimulator
+      extends Modelica.Icons.Example;
 
       Plant plant annotation (Placement(transformation(extent={{20,-20},{60,20}},
               rotation=0)));
