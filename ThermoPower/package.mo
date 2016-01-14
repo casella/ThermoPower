@@ -977,7 +977,8 @@ end Electrical;
 
 
 package Icons "Icons for ThermoPower library"
-  extends Modelica.Icons.Package;
+  extends Modelica.Icons.IconsPackage;
+
   package Water "Icons for component using water/steam as working fluid"
     extends Modelica.Icons.Package;
     partial model SourceP
