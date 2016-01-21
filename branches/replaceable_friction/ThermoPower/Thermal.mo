@@ -100,10 +100,10 @@ package Thermal "Thermal models of heat transfer"
     // TO BE ADAPTED!!!
 
     parameter Integer N=1 "Number of nodes on DHT side";
-    parameter SI.Area exchangeSurface "Area of heat transfer surface";
+  //  parameter SI.Area exchangeSurface "Area of heat transfer surface";
     HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
             rotation=0)));
-    DHT DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
+    DHTVolumes DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
               120,40}}, rotation=0)));
   equation
     for i in 1:N loop
@@ -111,10 +111,10 @@ package Thermal "Thermal models of heat transfer"
     end for;
     if N == 1 then
       // Uniform flow distribution
-      DHT_port.phi[1]*exchangeSurface + HT_port.Q_flow = 0 "Energy balance";
+      DHT_port.Q[1] + HT_port.Q_flow = 0 "Energy balance";
     else
       // Piecewise linear flow distribution
-      sum(DHT_port.phi[1:N - 1] + DHT_port.phi[2:N])/2*exchangeSurface/(N - 1)
+      sum(DHT_port.Q[1:N - 1] + DHT_port.Q[2:N])/2/(N - 1)
          + HT_port.Q_flow = 0 "Energy balance";
     end if;
     annotation (Icon(graphics={

@@ -1082,6 +1082,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           Dhyd/A,
           e,
           Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
+    elseif FFtype == FFtypes.External then
+      Cf = Kfc*Cfcorr(w,Dhyd,A,Medium.dynamicViscosity(fluidState[integer(N/2)]));
+      Kf = Cf*omega_hyd*L/(2*A^3);
     else  // if FFtype == FFtypes.NoFriction then
       Cf = 0;
     end if;
@@ -1278,7 +1281,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
-    HeatTransfer heatTransfer2(
+    HeatTransfer2 heatTransfer2(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
@@ -1415,6 +1418,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
             Medium.dynamicViscosity(Medium.setBubbleState(sat, 1)),
             Medium.dynamicViscosity(Medium.setDewState(sat, 1)),
             x[j])*Kfc;
+        Kf[j] = Cf[j]*omega_hyd*l/(2*A^3);
+      elseif FFtype == FFtypes.External then
+        Cf[j] = Kfc*Cfcorr(w,Dhyd,A,Medium.dynamicViscosity(fluidState[j]));
         Kf[j] = Cf[j]*omega_hyd*l/(2*A^3);
       elseif FFtype == FFtypes.NoFriction then
         Cf[j] = 0;
@@ -1683,7 +1689,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
-    HeatTransfer heatTransfer2(
+    HeatTransfer2 heatTransfer2(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
@@ -1814,6 +1820,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
             Dhyd/A,
             e,
             Medium.dynamicViscosity(fluidState[i]))*Kfc;
+      elseif FFtype == FFtypes.External then
+        Cf[i] = Kfc*Cfcorr(w[i],Dhyd,A,Medium.dynamicViscosity(fluidState[i]));
+        Kf[i] = Cf[i]*omega_hyd*l/(2*A^3);
       elseif FFtype == FFtypes.NoFriction then
         Cf[i] = 0;
       end if;
@@ -2334,7 +2343,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       elseif FFtype == FFtypes.Cfnom then
         Cf[i] = Cfnom*Kfc;
       else
-        assert(true, "Unsupported friction factor selection");
+        assert(false, "Unsupported friction factor selection");
       end if;
       Kf[i] = Cf[i]*omega_hyd*L/(2*A^3)
         "Relationship between friction coefficient and Fanning friction factor";
@@ -4701,6 +4710,12 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
         annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
       constant SI.Acceleration g=Modelica.Constants.g_n;
       function squareReg = ThermoPower.Functions.squareReg;
+
+      replaceable function Cfcorr =
+        ThermoPower.Functions.FrictionFactors.NoFriction constrainedby
+        ThermoPower.Functions.FrictionFactors.BaseFFcorr
+        "External Fanning friction factor correlation"
+        annotation(choicesAllMatching = true, Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.External)));
 
       FlangeA infl(
         h_outflow(start=hstartin),

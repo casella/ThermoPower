@@ -1001,6 +1001,9 @@ package Gas "Models of components with ideal gases as working fluid"
     elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction then
       Cf = 0;
       Kf = 0;
+    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.External then
+      Cf = Kfc*Cfcorr(w,Dhyd,A,sum(Medium.dynamicViscosity(gas[:].state))/N);
+      Kf = Cf*omega_hyd*L/(2*A^3);
     else
       assert(false, "Unsupported FFtype");
       Cf = 0;
@@ -1221,7 +1224,7 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
-    HeatTransfer heatTransfer2(
+    HeatTransfer2 heatTransfer2(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
@@ -2766,6 +2769,12 @@ The packages Medium are redeclared and a mass balance determines the composition
       parameter Boolean noInitialPressure=false
         "Remove initial equation on pressure"
         annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
+      replaceable function Cfcorr =
+          ThermoPower.Functions.FrictionFactors.NoFriction constrainedby
+        ThermoPower.Functions.FrictionFactors.BaseFFcorr
+        "External Fanning friction factor correlation"
+        annotation(choicesAllMatching = true, Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.External)));
 
       function squareReg = ThermoPower.Functions.squareReg;
     protected
@@ -4373,6 +4382,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 </html>"),
       DymolaStoredErrors);
   end Flow1D;
+
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using ideal gases as working fluid.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:

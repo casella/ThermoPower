@@ -1017,7 +1017,8 @@ package Icons "Icons for ThermoPower library"
       annotation (Icon(graphics={Rectangle(
               extent={{-80,40},{80,-40}},
               lineColor={0,0,0},
-              fillPattern=FillPattern.HorizontalCylinder)}), Diagram(graphics));
+              fillPattern=FillPattern.HorizontalCylinder,
+              fillColor={0,0,255})}),                        Diagram(graphics));
     end Tube;
 
     partial model Mixer
@@ -1153,6 +1154,7 @@ package Icons "Icons for ThermoPower library"
             Ellipse(
               extent={{-60,80},{60,-40}},
               lineColor={0,0,0},
+              fillColor={0,0,255},
               fillPattern=FillPattern.Sphere),
             Polygon(
               points={{-30,52},{-30,-8},{48,20},{-30,52}},
@@ -2289,6 +2291,28 @@ This characteristic is such that the relative change of the flow coefficient is 
       end quadraticFlowBladesCoeff;
     end Utilities;
   end FanCharacteristics;
+
+  package FrictionFactors "Friction factor correlations"
+
+    partial function BaseFFcorr
+      "Base friction factor correlation (as a function of Re)"
+      extends Modelica.Icons.Function;
+      input SI.MassFlowRate w;
+      input SI.Length Dhyd;
+      input SI.Area A;
+      input SI.DynamicViscosity mu;
+      output SI.CoefficientOfFriction f;
+
+    end BaseFFcorr;
+
+    function NoFriction "No friction"
+      extends BaseFFcorr;
+
+    algorithm
+      f := 0;
+    end NoFriction;
+
+  end FrictionFactors;
   annotation (Documentation(info="<HTML>
 This package contains general-purpose functions and models
 </HTML>"));
