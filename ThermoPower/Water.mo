@@ -1212,7 +1212,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
     annotation (
       Diagram(graphics),
-      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-60},{100,-100}},textString="%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
@@ -1301,7 +1301,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     connect(wall2,heatTransfer2.wall);
     annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
               -100},{100,100}}), graphics), Icon(coordinateSystem(
-            preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics));
+            preserveAspectRatio=false, extent={{-100,-100},{100,100}})));
   end Flow1DFV2w;
 
   model Flow1DFV2ph
@@ -1618,7 +1618,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     annotation (
       Diagram(graphics),
-      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-60},{100,-100}},textString="%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is either one-phase, or a two-phase mixture.
@@ -2124,7 +2124,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
     annotation (
       Diagram(graphics),
-      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-60},{100,-100}},textString="%name")}),
       Documentation(info="<HTML>
 <p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 <ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
