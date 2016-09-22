@@ -7961,7 +7961,7 @@ Algorithm Tolerance = 1e-7
         wnom=0.05,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        pstart=600000)                                        annotation (
+        pstart=6000000)                                        annotation (
           Placement(transformation(extent={{-20,-70},{0,-50}}, rotation=0)));
       ThermoPower.Water.ValveLin valve(Kv=0.05/60e5) annotation (Placement(
             transformation(extent={{30,-70},{50,-50}}, rotation=0)));
