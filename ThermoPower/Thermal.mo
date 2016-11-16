@@ -1119,7 +1119,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
       Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
-      Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+      Medium.Temperature Tvol[Nw] "Fluid average temperature in the volumes";
       Medium.Temperature Ts "Saturated water temperature";
       Medium.SaturationProperties sat "Properties of saturated fluid";
       Medium.ThermodynamicState bubble "Bubble point, one-phase side";
@@ -1192,7 +1192,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
       for j in 1:Nw loop
          if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then  // 1-phase liquid or vapour
-           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
            state[j] = 1;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
@@ -1229,9 +1229,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
          end if;
 
          if useAverageTemperature then
-           Tvolbar[j] = (T[j] + T[j + 1])/2;
+           Tvol[j] = (T[j] + T[j + 1])/2;
          else
-           Tvolbar[j] = T[j + 1];
+           Tvol[j] = T[j + 1];
          end if;
       end for;
        annotation (
@@ -1274,7 +1274,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
       Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
-      Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+      Medium.Temperature Tvol[Nw] "Fluid average temperature in the volumes";
       Medium.Temperature Ts "Saturated water temperature";
       Medium.SaturationProperties sat "Properties of saturated fluid";
       Medium.AbsolutePressure p "Fluid pressure for property calculations";
@@ -1307,12 +1307,12 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
       for j in 1:Nw loop
          if noEvent(h[j] < hl and h[j + 1] < hl) then  // liquid
-           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*gamma_liq;
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*gamma_liq;
            state[j] = 0;
            alpha_l[j] = 1;
            alpha_v[j] = 0;
          elseif noEvent(h[j] > hv and h[j + 1]> hv) then  // vapour
-           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*gamma_vap;
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*gamma_vap;
            state[j] = 1;
            alpha_l[j] = 0;
            alpha_v[j] = 1;
@@ -1348,9 +1348,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
          end if;
 
          if useAverageTemperature then
-           Tvolbar[j] = (T[j] + T[j + 1])/2;
+           Tvol[j] = (T[j] + T[j + 1])/2;
          else
-           Tvolbar[j] = T[j + 1];
+           Tvol[j] = T[j + 1];
          end if;
       end for;
        annotation (
