@@ -4766,7 +4766,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         annotation(Evaluate = true);
       parameter SI.Area Av(
         fixed=fixedAv,
-        start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
+        start=wnom/(sqrt(rhonom*dpnom)*FlowChar(thetanom)))
         "Av (metric) flow coefficient"
         annotation (Dialog(group="Flow Coefficient",
                            enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Av)));
