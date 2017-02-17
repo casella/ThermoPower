@@ -885,12 +885,22 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
        parameter SI.CoefficientOfHeatTransfer gamma
         "Constant heat transfer coefficient";
+       parameter Boolean adaptiveAverageTemperature = true
+        "Adapt the average temperature at low flow rates";
+       parameter Modelica.SIunits.PerUnit sigma = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is computed on outlet volume temperatures";
+
+       SI.PerUnit w_wnom "Ratio between actual and nominal flow rate";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
     equation
       assert(Nw ==  Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
+      w_wnom = abs(w[1])/wnom;
       for j in 1:Nw loop
-         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+         Tvol[j] =
+           if not useAverageTemperature then T[j+1]
+           else if not adaptiveAverageTemperature then (T[j] + T[j + 1])/2
+           else (T[j]+T[j+1])/2 + (T[j+1]-T[j])/2*exp(-w_wnom/sigma);
          Qw[j] = (Tw[j] - Tvol[j])*omega*l*gamma*Nt;
       end for;
 
@@ -898,7 +908,12 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
                 graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+        Documentation(info="<html>
+<p>This component assumes a uniform and connstant heat transfer coefficient gamma.</p>
+<p>If useAverageTemperature=false, the outlet fluid temperature of each volume is used to compute the heat transfer, otherwise the average temperature between inlet and outlet is used.</p>
+<p>In the latter case, the temperature distribution is accurately predicted if N &GT; NTU. However, non-physical temperature distributions and numerical problems can arise at low flows, when NTU increases. If adaptiveAverageTemperature=true, then the outlet temperature is used instead of the average one when w/wnom_ht &lt; sigma. This leads to physically realistic temperature distributions and better numerical properties at low or zero flows.</p>
+</html>"));
     end ConstantHeatTransferCoefficient;
 
     model ConstantHeatTransferCoefficientTwoGrids
@@ -979,7 +994,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
                 graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+        Documentation(info="<html>Same as <a href=\"ConstantHeatTransferCoefficient\">ConstantHeatTransferCoefficient</a>, except that
+the global nominal thermal conductance UA is given instead of the nominal specific heat transfer coefficient.
+</html>"));
     end ConstantThermalConductance;
 
     model FlowDependentHeatTransferCoefficient
@@ -993,6 +1011,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
         "Fraction of nominal flow rate below which the heat transfer is not reduced";
        parameter SI.MassFlowRate wnom_ht = wnom
         "Nominal flow rate for heat transfer correlation (single tube)";
+       parameter Boolean adaptiveAverageTemperature = true
+        "Adapt the average temperature at low flow rates";
+       parameter Modelica.SIunits.PerUnit sigma = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is computed on outlet volume temperatures";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
        SI.CoefficientOfHeatTransfer gamma(start = gamma_nom)
         "Actual heat transfer coefficient";
@@ -1004,21 +1026,28 @@ The swapping is performed if the counterCurrent parameter is true (default value
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       // Computation of actual heat transfer coefficient with smooth lower saturation to avoid numerical singularities at low flows
-      w_wnom = abs(w[1])/wnom_ht
-        "Inlet flow rate used for the computation of the h.t.c.";
+      w_wnom = abs(w[1])/wnom_ht;
       w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2);
       gamma = homotopy(gamma_nom*w_wnom_reg^alpha,
                        gamma_nom);
 
       for j in 1:Nw loop
-         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+         Tvol[j] =
+           if not useAverageTemperature then T[j+1]
+           else if not adaptiveAverageTemperature then (T[j] + T[j + 1])/2
+           else (T[j]+T[j+1])/2 + (T[j+1]-T[j])/2*exp(-w_wnom/sigma);
          Qw[j] = (Tw[j] - Tvol[j])*gamma*omega*l*Nt;
       end for;
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
                 graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+        Documentation(info="<html>
+<p>This component assumes a uniform heat transfer coefficient gamma_nom*(w/wnom_ht)^alpha. When w/wnom_ht &LT; beta the heat transfer coefficient stops decreasing, to avoid numerical problems at low flows.</p>
+<p>If useAverageTemperature=false, the outlet fluid temperature of each volume is used to compute the heat transfer, otherwise the average temperature between inlet and outlet is used.</p>
+<p>In the latter case, the temperature distribution is accurately predicted if N &GT; NTU. However, non-physical temperature distributions and numerical problems can arise at low flows, when NTU increases. If adaptiveAverageTemperature=true, then the outlet temperature is used instead of the average one when w/wnom_ht &lt; sigma. This leads to physically realistic temperature distributions and better numerical properties at low or zero flows.</p>
+</html>"));
     end FlowDependentHeatTransferCoefficient;
 
     model FlowDependentThermalConductance
@@ -1032,7 +1061,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
                 graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+        Documentation(info="<html>Same as <a href=\"FlowDependentHeatTransferCoefficient\">FlowDependentHeatTransferCoefficient</a>, except that
+the global nominal thermal conductance UAnom is given instead of the nominal specific heat transfer coefficient.
+</html>"));
     end FlowDependentThermalConductance;
 
     model DittusBoelter "Dittus-Boelter heat transfer correlation"

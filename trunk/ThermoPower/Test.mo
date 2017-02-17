@@ -8706,6 +8706,142 @@ Casella</a>:<br>
 </html>"));
     end TestFlowDependentHeatTransferCoefficient2ph;
 
+    model TestWaterFlow1DFV_AdaptiveAverageTemp
+      "Test case for Water.Flow1DFV"
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
+        constrainedby Modelica.Media.Interfaces.PartialPureSubstance;
+      parameter Integer Nnodes=4 "Number of nodes";
+      parameter Integer Nt = 5 "Number of tubes";
+      parameter Modelica.SIunits.Length Lhex=2 "Total length";
+      parameter Modelica.SIunits.Diameter Dihex=0.02 "Internal diameter";
+      final parameter Modelica.SIunits.Radius rhex=Dihex/2 "Internal radius";
+      final parameter Modelica.SIunits.Length omegahex=Modelica.Constants.pi*Dihex
+        "Internal perimeter";
+      final parameter Modelica.SIunits.Area Ahex=Modelica.Constants.pi*rhex^2
+        "Internal cross section";
+      parameter Real Cfhex=0.005 "Friction coefficient";
+      parameter Modelica.SIunits.MassFlowRate whex=0.31
+        "Nominal mass flow rate";
+      parameter Modelica.SIunits.Pressure phex=3e5 "Initial pressure";
+      parameter Modelica.SIunits.SpecificEnthalpy hs=Medium.specificEnthalpy_pT(phex,293.15)
+        "Initial inlet specific enthalpy";
+      parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma = 5000
+        "Fixed heat transfer coefficient";
+      Real cp = Medium.specificHeatCapacityCp(hex.fluidState[1]);
+      Real NTU = (Nt*Lhex*Dihex*3.1415*gamma)/(whex*Medium.specificHeatCapacityCp(hex.fluidState[1]))
+        "Number of heat transfer units";
+      Real alpha = 1-exp(-NTU)
+        "Steady state gain of outlet temperature vs. external temperature";
+
+      Water.ValveLin valve(Kv=2*whex/phex)      annotation (
+          Placement(transformation(extent={{26,-22},{46,-2}}, rotation=0)));
+      Water.SourceMassFlow fluidSource(
+        w0=whex,
+        p0=phex,
+        h=hs,
+        use_in_w0=true)
+              annotation (Placement(transformation(extent={{-70,-22},{-50,-2}},
+              rotation=0)));
+      Water.SinkPressure      fluidSink(p0=phex/2, h=hs) annotation (Placement(
+            transformation(extent={{74,-22},{94,-2}}, rotation=0)));
+      Modelica.Blocks.Sources.Constant temperature(k=293.15 + 50) annotation (
+          Placement(transformation(extent={{-34,16},{-18,32}}, rotation=0)));
+      Modelica.Blocks.Sources.Constant valveOpening(k=1) annotation (Placement(
+            transformation(extent={{12,12},{28,28}}, rotation=0)));
+      Water.SensT T_in(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{-40,-18},{-20,2}},
+              rotation=0)));
+      Water.SensT T_out(redeclare package Medium = Medium)
+        annotation (Placement(transformation(extent={{50,-18},{70,2}}, rotation=
+               0)));
+      inner System system
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+      Thermal.TempSource1DFV tempSource(Nw=Nnodes - 1)
+        annotation (Placement(transformation(extent={{-12,2},{8,22}})));
+      Water.Flow1DFV hex(
+        redeclare package Medium = Medium,
+        N=Nnodes,
+        L=Lhex,
+        A=Ahex,
+        omega=omegahex,
+        Dhyd=Dihex,
+        wnom=whex,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        Cfnom=Cfhex,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Liquid,
+        pstart=phex,
+        hstartin=hs,
+        hstartout=hs,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        Nt=Nt,
+        dpnom=1000,
+        redeclare model HeatTransfer =
+            Thermal.HeatTransferFV.FlowDependentHeatTransferCoefficient (
+            gamma_nom=gamma,
+            alpha=0.8,
+            adaptiveAverageTemperature=true))
+        annotation (Placement(transformation(extent={{-12,-22},{8,-2}})));
+      Modelica.Blocks.Sources.Ramp massFlowRate(
+        offset=whex,
+        startTime=10,
+        duration=10,
+        height=-whex) annotation (Placement(transformation(extent={{-94,8},{-78,24}},
+                      rotation=0)));
+    equation
+      connect(T_in.inlet,fluidSource. flange) annotation (Line(
+          points={{-36,-12},{-36,-12},{-50,-12}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(valve.outlet, T_out.inlet)     annotation (Line(
+          points={{46,-12},{54,-12}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(T_out.outlet,fluidSink. flange) annotation (Line(
+          points={{66,-12},{74,-12}},
+          thickness=0.5,
+          color={0,0,255}));
+      connect(valveOpening.y, valve.cmd)
+        annotation (Line(points={{28.8,20},{36,20},{36,-4}}, color={0,0,127}));
+      connect(T_in.outlet, hex.infl)      annotation (Line(
+          points={{-24,-12},{-12,-12}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(hex.outfl, valve.inlet)          annotation (Line(
+          points={{8,-12},{26,-12}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(tempSource.wall, hex.wall)          annotation (Line(
+          points={{-2,9},{-2,-7}},
+          color={255,127,0},
+          smooth=Smooth.None));
+      connect(temperature.y, tempSource.temperature) annotation (Line(
+          points={{-17.2,24},{-2,24},{-2,16}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(massFlowRate.y, fluidSource.in_w0)
+        annotation (Line(points={{-77.2,16},{-64,16},{-64,-6}}, color={0,0,127}));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,
+                -100},{100,100}})),
+        experiment(StopTime=200, Tolerance=1e-006),
+        __Dymola_experimentSetupOutput,
+        Documentation(info="<html>
+<p>This model is designed to test the adaptive average temperature mechanism of the <a href=\"modelica://Thermal.HeatTransferFV.FlowDependentHeatTransferCoefficient\">FlowDependentHeatTransferCoefficient</a> model.
+<p>This model represent the fluid side of a heat exchanger with convective thermal exchange agains an external source of constant and uniform temperature. The number of transfer units at the beginning of the transient with the nominal flow rate is NTU = 2.42. </p>
+<p>By computing the heat transfer with the average volume temperatures, using three finite volumes the outlet temperature is computed at 66.17 degC, which is very close to the theoretical value 20+50*(1-exp(-NTU))=65.55. </p>
+<p>After 10 seconds, the mass flow rate is rapidly reduced to zero. Thanks to the adaptive average temperature feature, when the flows gets below 10% of the nominal value, the heat transfer is computed as a function of the volume outlet temperatures instead of the average inlet/outlet temperature. As a consequence, all the temperatures correctly move to the value of the heat source</p>
+<p>If the adaptiveAverageTemperature parameter of the heat transfer model is set to false, the values of the temperature along the heat exchanger approach non-physical values, some of them above the source temperature, and lead to a singularity when the flow rate is exactly zero.</p>
+<p>Simulation Interval = [0...200] sec </p>
+<p>Integration Algorithm = DASSL </p>
+<p>Algorithm Tolerance = 1e-6 </p>
+</html>", revisions="<html>
+<p><ul>
+<li>18 Feb 2017 by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br/>First release.</li>
+</ul></p>
+</html>"));
+    end TestWaterFlow1DFV_AdaptiveAverageTemp;
+
     package OldTests "Contains tests for old Flow1D components"
       extends Modelica.Icons.ExamplesPackage;
 
