@@ -50,7 +50,7 @@ package Examples "Application examples"
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=1800),
-        dpnom=1000,
+        dpnom=100,
         pstart=6000000) annotation (Placement(transformation(
             origin={-149,-60},
             extent={{-20,-19},{20,19}},
@@ -324,7 +324,8 @@ package Examples "Application examples"
         A=5.62e-5,
         Kfc=2,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic,
-        dpnom=80000)
+        dpnom=80000,
+        state(d(start=750)))
                  annotation (Placement(transformation(extent={{-70,-180},{-40,
                 -150}},
               rotation=0)));
