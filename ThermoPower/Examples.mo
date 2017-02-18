@@ -19,12 +19,11 @@ package Examples "Application examples"
         afd=0.0,
         gl=300,
         Ks=100,
-        pstart=60e5,
         hvstart=2.78e6,
         tauc=5,
         gv=150,
         hlstart=1.15e5,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
+        pstart=6000000)                                       annotation (
           Placement(transformation(extent={{-120,6},{-60,66}},  rotation=0)));
       Water.SourceMassFlow
                     FeedWater(h=1.1059e6,
@@ -48,7 +47,6 @@ package Examples "Application examples"
         hstartin=1.15e6,
         hstartout=1.15e6,
         DynamicMomentum=false,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=1800),
@@ -74,7 +72,6 @@ package Examples "Application examples"
         e=1.2e-3,
         wnom=0.23,
         hstartin=1.15e6,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         redeclare model HeatTransfer =
@@ -100,13 +97,14 @@ package Examples "Application examples"
         e=9.9e-4,
         hstartin=1.6e6,
         hstartout=1.6e6,
-        initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=10000),
         dpnom=17000,
-        pstart=6000000) annotation (Placement(transformation(
+        pstart=6000000,
+        noInitialPressure=true)
+                        annotation (Placement(transformation(
             origin={-22,-25},
             extent={{-19,18},{19,-18}},
             rotation=90)));
@@ -128,14 +126,12 @@ package Examples "Application examples"
         hstartin=2.777e6,
         hstartout=2.777e6,
         Cfnom=0.004,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        dpnom=2000,
-        pstart=6000000,
         redeclare model HeatTransfer =
-          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000))
-                        annotation (Placement(transformation(extent={{-56,44},{
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000),
+        dpnom=2000,
+        pstart=6000000) annotation (Placement(transformation(extent={{-56,44},{
                 -18,80}},  rotation=0)));
       Water.Flow1DFV2ph SH(
         redeclare package Medium = Medium,
@@ -153,11 +149,11 @@ package Examples "Application examples"
         e=1.7e-3,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP,
+        redeclare model HeatTransfer =
+          ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB(gamma_b=20000),
         dpnom=170000,
         pstart=5900000,
-        redeclare model HeatTransfer =
-          ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB(gamma_b=20000))
+        noInitialPressure=true)
                         annotation (Placement(transformation(extent={{-4,44},{
                 32,80}},  rotation=0)));
       Water.Flow1DFV2ph
@@ -176,14 +172,12 @@ package Examples "Application examples"
         hstartin=2.8e6,
         hstartout=2.8e6,
         Cfnom=0.004,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
-        dpnom=1000,
-        pstart=5600000,
         redeclare model HeatTransfer =
-          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000))
-                        annotation (Placement(transformation(extent={{48,44},{
+          ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000),
+        dpnom=1000,
+        pstart=5600000) annotation (Placement(transformation(extent={{48,44},{
                 86,80}},  rotation=0)));
       Water.ValveVap Valve(
         redeclare package Medium = Medium,
@@ -213,9 +207,9 @@ package Examples "Application examples"
         gamma=2000,
         Cm=4.08e6*4.51e-4,
         hstart=1.1e6,
+        pstart=6118000,
         Tmstart=540,
-        pstart=61.18e5,
-        initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) annotation (
+        noInitialPressure=true)                                  annotation (
           Placement(transformation(extent={{-128,-186},{-88,-146}},  rotation=0)));
       Water.Header HeaderUpper(
         redeclare package Medium = Medium,
@@ -223,10 +217,10 @@ package Examples "Application examples"
         S=7.184e-2,
         gamma=2000,
         Cm=4.08e6*4.51e-4,
-        pstart=60.2e5,
-        Tmstart=540,
         hstart=1.6e6,
-        initOpt=ThermoPower.Choices.Init.Options.steadyStateNoP) annotation (
+        pstart=6020000,
+        Tmstart=540,
+        noInitialPressure=true)                                  annotation (
           Placement(transformation(
             origin={-21,-78},
             extent={{-16,-17},{16,17}},
@@ -239,7 +233,6 @@ package Examples "Application examples"
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         Nw=1,
         Tstart1=540,
         TstartN=540)                                          annotation (
@@ -255,7 +248,6 @@ package Examples "Application examples"
         lambda=19,
         rhomcm=4.08e6,
         WallRes=true,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         Nw=6,
         Nt=6,
         Tstart1=548,
@@ -272,7 +264,6 @@ package Examples "Application examples"
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         Nw=1,
         Tstart1=548,
         TstartN=548)                                          annotation (
@@ -288,7 +279,6 @@ package Examples "Application examples"
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         Nw=1,
         Tstart1=548,
         TstartN=548)                                          annotation (
@@ -304,7 +294,6 @@ package Examples "Application examples"
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         Nw=4,
         Tstart1=551,
         TstartN=551)                                          annotation (
@@ -320,7 +309,6 @@ package Examples "Application examples"
         rhomcm=4.08e6,
         lambda=19,
         WallRes=true,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
         Nw=1,
         Tstart1=548,
         TstartN=548)                                          annotation (
@@ -361,7 +349,7 @@ package Examples "Application examples"
       Modelica.Blocks.Interfaces.RealInput FeedWaterEnthalpy annotation (
           Placement(transformation(extent={{-190,76},{-170,96}},   rotation=0),
             iconTransformation(extent={{-120,31},{-102,49}})));
-      inner System system(allowFlowReversal=false)
+      inner System system(allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{146,-130},{184,-94}})));
     equation
       connect(Pipe2Drum.infl, HeaderUpper.outlet) annotation (Line(
@@ -466,7 +454,7 @@ package Examples "Application examples"
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-220,-200},{200,180}},
-            initialScale=0.1), graphics),
+            initialScale=0.1)),
         Documentation(info="<HTML>
 <p>This is the model of the CISE steam generation plant described in the paper: F. Casella, A. Leva, \"Modelica open library for power plant simulation: design and experimental validation\", <i>Proceedings of the 2003 Modelica Conference</i>, Link&ouml eping, Sweden, 2003.
 <p>The geometric parameters are already set. The start values set in the model parameters are guess values around the nominal full load steady state (60 bar drum pressure).
