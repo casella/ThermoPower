@@ -1,6 +1,6 @@
 within ThermoPower;
 package PowerPlants "Models of thermoelectrical power plants components"
-  extends Modelica.Icons.Package;
+  extends Modelica.Icons.ExamplesPackage;
   import ThermoPower.Choices.Init.Options;
 
   package GasTurbine
@@ -18910,6 +18910,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
   package Simulators
     "Simulators for steam power plants and simple combined cycles"
+    extends Modelica.Icons.ExamplesPackage;
+    
     model SteamPlant_Sim1
       "Test total plant with levels control and ratio control on the condenser, inlet valves"
       package FlueGasMedium = ThermoPower.Media.FlueGas;
