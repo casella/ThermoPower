@@ -17466,22 +17466,18 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             thickness=0.5));
         connect(generator.powerConnection, powerSensor.port_a) annotation (Line(
             points={{-22.2,5.32907e-016},{0.6,5.32907e-016},{0.6,0},{12,0}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(frequencySensor.port, generator.powerConnection) annotation (
             Line(
             points={{10,-60},{0,-60},{0,5.32907e-016},{-22.2,5.32907e-016}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(powerSensor.port_b, breaker.connection1) annotation (Line(
             points={{28,-0.16},{34,-0.16},{34,-3.55271e-016},{50.8,-3.55271e-016}},
-            pattern=LinePattern.None,
             thickness=0.5));
 
         connect(breaker.connection2, grid.connection) annotation (Line(
             points={{85.2,-3.55271e-016},{86,-3.1606e-022},{86,0},{94,0},{94,
                 3.55271e-016},{102.8,3.55271e-016}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(ActuatorsBus.breakerClosed, breaker.closed) annotation (Line(
               points={{200,-140},{68,-140},{68,-16}}, color={213,255,170}));
@@ -17552,30 +17548,24 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(powerSensor_B.port_a, generator_B.powerConnection) annotation (
             Line(
             points={{10,-100},{-24.2,-100}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(frequencySensor_B.port, generator_B.powerConnection)
           annotation (Line(
             points={{8,-160},{0,-160},{0,-100},{-24.2,-100}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(breaker_B.connection1, powerSensor_B.port_b) annotation (Line(
             points={{62.8,-100},{35.7,-100},{35.7,-100.2},{30,-100.2}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(breaker_A.connection1, powerSensor_A.port_b) annotation (Line(
             points={{62.8,100},{35.7,100},{35.7,99.8},{30,99.8}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(powerSensor_A.port_a, generator_A.powerConnection) annotation (
             Line(
             points={{10,100},{-24.2,100}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(frequencySensor_A.port, generator_A.powerConnection)
           annotation (Line(
             points={{10,170},{0,170},{0,100},{-24.2,100}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(damper_B.flange_a, shaft_B) annotation (Line(
             points={{-120,-20},{-140,-20},{-140,-100},{-200,-100}},
@@ -17621,11 +17611,9 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
                 28.2,-160}}, color={255,170,213}));
         connect(grid.connection_B, breaker_B.connection2) annotation (Line(
             points={{142.8,12},{120,12},{120,-100},{97.2,-100}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(grid.connection_A, breaker_A.connection2) annotation (Line(
             points={{142.8,28},{120,28},{120,100},{97.2,100}},
-            pattern=LinePattern.None,
             thickness=0.5));
         annotation (Diagram(graphics));
       end DoubleShaft_static;
@@ -17690,38 +17678,30 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
       equation
         connect(fixed.flange, damper_B.flange_b) annotation (Line(
             points={{-100,-176},{-100,-40},{-120,-40}},
-            color={0,0,0},
             thickness=0.5));
         connect(damper_C.flange_b, fixed.flange) annotation (Line(
             points={{-120,-160},{-100,-160},{-100,-176}},
-            color={0,0,0},
             thickness=0.5));
         connect(fixed.flange, damper_A.flange_b) annotation (Line(
             points={{-100,-176},{-100,80},{-120,80}},
-            color={0,0,0},
             thickness=0.5));
         connect(inertia_C.flange_b, generator_C.shaft) annotation (Line(
             points={{-120,-120},{-75.8,-120}},
-            color={0,0,0},
             thickness=0.5));
         connect(generator_C.powerConnection, powerSensor_C.port_a) annotation (
             Line(
             points={{-24.2,-120},{20,-120}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(powerSensor_C.port_b, breaker_C.connection1) annotation (Line(
             points={{40,-120.2},{48,-120.2},{48,-120},{62.8,-120}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(breaker_B.connection1, powerSensor_B.port_b) annotation (Line(
             points={{62.8,3.55271e-016},{53.55,3.55271e-016},{53.55,-0.2},{40,-0.2}},
-            pattern=LinePattern.None,
             thickness=0.5));
 
         connect(powerSensor_B.port_a, generator_B.powerConnection) annotation (
             Line(
             points={{20,0},{13.6,0},{13.6,5.32907e-016},{-24.2,5.32907e-016}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(generator_B.shaft, inertia_B.flange_b) annotation (Line(
             points={{-75.8,5.32907e-016},{-76,5.32907e-016},{-76,0},{-120,0}},
@@ -17746,27 +17726,22 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(generator_A.powerConnection, powerSensor_A.port_a) annotation (
             Line(
             points={{-24.2,120},{20,120}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(powerSensor_A.port_b, breaker_A.connection1) annotation (Line(
             points={{40,119.8},{48,119.8},{48,120},{62.8,120}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(frequencySensor_A.port, generator_A.powerConnection)
           annotation (Line(
             points={{20,160},{0,160},{0,120},{-24.2,120}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(frequencySensor_B.port, generator_B.powerConnection)
           annotation (Line(
             points={{20,40},{0,40},{0,0},{-6,0},{-6,5.32907e-016},{-24.2,
                 5.32907e-016}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(frequencySensor_C.port, generator_C.powerConnection)
           annotation (Line(
             points={{20,-80},{0,-80},{0,-120},{-24.2,-120}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(damper_C.flange_a, shaft_C) annotation (Line(
             points={{-140,-160},{-160,-160},{-160,-120},{-200,-120}},
@@ -17810,15 +17785,12 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         connect(grid_3in.connection_B, breaker_B.connection2) annotation (Line(
             points={{142.8,3.55271e-016},{96,-3.1606e-022},{96,3.55271e-016},{
                 97.2,3.55271e-016}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(grid_3in.connection_C, breaker_C.connection2) annotation (Line(
             points={{142.8,-16},{120,-16},{120,-120},{97.2,-120}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(grid_3in.connection_A, breaker_A.connection2) annotation (Line(
             points={{142.8,16},{120,16},{120,120},{97.2,120}},
-            pattern=LinePattern.None,
             thickness=0.5));
         annotation (Diagram(graphics));
       end TripleShaft_static;
@@ -17851,7 +17823,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           initOpt=if SSInit then ThermoPower.Choices.Init.Options.steadyState
                else ThermoPower.Choices.Init.Options.noInit) annotation (
             Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-        Modelica.Mechanics.Rotational.Components.Damper damper(d=d_shaft)
+        Modelica.Mechanics.Rotational.Components.Damper damper(d=d_shaft, phi_rel(
+              fixed=true))
           annotation (Placement(transformation(extent={{-100,-60},{-80,-40}},
                 rotation=0)));
         Modelica.Mechanics.Rotational.Components.Fixed fixed annotation (
@@ -17868,16 +17841,13 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
         connect(generator.powerConnection, powerSensor.port_a) annotation (Line(
             points={{-44.2,5.32907e-016},{20,5.32907e-016},{20,0}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(frequencySensor.port, generator.powerConnection) annotation (
             Line(
             points={{20,50},{-20,50},{-20,5.32907e-016},{-44.2,5.32907e-016}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(network.powerConnection, powerSensor.port_b) annotation (Line(
             points={{80,3.55271e-016},{40,3.55271e-016},{40,-0.2}},
-            pattern=LinePattern.None,
             thickness=0.5));
         connect(ActuatorsBus.ConnectedGenerator, network.closed) annotation (
             Line(points={{200,-140},{140,-140},{140,40},{100,40},{100,19.4}},
@@ -18911,7 +18881,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
   package Simulators
     "Simulators for steam power plants and simple combined cycles"
     extends Modelica.Icons.ExamplesPackage;
-    
+
     model SteamPlant_Sim1
       "Test total plant with levels control and ratio control on the condenser, inlet valves"
       package FlueGasMedium = ThermoPower.Media.FlueGas;
