@@ -3987,7 +3987,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
           color={0,0,0},
           thickness=0.5));
       annotation (experiment(StopTime=5), Documentation(info="<html>
-This is a simplified model of a turbojet-type engine at 11.000m [1], at costant speed.
+This is a simplified model of a turbojet-type engine at 11.000m [1], at constant speed.
 <p>Simulate the model for 20s. At time t = 1 the fuel flow rate is reduced by 10%; the engine slows down accordingly.
 <p><b>References:</b></p>
 <ol>
@@ -5080,7 +5080,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       parameter Real Cfhex=0.005 "friction coefficient";
       parameter Modelica.SIunits.MassFlowRate whex=0.31
         "nominal mass flow rate";
-      parameter Modelica.SIunits.Pressure phex=3e5 "intial pressure";
+      parameter Modelica.SIunits.Pressure phex=3e5 "initial pressure";
       parameter Modelica.SIunits.SpecificEnthalpy hs=1e5
         "initial inlet specific enthalpy";
 
@@ -8828,7 +8828,7 @@ Casella</a>:<br>
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
 <p>This model is designed to test the adaptive average temperature mechanism of the <a href=\"modelica://Thermal.HeatTransferFV.FlowDependentHeatTransferCoefficient\">FlowDependentHeatTransferCoefficient</a> model.
-<p>This model represent the fluid side of a heat exchanger with convective thermal exchange agains an external source of constant and uniform temperature. The number of transfer units at the beginning of the transient with the nominal flow rate is NTU = 2.42. </p>
+<p>This model represent the fluid side of a heat exchanger with convective thermal exchange against an external source of constant and uniform temperature. The number of transfer units at the beginning of the transient with the nominal flow rate is NTU = 2.42. </p>
 <p>By computing the heat transfer with the average volume temperatures, using three finite volumes the outlet temperature is computed at 66.17 degC, which is very close to the theoretical value 20+50*(1-exp(-NTU))=65.55. </p>
 <p>After 10 seconds, the mass flow rate is rapidly reduced to zero. Thanks to the adaptive average temperature feature, when the flows gets below 10% of the nominal value, the heat transfer is computed as a function of the volume outlet temperatures instead of the average inlet/outlet temperature. As a consequence, all the temperatures correctly move to the value of the heat source</p>
 <p>If the adaptiveAverageTemperature parameter of the heat transfer model is set to false, the values of the temperature along the heat exchanger approach non-physical values, some of them above the source temperature, and lead to a singularity when the flow rate is exactly zero.</p>
