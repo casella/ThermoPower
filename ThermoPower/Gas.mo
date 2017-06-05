@@ -1632,7 +1632,7 @@ package Gas "Models of components with ideal gases as working fluid"
     gas.Xi = homotopy(if not allowFlowReversal then inStream(inlet.Xi_outflow)
        else actualStream(inlet.Xi_outflow), inStream(inlet.Xi_outflow));
 
-    pin - pout = homotopy(smooth(1, Kf*squareReg(w, wnom*wnf))/gas.d, dpnom/
+    pin - pout = homotopy(smooth(1, Kf_a*squareReg(w, wnom*wnf))/gas.d, dpnom/
       wnom*w) "Flow characteristics";
 
     //Boundary conditions
