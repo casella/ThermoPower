@@ -369,7 +369,8 @@ package Thermal "Thermal models of heat transfer"
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Temperature Tvolstart[Nw]=
-      Functions.linspaceExt(Tstart1, TstartN, Nw);
+      Functions.linspaceExt(Tstart1, TstartN, Nw)
+          annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=system.initOpt
       "Initialisation option"
       annotation (Dialog(tab="Initialisation"));
@@ -572,7 +573,8 @@ package Thermal "Thermal models of heat transfer"
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Temperature Tvolstart[Nw]=
-      Functions.linspaceExt(Tstart1, TstartN, Nw);
+      Functions.linspaceExt(Tstart1, TstartN, Nw)
+          annotation (Dialog(tab="Initialisation"));
     parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
