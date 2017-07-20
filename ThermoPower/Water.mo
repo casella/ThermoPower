@@ -905,7 +905,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
-    Medium.ThermodynamicState liquidState(p(start=pext),h(start=hstart))
+    Medium.ThermodynamicState liquidState
       "Thermodynamic state of the liquid";
     parameter SI.Area A "Cross-sectional area";
     parameter SI.Volume V0=0 "Volume at zero level";
