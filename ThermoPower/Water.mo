@@ -222,8 +222,7 @@ package Water "Models of components with water/steam as working fluid"
     parameter Medium.SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
-    parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
-                                                                                annotation(Dialog(group="External inputs"), choices(checkBox=true));
+    parameter Boolean use_in_w0 = false "Use connector input for the mass flow" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_h = false
       "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
@@ -299,8 +298,7 @@ package Water "Models of components with water/steam as working fluid"
     parameter Medium.SpecificEnthalpy h=1e5 "Nominal specific enthalpy";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
-    parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
-                                                                                annotation(Dialog(group="External inputs"), choices(checkBox=true));
+    parameter Boolean use_in_w0 = false "Use connector input for the mass flow" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_h = false
       "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
@@ -374,8 +372,7 @@ package Water "Models of components with water/steam as working fluid"
     parameter Medium.MassFlowRate w0=0 "Nominal mass flow rate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
-    parameter Boolean use_in_w0 = false "Use connector input for the mass flow"
-                                                                                annotation(Dialog(group="External inputs"), choices(checkBox=true));
+    parameter Boolean use_in_w0 = false "Use connector input for the mass flow" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     Medium.MassFlowRate w "Mass flow rate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -4260,6 +4257,168 @@ li><i>1 Jul 2004</i>
 </ul>
 </html>"));
   end PumpMech;
+
+  model SprayCondenser
+    "Model of a spray condenser  assuming  themodynamic equilibrium between the phases"
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+      annotation(choicesAllMatching = true);
+    parameter SI.Volume Vt "Condenser total volume";
+    parameter SI.Volume V0 "Volume of liquid at zero level";
+    parameter SI.Height y0 "Height of liquid outlet over the zero level";
+    parameter SI.Area A "Cross section";
+                                          outer ThermoPower.System system "System wide properties";
+    parameter SI.Pressure pstart "Pressure start value"
+      annotation (Dialog(tab="Initialisation"));
+    parameter SI.Height ystart "Start value of the level"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    constant SI.Acceleration g = Modelica.Constants.g_n "Acceleration of gravity";
+
+    Medium.SaturationProperties sat "Saturation conditions";
+    FlangeA coolingWater(redeclare package Medium = Medium, m_flow(min=0)) annotation (
+        Placement(transformation(extent={{-100,20},{-60,60}}, rotation=0),
+          iconTransformation(extent={{-100,20},{-60,60}})));
+    FlangeA condensingSteam(redeclare package Medium = Medium, m_flow(min=0)) annotation (
+        Placement(transformation(extent={{-20,80},{20,120}}, rotation=0),
+          iconTransformation(extent={{-20,80},{20,120}})));
+    FlangeB liquidOutlet(redeclare package Medium = Medium) annotation (
+        Placement(transformation(extent={{-20,-120},{20,-80}}, rotation=0),
+          iconTransformation(extent={{-20,-120},{20,-80}})));
+    SI.Mass Ml "Liquid water mass";
+    SI.Mass Mv "Steam mass";
+    SI.Mass M "Total liquid+steam mass";
+    SI.Energy E "Total energy";
+    SI.Volume Vl "Liquid water total volume";
+    SI.Volume Vv "Steam volume";
+    SI.Height y(start = ystart, stateSelect=StateSelect.prefer) "Level relative to zero reference";
+    Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
+      "Steam pressure";
+    Medium.AbsolutePressure pl "Pressure at the liquid outlet";
+    Medium.MassFlowRate qs "Condensing steam inlet mass flow rate";
+    Medium.MassFlowRate qc "Cooling water  inlet mass flow rate";
+    Medium.MassFlowRate ql "Saturated liquid outlet flow rate";
+    Medium.SpecificEnthalpy hs "Condensing steam specific enthalpy";
+    Medium.SpecificEnthalpy hc "Cooling water specific enthalpy";
+    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
+    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
+    Medium.Temperature Ts "Saturation temperature";
+    Units.LiquidDensity rhol "Density of saturated liquid";
+    Units.GasDensity rhov "Density of saturated steam";
+  equation
+    Ml = Vl*rhol "Mass of liquid";
+    Mv = Vv*rhov "Mass of vapour";
+    M = Ml + Mv "Total mass";
+    E = Ml*hl + Mv*hv - p*Vt "Total energy";
+    Vl = V0 + A*y "Volume - level relationship";
+    Ts = Medium.saturationTemperature_sat(sat) "Saturation temperature";
+    der(M) = qs + qc - ql "Mass balance";
+    der(E) = qs*hs + qc*hc - ql*hl "Energy balance";
+    Vt = Vl + Vv "Total volume";
+    pl = p + rhol*g*(y + y0) "Static head between steam and liquid outlet";
+
+    // Boundary conditions
+    p =coolingWater.p;
+    p =condensingSteam.p;
+    pl = liquidOutlet.p;
+    condensingSteam.m_flow = qs;
+    coolingWater.m_flow = qc;
+    -liquidOutlet.m_flow = ql;
+    hs = inStream(condensingSteam.h_outflow);
+    hc = inStream(coolingWater.h_outflow);
+    condensingSteam.h_outflow = hv "Not used, no flow reversal";
+    coolingWater.h_outflow = hl "Not used, no flow reversal";
+    liquidOutlet.h_outflow = hl;
+
+    // Fluid properties
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    rhol = Medium.bubbleDensity(sat);
+    rhov = Medium.dewDensity(sat);
+    hl = Medium.bubbleEnthalpy(sat);
+    hv = Medium.dewEnthalpy(sat);
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      y = ystart;
+    elseif initOpt == Choices.Init.Options.steadyState then
+      if not noInitialPressure then
+        der(p) = 0;
+      end if;
+      der(y) = 0;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+    annotation (
+      Documentation(info="<html>
+<p>Model of a spray condenser. Thermodynamic equilibrium and perfect phase separation is assumed between the vapour and liquid phase, the condensate outlet pressure takes into account the static head due to the liquid level. The model assumes a cylindrical geometry with vertical axis in its validity range; by choosing Vt, V0, and y0 appropriately, any shape can be represented for the top and bottom of the vessel.  </p>
+</html>", revisions="<html>
+<ul>
+<li><i>26 Jul 2017</i> <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>First release.</li>
+</ul>
+</html>"),   Icon(graphics={
+          Rectangle(
+            extent={{-60,60},{60,-60}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Ellipse(
+            extent={{-60,80},{60,40}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Ellipse(
+            extent={{-60,-40},{60,-80}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Ellipse(
+            extent={{-52,74},{52,44}},
+            lineColor={0,0,191},
+            pattern=LinePattern.None,
+            fillColor={159,159,223},
+            fillPattern=FillPattern.Solid),
+          Rectangle(
+            extent={{-52,2},{52,-60}},
+            lineColor={0,0,191},
+            fillColor={0,0,191},
+            fillPattern=FillPattern.Solid),
+          Rectangle(
+            extent={{-52,60},{52,0}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={159,159,223},
+            fillPattern=FillPattern.Solid),
+          Ellipse(
+            extent={{-52,-44},{52,-74}},
+            lineColor={0,0,191},
+            pattern=LinePattern.None,
+            fillColor={0,0,191},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{-60,38},{2,38},{2,44},{-60,44},{-60,38}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{2,38},{-10,26},{12,26},{2,38}},
+            lineColor={0,0,255},
+            fillColor={0,0,235},
+            fillPattern=FillPattern.Solid)}));
+  end SprayCondenser;
 
   function f_chen "Chen's correlation for two-phase flow in a tube"
 

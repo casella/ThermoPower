@@ -2520,6 +2520,82 @@ Algorithm Tolerance = 1e-4
           smooth=Smooth.None));
       annotation (Diagram(graphics));
     end TestTurbine;
+
+    model TestSprayCondenser
+      extends Modelica.Icons.Example;
+      Water.SprayCondenser condenser(
+        y0=2,
+        ystart=0,
+        Vt=0.1,
+        V0=0.05,
+        A=0.025,
+        pstart=50000)
+        annotation (Placement(transformation(extent={{-20,-20},{20,20}})));
+      Water.SourceMassFlow steamFlow(h=3000e3, w0=0.1)
+        annotation (Placement(transformation(extent={{-60,30},{-40,50}})));
+      Water.SourceMassFlow coolingFlow(
+        w0=1,
+        h=100e3,
+        use_in_w0=true)
+        annotation (Placement(transformation(extent={{-60,-2},{-40,18}})));
+      Water.SinkPressure sinkPressure
+        annotation (Placement(transformation(extent={{30,-90},{50,-70}})));
+      Water.Flow1DFV pip(
+        L=5,
+        H=-5,
+        A=3e-4,
+        omega=0.1,
+        wnom=1,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        Cfnom=0.005,
+        HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
+        hstartin=300e3,
+        hstartout=300e3,
+        noInitialPressure=true,
+        dpnom=1000,
+        pstart=100000) annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={0,-46})));
+      inner System system(allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+      Modelica.Blocks.Sources.Step step(
+        height=0.1,
+        offset=1,
+        startTime=10)
+        annotation (Placement(transformation(extent={{-88,14},{-68,34}})));
+      Water.SensT1 steamTemperature
+        annotation (Placement(transformation(extent={{-10,52},{10,72}})));
+      Water.SensT1 coolingWaterTemperature
+        annotation (Placement(transformation(extent={{-40,14},{-20,34}})));
+      Water.SensT1 condensateTemperature
+        annotation (Placement(transformation(extent={{16,-26},{36,-6}})));
+    equation
+      connect(steamFlow.flange, condenser.condensingSteam) annotation (Line(
+            points={{-40,40},{-22,40},{0,40},{0,20}}, color={0,0,255}));
+      connect(coolingFlow.flange, condenser.coolingWater)
+        annotation (Line(points={{-40,8},{-16,8}}, color={0,0,255}));
+      connect(condenser.liquidOutlet, pip.infl) annotation (Line(points={{0,-20},
+              {0,-36},{1.77636e-015,-36}}, color={0,0,255}));
+      connect(pip.outfl, sinkPressure.flange) annotation (Line(points={{
+              -1.77636e-015,-56},{0,-56},{0,-70},{0,-80},{30,-80}}, color={0,0,
+              255}));
+      connect(step.y, coolingFlow.in_w0) annotation (Line(points={{-67,24},{-54,
+              24},{-54,14}}, color={0,0,127}));
+      connect(condenser.condensingSteam, steamTemperature.flange)
+        annotation (Line(points={{0,20},{0,20},{0,58}}, color={0,0,255}));
+      connect(condenser.coolingWater, coolingWaterTemperature.flange)
+        annotation (Line(points={{-16,8},{-30,8},{-30,20}}, color={0,0,255}));
+      connect(condenser.liquidOutlet, condensateTemperature.flange)
+        annotation (Line(points={{0,-20},{14,-20},{26,-20}}, color={0,0,255}));
+      annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+            coordinateSystem(preserveAspectRatio=false)),
+        Documentation(info="<html>
+<p>This test model represents a barometric condenser, where a spray condenser is kept under sub-atmospheric pressure by a vertical pipe discharging to the atmosphere.</p>
+<p>The model is started in steady-state, with 0.1 kg/s of steam at 262 degC is condensed by 1 kg/s of cooling water at 23.8 degC, resulting in a condensate flow at 86.8 degC. The level is -0.57 m below the zero reference.</p>
+<p>At time = 10, the cooling flow is increased by 10&percnt;. As a consequence, the condenser transitions to a lower temperature, corresponding to a level of 1.05 m above the reference, due to the lowered condensation pressure.</p>
+</html>"));
+    end TestSprayCondenser;
   end WaterComponents;
 
   package GasComponents "Tests for lumped-parameters Gas package components"
