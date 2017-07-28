@@ -1975,10 +1975,29 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 
     function constantEfficiency "Constant efficiency characteristic"
       extends baseEfficiency;
-      input Real eta_nom "Nominal efficiency" annotation(Dialog);
+      input SI.PerUnit eta_nom "Nominal efficiency" annotation(Dialog);
     algorithm
       eta := eta_nom;
     end constantEfficiency;
+
+    function quadraticEfficiency "Quadratic efficiency characteristic"
+      extends baseEfficiency;
+      input SI.VolumeFlowRate q_nom[3]
+        "Volume flow rate for three operating points (single pump)" annotation(Dialog);
+      input SI.PerUnit eta_nom[3] "Efficiency for three operating points";
+    protected
+      Real eta_nom2[3]={eta_nom[1]^2,eta_nom[2]^2,eta_nom[3]^2}
+        "Squared efficiencies";
+      /* Linear system to determine the coefficients:
+  eta_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  eta_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  eta_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+      Real c[3]=Modelica.Math.Matrices.solve([ones(3), eta_nom, eta_nom2], eta_nom)
+        "Coefficients of quadratic power consumption curve";
+    algorithm
+      eta := c[1] + q_flow*c[2] + q_flow^2*c[3];
+    end quadraticEfficiency;
 
     function polynomialFlow_rel
       "Polynomial flow characteristic relative to design point"
