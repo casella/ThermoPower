@@ -4420,6 +4420,211 @@ li><i>1 Jul 2004</i>
             fillPattern=FillPattern.Solid)}));
   end SprayCondenser;
 
+  model CoolingTower "Cooling tower with variable speed fan"
+    import Modelica.SIunits.Conversions;
+    package Water = Modelica.Media.Water.StandardWater;
+    package DryAir = Modelica.Media.Air.SimpleAir;
+
+    outer ThermoPower.System system "System object";
+
+    ThermoPower.Water.FlangeA waterInlet annotation (Placement(transformation(
+            extent={{-10,80},{10,100}}), iconTransformation(extent={{-10,80},{10,100}})));
+    ThermoPower.Water.FlangeB waterOutlet annotation (Placement(transformation(
+            extent={{-10,-100},{10,-80}}), iconTransformation(extent={{-10,-100},{
+              10,-80}})));
+    Modelica.Blocks.Interfaces.RealInput fanRpm "Fan rotational speed in rpm"
+      annotation (Placement(transformation(extent={{-100,60},{-60,100}}),
+          iconTransformation(extent={{-90,30},{-70,50}})));
+
+      Modelica.Blocks.Interfaces.RealOutput powerConsumption
+      "Total fan power consumption"
+      annotation (Placement(transformation(extent={{74,-10},{94,10}})));
+    parameter Boolean staticModel = false "= true for a static model";
+    parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt "Initialization option"
+       annotation (Dialog(tab="Initialisation"));
+    parameter Integer Nt "Number of towers in parallel";
+    parameter Integer N(min = 2) = 10 "Number of nodes";
+    parameter SI.Mass M0
+      "Water hold-up at zero water flow rate (single column)";
+    parameter SI.Mass Mnom
+      "Water hold-up at nominal water flow rate (single tower)";
+    parameter SI.MassFlowRate wlnom
+      "Nominal water mass flow rate (single tower)";
+    parameter SI.VolumeFlowRate qanom
+      "Nominal air volume flow rate (single tower)";
+    parameter SI.Density rhoanom "Nominal air density";
+    parameter SI.Mass Mp "Mass of packaging";
+    parameter SI.SpecificHeatCapacity cp "Specific heat of packaging";
+    parameter SI.Area S "Surface of packaging";
+    parameter SI.CoefficientOfHeatTransfer gamma_wp_nom
+      "Nominal heat transfer coefficient water-packing";
+    parameter Real k_wa_nom(final unit = "kg/m2")
+      "Nominal total heat transfer coefficient per unit surface";
+    parameter SI.PerUnit nu_a
+      "Exponent of air flow rate in mass & heat transfer coefficients";
+    parameter SI.PerUnit nu_l
+      "Exponent of liquid flow rate in mass & heat transfer coefficients";
+    parameter Real rpm_nom "Nominal fan rotational speed [rpm]";
+    parameter SI.Power Wnom "Nominal power consumption (single tower)";
+    parameter SI.Pressure patm = 101325 "Atmospheric pressure";
+    parameter SI.Mass Mstart[N-1] = ones(N-1)*Mnom/(N-1) "Start value of water holdup in each volume"
+       annotation (Dialog(tab="Initialisation"));
+    parameter SI.SpecificEnthalpy hlstart[N] = fill(120e3,N) "Start values of liquid enthalpy at volume boundaries"
+      annotation (Dialog(tab="Initialisation"));
+    parameter SI.Temperature Tpstart[N-1] = ones(N-1)*(30+273.15) "Start value of packaging temperature in each volume"
+       annotation (Dialog(tab="Initialisation"));
+    parameter SI.Temperature Twbstart = system.T_wb "Start value of average wet bulb temperature"
+      annotation (Dialog(tab="Initialisation"));
+    final parameter SI.MassFlowRate wanom = qanom*rhoanom
+      "Nominal air mass flow rate";
+
+
+    constant Real MMv = 0.029;
+    constant Real MMa = 0.018;
+
+    SI.MassFlowRate wl[N] "Water flow rate";
+    SI.MassFlowRate wa(start = qanom*rhoanom) "Dry air flow rate";
+    SI.MassFlowRate wev[N-1] "Evaporation flow rate";
+    SI.VolumeFlowRate qfan "Air volume flow rate through fan";
+    Water.SpecificEnthalpy hl[N] "Water specific enthalpy";
+    DryAir.SpecificEnthalpy ha[N]
+      "Specific enthalpy of saturated humid air @ Twb, per unit dry mass";
+    SI.SpecificEnthalpy hw[N]
+      "Specific enthalpy of saturated humid air @ water temperature, per unit dry mass";
+    Water.SpecificEnthalpy hvw[N]
+      "Specific enthalpy of saturated steam at water temperature";
+    Water.SpecificEnthalpy hva[N]
+      "Specific enthalpy of saturated steam at interface (i.e. Twb)";
+    DryAir.SpecificEnthalpy haw[N]
+      "Dry air specific enthalpy @ liquid temperature";
+    DryAir.SpecificEnthalpy haa[N]
+      "Dry air specific enthalpy @ interface (i.e. Twb)";
+    Water.AbsolutePressure pvw[N] "Saturation pressure at water temperature";
+    Water.AbsolutePressure pva[N](each start = 5000, each nominal = 5000)
+      "Saturation pressure at interface (i.e. Twb)";
+    SI.MassFraction Xvw[N](each start = 0.01)
+      "Absolute humidity (Mv/Ma_dry) of saturated air at the liquid temperature";
+    SI.MassFraction Xva[N](each start = 0.01)
+      "Absolute humidity (Mv/Ma_dry) of air at the interface";
+    Water.Temperature Tl[N](each start = 300) "Water temperature";
+    Water.Temperature Twb[N](each start = Twbstart)
+      "Wet bulb temperature of air at interface";
+    SI.Mass M[N-1](each stateSelect = StateSelect.prefer,
+                   each start = Mnom/(N-1)) "Water hold-up";
+    Water.SpecificEnthalpy hltilde[N-1](start = hlstart[2:N], stateSelect = StateSelect.prefer)
+      "Specific enthalpy state variable";
+    SI.Temperature Tp[N-1](stateSelect = StateSelect.prefer,
+                           start = Tpstart) "Packing temperature";
+    SI.Power Qlp[N-1] "Thermal power transfer water->packing";
+    SI.Power Q[N-1] "Total thermal power transfer water->air interface (@Twb)";
+    SI.Power W "Power consumption of the fan (single column)";
+    SI.Power Wtot "Power consumption of the fans (all columns)";
+    SI.CoefficientOfHeatTransfer gamma_wp[N](each start = gamma_wp_nom)
+      "Heat transfer coefficient water-packing";
+    Real k_wa(start = k_wa_nom)
+      "Total heat transfer coefficient per unit surface";
+
+    SI.Temperature Tlin "Inlet water temperature";
+    SI.Temperature Tlout "Outlet water temperature";
+
+  equation
+    for i in 1:N-1 loop
+      if staticModel then
+        0 = wl[i] - wl[i+1] - wev[i];
+        0 = wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] - Qlp[i];
+        0 = Qlp[i];
+      else
+        der(M[i]) = wl[i] - wl[i+1] - wev[i];
+        der(M[i])*hltilde[i] + M[i]*der(hltilde[i]) =
+            wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] - Qlp[i];
+        cp*Mp/(N-1)*der(Tp[i]) = Qlp[i];
+      end if;
+
+      wa*Xva[i+1] + wev[i] = wa*Xva[i] "vapour mass balance in air";
+      wa*ha[i+1] + Q[i] = wa*ha[i] "energy balance @ air interface";
+
+      hltilde[i] = hl[i+1];
+
+      Q[i] = ((hw[i] + hw[i+1])/2 - (ha[i] + ha[i+1])/2)*S/(N-1)*k_wa;
+      Qlp[i] = ((Tl[i] + Tl[i+1])/2 - Tp[i])*S/(N-1)*gamma_wp[i];
+      wl[i+1] = (M[i] - M0/(N-1))/(Mnom/(N-1) - M0/(N-1))*wlnom;
+    end for;
+
+    for i in 1:N loop
+      Tl[i] = Water.temperature_ph(patm, hl[i]);
+      pvw[i] = Water.saturationPressure(Tl[i]);
+      pva[i] = Water.saturationPressure(Twb[i]);
+      hvw[i] = Water.dewEnthalpy(Water.setSat_T(Tl[i]));
+      hva[i] = Water.dewEnthalpy(Water.setSat_T(Twb[i]));
+      haw[i] = DryAir.specificEnthalpy(DryAir.setState_pT(patm, Tl[i]));
+      haa[i] = DryAir.specificEnthalpy(DryAir.setState_pT(patm, Twb[i]));
+      pvw[i]/patm = Xvw[i]*MMa/(Xvw[i]*MMa+MMv)
+        "Saturation conditions @ liquid temperature";
+      pva[i]/patm = Xva[i]*MMa/(Xva[i]*MMa+MMv)
+        "Saturation conditions @ interface (i.e. Twb)";
+      hw[i] = haw[i] + hvw[i]*Xvw[i];
+      ha[i] = haa[i] + hva[i]*Xva[i];
+
+      gamma_wp[i] = gamma_wp_nom*max(wl[i]/wlnom, 0.3)^nu_l;
+    end for;
+
+    k_wa = k_wa_nom*max(wa/wanom, 0.3)^nu_a*max(wl[1]/wlnom, 0.3)^nu_l;
+    qfan = qanom*fanRpm/rpm_nom;
+    wa = qfan*rhoanom "Dry air flow roughly equal to humid air flow (+/- 1%)";
+    W = Wnom*(fanRpm/rpm_nom)^3;
+    Wtot = W*Nt;
+
+    // Boundary conditions
+    wl[1] = waterInlet.m_flow/Nt;
+    wl[N] = -waterOutlet.m_flow/Nt;
+    waterInlet.p = patm;
+    hl[1] = inStream(waterInlet.h_outflow);
+    waterInlet.h_outflow = hltilde[1];
+    waterOutlet.h_outflow = hl[N];
+    Twb[N] = system.T_wb;
+
+    powerConsumption = Wtot;
+
+    // Monitoring variables
+    Tlin = Tl[1];
+    Tlout = Tl[N];
+
+  initial equation
+    if not staticModel and initOpt == ThermoPower.Choices.Init.Options.steadyState then
+      der(M) = zeros(N-1);
+      der(hltilde) = zeros(N-1);
+      der(Tp) = zeros(N-1);
+    elseif not staticModel and initOpt == ThermoPower.Choices.Init.Options.fixedState then
+      M = Mstart;
+      hltilde = hlstart[2:N];
+      Tp = Tpstart;
+    end if;
+    annotation (Icon(graphics={Polygon(
+            points={{-60,80},{-100,-80},{100,-80},{60,80},{-60,80}},
+            lineColor={0,0,0},
+            smooth=Smooth.None,
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid), Polygon(
+            points={{-12,26},{-28,26},{-40,38},{-28,52},{-12,52},{12,26},{30,26},{
+                40,38},{30,52},{12,52},{0,38},{-12,26}},
+            lineColor={0,0,0},
+            smooth=Smooth.None,
+            fillColor={255,255,255},
+            fillPattern=FillPattern.Solid)}), Documentation(info="<html>
+<p>This model represents a cooling tower with variable speed fans, filled with metallic packaging.</p>
+<p>The mass and heat transfer from the hot water to humid ambient air is modelled according to Merkel&apos;s equation: the driving force for heat and mass transfer is the difference between the specific enthalpy of saturated humid air at the water temperature per unit dry air mass, and the specific enthalpy of saturated humid air at the wet bulb temperature Twb per unit dry air mass. The wet bulb temperature of incoming air is given by the settings of the system object.</p>
+<p>The 1D counter-current heat and mass transfer equations are discretized by the finite volume method, with <code>N-1</code> volumes; average quantities between volume inlet and volume outlet are used to compute the driving force of the mass and energy transfer.</p>
+<p>Humid air is modelled as an ideal mixture of dry air and steam, using the IF97 water-steam model.</p>
+<p>The hold-up of water in the packaging is modelled assuming a simple linear relationship between the hold-up in each volume and the corresponding outgoing flow, which is calibrated by the <code>Mnom</code> and <code>M0</code> parameters. The energy storage in the water hold-up and in the packaging is accounted for.</p>
+<p>The behaviour of the fan is modelled by kinematic similarity; the air flow is proportional to the fan rpm, while the consumption is proportional to the cube of the fan rpm.</p>
+<p>Is it possible to neglect all dynamic behaviour and get a static model by setting <code>staticModel=true</code>.</p>
+</html>",   revisions="<html>
+<ul>
+<li><i>28 Jul 2017</i> <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>First release.</li>
+</ul>
+</html>"));
+  end CoolingTower;
+
   function f_chen "Chen's correlation for two-phase flow in a tube"
 
     input SI.MassFlowRate w "Mass flowrate";

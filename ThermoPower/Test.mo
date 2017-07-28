@@ -2596,6 +2596,68 @@ Algorithm Tolerance = 1e-4
 <p>At time = 10, the cooling flow is increased by 10&percnt;. As a consequence, the condenser transitions to a lower temperature, corresponding to a level of 1.05 m above the reference, due to the lowered condensation pressure.</p>
 </html>"));
     end TestSprayCondenser;
+
+    model TestCoolingTower
+      extends Modelica.Icons.Example;
+      package Water = Modelica.Media.Water.StandardWater;
+      ThermoPower.Water.CoolingTower coolingTower(
+        Nt=5,
+        M0=0.7*4300,
+        Mnom=4300,
+        wlnom=504/3600*995,
+        qanom=99,
+        rhoanom=1.2,
+        Mp=2000,
+        cp=680,
+        rpm_nom=230,
+        Wnom(displayUnit="kW") = 42000,
+        N=10,
+        gamma_wp_nom=10,
+        S=8700,
+        k_wa_nom=1.08e-2,
+        nu_a=1,
+        nu_l=0)
+        annotation (Placement(transformation(extent={{-20,0},{20,40}})));
+      ThermoPower.Water.SourceMassFlow sourceW(
+        h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
+        w0=2520/3600*995)
+        annotation (Placement(transformation(extent={{-52,50},{-32,70}})));
+      ThermoPower.Water.SinkPressure
+                              sinkP
+        annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
+      Modelica.Blocks.Sources.Ramp fanRpm(
+        duration=1,
+        offset=230,
+        height=-20)
+        annotation (Placement(transformation(extent={{-82,26},{-62,46}})));
+      inner ThermoPower.System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          T_wb=287.15)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+    equation
+      connect(sourceW.flange, coolingTower.waterInlet) annotation (Line(
+          points={{-32,60},{0,60},{0,38}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(coolingTower.waterOutlet, sinkP.flange) annotation (Line(
+          points={{0,2},{0,-28},{12,-28}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(fanRpm.y, coolingTower.fanRpm) annotation (Line(
+          points={{-61,36},{-38,36},{-38,28},{-16,28}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      annotation (
+        Diagram(graphics),
+        experiment(
+          StartTime=-50,
+          StopTime=200,
+          Tolerance=1e-006),
+        experimentSetupOutput(equdistant=false),
+        Documentation(info="<html>
+<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 22.5 degC using air with wet bulb temperature at 14 degC.</p>
+<p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
+</html>"));
+    end TestCoolingTower;
   end WaterComponents;
 
   package GasComponents "Tests for lumped-parameters Gas package components"

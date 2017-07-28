@@ -9,9 +9,19 @@ model System "System wide properties and defaults"
   // Assumptions
   parameter Boolean allowFlowReversal=true
     "= false to restrict to design flow direction (flangeA -> flangeB)"
-    annotation (Evaluate=true);
-  parameter Choices.Init.Options initOpt = ThermoPower.Choices.Init.Options.fixedState;
+    annotation (
+      Evaluate=true,
+      Dialog(group="Simulation options"));
+  parameter Choices.Init.Options initOpt = ThermoPower.Choices.Init.Options.fixedState
+    annotation(Dialog(group="Simulation options"));
   // parameter ThermoPower.Choices.System.Dynamics Dynamics=ThermoPower.Choices.System.Dynamics.DynamicFreeInitial;
+
+  parameter SI.Pressure p_amb = 101325 "Ambient pressure"
+    annotation(Dialog(group="Ambient conditions"));
+  parameter SI.Temperature T_amb = 293.15 "Ambient Temperature (dry bulb)"
+    annotation(Dialog(group="Ambient conditions"));
+  parameter SI.Temperature T_wb = 288.15 "Ambient temperature (wet bulb)"
+    annotation(Dialog(group="Ambient conditions"));
   annotation (
     defaultComponentName="system",
     defaultComponentPrefixes="inner",
@@ -1974,8 +1984,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       "Polynomial flow characteristic relative to design point"
       extends baseFlow_rel;
       input Real q_nom[:]
-        "Non - dimensional volume flow rate for N operating points (single pump)"
-                                                                                  annotation(Dialog);
+        "Non - dimensional volume flow rate for N operating points (single pump)" annotation(Dialog);
       input Real head_nom[:]
         "Non - dimensional pump head for N operating points"                      annotation(Dialog);
     protected
@@ -2155,15 +2164,13 @@ This characteristic is such that the relative change of the flow coefficient is 
       extends baseFlow;
       input Real bladePos_nom[:];
       input SI.VolumeFlowRate q_nom[3, :]
-        "Volume flow rate for three operating points at N_pos blade positionings"
-                                                                                  annotation(Dialog);
+        "Volume flow rate for three operating points at N_pos blade positionings" annotation(Dialog);
       input SI.Height H_nom[3, :]
         "Specific work for three operating points at N_pos blade positionings" annotation(Dialog);
       input Real slope_s(
         unit="(J/kg)/(m3/s)",
         max=0) = 0
-        "Slope of flow characteristic at stalling conditions (must be negative)"
-                                                                                 annotation(Dialog);
+        "Slope of flow characteristic at stalling conditions (must be negative)" annotation(Dialog);
     algorithm
       H := Utilities.quadraticFlowBlades(
               q_flow,
