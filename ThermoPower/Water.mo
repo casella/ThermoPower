@@ -906,7 +906,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Thermodynamic state of the liquid";
     parameter SI.Area A "Cross-sectional area";
     parameter SI.Volume V0=0 "Volume at zero level";
-    parameter Medium.AbsolutePressure pext=1.01325e5 "Surface pressure";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -921,12 +920,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.SpecificEnthalpy h(start=hstart, stateSelect=StateSelect.prefer)
       "Liquid specific enthalpy";
     Medium.SpecificEnthalpy hin "Inlet specific enthalpy";
+    Medium.SpecificEnthalpy htop "Top inlet specific enthalpy";
     Medium.SpecificEnthalpy hout "Outlet specific enthalpy";
-    Medium.AbsolutePressure p(start=pext) "Bottom pressure";
+    Medium.AbsolutePressure p(start=system.p_amb) "Bottom pressure";
     constant SI.Acceleration g=Modelica.Constants.g_n;
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{-100,-80},{-60,-40}}, rotation=0)));
+    FlangeA inletTop(redeclare package Medium = Medium, m_flow(min=0)) annotation (
+       Placement(transformation(extent={{-100,-80},{-60,-40}}, rotation=0),
+          iconTransformation(extent={{-20,60},{20,100}})));
     FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
             allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
        Placement(transformation(extent={{60,-80},{100,-40}}, rotation=0)));
@@ -938,23 +941,26 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
   equation
     // Set liquid properties
-    liquidState = Medium.setState_ph(pext, h);
+    liquidState = Medium.setState_ph(system.p_amb, h);
 
     V = V0 + A*y "Liquid volume";
     M = V*Medium.density(liquidState) "Liquid mass";
     H = M*Medium.specificInternalEnergy(liquidState) "Liquid enthalpy";
-    der(M) = inlet.m_flow + outlet.m_flow "Mass balance";
-    der(H) = inlet.m_flow*hin + outlet.m_flow*hout "Energy balance";
-    p - pext = Medium.density(liquidState)*g*y "Stevino's law";
+    der(M) = inlet.m_flow + inletTop.m_flow + outlet.m_flow "Mass balance";
+    der(H) = inlet.m_flow*hin + inletTop.m_flow*htop + outlet.m_flow*hout "Energy balance";
+    p - system.p_amb = Medium.density(liquidState)*g*y "Stevin's law";
 
     // Boundary conditions
     hin = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow)
-       else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
+                     else actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
+    htop = inStream(inletTop.h_outflow);
     hout = homotopy(if not allowFlowReversal then h else actualStream(outlet.h_outflow),
       h);
     inlet.h_outflow = h;
+    inletTop.h_outflow = h "dummy, not used";
     outlet.h_outflow = h;
     inlet.p = p;
+    inletTop.p = system.p_amb;
     outlet.p = p;
   initial equation
     if initOpt == Choices.Init.Options.noInit then
@@ -974,23 +980,18 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     end if;
 
     annotation (
-      Icon(graphics={Text(extent={{-100,90},{100,64}}, textString="%name")}),
+      Icon(graphics={Text(extent={{-100,-90},{100,-116}},
+                                                       textString="%name")}),
       Documentation(info="<html>
-<p>This model describes a simple free-surface cylindrical water tank. The model is based on mass and energy balances, assuming that no heat transfer takes place except through the inlet and outlet flows.
+<p>This model describes a simple free-surface cylindrical water tank. The model is based on mass and energy balances, assuming that no heat transfer takes place except through the inlet and outlet flows. </p>
+<p>The pressure at the inlet and outlet ports is the ambient pressure plus the static head due to the level, while the pressure at the inletTop port is the ambient pressure.</p>
 </html>", revisions="<html>
 <ul>
-<li><i>30 May 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Initialisation support added.</li>
-<li><i>16 Dec 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Standard medium definition added.</li>
-<li><i>22 Jun 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Improved equations and adapted to Modelica.Media.
-<li><i>1 Oct 2003</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
+<li><i>29 Jul 2017</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>Added inletTop port.</li>
+<li><i>30 May 2005</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>Initialisation support added.</li>
+<li><i>16 Dec 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>Standard medium definition added.</li>
+<li><i>22 Jun 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>Improved equations and adapted to Modelica.Media. </li>
+<li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>First release.</li>
 </ul>
 </html>"),
       Diagram(graphics));
