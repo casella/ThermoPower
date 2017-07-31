@@ -1986,14 +1986,14 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
         "Volume flow rate for three operating points (single pump)" annotation(Dialog);
       input SI.PerUnit eta_nom[3] "Efficiency for three operating points";
     protected
-      Real eta_nom2[3]={eta_nom[1]^2,eta_nom[2]^2,eta_nom[3]^2}
+      Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
         "Squared efficiencies";
       /* Linear system to determine the coefficients:
   eta_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
   eta_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
   eta_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
   */
-      Real c[3]=Modelica.Math.Matrices.solve([ones(3), eta_nom, eta_nom2], eta_nom)
+      Real c[3]=Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2], eta_nom)
         "Coefficients of quadratic power consumption curve";
     algorithm
       eta := c[1] + q_flow*c[2] + q_flow^2*c[3];
