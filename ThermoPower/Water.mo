@@ -906,6 +906,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Thermodynamic state of the liquid";
     parameter SI.Area A "Cross-sectional area";
     parameter SI.Volume V0=0 "Volume at zero level";
+    parameter SI.Height y0 = 0 "Height of zero level over inlet and outlet flanges";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
     outer ThermoPower.System system "System wide properties";
@@ -948,7 +949,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     H = M*Medium.specificInternalEnergy(liquidState) "Liquid enthalpy";
     der(M) = inlet.m_flow + inletTop.m_flow + outlet.m_flow "Mass balance";
     der(H) = inlet.m_flow*hin + inletTop.m_flow*htop + outlet.m_flow*hout "Energy balance";
-    p - system.p_amb = Medium.density(liquidState)*g*y "Stevin's law";
+    p - system.p_amb = Medium.density(liquidState)*g*(y+y0) "Stevin's law";
 
     // Boundary conditions
     hin = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow)
