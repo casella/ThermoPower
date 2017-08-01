@@ -4520,9 +4520,9 @@ li><i>1 Jul 2004</i>
       "Wet bulb temperature of air at interface";
     SI.Mass M[N-1](each stateSelect = StateSelect.prefer,
                    each start = Mnom/(N-1)) "Water hold-up";
-    Water.SpecificEnthalpy hltilde[N-1](start = hlstart[2:N], stateSelect = StateSelect.prefer)
+    Water.SpecificEnthalpy hltilde[N-1](start = hlstart[2:N], each stateSelect = StateSelect.prefer)
       "Specific enthalpy state variable";
-    SI.Temperature Tp[N-1](stateSelect = StateSelect.prefer,
+    SI.Temperature Tp[N-1](each stateSelect = StateSelect.prefer,
                            start = Tpstart) "Packing temperature";
     SI.Power Qlp[N-1] "Thermal power transfer water->packing";
     SI.Power Q[N-1] "Total thermal power transfer water->air interface (@Twb)";
