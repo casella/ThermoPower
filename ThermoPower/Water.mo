@@ -4280,6 +4280,9 @@ li><i>1 Jul 2004</i>
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialLevel=false
+      "Remove initial equation on level"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
     constant SI.Acceleration g = Modelica.Constants.g_n "Acceleration of gravity";
 
     Medium.SaturationProperties sat "Saturation conditions";
@@ -4351,12 +4354,16 @@ li><i>1 Jul 2004</i>
       if not noInitialPressure then
         p = pstart;
       end if;
-      y = ystart;
+      if not noInitialLevel then
+        y = ystart;
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
       if not noInitialPressure then
         der(p) = 0;
       end if;
-      der(y) = 0;
+      if not noInitialLevel then
+        der(y) = 0;
+      end if;
     else
       assert(false, "Unsupported initialisation option");
     end if;
