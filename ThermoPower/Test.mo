@@ -2597,7 +2597,7 @@ Algorithm Tolerance = 1e-4
 </html>"));
     end TestSprayCondenser;
 
-    model TestCoolingTower
+    model TestCoolingTower "Test of the cooling tower model"
       extends Modelica.Icons.Example;
       package Water = Modelica.Media.Water.StandardWater;
       ThermoPower.Water.CoolingTower coolingTower(
@@ -2658,6 +2658,21 @@ Algorithm Tolerance = 1e-4
 <p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
 </html>"));
     end TestCoolingTower;
+
+    model TestCoolingTowerStatic
+      "Test of the static model of the cooling tower"
+      extends TestCoolingTower(coolingTower(staticModel = true));
+      annotation (
+        experiment(
+          StartTime=-50,
+          StopTime=200,
+          Tolerance=1e-006),
+        Documentation(info="<html>
+<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 22.5 degC using air with wet bulb temperature at 14 degC.</p>
+<p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
+<p>The static model is employed in this case</p>
+</html>"));
+    end TestCoolingTowerStatic;
   end WaterComponents;
 
   package GasComponents "Tests for lumped-parameters Gas package components"
