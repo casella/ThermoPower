@@ -4451,7 +4451,7 @@ li><i>1 Jul 2004</i>
     parameter Boolean staticModel = false "= true for a static model";
     parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt "Initialization option"
        annotation (Dialog(tab="Initialisation"));
-    parameter Integer Nt "Number of towers in parallel";
+    parameter Integer Nt = 1 "Number of towers in parallel";
     parameter Integer N(min = 2) = 10 "Number of nodes";
     parameter SI.Mass M0
       "Water hold-up at zero water flow rate (single column)";
