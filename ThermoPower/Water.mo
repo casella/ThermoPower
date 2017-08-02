@@ -4518,12 +4518,18 @@ li><i>1 Jul 2004</i>
     Water.Temperature Tl[N](each start = 300) "Water temperature";
     Water.Temperature Twb[N](each start = Twbstart)
       "Wet bulb temperature of air at interface";
-    SI.Mass M[N-1](each stateSelect = StateSelect.prefer,
-                   each start = Mnom/(N-1)) "Water hold-up";
-    Water.SpecificEnthalpy hltilde[N-1](start = hlstart[2:N], each stateSelect = StateSelect.prefer)
+    SI.Mass M[N-1](
+      each start = Mnom/(N-1),
+      each stateSelect = if staticModel then StateSelect.default else StateSelect.prefer)
+       "Water hold-up";
+    Water.SpecificEnthalpy hltilde[N-1](
+      start = hlstart[2:N],
+      each stateSelect = if staticModel then StateSelect.default else StateSelect.prefer)
       "Specific enthalpy state variable";
-    SI.Temperature Tp[N-1](each stateSelect = StateSelect.prefer,
-                           start = Tpstart) "Packing temperature";
+    SI.Temperature Tp[N-1](
+      start = Tpstart,
+      each stateSelect = if staticModel then StateSelect.default else StateSelect.prefer)
+       "Packing temperature";
     SI.Power Qlp[N-1] "Thermal power transfer water->packing";
     SI.Power Q[N-1] "Total thermal power transfer water->air interface (@Twb)";
     SI.Power W "Power consumption of the fan (single column)";
