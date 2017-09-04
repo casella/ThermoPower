@@ -589,7 +589,7 @@ package Thermal "Thermal models of heat transfer"
   equation
     (Cm/Nw)*der(Tvol) = int.Q + ext.Q "Energy balance";
     if WallRes then
-      assert(UA_int > 0 and UA_ext > 0, "Assign postive values to UA_int, UA_ext");
+      assert(UA_int > 0 and UA_ext > 0, "Assign positive values to UA_int, UA_ext");
       ext.Q = (ext.T-Tvol)*UA_ext/Nw;
       int.Q = (int.T-Tvol)*UA_int/Nw;
     else

@@ -1497,7 +1497,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
 <li>Each tube has a length <tt>L</tt>, internal and external diameters <tt>Dint</tt> and <tt>Dext</tt>, and is made of a metal having density <tt>rhom</tt> and a specific heat capacity of <tt>cm</tt>. 
 <li>The series connection of the tubes is discretised with <tt>Nr+1</tt> nodes, so that each cell between two nodes corresponds to a single row.
 <li>The gas flow is also discretised with <tt>Nr+1</tt> nodes, so that each gas cell interacts with a single tube row. 
-<li>The gas flows through a volume having a (net) cross-section <tt>Sb</tt> and a (net) lenght <tt>Lb</tt>. 
+<li>The gas flows through a volume having a (net) cross-section <tt>Sb</tt> and a (net) length <tt>Lb</tt>. 
 <li>Mass and energy dynamic balances are assumed for the water side.
 <li>The mass and energy balances for the gas side are either static or dynamic, depending on the value of the <tt>StaticGasBalances</tt> parameter.
 <li>The fluid in the water side remains liquid throughout the boiler.
