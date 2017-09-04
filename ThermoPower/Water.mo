@@ -1303,8 +1303,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   model Flow1DFV2ph
     "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)"
     extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
-          StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
+          StandardWater "Medium model" constrainedby
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium,
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
     replaceable model HeatTransfer = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
