@@ -2309,9 +2309,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     "1-dimensional fluid flow model for water/steam (finite elements)"
     extends BaseClasses.Flow1DBase(
       Nw = N,
-      redeclare replaceable package Medium = StandardWater
-        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium
-        "Medium model");
+      redeclare replaceable package Medium = StandardWater "Medium model"
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium);
       replaceable model HeatTransfer =
         Thermal.HeatTransferFEM.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFEM
@@ -6261,8 +6260,8 @@ This model is not yet complete
     "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)"
     extends Modelica.Icons.ObsoleteModel;
     extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
-          StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model",
+          StandardWater "Medium model" constrainedby
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium,
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
     replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -7471,8 +7470,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
-          StandardWater constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model");
+          StandardWater "Medium model" constrainedby
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium);
     replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
