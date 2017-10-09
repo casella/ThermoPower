@@ -5,6 +5,89 @@ package Test "Test cases for the ThermoPower models"
   package WaterComponents
     "Tests for lumped-parameters Water package components"
     extends Modelica.Icons.ExamplesPackage;
+    model TestSources "Test source and sink components"
+        extends Modelica.Icons.Example;
+      Water.SourceMassFlow source_w_h(use_in_T=false)
+        annotation (Placement(transformation(extent={{-50,130},{-30,150}})));
+      Water.SinkMassFlow sink_w_h
+        annotation (Placement(transformation(extent={{30,-20},{50,0}})));
+      Water.SourceMassFlow source_w_T(
+        use_T=true,
+        use_in_T=false,
+        T=323.15)
+        annotation (Placement(transformation(extent={{-50,100},{-30,120}})));
+      Water.SourceMassFlow source_w_h_in(use_in_T=false, use_in_h=true)
+        annotation (Placement(transformation(extent={{-50,56},{-30,76}})));
+      Water.SourceMassFlow source_w_T_in(use_T=true, use_in_T=true)
+        annotation (Placement(transformation(extent={{-50,10},{-30,30}})));
+      Water.SinkMassFlow sink_w_T(use_T=true, T=323.15)
+        annotation (Placement(transformation(extent={{30,-50},{50,-30}})));
+      Water.SinkMassFlow sink_w_h_in(use_in_h=true)
+        annotation (Placement(transformation(extent={{30,-90},{50,-70}})));
+      Water.SinkMassFlow sink_w_T_in(use_T=true, use_in_T=true)
+        annotation (Placement(transformation(extent={{30,-130},{50,-110}})));
+      Water.SinkPressure sink_P_h
+        annotation (Placement(transformation(extent={{30,130},{50,150}})));
+      Water.SourcePressure source_P_h
+        annotation (Placement(transformation(extent={{-50,-20},{-30,0}})));
+      Water.SinkPressure sink_P_T(use_T=true, T=323.15)
+        annotation (Placement(transformation(extent={{30,100},{50,120}})));
+      Water.SourcePressure source_P_T(use_T=true, T=323.15)
+        annotation (Placement(transformation(extent={{-50,-50},{-30,-30}})));
+      Water.SourcePressure source_P_h_in(use_in_h=true)
+        annotation (Placement(transformation(extent={{-50,-90},{-30,-70}})));
+      Water.SourcePressure source_P_T_in(use_T=true, use_in_T=true)
+        annotation (Placement(transformation(extent={{-50,-130},{-30,-110}})));
+      Water.SinkPressure sink_P_h_in(use_in_h=true)
+        annotation (Placement(transformation(extent={{30,56},{50,76}})));
+      Water.SinkPressure sink_P_T_in(use_in_T=true, use_T=true)
+        annotation (Placement(transformation(extent={{30,10},{50,30}})));
+      Modelica.Blocks.Sources.RealExpression h_w(y=3e5)
+        annotation (Placement(transformation(extent={{-76,68},{-56,88}})));
+      Modelica.Blocks.Sources.RealExpression T_P(y=80 + 273.15)
+        annotation (Placement(transformation(extent={{-78,-114},{-58,-94}})));
+      Modelica.Blocks.Sources.RealExpression T_w(y=80 + 273.15)
+        annotation (Placement(transformation(extent={{-74,22},{-54,42}})));
+      Modelica.Blocks.Sources.RealExpression h_P(y=3e5)
+        annotation (Placement(transformation(extent={{-76,-74},{-56,-54}})));
+    equation
+      connect(source_w_h.flange, sink_P_h.flange) annotation (Line(points={{-30,
+              140},{0,140},{30,140}}, color={0,0,255}));
+      connect(source_w_T.flange, sink_P_T.flange) annotation (Line(points={{-30,
+              110},{-30,110},{30,110}}, color={0,0,255}));
+      connect(source_w_h_in.flange, sink_P_h_in.flange)
+        annotation (Line(points={{-30,66},{30,66}}, color={0,0,255}));
+      connect(source_w_T_in.flange, sink_P_T_in.flange)
+        annotation (Line(points={{-30,20},{30,20}}, color={0,0,255}));
+      connect(source_P_h.flange, sink_w_h.flange) annotation (Line(points={{-30,
+              -10},{0,-10},{30,-10}}, color={0,0,255}));
+      connect(source_P_T.flange, sink_w_T.flange)
+        annotation (Line(points={{-30,-40},{30,-40}}, color={0,0,255}));
+      connect(source_P_h_in.flange, sink_w_h_in.flange) annotation (Line(points
+            ={{-30,-80},{0,-80},{30,-80}}, color={0,0,255}));
+      connect(source_P_T_in.flange, sink_w_T_in.flange) annotation (Line(points
+            ={{-30,-120},{-2,-120},{30,-120}}, color={0,0,255}));
+      connect(h_w.y, source_w_h_in.in_h) annotation (Line(points={{-55,78},{-55,
+              78},{-34.8,78},{-34.8,71.6}}, color={0,0,127}));
+      connect(T_P.y, source_P_T_in.in_T) annotation (Line(points={{-57,-104},{
+              -40,-104},{-40,-110.4}}, color={0,0,127}));
+      connect(T_w.y, source_w_T_in.in_T) annotation (Line(points={{-53,32},{
+              -39.4,32},{-39.4,25.6}}, color={0,0,127}));
+      connect(h_P.y, source_P_h_in.in_h) annotation (Line(points={{-55,-64},{
+              -35.8,-64},{-35.8,-71.6}}, color={0,0,127}));
+      connect(h_w.y, sink_P_h_in.in_h) annotation (Line(points={{-55,78},{44.2,
+              78},{44.2,74.4}}, color={0,0,127}));
+      connect(T_w.y, sink_P_T_in.in_T) annotation (Line(points={{-53,32},{40,32},
+              {40,29.6}}, color={0,0,127}));
+      connect(h_P.y, sink_w_h_in.in_h) annotation (Line(points={{-55,-64},{-12,
+              -64},{45.2,-64},{45.2,-74.4}}, color={0,0,127}));
+      connect(T_P.y, sink_w_T_in.in_T) annotation (Line(points={{-57,-104},{-10,
+              -104},{40.6,-104},{40.6,-114.4}}, color={0,0,127}));
+      annotation (experiment(StopTime = 1),
+        Diagram(coordinateSystem(extent={{-100,-140},{100,160}})),
+        Icon(coordinateSystem(extent={{-100,-100},{120,100}})));
+    end TestSources;
+
     model TestMixer
         extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.StandardWater;
