@@ -1906,6 +1906,40 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       head := c[1] + q_flow*c[2] + q_flow^2*c[3];
     end quadraticFlow;
 
+    function quadraticFlowMonotonic
+      extends baseFlow;
+      input SI.VolumeFlowRate q_nom[3]
+        "Volume flow rate for three operating points (single pump)" annotation(Dialog);
+      input SI.Height head_nom[3] "Pump head for three operating points"
+                                               annotation(Dialog);
+    protected
+      parameter Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
+        "Squared nominal flow rates";
+      /* Linear system to determine the coefficients:
+  head_nom[1] = c[1] + q_nom[1]*c[2] + q_nom[1]^2*c[3];
+  head_nom[2] = c[1] + q_nom[2]*c[2] + q_nom[2]^2*c[3];
+  head_nom[3] = c[1] + q_nom[3]*c[2] + q_nom[3]^2*c[3];
+  */
+      parameter Real c[3]=Modelica.Math.Matrices.solve([ones(3), q_nom, q_nom2],
+          head_nom) "Coefficients of quadratic head curve";
+      
+      SI.Height hvertex "head value at vertex";
+      SI.VolumeFlowRate q99 "volume flowrate at 99% of hvertex";
+      SI.Height hmax "head value when q_flow = 0";    
+    algorithm
+      hvertex := c[1]-c[2]^2/(4*c[3]);
+      q99 := -(c[2]+sqrt(c[2]^2-4*c[3]*(c[1]-0.99*hvertex)))/(2*c[3]);
+      hmax := 0.99*hvertex - q99*(2*q99*c[3] + c[2]);
+      
+      if q_flow > q99 then
+        // quadratic flow equation
+        head := c[1] + q_flow*c[2] + q_flow^2*c[3];
+      else
+        // linear flow equation
+        head := q_flow*(c[2] + 2*q99*c[3]) + hmax;
+      end if;  
+    end quadraticFlowMonotonic;
+   
     function polynomialFlow "Polynomial flow characteristic"
       extends baseFlow;
       input SI.VolumeFlowRate q_nom[:]
