@@ -63,10 +63,10 @@ package Test "Test cases for the ThermoPower models"
               -10},{0,-10},{30,-10}}, color={0,0,255}));
       connect(source_P_T.flange, sink_w_T.flange)
         annotation (Line(points={{-30,-40},{30,-40}}, color={0,0,255}));
-      connect(source_P_h_in.flange, sink_w_h_in.flange) annotation (Line(points
-            ={{-30,-80},{0,-80},{30,-80}}, color={0,0,255}));
-      connect(source_P_T_in.flange, sink_w_T_in.flange) annotation (Line(points
-            ={{-30,-120},{-2,-120},{30,-120}}, color={0,0,255}));
+      connect(source_P_h_in.flange, sink_w_h_in.flange) annotation (Line(points=
+             {{-30,-80},{0,-80},{30,-80}}, color={0,0,255}));
+      connect(source_P_T_in.flange, sink_w_T_in.flange) annotation (Line(points=
+             {{-30,-120},{-2,-120},{30,-120}}, color={0,0,255}));
       connect(h_w.y, source_w_h_in.in_h) annotation (Line(points={{-55,78},{-55,
               78},{-34.8,78},{-34.8,71.6}}, color={0,0,127}));
       connect(T_P.y, source_P_T_in.in_T) annotation (Line(points={{-57,-104},{
@@ -2679,6 +2679,82 @@ Algorithm Tolerance = 1e-4
 <p>At time = 10, the cooling flow is increased by 10&percnt;. As a consequence, the condenser transitions to a lower temperature, corresponding to a level of 1.05 m above the reference, due to the lowered condensation pressure.</p>
 </html>"));
     end TestSprayCondenser;
+
+    model TestBarometricCondenser
+      extends Modelica.Icons.Example;
+      Water.SourceMassFlow steamFlow(h=3000e3,
+        w0=0.1,
+        use_in_w0=true)
+        annotation (Placement(transformation(extent={{-60,30},{-40,50}})));
+      Water.SourceMassFlow coolingFlow(
+        w0=1,
+        h=100e3,
+        use_in_w0=true,
+        use_T=true,
+        use_in_T=false,
+        T=293.15)
+        annotation (Placement(transformation(extent={{-60,-2},{-40,18}})));
+      inner System system(allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+      Water.SensT1 steamTemperature
+        annotation (Placement(transformation(extent={{-10,52},{10,72}})));
+      Water.SensT1 coolingWaterTemperature
+        annotation (Placement(transformation(extent={{-40,14},{-20,34}})));
+      Water.SensT1 condensateTemperature
+        annotation (Placement(transformation(extent={{12,-4},{32,16}})));
+      Water.BarometricCondenser barometricCondenser(
+        wnom=1,
+        Tt=5,
+        Tlstart=313.15)
+        annotation (Placement(transformation(extent={{-12,-18},{12,14}})));
+      Water.Tank tank(
+        A=0.1,
+        ystart=1,
+        initOpt=ThermoPower.Choices.Init.Options.fixedState,
+        hstart=168861)
+        annotation (Placement(transformation(extent={{32,-24},{52,-4}})));
+      Water.SinkMassFlow sinkMassFlow(w0=1.03)
+        annotation (Placement(transformation(extent={{68,-30},{88,-10}})));
+      Modelica.Blocks.Sources.TimeTable steamFlowRate(table=[0,0.07; 10,0.07;
+            10,0.035; 40,0.035; 40,0; 100,0])
+        annotation (Placement(transformation(extent={{-88,54},{-68,74}})));
+      Modelica.Blocks.Sources.TimeTable coolingFlowRate(table=[0,1; 20,1; 20,
+            0.5; 40,0.5; 40,0; 100,0])
+        annotation (Placement(transformation(extent={{-88,14},{-68,34}})));
+    equation
+      connect(coolingFlow.flange, barometricCondenser.coolingWater)
+        annotation (Line(points={{-40,8},{-26,8},{-12,8}}, color={0,0,255}));
+      connect(coolingWaterTemperature.flange, barometricCondenser.coolingWater)
+        annotation (Line(points={{-30,20},{-22,20},{-22,8},{-12,8}}, color={0,0,
+              255}));
+      connect(steamFlow.flange, barometricCondenser.condensingSteam)
+        annotation (Line(points={{-40,40},{-20,40},{0,40},{0,13.8}}, color={0,0,
+              255}));
+      connect(steamTemperature.flange, barometricCondenser.condensingSteam)
+        annotation (Line(points={{0,58},{0,13.8}}, color={0,0,255}));
+      connect(barometricCondenser.liquidOutlet, tank.inlet) annotation (Line(
+            points={{0,-17.2},{0,-20},{34,-20}}, color={0,0,255}));
+      connect(tank.outlet, sinkMassFlow.flange) annotation (Line(points={{50,
+              -20},{50,-20},{68,-20}}, color={0,0,255}));
+      connect(condensateTemperature.flange, tank.inlet)
+        annotation (Line(points={{22,2},{22,-20},{34,-20}}, color={0,0,255}));
+      connect(coolingFlowRate.y, coolingFlow.in_w0) annotation (Line(points={{
+              -67,24},{-54,24},{-54,13.6}}, color={0,0,127}));
+      connect(steamFlowRate.y, steamFlow.in_w0) annotation (Line(points={{-67,
+              64},{-62,64},{-54,64},{-54,45.6}}, color={0,0,127}));
+      annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+            coordinateSystem(preserveAspectRatio=false)),
+        Documentation(info="<html>
+<p>This model tests the barometric condenser.</p>
+<p>The model is started in steady-state, with 0.07 kg/s of steam at 262 degC is condensed by 1 kg/s of cooling
+water at 20 degC, resulting in a condensate flow at 65.6 degC.</p>
+<p>At time = 10, the steam flow is cut by 50 percent, so the outlet temperature drops by 22 degC.
+At time = 20, the cooling water flow is also cut by 50 percent, so the initial temperature is restored
+and the tank level starts dropping significantly. At time = 40, when both flows are cut to zero, the model remains well-posed; this
+feature can be useful if one wants to simulate circuits where some condensers may be brough off-duty during the simulation.</p>
+</html>"),
+        experiment(StopTime=50));
+    end TestBarometricCondenser;
 
     model TestCoolingTower "Test of the cooling tower model"
       extends Modelica.Icons.Example;

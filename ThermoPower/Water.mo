@@ -2309,8 +2309,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     "1-dimensional fluid flow model for water/steam (finite elements)"
     extends BaseClasses.Flow1DBase(
       Nw = N,
-      redeclare replaceable package Medium = StandardWater "Medium model"
-        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium);
+      redeclare replaceable package Medium = StandardWater
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium
+                                                           "Medium model");
       replaceable model HeatTransfer =
         Thermal.HeatTransferFEM.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFEM
@@ -4557,6 +4558,158 @@ li><i>1 Jul 2004</i>
             fillPattern=FillPattern.Solid)}));
   end SprayCondenser;
 
+  model BarometricCondenser
+    "Model of a barometric condenser including the barometric leg"
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+      annotation(choicesAllMatching = true);
+    parameter SI.Time Tr = 1 "Residence time of the droplets in the condenser";
+    parameter SI.MassFlowRate wnom "Nominal cooling water flow rate";
+    parameter SI.TemperatureDifference Tt = 5 "Terminal temperature difference";
+    parameter Boolean neglectLegDynamics = true "Neglect the dynamics of the barometric leg";
+
+    parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt "Initialization option"
+       annotation (Dialog(tab="Initialisation"));
+    parameter Medium.Temperature Tlstart = 293.15 "Liquid outlet temperature start value"
+     annotation (Dialog(tab="Initialisation"));
+
+    final parameter Medium.AbsolutePressure pstart = Medium.saturationPressure(Tlstart + Tt);
+    final parameter Medium.SpecificEnthalpy hlstart = Medium.specificEnthalpy_pT(pstart, Tlstart);
+
+    outer ThermoPower.System system "System wide properties";
+
+    Medium.Temperature Tl "Liquid outlet temperature";
+    Medium.SpecificEnthalpy hc "Cooling water specific enthalpy";
+    Medium.SpecificEnthalpy hv "Condensing steam specific enthalpy";
+    Medium.SpecificEnthalpy hl(start = hlstart, stateSelect = StateSelect.prefer)
+      "Liquid outlet specific enthalpy";
+
+    SI.MassFlowRate wc "Cooling water mass flow rate";
+    SI.MassFlowRate wv "Condensing steam inlet mass flow rate";
+    SI.MassFlowRate wl "Liquid outlet mass flow rate";
+
+    FlangeA coolingWater(redeclare package Medium = Medium, m_flow(min=0)) "Cooling water inlet"
+       annotation (Placement(transformation(extent={{-100,20},{-60,60}}, rotation=0),
+          iconTransformation(extent={{-140,80},{-100,120}})));
+    FlangeA condensingSteam(redeclare package Medium = Medium, m_flow(min=0)) "Condensing steam inlet"
+       annotation (
+        Placement(transformation(extent={{-20,80},{20,120}}, rotation=0),
+          iconTransformation(extent={{-20,138},{20,178}})));
+    FlangeB liquidOutlet(redeclare package Medium = Medium) "Liquid outlet" annotation (
+        Placement(transformation(extent={{-20,-120},{20,-80}}, rotation=0),
+          iconTransformation(extent={{-20,-172},{20,-132}})));
+
+    Medium.AbsolutePressure p(start=pstart) "Steam pressure in the condenser";
+
+  equation
+    wc + wv = wl;
+    Tr*wnom*der(hl) = wc*hc + wv*hv - wl*hl;
+    Tl = Medium.temperature_ph(p, hl);
+    p = Medium.saturationPressure(Tl + Tt);
+
+    assert(neglectLegDynamics, "Full leg dynamics not implemented yet");
+
+    // Boundary conditions
+    p = coolingWater.p;
+    p = condensingSteam.p;
+    wc = coolingWater.m_flow;
+    wv = condensingSteam.m_flow;
+    wl = -liquidOutlet.m_flow;
+    hv = inStream(condensingSteam.h_outflow);
+    hc = inStream(coolingWater.h_outflow);
+    condensingSteam.h_outflow = hv "Not used, no flow reversal";
+    coolingWater.h_outflow = hl "Not used, no flow reversal";
+    liquidOutlet.h_outflow = hl;
+
+  initial equation
+    if initOpt == ThermoPower.Choices.Init.Options.steadyState then
+      der(hl) = 0;
+    elseif initOpt == ThermoPower.Choices.Init.Options.fixedState then
+      hl = hlstart;
+    end if;
+
+    annotation (
+      Documentation(info="<html>
+<p>Model of a barometric condenser including the barometric leg.</p>
+<p>The incoming cooling water is sprayed in the condenser and mixes with the incoming steam flow. It is assumed that the residence time of the droplets in the condenser is equal to <code>Tr</code>. The pressure <code>p</code> in the condenser corresponds to the droplet temperature <code>Tl</code> plus the terminal temperature difference <code>Tt</code>, which is assumed to be constant for simplicity. </p>
+<p>In most cases, barometric condensers discharge into tanks that have a much larger diameter and a much larger mass storage than the barometric leg. Therefore, the effects of the leg dynamics, i.e. the changes of the level in the pipe and the delay between the temperature at the condenser outlet and the temperature at the pipe outlet, are negligible. By setting <code>neglectLegDynamics = true</code>, the mass flow rate and specific enthalpy at the barometric leg outlet are assumed to be the same as the ones at the condenser outlet. </p>
+<p>If <code>neglectLegDynamics</code> = false, the effects of mass, momentum and energy storage in the barometric leg are also accounted for. This is currently not yet implemented.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>26 Jul 2017</i> <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>First release.</li>
+</ul>
+</html>"),   Icon(coordinateSystem(extent={{-120,-160},{120,160}}),
+                  graphics={
+          Rectangle(
+            extent={{-60,128},{60,58}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Ellipse(
+            extent={{-60,140},{60,112}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Ellipse(
+            extent={{-52,132},{54,116}},
+            lineColor={0,0,191},
+            pattern=LinePattern.None,
+            fillColor={159,159,223},
+            fillPattern=FillPattern.Solid),
+          Rectangle(
+            extent={{-54,124},{54,58}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={159,159,223},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{-100,96},{2,96},{2,102},{-100,102},{-100,96}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{0,96},{-12,84},{10,84},{0,96}},
+            lineColor={0,0,255},
+            fillColor={0,0,235},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{-54,60},{56,60},{12,2},{-10,2},{-54,60}},
+            lineColor={159,159,223},
+            fillColor={159,159,223},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{-60,60},{-12,0},{-4,-2},{-54,60},{-60,60}},
+            lineColor={128,128,128},
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Polygon(
+            points={{54,60},{60,60},{12,2},{6,2},{54,60}},
+            lineColor={128,128,128},
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Rectangle(
+            extent={{-12,2},{12,-140}},
+            lineColor={0,0,255},
+            pattern=LinePattern.None,
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Solid),
+          Rectangle(
+            extent={{8,20},{-8,20}},
+            fillColor={159,159,223},
+            fillPattern=FillPattern.Solid,
+            pattern=LinePattern.None),
+          Rectangle(
+            extent={{6,2},{-6,-136}},
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid,
+            pattern=LinePattern.None,
+            lineColor={0,0,0})}),
+      Diagram(coordinateSystem(extent={{-120,-160},{120,160}})));
+  end BarometricCondenser;
+
   model CoolingTower "Cooling tower with variable speed fan"
     import Modelica.SIunits.Conversions;
     package Water = Modelica.Media.Water.StandardWater;
@@ -6260,8 +6413,9 @@ This model is not yet complete
     "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)"
     extends Modelica.Icons.ObsoleteModel;
     extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
-          StandardWater "Medium model" constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium,
+          StandardWater                constrainedby
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium
+                        "Medium model",
         FluidPhaseStart=Choices.FluidPhase.FluidPhases.TwoPhases);
     replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
@@ -7470,8 +7624,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
-          StandardWater "Medium model" constrainedby
-        Modelica.Media.Interfaces.PartialTwoPhaseMedium);
+          StandardWater                constrainedby
+        Modelica.Media.Interfaces.PartialTwoPhaseMedium
+                        "Medium model");
     replaceable ThermoPower.Thermal.DHT wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
