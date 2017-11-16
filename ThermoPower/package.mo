@@ -1928,8 +1928,8 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
       SI.Height hmax "head value when q_flow = 0";    
     algorithm
       hvertex := c[1]-c[2]^2/(4*c[3]);
-      q99 := -(c[2]+sqrt(c[2]^2-4*c[3]*(c[1]-0.99*hvertex)))/(2*c[3]);
-      hmax := 0.99*hvertex - q99*(2*q99*c[3] + c[2]);
+      q99 := -(c[2]+sqrt(c[2]^2-4*c[3]*(c[1]-0.9999*hvertex)))/(2*c[3]);
+      hmax := 0.9999*hvertex - q99*(2*q99*c[3] + c[2]);
       
       if q_flow > q99 then
         // quadratic flow equation
