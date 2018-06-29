@@ -52,7 +52,6 @@ package Water "Models of components with water/steam as working fluid"
   extends Modelica.Icons.Package;
 
   package StandardWater = Modelica.Media.Water.StandardWater;
-
   model SourcePressure "Pressure source for water/steam flows"
     extends Icons.Water.SourceP;
     replaceable package Medium = StandardWater constrainedby
@@ -108,10 +107,10 @@ package Water "Models of components with water/steam as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_T_internal;
     Modelica.Blocks.Interfaces.RealInput in_h_internal;
   equation
-    if R == 0 then
-      flange.p = p;
-    else
+    if R > 0 then
       flange.p = p + flange.m_flow*R;
+    else
+      flange.p = p;
     end if;
 
     p = in_p0_internal;
@@ -218,10 +217,10 @@ package Water "Models of components with water/steam as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_h_internal;
 
   equation
-    if R == 0 then
-      flange.p = p;
-    else
+    if R > 0 then
       flange.p = p + flange.m_flow*R;
+    else
+      flange.p = p;
     end if;
 
     p = in_p0_internal;
@@ -328,10 +327,10 @@ package Water "Models of components with water/steam as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_T_internal;
     Modelica.Blocks.Interfaces.RealInput in_h_internal;
   equation
-    if G == 0 then
-      flange.m_flow = -w;
-    else
+    if G > 0 then
       flange.m_flow = -w + (flange.p - p0)*G;
+    else
+      flange.m_flow = -w;
     end if;
 
     w = in_w0_internal;
@@ -441,10 +440,10 @@ package Water "Models of components with water/steam as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_T_internal;
     Modelica.Blocks.Interfaces.RealInput in_h_internal;
   equation
-    if G == 0 then
-      flange.m_flow = w;
-    else
+    if G > 0 then
       flange.m_flow = w + (flange.p - p0)*G;
+    else
+      flange.m_flow = w;
     end if;
 
     w = in_w0_internal;
@@ -8685,7 +8684,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </html>"),
       Diagram(graphics));
   end ThroughW;
-
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
 <p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.

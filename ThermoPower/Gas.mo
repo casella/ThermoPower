@@ -94,10 +94,10 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
 
   equation
-    if R == 0 then
-      flange.p = gas.p;
-    else
+    if R > 0 then
       flange.p = gas.p + flange.m_flow*R;
+    else
+      flange.p = gas.p;
     end if;
 
     gas.p = in_p0_internal;
@@ -191,10 +191,10 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_T_internal;
     Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
   equation
-    if R == 0 then
-      flange.p = gas.p;
-    else
+    if R > 0 then
       flange.p = gas.p + flange.m_flow*R;
+    else
+      flange.p = gas.p;
     end if;
 
     gas.p = in_p0_internal;
@@ -290,10 +290,10 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
 
   equation
-    if G == 0 then
-      flange.m_flow = -w;
-    else
+    if G > 0 then
       flange.m_flow = -w + (flange.p - p0)*G;
+    else
+      flange.m_flow = -w;
     end if;
 
     w = in_w0_internal;
@@ -391,10 +391,10 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_T_internal;
     Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
   equation
-    if G == 0 then
-      flange.m_flow = w;
-    else
+    if G > 0 then
       flange.m_flow = w + (flange.p - p0)*G;
+    else
+      flange.m_flow = w;
     end if;
 
     w = in_w0_internal;
