@@ -529,6 +529,9 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialTemperature=false
+      "Remove initial equation on temperature"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Total mass";
     SI.InternalEnergy E "Total internal energy";
@@ -584,16 +587,22 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         gas.p = pstart;
       end if;
-      gas.T = Tstart;
+      if not noInitialTemperature then
+        gas.T = Tstart;
+      end if;
       gas.Xi = Xstart[1:Medium.nXi];
     elseif initOpt == Choices.Init.Options.steadyState then
       if not noInitialPressure then
         der(gas.p) = 0;
       end if;
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
     else
       assert(false, "Unsupported initialisation option");
@@ -648,6 +657,9 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(tab="Initialisation"));
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialTemperature=false
+      "Remove initial equation on temperature"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Gas total mass";
@@ -710,7 +722,9 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         gas.p = pstart;
       end if;
-      gas.T = Tstart;
+      if not noInitialTemperature then
+        gas.T = Tstart;
+      end if;
       gas.Xi = Xstart[1:Medium.nXi];
       if (Cm > 0 and gamma > 0) then
         Tm  = Tmstart;
@@ -719,13 +733,17 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         der(gas.p) = 0;
       end if;
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
@@ -785,6 +803,9 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(tab="Initialisation"));
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialTemperature=false
+      "Remove initial equation on temperature"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Gas total mass";
@@ -861,7 +882,9 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         gas.p = pstart;
       end if;
-      gas.T = Tstart;
+      if not noInitialTemperature then
+        gas.T = Tstart;
+      end if;
       gas.Xi = Xstart[1:Medium.nXi];
       if (Cm > 0 and gamma > 0) then
         Tm  = Tmstart;
@@ -870,13 +893,17 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         der(gas.p) = 0;
       end if;
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
