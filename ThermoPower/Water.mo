@@ -728,6 +728,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialEnthalpy=false
+      "Remove initial equation on enthalpy"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     FlangeA inlet(
       h_outflow(start=hstart),
@@ -797,12 +800,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       if not noInitialPressure then
         p = pstart;
       end if;
-      h = hstart;
+      if not noInitialEnthalpy then
+        h = hstart;
+      end if;
       if (Cm > 0 and gamma > 0) then
         Tm = Tmstart;
       end if;
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(h) = 0;
+      if not noInitialEnthalpy then
+        der(h) = 0;
+      end if;
       if (not Medium.singleState and not noInitialPressure) then
         der(p) = 0;
       end if;
@@ -810,7 +817,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         der(Tm) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(h) = 0;
+      if not noInitialEnthalpy then
+        der(h) = 0;
+      end if;
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
       end if;
@@ -898,6 +907,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialEnthalpy=false
+      "Remove initial equation on enthalpy"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     FlangeA in1(
       h_outflow(start=hstart),
@@ -976,12 +988,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       if not noInitialPressure then
         p = pstart;
       end if;
-      h = hstart;
+      if not noInitialEnthalpy then
+        h = hstart;
+      end if;
       if (Cm > 0 and gamma > 0) then
         Tm = Tmstart;
       end if;
     elseif initOpt == Choices.Init.Options.steadyState then
-      der(h) = 0;
+      if not noInitialEnthalpy then
+        der(h) = 0;
+      end if;
       if (not Medium.singleState and not noInitialPressure) then
         der(p) = 0;
       end if;
@@ -989,7 +1005,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         der(Tm) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(h) = 0;
+      if not noInitialEnthalpy then
+        der(h) = 0;
+      end if;
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
       end if;
