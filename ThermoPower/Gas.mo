@@ -512,7 +512,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
-      Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
+      Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter SI.Volume V "Inner volume";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
       "= true to allow flow reversal, false restricts to design direction";
