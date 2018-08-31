@@ -61,7 +61,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
       "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
@@ -159,7 +160,8 @@ package Gas "Models of components with ideal gases as working fluid"
       "Nominal gas composition";
     parameter Units.HydraulicResistance R=0 "Hydraulic Resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
       "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
@@ -255,7 +257,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Units.HydraulicConductance G=0 "HydraulicConductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_w0 = false
       "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
@@ -356,7 +359,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Units.HydraulicConductance G=0 "Hydraulic Conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_w0 = false
       "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
@@ -448,7 +452,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(choicesAllMatching = true);
     parameter Medium.MassFlowRate w0=0 "Nominal mass flow rate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_w0 = false
       "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
@@ -515,7 +520,8 @@ package Gas "Models of components with ideal gases as working fluid"
       Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter SI.Volume V "Inner volume";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
@@ -644,7 +650,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Evaluate=true);
     parameter SI.HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
@@ -788,7 +795,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Evaluate=true);
     parameter SI.HeatCapacity Cm=0 "Metal heat capacity" annotation (Evaluate=true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
@@ -1278,7 +1286,8 @@ package Gas "Models of components with ideal gases as working fluid"
     constant Medium.MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Boolean rev_inlet1=allowFlowReversal
       "Allow flow reversal at inlet1" annotation (Evaluate=true);
@@ -1417,7 +1426,8 @@ package Gas "Models of components with ideal gases as working fluid"
     constant Medium.MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Boolean rev_inlet=allowFlowReversal
       "Allow flow reversal at inlet" annotation (Evaluate=true);
@@ -1551,7 +1561,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(choicesAllMatching = true);
     parameter Units.HydraulicResistance R "Hydraulic resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -1616,7 +1627,8 @@ package Gas "Models of components with ideal gases as working fluid"
     final parameter Real Kf_a(fixed = false)
       "Actual hydraulic resistance coefficient";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=101325 "Start pressure value"
       annotation (Dialog(tab="Initialisation"));
@@ -1708,7 +1720,8 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     Medium.BaseProperties gas;
@@ -1806,7 +1819,8 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -1892,7 +1906,8 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     Medium.BaseProperties gas "Gas properties";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -1949,7 +1964,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(choicesAllMatching = true);
     parameter Units.HydraulicConductance Kv "Hydraulic conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     Medium.MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -2048,7 +2064,8 @@ package Gas "Models of components with ideal gases as working fluid"
       constrainedby Functions.ValveCharacteristics.baseFun
       "Critical ratio characteristic";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pin_start=pnom
       "Inlet pressure start value"
@@ -2765,7 +2782,8 @@ The packages Medium are redeclared and a mass balance determines the composition
       parameter Boolean avoidInletEnthalpyDerivative=true
         "Avoid inlet enthalpy derivative";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
         annotation (Dialog(tab="Initialisation"));
@@ -2840,7 +2858,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         annotation (Dialog(tab="Initialisation"));
       parameter SI.SpecificEnthalpy HH "Lower Heating value of fuel";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter Air.AbsolutePressure pstart=101325 "Pressure start value"
         annotation (Dialog(tab="Initialisation"));
@@ -2979,7 +2998,8 @@ This is the model-base of a Combustion Chamber, with a constant volume.
         annotation (Dialog(tab="Initialisation"));
       parameter Medium.Temperature Tdes_in "inlet design temperature";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter Medium.Temperature Tstart_in=Tdes_in "inlet start temperature"
                                   annotation (Dialog(tab="Initialisation"));
@@ -3108,7 +3128,8 @@ This is the model-base of a Combustion Chamber, with a constant volume.
       parameter SI.PerUnit eta_mech=0.98 "mechanical efficiency";
       parameter Medium.Temperature Tdes_in "inlet design temperature";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter Medium.AbsolutePressure pstart_in "inlet start pressure"
         annotation (Dialog(tab="Initialisation"));
@@ -3247,7 +3268,8 @@ This is the model-base of a Combustion Chamber, with a constant volume.
       parameter SI.SpecificEnthalpy HH "Lower Heating value";
       parameter SI.PerUnit eta_mech=0.95 "mechanical efficiency";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
 
       Air.BaseProperties gas(
@@ -3439,7 +3461,8 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
       parameter SI.Volume V=0 "Fan Internal Volume" annotation (Evaluate=true);
       parameter Boolean CheckValve=false "Reverse flow stopped";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter SI.VolumeFlowRate q_single_start=q_single0
         "Volume Flow Rate Start Value (single pump)"
@@ -3662,7 +3685,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
@@ -3745,7 +3769,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       "Nominal gas composition";
     parameter Units.HydraulicResistance R=0 "Hydraulic Resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
@@ -3826,7 +3851,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Units.HydraulicConductance G=0 "HydraulicConductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     Medium.MassFlowRate w;
@@ -3910,7 +3936,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Units.HydraulicConductance G=0 "Hydraulic Conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     Medium.MassFlowRate w;
@@ -3986,7 +4013,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -4070,7 +4098,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Boolean avoidInletEnthalpyDerivative=true
       "Avoid inlet enthalpy derivative";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
