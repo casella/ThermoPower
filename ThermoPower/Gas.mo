@@ -3433,10 +3433,18 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
         annotation(choicesAllMatching = true);
       Medium.BaseProperties inletFluid(h(start=hstart))
         "Fluid properties at the inlet";
+      // Flow Characteristic curves
+      parameter Boolean useFlowModel = false "Use function from replaceable model for flow characteristic"
+        annotation(Evaluate = true, choices(CheckBox = true),Dialog(group="Characteristics"));
       replaceable function flowCharacteristic =
         Functions.FanCharacteristics.baseFlow
         "Head vs. q_flow characteristic at nominal speed and density" annotation (
-         Dialog(group="Characteristics"), choicesAllMatching=true);
+         Dialog(group="Characteristics"), choicesAllMatching=true,
+         enable = not useFlowCharacteristicModel);
+      replaceable model FlowCharacteristicModel =
+          Functions.FanCharacteristics.Models.BaseFlow annotation (
+         Dialog(group="Characteristics"), choicesAllMatching=true, enable = not useFlowCharacteristicModel);
+      // Power characteristic curves
       parameter Boolean usePowerCharacteristic=false
         "Use powerCharacteristic (vs. efficiencyCharacteristic)"
         annotation (Dialog(group="Characteristics"));
@@ -3446,6 +3454,7 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
         "Power consumption vs. q_flow at nominal speed and density" annotation (
           Dialog(group="Characteristics", enable=usePowerCharacteristic),
           choicesAllMatching=true);
+      // Efficiency characteristic curves
       replaceable function efficiencyCharacteristic =
           Functions.FanCharacteristics.constantEfficiency (eta_nom=0.8)
         constrainedby Functions.PumpCharacteristics.baseEfficiency
@@ -3481,17 +3490,7 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
       final parameter SI.VolumeFlowRate q_single0=w0/(Np0*rho0)
         "Nominal volume flow rate (single pump)";
       final parameter SI.SpecificEnergy H0=dp0/(rho0) "Nominal specific energy";
-    protected
-      function dH_dqflow
-        "Approximated partial derivative of flow characteristic w.r.t. flow"
-        input SI.VolumeFlowRate q_flow;
-        output Real dH;
-      algorithm
-        dH := (flowCharacteristic(1.05*q_flow) -
-              flowCharacteristic(0.95*q_flow)) / 0.1;
-      annotation(Inline = true);
-      end dH_dqflow;
-    public
+
       Medium.MassFlowRate w_single(start=q_single_start*rho_start)
         "Mass flow rate (single fan)";
       Medium.MassFlowRate w=Np*w_single "Mass flow rate (total)";
@@ -3535,6 +3534,34 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
             origin={-40,76},
             extent={{-10,-10},{10,10}},
             rotation=270)));
+
+      FlowCharacteristicModel flowCharacteristicModel
+       "Model for flow characteristic function with static parameters";
+      // Select whether to use the replaceable functions or the functions within
+      // the replaceable model instances
+    protected
+      function flowCharacteristicInternal
+        extends ThermoPower.Functions.FanCharacteristics.baseFlow;
+        input Boolean useFlowModel;
+      algorithm
+        H := if useFlowModel
+          then flowCharacteristicModel.flowCharacteristic(q_flow, bladePos)
+          else flowCharacteristic(q_flow, bladePos);
+      annotation(Inline = true);
+      end flowCharacteristicInternal;
+
+      function dH_dqflow
+        "Approximated partial derivative of flow characteristic w.r.t. flow"
+        input SI.VolumeFlowRate q_flow;
+        input SI.PerUnit bladePos0;
+        input Boolean useFlowModel;
+        output Real dH;
+      algorithm
+        dH := (flowCharacteristicInternal(1.05*q_flow,bladePos0, useFlowModel) -
+               flowCharacteristicInternal(0.95*q_flow,bladePos0, useFlowModel)) / 0.1;
+      annotation(Inline = true);
+      end dH_dqflow;
+
     equation
       // Number of fans in parallel
       Np = in_Np;
@@ -3561,16 +3588,16 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
         // Flow characteristics when check valve is open
         q_single = s;
         H = homotopy(
-          (n/n0)^2*flowCharacteristic(q_single*n0/(n + n_eps), bladePos),
-          dH_dqflow(q_single0)*(q_single - q_single0) +
-           (2/n0*flowCharacteristic(q_single0) -
-            q_single0/n0*dH_dqflow(q_single0))*(n-n0) + H0);
+          (n/n0)^2*flowCharacteristicInternal(q_single*n0/(n + n_eps), bladePos,useFlowModel),
+          dH_dqflow(q_single0, bladePos0, useFlowModel)*(q_single - q_single0) +
+           (2/n0*flowCharacteristicInternal(q_single0, bladePos0, useFlowModel) -
+            q_single0/n0*dH_dqflow(q_single0, bladePos0, useFlowModel))*(n-n0) + H0);
       else
         // Flow characteristics when check valve is closed
-        H = homotopy((n/n0)^2*flowCharacteristic(0) - s,
-          dH_dqflow(q_single0)*(q_single - q_single0) +
-           (2/n0*flowCharacteristic(q_single0) -
-            q_single0/n0*dH_dqflow(q_single0))*(n - n0) + H0);
+        H = homotopy((n/n0)^2*flowCharacteristicInternal(0,bladePos,useFlowModel) - s,
+          dH_dqflow(q_single0, bladePos0, useFlowModel)*(q_single - q_single0) +
+           (2/n0*flowCharacteristicInternal(q_single0,bladePos0,useFlowModel) -
+            q_single0/n0*dH_dqflow(q_single0, bladePos0, useFlowModel))*(n - n0) + H0);
         q_single = 0;
       end if;
 
