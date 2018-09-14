@@ -3574,20 +3574,6 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
         q_single = 0;
       end if;
 
-      /*
-  // Flow equations
-  q_single = w_single/rho;
-  if noEvent(s > 0 or (not CheckValve)) then
-    // Flow characteristics when check valve is open
-    q_single = s;
-    H = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps),bladePos);
-  else
-    // Flow characteristics when check valve is closed
-    H = (n/n0)^2*flowCharacteristic(0) - s;
-    q_single = 0;
-  end if;
-*/
-
       // Power consumption
       if usePowerCharacteristic then
         W_single = (n/n0)^3*(rho/rho0)*powerCharacteristic(q_single*n0/(n + n_eps),
