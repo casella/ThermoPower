@@ -2173,6 +2173,12 @@ This characteristic is such that the relative change of the flow coefficient is 
       output Real eta "Efficiency";
     end baseEfficiency;
 
+    function dummyFlow "Default placeholder for flow characteristic function"
+      extends baseFlow;
+    algorithm
+      assert(false, "The dummyFlow function must be redeclared");
+    end dummyFlow;
+
     function linearFlow "Linear flow characteristic, fixed blades"
       extends baseFlow;
       input Modelica.SIunits.VolumeFlowRate q_nom[2]
@@ -2358,7 +2364,19 @@ This characteristic is such that the relative change of the flow coefficient is 
       model BaseFlow
         "Base class for models contaning flow characteristic functions with static parameters"
         replaceable function flowCharacteristic =
-            ThermoPower.Functions.FanCharacteristics.baseFlow;
+          ThermoPower.Functions.FanCharacteristics.dummyFlow
+          constrainedby ThermoPower.Functions.FanCharacteristics.baseFlow;
+
+        function dH_dq
+          "Approximated partial derivative of flow characteristic w.r.t. volume flow"
+          input SI.VolumeFlowRate q_flow;
+          input SI.PerUnit bladePos;
+          output Real dH;
+        algorithm
+          dH := (flowCharacteristic(1.05*q_flow,bladePos) -
+                 flowCharacteristic(0.95*q_flow,bladePos)) / 0.1;
+        annotation(Inline = true);
+        end dH_dq;
       end BaseFlow;
 
       model SplineFlow "Contains spline functions with static parameters"
