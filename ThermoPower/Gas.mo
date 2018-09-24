@@ -1640,7 +1640,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.MassFlowRate w "Mass flow rate in the inlet";
     Medium.AbsolutePressure pin "Inlet pressure";
     Medium.AbsolutePressure pout "Outlet pressure";
-    SI.Pressure dp "Pressure drop";
+    SI.PressureDifference dp "Pressure drop";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(start=wnom, min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -2078,7 +2078,7 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
     Medium.MassFlowRate w "Mass Flow Rate";
-    SI.Pressure dp "Pressure drop";
+    SI.PressureDifference dp "Pressure drop";
     SI.PerUnit Fxt;
     SI.PerUnit x "Pressure drop ratio";
     SI.PerUnit xs "Saturated pressure drop ratio";
@@ -3511,7 +3511,7 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
       Medium.MassFlowRate w=Np*w_single "Mass flow rate (total)";
       SI.VolumeFlowRate q_single "Volume flow rate (single fan)";
       SI.VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
-      SI.Pressure dp "Outlet pressure minus inlet pressure";
+      SI.PressureDifference dp "Outlet pressure minus inlet pressure";
       SI.SpecificEnergy H "Specific energy";
       Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";

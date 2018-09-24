@@ -624,7 +624,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.MassFlowRate w "Flow rate at the inlet";
     Medium.AbsolutePressure pin "Inlet pressure";
     Medium.AbsolutePressure pout "Outlet pressure";
-    SI.Pressure dp "Pressure drop";
+    SI.PressureDifference dp "Pressure drop";
     FlangeA inlet(m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf
              else 0), redeclare package Medium = Medium) annotation (Placement(
           transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
@@ -5512,7 +5512,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       Medium.MassFlowRate w "Mass flow rate";
       Units.LiquidDensity rho "Inlet density";
       Medium.Temperature Tin;
-      SI.Pressure dp "Pressure drop across the valve";
+      SI.PressureDifference dp "Pressure drop across the valve";
       SI.PerUnit theta_act "Actual valve opening";
     protected
       function sqrtR = Functions.sqrtReg (delta=b*dpnom);
@@ -5692,7 +5692,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       SI.VolumeFlowRate q_single(start=wstart/(Np0*rho0))
         "Volume flow rate (single pump)";
       SI.VolumeFlowRate q=Np*q_single "Volume flow rate (total)";
-      SI.Pressure dp "Outlet pressure minus inlet pressure";
+      SI.PressureDifference dp "Outlet pressure minus inlet pressure";
       SI.Height head "Pump head";
       Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hin "Enthalpy of entering fluid";
