@@ -605,7 +605,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     parameter FFtypes FFtype=FFtypes.Kf "Friction Factor Type";
     parameter Real Kf = 0 "Hydraulic resistance coefficient (DP = Kf*w^2/rho)"
       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.Kf)));
-    parameter Medium.AbsolutePressure dpnom "Nominal pressure drop";
+    parameter SI.PressureDifference dpnom "Nominal pressure drop";
     parameter Medium.Density rhonom=0 "Nominal density"
       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.PressDrop.FFtypes.OpPoint)));
     parameter Real K=0 "Kinetic resistance coefficient (DP=K*rho*velocity2/2)";
@@ -5347,7 +5347,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
         annotation (Evaluate=true);
-      parameter SI.Pressure dpnom = 0
+      parameter SI.PressureDifference dpnom = 0
         "Nominal pressure drop (friction term only!)";
       parameter Real Kfnom = 0
         "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)"
@@ -5481,7 +5481,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         annotation(Dialog(group= "Valve Opening", enable = not useThetaInput));
       parameter Medium.AbsolutePressure pnom "Nominal inlet pressure"
         annotation (Dialog(group="Nominal operating point"));
-      parameter SI.Pressure dpnom "Nominal pressure drop"
+      parameter SI.PressureDifference dpnom "Nominal pressure drop"
         annotation (Dialog(group="Nominal operating point"));
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate"
         annotation (Dialog(group="Nominal operating point"));

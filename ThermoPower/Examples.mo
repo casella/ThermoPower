@@ -1825,7 +1825,7 @@ This is the model of a digital PI controller, complete with auto/man and trackin
           "Friction Factor Type, gas side";
         parameter Real Kfnom_G=0
           "Nominal hydraulic resistance coefficient, gas side";
-        parameter SI.Pressure dpnom_G=0
+        parameter SI.PressureDifference dpnom_G=0
           "Nominal pressure drop, gas side (friction term only!)";
         parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
         parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
@@ -2366,7 +2366,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           "Friction Factor Type, gas side";
         parameter Real Kfnom_G=0
           "Nominal hydraulic resistance coefficient, gas side";
-        parameter SI.Pressure dpnom_G=0
+        parameter SI.PressureDifference dpnom_G=0
           "Nominal pressure drop, gas side (friction term only!)";
         parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
         parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
@@ -2374,7 +2374,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           "Friction Factor Type, fluid side";
         parameter Real Kfnom_F=0
           "Nominal hydraulic resistance coefficient, fluid side";
-        parameter SI.Pressure dpnom_F=0
+        parameter SI.PressureDifference dpnom_F=0
           "Nominal pressure drop, fluid side (friction term only!)";
         parameter SI.Density rhonom_F=0 "Nominal inlet density, fluid side";
         parameter Real Cfnom_F=0 "Nominal Fanning friction factor, fluid side";

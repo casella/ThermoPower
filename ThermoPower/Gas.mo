@@ -1609,7 +1609,7 @@ package Gas "Models of components with ideal gases as working fluid"
       T(start=Tstart),
       Xi(start=Xstart[1:Medium.nXi]));
     parameter Medium.MassFlowRate wnom "Nominal mass flowrate";
-    parameter SI.Pressure dpnom "Nominal pressure drop";
+    parameter SI.PressureDifference dpnom "Nominal pressure drop";
     parameter ThermoPower.Choices.PressDrop.FFtypes FFtype= ThermoPower.Choices.PressDrop.FFtypes.Kf
       "Friction factor type";
     parameter Real Kf = 0 "Hydraulic resistance coefficient (DP = Kf*w^2/rho)"
@@ -2044,7 +2044,7 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(Dialog(group= "Valve Opening", enable = not useThetaInput));
     parameter Medium.AbsolutePressure pnom "Nominal inlet pressure"
       annotation (Dialog(group="Nominal operating point"));
-    parameter Medium.AbsolutePressure dpnom "Nominal pressure drop"
+    parameter SI.PressureDifference dpnom "Nominal pressure drop"
       annotation (Dialog(group="Nominal operating point"));
     parameter Medium.MassFlowRate wnom "Nominal mass flowrate"
       annotation (Dialog(group="Nominal operating point"));
@@ -2760,7 +2760,7 @@ The packages Medium are redeclared and a mass balance determines the composition
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
         annotation(Evaluate=true);
-      parameter SI.Pressure dpnom = 0 "Nominal pressure drop";
+      parameter SI.PressureDifference dpnom = 0 "Nominal pressure drop";
       parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
       parameter Medium.Density rhonom=0 "Nominal inlet density"
@@ -4101,7 +4101,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
     parameter FFtypes FFtype "Friction Factor Type";
     parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient";
-    parameter Medium.AbsolutePressure dpnom=0 "Nominal pressure drop";
+    parameter SI.PressureDifference dpnom=0 "Nominal pressure drop";
     parameter Medium.Density rhonom=0 "Nominal inlet density";
     parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor";
     parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
