@@ -4788,7 +4788,7 @@ li><i>1 Jul 2004</i>
     parameter SI.CoefficientOfHeatTransfer gamma_wp_nom = 0
       "Nominal heat transfer coefficient water-packaging"
       annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
-    parameter Real k_wa_nom(final unit = "kg/m2")
+    parameter Real k_wa_nom(final unit = "kg.K/(m2.s)")
       "Nominal total heat transfer coefficient per unit surface";
     parameter SI.PerUnit nu_a
       "Exponent of air flow rate in mass & heat transfer coefficients";
@@ -4857,7 +4857,7 @@ li><i>1 Jul 2004</i>
     SI.Power Wtot "Power consumption of the fans (all columns)";
     SI.CoefficientOfHeatTransfer gamma_wp[N](each start = gamma_wp_nom)
       "Heat transfer coefficient water-packing";
-    Real k_wa(start = k_wa_nom)
+    Real k_wa(final unit = "kg.K/(m2.s)", start = k_wa_nom)
       "Total heat transfer coefficient per unit surface";
 
     SI.Temperature Tlin "Inlet water temperature";
