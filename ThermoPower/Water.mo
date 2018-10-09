@@ -895,7 +895,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Internal Heat Transfer Coefficient" annotation (Evaluate=true);
     parameter SI.HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction" 
+      "= true to allow flow reversal, false restricts to design direction"
       annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
@@ -3813,7 +3813,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     parameter Real avr=1.2 "Phase separation efficiency coefficient";
     parameter Integer DrumOrientation=0 "0: Horizontal; 1: Vertical";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction" 
+      "= true to allow flow reversal, false restricts to design direction"
       annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
@@ -4769,20 +4769,25 @@ li><i>1 Jul 2004</i>
        annotation (Dialog(tab="Initialisation"));
     parameter Integer Nt = 1 "Number of towers in parallel";
     parameter Integer N(min = 2) = 10 "Number of nodes";
-    parameter SI.Mass M0
-      "Water hold-up at zero water flow rate (single column)";
-    parameter SI.Mass Mnom
-      "Water hold-up at nominal water flow rate (single tower)";
+    parameter SI.Mass M0 = 0
+      "Water hold-up at zero water flow rate (single column)"
+      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
+    parameter SI.Mass Mnom = 0
+      "Water hold-up at nominal water flow rate (single tower)"
+      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
     parameter SI.MassFlowRate wlnom
       "Nominal water mass flow rate (single tower)";
     parameter SI.VolumeFlowRate qanom
       "Nominal air volume flow rate (single tower)";
     parameter SI.Density rhoanom "Nominal air density";
-    parameter SI.Mass Mp "Mass of packaging";
-    parameter SI.SpecificHeatCapacity cp "Specific heat of packaging";
+    parameter SI.Mass Mp = 0 "Mass of packaging"
+      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
+    parameter SI.SpecificHeatCapacity cp = 0 "Specific heat of packaging"
+      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
     parameter SI.Area S "Surface of packaging";
-    parameter SI.CoefficientOfHeatTransfer gamma_wp_nom
-      "Nominal heat transfer coefficient water-packing";
+    parameter SI.CoefficientOfHeatTransfer gamma_wp_nom = 0
+      "Nominal heat transfer coefficient water-packaging"
+      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
     parameter Real k_wa_nom(final unit = "kg/m2")
       "Nominal total heat transfer coefficient per unit surface";
     parameter SI.PerUnit nu_a
@@ -4793,11 +4798,11 @@ li><i>1 Jul 2004</i>
     parameter SI.Power Wnom "Nominal power consumption (single tower)";
     parameter SI.Pressure patm = 101325 "Atmospheric pressure";
     parameter SI.Mass Mstart[N-1] = ones(N-1)*Mnom/(N-1) "Start value of water holdup in each volume"
-       annotation (Dialog(tab="Initialisation"));
+       annotation (Dialog(tab="Initialisation", enable = not staticModel));
     parameter SI.SpecificEnthalpy hlstart[N] = fill(120e3,N) "Start values of liquid enthalpy at volume boundaries"
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Temperature Tpstart[N-1] = ones(N-1)*(30+273.15) "Start value of packaging temperature in each volume"
-       annotation (Dialog(tab="Initialisation"));
+       annotation (Dialog(tab="Initialisation", enable = not staticModel));
     parameter SI.Temperature Twbstart = system.T_wb "Start value of average wet bulb temperature"
       annotation (Dialog(tab="Initialisation"));
     final parameter SI.MassFlowRate wanom = qanom*rhoanom
@@ -4864,11 +4869,15 @@ li><i>1 Jul 2004</i>
         0 = wl[i] - wl[i+1] - wev[i];
         0 = wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] - Qlp[i];
         0 = Qlp[i];
+        M[i] = 0;
+        Tp[i] = Tl[i];
       else
         der(M[i]) = wl[i] - wl[i+1] - wev[i];
         der(M[i])*hltilde[i] + M[i]*der(hltilde[i]) =
             wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] - Qlp[i];
         cp*Mp/(N-1)*der(Tp[i]) = Qlp[i];
+        wl[i+1] = (M[i] - M0/(N-1))/(Mnom/(N-1) - M0/(N-1))*wlnom;
+        Qlp[i] = ((Tl[i] + Tl[i+1])/2 - Tp[i])*S/(N-1)*gamma_wp[i];
       end if;
 
       wa*Xva[i+1] + wev[i] = wa*Xva[i] "vapour mass balance in air";
@@ -4877,8 +4886,6 @@ li><i>1 Jul 2004</i>
       hltilde[i] = hl[i+1];
 
       Q[i] = ((hw[i] + hw[i+1])/2 - (ha[i] + ha[i+1])/2)*S/(N-1)*k_wa;
-      Qlp[i] = ((Tl[i] + Tl[i+1])/2 - Tp[i])*S/(N-1)*gamma_wp[i];
-      wl[i+1] = (M[i] - M0/(N-1))/(Mnom/(N-1) - M0/(N-1))*wlnom;
     end for;
 
     for i in 1:N loop
@@ -4929,6 +4936,14 @@ li><i>1 Jul 2004</i>
       M = Mstart;
       hltilde = hlstart[2:N];
       Tp = Tpstart;
+    end if;
+
+    // Default parameter values not allowed for dynamic model
+    if not staticModel then
+      assert(M0 > 0, "M0 must be positive");
+      assert(Mnom > 0, "Mnom must be positive");
+      assert(Mp > 0, "Mp must be positive");
+      assert(cp > 0, "cp must be positive");
     end if;
     annotation (Icon(graphics={Polygon(
             points={{-60,80},{-100,-80},{100,-80},{60,80},{-60,80}},
