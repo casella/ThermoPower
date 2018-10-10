@@ -4763,7 +4763,8 @@ li><i>1 Jul 2004</i>
 
       Modelica.Blocks.Interfaces.RealOutput powerConsumption
       "Total fan power consumption"
-      annotation (Placement(transformation(extent={{74,-10},{94,10}})));
+      annotation (Placement(transformation(extent={{74,-10},{94,10}}),
+          iconTransformation(extent={{70,-10},{90,10}})));
     parameter Boolean staticModel = false "= true for a static model";
     parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt "Initialization option"
        annotation (Dialog(tab="Initialisation"));
@@ -4863,6 +4864,9 @@ li><i>1 Jul 2004</i>
     SI.Temperature Tlin "Inlet water temperature";
     SI.Temperature Tlout "Outlet water temperature";
 
+    Thermal.DHTVolumes dHTVolumes annotation (Placement(transformation(extent={
+              {-146,-36},{-126,-16}}), iconTransformation(extent={{-90,-36},{
+              -70,-16}})));
   equation
     for i in 1:N-1 loop
       if staticModel then
@@ -4946,13 +4950,13 @@ li><i>1 Jul 2004</i>
       assert(cp > 0, "cp must be positive");
     end if;
     annotation (Icon(graphics={Polygon(
-            points={{-60,80},{-100,-80},{100,-80},{60,80},{-60,80}},
+            points={{-70,80},{-70,-80},{70,-80},{70,80},{-70,80}},
             lineColor={0,0,0},
             smooth=Smooth.None,
             fillColor={0,0,255},
             fillPattern=FillPattern.Solid), Polygon(
-            points={{-12,26},{-28,26},{-40,38},{-28,52},{-12,52},{12,26},{30,26},{
-                40,38},{30,52},{12,52},{0,38},{-12,26}},
+            points={{-12,36},{-28,36},{-40,48},{-28,62},{-12,62},{12,36},{30,36},
+                {40,48},{30,62},{12,62},{0,48},{-12,36}},
             lineColor={0,0,0},
             smooth=Smooth.None,
             fillColor={255,255,255},
