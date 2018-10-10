@@ -8,7 +8,9 @@ package Thermal "Thermal models of heat transfer"
     parameter Integer N(min=1) = 2 "Number of nodes";
     SI.Temperature T[N] "Temperature at the nodes";
     flow SI.HeatFlux phi[N] "Heat flux at the nodes";
-    annotation (Icon(graphics={Rectangle(
+    annotation (
+            Diagram(coordinateSystem(preserveAspectRatio=false)),
+            Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
             fillColor={255,127,0},
@@ -19,7 +21,9 @@ package Thermal "Thermal models of heat transfer"
     parameter Integer N "Number of volumes";
     SI.Temperature T[N] "Temperature at the volumes";
     flow SI.Power Q[N] "Heat flow at the volumes";
-    annotation (Icon(graphics={Rectangle(
+    annotation (
+            Diagram(coordinateSystem(preserveAspectRatio=false)),
+            Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
             fillColor={255,127,0},
