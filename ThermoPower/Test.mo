@@ -2756,7 +2756,8 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         experiment(StopTime=50));
     end TestBarometricCondenser;
 
-    model TestCoolingTower "Test of the cooling tower model"
+    model TestCoolingTowerPacking
+      "Test of the dynamic cooling tower model with packing"
       extends Modelica.Icons.Example;
       package Water = Modelica.Media.Water.StandardWater;
       ThermoPower.Water.CoolingTower coolingTower(
@@ -2765,7 +2766,6 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         Mnom=4300,
         wlnom=504/3600*995,
         qanom=99,
-        rhoanom=1.2,
         Mp=2000,
         cp=680,
         rpm_nom=230,
@@ -2775,7 +2775,65 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         S=8700,
         k_wa_nom=1.08e-2,
         nu_a=1,
-        nu_l=0)
+        nu_l=0,
+        rhoanom=1.2)
+        annotation (Placement(transformation(extent={{-20,0},{20,40}})));
+      ThermoPower.Water.SourceMassFlow sourceW(
+        h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
+        w0=2520/3600*995)
+        annotation (Placement(transformation(extent={{-52,50},{-32,70}})));
+      ThermoPower.Water.SinkPressure
+                              sinkP
+        annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
+      Modelica.Blocks.Sources.Ramp fanRpm(
+        duration=1,
+        offset=230,
+        height=-20)
+        annotation (Placement(transformation(extent={{-82,26},{-62,46}})));
+      inner ThermoPower.System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          T_wb=287.15)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+    equation
+      connect(sourceW.flange, coolingTower.waterInlet) annotation (Line(
+          points={{-32,60},{0,60},{0,38}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(coolingTower.waterOutlet, sinkP.flange) annotation (Line(
+          points={{0,2},{0,-28},{12,-28}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(fanRpm.y, coolingTower.fanRpm) annotation (Line(
+          points={{-61,36},{-38,36},{-38,28},{-16,28}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      annotation (
+        experiment(
+          StartTime=-50,
+          StopTime=200,
+          Tolerance=1e-006),
+        experimentSetupOutput(equdistant=false),
+        Documentation(info="<html>
+<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 21.5 degC using air with wet bulb temperature at 14 degC.</p>
+<p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
+</html>"));
+    end TestCoolingTowerPacking;
+
+    model TestCoolingTowerStatic "Test of the static cooling tower model"
+      extends Modelica.Icons.Example;
+      package Water = Modelica.Media.Water.StandardWater;
+      ThermoPower.Water.CoolingTower coolingTower(
+        Nt=5,
+        wlnom=504/3600*995,
+        qanom=99,
+        rpm_nom=230,
+        Wnom(displayUnit="kW") = 42000,
+        N=10,
+        S=8700,
+        k_wa_nom=1.08e-2,
+        nu_a=1,
+        nu_l=0,
+        staticModel=true,
+        rhoanom=1.2)
         annotation (Placement(transformation(extent={{-20,0},{20,40}})));
       ThermoPower.Water.SourceMassFlow sourceW(
         h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
@@ -2816,22 +2874,66 @@ feature can be useful if one wants to simulate circuits where some condensers ma
 <p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 22.5 degC using air with wet bulb temperature at 14 degC.</p>
 <p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
 </html>"));
-    end TestCoolingTower;
+    end TestCoolingTowerStatic;
 
-    model TestCoolingTowerStatic
-      "Test of the static model of the cooling tower"
-      extends TestCoolingTower(coolingTower(staticModel = true));
+    model TestCoolingTowerClosed "Test of the a closed cooling tower model"
+      extends Modelica.Icons.Example;
+      package Water = Modelica.Media.Water.StandardWater;
+      ThermoPower.Water.CoolingTower coolingTower(
+        Nt=5,
+        wlnom=504/3600*995,
+        qanom=99,
+        rpm_nom=230,
+        Wnom(displayUnit="kW") = 42000,
+        N=10,
+        S=8700,
+        k_wa_nom=1.08e-2,
+        nu_a=1,
+        nu_l=0,
+        staticModel=true,
+        useHeatPort=true,
+        rhoanom=1.2)
+        annotation (Placement(transformation(extent={{-20,0},{20,40}})));
+      ThermoPower.Water.SourceMassFlow sourceW(
+        h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
+        w0=2520/3600*995)
+        annotation (Placement(transformation(extent={{-52,50},{-32,70}})));
+      ThermoPower.Water.SinkPressure
+                              sinkP
+        annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
+      Modelica.Blocks.Sources.Ramp fanRpm(
+        duration=1,
+        offset=230,
+        height=-20)
+        annotation (Placement(transformation(extent={{-82,26},{-62,46}})));
+      inner ThermoPower.System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          T_wb=287.15)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+    equation
+      connect(sourceW.flange, coolingTower.waterInlet) annotation (Line(
+          points={{-32,60},{0,60},{0,38}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(coolingTower.waterOutlet, sinkP.flange) annotation (Line(
+          points={{0,2},{0,-28},{12,-28}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(fanRpm.y, coolingTower.fanRpm) annotation (Line(
+          points={{-61,36},{-38,36},{-38,28},{-16,28}},
+          color={0,0,127},
+          smooth=Smooth.None));
       annotation (
+        Diagram(graphics),
         experiment(
           StartTime=-50,
           StopTime=200,
           Tolerance=1e-006),
+        experimentSetupOutput(equdistant=false),
         Documentation(info="<html>
 <p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 22.5 degC using air with wet bulb temperature at 14 degC.</p>
 <p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
-<p>The static model is employed in this case</p>
 </html>"));
-    end TestCoolingTowerStatic;
+    end TestCoolingTowerClosed;
   end WaterComponents;
 
   package GasComponents "Tests for lumped-parameters Gas package components"

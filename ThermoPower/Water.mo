@@ -4747,6 +4747,7 @@ li><i>1 Jul 2004</i>
 
   model CoolingTower "Cooling tower with variable speed fan"
     import Modelica.SIunits.Conversions;
+    import LSTI = ThermoPower.Choices.CoolingTower.LiquidSolidThermalInteraction;
     package Water = Modelica.Media.Water.StandardWater;
     package DryAir = Modelica.Media.Air.SimpleAir;
 
@@ -4766,10 +4767,12 @@ li><i>1 Jul 2004</i>
       annotation (Placement(transformation(extent={{74,-10},{94,10}}),
           iconTransformation(extent={{70,-10},{90,10}})));
     parameter Boolean staticModel = false "= true for a static model";
+    parameter LSTI lsInteraction =  LSTI.packing "Type of liquid-solid interaction";
     parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt "Initialization option"
-       annotation (Dialog(tab="Initialisation"));
+       annotation (Dialog(tab="Initialisation", enable = not staticModel));
     parameter Integer Nt = 1 "Number of towers in parallel";
     parameter Integer N(min = 2) = 10 "Number of nodes";
+    final parameter Integer Nw = N-1 "Number of volumes on the pipe wall";
     parameter SI.Mass M0 = 0
       "Water hold-up at zero water flow rate (single column)"
       annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
@@ -4781,16 +4784,19 @@ li><i>1 Jul 2004</i>
     parameter SI.VolumeFlowRate qanom
       "Nominal air volume flow rate (single tower)";
     parameter SI.Density rhoanom "Nominal air density";
-    parameter SI.Mass Mp = 0 "Mass of packaging"
-      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
-    parameter SI.SpecificHeatCapacity cp = 0 "Specific heat of packaging"
-      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
-    parameter SI.Area S "Surface of packaging";
+    parameter SI.Mass Mp = 0 "Mass of packing"
+      annotation(Dialog(group = "Dynamic model only",
+                        enable = not staticModel and lsInteraction == LSTI.packing));
+    parameter SI.SpecificHeatCapacity cp = 0 "Specific heat of packing"
+      annotation(Dialog(group = "Dynamic model only",
+                        enable = not staticModeln and lsInteraction == LSTI.packing));
+    parameter SI.Area S "Surface of air/water mass and heat transfer";
     parameter SI.CoefficientOfHeatTransfer gamma_wp_nom = 0
-      "Nominal heat transfer coefficient water-packaging"
-      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
+      "Nominal heat transfer coefficient water-packing"
+      annotation(Dialog(group = "Dynamic model only",
+                        enable = not staticModel and lsInteraction == LSTI.packing));
     parameter Real k_wa_nom(final unit = "kg.K/(m2.s)")
-      "Nominal total heat transfer coefficient per unit surface";
+      "Nominal total mass & heat transfer coefficient per unit surface";
     parameter SI.PerUnit nu_a
       "Exponent of air flow rate in mass & heat transfer coefficients";
     parameter SI.PerUnit nu_l
@@ -4802,13 +4808,14 @@ li><i>1 Jul 2004</i>
        annotation (Dialog(tab="Initialisation", enable = not staticModel));
     parameter SI.SpecificEnthalpy hlstart[N] = fill(120e3,N) "Start values of liquid enthalpy at volume boundaries"
       annotation (Dialog(tab="Initialisation"));
-    parameter SI.Temperature Tpstart[N-1] = ones(N-1)*(30+273.15) "Start value of packaging temperature in each volume"
-       annotation (Dialog(tab="Initialisation", enable = not staticModel));
+    parameter SI.Temperature Tpstart[N-1] = ones(N-1)*(30+273.15) "Start value of packing temperature in each volume"
+       annotation (Dialog(tab="Initialisation",
+                          enable = not staticModel and lsInteraction == LSTI.packing));
     parameter SI.Temperature Twbstart = system.T_wb "Start value of average wet bulb temperature"
       annotation (Dialog(tab="Initialisation"));
     final parameter SI.MassFlowRate wanom = qanom*rhoanom
       "Nominal air mass flow rate";
-
+    final parameter Boolean useHeatPort = (lsInteraction == LSTI.tubes);
 
     constant Real MMv = 0.029;
     constant Real MMa = 0.018;
@@ -4837,7 +4844,8 @@ li><i>1 Jul 2004</i>
       "Absolute humidity (Mv/Ma_dry) of saturated air at the liquid temperature";
     SI.MassFraction Xva[N](each start = 0.01)
       "Absolute humidity (Mv/Ma_dry) of air at the interface";
-    Water.Temperature Tl[N](each start = 300) "Water temperature";
+    Water.Temperature Tl[N](each start = 300) "Water temperature at the nodes";
+    Water.Temperature Tla[N-1](each start = 300) "Average water temperature for each volume";
     Water.Temperature Twb[N](each start = Twbstart)
       "Wet bulb temperature of air at interface";
     SI.Mass M[N-1](
@@ -4850,10 +4858,10 @@ li><i>1 Jul 2004</i>
       "Specific enthalpy state variable";
     SI.Temperature Tp[N-1](
       start = Tpstart,
-      each stateSelect = if staticModel then StateSelect.default else StateSelect.prefer)
+      each stateSelect = if not staticModel and lsInteraction == LSTI.packing then StateSelect.prefer else StateSelect.default)
        "Packing temperature";
-    SI.Power Qlp[N-1] "Thermal power transfer water->packing";
-    SI.Power Q[N-1] "Total thermal power transfer water->air interface (@Twb)";
+    SI.Power Qpt[N-1] "Thermal power transfer packing/tubes -> water";
+    SI.Power Q[N-1] "Total thermal power transfer water -> air interface (@Twb)";
     SI.Power W "Power consumption of the fan (single column)";
     SI.Power Wtot "Power consumption of the fans (all columns)";
     SI.CoefficientOfHeatTransfer gamma_wp[N](each start = gamma_wp_nom)
@@ -4864,24 +4872,45 @@ li><i>1 Jul 2004</i>
     SI.Temperature Tlin "Inlet water temperature";
     SI.Temperature Tlout "Outlet water temperature";
 
-    Thermal.DHTVolumes dHTVolumes annotation (Placement(transformation(extent={
-              {-146,-36},{-126,-16}}), iconTransformation(extent={{-90,-36},{
-              -70,-16}})));
+    Thermal.DHTVolumes tubeWalls(N = Nw, T = Tla, Q = Qpt) if
+         (lsInteraction == LSTI.tubes) "Interface to tube walls @ liquid temperature" annotation (Placement(transformation(
+            extent={{-80,-22},{-60,-2}}),    iconTransformation(extent={{-90,-60},
+              {-70,0}})));
   equation
     for i in 1:N-1 loop
+      // Liquid mass and energy balance
       if staticModel then
         0 = wl[i] - wl[i+1] - wev[i];
-        0 = wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] - Qlp[i];
-        0 = Qlp[i];
+        0 = wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] + Qpt[i];
         M[i] = 0;
-        Tp[i] = Tl[i];
       else
         der(M[i]) = wl[i] - wl[i+1] - wev[i];
         der(M[i])*hltilde[i] + M[i]*der(hltilde[i]) =
-            wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] - Qlp[i];
-        cp*Mp/(N-1)*der(Tp[i]) = Qlp[i];
+          wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] + Qpt[i];
         wl[i+1] = (M[i] - M0/(N-1))/(Mnom/(N-1) - M0/(N-1))*wlnom;
-        Qlp[i] = ((Tl[i] + Tl[i+1])/2 - Tp[i])*S/(N-1)*gamma_wp[i];
+      end if;
+
+      // Energy balance for packing/tubes
+      // (handled by tubeWalls modifier if lsInteraction == LSTI.tubes)
+      if staticModel then
+        if lsInteraction <> LSTI.tubes then
+           0 = Qpt[i];
+        end if;
+      else
+        if lsInteraction == LSTI.none then
+          0 = Qpt[i];
+        elseif lsInteraction == LSTI.packing then
+          cp*Mp/(N-1)*der(Tp[i]) = -Qpt[i];
+        end if;
+      end if;
+
+
+      // Equation for Qpt/Tp if lsInteraction = LSTI.packing
+      // otherwise dummy equation for unused Tp
+      if lsInteraction == LSTI.packing then
+        Qpt[i] = (Tp[i] - Tla[i])*S/(N-1)*gamma_wp[i];
+      else
+        Tp[i] = Tl[i];
       end if;
 
       wa*Xva[i+1] + wev[i] = wa*Xva[i] "vapour mass balance in air";
@@ -4890,6 +4919,8 @@ li><i>1 Jul 2004</i>
       hltilde[i] = hl[i+1];
 
       Q[i] = ((hw[i] + hw[i+1])/2 - (ha[i] + ha[i+1])/2)*S/(N-1)*k_wa;
+
+      Tla[i] = (Tl[i] + Tl[i+1])/2;
     end for;
 
     for i in 1:N loop
