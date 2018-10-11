@@ -4747,7 +4747,6 @@ li><i>1 Jul 2004</i>
 
   model CoolingTower "Cooling tower with variable speed fan"
     import Modelica.SIunits.Conversions;
-    import LSTI = ThermoPower.Choices.CoolingTower.LiquidSolidThermalInteraction;
     package Water = Modelica.Media.Water.StandardWater;
     package DryAir = Modelica.Media.Air.SimpleAir;
 
@@ -4767,7 +4766,7 @@ li><i>1 Jul 2004</i>
       annotation (Placement(transformation(extent={{74,-10},{94,10}}),
           iconTransformation(extent={{70,-10},{90,10}})));
     parameter Boolean staticModel = false "= true for a static model";
-    parameter LSTI lsInteraction =  LSTI.packing "Type of liquid-solid interaction";
+    parameter Boolean useHeatPort = false "Use heat port for closed circuit cooling, no packing";
     parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt "Initialization option"
        annotation (Dialog(tab="Initialisation", enable = not staticModel));
     parameter Integer Nt = 1 "Number of towers in parallel";
@@ -4786,15 +4785,15 @@ li><i>1 Jul 2004</i>
     parameter SI.Density rhoanom "Nominal air density";
     parameter SI.Mass Mp = 0 "Mass of packing"
       annotation(Dialog(group = "Dynamic model only",
-                        enable = not staticModel and lsInteraction == LSTI.packing));
+                        enable = not staticModel and not useHeatPort));
     parameter SI.SpecificHeatCapacity cp = 0 "Specific heat of packing"
       annotation(Dialog(group = "Dynamic model only",
-                        enable = not staticModeln and lsInteraction == LSTI.packing));
+                        enable = not staticModeln and not useHeatPort));
     parameter SI.Area S "Surface of air/water mass and heat transfer";
     parameter SI.CoefficientOfHeatTransfer gamma_wp_nom = 0
       "Nominal heat transfer coefficient water-packing"
       annotation(Dialog(group = "Dynamic model only",
-                        enable = not staticModel and lsInteraction == LSTI.packing));
+                        enable = not staticModel and not useHeatPort));
     parameter Real k_wa_nom(final unit = "kg.K/(m2.s)")
       "Nominal total mass & heat transfer coefficient per unit surface";
     parameter SI.PerUnit nu_a
@@ -4810,12 +4809,11 @@ li><i>1 Jul 2004</i>
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Temperature Tpstart[N-1] = ones(N-1)*(30+273.15) "Start value of packing temperature in each volume"
        annotation (Dialog(tab="Initialisation",
-                          enable = not staticModel and lsInteraction == LSTI.packing));
+                          enable = not staticModel and not useHeatPort));
     parameter SI.Temperature Twbstart = system.T_wb "Start value of average wet bulb temperature"
       annotation (Dialog(tab="Initialisation"));
     final parameter SI.MassFlowRate wanom = qanom*rhoanom
       "Nominal air mass flow rate";
-    final parameter Boolean useHeatPort = (lsInteraction == LSTI.tubes);
 
     constant Real MMv = 0.029;
     constant Real MMa = 0.018;
@@ -4858,7 +4856,7 @@ li><i>1 Jul 2004</i>
       "Specific enthalpy state variable";
     SI.Temperature Tp[N-1](
       start = Tpstart,
-      each stateSelect = if not staticModel and lsInteraction == LSTI.packing then StateSelect.prefer else StateSelect.default)
+      each stateSelect = if not staticModel and Mp > 0 and not useHeatPort then StateSelect.prefer else StateSelect.default)
        "Packing temperature";
     SI.Power Qpt[N-1] "Thermal power transfer packing/tubes -> water";
     SI.Power Q[N-1] "Total thermal power transfer water -> air interface (@Twb)";
@@ -4872,8 +4870,8 @@ li><i>1 Jul 2004</i>
     SI.Temperature Tlin "Inlet water temperature";
     SI.Temperature Tlout "Outlet water temperature";
 
-    Thermal.DHTVolumes tubeWalls(N = Nw, T = Tla, Q = Qpt) if
-         (lsInteraction == LSTI.tubes) "Interface to tube walls @ liquid temperature" annotation (Placement(transformation(
+    Thermal.DHTVolumes tubeWalls(N = Nw, T = Tla, Q = Qpt) if useHeatPort
+      "Interface to tube walls @ liquid temperature" annotation (Placement(transformation(
             extent={{-80,-22},{-60,-2}}),    iconTransformation(extent={{-90,-60},
               {-70,0}})));
   equation
@@ -4891,23 +4889,19 @@ li><i>1 Jul 2004</i>
       end if;
 
       // Energy balance for packing/tubes
-      // (handled by tubeWalls modifier if lsInteraction == LSTI.tubes)
-      if staticModel then
-        if lsInteraction <> LSTI.tubes then
-           0 = Qpt[i];
-        end if;
-      else
-        if lsInteraction == LSTI.none then
-          0 = Qpt[i];
-        elseif lsInteraction == LSTI.packing then
-          cp*Mp/(N-1)*der(Tp[i]) = -Qpt[i];
+      // (handled by tubeWalls modifier heat port is used)
+      if not useHeatPort then
+        if not Mp > 0 or staticModel then
+           0 = -Qpt[i];
+        else
+           cp*Mp/(N-1)*der(Tp[i]) = -Qpt[i];
         end if;
       end if;
 
 
-      // Equation for Qpt/Tp if lsInteraction = LSTI.packing
+      // Equation for Qpt for dynamic model with packing
       // otherwise dummy equation for unused Tp
-      if lsInteraction == LSTI.packing then
+      if not staticModel and Mp > 0 and not useHeatPort then
         Qpt[i] = (Tp[i] - Tla[i])*S/(N-1)*gamma_wp[i];
       else
         Tp[i] = Tl[i];
@@ -4966,19 +4960,23 @@ li><i>1 Jul 2004</i>
     if not staticModel and initOpt == ThermoPower.Choices.Init.Options.steadyState then
       der(M) = zeros(N-1);
       der(hltilde) = zeros(N-1);
-      der(Tp) = zeros(N-1);
+      if Mp > 0 then
+        der(Tp) = zeros(N-1);
+      end if;
     elseif not staticModel and initOpt == ThermoPower.Choices.Init.Options.fixedState then
       M = Mstart;
       hltilde = hlstart[2:N];
-      Tp = Tpstart;
+      if Mp > 0 then
+        Tp = Tpstart;
+      end if;
     end if;
 
     // Default parameter values not allowed for dynamic model
     if not staticModel then
       assert(M0 > 0, "M0 must be positive");
       assert(Mnom > 0, "Mnom must be positive");
-      assert(Mp > 0, "Mp must be positive");
-      assert(cp > 0, "cp must be positive");
+      assert(not (Mp > 0 and not cp > 0), "If Mp > 0 then cp must be positive");
+      assert(not (Mp > 0 and not gamma_wp_nom > 0), "If Mp > 0 then gamma_wp_nom must be positive");
     end if;
     annotation (Icon(graphics={Polygon(
             points={{-70,80},{-70,-80},{70,-80},{70,80},{-70,80}},

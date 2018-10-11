@@ -2877,53 +2877,77 @@ feature can be useful if one wants to simulate circuits where some condensers ma
     end TestCoolingTowerStatic;
 
     model TestCoolingTowerClosed "Test of the a closed cooling tower model"
+      import ThermoPower;
       extends Modelica.Icons.Example;
       package Water = Modelica.Media.Water.StandardWater;
       ThermoPower.Water.CoolingTower coolingTower(
-        Nt=5,
-        wlnom=504/3600*995,
-        qanom=99,
         rpm_nom=230,
         Wnom(displayUnit="kW") = 42000,
-        N=10,
-        S=8700,
         k_wa_nom=1.08e-2,
         nu_a=1,
         nu_l=0,
-        staticModel=true,
         useHeatPort=true,
+        Nt=1,
+        N=6,
+        staticModel=true,
+        wlnom=30/3600*995,
+        S=820,
+        qanom=8,
         rhoanom=1.2)
         annotation (Placement(transformation(extent={{-20,0},{20,40}})));
-      ThermoPower.Water.SourceMassFlow sourceW(
-        h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
-        w0=2520/3600*995)
-        annotation (Placement(transformation(extent={{-52,50},{-32,70}})));
-      ThermoPower.Water.SinkPressure
-                              sinkP
+      ThermoPower.Water.SourceMassFlow sourceClosedCircuit(
+        w0=30/3600*995,
+        use_T=true,
+        T=308.15)
+        annotation (Placement(transformation(extent={{-86,18},{-66,38}})));
+      ThermoPower.Water.SinkPressure towerDischarge
         annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
       Modelica.Blocks.Sources.Ramp fanRpm(
         duration=1,
         offset=230,
         height=-20)
-        annotation (Placement(transformation(extent={{-82,26},{-62,46}})));
+        annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
       inner ThermoPower.System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
           T_wb=287.15)
         annotation (Placement(transformation(extent={{60,60},{80,80}})));
+      ThermoPower.Water.Flow1DFV cooledFlow(
+        N=6,
+        L=1,
+        H=100,
+        A=0.001,
+        omega=100,
+        wnom=8.33,
+        redeclare model HeatTransfer =
+            ThermoPower.Thermal.HeatTransferFV.FlowDependentThermalConductance
+            (alpha=1, UAnom=15000)) annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={-40,12})));
+      ThermoPower.Water.SinkPressure closedCircuitDischarge(p0=300000)
+        annotation (Placement(transformation(extent={{-36,-36},{-16,-16}})));
+      ThermoPower.Water.SourceMassFlow sourceCoolingWater(
+        use_T=true,
+        w0=0.2,
+        T=293.15)
+        annotation (Placement(transformation(extent={{-28,56},{-8,76}})));
     equation
-      connect(sourceW.flange, coolingTower.waterInlet) annotation (Line(
-          points={{-32,60},{0,60},{0,38}},
-          color={0,0,255},
-          smooth=Smooth.None));
-      connect(coolingTower.waterOutlet, sinkP.flange) annotation (Line(
+      connect(coolingTower.waterOutlet, towerDischarge.flange) annotation (Line(
           points={{0,2},{0,-28},{12,-28}},
           color={0,0,255},
           smooth=Smooth.None));
       connect(fanRpm.y, coolingTower.fanRpm) annotation (Line(
-          points={{-61,36},{-38,36},{-38,28},{-16,28}},
+          points={{-39,50},{-24,50},{-24,28},{-16,28}},
           color={0,0,127},
           smooth=Smooth.None));
+      connect(cooledFlow.wall, coolingTower.tubeWalls) annotation (Line(points=
+              {{-35,12},{-24.5,12},{-24.5,14},{-16,14}}, color={255,127,0}));
+      connect(sourceClosedCircuit.flange, cooledFlow.infl) annotation (Line(
+            points={{-66,28},{-40,28},{-40,22}}, color={0,0,255}));
+      connect(cooledFlow.outfl, closedCircuitDischarge.flange) annotation (Line(
+            points={{-40,2},{-40,-26},{-36,-26}}, color={0,0,255}));
+      connect(sourceCoolingWater.flange, coolingTower.waterInlet)
+        annotation (Line(points={{-8,66},{0,66},{0,38}}, color={0,0,255}));
       annotation (
-        Diagram(graphics),
         experiment(
           StartTime=-50,
           StopTime=200,
