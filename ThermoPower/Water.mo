@@ -4783,19 +4783,19 @@ li><i>1 Jul 2004</i>
     parameter SI.VolumeFlowRate qanom
       "Nominal air volume flow rate (single tower)";
     parameter SI.Density rhoanom "Nominal air density";
-    parameter SI.Mass Mp = 0 "Mass of packing"
+    parameter SI.Mass Mp = 0 "Mass of packing (single tower)"
       annotation(Dialog(group = "Dynamic model only",
                         enable = not staticModel and not useHeatPort));
     parameter SI.SpecificHeatCapacity cp = 0 "Specific heat of packing"
       annotation(Dialog(group = "Dynamic model only",
                         enable = not staticModeln and not useHeatPort));
-    parameter SI.Area S "Surface of air/water mass and heat transfer";
+    parameter SI.Area S "Surface of air/water mass and heat transfer (single tower)";
     parameter SI.CoefficientOfHeatTransfer gamma_wp_nom = 0
       "Nominal heat transfer coefficient water-packing"
       annotation(Dialog(group = "Dynamic model only",
                         enable = not staticModel and not useHeatPort));
     parameter Real k_wa_nom(final unit = "kg.K/(m2.s)")
-      "Nominal total mass & heat transfer coefficient per unit surface";
+      "Nominal total mass & heat transfer coefficient per unit surface (single tower)";
     parameter SI.PerUnit nu_a
       "Exponent of air flow rate in mass & heat transfer coefficients";
     parameter SI.PerUnit nu_l
@@ -4870,7 +4870,7 @@ li><i>1 Jul 2004</i>
     SI.Temperature Tlin "Inlet water temperature";
     SI.Temperature Tlout "Outlet water temperature";
 
-    Thermal.DHTVolumes tubeWalls(N = Nw, T = Tla, Q = Qpt) if useHeatPort
+    Thermal.DHTVolumes tubeWalls(N = Nw, T = Tla, Q = Qpt*Nt) if useHeatPort
       "Interface to tube walls @ liquid temperature" annotation (Placement(transformation(
             extent={{-80,-22},{-60,-2}}),    iconTransformation(extent={{-90,-60},
               {-70,0}})));
