@@ -2824,9 +2824,20 @@ The packages Medium are redeclared and a mass balance determines the composition
               if allowFlowReversal then +Modelica.Constants.inf else 0))
         annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
                0)));
-    equation
+    initial equation
+        assert(wnom > 0, "Please set a positive value for wnom");
         assert(FFtype == FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
+        assert(not
+                  (FFtype == FFtypes.Kfnom     and not Kfnom > 0),  "Kfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.OpPoint   and not rhonom > 0), "rhonom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Cfnom     and not Cfnom > 0),  "Cfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)),
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.

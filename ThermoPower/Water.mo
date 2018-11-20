@@ -5344,6 +5344,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
       "Basic interface for 1-dimensional water/steam fluid flow models"
+      import ThermoPower.Choices.Flow1D.FFtypes;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
@@ -5431,10 +5432,20 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       final parameter SI.PerUnit dzdx=H/L "Slope" annotation (Evaluate=true);
       final parameter SI.Length l=L/(N - 1) "Length of a single volume";
       final parameter SI.Volume V = Nt*A*L "Total volume (all Nt tubes)";
-    equation
-        assert(FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction or dpnom > 0,
+    initial equation
+        assert(wnom > 0, "Please set a positive value for wnom");
+        assert(FFtype == FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
-
+        assert(not
+                  (FFtype == FFtypes.Kfnom     and not Kfnom > 0),  "Kfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.OpPoint   and not rhonom > 0), "rhonom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Cfnom     and not Cfnom > 0),  "Cfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
         annotation (Evaluate=true,
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
