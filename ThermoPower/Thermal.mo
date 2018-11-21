@@ -840,6 +840,38 @@ The swapping is performed if the counterCurrent parameter is true (default value
 "));
   end CounterCurrentFEM;
 
+  model ConvHTFV "1D Constant thermal conductance"
+    extends Icons.HeatFlow;
+    parameter Integer Nv=2 "Number of finite volumes";
+    parameter SI.ThermalConductance G "Overall thermal conductance";
+
+    DHTVolumes side1(final N=Nv) annotation (Placement(transformation(extent={{-40,20},{40,40}},
+            rotation=0)));
+    DHTVolumes side2(final N=Nv) annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
+            rotation=0)));
+  equation
+    side1.Q = G*(side1.T - side2.T) "Convective heat transfer";
+    side1.Q + side2.Q = zeros(Nv) "Static energy balance";
+    annotation (Icon(graphics={Text(
+            extent={{-100,-44},{100,-68}},
+            lineColor={191,95,0},
+            textString="%name")}), Documentation(info="<HTML>
+<p>Model of a uniformly distributed finite-volume constant thermal conductance between two 1D objects.
+<p>Volume <tt>j</tt> on side 1 interacts with volume <tt>j</tt> on side 2.
+</HTML>", revisions="<html>
+<li><i>23 Oct 2018</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end ConvHTFV;
+
+  model FoulingFV "1D FV thermal resistance due to fouling"
+    extends ConvHTFV(final G = A/R);
+    parameter Units.SpecificThermalResistance R "Fouling factor";
+    parameter SI.Area A "Total surface";
+  end FoulingFV;
+
   model ConvHTLumped "Lumped parameter convective heat transfer"
     extends Icons.HeatFlow;
     parameter SI.ThermalConductance G "Constant thermal conductance";
