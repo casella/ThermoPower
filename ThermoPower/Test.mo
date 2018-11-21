@@ -2871,33 +2871,36 @@ feature can be useful if one wants to simulate circuits where some condensers ma
           Tolerance=1e-006),
         experimentSetupOutput(equdistant=false),
         Documentation(info="<html>
-<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 22.5 degC using air with wet bulb temperature at 14 degC.</p>
+<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 21.5 degC using air with wet bulb temperature at 14 degC.</p>
 <p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
 </html>"));
     end TestCoolingTowerStatic;
 
-    model TestCoolingTowerClosed "Test of the a closed cooling tower model"
+    model TestCoolingTowerClosed
+      "Test of the a closed cooling tower model"
       import ThermoPower;
       extends Modelica.Icons.Example;
       package Water = Modelica.Media.Water.StandardWater;
       ThermoPower.Water.CoolingTower coolingTower(
-        rpm_nom=230,
-        Wnom(displayUnit="kW") = 42000,
-        k_wa_nom=1.08e-2,
         nu_a=1,
         nu_l=0,
-        useHeatPort=true,
         Nt=1,
-        N=6,
         staticModel=true,
         wlnom=30/3600*995,
-        S=820,
-        qanom=8,
-        rhoanom=1.2)
-        annotation (Placement(transformation(extent={{-20,0},{20,40}})));
+        Wnom(displayUnit="kW") = 4100,
+        rpm_nom=230,
+        N=6,
+        closedCircuit=true,
+        rhoanom(displayUnit="kg/m3") = 1.2,
+        gamma_wp_nom=200,
+        S=400,
+        k_wa_nom=0.024,
+        qanom=7.3)
+        annotation (Placement(transformation(extent={{-20,-2},{20,38}})));
       ThermoPower.Water.SourceMassFlow sourceClosedCircuit(
-        w0=30/3600*995,
         use_T=true,
+        w0=30/3600*995,
+        p0=400000,
         T=308.15)
         annotation (Placement(transformation(extent={{-86,18},{-66,38}})));
       ThermoPower.Water.SinkPressure towerDischarge
@@ -2908,45 +2911,55 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         height=-20)
         annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
       inner ThermoPower.System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
-          T_wb=287.15)
+        T_amb=303.15,
+        T_wb=298.15)
         annotation (Placement(transformation(extent={{60,60},{80,80}})));
       ThermoPower.Water.Flow1DFV cooledFlow(
-        N=6,
         L=1,
-        H=100,
-        A=0.001,
         omega=100,
         wnom=8.33,
+        H=10,
+        N=6,
+        A=0.003,
         redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.FlowDependentThermalConductance
-            (alpha=1, UAnom=15000)) annotation (Placement(transformation(
+            (alpha=1, UAnom=80000)) annotation (Placement(transformation(
             extent={{-10,-10},{10,10}},
             rotation=-90,
-            origin={-40,12})));
+            origin={-52,12})));
       ThermoPower.Water.SinkPressure closedCircuitDischarge(p0=300000)
         annotation (Placement(transformation(extent={{-36,-36},{-16,-16}})));
       ThermoPower.Water.SourceMassFlow sourceCoolingWater(
         use_T=true,
-        w0=0.2,
-        T=293.15)
+        w0=0.4,
+        T=301.15)
         annotation (Placement(transformation(extent={{-28,56},{-8,76}})));
+      ThermoPower.Thermal.MetalWallFV metalWallFV(
+        Nw=5,
+        M=20,
+        cm=500) annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=90,
+            origin={-32,12})));
     equation
       connect(coolingTower.waterOutlet, towerDischarge.flange) annotation (Line(
-          points={{0,2},{0,-28},{12,-28}},
+          points={{0,0},{0,-28},{12,-28}},
           color={0,0,255},
           smooth=Smooth.None));
       connect(fanRpm.y, coolingTower.fanRpm) annotation (Line(
-          points={{-39,50},{-24,50},{-24,28},{-16,28}},
+          points={{-39,50},{-24,50},{-24,26},{-16,26}},
           color={0,0,127},
           smooth=Smooth.None));
-      connect(cooledFlow.wall, coolingTower.tubeWalls) annotation (Line(points=
-              {{-35,12},{-24.5,12},{-24.5,14},{-16,14}}, color={255,127,0}));
       connect(sourceClosedCircuit.flange, cooledFlow.infl) annotation (Line(
-            points={{-66,28},{-40,28},{-40,22}}, color={0,0,255}));
+            points={{-66,28},{-52,28},{-52,22}}, color={0,0,255}));
       connect(cooledFlow.outfl, closedCircuitDischarge.flange) annotation (Line(
-            points={{-40,2},{-40,-26},{-36,-26}}, color={0,0,255}));
+            points={{-52,2},{-52,-26},{-36,-26}}, color={0,0,255}));
       connect(sourceCoolingWater.flange, coolingTower.waterInlet)
-        annotation (Line(points={{-8,66},{0,66},{0,38}}, color={0,0,255}));
+        annotation (Line(points={{-8,66},{0,66},{0,36}}, color={0,0,255}));
+      connect(cooledFlow.wall, metalWallFV.int)
+        annotation (Line(points={{-47,12},{-35,12}}, color={255,127,0}));
+      connect(metalWallFV.ext, coolingTower.tubeWalls)
+        annotation (Line(points={{-28.9,12},{-16,12}}, color={255,127,0}));
       annotation (
         experiment(
           StartTime=-50,
@@ -2954,7 +2967,8 @@ feature can be useful if one wants to simulate circuits where some condensers ma
           Tolerance=1e-006),
         experimentSetupOutput(equdistant=false),
         Documentation(info="<html>
-<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 22.5 degC using air with wet bulb temperature at 14 degC.</p>
+<p>Test of the closed cooling tower model. A flow of 8.3 kg/s of water in the closed circuit
+at 35 degC is cooled down to 30 degC using using air with wet bulb temperature at 25 degC.</p>
 <p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
 </html>"));
     end TestCoolingTowerClosed;

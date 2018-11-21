@@ -4765,8 +4765,12 @@ li><i>1 Jul 2004</i>
       "Total fan power consumption"
       annotation (Placement(transformation(extent={{74,-10},{94,10}}),
           iconTransformation(extent={{70,-10},{90,10}})));
+    Thermal.DHTVolumes tubeWalls(N = Nw, T = Tp, Q = Qwp*Nt) if closedCircuit
+      "Interface to tube walls @ wall temperature"
+      annotation (Placement(transformation(extent={{-80,-22},{-60,-2}}), iconTransformation(extent={{-90,-60}, {-70,0}})));
+
+    parameter Boolean closedCircuit = false "true for closed-circuit tower";
     parameter Boolean staticModel = false "= true for a static model";
-    parameter Boolean useHeatPort = false "Use heat port for closed circuit cooling, no packing";
     parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt "Initialization option"
        annotation (Dialog(tab="Initialisation", enable = not staticModel));
     parameter Integer Nt = 1 "Number of towers in parallel";
@@ -4785,15 +4789,13 @@ li><i>1 Jul 2004</i>
     parameter SI.Density rhoanom "Nominal air density";
     parameter SI.Mass Mp = 0 "Mass of packing (single tower)"
       annotation(Dialog(group = "Dynamic model only",
-                        enable = not staticModel and not useHeatPort));
+                        enable = not staticModel and not closedCircuit));
     parameter SI.SpecificHeatCapacity cp = 0 "Specific heat of packing"
-      annotation(Dialog(group = "Dynamic model only",
-                        enable = not staticModeln and not useHeatPort));
+      annotation(Dialog(enable = not staticModel and not closedCircuit));
     parameter SI.Area S "Surface of air/water mass and heat transfer (single tower)";
     parameter SI.CoefficientOfHeatTransfer gamma_wp_nom = 0
-      "Nominal heat transfer coefficient water-packing"
-      annotation(Dialog(group = "Dynamic model only",
-                        enable = not staticModel and not useHeatPort));
+      "Nominal heat transfer coefficient beween water and packing or tubes"
+      annotation(Dialog(enable = not staticModel or closedCircuit));
     parameter Real k_wa_nom(final unit = "kg.K/(m2.s)")
       "Nominal total mass & heat transfer coefficient per unit surface (single tower)";
     parameter SI.PerUnit nu_a
@@ -4856,53 +4858,50 @@ li><i>1 Jul 2004</i>
       "Specific enthalpy state variable";
     SI.Temperature Tp[N-1](
       start = Tpstart,
-      each stateSelect = if not staticModel and Mp > 0 and not useHeatPort then StateSelect.prefer else StateSelect.default)
-       "Packing temperature";
-    SI.Power Qpt[N-1] "Thermal power transfer packing/tubes -> water";
+      each stateSelect = if not staticModel and Mp > 0 and not closedCircuit then StateSelect.prefer else StateSelect.default)
+       "Temperature of packing or tube surface";
+    SI.Power Qwp[N-1] "Thermal power transfer between water and packing or tubes";
     SI.Power Q[N-1] "Total thermal power transfer water -> air interface (@Twb)";
     SI.Power W "Power consumption of the fan (single column)";
     SI.Power Wtot "Power consumption of the fans (all columns)";
     SI.CoefficientOfHeatTransfer gamma_wp[N](each start = gamma_wp_nom)
-      "Heat transfer coefficient water-packing";
+      "Heat transfer coefficient between water and packing or tubes";
     Real k_wa(final unit = "kg.K/(m2.s)", start = k_wa_nom)
-      "Total heat transfer coefficient per unit surface";
+      "Total evaporation heat transfer coefficient per unit surface";
 
     SI.Temperature Tlin "Inlet water temperature";
     SI.Temperature Tlout "Outlet water temperature";
 
-    Thermal.DHTVolumes tubeWalls(N = Nw, T = Tla, Q = Qpt*Nt) if useHeatPort
-      "Interface to tube walls @ liquid temperature" annotation (Placement(transformation(
-            extent={{-80,-22},{-60,-2}}),    iconTransformation(extent={{-90,-60},
-              {-70,0}})));
   equation
     for i in 1:N-1 loop
       // Liquid mass and energy balance
       if staticModel then
         0 = wl[i] - wl[i+1] - wev[i];
-        0 = wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] + Qpt[i];
+        0 = wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] + Qwp[i];
         M[i] = 0;
       else
         der(M[i]) = wl[i] - wl[i+1] - wev[i];
         der(M[i])*hltilde[i] + M[i]*der(hltilde[i]) =
-          wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] + Qpt[i];
+          wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] + Qwp[i];
         wl[i+1] = (M[i] - M0/(N-1))/(Mnom/(N-1) - M0/(N-1))*wlnom;
       end if;
 
       // Energy balance for packing/tubes
-      // (handled by tubeWalls modifier heat port is used)
-      if not useHeatPort then
+      // if closedCircuit = true, Qwp is bound to the tubeWalls.Q variable in the connector
+      if not closedCircuit then
         if not Mp > 0 or staticModel then
-           0 = -Qpt[i];
+           0 = -Qwp[i];
         else
-           cp*Mp/(N-1)*der(Tp[i]) = -Qpt[i];
+           cp*Mp/(N-1)*der(Tp[i]) = -Qwp[i];
         end if;
       end if;
 
 
-      // Equation for Qpt for dynamic model with packing
+      // Equation for Qwp for open-circuit dynamic model with packing
+      // and for closed-circuit model with external tubes
       // otherwise dummy equation for unused Tp
-      if not staticModel and Mp > 0 and not useHeatPort then
-        Qpt[i] = (Tp[i] - Tla[i])*S/(N-1)*gamma_wp[i];
+      if closedCircuit or (not staticModel and Mp > 0) then
+        Qwp[i] = (Tp[i] - Tla[i])*S/(N-1)*gamma_wp[i];
       else
         Tp[i] = Tl[i];
       end if;
@@ -4972,6 +4971,9 @@ li><i>1 Jul 2004</i>
     end if;
 
     // Default parameter values not allowed for dynamic model
+    if closedCircuit then
+      assert(not Mp > 0, "A closed-circuit tower should have Mp = 0");
+    end if;
     if not staticModel then
       assert(M0 > 0, "M0 must be positive");
       assert(Mnom > 0, "Mnom must be positive");
@@ -4990,8 +4992,17 @@ li><i>1 Jul 2004</i>
             smooth=Smooth.None,
             fillColor={255,255,255},
             fillPattern=FillPattern.Solid)}), Documentation(info="<html>
-<p>This model represents a cooling tower with variable speed fans, filled with metallic packaging.</p>
-<p>The mass and heat transfer from the hot water to humid ambient air is modelled according to Merkel&apos;s equation: the driving force for heat and mass transfer is the difference between the specific enthalpy of saturated humid air at the water temperature per unit dry air mass, and the specific enthalpy of saturated humid air at the wet bulb temperature Twb per unit dry air mass. The wet bulb temperature of incoming air is given by the settings of the system object.</p>
+<p>This model represents a cooling tower with variable speed fans. If <code>closedCircuit</code> is false, the model
+represents a cooling tower filled with metallic packing, where the incoming water is cooled by direct contact with humid air,
+by means of evaporation. Dynamic models with <code>Mp > 0</code> also represent heat storage in the packing and heat
+transfer between the packing and the evaporating water.</p>
+<p>If <code>closedCircuit</code> is true and <code>Mp = 0</code>, then the model represents a closed-circuit tower cooling an
+external circuit, which is thermally connected through the 1D distributed heat port <code>wallPort</code>, representing the tube external surface.</p>
+<p>The heat transfer between the packing or the tube surface and the evaporating water is computed by a specific
+heat transfer coefficient, whose nominal value is <code>gamma_wp_nom</code>, and which varies with the <code>nu_l</code>-th power
+of the liquid flow.</p>  
+<p>The mass and heat transfer from the hot water to humid ambient air is modelled according to Merkel&apos;s equation: the driving force for heat and mass transfer is the difference between the specific enthalpy of saturated humid air at the water temperature per unit dry air mass, and the specific enthalpy of saturated humid air at the wet bulb temperature Twb per unit dry air mass.
+The dry and wet bulb temperatures of incoming air are given by the settings of the system object.</p>
 <p>The 1D counter-current heat and mass transfer equations are discretized by the finite volume method, with <code>N-1</code> volumes; average quantities between volume inlet and volume outlet are used to compute the driving force of the mass and energy transfer.</p>
 <p>Humid air is modelled as an ideal mixture of dry air and steam, using the IF97 water-steam model.</p>
 <p>The hold-up of water in the packaging is modelled assuming a simple linear relationship between the hold-up in each volume and the corresponding outgoing flow, which is calibrated by the <code>Mnom</code> and <code>M0</code> parameters. The energy storage in the water hold-up and in the packaging is accounted for.</p>
