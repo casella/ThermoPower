@@ -2920,10 +2920,10 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         wnom=8.33,
         H=10,
         N=6,
-        A=0.003,
         redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.FlowDependentThermalConductance
-            (alpha=1, UAnom=80000)) annotation (Placement(transformation(
+            (alpha=1, UAnom=80000),
+        A=0.06)                     annotation (Placement(transformation(
             extent={{-10,-10},{10,10}},
             rotation=-90,
             origin={-52,12})));
