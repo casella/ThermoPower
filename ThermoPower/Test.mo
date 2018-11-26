@@ -2934,7 +2934,7 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         w0=0.4,
         T=301.15)
         annotation (Placement(transformation(extent={{-28,56},{-8,76}})));
-      ThermoPower.Thermal.MetalWallFV metalWallFV(
+      ThermoPower.Thermal.MetalWallFV tubeWalls(
         Nw=5,
         M=20,
         cm=500) annotation (Placement(transformation(
@@ -2956,9 +2956,9 @@ feature can be useful if one wants to simulate circuits where some condensers ma
             points={{-52,2},{-52,-26},{-36,-26}}, color={0,0,255}));
       connect(sourceCoolingWater.flange, coolingTower.waterInlet)
         annotation (Line(points={{-8,66},{0,66},{0,36}}, color={0,0,255}));
-      connect(cooledFlow.wall, metalWallFV.int)
+      connect(cooledFlow.wall, tubeWalls.int)
         annotation (Line(points={{-47,12},{-35,12}}, color={255,127,0}));
-      connect(metalWallFV.ext, coolingTower.tubeWalls)
+      connect(tubeWalls.ext, coolingTower.tubeWalls)
         annotation (Line(points={{-28.9,12},{-16,12}}, color={255,127,0}));
       annotation (
         experiment(
