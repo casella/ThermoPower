@@ -4858,7 +4858,7 @@ li><i>1 Jul 2004</i>
       "Specific enthalpy state variable";
     SI.Temperature Tp[N-1](
       start = Tpstart,
-      each stateSelect = if not staticModel and Mp > 0 and not closedCircuit then StateSelect.prefer else StateSelect.default)
+      each stateSelect = if not staticModel and not closedCircuit then StateSelect.prefer else StateSelect.default)
        "Temperature of packing or tube surface";
     SI.Power Qwp[N-1] "Thermal power transfer between water and packing or tubes";
     SI.Power Q[N-1] "Total thermal power transfer water -> air interface (@Twb)";
