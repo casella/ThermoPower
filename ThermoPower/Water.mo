@@ -1158,6 +1158,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends BaseClasses.Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
+
+    parameter SI.PerUnit wnm = 1e-3 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     SI.Length omega_hyd "Wet perimeter (single tube)";
@@ -1340,6 +1343,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     M = sum(rhobar)*A*l "Fluid mass (single tube)";
     Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
+
+    assert(w > -wnom*wnm, "Reverse flow not allowed, maybe you connected the component with wrong orientation");
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -1487,6 +1492,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     constant SI.Pressure pzero=10 "Small deltap for calculations";
     constant Medium.AbsolutePressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SI.SpecificEnthalpy hzero=1e-3 "Small value for deltah";
+
+    parameter SI.PerUnit wnm = 1e-3 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+
     // SmoothMedium.ThermodynamicState fluidState[N]
     //   "Thermodynamic state of the fluid at the nodes";
     Medium.ThermodynamicState fluidState[N]
@@ -1743,6 +1751,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
 
+    assert(infl.m_flow > -wnom*wnm, "Reverse flow not allowed, maybe you connected the component with wrong orientation");
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -5023,8 +5032,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
     outer ThermoPower.System system "System wide properties";
     parameter Boolean allowFlowReversal = system.allowFlowReversal "= true to allow flow reversal, false restricts to design direction" annotation (
       Evaluate = true);
-    parameter SI.Pressure pf "Pressurizer pressure" annotation (
-      Dialog(tab = "Initialisation"));
+    parameter SI.Pressure pf "Fixed flange pressure";
 
     ThermoPower.Water.FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min = if allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
       Placement(transformation(extent={{-60,-80},{-20,-40}},       rotation = 0),

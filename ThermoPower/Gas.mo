@@ -964,6 +964,8 @@ package Gas "Models of components with ideal gases as working fluid"
       final w=w*ones(N),
       final fluidState=gas.state) "Instantiated heat transfer model";
 
+    parameter SI.PerUnit wnm = 1e-2 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+
     Medium.BaseProperties gas[N] "Gas nodal properties";
     SI.Pressure Dpfric "Pressure drop due to friction";
     SI.Length omega_hyd "Wet perimeter (single tube)";
@@ -1173,6 +1175,8 @@ package Gas "Models of components with ideal gases as working fluid"
     Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
+
+    assert(infl.m_flow > -wnom*wnm, "Reverse flow not allowed, maybe you connected the component with wrong orientation");
   initial equation
     if initOpt == Choices.Init.Options.noInit or QuasiStatic then
       // do nothing
