@@ -4913,7 +4913,7 @@ li><i>1 Jul 2004</i>
 
       Q[i] = ((hw[i] + hw[i+1])/2 - (ha[i] + ha[i+1])/2)*S/(N-1)*k_wa;
 
-      Tla[i] = (Tl[i] + Tl[i+1])/2;
+      Tla[i] = if closedCircuit then Tl[i+1] else (Tl[i] + Tl[i+1])/2;
     end for;
 
     for i in 1:N loop
