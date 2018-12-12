@@ -2987,7 +2987,8 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
         dpnom=200000,
         pstart=700000)
         annotation (Placement(transformation(extent={{22,-10},{42,10}})));
-      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          allowFlowReversal=false)
         annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
     equation
       connect(expTankIdeal.WaterOutfl, pipe.infl)
