@@ -1258,17 +1258,17 @@ package Icons "Icons for ThermoPower library"
               origin = {1, 0}, 
               extent = {{-21, 26}, {21, -26}}, 
               textString = "P"), 
-            Rectangle(
-              origin = {-1, -90}, 
-              fillColor = {0, 0, 255}, 
-              fillPattern = FillPattern.Solid, 
-              extent = {{-29, 4}, {29, -4}}), 
-            Rectangle(
-              origin = {0, -71}, 
-              lineColor = {0, 0, 255}, 
-              fillColor = {0, 0, 255}, 
-              fillPattern = FillPattern.Solid, 
-              extent = {{-4, 17}, {4, -17}}), 
++           Rectangle(
++             origin={-1,-96},
++             fillColor = {0, 0, 255},
++             fillPattern = FillPattern.Solid,
++             extent = {{-29, 4}, {29, -4}}),
++           Rectangle(
++             origin={0,-73},
++             lineColor = {0, 0, 255},
++             fillColor = {0, 0, 255},
++             fillPattern = FillPattern.Solid,
++             extent={{-4,19},{4,-19}}),
             Text(
               origin = {-2, -125}, 
               extent = {{-36, 13}, {36, -13}}, 
