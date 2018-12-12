@@ -5033,6 +5033,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
     parameter Boolean allowFlowReversal = system.allowFlowReversal "= true to allow flow reversal, false restricts to design direction" annotation (
       Evaluate = true);
     parameter SI.Pressure pf "Fixed flange pressure";
+    Medium.MassFlowRate wn "Net entering mass flow rate";
 
     ThermoPower.Water.FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min = if allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
       Placement(transformation(extent={{-60,-80},{-20,-40}},       rotation = 0),
@@ -5046,6 +5047,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
     WaterOutfl.h_outflow = inStream(WaterInfl.h_outflow);
     WaterInfl.p = pf;
     WaterOutfl.p = pf;
+    wn = WaterInfl.m_flow + WaterOutfl.m_flow;
     annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
           coordinateSystem(preserveAspectRatio=false)),
       Documentation(info="<html>
