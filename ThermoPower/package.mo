@@ -1272,7 +1272,7 @@ package Icons "Icons for ThermoPower library"
                 fillPattern = FillPattern.Solid, 
                 extent = {{-4, 17}, {4, -17}}), 
               Text(
-                origin = {-2, -91}, 
+                origin = {-2, -100}, 
                 extent = {{-98, 9}, {100, -11}}, 
                 textString = "%name")}), Diagram(graphics));
     end ExpansionTankIdeal;
