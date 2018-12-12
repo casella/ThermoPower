@@ -5015,6 +5015,44 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
 </html>"));
   end CoolingTower;
 
+  model IdealPressuriser "Ideal pressurizer with prescribed pressure"
+    extends Icons.Water.IdealPressuriser;
+    replaceable package Medium = Modelica.Media.Water.StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialMedium  "Liquid medium model" annotation (
+       choicesAllMatching = true);
+    outer ThermoPower.System system "System wide properties";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal "= true to allow flow reversal, false restricts to design direction" annotation (
+      Evaluate = true);
+    parameter SI.Pressure pf "Pressurizer pressure" annotation (
+      Dialog(tab = "Initialisation"));
+
+    ThermoPower.Water.FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min = if allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+      Placement(transformation(extent = {{-44, -100}, {-24, -80}}, rotation = 0)));
+    ThermoPower.Water.FlangeB WaterOutfl(redeclare package Medium = Medium, m_flow(max = if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+      Placement(transformation(extent = {{24, -100}, {44, -80}}, rotation = 0)));
+
+  equation
+    WaterInfl.h_outflow = inStream(WaterOutfl.h_outflow);
+    WaterOutfl.h_outflow = inStream(WaterInfl.h_outflow);
+    WaterInfl.p = pf;
+    WaterOutfl.p = pf;
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+          coordinateSystem(preserveAspectRatio=false)),
+      Documentation(info="<html>
+<p>This model implements an ideal pressuriser, in wich the pressure at the bottom flanges is prescribed, while the water mass inside the pressuriser is free to change in order to compensaste the fluid expansion in the circuit connected to the pressuriser itself.</p>
+<p>Water flows in and out through the interfaces at the component bottom (flow reversal supported), the water entalpy is transferred through the flanges following to the water flow direction, whithout changes.</p>
+<h4>Parameters</h4>
+<ul>
+<li>pf: prescribed pressure at the bottom flanges.</li>
+</ul>
+</html>", revisions="<html>
+<ul>
+<li><i>12 Dec 2018</i> <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>First release.</li>
+</ul>
+<p>First Release.</p>
+</html>"));
+  end IdealPressuriser;
+
   function f_chen "Chen's correlation for two-phase flow in a tube"
 
     input SI.MassFlowRate w "Mass flowrate";
