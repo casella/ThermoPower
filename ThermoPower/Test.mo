@@ -2972,6 +2972,34 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
 <p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
 </html>"));
     end TestCoolingTowerClosed;
+
+    model TestExpansionTankIdeal "Test case for ExpansionTankIdeal"
+      extends Modelica.Icons.Example;
+
+      Water.ExpansionTankIdeal expTankIdeal(pf=700000)
+        annotation (Placement(transformation(extent={{-10,-4},{10,16}})));
+      Water.ThroughMassFlow idealPump(w0=10)
+        annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
+      Water.Flow1DFV pipe(A = 3.1416 * 0.04 ^ 2, FFtype = ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+      L = 10,                 hstartin = 134.11e3, hstartout = 134.11e3,
+      omega = 3.1416 * 0.04 * 2,               wnom = 10,
+        rhonom=999,
+        dpnom=200000,
+        pstart=700000)
+        annotation (Placement(transformation(extent={{22,-10},{42,10}})));
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
+    equation
+      connect(expTankIdeal.WaterOutfl, pipe.infl)
+        annotation (Line(points={{4,0},{13,0},{22,0}}, color={0,0,255}));
+      connect(idealPump.outlet, expTankIdeal.WaterInfl)
+        annotation (Line(points={{-20,0},{-12,0},{-4,0}}, color={0,0,255}));
+      connect(pipe.outfl, idealPump.inlet) annotation (Line(points={{42,0},{50,
+              0},{50,-14},{20,-14},{-46,-14},{-46,0},{-40,0}}, color={0,0,255}));
+      annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+            coordinateSystem(preserveAspectRatio=false)),
+        experiment(StopTime=500));
+    end TestExpansionTankIdeal;
   end WaterComponents;
 
   package GasComponents "Tests for lumped-parameters Gas package components"
