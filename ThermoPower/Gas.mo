@@ -642,7 +642,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
-      Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
+      Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter Medium.Temperature Tmstart=300 "Metal wall start temperature";
     parameter SI.Volume V "Inner volume";
     parameter SI.Area S=0 "Inner surface";
@@ -788,7 +788,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
-      Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
+      Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter SI.Volume V "Inner volume";
     parameter SI.Area S=0 "Inner surface";
     parameter SI.CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
