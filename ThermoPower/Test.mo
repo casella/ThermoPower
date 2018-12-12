@@ -2980,27 +2980,72 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
         annotation (Placement(transformation(extent={{-10,-4},{10,16}})));
       Water.ThroughMassFlow idealPump(w0=10)
         annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
-      Water.Flow1DFV pipe(A = 3.1416 * 0.04 ^ 2, FFtype = ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-      L = 10,                 hstartin = 134.11e3, hstartout = 134.11e3,
-      omega = 3.1416 * 0.04 * 2,               wnom = 10,
-        rhonom=999,
-        N=3,
+      Water.Flow1DFV boiler(
+        A=3.1416*0.04^2,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        L=10,
+        hstartin=134.11e3,
+        hstartout=134.11e3,
+        omega=3.1416*0.04*2,
+        wnom=10,
+        N=2,
         dpnom=200000,
+        rhonom=999,
         pstart=700000)
         annotation (Placement(transformation(extent={{22,-10},{42,10}})));
-      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
-          allowFlowReversal=false)
+      inner System system(
+          allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
+      Thermal.TempSource1DFV temperatureSource
+        annotation (Placement(transformation(extent={{-26,-48},{-6,-68}})));
+      Modelica.Blocks.Sources.RealExpression externalTemperature(y=system.T_amb)
+        annotation (Placement(transformation(extent={{-78,-90},{-46,-70}})));
+      Water.Flow1DFV heater(
+        A=3.1416*0.04^2,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        L=10,
+        hstartin=134.11e3,
+        hstartout=134.11e3,
+        omega=3.1416*0.04*2,
+        wnom=10,
+        N=2,
+        dpnom=200000,
+        rhonom=999,
+        pstart=700000,
+        redeclare model HeatTransfer =
+            Thermal.HeatTransferFV.ConstantThermalConductance (UA=50000))
+        annotation (Placement(transformation(extent={{-6,-30},{-26,-50}})));
+      Thermal.HeatSource1DFV heatFlowSource
+        annotation (Placement(transformation(extent={{22,12},{42,32}})));
+      Modelica.Blocks.Sources.Step step(height=1e6, startTime=10)
+        annotation (Placement(transformation(extent={{-6,30},{14,50}})));
     equation
-      connect(expTankIdeal.WaterOutfl, pipe.infl)
+      connect(expTankIdeal.WaterOutfl, boiler.infl)
         annotation (Line(points={{4,0},{13,0},{22,0}}, color={0,0,255}));
       connect(idealPump.outlet, expTankIdeal.WaterInfl)
         annotation (Line(points={{-20,0},{-12,0},{-4,0}}, color={0,0,255}));
-      connect(pipe.outfl, idealPump.inlet) annotation (Line(points={{42,0},{50,
-              0},{50,-14},{20,-14},{-46,-14},{-46,0},{-40,0}}, color={0,0,255}));
+      connect(externalTemperature.y, temperatureSource.temperature) annotation
+        (Line(points={{-44.4,-80},{-16,-80},{-16,-62}}, color={0,0,127}));
+      connect(heater.wall, temperatureSource.wall)
+        annotation (Line(points={{-16,-45},{-16,-55}}, color={255,127,0}));
+      connect(heatFlowSource.wall, boiler.wall)
+        annotation (Line(points={{32,19},{32,5}}, color={255,127,0}));
+      connect(step.y, heatFlowSource.power)
+        annotation (Line(points={{15,40},{32,40},{32,26}}, color={0,0,127}));
+      connect(boiler.outfl, heater.infl) annotation (Line(points={{42,0},{60,0},
+              {60,-40},{-6,-40}}, color={0,0,255}));
+      connect(heater.outfl, idealPump.inlet) annotation (Line(points={{-26,-40},
+              {-60,-40},{-60,0},{-40,0}}, color={0,0,255}));
       annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
             coordinateSystem(preserveAspectRatio=false)),
-        experiment(StopTime=500));
+        experiment(StopTime=500),
+        Documentation(info="<html>
+<p>This model demonstrates the use of an ideal expansion tank in a closed circuit. The ideal expansion tank keeps
+its flange pressure fixed, allowing some flow rate to enter or leave the circuit to balance the fluid thermal expansion</p>
+<p>The model represents an idealized heating system. It starts in steady state at ambient temperature, then at time = 10
+the heating power is turned on; as a consequence, the fluid gradually heats up to its final steady state value, and during
+this transient there is a net flow rate entering the expansion tank.
+</html>"));
     end TestExpansionTankIdeal;
   end WaterComponents;
 
