@@ -2984,6 +2984,7 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
       L = 10,                 hstartin = 134.11e3, hstartout = 134.11e3,
       omega = 3.1416 * 0.04 * 2,               wnom = 10,
         rhonom=999,
+        N=3,
         dpnom=200000,
         pstart=700000)
         annotation (Placement(transformation(extent={{22,-10},{42,10}})));
