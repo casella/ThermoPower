@@ -1241,6 +1241,40 @@ package Icons "Icons for ThermoPower library"
               fillPattern=FillPattern.Solid)}), Diagram(graphics));
     end Accumulator;
 
+    partial model IdealPressuriser
+    
+      annotation(Icon(graphics = {
+            Ellipse(
+              fillColor = {0, 0, 255}, 
+              fillPattern = FillPattern.Solid, 
+              extent = {{-60, 60}, {60, -60}}, 
+              endAngle = 360), 
+            Ellipse(
+              fillColor = {255, 255, 255}, 
+              fillPattern = FillPattern.Solid, 
+              extent = {{-40, 40}, {40, -40}}, 
+              endAngle = 360), 
+            Text(
+              origin = {1, 0}, 
+              extent = {{-21, 26}, {21, -26}}, 
+              textString = "P"), 
+            Rectangle(
+              origin = {-1, -90}, 
+              fillColor = {0, 0, 255}, 
+              fillPattern = FillPattern.Solid, 
+              extent = {{-29, 4}, {29, -4}}), 
+            Rectangle(
+              origin = {0, -71}, 
+              lineColor = {0, 0, 255}, 
+              fillColor = {0, 0, 255}, 
+              fillPattern = FillPattern.Solid, 
+              extent = {{-4, 17}, {4, -17}}), 
+            Text(
+              origin = {-2, -125}, 
+              extent = {{-36, 13}, {36, -13}}, 
+              textString = "%name")}), Diagram(graphics));
+    end IdealPressuriser;
+    
     partial model PumpMech
 
       annotation (Icon(graphics={
