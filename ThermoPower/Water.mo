@@ -5015,8 +5015,8 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
 </html>"));
   end CoolingTower;
 
-  model IdealPressuriser "Ideal pressurizer with prescribed pressure"
-    extends Icons.Water.IdealPressuriser;
+  model ExpansionTankIdeal "Ideal expansion tank with prescribed pressure"
+    extends Icons.Water.ExpansionTankIdeal;
     replaceable package Medium = Modelica.Media.Water.StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium  "Liquid medium model" annotation (
        choicesAllMatching = true);
@@ -5027,9 +5027,11 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
       Dialog(tab = "Initialisation"));
 
     ThermoPower.Water.FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min = if allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-      Placement(transformation(extent = {{-44, -100}, {-24, -80}}, rotation = 0)));
+      Placement(transformation(extent={{-60,-80},{-20,-40}},       rotation = 0),
+          iconTransformation(extent={{-60,-80},{-20,-40}})));
     ThermoPower.Water.FlangeB WaterOutfl(redeclare package Medium = Medium, m_flow(max = if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
-      Placement(transformation(extent = {{24, -100}, {44, -80}}, rotation = 0)));
+      Placement(transformation(extent={{20,-80},{60,-40}},       rotation = 0),
+          iconTransformation(extent={{20,-80},{60,-40}})));
 
   equation
     WaterInfl.h_outflow = inStream(WaterOutfl.h_outflow);
@@ -5039,8 +5041,8 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
     annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
           coordinateSystem(preserveAspectRatio=false)),
       Documentation(info="<html>
-<p>This model implements an ideal pressuriser, in wich the pressure at the bottom flanges is prescribed, while the water mass inside the pressuriser is free to change in order to compensaste the fluid expansion in the circuit connected to the pressuriser itself.</p>
-<p>Water flows in and out through the interfaces at the component bottom (flow reversal supported), the water entalpy is transferred through the flanges following to the water flow direction, whithout changes.</p>
+<p>This model implements an ideal expansion tank, in wich the pressure at the bottom flanges is prescribed, while the water mass is free to change in order to compensaste the fluid expansion in the circuit connected to the expansion tank itself.</p>
+<p>Water flows in and out through the interfaces at the expansion tank bottom (flow reversal supported), the water entalpy is transferred through the flanges following to the water flow direction, whithout changes.</p>
 <h4>Parameters</h4>
 <ul>
 <li>pf: prescribed pressure at the bottom flanges.</li>
@@ -5051,7 +5053,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
 </ul>
 <p>First Release.</p>
 </html>"));
-  end IdealPressuriser;
+  end ExpansionTankIdeal;
 
   function f_chen "Chen's correlation for two-phase flow in a tube"
 
