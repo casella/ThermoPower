@@ -1160,6 +1160,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     import ThermoPower.Choices.Flow1D.HCtypes;
 
     parameter SI.PerUnit wnm = 1e-3 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+    parameter Boolean fixedMassFlowSimplified = false "Fix flow rate = wnom for simplified homotopy model"
+        annotation (Dialog(tab="Initialisation"));
 
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
@@ -1296,7 +1298,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       drbdp[j] = (drdp[j] + drdp[j + 1])/2;
       drbdh[j] = (drdh[j] + drdh[j + 1])/2;
       vbar[j] = 1/rhobar[j];
-      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      if fixedMassFlowSimplified then
+        wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      else
+        wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+      end if;
     end for;
 
     // for j in 1:N loop
@@ -1494,6 +1500,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     constant SI.SpecificEnthalpy hzero=1e-3 "Small value for deltah";
 
     parameter SI.PerUnit wnm = 1e-3 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+    parameter Boolean fixedMassFlowSimplified = false "Fix flow rate = wnom for simplified homotopy model";
 
     // SmoothMedium.ThermodynamicState fluidState[N]
     //   "Thermodynamic state of the fluid at the nodes";
@@ -1610,8 +1617,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         der(p)) "Mass balance for each volume";
       // Average volume quantities
       vbar[j] = 1/rhobar[j] "Average specific volume";
-      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/
-        Nt);
+      if fixedMassFlowSimplified then
+        wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      else
+        wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+      end if;
       dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else homotopy(smooth(1,
         Kf[j]*squareReg(w, wnom/Nt*wnf))*vbar[j], dpnom/(N - 1)/(wnom/Nt)*w));
       if avoidInletEnthalpyDerivative and j == 1 then
