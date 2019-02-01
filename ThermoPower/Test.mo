@@ -7279,6 +7279,7 @@ Casella</a>:<br>
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        fixedMassFlowSimplified = true,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB (gamma_b=30000),
         dpnom=1000)
