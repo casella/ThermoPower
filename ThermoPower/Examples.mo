@@ -714,10 +714,12 @@ Casella</a>:<br>
                 60,-74},{60,22}}, color={0,0,127}));
         connect(SHPower, HeatSourceSH.power) annotation (Line(points={{-100,84},{
                 -60,84},{2,84},{2,72}},          color={0,0,127}));
-        connect(FeedWaterEnthalpy, FeedWater.in_h) annotation (Line(points={{-100,
-                57},{-78,57},{-78,16}}, color={0,0,127}));
+        connect(FeedWaterEnthalpy, FeedWater.in_h) annotation (Line(points={{-100,57},
+                {-76.8,57},{-76.8,15.6}},
+                                        color={0,0,127}));
         connect(FeedWaterFlow, FeedWater.in_w0) annotation (Line(points={{-100,30},
-                {-86,30},{-86,16}}, color={0,0,127}));
+                {-86,30},{-86,15.6}},
+                                    color={0,0,127}));
         connect(Pipe2SHWall.int, Pipe2SH.wall) annotation (Line(
             points={{-28,45},{-28,35}},
             color={255,127,0},
@@ -1507,6 +1509,147 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
 </html>"));
       end HeatExchanger;
 
+      model Evaporator
+        "Fire tube boiler, fixed heat transfer coefficient, no radiative heat transfer"
+
+        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas
+          constrainedby Modelica.Media.Interfaces.PartialMedium
+          "Flue gas model";
+        replaceable package FluidMedium = ThermoPower.Water.StandardWater
+          constrainedby Modelica.Media.Interfaces.PartialPureSubstance
+          "Fluid model";
+
+        parameter Integer N=2 "Number of node of the gas side";
+
+        //Nominal parameter
+        parameter SI.MassFlowRate gasNomFlowRate
+          "Nominal flow rate through the gas side";
+        parameter SI.MassFlowRate fluidNomFlowRate
+          "Nominal flow rate through the fluid side";
+        parameter SI.Pressure gasNomPressure
+          "Nominal pressure in the gas side inlet";
+        parameter SI.Pressure fluidNomPressure
+          "Nominal pressure in the fluid side inlet";
+
+        //Physical Parameter
+        parameter SI.Area exchSurface
+          "Exchange surface between gas - metal tube";
+        parameter SI.Volume gasVol "Gas volume";
+        parameter SI.Volume fluidVol "Fluid volume";
+        parameter SI.Volume metalVol "Volume of the metal part in the tubes";
+        parameter SI.Density rhom "Metal density";
+        parameter SI.SpecificHeatCapacity cm
+          "Specific heat capacity of the metal";
+
+        //Start value
+        parameter SI.Temperature Tstart "Average gas temperature start value"
+          annotation (Dialog(tab="Initialization"));
+        parameter Boolean SSInit=false "Steady-state initialization"
+          annotation (Dialog(tab="Initialization"));
+        parameter SI.CoefficientOfHeatTransfer gamma
+          "Constant heat transfer coefficient in the gas side";
+        parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
+          "Friction Factor Type, gas side";
+        parameter Real Kfnom_G=0
+          "Nominal hydraulic resistance coefficient, gas side";
+        parameter SI.PressureDifference dpnom_G=0
+          "Nominal pressure drop, gas side (friction term only!)";
+        parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
+        parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
+        parameter Boolean gasQuasiStatic=false
+          "Quasi-static model of the flue gas (mass, energy and momentum static balances";
+        constant Real pi=Modelica.Constants.pi;
+        Water.DrumEquilibrium water(
+          cm=cm,
+          redeclare package Medium = FluidMedium,
+          Vd=fluidVol,
+          Mm=metalVol*rhom,
+          pstart=fluidNomPressure,
+          Vlstart=fluidVol*0.8,
+          initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit)
+          annotation (Placement(transformation(extent={{-24,18},{24,66}},
+                rotation=0)));
+        Thermal.HT_DHTVolumes      adapter(N=N - 1)
+          annotation (Placement(transformation(
+              origin={0,-8},
+              extent={{-10,-10},{10,10}},
+              rotation=270)));
+        Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
+           Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
+        Water.FlangeB waterOut(redeclare package Medium = FluidMedium)
+          annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
+                rotation=0)));
+        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
+            Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
+        Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
+            Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
+        Gas.Flow1DFV
+                   gasFlow(
+          Dhyd=1,
+          wnom=gasNomFlowRate,
+          FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+          redeclare package Medium = FlueGasMedium,
+          QuasiStatic=gasQuasiStatic,
+          N=N,
+          initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
+          L=L,
+          A=gasVol/L,
+          omega=exchSurface/L,
+          Tstartbar=Tstart,
+          redeclare model HeatTransfer =
+              Thermal.HeatTransferFV.ConstantHeatTransferCoefficient (gamma=
+                  gamma))   annotation (Placement(transformation(
+              origin={0,-40},
+              extent={{14,14},{-14,-14}},
+              rotation=180)));
+
+        Modelica.Blocks.Interfaces.RealOutput voidFraction annotation (Placement(
+              transformation(extent={{96,50},{116,70}}, rotation=0)));
+        final parameter SI.Distance L=1 "Tube length";
+        Modelica.Blocks.Sources.RealExpression realExpression
+          annotation (Placement(transformation(extent={{18,108},{38,128}})));
+        Modelica.Blocks.Sources.RealExpression output1(y=water.Vv/water.Vd)
+          annotation (Placement(transformation(extent={{54,52},{86,70}})));
+      equation
+        connect(water.feed, waterIn) annotation (Line(
+            points={{-21.6,31.44},{-52,31.44},{-52,100},{0,100}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(water.steam, waterOut) annotation (Line(
+            points={{16.32,59.28},{40,59.28},{40,-70},{0,-70},{0,-100}},
+            thickness=0.5,
+            color={0,0,255}));
+        connect(gasFlow.infl, gasIn) annotation (Line(
+            points={{-14,-40},{-60,-40},{-60,0},{-100,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(gasFlow.outfl, gasOut) annotation (Line(
+            points={{14,-40},{60,-40},{60,0},{100,0}},
+            color={159,159,223},
+            thickness=0.5));
+        connect(output1.y, voidFraction) annotation (Line(points={{87.6,61},{96,61},{96,
+                60},{106,60}}, color={0,0,127}));
+        connect(adapter.DHT_port, gasFlow.wall) annotation (Line(points={{
+                -1.9984e-15,-19},{-1.9984e-15,-32},{-8.88178e-16,-32},{
+                -8.88178e-16,-33}}, color={255,127,0}));
+        connect(adapter.HT_port, water.wall) annotation (Line(points={{
+                2.19269e-15,4},{0,4},{0,20.4}}, color={191,0,0}));
+        annotation (                   Icon(graphics={
+              Rectangle(
+                extent={{-100,100},{100,-100}},
+                lineColor={0,0,255},
+                fillColor={230,230,230},
+                fillPattern=FillPattern.Solid),
+              Line(
+                points={{0,-80},{0,-40},{40,-20},{-40,20},{0,40},{0,80}},
+                color={0,0,255},
+                thickness=0.5),
+              Text(
+                extent={{-100,-115},{100,-145}},
+                lineColor={85,170,255},
+                textString="%name")}));
+      end Evaporator;
+
       model HRBPlant "Simple plant model with HRB"
         replaceable package GasMedium =
             Modelica.Media.IdealGases.MixtureGases.CombustionAir constrainedby
@@ -1782,147 +1925,6 @@ This is the model of a digital PI controller, complete with auto/man and trackin
 </html>"));
       end DigitalPI;
 
-      model Evaporator
-        "Fire tube boiler, fixed heat transfer coefficient, no radiative heat transfer"
-
-        replaceable package FlueGasMedium = ThermoPower.Media.FlueGas
-          constrainedby Modelica.Media.Interfaces.PartialMedium
-          "Flue gas model";
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater
-          constrainedby Modelica.Media.Interfaces.PartialPureSubstance
-          "Fluid model";
-
-        parameter Integer N=2 "Number of node of the gas side";
-
-        //Nominal parameter
-        parameter SI.MassFlowRate gasNomFlowRate
-          "Nominal flow rate through the gas side";
-        parameter SI.MassFlowRate fluidNomFlowRate
-          "Nominal flow rate through the fluid side";
-        parameter SI.Pressure gasNomPressure
-          "Nominal pressure in the gas side inlet";
-        parameter SI.Pressure fluidNomPressure
-          "Nominal pressure in the fluid side inlet";
-
-        //Physical Parameter
-        parameter SI.Area exchSurface
-          "Exchange surface between gas - metal tube";
-        parameter SI.Volume gasVol "Gas volume";
-        parameter SI.Volume fluidVol "Fluid volume";
-        parameter SI.Volume metalVol "Volume of the metal part in the tubes";
-        parameter SI.Density rhom "Metal density";
-        parameter SI.SpecificHeatCapacity cm
-          "Specific heat capacity of the metal";
-
-        //Start value
-        parameter SI.Temperature Tstart "Average gas temperature start value"
-          annotation (Dialog(tab="Initialization"));
-        parameter Boolean SSInit=false "Steady-state initialization"
-          annotation (Dialog(tab="Initialization"));
-        parameter SI.CoefficientOfHeatTransfer gamma
-          "Constant heat transfer coefficient in the gas side";
-        parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
-          "Friction Factor Type, gas side";
-        parameter Real Kfnom_G=0
-          "Nominal hydraulic resistance coefficient, gas side";
-        parameter SI.PressureDifference dpnom_G=0
-          "Nominal pressure drop, gas side (friction term only!)";
-        parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
-        parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
-        parameter Boolean gasQuasiStatic=false
-          "Quasi-static model of the flue gas (mass, energy and momentum static balances";
-        constant Real pi=Modelica.Constants.pi;
-        Water.Drum2States water(
-          Vdcr=0,
-          cm=cm,
-          Mmdcr=0,
-          redeclare package Medium = FluidMedium,
-          Vd=fluidVol,
-          Mmd=metalVol*rhom,
-          pstart=fluidNomPressure,
-          Vldstart=fluidVol*0.8,
-          initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit)
-          annotation (Placement(transformation(extent={{-20,26},{20,66}},
-                rotation=0)));
-        ThermoPower.Thermal.HT_DHT adapter(N=N, exchangeSurface=exchSurface)
-          annotation (Placement(transformation(
-              origin={0,0},
-              extent={{-10,-10},{10,10}},
-              rotation=270)));
-        Thermal.ConvHT heatTransfer_ext(N=N, gamma=gamma) annotation (Placement(
-              transformation(
-              origin={0,-28},
-              extent={{-10,-10},{10,10}},
-              rotation=180)));
-        Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
-           Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
-        Water.FlangeB waterOut(redeclare package Medium = FluidMedium)
-          annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
-                rotation=0)));
-        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
-            Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-        Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
-            Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-        Gas.Flow1D gasFlow(
-          Dhyd=1,
-          wnom=gasNomFlowRate,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
-          redeclare package Medium = FlueGasMedium,
-          QuasiStatic=gasQuasiStatic,
-          N=N,
-          initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit,
-          L=L,
-          A=gasVol/L,
-          omega=exchSurface/L,
-          Tstartbar=Tstart) annotation (Placement(transformation(
-              origin={0,-50},
-              extent={{10,10},{-10,-10}},
-              rotation=180)));
-
-        Modelica.Blocks.Interfaces.RealOutput voidFraction annotation (Placement(
-              transformation(extent={{96,50},{116,70}}, rotation=0)));
-        final parameter SI.Distance L=1 "Tube length";
-      equation
-        voidFraction = 1 - water.Vld/water.Vd;
-        connect(heatTransfer_ext.side2, adapter.DHT_port) annotation (Line(points=
-               {{3.79641e-016,-24.9},{3.79641e-016,-12},{0,-12},{0,-11},{-2.02067e-015,
-                -11}}, color={255,127,0}));
-        connect(water.feed, waterIn) annotation (Line(
-            points={{-18,37.2},{-52,37.2},{-52,100},{0,100}},
-            thickness=0.5,
-            color={0,0,255}));
-        connect(water.steam, waterOut) annotation (Line(
-            points={{13.6,60.4},{48,60.4},{48,-68},{0,-68},{0,-100}},
-            thickness=0.5,
-            color={0,0,255}));
-        connect(adapter.HT_port, water.heat) annotation (Line(points={{0.4,12},{
-                7.10543e-016,12},{7.10543e-016,28}}, color={0,0,255}));
-        connect(gasFlow.wall, heatTransfer_ext.side1) annotation (Line(points={{
-                6.12323e-016,-45},{6.12323e-016,-38.5},{-3.67394e-016,-38.5},{-3.67394e-016,
-                -31}}, color={255,127,0}));
-        connect(gasFlow.infl, gasIn) annotation (Line(
-            points={{-10,-50},{-60,-50},{-60,0},{-100,0}},
-            color={159,159,223},
-            thickness=0.5));
-        connect(gasFlow.outfl, gasOut) annotation (Line(
-            points={{10,-50},{60,-50},{60,0},{100,0}},
-            color={159,159,223},
-            thickness=0.5));
-        annotation (Diagram(graphics), Icon(graphics={
-              Rectangle(
-                extent={{-100,100},{100,-100}},
-                lineColor={0,0,255},
-                fillColor={230,230,230},
-                fillPattern=FillPattern.Solid),
-              Line(
-                points={{0,-80},{0,-40},{40,-20},{-40,20},{0,40},{0,80}},
-                color={0,0,255},
-                thickness=0.5),
-              Text(
-                extent={{-100,-115},{100,-145}},
-                lineColor={85,170,255},
-                textString="%name")}));
-      end Evaporator;
     end Models;
 
     package Simulators "Simulation models for the HRB example"
