@@ -56,8 +56,8 @@ package Thermal "Thermal models of heat transfer"
   model HT_DHTNodes "HT to DHT adaptor"
     parameter Integer N=1 "Number of nodes on DHT side";
     parameter SI.Area exchangeSurface "Area of heat transfer surface";
-    HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
-            rotation=0)));
+    HT HT_port annotation (Placement(transformation(extent={{-140,-20},{-100,20}},
+            rotation=0), iconTransformation(extent={{-140,-20},{-100,20}})));
     DHT DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
               120,40}}, rotation=0)));
   equation
@@ -101,8 +101,8 @@ package Thermal "Thermal models of heat transfer"
 
   model HT_DHTVolumes "HT to DHT adaptor"
     parameter Integer N=1 "Number of volumes on the connectors";
-    HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
-            rotation=0)));
+    HT HT_port annotation (Placement(transformation(extent={{-140,-20},{-100,20}},
+            rotation=0), iconTransformation(extent={{-140,-20},{-100,20}})));
     DHTVolumes DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
               120,40}}, rotation=0)));
   equation
