@@ -5586,7 +5586,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
-      Medium.ThermodynamicState fluidState(p(start=pin_start));
+      Medium.ThermodynamicState fluidState;
       parameter ThermoPower.Choices.Valve.CvTypes CvData=ThermoPower.Choices.Valve.CvTypes.Av
         "Selection of flow coefficient"
        annotation (Dialog(group="Flow Coefficient"),
