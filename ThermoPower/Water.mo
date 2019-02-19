@@ -3675,132 +3675,6 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 </html>"));
   end Accumulator;
 
-  model Drum2States
-    extends Icons.Water.Drum;
-    replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
-      annotation(choicesAllMatching = true);
-    parameter SI.Volume Vd "Drum volume";
-    parameter SI.Volume Vdcr "Volume of downcomer and risers";
-    parameter SI.Mass Mmd "Drum metal mass";
-    parameter SI.Mass Mmdcr "Metal mass of downcomer and risers";
-    parameter Medium.SpecificHeatCapacity cm
-      "Specific heat capacity of the metal";
-    parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction"
-      annotation(Evaluate=true);
-    outer ThermoPower.System system "System wide properties";
-    parameter SI.Pressure pstart "Pressure start value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter SI.Volume Vldstart "Start value of drum water volume"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=system.initOpt
-      "Initialisation option"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Boolean noInitialPressure=false
-      "Remove initial equation on pressure"
-      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
-
-    Medium.SaturationProperties sat "Saturation conditions";
-    FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
-    FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
-    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
-      "Metal wall thermal port" annotation (Placement(transformation(extent={{-28,
-              -100},{28,-80}}, rotation=0)));
-    SI.Mass Ml "Liquid water mass";
-    SI.Mass Mv "Steam mass";
-    SI.Mass M "Total liquid+steam mass";
-    SI.Energy E "Total energy";
-    SI.Volume Vt "Total volume";
-    SI.Volume Vl(start=Vldstart + Vdcr) "Liquid water total volume";
-    SI.Volume Vld(start=Vldstart, stateSelect=StateSelect.prefer)
-      "Liquid water volume in the drum";
-    SI.Volume Vv "Steam volume";
-    Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
-      "Drum pressure";
-    Medium.MassFlowRate qf "Feedwater mass flowrate";
-    Medium.MassFlowRate qs "Steam mass flowrate";
-    SI.HeatFlowRate Q "Heat flow to the risers";
-    Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
-    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
-    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
-    Medium.Temperature Ts "Saturation temperature";
-    Units.LiquidDensity rhol "Density of saturated liquid";
-    Units.GasDensity rhov "Density of saturated steam";
-  equation
-    Ml = Vl*rhol "Mass of liquid";
-    Mv = Vv*rhov "Mass of vapour";
-    M = Ml + Mv "Total mass";
-    E = Ml*hl + Mv*hv - p*Vt + (Mmd + Mmdcr)*cm*Ts "Total energy";
-    Ts = sat.Tsat "Saturation temperature";
-    der(M) = qf - qs "Mass balance";
-    der(E) = Q + qf*hf - qs*hv "Energy balance";
-    Vl = Vld + Vdcr "Liquid volume";
-    Vt = Vd + Vdcr "Total volume";
-    Vt = Vl + Vv "Total volume";
-
-    // Boundary conditions
-    p = feed.p;
-    p = steam.p;
-    hf = homotopy(if not allowFlowReversal then inStream(feed.h_outflow) else
-      actualStream(feed.h_outflow), inStream(feed.h_outflow));
-    feed.m_flow = qf;
-    -steam.m_flow = qs;
-    feed.h_outflow = hl;
-    steam.h_outflow = hv;
-    Q = heat.Q_flow;
-    heat.T = Ts;
-
-    // Fluid properties
-    sat.psat = p;
-    sat.Tsat = Medium.saturationTemperature(p);
-    rhol = Medium.bubbleDensity(sat);
-    rhov = Medium.dewDensity(sat);
-    hl = Medium.bubbleEnthalpy(sat);
-    hv = Medium.dewEnthalpy(sat);
-  initial equation
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-    elseif initOpt == Choices.Init.Options.fixedState then
-      if not noInitialPressure then
-        p = pstart;
-      end if;
-      Vld = Vldstart;
-    elseif initOpt == Choices.Init.Options.steadyState then
-      if not noInitialPressure then
-        der(p) = 0;
-      end if;
-      der(Vld) = 0;
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
-    annotation (
-      Diagram(graphics),
-      Documentation(info="<HTML>
-<p>Simplified model of a drum for drum boilers. This model assumes thermodynamic equilibrium between the liquid and vapour volumes. The model has two state variables (i.e., pressure and liquid volume).
-</HTML>", revisions="<html>
-<ul>
-<li><i>30 May 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Initialisation support added.</li>
-<li><i>16 Dec 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Standard medium definition added.</li>
-<li><i>24 Sep 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Adapted to Modelica.Media.</li>
-<li><i>1 May 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"),
-      Icon(graphics));
-  end Drum2States;
-
   model Drum "Drum for circulation boilers"
     extends Icons.Water.Drum;
     replaceable package Medium = StandardWater constrainedby
@@ -4119,6 +3993,135 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 </ul>
 "),   Diagram(graphics));
   end Drum;
+
+  model DrumEquilibrium
+    extends Icons.Water.Drum;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+      annotation(choicesAllMatching = true);
+    parameter SI.Volume Vd "Drum internal volume";
+    parameter SI.Mass Mm "Drum metal mass";
+    parameter Medium.SpecificHeatCapacity cm
+      "Specific heat capacity of the metal";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
+    outer ThermoPower.System system "System wide properties";
+    parameter SI.Pressure pstart "Pressure start value"
+      annotation (Dialog(tab="Initialisation"));
+    parameter SI.Volume Vlstart "Start value of drum water volume"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
+    Medium.SaturationProperties sat "Saturation conditions";
+    FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
+    FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
+    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a wall
+      "Metal wall thermal port" annotation (Placement(transformation(extent={{-28,
+              -100},{28,-80}}, rotation=0)));
+
+    SI.Mass Ml "Liquid water mass";
+    SI.Mass Mv "Steam mass";
+    SI.Mass M "Total liquid+steam mass";
+    SI.Energy E "Total energy";
+    SI.Volume Vv(start = Vd - Vlstart) "Steam volume";
+    SI.Volume Vl(
+      start = Vlstart,
+      stateSelect=StateSelect.prefer)
+      "Liquid water total volume";
+    Medium.AbsolutePressure p(
+      start=pstart,
+      stateSelect=StateSelect.prefer)
+      "Drum pressure";
+    Medium.MassFlowRate qf "Feedwater mass flowrate";
+    Medium.MassFlowRate qs "Steam mass flowrate";
+    SI.HeatFlowRate Q "Heat flow to the risers";
+    Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
+    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
+    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
+    Medium.Temperature Ts "Saturation temperature";
+    Units.LiquidDensity rhol "Density of saturated liquid";
+    Units.GasDensity rhov "Density of saturated steam";
+  equation
+    Ml = Vl*rhol "Mass of liquid";
+    Mv = Vv*rhov "Mass of vapour";
+    M = Ml + Mv "Total mass";
+    E = Ml*hl + Mv*hv - p*Vd + Mm*cm*Ts "Total energy";
+    Ts = sat.Tsat "Saturation temperature";
+    der(M) = qf - qs "Mass balance";
+    der(E) = Q + qf*hf - qs*hv "Energy balance";
+    Vl + Vv = Vd "Total volume";
+
+    // Boundary conditions
+    p = feed.p;
+    p = steam.p;
+    if not allowFlowReversal then
+      hf = inStream(feed.h_outflow);
+    else
+      // assume flow is entering during simplified initialization
+      hf = homotopy(
+        actualStream(feed.h_outflow),
+        inStream(feed.h_outflow));
+    end if;
+    feed.m_flow = qf;
+    -steam.m_flow = qs;
+    feed.h_outflow = hl;
+    steam.h_outflow = hv;
+    Q = wall.Q_flow;
+    wall.T = Ts;
+
+    // Fluid properties
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    rhol = Medium.bubbleDensity(sat);
+    rhov = Medium.dewDensity(sat);
+    hl = Medium.bubbleEnthalpy(sat);
+    hv = Medium.dewEnthalpy(sat);
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      Vl = Vlstart;
+    elseif initOpt == Choices.Init.Options.steadyState then
+      if not noInitialPressure then
+        der(p) = 0;
+      end if;
+      der(Vl) = 0;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+    annotation (
+      Diagram(graphics),
+      Documentation(info="<HTML>
+<p>Simplified model of a drum for drum boilers and fire-tube boilers. This model assumes
+<ul>
+<li>Thermodynamic equiibrium between the liquid, vapour, and metal wall
+<li>Perfect separation of the liquid and vapour phase
+</ul></p>
+<p>The model has two state variables the pressure <code>p</code> and the liquid volume <code>Vl</code>. It is possible to extend it,
+adding a specific geometry and the computation of the level from the liquid volume. In that case, one may want to use the level as a state.
+</p>
+</HTML>", revisions="<html>
+<ul>
+<li><i>19 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Adapted from old <code>Drum2States</code> model.</li>
+</ul>
+</html>"),
+      Icon(graphics));
+  end DrumEquilibrium;
 
   model ValveLin "Valve for water/steam flows with linear pressure drop"
     extends Icons.Water.Valve;
@@ -6290,6 +6293,133 @@ This model is not yet complete
 </html>"));
     end EvaporatorBase;
   end BaseClasses;
+
+  model Drum2States
+    extends Icons.Water.Drum;
+    extends Modelica.Icons.ObsoleteModel;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+      annotation(choicesAllMatching = true);
+    parameter SI.Volume Vd "Drum volume";
+    parameter SI.Volume Vdcr "Volume of downcomer and risers";
+    parameter SI.Mass Mmd "Drum metal mass";
+    parameter SI.Mass Mmdcr "Metal mass of downcomer and risers";
+    parameter Medium.SpecificHeatCapacity cm
+      "Specific heat capacity of the metal";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
+    outer ThermoPower.System system "System wide properties";
+    parameter SI.Pressure pstart "Pressure start value"
+      annotation (Dialog(tab="Initialisation"));
+    parameter SI.Volume Vldstart "Start value of drum water volume"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
+    Medium.SaturationProperties sat "Saturation conditions";
+    FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
+    FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
+    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
+      "Metal wall thermal port" annotation (Placement(transformation(extent={{-28,
+              -100},{28,-80}}, rotation=0)));
+    SI.Mass Ml "Liquid water mass";
+    SI.Mass Mv "Steam mass";
+    SI.Mass M "Total liquid+steam mass";
+    SI.Energy E "Total energy";
+    SI.Volume Vt "Total volume";
+    SI.Volume Vl(start=Vldstart + Vdcr) "Liquid water total volume";
+    SI.Volume Vld(start=Vldstart, stateSelect=StateSelect.prefer)
+      "Liquid water volume in the drum";
+    SI.Volume Vv "Steam volume";
+    Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
+      "Drum pressure";
+    Medium.MassFlowRate qf "Feedwater mass flowrate";
+    Medium.MassFlowRate qs "Steam mass flowrate";
+    SI.HeatFlowRate Q "Heat flow to the risers";
+    Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
+    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
+    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
+    Medium.Temperature Ts "Saturation temperature";
+    Units.LiquidDensity rhol "Density of saturated liquid";
+    Units.GasDensity rhov "Density of saturated steam";
+  equation
+    Ml = Vl*rhol "Mass of liquid";
+    Mv = Vv*rhov "Mass of vapour";
+    M = Ml + Mv "Total mass";
+    E = Ml*hl + Mv*hv - p*Vt + (Mmd + Mmdcr)*cm*Ts "Total energy";
+    Ts = sat.Tsat "Saturation temperature";
+    der(M) = qf - qs "Mass balance";
+    der(E) = Q + qf*hf - qs*hv "Energy balance";
+    Vl = Vld + Vdcr "Liquid volume";
+    Vt = Vd + Vdcr "Total volume";
+    Vt = Vl + Vv "Total volume";
+
+    // Boundary conditions
+    p = feed.p;
+    p = steam.p;
+    hf = homotopy(if not allowFlowReversal then inStream(feed.h_outflow) else
+      actualStream(feed.h_outflow), inStream(feed.h_outflow));
+    feed.m_flow = qf;
+    -steam.m_flow = qs;
+    feed.h_outflow = hl;
+    steam.h_outflow = hv;
+    Q = heat.Q_flow;
+    heat.T = Ts;
+
+    // Fluid properties
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    rhol = Medium.bubbleDensity(sat);
+    rhov = Medium.dewDensity(sat);
+    hl = Medium.bubbleEnthalpy(sat);
+    hv = Medium.dewEnthalpy(sat);
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      Vld = Vldstart;
+    elseif initOpt == Choices.Init.Options.steadyState then
+      if not noInitialPressure then
+        der(p) = 0;
+      end if;
+      der(Vld) = 0;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+    annotation (
+      Diagram(graphics),
+      Documentation(info="<HTML>
+<p>Simplified model of a drum for drum boilers. This model assumes thermodynamic equilibrium between the liquid and vapour volumes. The model has two state variables (i.e., pressure and liquid volume).
+</HTML>", revisions="<html>
+<ul>
+<li><i>30 May 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Initialisation support added.</li>
+<li><i>16 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Standard medium definition added.</li>
+<li><i>24 Sep 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Adapted to Modelica.Media.</li>
+<li><i>1 May 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+      Icon(graphics));
+  end Drum2States;
 
   model Flow1D
     "1-dimensional fluid flow model for water/steam (finite volumes)"
