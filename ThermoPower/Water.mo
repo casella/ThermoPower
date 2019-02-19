@@ -5219,12 +5219,11 @@ Input variables changed. This function now computes the heat transfer coefficien
     extends BaseClasses.SteamTurbineBase;
     parameter SI.PerUnit eta_iso_nom=0.92 "Nominal isentropic efficiency";
     parameter SI.Area Kt "Kt coefficient of Stodola's law";
-    parameter SI.PerUnit partialArc_nom=1 "Nominal partial arc";
+    Medium.Density rho "Inlet density";
   equation
-    w = homotopy(Kt*partialArc*sqrt(Medium.pressure(steamState_in)*
-      Medium.density(steamState_in))*Functions.sqrtReg(1 - (1/PR)^2),
-      partialArc/partialArc_nom*wnom/pnom*Medium.pressure(steamState_in))
-      "Stodola's law";
+    rho =  Medium.density(steamState_in);
+    w = homotopy(Kt*theta*sqrt(pin*rho)*Functions.sqrtReg(1 - (1/PR)^2),
+                 theta*wnom/pnom*pin) "Stodola's law";
     eta_iso = eta_iso_nom "Constant efficiency";
     annotation (Documentation(info="<html>
 <p>This model extends <tt>SteamTurbineBase</tt> by adding the actual performance characteristics:
@@ -6005,9 +6004,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       parameter Medium.MassFlowRate wnom "Inlet nominal flowrate";
       parameter Medium.AbsolutePressure pnom "Nominal inlet pressure";
       parameter Real eta_mech=0.98 "Mechanical efficiency";
-      parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction"
-      annotation(Evaluate=true);
+      parameter Boolean usePartialArcInput = false
+        "Use the input connector for the partial arc opening";
+
       outer ThermoPower.System system "System wide properties";
 
       Medium.ThermodynamicState steamState_in;
@@ -6026,26 +6025,29 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       SI.PerUnit PR "pressure ratio";
       SI.Power Pm "Mechanical power input";
       SI.PerUnit eta_iso "Isentropic efficiency";
+      SI.PerUnit theta "Partial arc opening in p.u.";
 
-      Modelica.Blocks.Interfaces.RealInput partialArc annotation (Placement(
+      Modelica.Blocks.Interfaces.RealInput partialArc if usePartialArcInput
+        "Partial arc opening in p.u." annotation (Placement(
             transformation(extent={{-60,-50},{-40,-30}}, rotation=0)));
       Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
           Placement(transformation(extent={{-76,-10},{-56,10}}, rotation=0)));
       Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
           Placement(transformation(extent={{54,-10},{74,10}}, rotation=0)));
-      FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-              allowFlowReversal then -Modelica.Constants.inf else 0))
+      FlangeA inlet(redeclare package Medium = Medium, m_flow(min=0))
         annotation (Placement(transformation(extent={{-100,60},{-60,100}},
               rotation=0)));
-      FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-              allowFlowReversal then +Modelica.Constants.inf else 0))
+      FlangeB outlet(redeclare package Medium = Medium, m_flow(max=0))
         annotation (Placement(transformation(extent={{60,60},{100,100}},
               rotation=0)));
-
+    protected
+      Modelica.Blocks.Interfaces.RealInput partialArc_int "Internal connector for partial arc input";
     equation
       PR = pin/pout "Pressure ratio";
-      if cardinality(partialArc) == 0 then
-        partialArc = 1 "Default value if not connected";
+      theta = partialArc_int;
+      if not usePartialArcInput then
+        partialArc_int = 1 "Default value if not connector input is disabled";
+        // otherwise partialArc_int is connected to partialArc input connector
       end if;
       if explicitIsentropicEnthalpy then
         hiso = Medium.isentropicEnthalpy(pout, steamState_in)
@@ -6063,7 +6065,8 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       Pm = -tau*omega "Mechanical power balance";
 
       inlet.m_flow + outlet.m_flow = 0 "Mass balance";
-      // assert(w >= -wnom/100, "The turbine model does not support flow reversal");
+
+      assert(w >= -wnom/100, "The turbine model does not support flow reversal");
 
       // Mechanical boundary conditions
       shaft_a.phi = phi;
@@ -6078,6 +6081,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       pin = inlet.p;
       pout = outlet.p;
       w = inlet.m_flow;
+
       // The next equation is provided to close the balance but never actually used
       inlet.h_outflow = outlet.h_outflow;
 
