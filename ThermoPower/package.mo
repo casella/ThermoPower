@@ -115,8 +115,11 @@ package Electrical "Simplified models of electric power components"
     parameter Integer Np=2 "Number of electrical poles";
     parameter SI.Frequency fstart=50 "Start value of the electrical frequency"
       annotation (Dialog(tab="Initialization"));
-    parameter ThermoPower.Choices.Init.Options initOpt=ThermoPower.Choices.Init.Options.noInit
+    parameter ThermoPower.Choices.Init.Options initOpt=system.initOpt
       "Initialization option" annotation (Dialog(tab="Initialization"));
+
+    System system "System object";
+
     SI.Power Pm "Mechanical power";
     SI.Power Pe "Electrical Power";
     SI.Power Ploss "Inertial power Loss";
@@ -1242,41 +1245,41 @@ package Icons "Icons for ThermoPower library"
     end Accumulator;
 
     partial model ExpansionTankIdeal
-    
-      annotation(Icon(graphics = {
+
+      annotation(Icon(graphics={
              Ellipse(
-               origin = {0, 30}, 
-               fillColor = {0, 0, 255}, 
-               fillPattern = FillPattern.Solid, 
-               extent = {{-60, 60}, {60, -60}}, 
-               endAngle = 360), 
+               origin = {0, 30},
+               fillColor = {0, 0, 255},
+               fillPattern = FillPattern.Solid,
+               extent = {{-60, 60}, {60, -60}},
+               endAngle = 360),
               Ellipse(
-                origin = {0, 30}, 
-                fillColor = {255, 255, 255}, 
-                fillPattern = FillPattern.Solid, 
-                extent = {{-40, 40}, {40, -40}}, 
-                endAngle = 360), 
+                origin = {0, 30},
+                fillColor = {255, 255, 255},
+                fillPattern = FillPattern.Solid,
+                extent = {{-40, 40}, {40, -40}},
+                endAngle = 360),
               Text(
-                origin = {1, 30}, 
-                extent = {{-21, 26}, {21, -26}}, 
-                textString = "P"), 
+                origin = {1, 30},
+                extent = {{-21, 26}, {21, -26}},
+                textString = "P"),
               Rectangle(
-                origin = {-1, -60}, 
-                fillColor = {0, 0, 255}, 
-                fillPattern = FillPattern.Solid, 
-                extent = {{-29, 4}, {29, -4}}), 
+                origin = {-1, -60},
+                fillColor = {0, 0, 255},
+                fillPattern = FillPattern.Solid,
+                extent = {{-29, 4}, {29, -4}}),
               Rectangle(
-                origin = {0, -41}, 
-                lineColor = {0, 0, 255}, 
-                fillColor = {0, 0, 255}, 
-                fillPattern = FillPattern.Solid, 
-                extent = {{-4, 17}, {4, -17}}), 
+                origin = {0, -41},
+                lineColor = {0, 0, 255},
+                fillColor = {0, 0, 255},
+                fillPattern = FillPattern.Solid,
+                extent = {{-4, 17}, {4, -17}}),
               Text(
-                origin = {-2, -100}, 
-                extent = {{-98, 9}, {100, -11}}, 
+                origin = {-2, -100},
+                extent = {{-98, 9}, {100, -11}},
                 textString = "%name")}), Diagram(graphics));
     end ExpansionTankIdeal;
-    
+
     partial model PumpMech
 
       annotation (Icon(graphics={
