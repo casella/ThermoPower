@@ -1185,6 +1185,7 @@ package Gas "Models of components with ideal gases as working fluid"
         p = pstart;
       end if;
       Ttilde = Tstart[2:N];
+      Xtilde = ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]);
     elseif initOpt == Choices.Init.Options.steadyState then
       if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
@@ -1250,8 +1251,7 @@ package Gas "Models of components with ideal gases as working fluid"
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),
-      DymolaStoredErrors);
+</html>"));
   end Flow1DFV;
 
   model Flow1DFV2w "Same as Flow1DFV with two walls and heat transfer models"
