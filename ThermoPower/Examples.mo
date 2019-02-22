@@ -3236,15 +3236,9 @@ This is a simple model of a steam plant.
       parameter Real tableEtaT[5, 4]=[1, 90, 100, 110; 2.36, 89e-2, 89.5e-2,
           89.3e-2; 2.88, 90e-2, 90.6e-2, 90.5e-2; 3.56, 90.5e-2, 90.6e-2,
           90.5e-2; 4.46, 90.2e-2, 90.3e-2, 90e-2];
-      Electrical.Generator generator(initOpt=ThermoPower.Choices.Init.Options.steadyState, J=30,
-        shaft(phi(start=0, fixed=true)))
+      Electrical.Generator generator(Pnom=4e6,
+                                     initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{92,-80},{132,-40}},
-              rotation=0)));
-      Electrical.NetworkGrid_Pmax network(
-        deltaStart=0.4,
-        initOpt=ThermoPower.Choices.Init.Options.steadyState,
-        Pmax=10e6,
-        J=30000) annotation (Placement(transformation(extent={{148,-72},{172,-48}},
               rotation=0)));
       Modelica.Blocks.Interfaces.RealInput fuelFlowRate        annotation (
           Placement(transformation(extent={{-210,-10},{-190,10}}, rotation=0)));
@@ -3353,12 +3347,9 @@ This is a simple model of a steam plant.
               extent={{-24,30},{-4,50}}, rotation=0)));
       inner System system(allowFlowReversal=false)
         annotation (Placement(transformation(extent={{158,160},{178,180}})));
+      Electrical.Grid grid(Pgrid=1e9)
+        annotation (Placement(transformation(extent={{144,-70},{164,-50}})));
     equation
-      connect(network.powerConnection, generator.powerConnection) annotation (
-          Line(
-          points={{148,-60},{129.2,-60}},
-          pattern=LinePattern.None,
-          thickness=0.5));
       connect(SourceW1.flange, CombustionChamber1.inf) annotation (Line(
           points={{-80,80},{-52,80},{-52,60}},
           color={159,159,223},
@@ -3415,11 +3406,15 @@ This is a simple model of a steam plant.
           points={{94.8,-60},{80,-60}},
           color={0,0,0},
           thickness=0.5));
+      connect(generator.port, grid.port) annotation (Line(
+          points={{129.2,-60},{145.4,-60}},
+          color={0,0,255},
+          thickness=0.5));
       annotation (
         Diagram(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-200,-200},{200,200}},
-            initialScale=0.1), graphics),
+            initialScale=0.1)),
         Icon(coordinateSystem(
             preserveAspectRatio=false,
             extent={{-200,-200},{200,200}},
