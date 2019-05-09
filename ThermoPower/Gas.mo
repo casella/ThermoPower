@@ -61,7 +61,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
       "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
@@ -94,10 +95,10 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
 
   equation
-    if R == 0 then
-      flange.p = gas.p;
-    else
+    if R > 0 then
       flange.p = gas.p + flange.m_flow*R;
+    else
+      flange.p = gas.p;
     end if;
 
     gas.p = in_p0_internal;
@@ -159,7 +160,8 @@ package Gas "Models of components with ideal gases as working fluid"
       "Nominal gas composition";
     parameter Units.HydraulicResistance R=0 "Hydraulic Resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
       "Use connector input for the temperature"                                  annotation(Dialog(group="External inputs"), choices(checkBox=true));
@@ -191,10 +193,10 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_T_internal;
     Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
   equation
-    if R == 0 then
-      flange.p = gas.p;
-    else
+    if R > 0 then
       flange.p = gas.p + flange.m_flow*R;
+    else
+      flange.p = gas.p;
     end if;
 
     gas.p = in_p0_internal;
@@ -255,7 +257,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Units.HydraulicConductance G=0 "HydraulicConductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_w0 = false
       "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
@@ -290,10 +293,10 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
 
   equation
-    if G == 0 then
-      flange.m_flow = -w;
-    else
+    if G > 0 then
       flange.m_flow = -w + (flange.p - p0)*G;
+    else
+      flange.m_flow = -w;
     end if;
 
     w = in_w0_internal;
@@ -356,7 +359,8 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Units.HydraulicConductance G=0 "Hydraulic Conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_w0 = false
       "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
@@ -391,10 +395,10 @@ package Gas "Models of components with ideal gases as working fluid"
     Modelica.Blocks.Interfaces.RealInput in_T_internal;
     Modelica.Blocks.Interfaces.RealInput in_X_internal[Medium.nX];
   equation
-    if G == 0 then
-      flange.m_flow = w;
-    else
+    if G > 0 then
       flange.m_flow = w + (flange.p - p0)*G;
+    else
+      flange.m_flow = w;
     end if;
 
     w = in_w0_internal;
@@ -448,7 +452,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(choicesAllMatching = true);
     parameter Medium.MassFlowRate w0=0 "Nominal mass flow rate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     parameter Boolean use_in_w0 = false
       "Use connector input for the nominal flow rate" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
@@ -512,10 +517,11 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
-      Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
+      Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter SI.Volume V "Inner volume";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
@@ -528,6 +534,9 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(tab="Initialisation"));
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialTemperature=false
+      "Remove initial equation on temperature"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Total mass";
@@ -584,16 +593,22 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         gas.p = pstart;
       end if;
-      gas.T = Tstart;
+      if not noInitialTemperature then
+        gas.T = Tstart;
+      end if;
       gas.Xi = Xstart[1:Medium.nXi];
     elseif initOpt == Choices.Init.Options.steadyState then
       if not noInitialPressure then
         der(gas.p) = 0;
       end if;
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
     else
       assert(false, "Unsupported initialisation option");
@@ -627,7 +642,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
-      Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
+      Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter Medium.Temperature Tmstart=300 "Metal wall start temperature";
     parameter SI.Volume V "Inner volume";
     parameter SI.Area S=0 "Inner surface";
@@ -635,7 +650,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Evaluate=true);
     parameter SI.HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
@@ -648,6 +664,9 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(tab="Initialisation"));
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialTemperature=false
+      "Remove initial equation on temperature"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Gas total mass";
@@ -710,7 +729,9 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         gas.p = pstart;
       end if;
-      gas.T = Tstart;
+      if not noInitialTemperature then
+        gas.T = Tstart;
+      end if;
       gas.Xi = Xstart[1:Medium.nXi];
       if (Cm > 0 and gamma > 0) then
         Tm  = Tmstart;
@@ -719,13 +740,17 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         der(gas.p) = 0;
       end if;
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
@@ -763,14 +788,15 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
-      Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
+      Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter SI.Volume V "Inner volume";
     parameter SI.Area S=0 "Inner surface";
     parameter SI.CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
       annotation (Evaluate=true);
     parameter SI.HeatCapacity Cm=0 "Metal heat capacity" annotation (Evaluate=true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
@@ -785,6 +811,9 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation (Dialog(tab="Initialisation"));
     parameter Boolean noInitialPressure=false
       "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+    parameter Boolean noInitialTemperature=false
+      "Remove initial equation on temperature"
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
 
     SI.Mass M "Gas total mass";
@@ -861,7 +890,9 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         gas.p = pstart;
       end if;
-      gas.T = Tstart;
+      if not noInitialTemperature then
+        gas.T = Tstart;
+      end if;
       gas.Xi = Xstart[1:Medium.nXi];
       if (Cm > 0 and gamma > 0) then
         Tm  = Tmstart;
@@ -870,13 +901,17 @@ package Gas "Models of components with ideal gases as working fluid"
       if not noInitialPressure then
         der(gas.p) = 0;
       end if;
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
       end if;
     elseif initOpt == Choices.Init.Options.steadyStateNoP then
-      der(gas.T) = 0;
+      if not noInitialTemperature then
+        der(gas.T) = 0;
+      end if;
       der(gas.Xi) = zeros(Medium.nXi);
       if (Cm > 0 and gamma > 0) then
         der(Tm) = 0;
@@ -928,6 +963,8 @@ package Gas "Models of components with ideal gases as working fluid"
       final wnom=wnom/Nt,
       final w=w*ones(N),
       final fluidState=gas.state) "Instantiated heat transfer model";
+
+    parameter SI.PerUnit wnm = 1e-2 "Maximum fraction of the nominal flow rate allowed as reverse flow";
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     SI.Pressure Dpfric "Pressure drop due to friction";
@@ -1141,6 +1178,8 @@ package Gas "Models of components with ideal gases as working fluid"
     Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
+
+    assert(infl.m_flow > -wnom*wnm, "Reverse flow not allowed, maybe you connected the component with wrong orientation");
   initial equation
     if initOpt == Choices.Init.Options.noInit or QuasiStatic then
       // do nothing
@@ -1149,6 +1188,7 @@ package Gas "Models of components with ideal gases as working fluid"
         p = pstart;
       end if;
       Ttilde = Tstart[2:N];
+      Xtilde = ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]);
     elseif initOpt == Choices.Init.Options.steadyState then
       if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
@@ -1177,16 +1217,16 @@ package Gas "Models of components with ideal gases as working fluid"
 <li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
 <li>The longitudinal heat diffusion term is neglected.
 <li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
-<li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
+<li>The fluid flow can exchange thermal power through the lateral tube boundary, by means of the <tt>wall</tt> connector, that actually represents the wall surface with its temperature. The heat flow is computed by an instance of the replaceable HeatTransfer model; various heat transfer models are available in the ThermoPower.Thermal.HeatTransferFV package.
 </ul>
 <p>The mass, momentum and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional), N-1 temperatures, and either one or N-1 gas composition vectors.
 <p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
 <p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical problems occur in tubes with very low pressure drops.
-<p>Flow reversal is fully supported.
+<p>Flow reversal is not supported by this model; if you need flow reversal, please consider using the Flow1DFEM model.
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package.In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
 <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater than or equal to 2.
-<p>if <tt>UniformComposition</tt> is true, then a uniform compostion is assumed for the gas through the entire tube lenght; otherwise, the gas compostion is computed in <tt>N</tt> equally spaced nodes, as in the case of thermal variables.
+<p>if <tt>UniformComposition</tt> is true, then a uniform compostion is assumed for the gas through the entire tube length; otherwise, the gas compostion is computed in <tt>N</tt> equally spaced nodes, as in the case of thermal variables.
 <p>The following options are available to specify the friction coefficient:
 <ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
 <li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
@@ -1214,8 +1254,7 @@ package Gas "Models of components with ideal gases as working fluid"
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),
-      DymolaStoredErrors);
+</html>"));
   end Flow1DFV;
 
   model Flow1DFV2w "Same as Flow1DFV with two walls and heat transfer models"
@@ -1254,7 +1293,8 @@ package Gas "Models of components with ideal gases as working fluid"
     constant Medium.MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Boolean rev_inlet1=allowFlowReversal
       "Allow flow reversal at inlet1" annotation (Evaluate=true);
@@ -1393,7 +1433,8 @@ package Gas "Models of components with ideal gases as working fluid"
     constant Medium.MassFlowRate wzero=1e-9
       "Small flowrate to avoid singularity in computing the outlet enthalpy and composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Boolean rev_inlet=allowFlowReversal
       "Allow flow reversal at inlet" annotation (Evaluate=true);
@@ -1527,7 +1568,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(choicesAllMatching = true);
     parameter Units.HydraulicResistance R "Hydraulic resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -1574,7 +1616,7 @@ package Gas "Models of components with ideal gases as working fluid"
       T(start=Tstart),
       Xi(start=Xstart[1:Medium.nXi]));
     parameter Medium.MassFlowRate wnom "Nominal mass flowrate";
-    parameter SI.Pressure dpnom "Nominal pressure drop";
+    parameter SI.PressureDifference dpnom "Nominal pressure drop";
     parameter ThermoPower.Choices.PressDrop.FFtypes FFtype= ThermoPower.Choices.PressDrop.FFtypes.Kf
       "Friction factor type";
     parameter Real Kf = 0 "Hydraulic resistance coefficient (DP = Kf*w^2/rho)"
@@ -1592,7 +1634,8 @@ package Gas "Models of components with ideal gases as working fluid"
     final parameter Real Kf_a(fixed = false)
       "Actual hydraulic resistance coefficient";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=101325 "Start pressure value"
       annotation (Dialog(tab="Initialisation"));
@@ -1604,7 +1647,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.MassFlowRate w "Mass flow rate in the inlet";
     Medium.AbsolutePressure pin "Inlet pressure";
     Medium.AbsolutePressure pout "Outlet pressure";
-    SI.Pressure dp "Pressure drop";
+    SI.PressureDifference dp "Pressure drop";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(start=wnom, min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -1684,7 +1727,8 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     Medium.BaseProperties gas;
@@ -1782,7 +1826,8 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
             allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
@@ -1868,7 +1913,8 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     Medium.BaseProperties gas "Gas properties";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -1925,7 +1971,8 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(choicesAllMatching = true);
     parameter Units.HydraulicConductance Kv "Hydraulic conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     Medium.MassFlowRate w "Mass flowrate";
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -1986,7 +2033,7 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(Evaluate = true);
     parameter SI.Area Av(
       fixed=fixedAv,
-      start=wnom/(sqrt(rhonom*dpnom))*FlowChar(thetanom))
+      start=wnom/(sqrt(rhonom*dpnom)*FlowChar(thetanom)))
       "Av (metric) flow coefficient"
       annotation (Dialog(group="Flow Coefficient",
                          enable=(CvData == ThermoPower.Choices.Valve.CvTypes.Av)));
@@ -2004,7 +2051,7 @@ package Gas "Models of components with ideal gases as working fluid"
       annotation(Dialog(group= "Valve Opening", enable = not useThetaInput));
     parameter Medium.AbsolutePressure pnom "Nominal inlet pressure"
       annotation (Dialog(group="Nominal operating point"));
-    parameter Medium.AbsolutePressure dpnom "Nominal pressure drop"
+    parameter SI.PressureDifference dpnom "Nominal pressure drop"
       annotation (Dialog(group="Nominal operating point"));
     parameter Medium.MassFlowRate wnom "Nominal mass flowrate"
       annotation (Dialog(group="Nominal operating point"));
@@ -2024,7 +2071,8 @@ package Gas "Models of components with ideal gases as working fluid"
       constrainedby Functions.ValveCharacteristics.baseFun
       "Critical ratio characteristic";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pin_start=pnom
       "Inlet pressure start value"
@@ -2037,7 +2085,7 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFraction Xstart[Medium.nX]=Medium.reference_X
       "Start gas composition" annotation (Dialog(tab="Initialisation"));
     Medium.MassFlowRate w "Mass Flow Rate";
-    SI.Pressure dp "Pressure drop";
+    SI.PressureDifference dp "Pressure drop";
     SI.PerUnit Fxt;
     SI.PerUnit x "Pressure drop ratio";
     SI.PerUnit xs "Saturated pressure drop ratio";
@@ -2796,7 +2844,7 @@ The packages Medium are redeclared and a mass balance determines the composition
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
         annotation(Evaluate=true);
-      parameter SI.Pressure dpnom = 0 "Nominal pressure drop";
+      parameter SI.PressureDifference dpnom = 0 "Nominal pressure drop";
       parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
       parameter Medium.Density rhonom=0 "Nominal inlet density"
@@ -2818,7 +2866,8 @@ The packages Medium are redeclared and a mass balance determines the composition
       parameter Boolean avoidInletEnthalpyDerivative=true
         "Avoid inlet enthalpy derivative";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
         annotation (Dialog(tab="Initialisation"));
@@ -2865,9 +2914,20 @@ The packages Medium are redeclared and a mass balance determines the composition
               if allowFlowReversal then +Modelica.Constants.inf else 0))
         annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
                0)));
-    equation
+    initial equation
+        assert(wnom > 0, "Please set a positive value for wnom");
         assert(FFtype == FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
+        assert(not
+                  (FFtype == FFtypes.Kfnom     and not Kfnom > 0),  "Kfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.OpPoint   and not rhonom > 0), "rhonom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Cfnom     and not Cfnom > 0),  "Cfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)),
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
@@ -2899,7 +2959,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         annotation (Dialog(tab="Initialisation"));
       parameter SI.SpecificEnthalpy HH "Lower Heating value of fuel";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter Air.AbsolutePressure pstart=101325 "Pressure start value"
         annotation (Dialog(tab="Initialisation"));
@@ -3038,7 +3099,8 @@ This is the model-base of a Combustion Chamber, with a constant volume.
         annotation (Dialog(tab="Initialisation"));
       parameter Medium.Temperature Tdes_in "inlet design temperature";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter Medium.Temperature Tstart_in=Tdes_in "inlet start temperature"
                                   annotation (Dialog(tab="Initialisation"));
@@ -3134,7 +3196,7 @@ This is the model-base of a Combustion Chamber, with a constant volume.
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
 <p>The following options are available to calculate the enthalpy of the outgoing gas:
-<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is obtained by equating the specific entropy of the inlet gas <tt>gas_in</tt> and of a fictious gas state <tt>gas_iso</tt>, with the same pressure of the outgoing gas; both are computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
+<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is obtained by equating the specific entropy of the inlet gas <tt>gas_in</tt> and of a fictitious gas state <tt>gas_iso</tt>, with the same pressure of the outgoing gas; both are computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
 </html>",   revisions="<html>
 <ul>
 <li><i>13 Apr 2005</i>
@@ -3167,7 +3229,8 @@ This is the model-base of a Combustion Chamber, with a constant volume.
       parameter SI.PerUnit eta_mech=0.98 "mechanical efficiency";
       parameter Medium.Temperature Tdes_in "inlet design temperature";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter Medium.AbsolutePressure pstart_in "inlet start pressure"
         annotation (Dialog(tab="Initialisation"));
@@ -3266,7 +3329,7 @@ This is the model-base of a Combustion Chamber, with a constant volume.
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package. In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
 <p>The following options are available to calculate the enthalpy of the outgoing gas:
-<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is determined by equating the specific entropy of the inlet gas <tt>gas_in</tt> and of a fictious gas state <tt>gas_iso</tt>, with the same pressure of the outgoing gas; both are computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
+<ul><li><tt>explicitIsentropicEnthalpy = true</tt>: the isentropic enthalpy <tt>hout_iso</tt> is calculated by the <tt>Medium.isentropicEnthalpy</tt> function. <li><tt>explicitIsentropicEnthalpy = false</tt>: the isentropic enthalpy is determined by equating the specific entropy of the inlet gas <tt>gas_in</tt> and of a fictitious gas state <tt>gas_iso</tt>, with the same pressure of the outgoing gas; both are computed with the function <tt>Medium.specificEntropy</tt>.</pp></ul>
 </html>",   revisions="<html>
 <ul>
 <li><i>13 Apr 2005</i>
@@ -3306,7 +3369,8 @@ This is the model-base of a Combustion Chamber, with a constant volume.
       parameter SI.SpecificEnthalpy HH "Lower Heating value";
       parameter SI.PerUnit eta_mech=0.95 "mechanical efficiency";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
 
       Air.BaseProperties gas(
@@ -3470,35 +3534,47 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
         annotation(choicesAllMatching = true);
       Medium.BaseProperties inletFluid(h(start=hstart))
         "Fluid properties at the inlet";
+      // Flow Characteristic curves
+      parameter Boolean useFlowModel = false "Use function from replaceable model for flow characteristic"
+        annotation(Evaluate = true, choices(CheckBox = true),Dialog(group="Characteristic curves"));
       replaceable function flowCharacteristic =
-        Functions.FanCharacteristics.baseFlow
+          Functions.FanCharacteristics.dummyFlow
+        constrainedby Functions.FanCharacteristics.baseFlow
         "Head vs. q_flow characteristic at nominal speed and density" annotation (
-         Dialog(group="Characteristics"), choicesAllMatching=true);
+         Dialog(group="Characteristic curves"), choicesAllMatching=true,
+         enable = not useFlowCharacteristicModel);
+      replaceable model FlowCharacteristicModel =
+          Functions.FanCharacteristics.Models.BaseFlow annotation (
+         Dialog(group="Characteristic curves"), choicesAllMatching=true, enable = not useFlowCharacteristicModel);
+      // Power characteristic curves
       parameter Boolean usePowerCharacteristic=false
         "Use powerCharacteristic (vs. efficiencyCharacteristic)"
-        annotation (Dialog(group="Characteristics"));
+        annotation (Dialog(group="Characteristic curves"));
       replaceable function powerCharacteristic =
           Functions.FanCharacteristics.constantPower constrainedby
         Functions.FanCharacteristics.basePower
         "Power consumption vs. q_flow at nominal speed and density" annotation (
-          Dialog(group="Characteristics", enable=usePowerCharacteristic),
+          Dialog(group="Characteristic curves", enable=usePowerCharacteristic),
           choicesAllMatching=true);
+      // Efficiency characteristic curves
       replaceable function efficiencyCharacteristic =
           Functions.FanCharacteristics.constantEfficiency (eta_nom=0.8)
         constrainedby Functions.PumpCharacteristics.baseEfficiency
         "Efficiency vs. q_flow at nominal speed and density" annotation (Dialog(
-            group="Characteristics", enable=not usePowerCharacteristic),
+            group="Characteristic curves", enable=not usePowerCharacteristic),
           choicesAllMatching=true);
       parameter Integer Np0(min=1) = 1 "Nominal number of fans in parallel";
-      parameter Real bladePos0=1 "Nominal blade position";
+      parameter SI.PerUnit bladePos0=1 "Nominal blade position"
+        annotation (Dialog(group="Nominal values"));
       parameter Medium.Density rho0=1.229 "Nominal Gas Density"
-        annotation (Dialog(group="Characteristics"));
+        annotation (Dialog(group="Nominal values"));
       parameter NonSI.AngularVelocity_rpm n0=1500 "Nominal rotational speed"
-        annotation (Dialog(group="Characteristics"));
+        annotation (Dialog(group="Nominal values"));
       parameter SI.Volume V=0 "Fan Internal Volume" annotation (Evaluate=true);
       parameter Boolean CheckValve=false "Reverse flow stopped";
       parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction";
+        "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
       parameter SI.VolumeFlowRate q_single_start=q_single0
         "Volume Flow Rate Start Value (single pump)"
@@ -3508,32 +3584,35 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
         annotation (Dialog(tab="Initialisation"));
       parameter Medium.Density rho_start=rho0 "Inlet Density start value"
         annotation (Dialog(tab="Initialisation"));
+      parameter NonSI.AngularVelocity_rpm n_start=n0 "Rotational speed start value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter SI.SpecificEnergy H_start = H0 "Specific energy start value"
+        annotation (Dialog(tab="Initialisation"));
+      parameter SI.PerUnit bladePos_start=bladePos0 "Blade position start value"
+        annotation (Dialog(tab="Initialisation"));
       parameter Choices.Init.Options initOpt=system.initOpt
         "Initialisation option" annotation (Dialog(tab="Initialisation"));
       parameter Medium.MassFlowRate w0 "Nominal mass flow rate"
-        annotation (Dialog(group="Characteristics"));
+        annotation (Dialog(group="Nominal values"));
       parameter SI.Pressure dp0 "Nominal pressure increase"
-        annotation (Dialog(group="Characteristics"));
+        annotation (Dialog(group="Nominal values"));
       final parameter SI.VolumeFlowRate q_single0=w0/(Np0*rho0)
-        "Nominal volume flow rate (single pump)";
-      final parameter SI.SpecificEnergy H0=dp0/(rho0) "Nominal specific energy";
-    protected
-      function dH_dqflow
-        "Approximated partial derivative of flow characteristic w.r.t. flow"
-        input SI.VolumeFlowRate q_flow;
-        output Real dH;
-      algorithm
-        dH := (flowCharacteristic(1.05*q_flow) -
-              flowCharacteristic(0.95*q_flow)) / 0.1;
-      annotation(Inline = true);
-      end dH_dqflow;
-    public
+        "Nominal volume flow rate (single fan)";
+      final parameter SI.SpecificEnergy H0 = dp0/(rho0) "Nominal specific energy";
+      final parameter Real dH_dq_start=
+        if useFlowModel then flowModel.dH_dq(q_single_start, bladePos_start)
+                        else dH_dq(q_single_start, bladePos_start)
+        "Derivative of specific energy w.r.t. volume flow at start conditions";
+      final parameter Real dH_dn_start=
+         2*H_start/n_start - dH_dq_start*q_single_start/n_start
+         "Derivative of flow characteristic w.r.t. fan speed at start conditions";
+
       Medium.MassFlowRate w_single(start=q_single_start*rho_start)
         "Mass flow rate (single fan)";
       Medium.MassFlowRate w=Np*w_single "Mass flow rate (total)";
       SI.VolumeFlowRate q_single "Volume flow rate (single fan)";
       SI.VolumeFlowRate q=Np*q_single "Volume flow rate (totale)";
-      SI.Pressure dp "Outlet pressure minus inlet pressure";
+      SI.PressureDifference dp "Outlet pressure minus inlet pressure";
       SI.SpecificEnergy H "Specific energy";
       Medium.SpecificEnthalpy h(start=hstart) "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hin(start=hstart) "Enthalpy of entering fluid";
@@ -3571,6 +3650,22 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
             origin={-40,76},
             extent={{-10,-10},{10,10}},
             rotation=270)));
+
+      FlowCharacteristicModel flowModel
+       "Model for flow characteristic function with static parameters";
+
+    protected
+      function dH_dq
+        "Approximated partial derivative of flow characteristic w.r.t. volume flow"
+        input SI.VolumeFlowRate q_flow;
+        input SI.PerUnit bladePos;
+        output Real dH;
+      algorithm
+        dH := (flowCharacteristic(1.05*q_flow,bladePos) -
+               flowCharacteristic(0.95*q_flow,bladePos)) / 0.1;
+      annotation(Inline = true);
+      end dH_dq;
+
     equation
       // Number of fans in parallel
       Np = in_Np;
@@ -3597,32 +3692,21 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
         // Flow characteristics when check valve is open
         q_single = s;
         H = homotopy(
-          (n/n0)^2*flowCharacteristic(q_single*n0/(n + n_eps), bladePos),
-          dH_dqflow(q_single0)*(q_single - q_single0) +
-           (2/n0*flowCharacteristic(q_single0) -
-            q_single0/n0*dH_dqflow(q_single0))*(n-n0) + H0);
-      else
+              if useFlowModel then
+                  (n/n0)^2*flowModel.flowCharacteristic(q_single*n0/(n + n_eps), bladePos)
+              else
+                  (n/n0)^2*flowCharacteristic(q_single*n0/(n + n_eps), bladePos),
+              H_start + dH_dq_start*(q_single - q_single_start) + dH_dn_start*(n - n_start));
+        else
         // Flow characteristics when check valve is closed
-        H = homotopy((n/n0)^2*flowCharacteristic(0) - s,
-          dH_dqflow(q_single0)*(q_single - q_single0) +
-           (2/n0*flowCharacteristic(q_single0) -
-            q_single0/n0*dH_dqflow(q_single0))*(n - n0) + H0);
         q_single = 0;
+        H = homotopy(
+              if useFlowModel then
+                  (n/n0)^2*flowModel.flowCharacteristic(0, bladePos) - s
+              else
+                  (n/n0)^2*flowCharacteristic(0, bladePos - s),
+              H_start + dH_dn_start*(n - n_start) - s);
       end if;
-
-      /*
-  // Flow equations
-  q_single = w_single/rho;
-  if noEvent(s > 0 or (not CheckValve)) then
-    // Flow characteristics when check valve is open
-    q_single = s;
-    H = (n/n0)^2*flowCharacteristic(q_single*n0/(n+n_eps),bladePos);
-  else
-    // Flow characteristics when check valve is closed
-    H = (n/n0)^2*flowCharacteristic(0) - s;
-    q_single = 0;
-  end if;
-*/
 
       // Power consumption
       if usePowerCharacteristic then
@@ -3721,7 +3805,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Medium.MassFraction Xnom[Medium.nX]=Medium.reference_X
       "Nominal gas composition";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     FlangeB flange(redeclare package Medium = Medium, m_flow(max=if
@@ -3804,7 +3889,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       "Nominal gas composition";
     parameter Units.HydraulicResistance R=0 "Hydraulic Resistance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
@@ -3885,7 +3971,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Units.HydraulicConductance G=0 "HydraulicConductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     Medium.MassFlowRate w;
@@ -3969,7 +4056,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Units.HydraulicConductance G=0 "Hydraulic Conductance";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     Medium.MassFlowRate w;
@@ -4045,7 +4133,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
 
     FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
@@ -4113,7 +4202,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
     parameter FFtypes FFtype "Friction Factor Type";
     parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient";
-    parameter Medium.AbsolutePressure dpnom=0 "Nominal pressure drop";
+    parameter SI.PressureDifference dpnom=0 "Nominal pressure drop";
     parameter Medium.Density rhonom=0 "Nominal inlet density";
     parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor";
     parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
@@ -4129,7 +4218,8 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     parameter Boolean avoidInletEnthalpyDerivative=true
       "Avoid inlet enthalpy derivative";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction";
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
       annotation (Dialog(tab="Initialisation"));
@@ -4428,7 +4518,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 <p><b>Modelling options</b></p>
 <p>The actual gas used in the component is determined by the replaceable <tt>Medium</tt> package.In the case of multiple component, variable composition gases, the start composition is given by <tt>Xstart</tt>, whose default value is <tt>Medium.reference_X</tt>.
 <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater than or equal to 2.
-<p>if <tt>UniformComposition</tt> is true, then a uniform compostion is assumed for the gas through the entire tube lenght; otherwise, the gas compostion is computed in <tt>N</tt> equally spaced nodes, as in the case of thermal variables.
+<p>if <tt>UniformComposition</tt> is true, then a uniform compostion is assumed for the gas through the entire tube length; otherwise, the gas compostion is computed in <tt>N</tt> equally spaced nodes, as in the case of thermal variables.
 <p>The following options are available to specify the friction coefficient:
 <ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
 <li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).

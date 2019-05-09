@@ -8,7 +8,9 @@ package Thermal "Thermal models of heat transfer"
     parameter Integer N(min=1) = 2 "Number of nodes";
     SI.Temperature T[N] "Temperature at the nodes";
     flow SI.HeatFlux phi[N] "Heat flux at the nodes";
-    annotation (Icon(graphics={Rectangle(
+    annotation (
+            Diagram(coordinateSystem(preserveAspectRatio=false)),
+            Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
             fillColor={255,127,0},
@@ -19,7 +21,9 @@ package Thermal "Thermal models of heat transfer"
     parameter Integer N "Number of volumes";
     SI.Temperature T[N] "Temperature at the volumes";
     flow SI.Power Q[N] "Heat flow at the volumes";
-    annotation (Icon(graphics={Rectangle(
+    annotation (
+            Diagram(coordinateSystem(preserveAspectRatio=false)),
+            Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
             fillColor={255,127,0},
@@ -96,26 +100,16 @@ package Thermal "Thermal models of heat transfer"
   end HT_DHTNodes;
 
   model HT_DHTVolumes "HT to DHT adaptor"
-
-    // TO BE ADAPTED!!!
-
-    parameter Integer N(min=2)=2 "Number of nodes on DHT side";
-  //  parameter SI.Area exchangeSurface "Area of heat transfer surface";
-    HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
-            rotation=0)));
-    DHTVolumes DHT_port(final N=N-1) annotation (Placement(transformation(extent={{100,-40},{
+    parameter Integer N=1 "Number of volumes on the connectors";
+    HT HT_port annotation (Placement(transformation(extent={{-140,-20},{-100,20}},
+            rotation=0), iconTransformation(extent={{-140,-20},{-100,20}})));
+    DHTVolumes DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
               120,40}}, rotation=0)));
   equation
-    for i in 1:N-1 loop
+    for i in 1:N loop
       DHT_port.T[i] = HT_port.T "Uniform temperature distribution on DHT side";
     end for;
-  /*  if N == 1 then
-    // Uniform flow distribution
-    DHT_port.Q[1] + HT_port.Q_flow = 0 "Energy balance";
-  else
-    // Piecewise linear flow distribution*/
-      sum(DHT_port.Q[1:N-1]) + HT_port.Q_flow = 0 "Energy balance";
-    //end if;
+    sum(DHT_port.Q) + HT_port.Q_flow = 0 "Energy balance";
     annotation (Icon(graphics={
           Polygon(
             points={{-100,100},{-100,-100},{100,100},{-100,100}},
@@ -368,7 +362,8 @@ package Thermal "Thermal models of heat transfer"
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Temperature Tvolstart[Nw]=
-      Functions.linspaceExt(Tstart1, TstartN, Nw);
+      Functions.linspaceExt(Tstart1, TstartN, Nw)
+          annotation (Dialog(tab="Initialisation"));
     parameter Choices.Init.Options initOpt=system.initOpt
       "Initialisation option"
       annotation (Dialog(tab="Initialisation"));
@@ -571,7 +566,8 @@ package Thermal "Thermal models of heat transfer"
       "Temperature start value - last volume"
       annotation (Dialog(tab="Initialisation"));
     parameter SI.Temperature Tvolstart[Nw]=
-      Functions.linspaceExt(Tstart1, TstartN, Nw);
+      Functions.linspaceExt(Tstart1, TstartN, Nw)
+          annotation (Dialog(tab="Initialisation"));
     parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt
       "Initialisation option" annotation (Dialog(tab="Initialisation"));
     constant Real pi=Modelica.Constants.pi;
@@ -586,7 +582,7 @@ package Thermal "Thermal models of heat transfer"
   equation
     (Cm/Nw)*der(Tvol) = int.Q + ext.Q "Energy balance";
     if WallRes then
-      assert(UA_int > 0 and UA_ext > 0, "Assign postive values to UA_int, UA_ext");
+      assert(UA_int > 0 and UA_ext > 0, "Assign positive values to UA_int, UA_ext");
       ext.Q = (ext.T-Tvol)*UA_ext/Nw;
       int.Q = (int.T-Tvol)*UA_int/Nw;
     else
@@ -844,6 +840,38 @@ The swapping is performed if the counterCurrent parameter is true (default value
 "));
   end CounterCurrentFEM;
 
+  model ConvHTFV "1D Constant thermal conductance"
+    extends Icons.HeatFlow;
+    parameter Integer Nv=2 "Number of finite volumes";
+    parameter SI.ThermalConductance G "Overall thermal conductance";
+
+    DHTVolumes side1(final N=Nv) annotation (Placement(transformation(extent={{-40,20},{40,40}},
+            rotation=0)));
+    DHTVolumes side2(final N=Nv) annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
+            rotation=0)));
+  equation
+    side1.Q = G*(side1.T - side2.T) "Convective heat transfer";
+    side1.Q + side2.Q = zeros(Nv) "Static energy balance";
+    annotation (Icon(graphics={Text(
+            extent={{-100,-44},{100,-68}},
+            lineColor={191,95,0},
+            textString="%name")}), Documentation(info="<HTML>
+<p>Model of a uniformly distributed finite-volume constant thermal conductance between two 1D objects.
+<p>Volume <tt>j</tt> on side 1 interacts with volume <tt>j</tt> on side 2.
+</HTML>", revisions="<html>
+<li><i>23 Oct 2018</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end ConvHTFV;
+
+  model FoulingFV "1D FV thermal resistance due to fouling"
+    extends ConvHTFV(final G = A/R);
+    parameter Units.SpecificThermalResistance R "Fouling factor";
+    parameter SI.Area A "Total surface";
+  end FoulingFV;
+
   model ConvHTLumped "Lumped parameter convective heat transfer"
     extends Icons.HeatFlow;
     parameter SI.ThermalConductance G "Constant thermal conductance";
@@ -884,12 +912,22 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
        parameter SI.CoefficientOfHeatTransfer gamma
         "Constant heat transfer coefficient";
+       parameter Boolean adaptiveAverageTemperature = true
+        "Adapt the average temperature at low flow rates";
+       parameter Modelica.SIunits.PerUnit sigma = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is computed on outlet volume temperatures";
+
+       SI.PerUnit w_wnom "Ratio between actual and nominal flow rate";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
     equation
       assert(Nw ==  Nf - 1, "The number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
+      w_wnom = abs(w[1])/wnom;
       for j in 1:Nw loop
-         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+         Tvol[j] =
+           if not useAverageTemperature then T[j+1]
+           else if not adaptiveAverageTemperature then (T[j] + T[j + 1])/2
+           else (T[j]+T[j+1])/2 + (T[j+1]-T[j])/2*exp(-w_wnom/sigma);
          Qw[j] = (Tw[j] - Tvol[j])*omega*l*gamma*Nt;
       end for;
 
@@ -897,7 +935,12 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
                 graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+        Documentation(info="<html>
+<p>This component assumes a uniform and connstant heat transfer coefficient gamma.</p>
+<p>If useAverageTemperature=false, the outlet fluid temperature of each volume is used to compute the heat transfer, otherwise the average temperature between inlet and outlet is used.</p>
+<p>In the latter case, the temperature distribution is accurately predicted if N &GT; NTU. However, non-physical temperature distributions and numerical problems can arise at low flows, when NTU increases. If adaptiveAverageTemperature=true, then the outlet temperature is used instead of the average one when w/wnom_ht &lt; sigma. This leads to physically realistic temperature distributions and better numerical properties at low or zero flows.</p>
+</html>"));
     end ConstantHeatTransferCoefficient;
 
     model ConstantHeatTransferCoefficientTwoGrids
@@ -978,7 +1021,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
                 graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+        Documentation(info="<html>Same as <a href=\"ConstantHeatTransferCoefficient\">ConstantHeatTransferCoefficient</a>, except that
+the global nominal thermal conductance UA is given instead of the nominal specific heat transfer coefficient.
+</html>"));
     end ConstantThermalConductance;
 
     model FlowDependentHeatTransferCoefficient
@@ -992,6 +1038,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
         "Fraction of nominal flow rate below which the heat transfer is not reduced";
        parameter SI.MassFlowRate wnom_ht = wnom
         "Nominal flow rate for heat transfer correlation (single tube)";
+       parameter Boolean adaptiveAverageTemperature = true
+        "Adapt the average temperature at low flow rates";
+       parameter Modelica.SIunits.PerUnit sigma = 0.1
+        "Fraction of nominal flow rate below which the heat transfer is computed on outlet volume temperatures";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
        SI.CoefficientOfHeatTransfer gamma(start = gamma_nom)
         "Actual heat transfer coefficient";
@@ -1010,14 +1060,22 @@ The swapping is performed if the counterCurrent parameter is true (default value
                        gamma_nom);
 
       for j in 1:Nw loop
-         Tvol[j] = if useAverageTemperature then (T[j] + T[j + 1])/2 else T[j+1];
+         Tvol[j] =
+           if not useAverageTemperature then T[j+1]
+           else if not adaptiveAverageTemperature then (T[j] + T[j + 1])/2
+           else (T[j]+T[j+1])/2 + (T[j+1]-T[j])/2*exp(-w_wnom/sigma);
          Qw[j] = (Tw[j] - Tvol[j])*gamma*omega*l*Nt;
       end for;
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
                 graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+        Documentation(info="<html>
+<p>This component assumes a uniform heat transfer coefficient gamma_nom*(w/wnom_ht)^alpha. When w/wnom_ht &LT; beta the heat transfer coefficient stops decreasing, to avoid numerical problems at low flows.</p>
+<p>If useAverageTemperature=false, the outlet fluid temperature of each volume is used to compute the heat transfer, otherwise the average temperature between inlet and outlet is used.</p>
+<p>In the latter case, the temperature distribution is accurately predicted if N &GT; NTU. However, non-physical temperature distributions and numerical problems can arise at low flows, when NTU increases. If adaptiveAverageTemperature=true, then the outlet temperature is used instead of the average one when w/wnom_ht &lt; sigma. This leads to physically realistic temperature distributions and better numerical properties at low or zero flows.</p>
+</html>"));
     end FlowDependentHeatTransferCoefficient;
 
     model FlowDependentThermalConductance
@@ -1031,7 +1089,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
                 100,100}}),
                 graphics),
-        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}));
+        Icon(graphics={Text(extent={{-100,-52},{100,-80}}, textString="%name")}),
+        Documentation(info="<html>Same as <a href=\"FlowDependentHeatTransferCoefficient\">FlowDependentHeatTransferCoefficient</a>, except that
+the global nominal thermal conductance UAnom is given instead of the nominal specific heat transfer coefficient.
+</html>"));
     end FlowDependentThermalConductance;
 
     model DittusBoelter "Dittus-Boelter heat transfer correlation"
@@ -1118,7 +1179,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
       Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
-      Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+      Medium.Temperature Tvol[Nw] "Fluid average temperature in the volumes";
       Medium.Temperature Ts "Saturated water temperature";
       Medium.SaturationProperties sat "Properties of saturated fluid";
       Medium.ThermodynamicState bubble "Bubble point, one-phase side";
@@ -1191,7 +1252,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
       for j in 1:Nw loop
          if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then  // 1-phase liquid or vapour
-           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
            state[j] = 1;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
@@ -1228,9 +1289,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
          end if;
 
          if useAverageTemperature then
-           Tvolbar[j] = (T[j] + T[j + 1])/2;
+           Tvol[j] = (T[j] + T[j + 1])/2;
          else
-           Tvolbar[j] = T[j + 1];
+           Tvol[j] = T[j + 1];
          end if;
       end for;
        annotation (
@@ -1273,7 +1334,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
       Medium.SpecificEnthalpy h[Nf] "Fluid specific enthalpy";
       Medium.SpecificEnthalpy hl "Saturated liquid enthalpy";
       Medium.SpecificEnthalpy hv "Saturated vapour enthalpy";
-      Medium.Temperature Tvolbar[Nw] "Fluid average temperature in the volumes";
+      Medium.Temperature Tvol[Nw] "Fluid average temperature in the volumes";
       Medium.Temperature Ts "Saturated water temperature";
       Medium.SaturationProperties sat "Properties of saturated fluid";
       Medium.AbsolutePressure p "Fluid pressure for property calculations";
@@ -1306,12 +1367,12 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
       for j in 1:Nw loop
          if noEvent(h[j] < hl and h[j + 1] < hl) then  // liquid
-           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*gamma_liq;
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*gamma_liq;
            state[j] = 0;
            alpha_l[j] = 1;
            alpha_v[j] = 0;
          elseif noEvent(h[j] > hv and h[j + 1]> hv) then  // vapour
-           Qw[j] = (Tw[j] - Tvolbar[j])*omega*l*Nt*gamma_vap;
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*gamma_vap;
            state[j] = 1;
            alpha_l[j] = 0;
            alpha_v[j] = 1;
@@ -1347,9 +1408,9 @@ The swapping is performed if the counterCurrent parameter is true (default value
          end if;
 
          if useAverageTemperature then
-           Tvolbar[j] = (T[j] + T[j + 1])/2;
+           Tvol[j] = (T[j] + T[j + 1])/2;
          else
-           Tvolbar[j] = T[j + 1];
+           Tvol[j] = T[j + 1];
          end if;
       end for;
        annotation (

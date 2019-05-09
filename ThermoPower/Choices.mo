@@ -1,13 +1,11 @@
 within ThermoPower;
 package Choices "Choice enumerations for ThermoPower models"
-  extends Modelica.Icons.Package;
+  extends Modelica.Icons.TypesPackage;
   package CylinderFourier
     type NodeDistribution = enumeration(
         uniform "Uniform distribution of node radii",
         thickInternal "Quadratically distributed node radii - thickest at rint",
-
         thickExternal "Quadratically distributed node radii - thickest at rext",
-
         thickBoth
           "Quadratically distributed node radii - thickest at both extremes")
       "Type, constants and menu choices for node distribution";
@@ -91,7 +89,6 @@ package Choices "Choice enumerations for ThermoPower models"
         FixedInitial "FixedInitial -- Dynamic balance, Initial value fixed",
         SteadyStateInitial
           "SteadyStateInitial -- Dynamic balance, Steady state initial with guess value",
-
         SteadyState "SteadyState -- Steady state balance, Initial guess value")
       "Enumeration to define definition of balance equations";
 
