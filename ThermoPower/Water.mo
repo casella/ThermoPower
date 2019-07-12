@@ -6030,7 +6030,6 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       Modelica.Blocks.Interfaces.RealInput partialArc if usePartialArcInput
         "Partial arc opening in p.u." annotation (Placement(
             transformation(extent={{-60,-50},{-40,-30}}, rotation=0)));
-
       Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
           Placement(transformation(extent={{-76,-10},{-56,10}}, rotation=0)));
       Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
