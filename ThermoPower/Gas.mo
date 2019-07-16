@@ -1260,7 +1260,7 @@ package Gas "Models of components with ideal gases as working fluid"
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
-    HeatTransfer heatTransfer2(
+    HeatTransfer2 heatTransfer2(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
