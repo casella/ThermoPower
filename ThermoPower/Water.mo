@@ -6099,7 +6099,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 
       // The next equation is provided to close the balance but never actually used
       inlet.h_outflow = outlet.h_outflow;
-
+      connect(partialArc, partialArc_int);
       annotation (
         Icon(graphics={
             Polygon(

@@ -308,6 +308,37 @@ package Thermal "Thermal models of heat transfer"
 "));
   end HeatSource1DFV;
 
+  model HeatSource1DNonUniformFV
+    "Distributed Heat Flow Source for Finite Volume models with non-uniformly distributed flow"
+    extends Icons.HeatFlow;
+    parameter Integer Nw = 1 "Number of volumes on the wall port";
+    Thermal.DHTVolumes wall(final N=Nw) annotation (Placement(transformation(
+            extent={{-40,-40},{40,-20}}, rotation=0)));
+    Modelica.Blocks.Interfaces.RealInput power[Nw] annotation (Placement(
+          transformation(
+          origin={0,40},
+          extent={{-20,-20},{20,20}},
+          rotation=270)));
+  equation
+    wall.Q = -power;
+    annotation (
+      Diagram(graphics),
+      Icon(graphics={Text(
+            extent={{-100,-44},{100,-68}},
+            lineColor={191,95,0},
+            textString="%name")}),
+      Documentation(info="<HTML>
+<p>Model of an ideal tubular heat flow source, with uniform heat flux. The actual heating power is provided by the <tt>power</tt> signal connector.
+</HTML>", revisions="<html>
+<ul>
+<li><i>1 Oct 2003</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
+  end HeatSource1DNonUniformFV;
+
   model HeatSource1DFEM "Distributed Heat Flow Source for FEM models"
     extends Icons.HeatFlow;
     parameter Integer N=2 "Number of nodes";
@@ -850,7 +881,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
     DHTVolumes side2(final N=Nv) annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
             rotation=0)));
   equation
-    side1.Q = G*(side1.T - side2.T) "Convective heat transfer";
+    side1.Q = G*(side1.T - side2.T)/Nv "Convective heat transfer";
     side1.Q + side2.Q = zeros(Nv) "Static energy balance";
     annotation (Icon(graphics={Text(
             extent={{-100,-44},{100,-68}},

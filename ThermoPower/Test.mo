@@ -4657,8 +4657,6 @@ This model tests <tt>GTunit_ISO</tt>.
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{-22,20},{-2,
                 40}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia Inertia(J=1) annotation (
-         Placement(transformation(extent={{-22,-10},{-2,10}}, rotation=0)));
       ThermoPower.Gas.SourceMassFlow
                               SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
@@ -4666,11 +4664,14 @@ This model tests <tt>GTunit_ISO</tt>.
         p0=12.5e5,
         w0=0.365) annotation (Placement(transformation(extent={{-80,20},{-60,40}},
               rotation=0)));
-      Electrical.Generator Generator(Np=2, eta=0.98) annotation (Placement(
+      Electrical.Generator Generator(
+        Pnom=5e6,                    Np=2, eta=0.98) annotation (Placement(
             transformation(extent={{32,-10},{52,10}}, rotation=0)));
-      Electrical.Breaker Breaker annotation (Placement(transformation(extent={{
+      Electrical.Breaker Breaker(Pnom=5e6)
+                                 annotation (Placement(transformation(extent={{
                 56,-10},{76,10}}, rotation=0)));
-      Electrical.Grid Grid(Pn=1e9) annotation (Placement(transformation(extent=
+      Electrical.Grid Grid(Pgrid=1e9)
+                                   annotation (Placement(transformation(extent=
                 {{80,-10},{100,10}}, rotation=0)));
       Modelica.Mechanics.Rotational.Components.IdealGear IdealGear1(ratio=(
             17372/60)/25, useSupport=false) annotation (Placement(
@@ -4693,34 +4694,23 @@ This model tests <tt>GTunit_ISO</tt>.
           points={{-34,6},{-27.6,6},{-27.6,30},{-22,30}},
           color={159,159,223},
           thickness=0.5));
-      connect(Generator.powerConnection, Breaker.connection1) annotation (Line(
-          points={{50.6,1.77636e-016},{54,0},{56,3.55272e-016},{56,1.77636e-016},
-              {57.4,1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(Breaker.connection2, Grid.connection) annotation (Line(
-          points={{74.6,1.77636e-016},{78,0},{80,3.55272e-016},{80,1.77636e-016},
-              {81.4,1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(GTunit.shaft_b, Inertia.flange_a) annotation (Line(
-          points={{-32.4,0},{-22,0}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(Inertia.flange_b, IdealGear1.flange_a) annotation (Line(
-          points={{-2,0},{6,0}},
-          color={0,0,0},
-          thickness=0.5));
       connect(IdealGear1.flange_b, Generator.shaft) annotation (Line(
           points={{26,0},{30,0},{30,1.77636e-016},{33.4,1.77636e-016}},
           color={0,0,0},
           thickness=0.5));
       connect(BooleanStep1.y, Breaker.closed)
         annotation (Line(points={{61,30},{66,30},{66,8}}, color={255,0,255}));
-    initial equation
-      Inertia.phi = 0;
-      der(Inertia.w) = 0;
+      connect(Generator.port, Breaker.port_a) annotation (Line(
+          points={{50.6,0},{57.4,0}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(Breaker.port_b, Grid.port) annotation (Line(
+          points={{74.6,0},{81.4,0}},
+          color={0,0,255},
+          thickness=0.5));
 
+      connect(GTunit.shaft_b, IdealGear1.flange_a)
+        annotation (Line(points={{-32.4,0},{6,0}}, color={0,0,0}));
       annotation (experiment(StopTime=2), Documentation(info="<html>
 This model tests a simple power plant based on a <tt>GTunit</tt>.
 
