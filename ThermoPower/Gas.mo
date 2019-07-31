@@ -2776,6 +2776,8 @@ The packages Medium are redeclared and a mass balance determines the composition
       0 = flange.m_flow + w_b "Mass balance";
       flange.h_outflow = Medium.h_default
         "Unused value as there is no flow out of the flange";
+      flange.Xi_outflow = Medium.X_default[1:Medium.nXi]
+        "Unused value as there is no flow out of the flange";
 
       connect(initEquationResidual, initEquationResidual_int)
         "Connects conditional input to hidden connector";
