@@ -2016,7 +2016,7 @@ This characteristic is such that the relative change of the flow coefficient is 
     end NoFriction;
 
   end FrictionFactors;
-  
+
   annotation (Documentation(info="<HTML>
 This package contains general-purpose functions and models
 </HTML>"));
@@ -2128,6 +2128,6 @@ This is a major new release, that has been in the making for 5 years. The new re
 <p>The ThermoPower package is licensed by Politecnico di Milano under the <b><a href=\"http://www.modelica.org/licenses/ModelicaLicense2\">Modelica License 2</a></b>. </p>
 <p><h4>Copyright &copy; 2002-2014, Politecnico di Milano.</h4></p>
 </html>"),
-  uses(Modelica(version="3.2.2")),
+  uses(Modelica(version="3.2.3")),
   version="3.1");
 end ThermoPower;
