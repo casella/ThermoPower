@@ -2756,7 +2756,8 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         experiment(StopTime=50));
     end TestBarometricCondenser;
 
-    model TestCoolingTower "Test of the cooling tower model"
+    model TestCoolingTowerPacking
+      "Test of the dynamic cooling tower model with packing"
       extends Modelica.Icons.Example;
       package Water = Modelica.Media.Water.StandardWater;
       ThermoPower.Water.CoolingTower coolingTower(
@@ -2765,7 +2766,6 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         Mnom=4300,
         wlnom=504/3600*995,
         qanom=99,
-        rhoanom=1.2,
         Mp=2000,
         cp=680,
         rpm_nom=230,
@@ -2775,7 +2775,65 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         S=8700,
         k_wa_nom=1.08e-2,
         nu_a=1,
-        nu_l=0)
+        nu_l=0,
+        rhoanom=1.2)
+        annotation (Placement(transformation(extent={{-20,0},{20,40}})));
+      ThermoPower.Water.SourceMassFlow sourceW(
+        h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
+        w0=2520/3600*995)
+        annotation (Placement(transformation(extent={{-52,50},{-32,70}})));
+      ThermoPower.Water.SinkPressure
+                              sinkP
+        annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
+      Modelica.Blocks.Sources.Ramp fanRpm(
+        duration=1,
+        offset=230,
+        height=-20)
+        annotation (Placement(transformation(extent={{-82,26},{-62,46}})));
+      inner ThermoPower.System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
+          T_wb=287.15)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+    equation
+      connect(sourceW.flange, coolingTower.waterInlet) annotation (Line(
+          points={{-32,60},{0,60},{0,38}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(coolingTower.waterOutlet, sinkP.flange) annotation (Line(
+          points={{0,2},{0,-28},{12,-28}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(fanRpm.y, coolingTower.fanRpm) annotation (Line(
+          points={{-61,36},{-38,36},{-38,28},{-16,28}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      annotation (
+        experiment(
+          StartTime=-50,
+          StopTime=200,
+          Tolerance=1e-006),
+        experimentSetupOutput(equdistant=false),
+        Documentation(info="<html>
+<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 21.5 degC using air with wet bulb temperature at 14 degC.</p>
+<p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
+</html>"));
+    end TestCoolingTowerPacking;
+
+    model TestCoolingTowerStatic "Test of the static cooling tower model"
+      extends Modelica.Icons.Example;
+      package Water = Modelica.Media.Water.StandardWater;
+      ThermoPower.Water.CoolingTower coolingTower(
+        Nt=5,
+        wlnom=504/3600*995,
+        qanom=99,
+        rpm_nom=230,
+        Wnom(displayUnit="kW") = 42000,
+        N=10,
+        S=8700,
+        k_wa_nom=1.08e-2,
+        nu_a=1,
+        nu_l=0,
+        staticModel=true,
+        rhoanom=1.2)
         annotation (Placement(transformation(extent={{-20,0},{20,40}})));
       ThermoPower.Water.SourceMassFlow sourceW(
         h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
@@ -2813,25 +2871,182 @@ feature can be useful if one wants to simulate circuits where some condensers ma
           Tolerance=1e-006),
         experimentSetupOutput(equdistant=false),
         Documentation(info="<html>
-<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 22.5 degC using air with wet bulb temperature at 14 degC.</p>
+<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 21.5 degC using air with wet bulb temperature at 14 degC.</p>
 <p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
 </html>"));
-    end TestCoolingTower;
+    end TestCoolingTowerStatic;
 
-    model TestCoolingTowerStatic
-      "Test of the static model of the cooling tower"
-      extends TestCoolingTower(coolingTower(staticModel = true));
+    model TestCoolingTowerClosed
+      "Test of the a closed cooling tower model"
+      import ThermoPower;
+      extends Modelica.Icons.Example;
+      package Water = Modelica.Media.Water.StandardWater;
+      ThermoPower.Water.CoolingTower coolingTower(
+        nu_a=1,
+        nu_l=0,
+        Nt=1,
+        staticModel=true,
+        wlnom=30/3600*995,
+        Wnom(displayUnit="kW") = 4100,
+        rpm_nom=230,
+        N=6,
+        closedCircuit=true,
+        rhoanom(displayUnit="kg/m3") = 1.2,
+        gamma_wp_nom=200,
+        S=400,
+        k_wa_nom=0.024,
+        qanom=7.3)
+        annotation (Placement(transformation(extent={{-20,-2},{20,38}})));
+      ThermoPower.Water.SourceMassFlow sourceClosedCircuit(
+        use_T=true,
+        w0=30/3600*995,
+        p0=400000,
+        T=308.15)
+        annotation (Placement(transformation(extent={{-86,18},{-66,38}})));
+      ThermoPower.Water.SinkPressure towerDischarge
+        annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
+      Modelica.Blocks.Sources.Ramp fanRpm(
+        duration=1,
+        offset=230,
+        height=-20)
+        annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
+      inner ThermoPower.System system(initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        T_amb=303.15,
+        T_wb=298.15)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+      ThermoPower.Water.Flow1DFV cooledFlow(
+        L=1,
+        omega=100,
+        wnom=8.33,
+        H=10,
+        N=6,
+        redeclare model HeatTransfer =
+            ThermoPower.Thermal.HeatTransferFV.FlowDependentThermalConductance
+            (alpha=1, UAnom=80000),
+        A=0.06)                     annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={-52,12})));
+      ThermoPower.Water.SinkPressure closedCircuitDischarge(p0=300000)
+        annotation (Placement(transformation(extent={{-36,-36},{-16,-16}})));
+      ThermoPower.Water.SourceMassFlow sourceCoolingWater(
+        use_T=true,
+        w0=0.4,
+        T=301.15)
+        annotation (Placement(transformation(extent={{-28,56},{-8,76}})));
+      ThermoPower.Thermal.MetalWallFV tubeWalls(
+        Nw=5,
+        M=20,
+        cm=500) annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=90,
+            origin={-32,12})));
+    equation
+      connect(coolingTower.waterOutlet, towerDischarge.flange) annotation (Line(
+          points={{0,0},{0,-28},{12,-28}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(fanRpm.y, coolingTower.fanRpm) annotation (Line(
+          points={{-39,50},{-24,50},{-24,26},{-16,26}},
+          color={0,0,127},
+          smooth=Smooth.None));
+      connect(sourceClosedCircuit.flange, cooledFlow.infl) annotation (Line(
+            points={{-66,28},{-52,28},{-52,22}}, color={0,0,255}));
+      connect(cooledFlow.outfl, closedCircuitDischarge.flange) annotation (Line(
+            points={{-52,2},{-52,-26},{-36,-26}}, color={0,0,255}));
+      connect(sourceCoolingWater.flange, coolingTower.waterInlet)
+        annotation (Line(points={{-8,66},{0,66},{0,36}}, color={0,0,255}));
+      connect(cooledFlow.wall, tubeWalls.int)
+        annotation (Line(points={{-47,12},{-35,12}}, color={255,127,0}));
+      connect(tubeWalls.ext, coolingTower.tubeWalls)
+        annotation (Line(points={{-28.9,12},{-16,12}}, color={255,127,0}));
       annotation (
         experiment(
           StartTime=-50,
           StopTime=200,
           Tolerance=1e-006),
+        experimentSetupOutput(equdistant=false),
         Documentation(info="<html>
-<p>Test of the cooling tower model. Inlet water at 32.5 degC is cooled down to 22.5 degC using air with wet bulb temperature at 14 degC.</p>
+<p>Test of the closed cooling tower model. A flow of 8.3 kg/s of water in the closed circuit
+at 35 degC is cooled down to 30 degC using using air with wet bulb temperature at 25 degC.</p>
 <p>At time = 0 the fan speed is reduced from 230 rpm to 210 rpm, causing a slight reduction of the cooling capacity of the tower.</p>
-<p>The static model is employed in this case</p>
 </html>"));
-    end TestCoolingTowerStatic;
+    end TestCoolingTowerClosed;
+
+    model TestExpansionTankIdeal "Test case for ExpansionTankIdeal"
+      extends Modelica.Icons.Example;
+
+      Water.ExpansionTankIdeal expTankIdeal(pf=700000)
+        annotation (Placement(transformation(extent={{-10,-4},{10,16}})));
+      Water.ThroughMassFlow idealPump(w0=10)
+        annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
+      Water.Flow1DFV boiler(
+        A=3.1416*0.04^2,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        L=10,
+        hstartin=134.11e3,
+        hstartout=134.11e3,
+        omega=3.1416*0.04*2,
+        wnom=10,
+        N=2,
+        dpnom=200000,
+        rhonom=999,
+        pstart=700000)
+        annotation (Placement(transformation(extent={{22,-10},{42,10}})));
+      inner System system(
+          allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
+      Thermal.TempSource1DFV temperatureSource
+        annotation (Placement(transformation(extent={{-26,-48},{-6,-68}})));
+      Modelica.Blocks.Sources.RealExpression externalTemperature(y=system.T_amb)
+        annotation (Placement(transformation(extent={{-78,-90},{-46,-70}})));
+      Water.Flow1DFV heater(
+        A=3.1416*0.04^2,
+        FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        L=10,
+        hstartin=134.11e3,
+        hstartout=134.11e3,
+        omega=3.1416*0.04*2,
+        wnom=10,
+        N=2,
+        dpnom=200000,
+        rhonom=999,
+        pstart=700000,
+        redeclare model HeatTransfer =
+            Thermal.HeatTransferFV.ConstantThermalConductance (UA=50000))
+        annotation (Placement(transformation(extent={{-6,-30},{-26,-50}})));
+      Thermal.HeatSource1DFV heatFlowSource
+        annotation (Placement(transformation(extent={{22,12},{42,32}})));
+      Modelica.Blocks.Sources.Step step(height=1e6, startTime=10)
+        annotation (Placement(transformation(extent={{-6,30},{14,50}})));
+    equation
+      connect(expTankIdeal.WaterOutfl, boiler.infl)
+        annotation (Line(points={{4,0},{13,0},{22,0}}, color={0,0,255}));
+      connect(idealPump.outlet, expTankIdeal.WaterInfl)
+        annotation (Line(points={{-20,0},{-12,0},{-4,0}}, color={0,0,255}));
+      connect(externalTemperature.y, temperatureSource.temperature) annotation (
+         Line(points={{-44.4,-80},{-16,-80},{-16,-62}}, color={0,0,127}));
+      connect(heater.wall, temperatureSource.wall)
+        annotation (Line(points={{-16,-45},{-16,-55}}, color={255,127,0}));
+      connect(heatFlowSource.wall, boiler.wall)
+        annotation (Line(points={{32,19},{32,5}}, color={255,127,0}));
+      connect(step.y, heatFlowSource.power)
+        annotation (Line(points={{15,40},{32,40},{32,26}}, color={0,0,127}));
+      connect(boiler.outfl, heater.infl) annotation (Line(points={{42,0},{60,0},
+              {60,-40},{-6,-40}}, color={0,0,255}));
+      connect(heater.outfl, idealPump.inlet) annotation (Line(points={{-26,-40},
+              {-60,-40},{-60,0},{-40,0}}, color={0,0,255}));
+      annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+            coordinateSystem(preserveAspectRatio=false)),
+        experiment(StopTime=500),
+        Documentation(info="<html>
+<p>This model demonstrates the use of an ideal expansion tank in a closed circuit. The ideal expansion tank keeps
+its flange pressure fixed, allowing some flow rate to enter or leave the circuit to balance the fluid thermal expansion</p>
+<p>The model represents an idealized heating system. It starts in steady state at ambient temperature, then at time = 10
+the heating power is turned on; as a consequence, the fluid gradually heats up to its final steady state value, and during
+this transient there is a net flow rate entering the expansion tank.
+</html>"));
+    end TestExpansionTankIdeal;
   end WaterComponents;
 
   package GasComponents "Tests for lumped-parameters Gas package components"
@@ -4442,8 +4657,6 @@ This model tests <tt>GTunit_ISO</tt>.
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{-22,20},{-2,
                 40}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia Inertia(J=1) annotation (
-         Placement(transformation(extent={{-22,-10},{-2,10}}, rotation=0)));
       ThermoPower.Gas.SourceMassFlow
                               SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
@@ -4451,11 +4664,14 @@ This model tests <tt>GTunit_ISO</tt>.
         p0=12.5e5,
         w0=0.365) annotation (Placement(transformation(extent={{-80,20},{-60,40}},
               rotation=0)));
-      Electrical.Generator Generator(Np=2, eta=0.98) annotation (Placement(
+      Electrical.Generator Generator(
+        Pnom=5e6,                    Np=2, eta=0.98) annotation (Placement(
             transformation(extent={{32,-10},{52,10}}, rotation=0)));
-      Electrical.Breaker Breaker annotation (Placement(transformation(extent={{
+      Electrical.Breaker Breaker(Pnom=5e6)
+                                 annotation (Placement(transformation(extent={{
                 56,-10},{76,10}}, rotation=0)));
-      Electrical.Grid Grid(Pn=1e9) annotation (Placement(transformation(extent=
+      Electrical.Grid Grid(Pgrid=1e9)
+                                   annotation (Placement(transformation(extent=
                 {{80,-10},{100,10}}, rotation=0)));
       Modelica.Mechanics.Rotational.Components.IdealGear IdealGear1(ratio=(
             17372/60)/25, useSupport=false) annotation (Placement(
@@ -4478,34 +4694,23 @@ This model tests <tt>GTunit_ISO</tt>.
           points={{-34,6},{-27.6,6},{-27.6,30},{-22,30}},
           color={159,159,223},
           thickness=0.5));
-      connect(Generator.powerConnection, Breaker.connection1) annotation (Line(
-          points={{50.6,1.77636e-016},{54,0},{56,3.55272e-016},{56,1.77636e-016},
-              {57.4,1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(Breaker.connection2, Grid.connection) annotation (Line(
-          points={{74.6,1.77636e-016},{78,0},{80,3.55272e-016},{80,1.77636e-016},
-              {81.4,1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(GTunit.shaft_b, Inertia.flange_a) annotation (Line(
-          points={{-32.4,0},{-22,0}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(Inertia.flange_b, IdealGear1.flange_a) annotation (Line(
-          points={{-2,0},{6,0}},
-          color={0,0,0},
-          thickness=0.5));
       connect(IdealGear1.flange_b, Generator.shaft) annotation (Line(
           points={{26,0},{30,0},{30,1.77636e-016},{33.4,1.77636e-016}},
           color={0,0,0},
           thickness=0.5));
       connect(BooleanStep1.y, Breaker.closed)
         annotation (Line(points={{61,30},{66,30},{66,8}}, color={255,0,255}));
-    initial equation
-      Inertia.phi = 0;
-      der(Inertia.w) = 0;
+      connect(Generator.port, Breaker.port_a) annotation (Line(
+          points={{50.6,0},{57.4,0}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(Breaker.port_b, Grid.port) annotation (Line(
+          points={{74.6,0},{81.4,0}},
+          color={0,0,255},
+          thickness=0.5));
 
+      connect(GTunit.shaft_b, IdealGear1.flange_a)
+        annotation (Line(points={{-32.4,0},{6,0}}, color={0,0,0}));
       annotation (experiment(StopTime=2), Documentation(info="<html>
 This model tests a simple power plant based on a <tt>GTunit</tt>.
 
@@ -7064,6 +7269,7 @@ Casella</a>:<br>
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        fixedMassFlowSimplified = true,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB (gamma_b=30000),
         dpnom=1000)
@@ -10366,273 +10572,314 @@ The moving boundary evaporator model is still incomplete, and it fails at t = 12
 
     model TestElectrical1
       extends Modelica.Icons.Example;
-      parameter SI.Power Pn=10e6 "Nominal generator power";
-      parameter SI.Time Ta=10 "Turbine acceleration time";
-      parameter Integer Np=2 "Number of generator poles";
-      parameter SI.Frequency f0=50 "Nominal network frequency";
-      parameter SI.AngularVelocity omegan_el=2*pi*f0
-        "Nominal electrical angular velocity";
-      parameter SI.AngularVelocity omegan_m=omegan_el/Np
+      parameter SI.Power Pnom=10e6 "Nominal generator power";
+      parameter SI.Frequency f0=system.fnom "Nominal network frequency";
+      parameter Integer Np = 2 "Number of polar expansions";
+      parameter SI.AngularVelocity omegan_m=2*pi*f0/Np
         "Nominal mechanical angular velocity";
-      parameter SI.MomentOfInertia Je=Pn*Ta/omegan_el^2
-        "Moment of inertia referred to electrical angles";
-      parameter SI.MomentOfInertia Jm=Np^2*Je "Mechanical moment of inertia";
-      parameter SI.Time Topen=10 "Time of breaker opening";
       constant Real pi = Modelica.Constants.pi;
-      Electrical.Generator generator annotation (Placement(transformation(
-              extent={{20,-10},{40,10}}, rotation=0)));
-      Electrical.Load load(Wn=Pn) annotation (Placement(transformation(extent={
-                {50,-20},{70,0}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia turboGenInertia(J=Jm)
-        annotation (Placement(transformation(extent={{-10,-10},{10,10}},
-              rotation=0)));
+      Electrical.Generator generator(
+        Pnom=Pnom,
+        Ta=10,
+        Np=2,
+        referenceGenerator=true) annotation (Placement(transformation(
+              extent={{8,-10},{28,10}},  rotation=0)));
+      Electrical.Load load(Pnom=Pnom) annotation (Placement(transformation(extent={{40,-20},
+                {60,0}},          rotation=0)));
       Modelica.Mechanics.Rotational.Sources.Torque primeMover(useSupport=false)
-        annotation (Placement(transformation(extent={{-40,-10},{-20,10}},
+        annotation (Placement(transformation(extent={{-30,-10},{-10,10}},
               rotation=0)));
       Modelica.Blocks.Sources.Step Step1(
-        height=-Pn/omegan_m,
-        offset=Pn/omegan_m,
-        startTime=1) annotation (Placement(transformation(extent={{-80,-10},{-60,
-                10}}, rotation=0)));
+        height=-Pnom/omegan_m,
+        offset=Pnom/omegan_m,
+        startTime=1) annotation (Placement(transformation(extent={{-70,-10},{
+                -50,10}},
+                      rotation=0)));
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
     equation
-      connect(generator.powerConnection, load.connection) annotation (Line(
-          points={{38.6,1.77636e-016},{60,1.77636e-016},{60,-1.4}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(turboGenInertia.flange_b, generator.shaft) annotation (Line(
-          points={{10,0},{16,0},{16,1.77636e-016},{21.4,1.77636e-016}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(primeMover.flange, turboGenInertia.flange_a) annotation (Line(
-          points={{-20,0},{-10,0}},
-          color={0,0,0},
-          thickness=0.5));
-    initial equation
-      load.f = 50;
-
-    equation
-      connect(Step1.y, primeMover.tau)
-        annotation (Line(points={{-59,0},{-42,0}}, color={0,0,127}));
+      connect(generator.port, load.port) annotation (Line(
+          points={{26.6,2.22045e-16},{50,2.22045e-16},{50,-1.4}},
+          thickness=0.5,
+          color={0,0,0}));
+      connect(Step1.y, primeMover.tau) annotation (Line(points={{-49,0},{-32,0}}, color={0,0,127}));
+      connect(primeMover.flange, generator.shaft) annotation (Line(points={{-10,0},
+              {0,0},{0,2.22045e-16},{9.4,2.22045e-16}},     color={0,0,0}));
       annotation (
-        Diagram(graphics),
         experiment(StopTime=2),
         Documentation(info="<html>
-<p>The model is designed to test the generator and load components of the <tt>Electrical</tt> library.<br>
-Simulation sequence:
+<p>The model is designed to test the generator and load components of the <span style=\"font-family: Courier New;\">Electrical</span> library.</p><p>Simulation sequence: </p>
 <ul>
-    <li>t=0 s: The system starts at equilibrium
-    <li>t=1 s: The torque is brought to zero.
-    <li>t=2 s: After 10% of the turbine acceleration time, the frequency has dropped by around 10%. The approximation is due to nonlinear effects.
+<li>t=0 s: The system starts at equilibrium </li>
+<li>t=1 s: The torque is brought to zero. Since there is a deficit of 100&percnt; nominal power in the island, the frequency starts
+decreasing with a rate of 100&percnt; for each acceleration time Ta=10 s, i.e., by 10&percnt;/s, or 5 Hz/s </li>
 </ul>
-<p>
-Simulation Interval = [0...2] sec <br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</p>
+<p>Since the system is not connected to a grid, the generator has <span style=\"font-family: Courier New;\">referenceGenerator = true</span> to provide a well-posed initialization problem.</p>
+<p>Simulation Interval = [0...2] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
-        <li><i>21 Jul 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        First release.</li>
-</ul>
+<li><i>21 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Rewrote from scratch.</li></ul>
 </html>
 "));
     end TestElectrical1;
 
     model TestElectrical2
       extends Modelica.Icons.Example;
-      parameter SI.Power Pn=10e6 "Nominal generator power";
-      parameter SI.Time Ta=10 "Turbine acceleration time";
-      parameter Integer Np=2 "Number of generator poles";
-      parameter SI.Frequency f0=50 "Nominal network frequency";
-      parameter SI.AngularVelocity omegan_el=2*pi*f0
-        "Nominal electrical angular velocity";
-      parameter SI.AngularVelocity omegan_m=omegan_el/Np
+      parameter SI.Power Pnom=10e6 "Nominal generator power";
+      parameter SI.Frequency f0=system.fnom "Nominal network frequency";
+      parameter Integer Np = 2 "Number of polar expansions";
+      parameter SI.AngularVelocity omegan_m=2*pi*f0/Np
         "Nominal mechanical angular velocity";
-      parameter SI.MomentOfInertia Je=Pn*Ta/omegan_el^2
-        "Moment of inertia referred to electrical angles";
-      parameter SI.MomentOfInertia Jm=Np^2*Je "Mechanical moment of inertia";
       constant Real pi = Modelica.Constants.pi;
-      parameter SI.Time Topen=10 "Time of breaker opening";
-      Electrical.Generator generator annotation (Placement(transformation(
+
+      Electrical.Generator generator(Ta = 10, Np = Np, Pnom = Pnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState)       annotation (Placement(transformation(
               extent={{10,-10},{30,10}}, rotation=0)));
-      Electrical.Load load(Wn=Pn) annotation (Placement(transformation(extent={
+      Electrical.Load load(Pnom = Pnom, usePowerInput=true) annotation (Placement(transformation(extent={
                 {30,-40},{50,-20}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia turboGenInertia(J=Jm)
-        annotation (Placement(transformation(extent={{-20,-10},{0,10}},
-              rotation=0)));
       Modelica.Mechanics.Rotational.Sources.Torque primeMover(useSupport=false)
-        annotation (Placement(transformation(extent={{-58,-10},{-38,10}},
+        annotation (Placement(transformation(extent={{-30,-10},{-10,10}},
               rotation=0)));
 
       Modelica.Blocks.Sources.Step GenTorque(
-        height=-0.1*Pn/omegan_m,
-        offset=Pn/omegan_m,
-        startTime=1) annotation (Placement(transformation(extent={{-92,-10},{-72,
-                10}}, rotation=0)));
-      Electrical.Grid grid(Pn=1e9) annotation (Placement(transformation(extent=
+        height=-0.1*Pnom/omegan_m,
+        offset=Pnom/omegan_m,
+        startTime=1) annotation (Placement(transformation(extent={{-64,-10},{-44,10}},
+                      rotation=0)));
+      Electrical.Grid grid(Pgrid=1e9)
+                                     annotation (Placement(transformation(extent=
                 {{76,-10},{96,10}}, rotation=0)));
-      Electrical.Breaker Breaker1 annotation (Placement(transformation(extent={
-                {50,-10},{70,10}}, rotation=0)));
       Modelica.Blocks.Sources.Step LocalLoad(
-        height=0.1*Pn,
-        offset=Pn,
-        startTime=2) annotation (Placement(transformation(extent={{0,-40},{20,-20}},
+        height=0.1*Pnom,
+        offset=Pnom,
+        startTime=3) annotation (Placement(transformation(extent={{0,-40},{20,-20}},
               rotation=0)));
-      Modelica.Blocks.Sources.BooleanStep BreakerCommand(startTime=3,
-          startValue=true) annotation (Placement(transformation(extent={{20,20},
-                {40,40}}, rotation=0)));
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
     equation
-      connect(turboGenInertia.flange_b, generator.shaft) annotation (Line(
-          points={{0,0},{4,0},{4,1.77636e-016},{11.4,1.77636e-016}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(primeMover.flange, turboGenInertia.flange_a) annotation (Line(
-          points={{-38,0},{-20,0}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(Breaker1.connection2, grid.connection) annotation (Line(
-          points={{68.6,1.77636e-016},{70.8,1.77636e-016},{70.8,1.77636e-016},{
-              73,1.77636e-016},{73,1.77636e-016},{77.4,1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-    initial equation
-      load.f = 50;
 
-    equation
-      connect(BreakerCommand.y, Breaker1.closed)
-        annotation (Line(points={{41,30},{60,30},{60,8}}, color={255,0,255}));
-      connect(generator.powerConnection, Breaker1.connection1) annotation (Line(
-          points={{28.6,1.77636e-016},{40,-3.1606e-022},{38,0},{51.4,
-              1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-
-      connect(load.connection, generator.powerConnection) annotation (Line(
+      connect(load.port, generator.port) annotation (Line(
           points={{40,-21.4},{40,1.77636e-016},{28.6,1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(LocalLoad.y, load.powerConsumption)
+          thickness=0.5,
+          color={0,0,0}));
+      connect(LocalLoad.y, load.referencePower)
         annotation (Line(points={{21,-30},{36.7,-30}}, color={0,0,127}));
       connect(GenTorque.y, primeMover.tau)
-        annotation (Line(points={{-71,0},{-60,0}}, color={0,0,127}));
+        annotation (Line(points={{-43,0},{-32,0}}, color={0,0,127}));
+      connect(primeMover.flange, generator.shaft)
+        annotation (Line(points={{-10,0},{11.4,0}}, color={0,0,0}));
+      connect(generator.port, grid.port) annotation (Line(
+          points={{28.6,0},{77.4,0}},
+          color={0,0,255},
+          thickness=0.5));
       annotation (
-        Diagram(graphics),
-        experiment(StopTime=4, Tolerance=1e-009),
+        experiment(StopTime=5, Interval = 0.005, Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the generator and load components of the <tt>Electrical</tt> library.<br>
-Simulation sequence:
+<p>The model is designed to test the generator, load, and grid components of the <span style=\"font-family: Courier New;\">Electrical</span> library.</p><p>Simulation sequence: </p>
 <ul>
-    <li>t=0 s: The system starts at equilibrium
-    <li>t=1 s: The torque is brought to zero.
-    <li>t=2 s: After 10% of the turbine acceleration time, the frequency has dropped by around 10%. The approximation is due to nonlinear effects.
+<li>t=0 s: The system starts at equilibrium. All power coming from the generator is absorbed by the load, no exchange with the grid. </li>
+<li>t=1 s: The generator torque (hence power) is reduced by 10&percnt;; the corresponding amount of power is now drawn from the grid. </li>
+<li>t=3 s: The load power is increased by 10&percnt;; the corresponding amount of power is drawn from the grid. </li>
 </ul>
-<p>
-Simulation Interval = [0...2] sec <br>
-Integration Algorithm = DASSL <br>
-Algorithm Tolerance = 1e-6
-</p>
+<p>Simulation Interval = [0...5] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
-        <li><i>21 Jul 2004</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        First release.</li>
-</ul>
+<li><i>21 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Rewrote from scratch.</li></ul>
 </html>
 "));
     end TestElectrical2;
 
-    model TestNetworkGridGenerator_Pmax
+    model TestElectrical3
       extends Modelica.Icons.Example;
-      parameter Boolean SSInit=true "Steady-state initialization";
-      Electrical.Generator gen(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState
-             else Choices.Init.Options.noInit) annotation (Placement(
-            transformation(extent={{-10,-10},{10,10}}, rotation=0)));
-      ThermoPower.Electrical.NetworkGrid_Pmax network(
-        J=10000,
-        Pmax=20e6,
-        hasBreaker=true,
-        deltaStart=0.488,
-        initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit)
-        annotation (Placement(transformation(extent={{40,-10},{60,10}},
+      parameter SI.Power Pnom=10e6 "Nominal generator power";
+      parameter SI.Frequency f0=system.fnom "Nominal network frequency";
+      parameter Integer Np = 2 "Number of polar expansions";
+      parameter SI.AngularVelocity omegan_m=2*pi*f0/Np
+        "Nominal mechanical angular velocity";
+      constant Real pi = Modelica.Constants.pi;
+      Electrical.Generator generator(Ta = 10, Np = Np, Pnom = Pnom) annotation (Placement(transformation(
+              extent={{10,-10},{30,10}}, rotation=0)));
+      Electrical.Load load(Pnom = Pnom, usePowerInput=true) annotation (Placement(transformation(extent={
+                {30,-40},{50,-20}}, rotation=0)));
+      Modelica.Mechanics.Rotational.Sources.Torque primeMover(useSupport=false)  annotation (Placement(transformation(extent={{-30,-10},{-10,10}},
               rotation=0)));
-      Modelica.Mechanics.Rotational.Sources.TorqueStep constantTorque(
-        offsetTorque=1e7/157.08,
-        stepTorque=1e7/157.08*0.2,
-        startTime=20,
-        useSupport=false) annotation (Placement(transformation(extent={{-78,-10},
-                {-58,10}}, rotation=0)));
-      Modelica.Blocks.Sources.BooleanConstant booleanConstant(k=true)
-        annotation (Placement(transformation(extent={{12,20},{32,40}}, rotation=
-               0)));
-      Modelica.Mechanics.Rotational.Components.Damper damper(d=25) annotation (
-          Placement(transformation(extent={{-10,-40},{10,-20}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Fixed fixed annotation (
-          Placement(transformation(extent={{20,-50},{40,-30}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Components.Inertia inertia(J=1, w(start=
-              157.08)) annotation (Placement(transformation(extent={{-48,-10},{
-                -28,10}}, rotation=0)));
+      Modelica.Blocks.Sources.Step GenTorque(
+        height=-0.2*Pnom/omegan_m,
+        offset=Pnom/omegan_m,
+        startTime=1) annotation (Placement(transformation(extent={{-64,-10},{-44,10}},
+                      rotation=0)));
+      Electrical.Grid grid(Pgrid=1e9)
+                                     annotation (Placement(transformation(extent=
+                {{76,-10},{96,10}}, rotation=0)));
+      Electrical.Breaker Breaker1(Pnom = Pnom) annotation (Placement(transformation(extent={
+                {50,-10},{70,10}}, rotation=0)));
+      Modelica.Blocks.Sources.Step LocalLoad(
+        height=-0.1*Pnom,
+        offset=Pnom,
+        startTime=3) annotation (Placement(transformation(extent={{0,-40},{20,-20}},
+              rotation=0)));
+      Modelica.Blocks.Sources.BooleanStep BreakerCommand(startTime=5,
+          startValue=true) annotation (Placement(transformation(extent={{20,20},
+                {40,40}}, rotation=0)));
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
     equation
-      connect(fixed.flange, damper.flange_b) annotation (Line(
-          points={{30,-40},{30,-30},{10,-30}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(inertia.flange_a, constantTorque.flange) annotation (Line(
-          points={{-48,0},{-58,0}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(gen.shaft, inertia.flange_b) annotation (Line(
-          points={{-8.6,1.77636e-016},{-18,1.77636e-016},{-18,0},{-28,0}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(damper.flange_a, inertia.flange_b) annotation (Line(
-          points={{-10,-30},{-22,-30},{-22,0},{-28,0}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(network.powerConnection, gen.powerConnection) annotation (Line(
-          points={{40,1.77636e-016},{32,0},{24,3.55272e-016},{24,1.77636e-016},
-              {8.6,1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(network.closed, booleanConstant.y) annotation (Line(points={{50,
-              9.7},{50,30},{33,30}}, color={255,0,255}));
+      connect(Breaker1.port_b, grid.port) annotation (Line(
+          points={{68.6,1.77636e-016},{70.8,1.77636e-016},{70.8,1.77636e-016},{
+              73,1.77636e-016},{73,1.77636e-016},{77.4,1.77636e-016}},
+          thickness=0.5,
+          color={0,0,0}));
+      connect(BreakerCommand.y, Breaker1.closed)
+        annotation (Line(points={{41,30},{60,30},{60,8}}, color={255,0,255}));
+      connect(generator.port, Breaker1.port_a) annotation (Line(
+          points={{28.6,1.77636e-016},{40,-3.1606e-022},{38,0},{51.4,
+              1.77636e-016}},
+          thickness=0.5,
+          color={0,0,0}));
+
+      connect(load.port, generator.port) annotation (Line(
+          points={{40,-21.4},{40,1.77636e-016},{28.6,1.77636e-016}},
+          thickness=0.5,
+          color={0,0,0}));
+      connect(LocalLoad.y, load.referencePower)
+        annotation (Line(points={{21,-30},{36.7,-30}}, color={0,0,127}));
+      connect(GenTorque.y, primeMover.tau)
+        annotation (Line(points={{-43,0},{-32,0}}, color={0,0,127}));
+      connect(primeMover.flange, generator.shaft)
+        annotation (Line(points={{-10,0},{11.4,0}}, color={0,0,0}));
       annotation (
-        Diagram(graphics),
-        experiment(StopTime=40, Tolerance=1e-006),
+        experiment(
+          StopTime=10,
+          Interval= 0.002,
+          Tolerance=1e-06),
         Documentation(info="<html>
-<p>The model is designed to test the <tt>NetworkGrid</tt> model.
-<p>The model starts at steady state.
-<p>At 20s, step variation of the tourque supplied to the generator. Observe the electric power oscillations.
+<p>The model is designed to test the generator and load components of the <span style=\"font-family: Courier New;\">Electrical</span> library.</p>
+<p>Simulation sequence: </p>
+<ul>
+<li>t=0 s: The system starts at equilibrium, with the breaker closed. All the active power produced by the generator is consumed by the load, so there is zero power drawn from the grid. </li>
+<li>t=1 s: The torque (hence the power) is reduced by 20&percnt;; the corresponding amount of power is now drawn from the grid. </li>
+<li>t=3 s: The load is reduced by 10&percnt;, so the power drawn from the grid is now reduced to 10&percnt; of the nominal value. </li>
+<li>t=5 s: The breaker is opened. Since there is a deficit of 10&percnt; nominal power in the formed island, the frequency starts decreasing with
+           a rate of 10&percnt; for each acceleration time Ta=10 s, i.e., by 1&percnt;/s, or 0.5 Hz/s. </li>
+</ul>
+<p>Simulation Interval = [0...10] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
-<li><i>15 Jul 2008</i>
-    by <a> Luca Savoldelli </a>:<br>
-       First release.</li>
-</ul>
-</html>"),
-        __Dymola_experimentSetupOutput(equdistant=false));
-    end TestNetworkGridGenerator_Pmax;
+<li><i>21 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Rewrote from scratch.</li></ul>
+</html>
+"));
+    end TestElectrical3;
 
-    model TestNetworkGridTwoGenerators
+    model TestElectrical4
       extends Modelica.Icons.Example;
-      parameter Boolean SSInit=true "Steady-state initialization";
-      ThermoPower.Electrical.NetworkGridTwoGenerators network(
-        J_a=10000,
-        J_b=10000,
-        r_b=0.3,
-        v=15000,
-        Xline=1.625,
-        e_a=15000,
-        e_b=15000,
-        X_a=4,
-        X_b=4,
-        hasBreaker=false,
-        initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit)
-        annotation (Placement(transformation(extent={{-10,-10},{10,10}},
+      parameter SI.Power Pnom=10e6 "Nominal generator power";
+      parameter SI.Frequency f0=system.fnom "Nominal network frequency";
+      parameter Integer Np = 4 "Number of polar expansions";
+      parameter SI.AngularVelocity omega_m_nom=2*pi*f0/Np
+        "Nominal mechanical angular velocity";
+      constant Real pi = Modelica.Constants.pi;
+      Electrical.Generator generator(Ta = 10, Np = Np, Pnom = Pnom,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState,
+        D=0.01)                                                     annotation (Placement(transformation(
+              extent={{-16,-10},{4,10}}, rotation=0)));
+      Electrical.Load load(Pnom = Pnom, usePowerInput=true) annotation (Placement(transformation(extent={{4,-40},
+                {24,-20}},          rotation=0)));
+      Modelica.Mechanics.Rotational.Sources.Torque primeMover(useSupport=false)  annotation (Placement(transformation(extent={{-56,-10},
+                {-36,10}},
               rotation=0)));
-      Electrical.Generator gen_a(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState
-             else Choices.Init.Options.noInit) annotation (Placement(
+      Modelica.Blocks.Sources.Step GenTorque(
+        height=0,
+        offset=Pnom/omega_m_nom,
+        startTime=2) annotation (Placement(transformation(extent={{-90,-10},{
+                -70,10}},
+                      rotation=0)));
+      Electrical.Grid grid(Pgrid=1e9) annotation (Placement(transformation(extent={{48,-10},
+                {68,10}},           rotation=0)));
+      Modelica.Blocks.Sources.Step LocalLoad(
+        height=-0.2*Pnom,
+        offset=0.2*Pnom,
+        startTime=1) annotation (Placement(transformation(extent={{-26,-40},{-6,
+                -20}},
+              rotation=0)));
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+      Electrical.TransmissionLine transmissionLine(Pnom=Pnom, Xpu=0.1)
+        annotation (Placement(transformation(extent={{24,-10},{44,10}})));
+    equation
+
+      connect(load.port, generator.port) annotation (Line(
+          points={{14,-21.4},{14,1.77636e-16},{2.6,1.77636e-16}},
+          thickness=0.5,
+          color={0,0,0}));
+      connect(LocalLoad.y, load.referencePower)
+        annotation (Line(points={{-5,-30},{10.7,-30}}, color={0,0,127}));
+      connect(GenTorque.y, primeMover.tau)
+        annotation (Line(points={{-69,0},{-58,0}}, color={0,0,127}));
+      connect(primeMover.flange, generator.shaft)
+        annotation (Line(points={{-36,0},{-14.6,0}},color={0,0,0}));
+      connect(grid.port, transmissionLine.port_b) annotation (Line(
+          points={{49.4,0},{44,0}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(generator.port, transmissionLine.port_a) annotation (
+          Line(
+          points={{2.6,0},{24,0}},
+          color={0,0,255},
+          thickness=0.5));
+      annotation (
+        experiment(
+          StopTime=10,
+          Interval= 0.002,
+          Tolerance=1e-06),
+        Documentation(
+    info="<html>
+<p>The model is designed to test the generator and load components of the <span style=\"font-family: Courier New;\">Electrical</span> library.</p>
+<p>Simulation sequence: </p>
+<ul>
+<li>t=0 s: The system starts at equilibrium. 20% of the active power produced by the generator is consumed by the local load, while the remaining
+80% is fed to the grid via a transmission line. </li>
+<li>t=1 s: The local load is brought to zero. As a consequence, 20% of the active power production is now rerouted to the grid</li>
+</ul>
+<p>During the transient, electro-mechanical oscillations are triggered. The theoretical pseudo-period is 
+<code>T = sqrt(2*pi*Ta*Xpu/fnom) = </code>0.35, which corresponds to the observed one.</p>
+<p>Simulation Interval = [0...10] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
+</html>",
+    revisions="<html>
+<ul>
+<li><i>21 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Rewrote from scratch.</li></ul>
+</html>
+"));
+    end TestElectrical4;
+
+    model TestElectrical5
+      extends Modelica.Icons.Example;
+      parameter SI.Power Pa = 30e6;
+      parameter SI.Power Pb = 10e6;
+      parameter SI.Power P = Pa + Pb;
+      parameter Integer Np = 2;
+      parameter SI.Time Ta = 10;
+      parameter SI.AngularVelocity omega = 2*pi*system.fnom/Np;
+      constant SI.PerUnit pi = Modelica.Constants.pi;
+      Electrical.Generator gen_a(
+        Ta=Ta,
+        Np=Np,                                    Pnom = Pa,
+        referenceGenerator=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState)
+                                                             annotation (Placement(
             transformation(extent={{-40,-10},{-20,10}}, rotation=0)));
-      Electrical.Generator gen_b(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState
-             else Choices.Init.Options.noInit) annotation (Placement(
+      Electrical.Generator gen_b(
+        Ta=Ta,
+        Np=Np,                                    Pnom = Pb,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(
             transformation(
             origin={30,0},
             extent={{-10,-10},{10,10}},
@@ -10644,26 +10891,26 @@ Algorithm Tolerance = 1e-6
         annotation (Placement(transformation(extent={{70,-10},{50,10}},
               rotation=0)));
       Modelica.Blocks.Sources.Step NomTorque_a(
-        offset=1e7/157,
+        offset=Pa/omega,
         startTime=20,
-        height=1e7/157*0.2) annotation (Placement(transformation(extent={{-96,-6},
+        height=0)           annotation (Placement(transformation(extent={{-96,-6},
                 {-84,6}}, rotation=0)));
-      Modelica.Blocks.Sources.Step NomTorque_b(height=0, offset=1e7/157)
+      Modelica.Blocks.Sources.Step NomTorque_b(height=0, offset=Pb/omega)
         annotation (Placement(transformation(extent={{96,-6},{84,6}}, rotation=
                 0)));
+      Electrical.TransmissionLine transmissionLine(Pnom=P, Xpu=0.3)
+        annotation (Placement(transformation(extent={{-8,-10},{12,10}})));
+      Electrical.Load load(Pnom=40e6, usePowerInput=true)
+        annotation (Placement(transformation(extent={{-30,-38},{-10,-18}})));
+      Modelica.Blocks.Sources.Step Load(
+        offset=P,
+        startTime=2,
+        height=0.01*P)
+                      annotation (Placement(transformation(extent={{-56,-34},{-44,-22}},
+              rotation=0)));
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
     equation
-      connect(gen_b.powerConnection, network.powerConnection_b) annotation (
-          Line(
-          points={{21.4,8.75561e-016},{18,8.75561e-016},{18,1.77636e-016},{10,
-              1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(network.powerConnection_a, gen_a.powerConnection) annotation (
-          Line(
-          points={{-10,1.77636e-016},{-8,1.77636e-016},{-14,0},{-18,0},{-18,
-              1.77636e-016},{-21.4,1.77636e-016}},
-          pattern=LinePattern.None,
-          thickness=0.5));
       connect(NomTorque_b.y, torque_b.tau)
         annotation (Line(points={{83.4,0},{72,0}}, color={0,0,127}));
       connect(NomTorque_a.y, torque_a.tau)
@@ -10677,44 +10924,339 @@ Algorithm Tolerance = 1e-6
           color={0,0,0},
           thickness=0.5));
 
+      connect(gen_a.port, transmissionLine.port_a) annotation (Line(
+          points={{-21.4,0},{-8,0}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(gen_b.port, transmissionLine.port_b) annotation (Line(
+          points={{21.4,1.11022e-15},{16,1.11022e-15},{16,0},{12,0}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(gen_a.port, load.port) annotation (Line(
+          points={{-21.4,0},{-20,0},{-20,-19.4}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(Load.y, load.referencePower)
+        annotation (Line(points={{-43.4,-28},{-23.3,-28}}, color={0,0,127}));
       annotation (
-        Diagram(graphics),
-        experiment(StopTime=40, Tolerance=1e-006),
+        experiment(StopTime=15, Tolerance=1e-07),
         Documentation(info="<html>
-<p>The model is designed to test the <tt>NetworkGridtwoGenerators</tt> model.
-<p>The model starts at steady state.
-<p>At 20s, step variation of the tourque supplied to a generator. Observe the electric power oscillations.
+<p>This model represents a simple islanded power system operating in open loop. Generator A has 30 MW nominal power, generator B has 10 MW.</p>
+<p>The model starts at steady state, with both generators at full load supplying a 40 MW load connected at the A side of the transmission line.</p>
+<p>At time = 2s, the load is increased by 1%. As both generators have Ta = 10s, the frequency starts dropping by 1% every 10 s, or 0.05 Hz/s.
+Electro-mechanical oscillations are also triggered, that are not damped out because the generator models do not include the effect of
+rotor damper cages, and there is no primary frequency control in the system.</p>
 </html>", revisions="<html>
 <ul>
-<li><i>15 Jul 2008</i>
-    by <a> Luca Savoldelli </a>:<br>
-       First release.</li>
-</ul>
-</html>"),
-        __Dymola_experimentSetupOutput(equdistant=false));
-    end TestNetworkGridTwoGenerators;
+<li><i>21 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Rewrote from scratch.</li></ul>
+</html>
+"),     __Dymola_experimentSetupOutput(equdistant=false));
+    end TestElectrical5;
 
-    model StaticController
-      parameter Real droop "Droop";
-      parameter Real PVnom=157.08 "Nominal value of process variable";
-      parameter Real CVnom "Nominal value of control variable";
-      Real e "error";
-      Real deltaCV;
-      Modelica.Blocks.Interfaces.RealInput PV annotation (Placement(
-            transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealOutput CV annotation (Placement(
-            transformation(extent={{100,-10},{120,10}}, rotation=0)));
-      Modelica.Blocks.Interfaces.RealInput SP annotation (Placement(
+    model TestElectrical6
+      extends Modelica.Icons.Example;
+      parameter SI.Power Pa = 30e6;
+      parameter SI.Power Pb = 10e6;
+      parameter SI.Power P = Pa + Pb;
+      parameter Integer Np = 2;
+      parameter SI.AngularVelocity omega = 2*pi*system.fnom/Np;
+      constant SI.PerUnit pi = Modelica.Constants.pi;
+      Electrical.Generator gen_a(Ta = 10, Np = 2, Pnom = Pa,
+        D=0.02,
+        referenceGenerator=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState)
+                                                             annotation (Placement(
+            transformation(extent={{-44,-50},{-24,-30}},rotation=0)));
+      Electrical.Generator gen_b(Ta = 10, Np = 2, Pnom = Pb,
+        D=0.02,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(
             transformation(
-            origin={0,100},
-            extent={{-20,-20},{20,20}},
-            rotation=270)));
+            origin={26,-40},
+            extent={{-10,-10},{10,10}},
+            rotation=180)));
+      Modelica.Mechanics.Rotational.Sources.Torque torque_a(useSupport=false)
+        annotation (Placement(transformation(extent={{-74,-50},{-54,-30}},
+              rotation=0)));
+      Modelica.Mechanics.Rotational.Sources.Torque torque_b(useSupport=false)
+        annotation (Placement(transformation(extent={{66,-50},{46,-30}},
+              rotation=0)));
+      Modelica.Blocks.Continuous.FirstOrder
+                                   torqueGen_a(
+        T=0.2,
+        initType=Modelica.Blocks.Types.Init.SteadyState,
+        y_start=Pa/omega)   annotation (Placement(transformation(extent={{-100,-46},
+                {-88,-34}},
+                          rotation=0)));
+      Electrical.TransmissionLine transmissionLine(Pnom=P, Xpu=0.3)
+        annotation (Placement(transformation(extent={{-12,-50},{8,-30}})));
+      Electrical.Load load(Pnom=40e6, usePowerInput=true)
+        annotation (Placement(transformation(extent={{-34,-78},{-14,-58}})));
+      Modelica.Blocks.Sources.Step Load(
+        offset=P,
+        startTime=2,
+        height=-0.1*P)
+                      annotation (Placement(transformation(extent={{-60,-74},{-48,-62}},
+              rotation=0)));
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+      Electrical.FrequencySensor frequency_a annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=90,
+            origin={-26,-16})));
+      Electrical.FrequencySensor frequency_b annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=90,
+            origin={16,-16})));
+      PrimaryController controllerA(Pnom=Pa)
+        annotation (Placement(transformation(extent={{-122,-34},{-110,-46}})));
+      Modelica.Blocks.Sources.Constant refPa(k=Pa)
+        annotation (Placement(transformation(extent={{-156,-48},{-144,-36}})));
+      Modelica.Blocks.Sources.Constant refPb(k=Pb)
+        annotation (Placement(transformation(extent={{142,-48},{130,-36}})));
+      PrimaryController controllerB(Pnom=Pb)
+        annotation (Placement(transformation(extent={{112,-34},{100,-46}})));
+      Modelica.Blocks.Continuous.FirstOrder torqueGen_b(
+        T=0.2,
+        initType=Modelica.Blocks.Types.Init.SteadyState,
+        y_start=Pb/omega) annotation (Placement(transformation(extent={{90,-46},{78,
+                -34}}, rotation=0)));
     equation
-      e = (SP - PVnom)/PVnom - (PV - PVnom)/PVnom;
-      deltaCV = 1/droop*e*CVnom;
-      CV = deltaCV + CVnom;
+      connect(torqueGen_a.y, torque_a.tau)
+        annotation (Line(points={{-87.4,-40},{-76,-40}},
+                                                     color={0,0,127}));
+      connect(torque_b.flange, gen_b.shaft) annotation (Line(
+          points={{46,-40},{34.6,-40}},
+          color={0,0,0},
+          thickness=0.5));
+      connect(torque_a.flange, gen_a.shaft) annotation (Line(
+          points={{-54,-40},{-42.6,-40}},
+          color={0,0,0},
+          thickness=0.5));
+
+      connect(gen_a.port, transmissionLine.port_a) annotation (Line(
+          points={{-25.4,-40},{-12,-40}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(gen_b.port, transmissionLine.port_b) annotation (Line(
+          points={{17.4,-40},{8,-40}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(gen_a.port, load.port) annotation (Line(
+          points={{-25.4,-40},{-24,-40},{-24,-59.4}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(Load.y, load.referencePower)
+        annotation (Line(points={{-47.4,-68},{-27.3,-68}}, color={0,0,127}));
+      connect(gen_a.port, frequency_a.port) annotation (Line(
+          points={{-25.4,-40},{-26,-40},{-26,-26}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(gen_b.port, frequency_b.port) annotation (Line(
+          points={{17.4,-40},{16,-40},{16,-26}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(torqueGen_a.u, controllerA.torque) annotation (Line(points={{-101.2,-40},
+              {-106,-40},{-106,-40},{-110,-40}}, color={0,0,127}));
+      connect(frequency_a.f, controllerA.frequency) annotation (Line(points={{-26,-5.8},
+              {-26,4},{-138,4},{-138,-37.6},{-122,-37.6}}, color={0,0,127}));
+      connect(refPa.y, controllerA.powerSetPoint) annotation (Line(points={{-143.4,-42},
+              {-134,-42},{-134,-42.4},{-122,-42.4}}, color={0,0,127}));
+      connect(controllerB.powerSetPoint, refPb.y) annotation (Line(points={{112,-42.4},
+              {126,-42.4},{126,-42},{129.4,-42}}, color={0,0,127}));
+      connect(frequency_b.f, controllerB.frequency) annotation (Line(points={{16,-5.8},
+              {16,4},{124,4},{124,-37.6},{112,-37.6}}, color={0,0,127}));
+      connect(controllerB.torque, torqueGen_b.u)
+        annotation (Line(points={{100,-40},{91.2,-40}}, color={0,0,127}));
+      connect(torque_b.tau, torqueGen_b.y)
+        annotation (Line(points={{68,-40},{77.4,-40}}, color={0,0,127}));
       annotation (
-        Diagram(graphics),
+        experiment(StopTime=40, Tolerance=1e-06),
+        Documentation(info="<html>
+<p>This model represents a simple islanded power system with primary frequency control open loop. Generator A has 30 MW nominal power, generator B has 10 MW.</p>
+<p>The model starts at steady state, with both generators at full load supplying a 40 MW load connected at the A side of the transmission line.</p>
+<p>At time = 2s, the load is decreased by 10%. The primary frequency controllers kick in and stabilize the frequency, with an error of 5% of 10% of 50 Hz, 
+i.e. 0.25 Hz. Electro-mechanical oscillations are also triggered, but eventually die out thanks to the generator damping effect.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>21 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Rewrote from scratch.</li></ul>
+</html>
+"),     __Dymola_experimentSetupOutput(equdistant=false),
+        Diagram(coordinateSystem(extent={{-160,-100},{160,100}})),
+        Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
+    end TestElectrical6;
+
+    model TestElectrical7
+      extends Modelica.Icons.Example;
+      parameter SI.Power Pa = 30e6;
+      parameter SI.Power Pb = 10e6;
+      parameter SI.Power P = Pa + Pb;
+      parameter Integer Np = 2;
+      parameter SI.AngularVelocity omega = 2*pi*system.fnom/Np;
+      constant SI.PerUnit pi = Modelica.Constants.pi;
+      Electrical.Generator gen_a(Ta = 10, Np = 2, Pnom = Pa,
+        D=0.02,
+        referenceGenerator=true,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState)
+                                                             annotation (Placement(
+            transformation(extent={{-44,-50},{-24,-30}},rotation=0)));
+      Electrical.Generator gen_b(Ta = 10, Np = 2, Pnom = Pb,
+        D=0.02,
+        initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(
+            transformation(
+            origin={26,-40},
+            extent={{-10,-10},{10,10}},
+            rotation=180)));
+      Modelica.Mechanics.Rotational.Sources.Torque torque_a(useSupport=false)
+        annotation (Placement(transformation(extent={{-74,-50},{-54,-30}},
+              rotation=0)));
+      Modelica.Mechanics.Rotational.Sources.Torque torque_b(useSupport=false)
+        annotation (Placement(transformation(extent={{66,-50},{46,-30}},
+              rotation=0)));
+      Modelica.Blocks.Continuous.FirstOrder
+                                   torqueGen_a(
+        T=0.2,
+        initType=Modelica.Blocks.Types.Init.SteadyState,
+        y_start=Pa/omega)   annotation (Placement(transformation(extent={{-100,-46},
+                {-88,-34}},
+                          rotation=0)));
+      Electrical.TransmissionLine transmissionLine(Pnom=P, Xpu=0.3)
+        annotation (Placement(transformation(extent={{-12,-50},{8,-30}})));
+      Electrical.Load load(Pnom=40e6, usePowerInput=true)
+        annotation (Placement(transformation(extent={{-34,-78},{-14,-58}})));
+      Modelica.Blocks.Sources.Step Load(
+        offset=P,
+        startTime=2,
+        height=-0.1*P)
+                      annotation (Placement(transformation(extent={{-60,-74},{-48,-62}},
+              rotation=0)));
+      inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+      Electrical.FrequencySensor frequency_a annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=90,
+            origin={-26,-16})));
+      Electrical.FrequencySensor frequency_b annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=90,
+            origin={16,-16})));
+      PrimaryController controllerA(Pnom=Pa)
+        annotation (Placement(transformation(extent={{-122,-34},{-110,-46}})));
+      Modelica.Blocks.Sources.Constant refPa(k=Pa)
+        annotation (Placement(transformation(extent={{-190,-48},{-178,-36}})));
+      Modelica.Blocks.Sources.Constant refPb(k=Pb)
+        annotation (Placement(transformation(extent={{142,-48},{130,-36}})));
+      PrimaryController controllerB(Pnom=Pb)
+        annotation (Placement(transformation(extent={{112,-34},{100,-46}})));
+      Modelica.Blocks.Continuous.FirstOrder torqueGen_b(
+        T=0.2,
+        initType=Modelica.Blocks.Types.Init.SteadyState,
+        y_start=Pb/omega) annotation (Placement(transformation(extent={{90,-46},{78,
+                -34}}, rotation=0)));
+      SecondaryController secondaryController(Pnom=40e6, Ts=300)
+        annotation (Placement(transformation(extent={{-60,20},{-80,40}})));
+      Modelica.Blocks.Math.Feedback feedback
+        annotation (Placement(transformation(extent={{-168,-34},{-152,-50}})));
+    equation
+      connect(torqueGen_a.y, torque_a.tau)
+        annotation (Line(points={{-87.4,-40},{-76,-40}},
+                                                     color={0,0,127}));
+      connect(torque_b.flange, gen_b.shaft) annotation (Line(
+          points={{46,-40},{34.6,-40}},
+          color={0,0,0},
+          thickness=0.5));
+      connect(torque_a.flange, gen_a.shaft) annotation (Line(
+          points={{-54,-40},{-42.6,-40}},
+          color={0,0,0},
+          thickness=0.5));
+
+      connect(gen_a.port, transmissionLine.port_a) annotation (Line(
+          points={{-25.4,-40},{-12,-40}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(gen_b.port, transmissionLine.port_b) annotation (Line(
+          points={{17.4,-40},{8,-40}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(gen_a.port, load.port) annotation (Line(
+          points={{-25.4,-40},{-24,-40},{-24,-59.4}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(Load.y, load.referencePower)
+        annotation (Line(points={{-47.4,-68},{-27.3,-68}}, color={0,0,127}));
+      connect(gen_a.port, frequency_a.port) annotation (Line(
+          points={{-25.4,-40},{-26,-40},{-26,-26}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(gen_b.port, frequency_b.port) annotation (Line(
+          points={{17.4,-40},{16,-40},{16,-26}},
+          color={0,0,255},
+          thickness=0.5));
+      connect(torqueGen_a.u, controllerA.torque) annotation (Line(points={{-101.2,-40},
+              {-106,-40},{-106,-40},{-110,-40}}, color={0,0,127}));
+      connect(frequency_a.f, controllerA.frequency) annotation (Line(points={{-26,-5.8},
+              {-26,4},{-138,4},{-138,-37.6},{-122,-37.6}}, color={0,0,127}));
+      connect(controllerB.powerSetPoint, refPb.y) annotation (Line(points={{112,-42.4},
+              {126,-42.4},{126,-42},{129.4,-42}}, color={0,0,127}));
+      connect(frequency_b.f, controllerB.frequency) annotation (Line(points={{16,-5.8},
+              {16,4},{124,4},{124,-37.6},{112,-37.6}}, color={0,0,127}));
+      connect(controllerB.torque, torqueGen_b.u)
+        annotation (Line(points={{100,-40},{91.2,-40}}, color={0,0,127}));
+      connect(torque_b.tau, torqueGen_b.y)
+        annotation (Line(points={{68,-40},{77.4,-40}}, color={0,0,127}));
+      connect(frequency_a.f, secondaryController.frequency)
+        annotation (Line(points={{-26,-5.8},{-26,30},{-60,30}}, color={0,0,127}));
+      connect(controllerA.powerSetPoint, feedback.y) annotation (Line(points={{-122,
+              -42.4},{-138,-42.4},{-138,-42},{-152.8,-42}}, color={0,0,127}));
+      connect(feedback.u1, refPa.y)
+        annotation (Line(points={{-166.4,-42},{-177.4,-42}}, color={0,0,127}));
+      connect(secondaryController.powerOffset, feedback.u2) annotation (Line(points=
+             {{-80,30},{-160,30},{-160,-35.6}}, color={0,0,127}));
+      annotation (
+        experiment(StopTime=300, Tolerance=1e-06),
+        Documentation(info="<html>
+<p>This model represents a simple islanded power system with primary and secondary frequency control open loop. Generator A has 30 MW nominal power, generator B has 10 MW.</p>
+<p>The model starts at steady state, with both generators at full load supplying a 40 MW load connected at the A side of the transmission line.</p>
+<p>At time = 2s, the load is decreased by 10%. The primary frequency controllers kick in and quickly stabilize the frequency, with an error of about 5% of 10% of 50 Hz, 
+i.e. 0.25 Hz. Electro-mechanical oscillations are also triggered, but eventually die out thanks to the generator damping effect. </p>
+<p>Subsequently, the secondary frequency controller brings back the system to 50 Hz in 300 s. Only generator A participates to the secondary frequency control action.</p>
+</html>", revisions="<html>
+<ul>
+<li><i>22 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Rewrote from scratch.</li></ul>
+</html>
+"),     __Dymola_experimentSetupOutput(equdistant=false),
+        Diagram(coordinateSystem(extent={{-200,-100},{160,100}})),
+        Icon(coordinateSystem(extent={{-100,-100},{100,100}})));
+    end TestElectrical7;
+
+    model PrimaryController
+      parameter SI.PerUnit droop = 0.05 "Droop";
+      parameter SI.Power Pnom "Nominal active power";
+      parameter Integer Np = 2 "Number of electric poles";
+      final parameter SI.Frequency f0 = system.fnom "Reference frequency";
+      constant Real pi = Modelica.Constants.pi;
+      outer System system;
+
+      SI.Power P;
+      Modelica.Blocks.Interfaces.RealInput frequency "Measured frequency in Hz"
+                                                     annotation (Placement(
+            transformation(extent={{-120,-60},{-80,-20}},rotation=0)));
+      Modelica.Blocks.Interfaces.RealOutput torque annotation (Placement(
+            transformation(extent={{100,0},{120,20}},   rotation=0),
+            iconTransformation(extent={{80,-20},{120,20}})));
+      Modelica.Blocks.Interfaces.RealInput powerSetPoint "Power set point in W"
+        annotation (Placement(transformation(extent={{-120,20},{-80,60}}, rotation=0)));
+    equation
+      P = powerSetPoint + Pnom/droop*(f0 - frequency)/f0;
+      torque = P/(2*pi*frequency/Np);
+      annotation (
         Icon(graphics={Rectangle(
                   extent={{-100,100},{100,-100}},
                   lineColor={0,0,255},
@@ -10732,142 +11274,59 @@ Algorithm Tolerance = 1e-6
        First release.</li>
 </ul>
 </html>"));
-    end StaticController;
+    end PrimaryController;
 
-    model TestN2GControl
-      "Test network with two generators, frequency controlled"
-      extends Modelica.Icons.Example;
-      parameter Boolean SSInit=true "Steady-state initialization";
-      ThermoPower.Electrical.NetworkTwoGenerators_Pmax network(
-        J_a=10000,
-        J_b=10000,
-        r_b=0.3,
-        Pmax=20e6,
-        deltaStart_ab=0.05,
-        initOpt=if SSInit then Choices.Init.Options.steadyState else Choices.Init.Options.noInit)
-        annotation (Placement(transformation(extent={{-10,-70},{10,-50}},
-              rotation=0)));
-      Electrical.Generator generator_a(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState
-             else Choices.Init.Options.noInit) annotation (Placement(
-            transformation(extent={{-50,-70},{-30,-50}}, rotation=0)));
-      Electrical.Generator generator_b(J=10000, initOpt=if SSInit then Choices.Init.Options.steadyState
-             else Choices.Init.Options.noInit) annotation (Placement(
-            transformation(
-            origin={40,-60},
-            extent={{-10,-10},{10,10}},
-            rotation=180)));
-      ThermoPower.Electrical.Load load_a(Wn=10e6) annotation (Placement(
-            transformation(extent={{-30,-90},{-10,-70}}, rotation=0)));
-      ThermoPower.Electrical.Load load_b(Wn=10e6) annotation (Placement(
-            transformation(extent={{10,-90},{30,-70}}, rotation=0)));
-      Modelica.Mechanics.Rotational.Sensors.SpeedSensor omegaSensor_a
-        annotation (Placement(transformation(extent={{-36,-8},{-20,8}},
-              rotation=0)));
-      Modelica.Mechanics.Rotational.Sensors.SpeedSensor omegaSensor_b
-        annotation (Placement(transformation(
-            origin={28,0},
-            extent={{-8,8},{8,-8}},
-            rotation=180)));
-      Modelica.Mechanics.Rotational.Sources.Torque torque_a(useSupport=false)
-        annotation (Placement(transformation(extent={{-80,-70},{-60,-50}},
-              rotation=0)));
-      Modelica.Mechanics.Rotational.Sources.Torque torque_b(useSupport=false)
-        annotation (Placement(transformation(extent={{86,-70},{66,-50}},
-              rotation=0)));
-      ThermoPower.Test.ElectricalComponents.StaticController controller_A(droop=
-            0.05, CVnom=1e7/157.08) annotation (Placement(transformation(extent=
-               {{-40,20},{-60,40}}, rotation=0)));
-      ThermoPower.Test.ElectricalComponents.StaticController controller_b(droop=
-            0.05, CVnom=1e7/157.08) annotation (Placement(transformation(extent=
-               {{40,20},{60,40}}, rotation=0)));
-      Modelica.Blocks.Sources.Step step_a(
-        startTime=50,
-        offset=8e6,
-        height=5e6) annotation (Placement(transformation(extent={{-56,-86},{-44,
-                -74}}, rotation=0)));
-      Modelica.Blocks.Sources.Constant SP_omega(k=157.08) annotation (Placement(
-            transformation(extent={{-40,70},{-20,90}}, rotation=0)));
-      Modelica.Blocks.Continuous.FirstOrder filter_a(
-        T=1,
-        y_start=1e7/157.08,
-        initType=if SSInit then Modelica.Blocks.Types.Init.SteadyState else
-            Modelica.Blocks.Types.Init.NoInit) annotation (Placement(
-            transformation(extent={{-70,20},{-90,40}}, rotation=0)));
-      Modelica.Blocks.Continuous.FirstOrder filter_b(y_start=1e7/157.08,
-          initType=if SSInit then Modelica.Blocks.Types.Init.SteadyState else
-            Modelica.Blocks.Types.Init.NoInit,
-        T=1)                                   annotation (Placement(
-            transformation(extent={{70,20},{90,40}}, rotation=0)));
+    model SecondaryController
+      parameter SI.PerUnit droop = 0.05 "Droop";
+      parameter SI.Power Pnom "Overall system nominal active power";
+      parameter SI.Time Ts "Settling time of frequency";
+      parameter ThermoPower.Choices.Init.Options initOpt=system.initOpt
+        "Initialization option" annotation (Dialog(tab="Initialization"));
+      parameter SI.Power powerOffset_start = 0 "Start value of power offset" annotation (Dialog(tab="Initialization"));
+      final parameter SI.Frequency f0 = system.fnom "Nominal frequency";
+      final parameter SI.AngularFrequency mu = 5*Ts*Pnom/(f0*droop) "Integral controller gain";
+      outer System system;
+
+      Modelica.Blocks.Interfaces.RealInput frequency "Measured frequency in Hz" annotation (Placement(
+            transformation(extent={{-120,-20},{-80,20}}, rotation=0),
+            iconTransformation(extent={{-120,-20},{-80,20}})));
+      Modelica.Blocks.Interfaces.RealOutput powerOffset(start = powerOffset_start)
+         "Power offset to the plant controllers" annotation (Placement(
+            transformation(extent={{100,0},{120,20}},   rotation=0),
+            iconTransformation(extent={{80,-20},{120,20}})));
+
     equation
-      connect(generator_b.powerConnection, network.powerConnection_b)
-        annotation (Line(
-          points={{31.4,-60},{10,-60}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(network.powerConnection_a, generator_a.powerConnection)
-        annotation (Line(
-          points={{-10,-60},{-31.4,-60}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(load_a.connection, generator_a.powerConnection) annotation (Line(
-          points={{-20,-71.4},{-20,-60},{-31.4,-60}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(load_b.connection, generator_b.powerConnection) annotation (Line(
-          points={{20,-71.4},{20,-60},{31.4,-60}},
-          pattern=LinePattern.None,
-          thickness=0.5));
-      connect(omegaSensor_a.flange, torque_a.flange) annotation (Line(
-          points={{-36,0},{-54,0},{-54,-60},{-60,-60}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(torque_b.flange, omegaSensor_b.flange) annotation (Line(
-          points={{66,-60},{58,-60},{58,-9.79717e-016},{36,-9.79717e-016}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(controller_A.PV, omegaSensor_a.w) annotation (Line(points={{-40,
-              30},{-10,30},{-10,0},{-19.2,0}}, color={0,0,127}));
-      connect(omegaSensor_b.w, controller_b.PV) annotation (Line(points={{19.2,
-              1.07769e-015},{10,1.07769e-015},{10,30},{40,30}}, color={0,0,127}));
-      connect(step_a.y, load_a.powerConsumption)
-        annotation (Line(points={{-43.4,-80},{-23.3,-80}}, color={0,0,127}));
-      connect(SP_omega.y, controller_b.SP) annotation (Line(points={{-19,80},{0,
-              80},{0,60},{50,60},{50,40}}, color={0,0,127}));
-      connect(controller_A.SP, SP_omega.y) annotation (Line(points={{-50,40},{-50,
-              60},{0,60},{0,80},{-19,80}}, color={0,0,127}));
-      connect(controller_A.CV, filter_a.u)
-        annotation (Line(points={{-61,30},{-68,30}}, color={0,0,127}));
-      connect(filter_a.y, torque_a.tau) annotation (Line(points={{-91,30},{-96,
-              30},{-96,-60},{-82,-60}}, color={0,0,127}));
-      connect(filter_b.u, controller_b.CV)
-        annotation (Line(points={{68,30},{61,30}}, color={0,0,127}));
-      connect(torque_b.tau, filter_b.y) annotation (Line(points={{88,-60},{96,-60},
-              {96,30},{91,30}}, color={0,0,127}));
-      connect(generator_a.shaft, torque_a.flange) annotation (Line(
-          points={{-48.6,-60},{-60,-60}},
-          color={0,0,0},
-          thickness=0.5));
-      connect(generator_b.shaft, torque_b.flange) annotation (Line(
-          points={{48.6,-60},{66,-60}},
-          color={0,0,0},
-          thickness=0.5));
+      der(powerOffset) = 5*Pnom/(Ts*droop)*(frequency-f0)/f0;
+    initial equation
+      if initOpt == ThermoPower.Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
+        der(powerOffset) = 0;
+      elseif initOpt == ThermoPower.Choices.Init.Options.fixedState then
+        powerOffset = powerOffset_start;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+
       annotation (
-        Diagram(coordinateSystem(
-            preserveAspectRatio=false,
-            extent={{-100,-100},{100,100}},
-            initialScale=0.1), graphics),
-        experiment(StopTime=100, Tolerance=1e-006),
+        Icon(graphics={Rectangle(
+                  extent={{-100,100},{100,-100}},
+                  lineColor={0,0,255},
+                  fillColor={255,255,255},
+                  fillPattern=FillPattern.Solid),Text(
+                  extent={{-60,60},{60,-60}},
+                  lineColor={0,0,0},
+                  textString="C")}),
         Documentation(info="<html>
-<p>At 20s, step variation of the load of a generator. Observe the electric power oscillations and the controlled angular velocity.
+<p>Controller for static control of the frequency.
 </html>", revisions="<html>
 <ul>
 <li><i>15 Jul 2008</i>
     by <a> Luca Savoldelli </a>:<br>
        First release.</li>
 </ul>
-</html>"),
-        __Dymola_experimentSetupOutput(equdistant=false));
-    end TestN2GControl;
+</html>"));
+    end SecondaryController;
   end ElectricalComponents;
 
   annotation (Documentation(info="<HTML>

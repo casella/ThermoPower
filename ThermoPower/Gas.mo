@@ -642,7 +642,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
-      Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
+      Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter Medium.Temperature Tmstart=300 "Metal wall start temperature";
     parameter SI.Volume V "Inner volume";
     parameter SI.Area S=0 "Inner surface";
@@ -788,7 +788,7 @@ package Gas "Models of components with ideal gases as working fluid"
     Medium.BaseProperties gas(
       p(start=pstart, stateSelect=StateSelect.prefer),
       T(start=Tstart, stateSelect=StateSelect.prefer),
-      Xi(start=Xstart[1:Medium.nXi], stateSelect=StateSelect.prefer));
+      Xi(start=Xstart[1:Medium.nXi], each stateSelect=StateSelect.prefer));
     parameter SI.Volume V "Inner volume";
     parameter SI.Area S=0 "Inner surface";
     parameter SI.CoefficientOfHeatTransfer gamma=0 "Heat Transfer Coefficient"
@@ -963,6 +963,8 @@ package Gas "Models of components with ideal gases as working fluid"
       final wnom=wnom/Nt,
       final w=w*ones(N),
       final fluidState=gas.state) "Instantiated heat transfer model";
+
+    parameter SI.PerUnit wnm = 1e-2 "Maximum fraction of the nominal flow rate allowed as reverse flow";
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     SI.Pressure Dpfric "Pressure drop due to friction";
@@ -1173,6 +1175,8 @@ package Gas "Models of components with ideal gases as working fluid"
     Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
+
+    assert(infl.m_flow > -wnom*wnm, "Reverse flow not allowed, maybe you connected the component with wrong orientation");
   initial equation
     if initOpt == Choices.Init.Options.noInit or QuasiStatic then
       // do nothing
@@ -1181,6 +1185,7 @@ package Gas "Models of components with ideal gases as working fluid"
         p = pstart;
       end if;
       Ttilde = Tstart[2:N];
+      Xtilde = ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]);
     elseif initOpt == Choices.Init.Options.steadyState then
       if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
@@ -1246,8 +1251,7 @@ package Gas "Models of components with ideal gases as working fluid"
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"),
-      DymolaStoredErrors);
+</html>"));
   end Flow1DFV;
 
   model Flow1DFV2w "Same as Flow1DFV with two walls and heat transfer models"
@@ -2824,9 +2828,20 @@ The packages Medium are redeclared and a mass balance determines the composition
               if allowFlowReversal then +Modelica.Constants.inf else 0))
         annotation (Placement(transformation(extent={{80,-20},{120,20}}, rotation=
                0)));
-    equation
+    initial equation
+        assert(wnom > 0, "Please set a positive value for wnom");
         assert(FFtype == FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
+        assert(not
+                  (FFtype == FFtypes.Kfnom     and not Kfnom > 0),  "Kfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.OpPoint   and not rhonom > 0), "rhonom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Cfnom     and not Cfnom > 0),  "Cfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)),
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.

@@ -895,7 +895,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       "Internal Heat Transfer Coefficient" annotation (Evaluate=true);
     parameter SI.HeatCapacity Cm=0 "Metal Heat Capacity" annotation (Evaluate=true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction" 
+      "= true to allow flow reversal, false restricts to design direction"
       annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Choices.FluidPhase.FluidPhases FluidPhaseStart=Choices.FluidPhase.FluidPhases.Liquid
@@ -1158,6 +1158,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     extends BaseClasses.Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
+
+    parameter SI.PerUnit wnm = 1e-3 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+    parameter Boolean fixedMassFlowSimplified = false "Fix flow rate = wnom for simplified homotopy model"
+        annotation (Dialog(tab="Initialisation"));
+
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     SI.Length omega_hyd "Wet perimeter (single tube)";
@@ -1293,7 +1298,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       drbdp[j] = (drdp[j] + drdp[j + 1])/2;
       drbdh[j] = (drdh[j] + drdh[j + 1])/2;
       vbar[j] = 1/rhobar[j];
-      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      if fixedMassFlowSimplified then
+        wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      else
+        wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+      end if;
     end for;
 
     // for j in 1:N loop
@@ -1340,6 +1349,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     M = sum(rhobar)*A*l "Fluid mass (single tube)";
     Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
+
+    assert(w > -wnom*wnm, "Reverse flow not allowed, maybe you connected the component with wrong orientation");
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -1487,6 +1498,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     constant SI.Pressure pzero=10 "Small deltap for calculations";
     constant Medium.AbsolutePressure pc=Medium.fluidConstants[1].criticalPressure;
     constant SI.SpecificEnthalpy hzero=1e-3 "Small value for deltah";
+
+    parameter SI.PerUnit wnm = 1e-3 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+    parameter Boolean fixedMassFlowSimplified = false "Fix flow rate = wnom for simplified homotopy model";
+
     // SmoothMedium.ThermodynamicState fluidState[N]
     //   "Thermodynamic state of the fluid at the nodes";
     Medium.ThermodynamicState fluidState[N]
@@ -1602,8 +1617,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         der(p)) "Mass balance for each volume";
       // Average volume quantities
       vbar[j] = 1/rhobar[j] "Average specific volume";
-      wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/
-        Nt);
+      if fixedMassFlowSimplified then
+        wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2, wnom/Nt);
+      else
+        wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+      end if;
       dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else homotopy(smooth(1,
         Kf[j]*squareReg(w, wnom/Nt*wnf))*vbar[j], dpnom/(N - 1)/(wnom/Nt)*w));
       if avoidInletEnthalpyDerivative and j == 1 then
@@ -1743,6 +1761,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
 
+    assert(infl.m_flow > -wnom*wnm, "Reverse flow not allowed, maybe you connected the component with wrong orientation");
   initial equation
     if initOpt == Choices.Init.Options.noInit then
       // do nothing
@@ -3656,132 +3675,6 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 </html>"));
   end Accumulator;
 
-  model Drum2States
-    extends Icons.Water.Drum;
-    replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
-      annotation(choicesAllMatching = true);
-    parameter SI.Volume Vd "Drum volume";
-    parameter SI.Volume Vdcr "Volume of downcomer and risers";
-    parameter SI.Mass Mmd "Drum metal mass";
-    parameter SI.Mass Mmdcr "Metal mass of downcomer and risers";
-    parameter Medium.SpecificHeatCapacity cm
-      "Specific heat capacity of the metal";
-    parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction"
-      annotation(Evaluate=true);
-    outer ThermoPower.System system "System wide properties";
-    parameter SI.Pressure pstart "Pressure start value"
-      annotation (Dialog(tab="Initialisation"));
-    parameter SI.Volume Vldstart "Start value of drum water volume"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Choices.Init.Options initOpt=system.initOpt
-      "Initialisation option"
-      annotation (Dialog(tab="Initialisation"));
-    parameter Boolean noInitialPressure=false
-      "Remove initial equation on pressure"
-      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
-
-    Medium.SaturationProperties sat "Saturation conditions";
-    FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
-            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
-    FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
-            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
-       Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
-    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
-      "Metal wall thermal port" annotation (Placement(transformation(extent={{-28,
-              -100},{28,-80}}, rotation=0)));
-    SI.Mass Ml "Liquid water mass";
-    SI.Mass Mv "Steam mass";
-    SI.Mass M "Total liquid+steam mass";
-    SI.Energy E "Total energy";
-    SI.Volume Vt "Total volume";
-    SI.Volume Vl(start=Vldstart + Vdcr) "Liquid water total volume";
-    SI.Volume Vld(start=Vldstart, stateSelect=StateSelect.prefer)
-      "Liquid water volume in the drum";
-    SI.Volume Vv "Steam volume";
-    Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
-      "Drum pressure";
-    Medium.MassFlowRate qf "Feedwater mass flowrate";
-    Medium.MassFlowRate qs "Steam mass flowrate";
-    SI.HeatFlowRate Q "Heat flow to the risers";
-    Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
-    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
-    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
-    Medium.Temperature Ts "Saturation temperature";
-    Units.LiquidDensity rhol "Density of saturated liquid";
-    Units.GasDensity rhov "Density of saturated steam";
-  equation
-    Ml = Vl*rhol "Mass of liquid";
-    Mv = Vv*rhov "Mass of vapour";
-    M = Ml + Mv "Total mass";
-    E = Ml*hl + Mv*hv - p*Vt + (Mmd + Mmdcr)*cm*Ts "Total energy";
-    Ts = sat.Tsat "Saturation temperature";
-    der(M) = qf - qs "Mass balance";
-    der(E) = Q + qf*hf - qs*hv "Energy balance";
-    Vl = Vld + Vdcr "Liquid volume";
-    Vt = Vd + Vdcr "Total volume";
-    Vt = Vl + Vv "Total volume";
-
-    // Boundary conditions
-    p = feed.p;
-    p = steam.p;
-    hf = homotopy(if not allowFlowReversal then inStream(feed.h_outflow) else
-      actualStream(feed.h_outflow), inStream(feed.h_outflow));
-    feed.m_flow = qf;
-    -steam.m_flow = qs;
-    feed.h_outflow = hl;
-    steam.h_outflow = hv;
-    Q = heat.Q_flow;
-    heat.T = Ts;
-
-    // Fluid properties
-    sat.psat = p;
-    sat.Tsat = Medium.saturationTemperature(p);
-    rhol = Medium.bubbleDensity(sat);
-    rhov = Medium.dewDensity(sat);
-    hl = Medium.bubbleEnthalpy(sat);
-    hv = Medium.dewEnthalpy(sat);
-  initial equation
-    if initOpt == Choices.Init.Options.noInit then
-      // do nothing
-    elseif initOpt == Choices.Init.Options.fixedState then
-      if not noInitialPressure then
-        p = pstart;
-      end if;
-      Vld = Vldstart;
-    elseif initOpt == Choices.Init.Options.steadyState then
-      if not noInitialPressure then
-        der(p) = 0;
-      end if;
-      der(Vld) = 0;
-    else
-      assert(false, "Unsupported initialisation option");
-    end if;
-    annotation (
-      Diagram(graphics),
-      Documentation(info="<HTML>
-<p>Simplified model of a drum for drum boilers. This model assumes thermodynamic equilibrium between the liquid and vapour volumes. The model has two state variables (i.e., pressure and liquid volume).
-</HTML>", revisions="<html>
-<ul>
-<li><i>30 May 2005</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Initialisation support added.</li>
-<li><i>16 Dec 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Standard medium definition added.</li>
-<li><i>24 Sep 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       Adapted to Modelica.Media.</li>
-<li><i>1 May 2004</i>
-    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-       First release.</li>
-</ul>
-</html>"),
-      Icon(graphics));
-  end Drum2States;
-
   model Drum "Drum for circulation boilers"
     extends Icons.Water.Drum;
     replaceable package Medium = StandardWater constrainedby
@@ -3813,7 +3706,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     parameter Real avr=1.2 "Phase separation efficiency coefficient";
     parameter Integer DrumOrientation=0 "0: Horizontal; 1: Vertical";
     parameter Boolean allowFlowReversal=system.allowFlowReversal
-      "= true to allow flow reversal, false restricts to design direction" 
+      "= true to allow flow reversal, false restricts to design direction"
       annotation(Evaluate=true);
     outer ThermoPower.System system "System wide properties";
     parameter Medium.AbsolutePressure pstart=1e5 "Pressure start value"
@@ -4100,6 +3993,135 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
 </ul>
 "),   Diagram(graphics));
   end Drum;
+
+  model DrumEquilibrium
+    extends Icons.Water.Drum;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+      annotation(choicesAllMatching = true);
+    parameter SI.Volume Vd "Drum internal volume";
+    parameter SI.Mass Mm "Drum metal mass";
+    parameter Medium.SpecificHeatCapacity cm
+      "Specific heat capacity of the metal";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
+    outer ThermoPower.System system "System wide properties";
+    parameter SI.Pressure pstart "Pressure start value"
+      annotation (Dialog(tab="Initialisation"));
+    parameter SI.Volume Vlstart "Start value of drum water volume"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
+    Medium.SaturationProperties sat "Saturation conditions";
+    FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
+    FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
+    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a wall
+      "Metal wall thermal port" annotation (Placement(transformation(extent={{-28,
+              -100},{28,-80}}, rotation=0)));
+
+    SI.Mass Ml "Liquid water mass";
+    SI.Mass Mv "Steam mass";
+    SI.Mass M "Total liquid+steam mass";
+    SI.Energy E "Total energy";
+    SI.Volume Vv(start = Vd - Vlstart) "Steam volume";
+    SI.Volume Vl(
+      start = Vlstart,
+      stateSelect=StateSelect.prefer)
+      "Liquid water total volume";
+    Medium.AbsolutePressure p(
+      start=pstart,
+      stateSelect=StateSelect.prefer)
+      "Drum pressure";
+    Medium.MassFlowRate qf "Feedwater mass flowrate";
+    Medium.MassFlowRate qs "Steam mass flowrate";
+    SI.HeatFlowRate Q "Heat flow to the risers";
+    Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
+    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
+    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
+    Medium.Temperature Ts "Saturation temperature";
+    Units.LiquidDensity rhol "Density of saturated liquid";
+    Units.GasDensity rhov "Density of saturated steam";
+  equation
+    Ml = Vl*rhol "Mass of liquid";
+    Mv = Vv*rhov "Mass of vapour";
+    M = Ml + Mv "Total mass";
+    E = Ml*hl + Mv*hv - p*Vd + Mm*cm*Ts "Total energy";
+    Ts = sat.Tsat "Saturation temperature";
+    der(M) = qf - qs "Mass balance";
+    der(E) = Q + qf*hf - qs*hv "Energy balance";
+    Vl + Vv = Vd "Total volume";
+
+    // Boundary conditions
+    p = feed.p;
+    p = steam.p;
+    if not allowFlowReversal then
+      hf = inStream(feed.h_outflow);
+    else
+      // assume flow is entering during simplified initialization
+      hf = homotopy(
+        actualStream(feed.h_outflow),
+        inStream(feed.h_outflow));
+    end if;
+    feed.m_flow = qf;
+    -steam.m_flow = qs;
+    feed.h_outflow = hl;
+    steam.h_outflow = hv;
+    Q = wall.Q_flow;
+    wall.T = Ts;
+
+    // Fluid properties
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    rhol = Medium.bubbleDensity(sat);
+    rhov = Medium.dewDensity(sat);
+    hl = Medium.bubbleEnthalpy(sat);
+    hv = Medium.dewEnthalpy(sat);
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      Vl = Vlstart;
+    elseif initOpt == Choices.Init.Options.steadyState then
+      if not noInitialPressure then
+        der(p) = 0;
+      end if;
+      der(Vl) = 0;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+    annotation (
+      Diagram(graphics),
+      Documentation(info="<HTML>
+<p>Simplified model of a drum for drum boilers and fire-tube boilers. This model assumes
+<ul>
+<li>Thermodynamic equiibrium between the liquid, vapour, and metal wall
+<li>Perfect separation of the liquid and vapour phase
+</ul></p>
+<p>The model has two state variables the pressure <code>p</code> and the liquid volume <code>Vl</code>. It is possible to extend it,
+adding a specific geometry and the computation of the level from the liquid volume. In that case, one may want to use the level as a state.
+</p>
+</HTML>", revisions="<html>
+<ul>
+<li><i>19 Feb 2019</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Adapted from old <code>Drum2States</code> model.</li>
+</ul>
+</html>"),
+      Icon(graphics));
+  end DrumEquilibrium;
 
   model ValveLin "Valve for water/steam flows with linear pressure drop"
     extends Icons.Water.Valve;
@@ -4763,28 +4785,41 @@ li><i>1 Jul 2004</i>
 
       Modelica.Blocks.Interfaces.RealOutput powerConsumption
       "Total fan power consumption"
-      annotation (Placement(transformation(extent={{74,-10},{94,10}})));
+      annotation (Placement(transformation(extent={{74,-10},{94,10}}),
+          iconTransformation(extent={{70,-10},{90,10}})));
+    Thermal.DHTVolumes tubeWalls(N = Nw, T = Tp, Q = Qwp*Nt) if closedCircuit
+      "Interface to tube walls @ wall temperature"
+      annotation (Placement(transformation(extent={{-80,-22},{-60,-2}}), iconTransformation(extent={{-90,-60}, {-70,0}})));
+
+    parameter Boolean closedCircuit = false "true for closed-circuit tower";
     parameter Boolean staticModel = false "= true for a static model";
     parameter ThermoPower.Choices.Init.Options initOpt = system.initOpt "Initialization option"
-       annotation (Dialog(tab="Initialisation"));
+       annotation (Dialog(tab="Initialisation", enable = not staticModel));
     parameter Integer Nt = 1 "Number of towers in parallel";
     parameter Integer N(min = 2) = 10 "Number of nodes";
-    parameter SI.Mass M0
-      "Water hold-up at zero water flow rate (single column)";
-    parameter SI.Mass Mnom
-      "Water hold-up at nominal water flow rate (single tower)";
+    final parameter Integer Nw = N-1 "Number of volumes on the pipe wall";
+    parameter SI.Mass M0 = 0
+      "Water hold-up at zero water flow rate (single column)"
+      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
+    parameter SI.Mass Mnom = 0
+      "Water hold-up at nominal water flow rate (single tower)"
+      annotation(Dialog(group = "Dynamic model only", enable = not staticModel));
     parameter SI.MassFlowRate wlnom
       "Nominal water mass flow rate (single tower)";
     parameter SI.VolumeFlowRate qanom
       "Nominal air volume flow rate (single tower)";
     parameter SI.Density rhoanom "Nominal air density";
-    parameter SI.Mass Mp "Mass of packaging";
-    parameter SI.SpecificHeatCapacity cp "Specific heat of packaging";
-    parameter SI.Area S "Surface of packaging";
-    parameter SI.CoefficientOfHeatTransfer gamma_wp_nom
-      "Nominal heat transfer coefficient water-packing";
-    parameter Real k_wa_nom(final unit = "kg/m2")
-      "Nominal total heat transfer coefficient per unit surface";
+    parameter SI.Mass Mp = 0 "Mass of packing (single tower)"
+      annotation(Dialog(group = "Dynamic model only",
+                        enable = not staticModel and not closedCircuit));
+    parameter SI.SpecificHeatCapacity cp = 0 "Specific heat of packing"
+      annotation(Dialog(enable = not staticModel and not closedCircuit));
+    parameter SI.Area S "Surface of air/water mass and heat transfer (single tower)";
+    parameter SI.CoefficientOfHeatTransfer gamma_wp_nom = 0
+      "Nominal heat transfer coefficient beween water and packing or tubes"
+      annotation(Dialog(enable = not staticModel or closedCircuit));
+    parameter Real k_wa_nom(final unit = "kg/(m2.s)")
+      "Nominal total mass & heat transfer coefficient per unit surface (single tower)";
     parameter SI.PerUnit nu_a
       "Exponent of air flow rate in mass & heat transfer coefficients";
     parameter SI.PerUnit nu_l
@@ -4793,16 +4828,16 @@ li><i>1 Jul 2004</i>
     parameter SI.Power Wnom "Nominal power consumption (single tower)";
     parameter SI.Pressure patm = 101325 "Atmospheric pressure";
     parameter SI.Mass Mstart[N-1] = ones(N-1)*Mnom/(N-1) "Start value of water holdup in each volume"
-       annotation (Dialog(tab="Initialisation"));
+       annotation (Dialog(tab="Initialisation", enable = not staticModel));
     parameter SI.SpecificEnthalpy hlstart[N] = fill(120e3,N) "Start values of liquid enthalpy at volume boundaries"
       annotation (Dialog(tab="Initialisation"));
-    parameter SI.Temperature Tpstart[N-1] = ones(N-1)*(30+273.15) "Start value of packaging temperature in each volume"
-       annotation (Dialog(tab="Initialisation"));
+    parameter SI.Temperature Tpstart[N-1] = ones(N-1)*(30+273.15) "Start value of packing temperature in each volume"
+       annotation (Dialog(tab="Initialisation",
+                          enable = not staticModel and not useHeatPort));
     parameter SI.Temperature Twbstart = system.T_wb "Start value of average wet bulb temperature"
       annotation (Dialog(tab="Initialisation"));
     final parameter SI.MassFlowRate wanom = qanom*rhoanom
       "Nominal air mass flow rate";
-
 
     constant Real MMv = 0.029;
     constant Real MMa = 0.018;
@@ -4831,7 +4866,8 @@ li><i>1 Jul 2004</i>
       "Absolute humidity (Mv/Ma_dry) of saturated air at the liquid temperature";
     SI.MassFraction Xva[N](each start = 0.01)
       "Absolute humidity (Mv/Ma_dry) of air at the interface";
-    Water.Temperature Tl[N](each start = 300) "Water temperature";
+    Water.Temperature Tl[N](each start = 300) "Water temperature at the nodes";
+    Water.Temperature Tla[N-1](each start = 300) "Average water temperature for each volume";
     Water.Temperature Twb[N](each start = Twbstart)
       "Wet bulb temperature of air at interface";
     SI.Mass M[N-1](
@@ -4844,31 +4880,52 @@ li><i>1 Jul 2004</i>
       "Specific enthalpy state variable";
     SI.Temperature Tp[N-1](
       start = Tpstart,
-      each stateSelect = if staticModel then StateSelect.default else StateSelect.prefer)
-       "Packing temperature";
-    SI.Power Qlp[N-1] "Thermal power transfer water->packing";
-    SI.Power Q[N-1] "Total thermal power transfer water->air interface (@Twb)";
+      each stateSelect = if not staticModel and not closedCircuit then StateSelect.prefer else StateSelect.default)
+       "Temperature of packing or tube surface";
+    SI.Power Qwp[N-1] "Thermal power transfer between water and packing or tubes";
+    SI.Power Q[N-1] "Total thermal power transfer water -> air interface (@Twb)";
     SI.Power W "Power consumption of the fan (single column)";
     SI.Power Wtot "Power consumption of the fans (all columns)";
     SI.CoefficientOfHeatTransfer gamma_wp[N](each start = gamma_wp_nom)
-      "Heat transfer coefficient water-packing";
-    Real k_wa(start = k_wa_nom)
-      "Total heat transfer coefficient per unit surface";
+      "Heat transfer coefficient between water and packing or tubes";
+    Real k_wa(final unit = "kg/(m2.s)", start = k_wa_nom)
+      "Total evaporation heat transfer coefficient per unit surface";
 
     SI.Temperature Tlin "Inlet water temperature";
     SI.Temperature Tlout "Outlet water temperature";
 
   equation
     for i in 1:N-1 loop
+      // Liquid mass and energy balance
       if staticModel then
         0 = wl[i] - wl[i+1] - wev[i];
-        0 = wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] - Qlp[i];
-        0 = Qlp[i];
+        0 = wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] + Qwp[i];
+        M[i] = 0;
       else
         der(M[i]) = wl[i] - wl[i+1] - wev[i];
         der(M[i])*hltilde[i] + M[i]*der(hltilde[i]) =
-            wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] - Qlp[i];
-        cp*Mp/(N-1)*der(Tp[i]) = Qlp[i];
+          wl[i]*hl[i] - wl[i+1]*hl[i+1] - Q[i] + Qwp[i];
+        wl[i+1] = (M[i] - M0/(N-1))/(Mnom/(N-1) - M0/(N-1))*wlnom;
+      end if;
+
+      // Energy balance for packing/tubes
+      // if closedCircuit = true, Qwp is bound to the tubeWalls.Q variable in the connector
+      if not closedCircuit then
+        if not Mp > 0 or staticModel then
+           0 = -Qwp[i];
+        else
+           cp*Mp/(N-1)*der(Tp[i]) = -Qwp[i];
+        end if;
+      end if;
+
+
+      // Equation for Qwp for open-circuit dynamic model with packing
+      // and for closed-circuit model with external tubes
+      // otherwise dummy equation for unused Tp
+      if closedCircuit or (not staticModel and Mp > 0) then
+        Qwp[i] = (Tp[i] - Tla[i])*S/(N-1)*gamma_wp[i];
+      else
+        Tp[i] = Tl[i];
       end if;
 
       wa*Xva[i+1] + wev[i] = wa*Xva[i] "vapour mass balance in air";
@@ -4877,8 +4934,8 @@ li><i>1 Jul 2004</i>
       hltilde[i] = hl[i+1];
 
       Q[i] = ((hw[i] + hw[i+1])/2 - (ha[i] + ha[i+1])/2)*S/(N-1)*k_wa;
-      Qlp[i] = ((Tl[i] + Tl[i+1])/2 - Tp[i])*S/(N-1)*gamma_wp[i];
-      wl[i+1] = (M[i] - M0/(N-1))/(Mnom/(N-1) - M0/(N-1))*wlnom;
+
+      Tla[i] = if closedCircuit then Tl[i+1] else (Tl[i] + Tl[i+1])/2;
     end for;
 
     for i in 1:N loop
@@ -4924,26 +4981,50 @@ li><i>1 Jul 2004</i>
     if not staticModel and initOpt == ThermoPower.Choices.Init.Options.steadyState then
       der(M) = zeros(N-1);
       der(hltilde) = zeros(N-1);
-      der(Tp) = zeros(N-1);
+      if Mp > 0 then
+        der(Tp) = zeros(N-1);
+      end if;
     elseif not staticModel and initOpt == ThermoPower.Choices.Init.Options.fixedState then
       M = Mstart;
       hltilde = hlstart[2:N];
-      Tp = Tpstart;
+      if Mp > 0 then
+        Tp = Tpstart;
+      end if;
+    end if;
+
+    // Default parameter values not allowed for dynamic model
+    if closedCircuit then
+      assert(not Mp > 0, "A closed-circuit tower should have Mp = 0");
+    end if;
+    if not staticModel then
+      assert(M0 > 0, "M0 must be positive");
+      assert(Mnom > 0, "Mnom must be positive");
+      assert(not (Mp > 0 and not cp > 0), "If Mp > 0 then cp must be positive");
+      assert(not (Mp > 0 and not gamma_wp_nom > 0), "If Mp > 0 then gamma_wp_nom must be positive");
     end if;
     annotation (Icon(graphics={Polygon(
-            points={{-60,80},{-100,-80},{100,-80},{60,80},{-60,80}},
+            points={{-70,80},{-70,-80},{70,-80},{70,80},{-70,80}},
             lineColor={0,0,0},
             smooth=Smooth.None,
             fillColor={0,0,255},
             fillPattern=FillPattern.Solid), Polygon(
-            points={{-12,26},{-28,26},{-40,38},{-28,52},{-12,52},{12,26},{30,26},{
-                40,38},{30,52},{12,52},{0,38},{-12,26}},
+            points={{-12,36},{-28,36},{-40,48},{-28,62},{-12,62},{12,36},{30,36},
+                {40,48},{30,62},{12,62},{0,48},{-12,36}},
             lineColor={0,0,0},
             smooth=Smooth.None,
             fillColor={255,255,255},
             fillPattern=FillPattern.Solid)}), Documentation(info="<html>
-<p>This model represents a cooling tower with variable speed fans, filled with metallic packaging.</p>
-<p>The mass and heat transfer from the hot water to humid ambient air is modelled according to Merkel&apos;s equation: the driving force for heat and mass transfer is the difference between the specific enthalpy of saturated humid air at the water temperature per unit dry air mass, and the specific enthalpy of saturated humid air at the wet bulb temperature Twb per unit dry air mass. The wet bulb temperature of incoming air is given by the settings of the system object.</p>
+<p>This model represents a cooling tower with variable speed fans. If <code>closedCircuit</code> is false, the model
+represents a cooling tower filled with metallic packing, where the incoming water is cooled by direct contact with humid air,
+by means of evaporation. Dynamic models with <code>Mp > 0</code> also represent heat storage in the packing and heat
+transfer between the packing and the evaporating water.</p>
+<p>If <code>closedCircuit</code> is true and <code>Mp = 0</code>, then the model represents a closed-circuit tower cooling an
+external circuit, which is thermally connected through the 1D distributed heat port <code>wallPort</code>, representing the tube external surface.</p>
+<p>The heat transfer between the packing or the tube surface and the evaporating water is computed by a specific
+heat transfer coefficient, whose nominal value is <code>gamma_wp_nom</code>, and which varies with the <code>nu_l</code>-th power
+of the liquid flow.</p>  
+<p>The mass and heat transfer from the hot water to humid ambient air is modelled according to Merkel&apos;s equation: the driving force for heat and mass transfer is the difference between the specific enthalpy of saturated humid air at the water temperature per unit dry air mass, and the specific enthalpy of saturated humid air at the wet bulb temperature Twb per unit dry air mass.
+The dry and wet bulb temperatures of incoming air are given by the settings of the system object.</p>
 <p>The 1D counter-current heat and mass transfer equations are discretized by the finite volume method, with <code>N-1</code> volumes; average quantities between volume inlet and volume outlet are used to compute the driving force of the mass and energy transfer.</p>
 <p>Humid air is modelled as an ideal mixture of dry air and steam, using the IF97 water-steam model.</p>
 <p>The hold-up of water in the packaging is modelled assuming a simple linear relationship between the hold-up in each volume and the corresponding outgoing flow, which is calibrated by the <code>Mnom</code> and <code>M0</code> parameters. The energy storage in the water hold-up and in the packaging is accounted for.</p>
@@ -4955,6 +5036,47 @@ li><i>1 Jul 2004</i>
 </ul>
 </html>"));
   end CoolingTower;
+
+  model ExpansionTankIdeal "Ideal expansion tank with prescribed pressure"
+    extends Icons.Water.ExpansionTankIdeal;
+    replaceable package Medium = Modelica.Media.Water.StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialMedium  "Liquid medium model" annotation (
+       choicesAllMatching = true);
+    outer ThermoPower.System system "System wide properties";
+    parameter Boolean allowFlowReversal = system.allowFlowReversal "= true to allow flow reversal, false restricts to design direction" annotation (
+      Evaluate = true);
+    parameter SI.Pressure pf "Fixed flange pressure";
+    Medium.MassFlowRate wn "Net entering mass flow rate";
+
+    ThermoPower.Water.FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min = if allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+      Placement(transformation(extent={{-60,-80},{-20,-40}},       rotation = 0),
+          iconTransformation(extent={{-60,-80},{-20,-40}})));
+    ThermoPower.Water.FlangeB WaterOutfl(redeclare package Medium = Medium, m_flow(max = if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+      Placement(transformation(extent={{20,-80},{60,-40}},       rotation = 0),
+          iconTransformation(extent={{20,-80},{60,-40}})));
+
+  equation
+    WaterInfl.h_outflow = inStream(WaterOutfl.h_outflow);
+    WaterOutfl.h_outflow = inStream(WaterInfl.h_outflow);
+    WaterInfl.p = pf;
+    WaterOutfl.p = pf;
+    wn = WaterInfl.m_flow + WaterOutfl.m_flow;
+    annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
+          coordinateSystem(preserveAspectRatio=false)),
+      Documentation(info="<html>
+<p>This model implements an ideal expansion tank, in wich the pressure at the bottom flanges is prescribed, while the water mass is free to change in order to compensaste the fluid expansion in the circuit connected to the expansion tank itself.</p>
+<p>Water flows in and out through the interfaces at the expansion tank bottom (flow reversal supported), the water entalpy is transferred through the flanges following to the water flow direction, whithout changes.</p>
+<h4>Parameters</h4>
+<ul>
+<li>pf: prescribed pressure at the bottom flanges.</li>
+</ul>
+</html>", revisions="<html>
+<ul>
+<li><i>12 Dec 2018</i> <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>First release.</li>
+</ul>
+<p>First Release.</p>
+</html>"));
+  end ExpansionTankIdeal;
 
   function f_chen "Chen's correlation for two-phase flow in a tube"
 
@@ -5097,12 +5219,11 @@ Input variables changed. This function now computes the heat transfer coefficien
     extends BaseClasses.SteamTurbineBase;
     parameter SI.PerUnit eta_iso_nom=0.92 "Nominal isentropic efficiency";
     parameter SI.Area Kt "Kt coefficient of Stodola's law";
-    parameter SI.PerUnit partialArc_nom=1 "Nominal partial arc";
+    Medium.Density rho "Inlet density";
   equation
-    w = homotopy(Kt*partialArc*sqrt(Medium.pressure(steamState_in)*
-      Medium.density(steamState_in))*Functions.sqrtReg(1 - (1/PR)^2),
-      partialArc/partialArc_nom*wnom/pnom*Medium.pressure(steamState_in))
-      "Stodola's law";
+    rho =  Medium.density(steamState_in);
+    w = homotopy(Kt*theta*sqrt(pin*rho)*Functions.sqrtReg(1 - (1/PR)^2),
+                 theta*wnom/pnom*pin) "Stodola's law";
     eta_iso = eta_iso_nom "Constant efficiency";
     annotation (Documentation(info="<html>
 <p>This model extends <tt>SteamTurbineBase</tt> by adding the actual performance characteristics:
@@ -5329,6 +5450,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
       "Basic interface for 1-dimensional water/steam fluid flow models"
+      import ThermoPower.Choices.Flow1D.FFtypes;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
@@ -5416,10 +5538,20 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       final parameter SI.PerUnit dzdx=H/L "Slope" annotation (Evaluate=true);
       final parameter SI.Length l=L/(N - 1) "Length of a single volume";
       final parameter SI.Volume V = Nt*A*L "Total volume (all Nt tubes)";
-    equation
-        assert(FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction or dpnom > 0,
+    initial equation
+        assert(wnom > 0, "Please set a positive value for wnom");
+        assert(FFtype == FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
-
+        assert(not
+                  (FFtype == FFtypes.Kfnom     and not Kfnom > 0),  "Kfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.OpPoint   and not rhonom > 0), "rhonom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Cfnom     and not Cfnom > 0),  "Cfnom = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
+        assert(not
+                  (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
         annotation (Evaluate=true,
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
@@ -5453,7 +5585,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
-      Medium.ThermodynamicState fluidState(p(start=pin_start));
+      Medium.ThermodynamicState fluidState;
       parameter ThermoPower.Choices.Valve.CvTypes CvData=ThermoPower.Choices.Valve.CvTypes.Av
         "Selection of flow coefficient"
        annotation (Dialog(group="Flow Coefficient"),
@@ -5872,9 +6004,9 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       parameter Medium.MassFlowRate wnom "Inlet nominal flowrate";
       parameter Medium.AbsolutePressure pnom "Nominal inlet pressure";
       parameter Real eta_mech=0.98 "Mechanical efficiency";
-      parameter Boolean allowFlowReversal=system.allowFlowReversal
-        "= true to allow flow reversal, false restricts to design direction"
-      annotation(Evaluate=true);
+      parameter Boolean usePartialArcInput = false
+        "Use the input connector for the partial arc opening";
+
       outer ThermoPower.System system "System wide properties";
 
       Medium.ThermodynamicState steamState_in;
@@ -5893,26 +6025,29 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       SI.PerUnit PR "pressure ratio";
       SI.Power Pm "Mechanical power input";
       SI.PerUnit eta_iso "Isentropic efficiency";
+      SI.PerUnit theta "Partial arc opening in p.u.";
 
-      Modelica.Blocks.Interfaces.RealInput partialArc annotation (Placement(
+      Modelica.Blocks.Interfaces.RealInput partialArc if usePartialArcInput
+        "Partial arc opening in p.u." annotation (Placement(
             transformation(extent={{-60,-50},{-40,-30}}, rotation=0)));
       Modelica.Mechanics.Rotational.Interfaces.Flange_a shaft_a annotation (
           Placement(transformation(extent={{-76,-10},{-56,10}}, rotation=0)));
       Modelica.Mechanics.Rotational.Interfaces.Flange_b shaft_b annotation (
           Placement(transformation(extent={{54,-10},{74,10}}, rotation=0)));
-      FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
-              allowFlowReversal then -Modelica.Constants.inf else 0))
+      FlangeA inlet(redeclare package Medium = Medium, m_flow(min=0))
         annotation (Placement(transformation(extent={{-100,60},{-60,100}},
               rotation=0)));
-      FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
-              allowFlowReversal then +Modelica.Constants.inf else 0))
+      FlangeB outlet(redeclare package Medium = Medium, m_flow(max=0))
         annotation (Placement(transformation(extent={{60,60},{100,100}},
               rotation=0)));
-
+    protected
+      Modelica.Blocks.Interfaces.RealInput partialArc_int "Internal connector for partial arc input";
     equation
       PR = pin/pout "Pressure ratio";
-      if cardinality(partialArc) == 0 then
-        partialArc = 1 "Default value if not connected";
+      theta = partialArc_int;
+      if not usePartialArcInput then
+        partialArc_int = 1 "Default value if not connector input is disabled";
+        // otherwise partialArc_int is connected to partialArc input connector
       end if;
       if explicitIsentropicEnthalpy then
         hiso = Medium.isentropicEnthalpy(pout, steamState_in)
@@ -5930,7 +6065,8 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       Pm = -tau*omega "Mechanical power balance";
 
       inlet.m_flow + outlet.m_flow = 0 "Mass balance";
-      // assert(w >= -wnom/100, "The turbine model does not support flow reversal");
+
+      assert(w >= -wnom/100, "The turbine model does not support flow reversal");
 
       // Mechanical boundary conditions
       shaft_a.phi = phi;
@@ -5945,6 +6081,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       pin = inlet.p;
       pout = outlet.p;
       w = inlet.m_flow;
+
       // The next equation is provided to close the balance but never actually used
       inlet.h_outflow = outlet.h_outflow;
 
@@ -6160,6 +6297,133 @@ This model is not yet complete
 </html>"));
     end EvaporatorBase;
   end BaseClasses;
+
+  model Drum2States
+    extends Icons.Water.Drum;
+    extends Modelica.Icons.ObsoleteModel;
+    replaceable package Medium = StandardWater constrainedby
+      Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+      annotation(choicesAllMatching = true);
+    parameter SI.Volume Vd "Drum volume";
+    parameter SI.Volume Vdcr "Volume of downcomer and risers";
+    parameter SI.Mass Mmd "Drum metal mass";
+    parameter SI.Mass Mmdcr "Metal mass of downcomer and risers";
+    parameter Medium.SpecificHeatCapacity cm
+      "Specific heat capacity of the metal";
+    parameter Boolean allowFlowReversal=system.allowFlowReversal
+      "= true to allow flow reversal, false restricts to design direction"
+      annotation(Evaluate=true);
+    outer ThermoPower.System system "System wide properties";
+    parameter SI.Pressure pstart "Pressure start value"
+      annotation (Dialog(tab="Initialisation"));
+    parameter SI.Volume Vldstart "Start value of drum water volume"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=system.initOpt
+      "Initialisation option"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Boolean noInitialPressure=false
+      "Remove initial equation on pressure"
+      annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+
+    Medium.SaturationProperties sat "Saturation conditions";
+    FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
+            allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
+    FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
+            allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+       Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
+    Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
+      "Metal wall thermal port" annotation (Placement(transformation(extent={{-28,
+              -100},{28,-80}}, rotation=0)));
+    SI.Mass Ml "Liquid water mass";
+    SI.Mass Mv "Steam mass";
+    SI.Mass M "Total liquid+steam mass";
+    SI.Energy E "Total energy";
+    SI.Volume Vt "Total volume";
+    SI.Volume Vl(start=Vldstart + Vdcr) "Liquid water total volume";
+    SI.Volume Vld(start=Vldstart, stateSelect=StateSelect.prefer)
+      "Liquid water volume in the drum";
+    SI.Volume Vv "Steam volume";
+    Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
+      "Drum pressure";
+    Medium.MassFlowRate qf "Feedwater mass flowrate";
+    Medium.MassFlowRate qs "Steam mass flowrate";
+    SI.HeatFlowRate Q "Heat flow to the risers";
+    Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
+    Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
+    Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
+    Medium.Temperature Ts "Saturation temperature";
+    Units.LiquidDensity rhol "Density of saturated liquid";
+    Units.GasDensity rhov "Density of saturated steam";
+  equation
+    Ml = Vl*rhol "Mass of liquid";
+    Mv = Vv*rhov "Mass of vapour";
+    M = Ml + Mv "Total mass";
+    E = Ml*hl + Mv*hv - p*Vt + (Mmd + Mmdcr)*cm*Ts "Total energy";
+    Ts = sat.Tsat "Saturation temperature";
+    der(M) = qf - qs "Mass balance";
+    der(E) = Q + qf*hf - qs*hv "Energy balance";
+    Vl = Vld + Vdcr "Liquid volume";
+    Vt = Vd + Vdcr "Total volume";
+    Vt = Vl + Vv "Total volume";
+
+    // Boundary conditions
+    p = feed.p;
+    p = steam.p;
+    hf = homotopy(if not allowFlowReversal then inStream(feed.h_outflow) else
+      actualStream(feed.h_outflow), inStream(feed.h_outflow));
+    feed.m_flow = qf;
+    -steam.m_flow = qs;
+    feed.h_outflow = hl;
+    steam.h_outflow = hv;
+    Q = heat.Q_flow;
+    heat.T = Ts;
+
+    // Fluid properties
+    sat.psat = p;
+    sat.Tsat = Medium.saturationTemperature(p);
+    rhol = Medium.bubbleDensity(sat);
+    rhov = Medium.dewDensity(sat);
+    hl = Medium.bubbleEnthalpy(sat);
+    hv = Medium.dewEnthalpy(sat);
+  initial equation
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.fixedState then
+      if not noInitialPressure then
+        p = pstart;
+      end if;
+      Vld = Vldstart;
+    elseif initOpt == Choices.Init.Options.steadyState then
+      if not noInitialPressure then
+        der(p) = 0;
+      end if;
+      der(Vld) = 0;
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+    annotation (
+      Diagram(graphics),
+      Documentation(info="<HTML>
+<p>Simplified model of a drum for drum boilers. This model assumes thermodynamic equilibrium between the liquid and vapour volumes. The model has two state variables (i.e., pressure and liquid volume).
+</HTML>", revisions="<html>
+<ul>
+<li><i>30 May 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Initialisation support added.</li>
+<li><i>16 Dec 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Standard medium definition added.</li>
+<li><i>24 Sep 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Adapted to Modelica.Media.</li>
+<li><i>1 May 2004</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       First release.</li>
+</ul>
+</html>"),
+      Icon(graphics));
+  end Drum2States;
 
   model Flow1D
     "1-dimensional fluid flow model for water/steam (finite volumes)"
