@@ -3047,6 +3047,59 @@ the heating power is turned on; as a consequence, the fluid gradually heats up t
 this transient there is a net flow rate entering the expansion tank.
 </html>"));
     end TestExpansionTankIdeal;
+
+    model TestTurbineStodolaPartialArc
+      "Test turbine with prescribed pressure conditions and with normalized partial arc variation"
+      extends Modelica.Icons.Example;
+
+      Water.SourcePressure
+                    source(             h=3.3e6,
+        p0=15000000,
+        use_in_p0=false)
+        annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
+      Water.SinkPressure
+                  sink(         h=2e6,
+        p0=8000,
+        use_in_p0=false)
+        annotation (Placement(transformation(extent={{40,20},{60,40}})));
+      Water.SteamTurbineStodola steamTurbineStodola(
+        wnom=70,
+        PRstart=1500,
+        pnom=15000000,
+        usePartialArcInput=true,
+        phi(fixed=true),
+        Kt=0.0025)
+        annotation (Placement(transformation(extent={{-22,-2},{-2,18}})));
+      Modelica.Mechanics.Rotational.Sources.ConstantSpeed constantSpeed(w_fixed=
+           3000/60*3.14159)
+        annotation (Placement(transformation(extent={{24,-2},{4,18}})));
+      inner System system(allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
+        annotation (Placement(transformation(extent={{60,60},{80,80}})));
+      Modelica.Blocks.Sources.Ramp NormalizedPartialArcVariation(
+        height=-1,
+        duration=1,
+        offset=1,
+        startTime=5)
+        annotation (Placement(transformation(extent={{-64,-20},{-44,0}})));
+    equation
+      connect(steamTurbineStodola.shaft_b, constantSpeed.flange) annotation (
+          Line(
+          points={{-5.6,8},{-5.6,7},{4,7},{4,8}},
+          color={0,0,0},
+          smooth=Smooth.None));
+      connect(source.flange, steamTurbineStodola.inlet) annotation (Line(
+          points={{-40,30},{-20,30},{-20,16}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(steamTurbineStodola.outlet, sink.flange) annotation (Line(
+          points={{-4,16},{-4,30},{40,30}},
+          color={0,0,255},
+          smooth=Smooth.None));
+      connect(NormalizedPartialArcVariation.y, steamTurbineStodola.partialArc)
+        annotation (Line(points={{-43,-10},{-30,-10},{-30,4},{-17,4}}, color={0,
+              0,127}));
+      annotation (experiment(StopTime=10));
+    end TestTurbineStodolaPartialArc;
   end WaterComponents;
 
   package GasComponents "Tests for lumped-parameters Gas package components"
