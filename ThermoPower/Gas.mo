@@ -1185,7 +1185,9 @@ package Gas "Models of components with ideal gases as working fluid"
         p = pstart;
       end if;
       Ttilde = Tstart[2:N];
-      Xtilde = ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]);
+      if (not Medium.fixedX) then
+        Xtilde = ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]);
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
       if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
