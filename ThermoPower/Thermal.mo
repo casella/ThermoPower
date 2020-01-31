@@ -784,7 +784,17 @@ package Thermal "Thermal models of heat transfer"
     annotation (
       Diagram(graphics),
       Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
-           graphics));
+           graphics={Polygon(
+            points={{-72,0},{-72,-16},{-50,-8},{-72,0}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid), Polygon(
+            points={{72,0},{52,8},{72,16},{72,0}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid)}));
   end HeatExchangerTopologyFV;
 
   model CounterCurrentFV
