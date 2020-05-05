@@ -782,7 +782,6 @@ package Thermal "Thermal models of heat transfer"
       side2.Q[HET.correspondingVolumes[j]] + side1.Q[j] = 0;
     end for;
     annotation (
-      Diagram(graphics),
       Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
            graphics));
   end HeatExchangerTopologyFV;
@@ -1073,6 +1072,8 @@ the global nominal thermal conductance UA is given instead of the nominal specif
         "Adapt the average temperature at low flow rates";
        parameter Modelica.SIunits.PerUnit sigma = 0.1
         "Fraction of nominal flow rate below which the heat transfer is computed on outlet volume temperatures";
+       parameter Boolean useHomotopy = true
+       "use nominal heat transfer coefficient for simplified model";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
        SI.CoefficientOfHeatTransfer gamma(start = gamma_nom)
         "Actual heat transfer coefficient";
@@ -1086,8 +1087,11 @@ the global nominal thermal conductance UA is given instead of the nominal specif
       // Computation of actual heat transfer coefficient with smooth lower saturation to avoid numerical singularities at low flows
       w_wnom = abs(w[1])/wnom_ht;
       w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2);
-      gamma = homotopy(gamma_nom*w_wnom_reg^alpha,
-                       gamma_nom);
+      if useHomotopy then
+        gamma = homotopy(gamma_nom*w_wnom_reg^alpha,gamma_nom);
+      else
+        gamma = gamma_nom*w_wnom_reg^alpha;
+      end if;
 
       for j in 1:Nw loop
          Tvol[j] =
