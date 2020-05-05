@@ -142,7 +142,6 @@ package Water "Models of components with water/steam as working fluid"
     assert(not (use_T and use_in_h), "use_in_h required use_T = false");
     assert(not (not use_T and use_in_T), "use_in_T required use_T = true");
     annotation (
-      Diagram(graphics),
       Documentation(info="<HTML>
 <p><b>Modelling options</b></p>
 <p>If <tt>R</tt> is set to zero, the pressure source is ideal; otherwise, the outlet pressure decreases proportionally to the outgoing flowrate.</p>
@@ -1337,7 +1336,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       p = outfl.p;
       w = win;
     end if;
-    infl.h_outflow = htilde[1];
+    infl.h_outflow = h[1];
     outfl.h_outflow = htilde[N - 1];
 
      h[1] = inStream(infl.h_outflow);
@@ -3327,7 +3326,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
        First release.</li>
 </ul>
 </html>
-"),   Diagram(graphics));
+"));
   end FlowSplit;
 
   model SensT "Temperature sensor for water-steam"
@@ -6012,10 +6011,10 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       Medium.ThermodynamicState steamState_in;
       Medium.ThermodynamicState steamState_iso;
 
-      SI.Angle phi "shaft rotation angle";
+      SI.Angle phi(start=0) "shaft rotation angle";
       SI.Torque tau "net torque acting on the turbine";
       SI.AngularVelocity omega "shaft angular velocity";
-      Medium.MassFlowRate w(start=wstart) "Mass flow rate";
+      Medium.MassFlowRate w "Mass flow rate";
       Medium.SpecificEnthalpy hin "Inlet enthalpy";
       Medium.SpecificEnthalpy hout "Outlet enthalpy";
       Medium.SpecificEnthalpy hiso "Isentropic outlet enthalpy";
@@ -6054,7 +6053,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
           "Isentropic enthalpy";
         //dummy assignments
         sin = 0;
-        steamState_iso = Medium.setState_ph(1e5, 1e5);
+        steamState_iso = Medium.setState_ph(Medium.p_default,Medium.h_default);
       else
         sin = Medium.specificEntropy(steamState_in);
         steamState_iso = Medium.setState_ps(pout, sin);
@@ -8994,6 +8993,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </html>"),
       Diagram(graphics));
   end ThroughW;
+
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
 <p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
