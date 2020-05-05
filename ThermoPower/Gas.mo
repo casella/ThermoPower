@@ -974,10 +974,9 @@ package Gas "Models of components with ideal gases as working fluid"
     Real dwdt "Time derivative of mass flow rate";
     SI.PerUnit Cf "Fanning friction factor";
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
-    Medium.Temperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))/
-          (N - 1)*(Tstartout - Tstartin), each stateSelect=StateSelect.prefer)
+    SI.Temperature Ttilde[N - 1](start = Tstart[2:N],each stateSelect=StateSelect.prefer)
       "Temperature state variables";
-    Medium.Temperature T[N] "Node temperatures";
+    Medium.Temperature T[N](start=Tstart) "Node temperatures";
     Medium.SpecificEnthalpy h[N] "Node specific enthalpies";
     Medium.Temperature Tin(start=Tstartin);
     Medium.MassFraction Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
