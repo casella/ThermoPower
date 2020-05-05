@@ -783,7 +783,17 @@ package Thermal "Thermal models of heat transfer"
     end for;
     annotation (
       Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
-           graphics));
+           graphics={Polygon(
+            points={{-72,0},{-72,-16},{-50,-8},{-72,0}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid), Polygon(
+            points={{72,0},{52,8},{72,16},{72,0}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid)}));
   end HeatExchangerTopologyFV;
 
   model CounterCurrentFV
@@ -880,7 +890,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
     DHTVolumes side2(final N=Nv) annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
             rotation=0)));
   equation
-    side1.Q = G*(side1.T - side2.T) "Convective heat transfer";
+    side1.Q = G*(side1.T - side2.T)/Nv "Convective heat transfer";
     side1.Q + side2.Q = zeros(Nv) "Static energy balance";
     annotation (Icon(graphics={Text(
             extent={{-100,-44},{100,-68}},
