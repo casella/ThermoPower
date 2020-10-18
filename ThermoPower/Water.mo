@@ -120,7 +120,7 @@ package Water "Models of components with water/steam as working fluid"
     end if;
 
     if use_T then
-      flange.h_outflow = Medium.specificEnthalpy_pT(p = flange.p, T = in_T_internal);
+      flange.h_outflow = Medium.specificEnthalpy_pTX(flange.p, in_T_internal, fill(0,0));
     else
       flange.h_outflow = in_h_internal "Enthalpy set by connector";
     end if;
@@ -230,7 +230,7 @@ package Water "Models of components with water/steam as working fluid"
     end if;
 
     if use_T then
-      flange.h_outflow = Medium.specificEnthalpy_pT(p = flange.p, T = in_T_internal);
+      flange.h_outflow = Medium.specificEnthalpy_pTX(flange.p, in_T_internal, fill(0,0));
     else
       flange.h_outflow = in_h_internal "Enthalpy set by connector";
     end if;
@@ -341,7 +341,7 @@ package Water "Models of components with water/steam as working fluid"
     end if;
 
     if use_T then
-      flange.h_outflow = Medium.specificEnthalpy_pT(p = flange.p, T = in_T_internal);
+      flange.h_outflow = Medium.specificEnthalpy_pTX(flange.p, in_T_internal, fill(0,0));
     else
       flange.h_outflow = in_h_internal "Enthalpy set by connector";
     end if;
@@ -455,7 +455,7 @@ package Water "Models of components with water/steam as working fluid"
     end if;
 
     if use_T then
-      flange.h_outflow = Medium.specificEnthalpy_pT(p = flange.p, T = in_T_internal);
+      flange.h_outflow = Medium.specificEnthalpy_pTX(flange.p, in_T_internal, fill(0,0));
     else
       flange.h_outflow = in_h_internal "Enthalpy set by connector";
     end if;
@@ -647,16 +647,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     // Fluid properties
   /*
   if not allowFlowReversal then
-    state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
+    state = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
   else
     state = Medium.setSmoothState(
         w,
-        Medium.setState_ph(inlet.p, inStream(inlet.h_outflow)),
-        Medium.setState_ph(outlet.p, inStream(outlet.h_outflow)),
+        Medium.setState_phX(inlet.p, inStream(inlet.h_outflow)),
+        Medium.setState_phX(outlet.p, inStream(outlet.h_outflow)),
         wnom*wnf);
   end if;
   */
-    state = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
+    state = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
 
     rho = Medium.density(state) "Fluid density";
     pin - pout = homotopy(smooth(1, Kf_a*squareReg(w, wnom*wnf))/rho,
@@ -769,7 +769,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
               50},{24,64}}, rotation=0)));
   equation
     // Set fluid properties
-    fluidState = Medium.setState_ph(p, h);
+    fluidState = Medium.setState_phX(p, h);
     T = Medium.temperature(fluidState);
 
     M = V*Medium.density(fluidState) "Fluid mass";
@@ -955,7 +955,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
               0)));
   equation
     // Set fluid properties
-    fluidState = Medium.setState_ph(p, h);
+    fluidState = Medium.setState_phX(p, h);
     T = Medium.temperature(fluidState);
 
     M = V*Medium.density(fluidState) "Fluid mass";
@@ -1096,7 +1096,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
   equation
     // Set liquid properties
-    liquidState = Medium.setState_ph(system.p_amb, h);
+    liquidState = Medium.setState_phX(system.p_amb, h);
 
     V = V0 + A*y "Liquid volume";
     M = V*Medium.density(liquidState) "Liquid mass";
@@ -1310,7 +1310,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     // Fluid property calculations
     for j in 1:N loop
-      fluidState[j] = Medium.setState_ph(p, h[j]);
+      fluidState[j] = Medium.setState_phX(p, h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
       drdp[j] = if Medium.singleState then 0 else Medium.density_derp_h(
@@ -1728,7 +1728,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     // Fluid property calculations
     for j in 1:N loop
-      fluidState[j] = Medium.setState_ph(p, h[j]);
+      fluidState[j] = Medium.setState_phX(p, h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
       drdp[j] = Medium.density_derp_h(fluidState[j]);
@@ -2036,7 +2036,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     // Fluid property calculations
     for j in 1:N loop
-      fluidState[j] = Medium.setState_ph(p, h[j]);
+      fluidState[j] = Medium.setState_phX(p, h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
       drdp[j] = if Medium.singleState then 0 else Medium.density_derp_h(
@@ -2594,7 +2594,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     //Computation of fluid properties
     for j in 1:N loop
-      fluidState[j] = Medium.setState_ph(p, h[j]);
+      fluidState[j] = Medium.setState_phX(p, h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
       drdp[j] = if Medium.singleState then 0 else Medium.density_derp_h(
@@ -3354,7 +3354,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     // Set fluid properties
     h = homotopy(if not allowFlowReversal then inStream(inlet.h_outflow) else
       actualStream(inlet.h_outflow), inStream(inlet.h_outflow));
-    fluidState = Medium.setState_ph(inlet.p, h);
+    fluidState = Medium.setState_phX(inlet.p, h);
     T = Medium.temperature(fluidState);
 
     // Boundary conditions
@@ -3397,7 +3397,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   equation
     flange.m_flow = 0;
     flange.h_outflow = 0;
-    T = Medium.temperature(Medium.setState_ph(flange.p, inStream(flange.h_outflow)));
+    T = Medium.temperature(Medium.setState_phX(flange.p, inStream(flange.h_outflow)));
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(
@@ -3605,7 +3605,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       hl_out - hl) - Qp "Water energy balance";
 
     // Set liquid properties
-    liquidState = Medium.setState_ph(pg, hl);
+    liquidState = Medium.setState_phX(pg, hl);
     rho = Medium.density(liquidState);
 
     pf = pg + rho*g*(zl + zl0) "Stevino's law";
@@ -3872,10 +3872,10 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     Aext = 2*pi*rext^2 + 2*pi*rext*L "External metal surface area";
 
     // Fluid properties
-    liquidState = Medium.setState_ph(p, hl);
+    liquidState = Medium.setState_phX(p, hl);
     Tl = Medium.temperature(liquidState);
     rhol = Medium.density(liquidState);
-    vapourState = Medium.setState_ph(p, hv);
+    vapourState = Medium.setState_phX(p, hv);
     Tv = Medium.temperature(vapourState);
     rhov = Medium.density(vapourState);
     sat.psat = p;
@@ -4630,7 +4630,7 @@ li><i>1 Jul 2004</i>
      annotation (Dialog(tab="Initialisation"));
 
     final parameter Medium.AbsolutePressure pstart = Medium.saturationPressure(Tlstart + Tt);
-    final parameter Medium.SpecificEnthalpy hlstart = Medium.specificEnthalpy_pT(pstart, Tlstart);
+    final parameter Medium.SpecificEnthalpy hlstart = Medium.specificEnthalpy_pTX(pstart, Tlstart, fill(0,0));
 
     outer ThermoPower.System system "System wide properties";
 
@@ -4943,8 +4943,8 @@ li><i>1 Jul 2004</i>
       pva[i] = Water.saturationPressure(Twb[i]);
       hvw[i] = Water.dewEnthalpy(Water.setSat_T(Tl[i]));
       hva[i] = Water.dewEnthalpy(Water.setSat_T(Twb[i]));
-      haw[i] = DryAir.specificEnthalpy(DryAir.setState_pT(patm, Tl[i]));
-      haa[i] = DryAir.specificEnthalpy(DryAir.setState_pT(patm, Twb[i]));
+      haw[i] = DryAir.specificEnthalpy(DryAir.setState_pTX(patm, Tl[i]));
+      haa[i] = DryAir.specificEnthalpy(DryAir.setState_pTX(patm, Twb[i]));
       pvw[i]/patm = Xvw[i]*MMa/(Xvw[i]*MMa+MMv)
         "Saturation conditions @ liquid temperature";
       pva[i]/patm = Xva[i]*MMa/(Xva[i]*MMa+MMv)
@@ -5320,7 +5320,7 @@ Input variables changed. This function now computes the heat transfer coefficien
     der(phi) = omega;
 
     // Fluid boundary conditions and inlet fluid properties
-    fluidState_in = Medium.setState_ph(inlet.p, hin);
+    fluidState_in = Medium.setState_phX(inlet.p, hin);
     hin = inStream(inlet.h_outflow);
     hout = outlet.h_outflow;
     w = inlet.m_flow;
@@ -5682,7 +5682,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       w = inlet.m_flow;
 
       // Fluid properties
-      fluidState = Medium.setState_ph(inlet.p, inStream(inlet.h_outflow));
+      fluidState = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
       Tin = Medium.temperature(fluidState);
       rho = Medium.density(fluidState);
 
@@ -5888,7 +5888,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       end if;
 
       // Fluid properties
-      inletFluidState = Medium.setState_ph(infl.p, hin);
+      inletFluidState = Medium.setState_phX(infl.p, hin);
       rho = Medium.density(inletFluidState);
       Tin = Medium.temperature(inletFluidState);
 
@@ -6053,7 +6053,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
           "Isentropic enthalpy";
         //dummy assignments
         sin = 0;
-        steamState_iso = Medium.setState_ph(Medium.p_default,Medium.h_default);
+        steamState_iso = Medium.setState_phX(Medium.p_default,Medium.h_default);
       else
         sin = Medium.specificEntropy(steamState_in);
         steamState_iso = Medium.setState_ps(pout, sin);
@@ -6074,7 +6074,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
       der(phi) = omega;
 
       // steam boundary conditions and inlet steam properties
-      steamState_in = Medium.setState_ph(pin, inStream(inlet.h_outflow));
+      steamState_in = Medium.setState_phX(pin, inStream(inlet.h_outflow));
       hin = inStream(inlet.h_outflow);
       hout = outlet.h_outflow;
       pin = inlet.p;
@@ -6548,7 +6548,7 @@ This model is not yet complete
 
     // Fluid property calculations
     for j in 1:N loop
-      fluidState[j] = Medium.setState_ph(p, h[j]);
+      fluidState[j] = Medium.setState_phX(p, h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
       drdp[j] = if Medium.singleState then 0 else Medium.density_derp_h(
@@ -6952,7 +6952,7 @@ This model is not yet complete
 
     // Fluid property calculations
     for j in 1:N loop
-      fluidState[j] = Medium.setState_ph(p, h[j]);
+      fluidState[j] = Medium.setState_phX(p, h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
       drdp[j] = Medium.density_derp_h(fluidState[j]);
@@ -7617,7 +7617,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     // Fluid property calculations
     for j in 1:N loop
-      fluidState[j] = Medium.setState_ph(p, h[j]);
+      fluidState[j] = Medium.setState_phX(p, h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
       drdp[j] = if Medium.singleState then 0 else Medium.density_derp_h(
@@ -8147,7 +8147,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     //Computation of fluid properties
     for j in 1:N loop
-      fluidState[j] = Medium.setState_ph(p, h[j]);
+      fluidState[j] = Medium.setState_phX(p, h[j]);
       T[j] = Medium.temperature(fluidState[j]);
       rho[j] = Medium.density(fluidState[j]);
       drdp[j] = if Medium.singleState then 0 else Medium.density_derp_h(
