@@ -697,10 +697,10 @@ package Thermal "Thermal models of heat transfer"
     constant Real pi=Modelica.Constants.pi;
     outer ThermoPower.System system "System wide properties";
     Units.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
-    ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface"
+    ThermoPower.Thermal.DHTNodes int(N=N, T(start=Tstart)) "Internal surface"
       annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=
               0)));
-    ThermoPower.Thermal.DHT ext(N=N, T(start=Tstart)) "External surface"
+    ThermoPower.Thermal.DHTNodes ext(N=N, T(start=Tstart)) "External surface"
       annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
             rotation=0)));
   equation
