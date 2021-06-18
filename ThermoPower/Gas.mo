@@ -965,6 +965,8 @@ package Gas "Models of components with ideal gases as working fluid"
       final fluidState=gas.state) "Instantiated heat transfer model";
 
     parameter SI.PerUnit wnm = 1e-2 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+    parameter Boolean fixedMassFlowSimplified = false "Fix flow rate = wnom for simplified homotopy model"
+        annotation (Dialog(tab="Initialisation"));
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     SI.Pressure Dpfric "Pressure drop due to friction";
@@ -1086,8 +1088,12 @@ package Gas "Models of components with ideal gases as working fluid"
           drbdX2[j, :] = dddX[j + 1, :]/2;
         end if;
         vbar[j] = 1/rhobar[j];
-        wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2,
-          wnom/Nt);
+        if fixedMassFlowSimplified then
+          wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2,
+                             wnom/Nt);
+        else
+          wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+        end if;
         cvbar[j] = (cv[j] + cv[j + 1])/2;
       else
         // Static mass and energy balances
@@ -1101,7 +1107,11 @@ package Gas "Models of components with ideal gases as working fluid"
         drbdX1[j, :] = zeros(nX);
         drbdX2[j, :] = zeros(nX);
         vbar[j] = 0;
-        wbar[j] = infl.m_flow/Nt;
+        if fixedMassFlowSimplified then
+          wbar[j] = homotopy(infl.m_flow/Nt, wnom/Nt);
+        else
+          wbar[j] = infl.m_flow/Nt;
+        end if;
         cvbar[j] = 0;
       end if;
     end for;
