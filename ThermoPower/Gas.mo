@@ -987,7 +987,7 @@ package Gas "Models of components with ideal gases as working fluid"
     SI.Power Q_single[N-1] = heatTransfer.Qvol/Nt
       "Heat flows entering the volumes from the lateral boundary (single tube)";
     SI.Velocity u[N] "Fluid velocity";
-    Medium.AbsolutePressure p(start=pstart, stateSelect=StateSelect.prefer);
+    Medium.AbsolutePressure p(start=pstart, fixed = false, stateSelect=StateSelect.prefer);
     SI.Time Tr "Residence time";
     SI.Mass M "Gas Mass (single tube)";
     SI.Mass Mtot "Gas Mass (total)";
@@ -2056,9 +2056,9 @@ package Gas "Models of components with ideal gases as working fluid"
     parameter Medium.MassFlowRate wnom "Nominal mass flowrate"
       annotation (Dialog(group="Nominal operating point"));
     parameter Medium.Density rhonom=1000 "Nominal density" annotation (Dialog(group=
-            "Nominal operating point", enable=(CvData == CvTypes.OpPoint)));
+            "Nominal operating point", enable=(CvData == ThermoPower.Choices.Valve.CvTypes.OpPoint)));
     parameter SI.PerUnit thetanom=1 "Nominal valve opening" annotation (Dialog(group=
-            "Nominal operating point", enable=(CvData == CvTypes.OpPoint)));
+            "Nominal operating point", enable=(CvData == ThermoPower.Choices.Valve.CvTypes.OpPoint)));
     parameter Boolean CheckValve=false "Reverse flow stopped";
     parameter SI.PerUnit b=0.01 "Regularisation factor";
 
@@ -4552,6 +4552,15 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
       DymolaStoredErrors);
   end Flow1D;
 
+  model Fan "Model for a gas fan, with constant speed"
+    extends ThermoPower.Gas.BaseClasses.FanBase(
+      redeclare replaceable package Medium = DEMO.Media.Helium.DefaultHelium
+        constrainedby DEMO.Internals.HeliumMedium);
+
+  equation
+    n=n0;
+
+  end Fan;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using ideal gases as working fluid.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
