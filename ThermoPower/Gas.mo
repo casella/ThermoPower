@@ -964,6 +964,21 @@ package Gas "Models of components with ideal gases as working fluid"
       final w=w*ones(N),
       final fluidState=gas.state) "Instantiated heat transfer model";
 
+    replaceable model FrictionModel = Friction.NoFriction
+      constrainedby Friction.FrictionModelBase
+      annotation (choicesAllMatching=true, Dialog(enable = useFrictionModel));
+
+    FrictionModel frictionModel(
+      redeclare package Medium = Medium,
+      final N=N-1,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final wnom=wnom/Nt,
+      final w=fill(w,N-1),
+      final fluidState=gas[1:N-1].state)
+      "Instantiated flow model";
+
     parameter SI.PerUnit wnm = 1e-2 "Maximum fraction of the nominal flow rate allowed as reverse flow";
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
@@ -1019,14 +1034,13 @@ package Gas "Models of components with ideal gases as working fluid"
     //All equations are referred to a single tube
     // Friction factor selection
     omega_hyd = 4*A/Dhyd;
-    if FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom then
+    if useFrictionModel then
+      Cf = sum(frictionModel.Cf)/(N-1)*Kfc;
+    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom then
       Kf = Kfnom*Kfc;
-      Cf = 2*Kf*A^3/(omega_hyd*L);
     elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint then
       Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-      Cf = 2*Kf*A^3/(omega_hyd*L);
     elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom then
-      Kf = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
       Cf = Cfnom*Kfc;
     elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook then
       Cf = f_colebrook(
@@ -1034,19 +1048,17 @@ package Gas "Models of components with ideal gases as working fluid"
           Dhyd/A,
           e,
           Medium.dynamicViscosity(gas[integer(N/2)].state))*Kfc;
-      Kf = Cf*omega_hyd*L/(2*A^3);
     elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction then
       Cf = 0;
-      Kf = 0;
     elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.External then
       Cf = Kfc*Cfcorr(w,Dhyd,A,sum(Medium.dynamicViscosity(gas[:].state))/N);
-      Kf = Cf*omega_hyd*L/(2*A^3);
     else
       assert(false, "Unsupported FFtype");
       Cf = 0;
-      Kf = 0;
     end if;
     assert(Kf >= 0, "Negative friction coefficient");
+    Kf = Cf*omega_hyd*L/(2*A^3)
+      "Relationship between friction coefficient and Fanning friction factor";
     Kfl = wnom/Nt*wnf*Kf "Linear friction factor";
 
     // Dynamic momentum term
@@ -1054,7 +1066,7 @@ package Gas "Models of components with ideal gases as working fluid"
 
     sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpfric = 0 "Momentum balance";
-    Dpfric = (if FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction then 0
+    Dpfric = (if not useFrictionModel and (FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction) then 0
               else homotopy((smooth(1, Kf*squareReg(w, wnom/Nt*wnf))*sum(vbar)/(N - 1)),
                              dpnom/(wnom/Nt)*w))
       "Pressure drop due to friction";
@@ -2845,15 +2857,16 @@ The packages Medium are redeclared and a mass balance determines the composition
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
-        annotation(Evaluate=true);
+        annotation(Evaluate=true, Dialog(enable = not useFrictionModel));
       parameter SI.PressureDifference dpnom = 0 "Nominal pressure drop";
       parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom) and not useFrictionModel));
       parameter Medium.Density rhonom=0 "Nominal inlet density"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint)));
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint) and not useFrictionModel));
       parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
-      parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom) and not useFrictionModel));
+      parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)"
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook) or useFrictionModel));
       parameter Real Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
         "Inertial phenomena accounted for"
@@ -2897,6 +2910,9 @@ The packages Medium are redeclared and a mass balance determines the composition
       parameter Boolean noInitialPressure=false
         "Remove initial equation on pressure"
         annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+      parameter Boolean useFrictionModel=false
+        "Use replaceable model for friction factor"
+        annotation (choices(checkBox=true));
 
       replaceable function Cfcorr =
           ThermoPower.Functions.FrictionFactors.NoFriction constrainedby
@@ -3791,6 +3807,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
 </ul>
 </html>"));
     end FanBase;
+
   end BaseClasses;
 
   model SourceP "Pressure source for gas flows"
@@ -4561,6 +4578,7 @@ Several functions are provided in the package <tt>Functions.FanCharacteristics</
     n=n0;
 
   end Fan;
+
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using ideal gases as working fluid.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
