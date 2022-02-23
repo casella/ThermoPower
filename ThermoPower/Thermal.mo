@@ -697,10 +697,10 @@ package Thermal "Thermal models of heat transfer"
     constant Real pi=Modelica.Constants.pi;
     outer ThermoPower.System system "System wide properties";
     Units.AbsoluteTemperature T[N](start=Tstart) "Node temperatures";
-    ThermoPower.Thermal.DHT int(N=N, T(start=Tstart)) "Internal surface"
+    ThermoPower.Thermal.DHTNodes int(N=N, T(start=Tstart)) "Internal surface"
       annotation (Placement(transformation(extent={{-40,20},{40,40}}, rotation=
               0)));
-    ThermoPower.Thermal.DHT ext(N=N, T(start=Tstart)) "External surface"
+    ThermoPower.Thermal.DHTNodes ext(N=N, T(start=Tstart)) "External surface"
       annotation (Placement(transformation(extent={{-40,-42},{40,-20}},
             rotation=0)));
   equation
@@ -782,9 +782,18 @@ package Thermal "Thermal models of heat transfer"
       side2.Q[HET.correspondingVolumes[j]] + side1.Q[j] = 0;
     end for;
     annotation (
-      Diagram(graphics),
       Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
-           graphics));
+           graphics={Polygon(
+            points={{-72,0},{-72,-16},{-50,-8},{-72,0}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid), Polygon(
+            points={{72,0},{52,8},{72,16},{72,0}},
+            lineColor={0,0,0},
+            lineThickness=0.5,
+            fillColor={0,0,0},
+            fillPattern=FillPattern.Solid)}));
   end HeatExchangerTopologyFV;
 
   model CounterCurrentFV
@@ -959,7 +968,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
            if not useAverageTemperature then T[j+1]
            else if not adaptiveAverageTemperature then (T[j] + T[j + 1])/2
            else (T[j]+T[j+1])/2 + (T[j+1]-T[j])/2*exp(-w_wnom/sigma);
-         Qw[j] = (Tw[j] - Tvol[j])*omega*l*gamma*Nt;
+         Qw[j] = (Tw[j] - Tvol[j])*omega*l*kc*gamma*Nt;
       end for;
 
       annotation (
@@ -1025,10 +1034,10 @@ The swapping is performed if the counterCurrent parameter is true (default value
     equation
       Hv*Qv = Hw*Qw "Energy balance on coarser grid";
       if Nw >= Nv then
-        Qw = omega*lw*gamma*(Tw - G*Tv)
+        Qw = omega*lw*kc*gamma*(Tw - G*Tv)
           "Convective heat transfer on finer grid";
       else
-        Qv = omega*lv*gamma*(Tv - G*Tw)
+        Qv = omega*lv*kc*gamma*(Tv - G*Tw)
           "Convective heat transfer on finer grid";
       end if;
       for j in 1:Nv loop
@@ -1073,6 +1082,8 @@ the global nominal thermal conductance UA is given instead of the nominal specif
         "Adapt the average temperature at low flow rates";
        parameter Modelica.SIunits.PerUnit sigma = 0.1
         "Fraction of nominal flow rate below which the heat transfer is computed on outlet volume temperatures";
+       parameter Boolean useHomotopy = true
+       "use nominal heat transfer coefficient for simplified model";
        Medium.Temperature Tvol[Nw] "Fluid temperature in the volumes";
        SI.CoefficientOfHeatTransfer gamma(start = gamma_nom)
         "Actual heat transfer coefficient";
@@ -1087,15 +1098,18 @@ the global nominal thermal conductance UA is given instead of the nominal specif
       w_wnom = abs(w[1])/wnom_ht
         "Inlet flow rate used for the computation of the h.t.c.";
       w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2);
-      gamma = homotopy(gamma_nom*w_wnom_reg^alpha,
-                       gamma_nom);
+      if useHomotopy then
+        gamma = homotopy(gamma_nom*w_wnom_reg^alpha,gamma_nom);
+      else
+        gamma = gamma_nom*w_wnom_reg^alpha;
+      end if;
 
       for j in 1:Nw loop
          Tvol[j] =
            if not useAverageTemperature then T[j+1]
            else if not adaptiveAverageTemperature then (T[j] + T[j + 1])/2
            else (T[j]+T[j+1])/2 + (T[j+1]-T[j])/2*exp(-w_wnom/sigma);
-         Qw[j] = (Tw[j] - Tvol[j])*gamma*omega*l*Nt;
+         Qw[j] = (Tw[j] - Tvol[j])*kc*gamma*omega*l*Nt;
       end for;
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
@@ -1176,7 +1190,7 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
       for j in 1:Nw loop
          Tvol[j]      = if useAverageTemperature then (T[j] + T[j + 1])/2       else T[j + 1];
          gamma_vol[j] = if useAverageTemperature then (gamma[j] + gamma[j+1])/2 else gamma[j+1];
-         Qw[j] = (Tw[j] - Tvol[j])*omega*l*gamma_vol[j]*Nt;
+         Qw[j] = (Tw[j] - Tvol[j])*kc*omega*l*gamma_vol[j]*Nt;
       end for;
       annotation (
         Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{
@@ -1283,37 +1297,37 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
 
       for j in 1:Nw loop
          if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1]> hv)) then  // 1-phase liquid or vapour
-           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2);
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*((gamma1ph[j] + gamma1ph[j+1])/2)*kc;
            state[j] = 1;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
          elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then          // liquid --> 2-phase
-           Qw[j] = alpha_l[j]*      (Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*((gamma1ph[j] + gamma_bubble)/2) +
-                   (1 - alpha_l[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = (alpha_l[j]*      (Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*((gamma1ph[j] + gamma_bubble)/2) +
+                    (1 - alpha_l[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph)*kc;
            state[j] = 2;
            alpha_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
            alpha_v[j] = 0;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then   // 2-phase
-           Qw[j] = (Tw[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = (Tw[j] - Ts)*omega*l*Nt*gamma2ph*kc;
            state[j] = 3;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then                // 2-phase --> vapour
            //Qw[j] = alpha_v[j]*(Tw[j] - (T[j + 1] + Ts)/2)*omega*l*(gamma1ph[j] + gamma1ph[j+1])/2 + (1 - alpha_v[j])*(Tw[j] - Ts)*omega*l*gamma2ph;
-           Qw[j] = alpha_v[j]*      (Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_dew + gamma1ph[j+1])/2 +
-                   (1 - alpha_v[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = (alpha_v[j]*      (Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_dew + gamma1ph[j+1])/2 +
+                    (1 - alpha_v[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph)*kc;
            state[j] = 4;
            alpha_l[j] = 0;
            alpha_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then                // 2-phase --> liquid
-           Qw[j] = alpha_l[j]*      (Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_bubble + gamma1ph[j+1])/2 +
-                   (1 - alpha_l[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = (alpha_l[j]*      (Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*(gamma_bubble + gamma1ph[j+1])/2 +
+                    (1 - alpha_l[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph)*kc;
            state[j] = 5;
            alpha_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
            alpha_v[j] = 0;
          else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then        // vapour --> 2-phase
-           Qw[j] = alpha_v[j]*      (Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*(gamma1ph[j] + gamma_dew)/2 +
-                   (1 - alpha_v[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph;
+           Qw[j] = (alpha_v[j]*      (Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*(gamma1ph[j] + gamma_dew)/2 +
+                    (1 - alpha_v[j])*(Tw[j] - Ts)*omega*l*Nt*gamma2ph)*kc;
            state[j] = 6;
            alpha_l[j] = 0;
            alpha_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
@@ -1398,41 +1412,41 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
 
       for j in 1:Nw loop
          if noEvent(h[j] < hl and h[j + 1] < hl) then  // liquid
-           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*gamma_liq;
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*gamma_liq*kc;
            state[j] = 0;
            alpha_l[j] = 1;
            alpha_v[j] = 0;
          elseif noEvent(h[j] > hv and h[j + 1]> hv) then  // vapour
-           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*gamma_vap;
+           Qw[j] = (Tw[j] - Tvol[j])*omega*l*Nt*gamma_vap*kc;
            state[j] = 1;
            alpha_l[j] = 0;
            alpha_v[j] = 1;
          elseif noEvent((h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv)) then // liquid --> 2-phase
-           Qw[j] = alpha_l[j]      *(Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_liq +
-                   (1 - alpha_l[j])*(Tw[j] - Ts)           *omega*l*Nt*gamma_2ph;
+           Qw[j] = (alpha_l[j]      *(Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_liq +
+                    (1 - alpha_l[j])*(Tw[j] - Ts)           *omega*l*Nt*gamma_2ph)*kc;
            state[j] = 2;
            alpha_l[j] = (hl - h[j])/(h[j + 1] - h[j]);
            alpha_v[j] = 0;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]<= hv) then // 2-phase
-           Qw[j] = (Tw[j] - Ts)*omega*l*Nt*gamma_2ph;
+           Qw[j] = (Tw[j] - Ts)*omega*l*Nt*gamma_2ph*kc;
            state[j] = 3;
            alpha_l[j] = 0;
            alpha_v[j] = 0;
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then // 2-phase --> vapour
-           Qw[j] = alpha_v[j]      *(Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_vap +
-                   (1 - alpha_v[j])*(Tw[j] - Ts)               *omega*l*Nt*gamma_2ph;
+           Qw[j] = (alpha_v[j]      *(Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_vap +
+                    (1 - alpha_v[j])*(Tw[j] - Ts)               *omega*l*Nt*gamma_2ph)*kc;
            state[j] = 4;
            alpha_l[j] = 0;
            alpha_v[j] = (h[j + 1] - hv)/(h[j + 1] - h[j]);
          elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then // 2-phase --> liquid
-           Qw[j] = alpha_l[j]      *(Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_liq +
-                   (1 - alpha_l[j])*(Tw[j] - Ts)               *omega*l*Nt*gamma_2ph;
+           Qw[j] = (alpha_l[j]      *(Tw[j] - (T[j + 1] + Ts)/2)*omega*l*Nt*gamma_liq +
+                    (1 - alpha_l[j])*(Tw[j] - Ts)               *omega*l*Nt*gamma_2ph)*kc;
            state[j] = 5;
            alpha_l[j] = (hl - h[j + 1])/(h[j] - h[j + 1]);
            alpha_v[j] = 0;
          else // if noEvent(h[j] > hv and h[j + 1] <= hv and h[j + 1] >= hl) then        // vapour --> 2-phase
-           Qw[j] = alpha_v[j]      *(Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_vap +
-                   (1 - alpha_v[j])*(Tw[j] - Ts)           *omega*l*Nt*gamma_2ph;
+           Qw[j] = (alpha_v[j]      *(Tw[j] - (T[j] + Ts)/2)*omega*l*Nt*gamma_vap +
+                    (1 - alpha_v[j])*(Tw[j] - Ts)           *omega*l*Nt*gamma_2ph)*kc;
            state[j] = 6;
            alpha_l[j] = 0;
            alpha_v[j] = (h[j] - hv)/(h[j] - h[j + 1]);
@@ -2116,6 +2130,7 @@ This package contains models to compute the material properties needed to model 
       parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       final parameter SI.Length l=L/(Nw) "Length of a single volume";
+      parameter Modelica.SIunits.PerUnit kc = 1 "Correction factor for heat transfer";
 
       Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
       Medium.Temperature Tw[Nw] "Temperatures of the wall volumes";

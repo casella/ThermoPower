@@ -980,6 +980,8 @@ package Gas "Models of components with ideal gases as working fluid"
       "Instantiated flow model";
 
     parameter SI.PerUnit wnm = 1e-2 "Maximum fraction of the nominal flow rate allowed as reverse flow";
+    parameter Boolean fixedMassFlowSimplified = false "Fix flow rate = wnom for simplified homotopy model"
+        annotation (Dialog(tab="Initialisation"));
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     SI.Pressure Dpfric "Pressure drop due to friction";
@@ -989,10 +991,9 @@ package Gas "Models of components with ideal gases as working fluid"
     Real dwdt "Time derivative of mass flow rate";
     SI.PerUnit Cf "Fanning friction factor";
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
-    Medium.Temperature Ttilde[N - 1](start=ones(N - 1)*Tstartin + (1:(N - 1))/
-          (N - 1)*(Tstartout - Tstartin), each stateSelect=StateSelect.prefer)
+    SI.Temperature Ttilde[N - 1](start = Tstart[2:N],each stateSelect=StateSelect.prefer)
       "Temperature state variables";
-    Medium.Temperature T[N] "Node temperatures";
+    Medium.Temperature T[N](start=Tstart) "Node temperatures";
     Medium.SpecificEnthalpy h[N] "Node specific enthalpies";
     Medium.Temperature Tin(start=Tstartin);
     Medium.MassFraction Xtilde[if UniformComposition or Medium.fixedX then 1 else N - 1, nX](
@@ -1102,8 +1103,12 @@ package Gas "Models of components with ideal gases as working fluid"
           drbdX2[j, :] = dddX[j + 1, :]/2;
         end if;
         vbar[j] = 1/rhobar[j];
-        wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2,
-          wnom/Nt);
+        if fixedMassFlowSimplified then
+          wbar[j] = homotopy(infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2,
+                             wnom/Nt);
+        else
+          wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
+        end if;
         cvbar[j] = (cv[j] + cv[j + 1])/2;
       else
         // Static mass and energy balances
@@ -1117,7 +1122,11 @@ package Gas "Models of components with ideal gases as working fluid"
         drbdX1[j, :] = zeros(nX);
         drbdX2[j, :] = zeros(nX);
         vbar[j] = 0;
-        wbar[j] = infl.m_flow/Nt;
+        if fixedMassFlowSimplified then
+          wbar[j] = homotopy(infl.m_flow/Nt, wnom/Nt);
+        else
+          wbar[j] = infl.m_flow/Nt;
+        end if;
         cvbar[j] = 0;
       end if;
     end for;
@@ -1200,7 +1209,9 @@ package Gas "Models of components with ideal gases as working fluid"
         p = pstart;
       end if;
       Ttilde = Tstart[2:N];
-      Xtilde = ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]);
+      if (not Medium.fixedX) then
+        Xtilde = ones(size(Xtilde, 1), size(Xtilde, 2))*diagonal(Xstart[1:nX]);
+      end if;
     elseif initOpt == Choices.Init.Options.steadyState then
       if (not Medium.singleState) and not noInitialPressure then
         der(p) = 0;
