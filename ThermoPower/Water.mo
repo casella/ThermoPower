@@ -1164,7 +1164,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     SI.Pressure Dpfric "Pressure drop due to friction (total)";
     SI.Pressure Dpfric1
       "Pressure drop due to friction (from inlet to capacitance)";
@@ -1242,7 +1241,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   equation
     //All equations are referred to a single tube
     // Friction factor selection
-    omega_hyd = 4*A/Dhyd;
     if useFrictionModel then
       Cf = sum(frictionModel.Cf)/(N-1)*Kfc;
     elseif FFtype == FFtypes.Kfnom then
@@ -1525,7 +1523,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     SI.Pressure Dpfric "Pressure drop due to friction";
     SI.Pressure Dpstat "Pressure drop due to static head";
     Real Kf[N - 1] "Friction coefficient";
@@ -1595,7 +1592,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.MassFlowRate dMdt[N - 1] "Derivative of fluid mass in each volume";
   equation
     //All equations are referred to a single tube
-    omega_hyd = 4*A/Dhyd;
     // Friction factor selection
     for j in 1:(N - 1) loop
       if useFrictionModel then
@@ -1955,7 +1951,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     constant SI.Acceleration g=Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
       "The number of nodes is even";
-    SI.Length omega_hyd "Hydraulic perimeter (single tube)";
     Real Kf[N] "Friction coefficients";
     Real Cf[N] "Fanning friction factors";
     Real dwdt "Dynamic momentum term";
@@ -2024,7 +2019,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     //Friction factor selection
-    omega_hyd = 4*A/Dhyd;
     for i in 1:N loop
       if useFrictionModel then
         Cf[i] = frictionModel.Cf[i]*Kfc;
@@ -2454,7 +2448,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
     Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
-    SI.Length omega_hyd "Hydraulic perimeter (single tube)";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p "Fluid pressure";
     SI.Pressure Dpfric "Pressure drop due to friction";
@@ -2571,7 +2564,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     //Friction factor calculation
-    omega_hyd = 4*A/Dhyd;
     for i in 1:N loop
       if useFrictionModel then
         Cf[i] = frictionModel.Cf[i]*Kfc;
@@ -5537,6 +5529,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       parameter SI.Length omega
         "Perimeter of heat transfer surface (single tube)";
       parameter SI.Length Dhyd = omega/pi "Hydraulic Diameter (single tube)";
+      final parameter SI.Length omega_hyd = 4*A/Dhyd "Wet perimeter (single tube)";
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"

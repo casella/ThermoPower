@@ -985,7 +985,6 @@ package Gas "Models of components with ideal gases as working fluid"
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     SI.Pressure Dpfric "Pressure drop due to friction";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     Real Kf "Friction factor";
     Real Kfl "Linear friction factor";
     Real dwdt "Time derivative of mass flow rate";
@@ -1034,7 +1033,6 @@ package Gas "Models of components with ideal gases as working fluid"
       "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
     // Friction factor selection
-    omega_hyd = 4*A/Dhyd;
     if useFrictionModel then
       Cf = sum(frictionModel.Cf)/(N-1)*Kfc;
     elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom then
@@ -2865,6 +2863,7 @@ The packages Medium are redeclared and a mass balance determines the composition
       parameter SI.Length omega
         "Perimeter of heat transfer surface (single tube)";
       parameter SI.Length Dhyd "Hydraulic Diameter (single tube)";
+      final parameter SI.Length omega_hyd = 4*A/Dhyd "Wet perimeter (single tube)";
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
