@@ -56,8 +56,8 @@ package Thermal "Thermal models of heat transfer"
   model HT_DHTNodes "HT to DHT adaptor"
     parameter Integer N=1 "Number of nodes on DHT side";
     parameter SI.Area exchangeSurface "Area of heat transfer surface";
-    HT HT_port annotation (Placement(transformation(extent={{-140,-20},{-100,20}},
-            rotation=0), iconTransformation(extent={{-140,-20},{-100,20}})));
+    HT HT_port annotation (Placement(transformation(extent={{-140,-16},{-100,24}},
+            rotation=0)));
     DHT DHT_port(N=N) annotation (Placement(transformation(extent={{100,-40},{
               120,40}}, rotation=0)));
   equation
@@ -1095,7 +1095,8 @@ the global nominal thermal conductance UA is given instead of the nominal specif
       assert(Nw ==  Nf - 1, "Number of volumes Nw on wall side should be equal to number of volumes fluid side Nf - 1");
 
       // Computation of actual heat transfer coefficient with smooth lower saturation to avoid numerical singularities at low flows
-      w_wnom = abs(w[1])/wnom_ht;
+      w_wnom = abs(w[1])/wnom_ht
+        "Inlet flow rate used for the computation of the h.t.c.";
       w_wnom_reg = Functions.smoothSat(w_wnom, beta, 1e9, beta/2);
       if useHomotopy then
         gamma = homotopy(gamma_nom*w_wnom_reg^alpha,gamma_nom);
@@ -3320,6 +3321,169 @@ The radial distribution of the nodes can be chosen by selecting the value of <tt
      extends ThermoPower.Functions.linspaceExt;
      extends Modelica.Icons.ObsoleteModel;
   end linspaceExt;
+
+  model CylinderFourierHT
+    "Thermal model of a hollow cylinder by Fourier's equation - 1 axial node and Nr radial nodes, with lumped HT connectors"
+    import Modelica.SIunits.*;
+    import ThermoPower.Choices.CylinderFourier.NodeDistribution;
+    extends ThermoPower.Icons.MetalWall;
+
+    replaceable model MaterialModel = MaterialProperties.Metals.StandardSteel
+      constrainedby MaterialProperties.Interfaces.PartialMaterial "Metal model";
+    parameter Integer Nr=2 "Number of radial nodes";
+    parameter NodeDistribution nodeDistribution=ThermoPower.Choices.CylinderFourier.NodeDistribution.uniform
+      "Node distribution";
+    parameter SI.Length rint "Internal radius";
+    parameter SI.Length rext "External radius";
+    parameter SI.Length L "Axial length";
+    parameter SI.Temperature Tstartint=300
+      "Temperature start value at rint (first node)"
+      annotation (Dialog(tab="Initialisation"));
+    parameter SI.Temperature Tstartext=300
+      "Temperature start value at rext (last node)"
+      annotation (Dialog(tab="Initialisation"));
+    parameter Choices.Init.Options initOpt=Choices.Init.Options.noInit
+      "Initialisation option" annotation (Dialog(tab="Initialisation"));
+
+    SI.Length r[Nr](fixed=false) "Node radii";
+  protected
+    SI.Length r1_2[Nr - 1](fixed=false) "Slice mean radii";
+    SI.Length r_lin[Nr](fixed=false) "Linearly distributed radii";
+    Real A[Nr](fixed=false);
+    Real B[Nr](fixed=false);
+    Real C[Nr](fixed=false);
+    constant Real pi = Modelica.Constants.pi;
+
+  public
+    SI.Temperature T[Nr](start=linspace(
+            Tstartint,
+            Tstartext,
+            Nr)) "Nodal temperatures";
+    SI.Temperature Tm "Mean temperature";
+    MaterialModel metal[Nr] "Metal properties at the nodes";
+
+    ThermoPower.Thermal.HT internalBoundary annotation (Placement(
+          transformation(extent={{-20,20},{20,40}}, rotation=0)));
+    ThermoPower.Thermal.HT externalBoundary annotation (Placement(
+          transformation(extent={{-20,-40},{20,-20}}, rotation=0)));
+
+  equation
+    // Generation of the temperature node distribution
+    r_lin = linspace(
+        rint,
+        rext,
+        Nr) "Linearly distributed node radii";
+    for i in 1:Nr loop
+      if nodeDistribution == NodeDistribution.uniform then
+        r[i] = r_lin[i] "Uniform distribution of node radii";
+      elseif nodeDistribution == NodeDistribution.thickInternal then
+        r[i] = rint + 1/(rext - rint)*(r_lin[i] - rint)^2
+          "Quadratically distributed node radii - thickest at rint";
+      elseif nodeDistribution == NodeDistribution.thickExternal then
+        r[i] = rext - 1/(rext - rint)*(rext - r_lin[i])^2
+          "Quadratically distributed node radii - thickest at rext";
+      elseif nodeDistribution == NodeDistribution.thickBoth then
+        if r_lin[i] <= (rint + rext)/2 then
+          r[i] = 2/(rext - rint)*(r_lin[i] - rint)^2 + rint
+            "Quadratically distributed node radii - thickest at rint";
+        else
+          r[i] = -2/(rext - rint)*(r_lin[i] - rext)^2 + rext
+            "Quadratically distributed node radii - thickest at rext";
+        end if;
+      else
+        r[i] = 0;
+        assert(true, "Unsupported NodeDistribution type");
+      end if;
+    end for;
+    for i in 1:Nr - 1 loop
+      r1_2[i] = (r[i + 1] + r[i])/2;
+    end for;
+
+    // Spatially discretized coefficients of Fourier's equation
+    for i in 2:Nr - 1 loop
+      A[i] = r1_2[i - 1]/(r[i]*(r[i] - r[i - 1])*(r1_2[i] - r1_2[i - 1]));
+      C[i] = r1_2[i]/(r[i]*(r[i + 1] - r[i])*(r1_2[i] - r1_2[i - 1]));
+      B[i] = -A[i] - C[i];
+    end for;
+    // Not used by Fourier equations
+    A[1] = 0;
+    B[1] = 0;
+    C[1] = 0;
+    A[Nr] = 0;
+    B[Nr] = 0;
+    C[Nr] = 0;
+
+    // Metal temperature equations
+    metal[1:Nr].T = T[1:Nr];
+
+    // Thermal field
+    for i in 2:Nr - 1 loop
+      metal[i].density*metal[i].specificHeatCapacity/metal[i].thermalConductivity
+        *der(T[i]) = A[i]*T[i - 1] + B[i]*T[i] + C[i]*T[i + 1]
+        "Fourier's equation";
+    end for;
+
+    // Thermal boundary conditions
+    internalBoundary.T = T[1];
+    externalBoundary.T = T[Nr];
+    internalBoundary.Q_flow = -metal[1].thermalConductivity*(T[2] - T[1])/(r[2]
+       - r[1])*2*pi*rint*L;
+    externalBoundary.Q_flow = metal[Nr].thermalConductivity*(T[Nr] - T[Nr - 1])
+      /(r[Nr] - r[Nr - 1])*2*pi*rext*L;
+
+    // Mean temperature
+    Tm = 1/(rext^2 - rint^2)*sum((T[i]*r[i] + T[i + 1]*r[i + 1])*(r[i + 1] - r[
+      i]) for i in 1:Nr - 1);
+    //  Tm = sum(T)/Nr;
+  initial equation
+    // Initial conditions
+    if initOpt == Choices.Init.Options.noInit then
+      // do nothing
+    elseif initOpt == Choices.Init.Options.steadyState then
+      der(T[2:Nr - 1]) = zeros(Nr - 2);
+    else
+      assert(false, "Unsupported initialisation option");
+    end if;
+    annotation (
+      Icon(graphics={
+          Text(
+            extent={{-94,52},{-42,24}},
+            lineColor={0,0,0},
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Forward,
+            textString="Int"),
+          Text(
+            extent={{-90,-24},{-42,-50}},
+            lineColor={0,0,0},
+            fillColor={128,128,128},
+            fillPattern=FillPattern.Forward,
+            textString="Ext"),
+          Text(
+            extent={{-98,-44},{102,-72}},
+            lineColor={191,95,0},
+            textString="%name")}),
+      Documentation(info="<html>
+This is the 1D thermal model of a solid hollow cylinder by Fourier's equations.
+<p>The model is axis-symmetric, has one node in the longitudinal direction, and <tt>Nr</tt> nodes in the radial direction. The two connectors correspond to the internal and external surfaces; if one of the surface is thermally insulated, just leave the connector unconnected (no connection on a <tt>DHT</tt> connector means zero heat flux). The temperature-dependent properties of the material are described by the replaceable <tt>MaterialModel</tt> model.
+<p><b>Modelling options</b></p>
+The radial distribution of the nodes can be chosen by selecting the value of <tt>nodeDistribution</tt>:
+<ul>
+<li> <tt>Choices.CylinderFourier.NodeDistribution.uniform</tt> uniform distribution, nodes are equally spaced;
+<li> <tt>Choices.CylinderFourier.NodeDistribution.thickInternal</tt> quadratic distribution, nodes are thickest near the internal surface;
+<li> <tt>Choices.CylinderFourier.NodeDistribution.thickExternal</tt> quadratic distribution, nodes are thickest near the external surface;
+<li> <tt>Choices.CylinderFourier.NodeDistribution.thickBoth</tt> quadratic distribution, nodes are thickest near both surfaces.
+</ul>
+</html>", revisions="<html>
+<ul>
+<li><i>30 Dec 2005</i>
+    by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+       Bugs fixed in boundary condition and node distribution.</li>
+<li><i>1 May 2005</i>
+    by <a href=\"mailto:luca.bascetta@polimi.it\">Luca Bascetta</a>:<br>
+       First release.</li>
+</ul>
+</html>"));
+  end CylinderFourierHT;
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components related to heat transfer phenomena.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:

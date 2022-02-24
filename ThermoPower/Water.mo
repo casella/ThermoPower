@@ -1164,7 +1164,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     SI.Pressure Dpfric "Pressure drop due to friction (total)";
     SI.Pressure Dpfric1
       "Pressure drop due to friction (from inlet to capacitance)";
@@ -1211,6 +1210,21 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       final w=w*ones(N),
       final fluidState=fluidState) "Instantiated heat transfer model";
 
+    replaceable model FrictionModel = Friction.NoFriction
+      constrainedby Friction.FrictionModelBase
+      annotation (choicesAllMatching=true, Dialog(enable = useFrictionModel));
+
+    FrictionModel frictionModel(
+      redeclare package Medium = Medium,
+      final N=N-1,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final wnom=wnom/Nt,
+      final w=fill(w,N-1),
+      final fluidState=fluidState[1:N-1])
+      "Instantiated flow model";
+
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw)
       annotation (Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
@@ -1227,8 +1241,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   equation
     //All equations are referred to a single tube
     // Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    if FFtype == FFtypes.Kfnom then
+    if useFrictionModel then
+      Cf = sum(frictionModel.Cf)/(N-1)*Kfc;
+    elseif FFtype == FFtypes.Kfnom then
       Kf = Kfnom*Kfc;
     elseif FFtype == FFtypes.OpPoint then
       Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
@@ -1240,6 +1255,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
           Dhyd/A,
           e,
           Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
+    elseif FFtype == FFtypes.External then
+      Cf = Kfc*Cfcorr(w,Dhyd,A,Medium.dynamicViscosity(fluidState[integer(N/2)]));
     else  // if FFtype == FFtypes.NoFriction then
       Cf = 0;
     end if;
@@ -1442,7 +1459,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
-    HeatTransfer heatTransfer2(
+    HeatTransfer2 heatTransfer2(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
@@ -1506,7 +1523,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     SI.Pressure Dpfric "Pressure drop due to friction";
     SI.Pressure Dpstat "Pressure drop due to static head";
     Real Kf[N - 1] "Friction coefficient";
@@ -1536,6 +1552,22 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Units.LiquidDensity rhol "Saturated liquid density";
     Units.GasDensity rhov "Saturated vapour density";
     SI.Mass M "Fluid mass";
+
+    replaceable model FrictionModel = Friction.NoFriction
+      constrainedby Friction.FrictionModelBase
+      annotation (choicesAllMatching=true, Dialog(enable = useFrictionModel));
+
+    FrictionModel frictionModel(
+      redeclare package Medium = Medium,
+      final N=N-1,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final wnom=wnom/Nt,
+      final w=fill(w,N-1),
+      final fluidState=fluidState[1:N-1])
+      "Instantiated flow model";
+
   protected
     SI.DerEnthalpyByPressure dhldp
       "Derivative of saturated liquid enthalpy by pressure";
@@ -1560,18 +1592,16 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.MassFlowRate dMdt[N - 1] "Derivative of fluid mass in each volume";
   equation
     //All equations are referred to a single tube
-    omega_hyd = 4*A/Dhyd;
     // Friction factor selection
     for j in 1:(N - 1) loop
-      if FFtype == FFtypes.Kfnom then
+      if useFrictionModel then
+        Cf[j] = frictionModel.Cf[j]*Kfc;
+      elseif FFtype == FFtypes.Kfnom then
         Kf[j] = Kfnom*Kfc/(N - 1);
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
       elseif FFtype == FFtypes.OpPoint then
         Kf[j] = dpnom*rhonom/(wnom/Nt)^2/(N - 1)*Kfc;
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
       elseif FFtype == FFtypes.Cfnom then
         Kf[j] = Cfnom*omega_hyd*l/(2*A^3)*Kfc;
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
       elseif FFtype == FFtypes.Colebrook then
         Cf[j] = if noEvent(htilde[j] < hl or htilde[j] > hv) then f_colebrook(
             w,
@@ -1584,16 +1614,17 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
             Medium.dynamicViscosity(Medium.setBubbleState(sat, 1)),
             Medium.dynamicViscosity(Medium.setDewState(sat, 1)),
             x[j])*Kfc;
-        Kf[j] = Cf[j]*omega_hyd*l/(2*A^3);
+      elseif FFtype == FFtypes.External then
+        Cf[j] = Kfc*Cfcorr(w,Dhyd,A,Medium.dynamicViscosity(fluidState[j]));
       elseif FFtype == FFtypes.NoFriction then
         Cf[j] = 0;
-        Kf[j] = 0;
       else
         assert(FFtype <> FFtypes.NoFriction, "Unsupported FFtype");
         Cf[j] = 0;
-        Kf[j] = 0;
       end if;
       assert(Kf[j] >= 0, "Negative friction coefficient");
+      Kf[j] = Cf[j]*omega_hyd*l/(2*A^3)
+        "Relationship between friction coefficient and Fanning friction factor";
       Kfl[j] = wnom/Nt*wnf*Kf[j];
     end for;
 
@@ -1621,7 +1652,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       else
         wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
       end if;
-      dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else homotopy(smooth(1,
+      dpf[j] = (if not useFrictionModel and (FFtype == FFtypes.NoFriction) then 0 else homotopy(smooth(1,
         Kf[j]*squareReg(w, wnom/Nt*wnf))*vbar[j], dpnom/(N - 1)/(wnom/Nt)*w));
       if avoidInletEnthalpyDerivative and j == 1 then
         // first volume properties computed by the outlet properties
@@ -1856,7 +1887,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
-    HeatTransfer heatTransfer2(
+    HeatTransfer2 heatTransfer2(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
@@ -1920,7 +1951,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     constant SI.Acceleration g=Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
       "The number of nodes is even";
-    SI.Length omega_hyd "Hydraulic perimeter (single tube)";
     Real Kf[N] "Friction coefficients";
     Real Cf[N] "Fanning friction factors";
     Real dwdt "Dynamic momentum term";
@@ -1939,6 +1969,22 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.Density rho[N] "Fluid density";
     SI.SpecificVolume v[N] "Fluid specific volume";
     SI.Mass Mtot "Total mass of fluid";
+
+    replaceable model FrictionModel = Friction.NoFriction
+      constrainedby Friction.FrictionModelBase
+      annotation (choicesAllMatching=true, Dialog(enable = useFrictionModel));
+
+    FrictionModel frictionModel(
+      redeclare package Medium = Medium,
+      final N=N,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final wnom=wnom/Nt,
+      final w=w,
+      final fluidState=fluidState)
+      "Instantiated flow model";
+
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
@@ -1973,9 +2019,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     //Friction factor selection
-    omega_hyd = 4*A/Dhyd;
     for i in 1:N loop
-      if FFtype == FFtypes.Kfnom then
+      if useFrictionModel then
+        Cf[i] = frictionModel.Cf[i]*Kfc;
+      elseif FFtype == FFtypes.Kfnom then
         Kf[i] = Kfnom*Kfc;
       elseif FFtype == FFtypes.OpPoint then
         Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
@@ -1987,6 +2034,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
             Dhyd/A,
             e,
             Medium.dynamicViscosity(fluidState[i]))*Kfc;
+      elseif FFtype == FFtypes.External then
+        Cf[i] = Kfc*Cfcorr(w[i],Dhyd,A,Medium.dynamicViscosity(fluidState[i]));
       elseif FFtype == FFtypes.NoFriction then
         Cf[i] = 0;
       end if;
@@ -2399,7 +2448,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
     Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
-    SI.Length omega_hyd "Hydraulic perimeter (single tube)";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p "Fluid pressure";
     SI.Pressure Dpfric "Pressure drop due to friction";
@@ -2428,6 +2476,22 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real Kf[N] "Friction coefficient";
     Real Cf[N] "Fanning friction factor";
     Real Phi[N] "Two-phase friction multiplier";
+
+    replaceable model FrictionModel = Friction.NoFriction
+      constrainedby Friction.FrictionModelBase
+      annotation (choicesAllMatching=true, Dialog(enable = useFrictionModel));
+
+    FrictionModel frictionModel(
+      redeclare package Medium = Medium,
+      final N=N,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd,
+      final wnom=wnom/Nt,
+      final w=w,
+      final fluidState=fluidState)
+      "Instantiated flow model";
+
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
@@ -2500,14 +2564,15 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
 
     //Friction factor calculation
-    omega_hyd = 4*A/Dhyd;
     for i in 1:N loop
-      if FFtype == FFtypes.NoFriction then
+      if useFrictionModel then
+        Cf[i] = frictionModel.Cf[i]*Kfc;
+      elseif FFtype == FFtypes.NoFriction then
         Cf[i] = 0;
       elseif FFtype == FFtypes.Cfnom then
         Cf[i] = Cfnom*Kfc;
       else
-        assert(true, "Unsupported friction factor selection");
+        assert(false, "Unsupported friction factor selection");
       end if;
       Kf[i] = Cf[i]*omega_hyd*L/(2*A^3)
         "Relationship between friction coefficient and Fanning friction factor";
@@ -5464,21 +5529,22 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       parameter SI.Length omega
         "Perimeter of heat transfer surface (single tube)";
       parameter SI.Length Dhyd = omega/pi "Hydraulic Diameter (single tube)";
+      final parameter SI.Length omega_hyd = 4*A/Dhyd "Wet perimeter (single tube)";
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
-        annotation (Evaluate=true);
+        annotation (Evaluate=true, Dialog(enable = not useFrictionModel));
       parameter SI.PressureDifference dpnom = 0
         "Nominal pressure drop (friction term only!)";
       parameter Real Kfnom = 0
         "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)"
-       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
+       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom) and not useFrictionModel));
       parameter Medium.Density rhonom=0 "Nominal inlet density"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint)));
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint) and not useFrictionModel));
       parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom) and not useFrictionModel));
       parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)));
+        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook) or useFrictionModel));
       parameter SI.PerUnit Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
         "Inertial phenomena accounted for"
@@ -5517,8 +5583,18 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       parameter Boolean noInitialPressure=false
         "Remove initial equation on pressure"
         annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+      parameter Boolean useFrictionModel=false
+        "Use replaceable model for friction factor"
+        annotation (choices(checkBox=true));
+
       constant SI.Acceleration g=Modelica.Constants.g_n;
       function squareReg = ThermoPower.Functions.squareReg;
+
+      replaceable function Cfcorr =
+        ThermoPower.Functions.FrictionFactors.NoFriction constrainedby
+        ThermoPower.Functions.FrictionFactors.BaseFFcorr
+        "External Fanning friction factor correlation"
+        annotation(choicesAllMatching = true, Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.External)));
 
       FlangeA infl(
         h_outflow(start=hstartin),

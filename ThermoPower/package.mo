@@ -1994,6 +1994,29 @@ This characteristic is such that the relative change of the flow coefficient is 
       end SplineFlow;
     end Models;
   end FanCharacteristics;
+
+  package FrictionFactors "Friction factor correlations"
+
+    partial function BaseFFcorr
+      "Base friction factor correlation (as a function of Re)"
+      extends Modelica.Icons.Function;
+      input SI.MassFlowRate w;
+      input SI.Length Dhyd;
+      input SI.Area A;
+      input SI.DynamicViscosity mu;
+      output SI.CoefficientOfFriction f;
+
+    end BaseFFcorr;
+
+    function NoFriction "No friction"
+      extends BaseFFcorr;
+
+    algorithm
+      f := 0;
+    end NoFriction;
+
+  end FrictionFactors;
+
   annotation (Documentation(info="<HTML>
 This package contains general-purpose functions and models
 </HTML>"));
