@@ -4423,7 +4423,7 @@ li><i>1 Jul 2004</i>
     omega = der(phi);
     W = omega*MechPort.tau;
 
-    n = Modelica.SIunits.Conversions.to_rpm(omega) "Rotational speed";
+    n =Modelica.Units.Conversions.to_rpm(omega)    "Rotational speed";
     annotation (
       Icon(graphics={Text(extent={{-10,104},{18,84}}, textString="Np")}),
       Diagram(graphics),
@@ -4767,7 +4767,7 @@ li><i>1 Jul 2004</i>
   end BarometricCondenser;
 
   model CoolingTower "Cooling tower with variable speed fan"
-    import Modelica.SIunits.Conversions;
+    import Modelica.Units.Conversions;
     package Water = Modelica.Media.Water.StandardWater;
     package DryAir = Modelica.Media.Air.SimpleAir;
 

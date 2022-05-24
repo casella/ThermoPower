@@ -954,7 +954,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
         "Constant heat transfer coefficient";
        parameter Boolean adaptiveAverageTemperature = true
         "Adapt the average temperature at low flow rates";
-       parameter Modelica.SIunits.PerUnit sigma = 0.1
+       parameter Modelica.Units.SI.PerUnit sigma=0.1
         "Fraction of nominal flow rate below which the heat transfer is computed on outlet volume temperatures";
 
        SI.PerUnit w_wnom "Ratio between actual and nominal flow rate";
@@ -1080,7 +1080,7 @@ the global nominal thermal conductance UA is given instead of the nominal specif
         "Nominal flow rate for heat transfer correlation (single tube)";
        parameter Boolean adaptiveAverageTemperature = true
         "Adapt the average temperature at low flow rates";
-       parameter Modelica.SIunits.PerUnit sigma = 0.1
+      parameter Modelica.Units.SI.PerUnit sigma=0.1
         "Fraction of nominal flow rate below which the heat transfer is computed on outlet volume temperatures";
        parameter Boolean useHomotopy = true
        "use nominal heat transfer coefficient for simplified model";
@@ -1621,7 +1621,7 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
       partial model PartialMaterial
         "Partial material properties (base model of all material models)"
 
-        import Modelica.SIunits.*;
+        import Modelica.Units.SI.*;
 
         // Constants to be set in Material
         constant String materialName "Name of the material";
@@ -1763,7 +1763,7 @@ This model computes the thermal and mechanical properties of a generic material.
     package Functions
       "Utility functions. Provide conversions and interpolation for table data."
       function CtoKTable
-        extends Modelica.SIunits.Conversions.ConversionIcon;
+        extends Modelica.Units.Icons.Conversion;
 
         input Real[:, :] table_degC;
         output Real table_degK[size(table_degC, 1), size(table_degC, 2)];
@@ -1771,14 +1771,14 @@ This model computes the thermal and mechanical properties of a generic material.
         table_degK := table_degC;
 
         for i in 1:size(table_degC, 1) loop
-          table_degK[i, 1] := Modelica.SIunits.Conversions.from_degC(table_degC[
-            i, 1]);
+          table_degK[i, 1] :=Modelica.Units.Conversions.from_degC(table_degC[i,
+            1]);
         end for;
       end CtoKTable;
 
       package Polynomials_Temp "Temporary Functions operating on polynomials (including polynomial fitting), extracted from Modelica.Media.Incompressible.TableBased;
    only to be used in Material.MaterialTable"
-        extends Modelica.Icons.Library;
+        extends Modelica.Icons.Package;
 
         function evaluate "Evaluate polynomial at a given abszissa value"
           extends Modelica.Icons.Function;
@@ -1939,15 +1939,15 @@ This model computes the thermal and mechanical properties of a generic material.
 
     package Test "Test cases"
       model TestMaterial
-        import Modelica.SIunits.*;
+        import Modelica.Units.SI.*;
         replaceable Metals.CarbonSteel_A106C Material(npol=3) constrainedby
           Interfaces.PartialMaterial "Material model";
-        Temp_K T;
-        Temp_C T_C;
+        Modelica.Units.SI.Temperature T;
+        Modelica.Units.NonSI.Temperature_degC T_C;
         Stress E;
       equation
         T_C = 21 + 500*time;
-        T = Modelica.SIunits.Conversions.from_degC(T_C);
+        T =Modelica.Units.Conversions.from_degC(T_C);
         Material.T = T;
         E = Material.yieldStress;
       end TestMaterial;
@@ -2129,7 +2129,8 @@ This package contains models to compute the material properties needed to model 
       parameter SI.MassFlowRate wnom "Nominal mass flow rate (single tube)"
         annotation(Dialog(enable=false, tab = "Set by Flow1D model"));
       final parameter SI.Length l=L/(Nw) "Length of a single volume";
-      parameter Modelica.SIunits.PerUnit kc = 1 "Correction factor for heat transfer";
+      parameter Modelica.Units.SI.PerUnit kc=1
+        "Correction factor for heat transfer";
 
       Medium.Temperature T[Nf] "Temperatures at the fluid side nodes";
       Medium.Temperature Tw[Nw] "Temperatures of the wall volumes";
@@ -3113,7 +3114,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
 
   model CylinderFourier
     "Thermal model of a hollow cylinder by Fourier's equation - 1 axial node and Nr radial nodes"
-    import Modelica.SIunits.*;
+    import Modelica.Units.SI.*;
     import ThermoPower.Choices.CylinderFourier.NodeDistribution;
     extends ThermoPower.Icons.MetalWall;
 
