@@ -1536,6 +1536,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Units.LiquidDensity rhol "Saturated liquid density";
     Units.GasDensity rhov "Saturated vapour density";
     SI.Mass M "Fluid mass";
+    SI.Mass Mtot "Fluid mass (total)";
   protected
     SI.DerEnthalpyByPressure dhldp
       "Derivative of saturated liquid enthalpy by pressure";
@@ -1757,6 +1758,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     Q = heatTransfer.Q "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Fluid mass (single tube)";
+    Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
       "Residence time";
 
