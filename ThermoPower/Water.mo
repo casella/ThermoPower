@@ -3880,8 +3880,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     vapourState = Medium.setState_phX(p, hv);
     Tv = Medium.temperature(vapourState);
     rhov = Medium.density(vapourState);
-    sat.psat = p;
-    sat.Tsat = Medium.saturationTemperature(p);
+    sat = Medium.setSat_p(p);
     hls = Medium.bubbleEnthalpy(sat);
     hvs = Medium.dewEnthalpy(sat);
     Ts = sat.Tsat;
