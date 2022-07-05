@@ -3840,8 +3840,8 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     end if;
     Mv = Vv*rhov "Vapour volume mass";
     Ml = Vl*rhol "Liquid volume mass";
-    Ev = Mv*Medium.specificInternalEnergy(vapourState) "Vapour volume energy";
-    El = Ml*Medium.specificInternalEnergy(liquidState) "Liquid volume energy";
+    Ev = hv*Mv - p*Vv "Vapour volume energy";
+    El = hl*Ml - p*Vl "Liquid volume energy";
     wev = xl*rhol*Vl/tauev "Bulk evaporation flow rate in the liquid volume";
     wc = (1 - xv)*rhov*Vv/tauc
       "Bulk condensation flow rate in the vapour volume";
@@ -3876,10 +3876,10 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
     // Fluid properties
     liquidState = Medium.setState_phX(p, hl);
     Tl = Medium.temperature(liquidState);
-    rhol = Medium.density(liquidState);
+    rhol = Medium.density_ph(p,hl);
     vapourState = Medium.setState_phX(p, hv);
     Tv = Medium.temperature(vapourState);
-    rhov = Medium.density(vapourState);
+    rhov = Medium.density_ph(p, hv);
     sat = Medium.setSat_p(p);
     hls = Medium.bubbleEnthalpy(sat);
     hvs = Medium.dewEnthalpy(sat);
