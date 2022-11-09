@@ -137,40 +137,40 @@ package PowerPlants "Models of thermoelectrical power plants components"
       model GasTurbineSimplified
         extends
           ThermoPower.PowerPlants.GasTurbine.Interfaces.GasTurbineSimplified;
-        parameter Modelica.SIunits.Power maxPower=235e6;
-        parameter Modelica.SIunits.MassFlowRate flueGasNomFlowRate=614
+        parameter Modelica.Units.SI.Power maxPower=235e6;
+        parameter Modelica.Units.SI.MassFlowRate flueGasNomFlowRate=614
           "Nominal flue gas flow rate";
-        parameter Modelica.SIunits.MassFlowRate flueGasMinFlowRate=454
+        parameter Modelica.Units.SI.MassFlowRate flueGasMinFlowRate=454
           "Minimum flue gas flow rate";
-        parameter Modelica.SIunits.MassFlowRate flueGasOffFlowRate=
+        parameter Modelica.Units.SI.MassFlowRate flueGasOffFlowRate=
             flueGasMinFlowRate/100 "Flue gas flow rate with GT switched off";
-        parameter Modelica.SIunits.MassFlowRate fuelNomFlowRate=12.1
+        parameter Modelica.Units.SI.MassFlowRate fuelNomFlowRate=12.1
           "Nominal fuel flow rate";
-        parameter Modelica.SIunits.MassFlowRate fuelIntFlowRate=7.08
+        parameter Modelica.Units.SI.MassFlowRate fuelIntFlowRate=7.08
           "Intermediate fuel flow rate";
-        parameter Modelica.SIunits.MassFlowRate fuelMinFlowRate=4.58
+        parameter Modelica.Units.SI.MassFlowRate fuelMinFlowRate=4.58
           "Minimum fuel flow rate";
-        parameter Modelica.SIunits.MassFlowRate fuelOffFlowRate=0.1
+        parameter Modelica.Units.SI.MassFlowRate fuelOffFlowRate=0.1
           "Flue gas flow rate with GT switched off";
         parameter Real constTempLoad=0.60
           "Fraction of load from which the temperature is kept constant";
         parameter Real intLoad=0.42
           "Intermediate load for fuel consumption computations";
-        parameter Modelica.SIunits.Temperature flueGasNomTemp=843
+        parameter Modelica.Units.SI.Temperature flueGasNomTemp=843
           "Maximum flue gas temperature";
-        parameter Modelica.SIunits.Temperature flueGasMinTemp=548
+        parameter Modelica.Units.SI.Temperature flueGasMinTemp=548
           "Minimum flue gas temperature (zero electrical load)";
-        parameter Modelica.SIunits.Temperature flueGasOffTemp=363.15
+        parameter Modelica.Units.SI.Temperature flueGasOffTemp=363.15
           "Flue gas temperature with GT switched off";
-        parameter Modelica.SIunits.SpecificEnthalpy fuel_LHV=49e6
+        parameter Modelica.Units.SI.SpecificEnthalpy fuel_LHV=49e6
           "Fuel Lower Heating Value";
-        parameter Modelica.SIunits.SpecificEnthalpy fuel_HHV=55e6
+        parameter Modelica.Units.SI.SpecificEnthalpy fuel_HHV=55e6
           "Fuel Higher Heating Value";
         FlueGasMedium.BaseProperties gas;
-        Modelica.SIunits.MassFlowRate w;
-        Modelica.SIunits.Power P_el=noEvent(if GTLoad > 0 then GTLoad*maxPower
+        Modelica.Units.SI.MassFlowRate w;
+        Modelica.Units.SI.Power P_el=noEvent(if GTLoad > 0 then GTLoad*maxPower
              else 0) "Electrical power output";
-        Modelica.SIunits.MassFlowRate fuelFlowRate "Fuel flow rate";
+        Modelica.Units.SI.MassFlowRate fuelFlowRate "Fuel flow rate";
       equation
         gas.p = flueGasOut.p;
         gas.Xi = FlueGasMedium.reference_X[1:FlueGasMedium.nXi];
@@ -3936,8 +3936,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Integer Np0=1 "Nominal number of pumps in parallel";
         parameter SI.Volume V=0 "Pump Internal Volume";
         parameter SI.Density rho0 "Nominal density";
-        parameter SI.Conversions.NonSIunits.AngularVelocity_rpm n0
-          "Nominal rpm";
+        parameter Modelica.Units.NonSI.AngularVelocity_rpm n0 "Nominal rpm";
         parameter SI.Pressure nominalOutletPressure "Nominal outlet pressure";
         parameter SI.Pressure nominalInletPressure "Nominal inlet pressure";
         parameter SI.MassFlowRate nominalFlow "Nominal mass flow rate";
@@ -4007,8 +4006,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Integer Np0=1 "Nominal number of pumps in parallel";
         parameter SI.Volume V=0 "Pump Internal Volume";
         parameter SI.Density rho0 "Nominal density";
-        parameter SI.Conversions.NonSIunits.AngularVelocity_rpm n0
-          "Nominal rpm";
+        parameter Modelica.Units.NonSI.AngularVelocity_rpm n0 "Nominal rpm";
         parameter SI.Pressure nominalOutletPressure "Nominal outlet pressure";
         parameter SI.Pressure nominalInletPressure "Nominal inlet pressure";
         parameter SI.MassFlowRate nominalFlow "Nominal mass flow rate";
@@ -4165,8 +4163,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
         parameter Integer Np0=1 "Nominal number of pumps in parallel";
         parameter SI.Volume V=0 "Pump Internal Volume";
         parameter SI.Density rho0 "Nominal density";
-        parameter SI.Conversions.NonSIunits.AngularVelocity_rpm n0
-          "Nominal rpm";
+        parameter Modelica.Units.NonSI.AngularVelocity_rpm n0 "Nominal rpm";
         parameter SI.Pressure nominalOutletPressure "Nominal outlet pressure";
         parameter SI.Pressure nominalInletPressure "Nominal inlet pressure";
         parameter SI.MassFlowRate nominalFlow "Nominal mass flow rate";
@@ -4630,7 +4627,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
       model ConvParallel
         "Convective heat transfer between one source and two objects in parallel"
-        import Modelica.SIunits.*;
+        import Modelica.Units.SI.*;
         extends Modelica.Icons.ObsoleteModel;
         parameter Integer N=2 "Number of Nodes";
         parameter Area As=Aa + Ab "Area of source" annotation (Evaluate=true);
@@ -13583,7 +13580,7 @@ package PowerPlants "Models of thermoelectrical power plants components"
 
       model PrescribedSpeed "Constant speed, not dependent on torque"
         extends Modelica.Mechanics.Rotational.Interfaces.PartialTorque;
-        Modelica.SIunits.AngularVelocity w
+        Modelica.Units.SI.AngularVelocity w
           "Angular velocity of flange with respect to support (= der(phi))";
         Modelica.Blocks.Interfaces.RealInput w_fixed annotation (Placement(
               transformation(extent={{-116,44},{-84,76}}, rotation=0)));
@@ -14064,7 +14061,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
         //Valves Parameters
         parameter Real valveHP_Cv=0 "Cv (US) flow coefficient of the HP valve"
           annotation (Dialog(group="HP valves"));
-        parameter Modelica.SIunits.Pressure valveHP_dpnom
+        parameter Modelica.Units.SI.Pressure valveHP_dpnom
           "Nominal pressure drop of the HP valve"
           annotation (Dialog(group="HP valves"));
         parameter Real bypassHP_Cv=0
@@ -14072,7 +14069,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Dialog(group="HP valves"));
         parameter Real valveIP_Cv=0 "Cv (US) flow coefficient of the IP valve"
           annotation (Dialog(group="IP valves"));
-        parameter Modelica.SIunits.Pressure valveIP_dpnom
+        parameter Modelica.Units.SI.Pressure valveIP_dpnom
           "Nominal pressure drop of the IP valve"
           annotation (Dialog(group="IP valves"));
         parameter Real bypassIP_Cv=0
@@ -14083,7 +14080,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           annotation (Dialog(group="IP valves"));
         parameter Real valveLP_Cv=0 "Cv (US) flow coefficient of the LP valve"
           annotation (Dialog(group="LP valves"));
-        parameter Modelica.SIunits.Pressure valveLP_dpnom
+        parameter Modelica.Units.SI.Pressure valveLP_dpnom
           "Nominal pressure drop of the LP valve"
           annotation (Dialog(group="LP valves"));
         parameter Real bypassLP_Cv=0
@@ -17203,7 +17200,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
           //Variable
           SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
+          Modelica.Units.NonSI.AngularVelocity_rpm n "Rotational speed";
           SI.Angle delta(start=delta_start) "Loaded angle";
           SI.AngularVelocity d_delta "Variation of loaded angle";
           SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
@@ -17223,7 +17220,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           D = 2*r*sqrt(Pmax*J*omega_nom*Np/(Np^2));
           omega = der(shaft.phi);
           Pm = omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega)
+          n =Modelica.Units.Conversions.to_rpm(omega)
             "Rotational speed in rpm";
           omegaGrid = 2*Modelica.Constants.pi*powerConnection.f;
           powerConnection.W = -Pe;
@@ -17268,7 +17265,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           parameter SI.Angle delta_start "Start value of loaded angle";
 
           SI.AngularVelocity omega "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
+          Modelica.Units.NonSI.AngularVelocity_rpm n "Rotational speed";
           SI.Angle delta(start=delta_start) "Loaded angle";
           SI.AngularVelocity d_delta "Variation of loaded angle";
           SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
@@ -17287,7 +17284,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           D = 2*r*sqrt(Pmax*J*omega*Np/(Np^2));
           omega = der(shaft.phi);
           Pm = omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega)
+          n =Modelica.Units.Conversions.to_rpm(omega)
             "Rotational speed in rpm";
           omegaGrid = 2*Modelica.Constants.pi*powerConnection.f;
           powerConnection.W = -Pe;
@@ -17337,7 +17334,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
             "Angulaty velocity of shaft start value";
 
           SI.AngularVelocity omega(start=omega_start) "Shaft angular velocity";
-          SI.Conversions.NonSIunits.AngularVelocity_rpm n "Rotational speed";
+          Modelica.Units.NonSI.AngularVelocity_rpm n "Rotational speed";
           SI.Angle delta(start=delta_start) "Loaded angle";
           SI.AngularVelocity d_delta "Variation of loaded angle";
           SI.AngularVelocity omegaGrid "Angulary velocity in the grid";
@@ -17365,7 +17362,7 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
           D = 2*r*sqrt(Pmax*J*omega_nom*Np/(Np^2));
           omega = der(shaft.phi);
           Pm = omega*shaft.tau;
-          n = Modelica.SIunits.Conversions.to_rpm(omega)
+          n =Modelica.Units.Conversions.to_rpm(omega)
             "Rotational speed in rpm";
           omegaGrid = 2*Modelica.Constants.pi*powerConnection.f;
           powerConnection.W = -Pe;
@@ -18712,8 +18709,8 @@ Model of <b>fixed</b> angular verlocity of flange, not dependent on torque.
 
     model PID "PID controller with anti-windup"
       parameter Real Kp "Proportional gain (normalised units)";
-      parameter Modelica.SIunits.Time Ti "Integral time";
-      parameter Modelica.SIunits.Time Td=0 "Derivative time";
+      parameter Modelica.Units.SI.Time Ti "Integral time";
+      parameter Modelica.Units.SI.Time Td=0 "Derivative time";
       parameter Real Nd=1 "Derivative action up to Nd / Td rad/s";
       parameter Real Ni=1
         "Ni*Ti is the time constant of anti-windup compensation";

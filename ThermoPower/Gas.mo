@@ -2311,21 +2311,21 @@ This model extends the CombustionChamber Base model, with the definition of the 
     parameter String fileName="noName" "File where matrix is stored";
     parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
-    Modelica.Blocks.Tables.CombiTable2D Eta(
+    Modelica.Blocks.Tables.CombiTable2Ds Eta(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableEta,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabEta",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-12,60},{8,80}}, rotation=0)));
-    Modelica.Blocks.Tables.CombiTable2D PressRatio(
+    Modelica.Blocks.Tables.CombiTable2Ds PressRatio(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePR,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPR",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-12,0},{8,20}}, rotation=0)));
-    Modelica.Blocks.Tables.CombiTable2D Phic(
+    Modelica.Blocks.Tables.CombiTable2Ds Phic(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePhic,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPhic",
@@ -2409,7 +2409,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
     Real N_T "Referred speed";
     Real N_T_design "Referred design speed";
     Real phic "Flow number";
-    Modelica.Blocks.Tables.CombiTable2D Phic(
+    Modelica.Blocks.Tables.CombiTable2Ds Phic(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePhic,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPhic",
@@ -2417,7 +2417,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-10,10},{10,30}}, rotation=
               0)));
-    Modelica.Blocks.Tables.CombiTable2D Eta(
+    Modelica.Blocks.Tables.CombiTable2Ds Eta(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableEta,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabEta",
@@ -2498,7 +2498,7 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     Real N_T_design "Referred design speed";
     Real phic "Flow number";
 
-    Modelica.Blocks.Tables.CombiTable2D Eta(
+    Modelica.Blocks.Tables.CombiTable2Ds Eta(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableEta,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabEta",
@@ -2642,28 +2642,28 @@ This model adds the performance characteristics to the GTunit_base model, when o
     parameter String fileName="noName" "File where matrix is stored";
     parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
-    Modelica.Blocks.Tables.CombiTable2D PowerOut(
+    Modelica.Blocks.Tables.CombiTable2Ds PowerOut(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableHI,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabHI",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-12,36},{8,56}}, rotation=0)));
-    Modelica.Blocks.Tables.CombiTable2D PressRatio(
+    Modelica.Blocks.Tables.CombiTable2Ds PressRatio(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePR,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPR",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-12,6},{8,26}}, rotation=0)));
-    Modelica.Blocks.Tables.CombiTable2D MassFlowRate(
+    Modelica.Blocks.Tables.CombiTable2Ds MassFlowRate(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableW,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabW",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
-      annotation (Placement(transformation(extent={{-10,-24},{10,-4}}, rotation=
-             0)));
+      annotation (Placement(transformation(extent={{-10,-24},{10,-4}}, rotation
+            =0)));
     SI.Temperature Tsync
       "temperature corresponding to omega referred in synchronous conditions";
   equation
@@ -2727,7 +2727,7 @@ The packages Medium are redeclared and a mass balance determines the composition
     Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort annotation (
         Placement(transformation(extent={{78,6},{108,36}}, rotation=0)));
   equation
-    n = Modelica.SIunits.Conversions.to_rpm(omega) "Rotational speed";
+    n =Modelica.Units.Conversions.to_rpm(omega)    "Rotational speed";
 
     // Mechanical boundary condition
     phi = MechPort.phi;
@@ -3362,11 +3362,11 @@ This is the model-base of a Combustion Chamber, with a constant volume.
       replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
       replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
       replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
-      parameter Modelica.SIunits.Pressure pstart "start pressure value"
+      parameter Modelica.Units.SI.Pressure pstart "start pressure value"
         annotation (Dialog(tab="Initialisation"));
       parameter Exhaust.Temperature Tstart "start temperature value"
         annotation (Dialog(tab="Initialisation"));
-      parameter Modelica.SIunits.MassFraction Xstart[Air.nX]=Air.reference_X
+      parameter Modelica.Units.SI.MassFraction Xstart[Air.nX]=Air.reference_X
         "start gas composition" annotation (Dialog(tab="Initialisation"));
       constant Exhaust.AbsolutePressure pnom=1.013e5 "ISO reference pressure";
       constant Air.Temperature Tnom=288.15 "ISO reference temperature";

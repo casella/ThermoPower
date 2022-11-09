@@ -1,8 +1,8 @@
 within ;
 package ThermoPower "Open library for thermal power plant simulation"
   extends Modelica.Icons.Package;
-  import SI = Modelica.SIunits;
-  import NonSI = Modelica.SIunits.Conversions.NonSIunits;
+  import      Modelica.Units.SI;
+  import         Modelica.Units.NonSI;
 
 
 model System "System wide properties and defaults"
@@ -1391,7 +1391,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
   end linspaceExt;
 
   block OffsetController "Offset computation for steady-state conditions"
-    extends Modelica.Blocks.Interfaces.BlockIcon;
+    extends Modelica.Blocks.Icons.Block;
     parameter Real steadyStateGain=0.0
       "0.0: Adds offset to input - 1.0: Closed loop action to find steady state";
     parameter Real SP0 "Initial setpoint for the controlled variable";
@@ -1754,7 +1754,7 @@ This characteristic is such that the relative change of the flow coefficient is 
   end ValveCharacteristics;
 
   package FanCharacteristics "Functions for fan characteristics"
-    import NonSI = Modelica.SIunits.Conversions.NonSIunits;
+    import         Modelica.Units.NonSI;
 
     partial function baseFlow "Base class for fan flow characteristics"
       extends Modelica.Icons.Function;
@@ -1766,14 +1766,14 @@ This characteristic is such that the relative change of the flow coefficient is 
     partial function basePower
       "Base class for fan power consumption characteristics"
       extends Modelica.Icons.Function;
-      input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
+      input Modelica.Units.SI.VolumeFlowRate q_flow "Volumetric flow rate";
       input Real bladePos=1 "Blade position";
-      output Modelica.SIunits.Power consumption "Power consumption";
+      output Modelica.Units.SI.Power consumption "Power consumption";
     end basePower;
 
     partial function baseEfficiency "Base class for efficiency characteristics"
       extends Modelica.Icons.Function;
-      input Modelica.SIunits.VolumeFlowRate q_flow "Volumetric flow rate";
+      input Modelica.Units.SI.VolumeFlowRate q_flow "Volumetric flow rate";
       input Real bladePos=1 "Blade position";
       output Real eta "Efficiency";
     end baseEfficiency;
@@ -1786,10 +1786,11 @@ This characteristic is such that the relative change of the flow coefficient is 
 
     function linearFlow "Linear flow characteristic, fixed blades"
       extends baseFlow;
-      input Modelica.SIunits.VolumeFlowRate q_nom[2]
-        "Volume flow rate for two operating points (single fan)" annotation(Dialog);
-      input Modelica.SIunits.Height H_nom[2]
-        "Specific energy for two operating points" annotation(Dialog);
+      input Modelica.Units.SI.VolumeFlowRate q_nom[2]
+        "Volume flow rate for two operating points (single fan)"
+        annotation (Dialog);
+      input Modelica.Units.SI.Height H_nom[2]
+        "Specific energy for two operating points" annotation (Dialog);
       /* Linear system to determine the coefficients:
   H_nom[1] = c[1] + q_nom[1]*c[2];
   H_nom[2] = c[1] + q_nom[2]*c[2];
@@ -1804,10 +1805,11 @@ This characteristic is such that the relative change of the flow coefficient is 
 
     function quadraticFlow "Quadratic flow characteristic, fixed blades"
       extends baseFlow;
-      input Modelica.SIunits.VolumeFlowRate q_nom[3]
-        "Volume flow rate for three operating points (single fan)" annotation(Dialog);
-      input Modelica.SIunits.Height H_nom[3]
-        "Specific work for three operating points" annotation(Dialog);
+      input Modelica.Units.SI.VolumeFlowRate q_nom[3]
+        "Volume flow rate for three operating points (single fan)"
+        annotation (Dialog);
+      input Modelica.Units.SI.Height H_nom[3]
+        "Specific work for three operating points" annotation (Dialog);
     protected
       parameter Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
         "Squared nominal flow rates";
@@ -1849,10 +1851,11 @@ This characteristic is such that the relative change of the flow coefficient is 
 
     function polynomialFlow "Polynomial flow characteristic, fixed blades"
       extends baseFlow;
-      input Modelica.SIunits.VolumeFlowRate q_nom[:]
-        "Volume flow rate for N operating points (single fan)" annotation(Dialog);
-      input Modelica.SIunits.Height H_nom[:]
-        "Specific work for N operating points"                                      annotation(Dialog);
+      input Modelica.Units.SI.VolumeFlowRate q_nom[:]
+        "Volume flow rate for N operating points (single fan)"
+        annotation (Dialog);
+      input Modelica.Units.SI.Height H_nom[:]
+        "Specific work for N operating points" annotation (Dialog);
     protected
       parameter Integer N=size(q_nom, 1) "Number of nominal operating points";
       parameter Real q_nom_pow[N, N]={{q_nom[j]^(i - 1) for j in 1:N} for i in
@@ -1880,7 +1883,8 @@ This characteristic is such that the relative change of the flow coefficient is 
 
     function constantPower "Constant power consumption characteristic"
       extends FanCharacteristics.basePower;
-      input Modelica.SIunits.Power power=0 "Constant power consumption" annotation(Dialog);
+      input Modelica.Units.SI.Power power=0 "Constant power consumption"
+        annotation (Dialog);
     algorithm
       consumption := power;
     end constantPower;
@@ -1888,10 +1892,11 @@ This characteristic is such that the relative change of the flow coefficient is 
     function quadraticPower
       "Quadratic power consumption characteristic, fixed blades"
       extends basePower;
-      input Modelica.SIunits.VolumeFlowRate q_nom[3]
-        "Volume flow rate for three operating points (single fan)" annotation(Dialog);
-      input Modelica.SIunits.Power W_nom[3]
-        "Power consumption for three operating points" annotation(Dialog);
+      input Modelica.Units.SI.VolumeFlowRate q_nom[3]
+        "Volume flow rate for three operating points (single fan)"
+        annotation (Dialog);
+      input Modelica.Units.SI.Power W_nom[3]
+        "Power consumption for three operating points" annotation (Dialog);
     protected
       Real q_nom2[3]={q_nom[1]^2,q_nom[2]^2,q_nom[3]^2}
         "Squared nominal flow rates";
@@ -1910,7 +1915,7 @@ This characteristic is such that the relative change of the flow coefficient is 
       function quadraticFlowBlades
         "Quadratic flow characteristic, movable blades"
         extends Modelica.Icons.Function;
-        input Modelica.SIunits.VolumeFlowRate q_flow;
+        input Modelica.Units.SI.VolumeFlowRate q_flow;
         input Real bladePos;
         input Real bladePos_nom[:];
         input Real c[:, :]
@@ -1945,9 +1950,9 @@ This characteristic is such that the relative change of the flow coefficient is 
       function quadraticFlowBladesCoeff
         extends Modelica.Icons.Function;
         input Real bladePos_nom[:];
-        input Modelica.SIunits.VolumeFlowRate q_nom[3, :]
+        input Modelica.Units.SI.VolumeFlowRate q_nom[3,:]
           "Volume flow rate for three operating points at N_pos blade positionings";
-        input Modelica.SIunits.Height H_nom[3, :]
+        input Modelica.Units.SI.Height H_nom[3,:]
           "Specific work for three operating points at N_pos blade positionings";
         output Real c[3, size(bladePos_nom, 1)]
           "Coefficients of quadratic specific work characteristic";
@@ -2105,6 +2110,6 @@ This is a major new release, that has been in the making for 5 years. The new re
 <p>The ThermoPower package is licensed by Politecnico di Milano under the <b><a href=\"http://www.modelica.org/licenses/ModelicaLicense2\">Modelica License 2</a></b>. </p>
 <p><h4>Copyright &copy; 2002-2014, Politecnico di Milano.</h4></p>
 </html>"),
-  uses(Modelica(version="3.2.3")),
-  version="3.1");
+  uses(Modelica(version="4.0.0")),
+  version="3.2");
 end ThermoPower;
