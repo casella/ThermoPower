@@ -273,7 +273,7 @@ package Water "Models of components with water/steam as working fluid"
   model SourceMassFlow "Flowrate source for water/steam flows"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialPureSubstance "Medium model"
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Medium.AbsolutePressure p0=1e5 "Nominal pressure";
@@ -383,7 +383,7 @@ package Water "Models of components with water/steam as working fluid"
   model SinkMassFlow "Flowrate sink for water/steam flows"
     extends Icons.Water.SourceW;
     replaceable package Medium = StandardWater constrainedby
-      Modelica.Media.Interfaces.PartialPureSubstance "Medium model"
+      Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
     parameter Medium.MassFlowRate w0=0 "Nominal mass flowrate";
     parameter Medium.AbsolutePressure p0=1e5 "Nominal pressure";
