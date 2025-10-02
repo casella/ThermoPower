@@ -2311,21 +2311,21 @@ This model extends the CombustionChamber Base model, with the definition of the 
     parameter String fileName="noName" "File where matrix is stored";
     parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
-    Modelica.Blocks.Tables.CombiTable2D Eta(
+    Modelica.Blocks.Tables.CombiTable2Ds Eta(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableEta,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabEta",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-12,60},{8,80}}, rotation=0)));
-    Modelica.Blocks.Tables.CombiTable2D PressRatio(
+    Modelica.Blocks.Tables.CombiTable2Ds PressRatio(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePR,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPR",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-12,0},{8,20}}, rotation=0)));
-    Modelica.Blocks.Tables.CombiTable2D Phic(
+    Modelica.Blocks.Tables.CombiTable2Ds Phic(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePhic,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPhic",
@@ -2409,7 +2409,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
     Real N_T "Referred speed";
     Real N_T_design "Referred design speed";
     Real phic "Flow number";
-    Modelica.Blocks.Tables.CombiTable2D Phic(
+    Modelica.Blocks.Tables.CombiTable2Ds Phic(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePhic,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPhic",
@@ -2417,7 +2417,7 @@ This model adds the performance characteristics to the Compressor_Base model, by
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-10,10},{10,30}}, rotation=
               0)));
-    Modelica.Blocks.Tables.CombiTable2D Eta(
+    Modelica.Blocks.Tables.CombiTable2Ds Eta(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableEta,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabEta",
@@ -2498,7 +2498,7 @@ This model adds the performance characteristics to the Turbine_Base model, by me
     Real N_T_design "Referred design speed";
     Real phic "Flow number";
 
-    Modelica.Blocks.Tables.CombiTable2D Eta(
+    Modelica.Blocks.Tables.CombiTable2Ds Eta(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableEta,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabEta",
@@ -2642,21 +2642,21 @@ This model adds the performance characteristics to the GTunit_base model, when o
     parameter String fileName="noName" "File where matrix is stored";
     parameter TableTypes Table = TableTypes.matrix
       "Selection of the way of definition of table matrix";
-    Modelica.Blocks.Tables.CombiTable2D PowerOut(
+    Modelica.Blocks.Tables.CombiTable2Ds PowerOut(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableHI,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabHI",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-12,36},{8,56}}, rotation=0)));
-    Modelica.Blocks.Tables.CombiTable2D PressRatio(
+    Modelica.Blocks.Tables.CombiTable2Ds PressRatio(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tablePR,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabPR",
       fileName=if (Table == TableTypes.matrix) then "NoName" else fileName,
       smoothness=Modelica.Blocks.Types.Smoothness.ContinuousDerivative)
       annotation (Placement(transformation(extent={{-12,6},{8,26}}, rotation=0)));
-    Modelica.Blocks.Tables.CombiTable2D MassFlowRate(
+    Modelica.Blocks.Tables.CombiTable2Ds MassFlowRate(
       tableOnFile=if (Table == TableTypes.matrix) then false else true,
       table=tableW,
       tableName=if (Table == TableTypes.matrix) then "NoName" else "tabW",
