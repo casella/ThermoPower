@@ -2727,7 +2727,7 @@ The packages Medium are redeclared and a mass balance determines the composition
     Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort annotation (
         Placement(transformation(extent={{78,6},{108,36}}, rotation=0)));
   equation
-    n = Modelica.SIunits.Conversions.to_rpm(omega) "Rotational speed";
+    n = Modelica.Units.Conversions.to_rpm(omega) "Rotational speed";
 
     // Mechanical boundary condition
     phi = MechPort.phi;
@@ -3362,11 +3362,11 @@ This is the model-base of a Combustion Chamber, with a constant volume.
       replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
       replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
       replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
-      parameter Modelica.SIunits.Pressure pstart "start pressure value"
+      parameter SI.Pressure pstart "start pressure value"
         annotation (Dialog(tab="Initialisation"));
       parameter Exhaust.Temperature Tstart "start temperature value"
         annotation (Dialog(tab="Initialisation"));
-      parameter Modelica.SIunits.MassFraction Xstart[Air.nX]=Air.reference_X
+      parameter SI.MassFraction Xstart[Air.nX]=Air.reference_X
         "start gas composition" annotation (Dialog(tab="Initialisation"));
       constant Exhaust.AbsolutePressure pnom=1.013e5 "ISO reference pressure";
       constant Air.Temperature Tnom=288.15 "ISO reference temperature";

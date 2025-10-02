@@ -1849,7 +1849,7 @@ Very simple plant model, providing boundary conditions to the <tt>HRB</tt> model
       model DigitalPI
         extends Modelica.Blocks.Interfaces.DiscreteBlock;
         parameter Real Kp "Gain";
-        parameter Modelica.SIunits.Time Ti(min=0) "Integral time";
+        parameter SI.Time Ti(min=0) "Integral time";
         parameter Real b(min=0) = 1 "Set-point weight (proportional action)";
         parameter Real CSmax "Control signal saturation upper bound";
         parameter Real CSmin "Control signal saturation lower bound";
@@ -2029,9 +2029,9 @@ Casella</a>:<br>
       model OpenLoopSimulatorHtc
         "Open-loop plant simulator with parameter computation"
         extends OpenLoopSimulatorSS(Plant(Boiler(gamma_nom = gamma_unknown)));
-        parameter Modelica.SIunits.CoefficientOfHeatTransfer gamma_unknown(fixed = false, start = 150);
+        parameter SI.CoefficientOfHeatTransfer gamma_unknown(fixed = false, start = 150);
       initial equation
-        Plant.GasOut.T = Modelica.SIunits.Conversions.from_degC(130);
+        Plant.GasOut.T = Modelica.Units.Conversions.from_degC(130);
         annotation (Documentation(revisions="<html>
 <ul>
 <li><i>20 Sep 2013</i>
@@ -2489,19 +2489,19 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
       model PrescribedSpeedPump "Prescribed speed pump"
         replaceable package FluidMedium =
             Modelica.Media.Interfaces.PartialTwoPhaseMedium;
-        parameter Modelica.SIunits.VolumeFlowRate q_nom[3]
+        parameter SI.VolumeFlowRate q_nom[3]
           "Nominal volume flow rates";
-        parameter Modelica.SIunits.Height head_nom[3] "Nominal heads";
-        parameter Modelica.SIunits.Density rho0 "Nominal density";
-        parameter Modelica.SIunits.Conversions.NonSIunits.AngularVelocity_rpm n0
+        parameter SI.Height head_nom[3] "Nominal heads";
+        parameter SI.Density rho0 "Nominal density";
+        parameter Modelica.Units.NonSI.AngularVelocity_rpm n0
           "Nominal rpm";
-        parameter Modelica.SIunits.Pressure nominalOutletPressure
+        parameter SI.Pressure nominalOutletPressure
           "Nominal live steam pressure";
-        parameter Modelica.SIunits.Pressure nominalInletPressure
+        parameter SI.Pressure nominalInletPressure
           "Nominal condensation pressure";
-        parameter Modelica.SIunits.MassFlowRate nominalMassFlowRate
+        parameter SI.MassFlowRate nominalMassFlowRate
           "Nominal steam mass flow rate";
-        parameter Modelica.SIunits.SpecificEnthalpy hstart=1e5
+        parameter SI.SpecificEnthalpy hstart=1e5
           "Fluid Specific Enthalpy Start Value";
         parameter Boolean SSInit=false "Steady-state initialization";
 
@@ -2572,10 +2572,10 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         replaceable package Medium = Water.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialMedium "Medium model";
         //Parameters
-        parameter Modelica.SIunits.Pressure p "Nominal inlet pressure";
-        parameter Modelica.SIunits.Volume Vtot=10
+        parameter SI.Pressure p "Nominal inlet pressure";
+        parameter SI.Volume Vtot=10
           "Total volume of the fluid side";
-        parameter Modelica.SIunits.Volume Vlstart=0.15*Vtot
+        parameter SI.Volume Vlstart=0.15*Vtot
           "Start value of the liquid water volume"
           annotation (Dialog(tab="Initialisation"));
         parameter Choices.Init.Options initOpt=system.initOpt
@@ -2586,18 +2586,18 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
 
 
         //Variables
-        Modelica.SIunits.Density rhol "Density of saturated liquid";
-        Modelica.SIunits.Density rhov "Density of saturated steam";
+        SI.Density rhol "Density of saturated liquid";
+        SI.Density rhov "Density of saturated steam";
         Medium.SaturationProperties sat "Saturation properties";
         Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
         Medium.SpecificEnthalpy hv "Specific enthalpy of saturated vapour";
-        Modelica.SIunits.Mass M "Total mass, steam+liquid";
-        Modelica.SIunits.Mass Ml "Liquid mass";
-        Modelica.SIunits.Mass Mv "Steam mass";
-        Modelica.SIunits.Volume Vl(start=Vlstart) "Liquid volume";
-        Modelica.SIunits.Volume Vv "Steam volume";
-        Modelica.SIunits.Energy E "Internal energy";
-        Modelica.SIunits.Power Q "Thermal power";
+        SI.Mass M "Total mass, steam+liquid";
+        SI.Mass Ml "Liquid mass";
+        SI.Mass Mv "Steam mass";
+        SI.Volume Vl(start=Vlstart) "Liquid volume";
+        SI.Volume Vv "Steam volume";
+        SI.Energy E "Internal energy";
+        SI.Power Q "Thermal power";
 
         //Connectors
         Water.FlangeA steamIn(redeclare package Medium = Medium) annotation (
