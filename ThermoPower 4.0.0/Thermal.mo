@@ -1776,7 +1776,7 @@ This model computes the thermal and mechanical properties of a generic material.
 
       package Polynomials_Temp "Temporary Functions operating on polynomials (including polynomial fitting), extracted from Modelica.Media.Incompressible.TableBased;
    only to be used in Material.MaterialTable"
-        extends Modelica.Icons.Library;
+        extends Modelica.Icons.Package;
 
         function evaluate "Evaluate polynomial at a given abszissa value"
           extends Modelica.Icons.Function;
