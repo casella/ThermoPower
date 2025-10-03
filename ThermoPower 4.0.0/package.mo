@@ -1391,7 +1391,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
   end linspaceExt;
 
   block OffsetController "Offset computation for steady-state conditions"
-    extends Modelica.Blocks.Interfaces.BlockIcon;
+    extends Modelica.Blocks.Icons.Block;
     parameter Real steadyStateGain=0.0
       "0.0: Adds offset to input - 1.0: Closed loop action to find steady state";
     parameter Real SP0 "Initial setpoint for the controlled variable";
