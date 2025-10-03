@@ -2135,7 +2135,7 @@ Casella</a>:<br>
             transformation(extent={{-60,30},{-40,50}}, rotation=0)));
       Modelica.Electrical.Analog.Basic.Inductor L(L=Lm) annotation (Placement(
             transformation(extent={{-20,30},{0,50}}, rotation=0)));
-      Modelica.Electrical.Analog.Basic.EMF emf(k=kT) annotation (Placement(
+      Modelica.Electrical.Analog.Basic.RotationalEMF emf(k=kT) annotation (Placement(
             transformation(extent={{0,-10},{20,10}}, rotation=0)));
       Modelica.Blocks.Interfaces.RealInput inPort annotation (Placement(
             transformation(extent={{-108,-10},{-90,10}}, rotation=0)));
