@@ -649,7 +649,7 @@ Casella</a>:<br>
               origin={32,48},
               extent={{-10,-10},{10,10}},
               rotation=180)));
-        Water.Drum2States DrumBoiler(
+        Drum2States DrumBoiler(
           redeclare package Medium = Medium,
           Vd=0.0604,
           cm=523,
@@ -1080,6 +1080,132 @@ Casella</a>:<br>
 </ul>
 </html>"));
       end CISESim2States;
+
+        model Drum2States
+          extends Icons.Water.Drum;
+          replaceable package Medium = Modelica.Media.Water.StandardWater constrainedby
+            Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+            annotation(choicesAllMatching = true);
+          parameter SI.Volume Vd "Drum volume";
+          parameter SI.Volume Vdcr "Volume of downcomer and risers";
+          parameter SI.Mass Mmd "Drum metal mass";
+          parameter SI.Mass Mmdcr "Metal mass of downcomer and risers";
+          parameter Medium.SpecificHeatCapacity cm
+            "Specific heat capacity of the metal";
+          parameter Boolean allowFlowReversal=system.allowFlowReversal
+            "= true to allow flow reversal, false restricts to design direction"
+            annotation(Evaluate=true);
+          outer ThermoPower.System system "System wide properties";
+          parameter SI.Pressure pstart "Pressure start value"
+            annotation (Dialog(tab="Initialisation"));
+          parameter SI.Volume Vldstart "Start value of drum water volume"
+            annotation (Dialog(tab="Initialisation"));
+          parameter Choices.Init.Options initOpt=system.initOpt
+            "Initialisation option"
+            annotation (Dialog(tab="Initialisation"));
+          parameter Boolean noInitialPressure=false
+            "Remove initial equation on pressure"
+            annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
+      
+          Medium.SaturationProperties sat "Saturation conditions";
+          Water.FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
+                  allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+             Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
+          Water.FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
+                  allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+             Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
+          Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
+            "Metal wall thermal port" annotation (Placement(transformation(extent={{-28,
+                    -100},{28,-80}}, rotation=0)));
+          SI.Mass Ml "Liquid water mass";
+          SI.Mass Mv "Steam mass";
+          SI.Mass M "Total liquid+steam mass";
+          SI.Energy E "Total energy";
+          SI.Volume Vt "Total volume";
+          SI.Volume Vl(start=Vldstart + Vdcr) "Liquid water total volume";
+          SI.Volume Vld(start=Vldstart, stateSelect=StateSelect.prefer)
+            "Liquid water volume in the drum";
+          SI.Volume Vv "Steam volume";
+          Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
+            "Drum pressure";
+          Medium.MassFlowRate qf "Feedwater mass flowrate";
+          Medium.MassFlowRate qs "Steam mass flowrate";
+          SI.HeatFlowRate Q "Heat flow to the risers";
+          Medium.SpecificEnthalpy hf "Feedwater specific enthalpy";
+          Medium.SpecificEnthalpy hl "Specific enthalpy of saturated liquid";
+          Medium.SpecificEnthalpy hv "Specific enthalpy of saturated steam";
+          Medium.Temperature Ts "Saturation temperature";
+          Units.LiquidDensity rhol "Density of saturated liquid";
+          Units.GasDensity rhov "Density of saturated steam";
+        equation
+          Ml = Vl*rhol "Mass of liquid";
+          Mv = Vv*rhov "Mass of vapour";
+          M = Ml + Mv "Total mass";
+          E = Ml*hl + Mv*hv - p*Vt + (Mmd + Mmdcr)*cm*Ts "Total energy";
+          Ts = sat.Tsat "Saturation temperature";
+          der(M) = qf - qs "Mass balance";
+          der(E) = Q + qf*hf - qs*hv "Energy balance";
+          Vl = Vld + Vdcr "Liquid volume";
+          Vt = Vd + Vdcr "Total volume";
+          Vt = Vl + Vv "Total volume";
+      
+          // Boundary conditions
+          p = feed.p;
+          p = steam.p;
+          hf = homotopy(if not allowFlowReversal then inStream(feed.h_outflow) else
+            actualStream(feed.h_outflow), inStream(feed.h_outflow));
+          feed.m_flow = qf;
+          -steam.m_flow = qs;
+          feed.h_outflow = hl;
+          steam.h_outflow = hv;
+          Q = heat.Q_flow;
+          heat.T = Ts;
+      
+          // Fluid properties
+          sat.psat = p;
+          sat.Tsat = Medium.saturationTemperature(p);
+          rhol = Medium.bubbleDensity(sat);
+          rhov = Medium.dewDensity(sat);
+          hl = Medium.bubbleEnthalpy(sat);
+          hv = Medium.dewEnthalpy(sat);
+        initial equation
+          if initOpt == Choices.Init.Options.noInit then
+            // do nothing
+          elseif initOpt == Choices.Init.Options.fixedState then
+            if not noInitialPressure then
+              p = pstart;
+            end if;
+            Vld = Vldstart;
+          elseif initOpt == Choices.Init.Options.steadyState then
+            if not noInitialPressure then
+              der(p) = 0;
+            end if;
+            der(Vld) = 0;
+          else
+            assert(false, "Unsupported initialisation option");
+          end if;
+          annotation (
+            Diagram(graphics),
+            Documentation(info="<HTML>
+      <p>Simplified model of a drum for drum boilers. This model assumes thermodynamic equilibrium between the liquid and vapour volumes. The model has two state variables (i.e., pressure and liquid volume).
+      </HTML>", revisions="<html>
+      <ul>
+      <li><i>30 May 2005</i>
+          by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+             Initialisation support added.</li>
+      <li><i>16 Dec 2004</i>
+          by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+             Standard medium definition added.</li>
+      <li><i>24 Sep 2004</i>
+          by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+             Adapted to Modelica.Media.</li>
+      <li><i>1 May 2004</i>
+          by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+             First release.</li>
+      </ul>
+      </html>"),
+            Icon(graphics));
+        end Drum2States;
     end Models;
 
     package Simulators
