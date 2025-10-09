@@ -1503,9 +1503,9 @@ Casella</a>:<br>
         parameter SI.CoefficientOfHeatTransfer gamma_nom=150
           "Nominal heat transfer coefficient - gas side";
 
-        Gas.FlangeA gasIn(redeclare package Medium = GasMedium) annotation (
+        IdealGas.FlangeA gasIn(redeclare package Medium = GasMedium) annotation (
             Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-        Gas.FlangeB gasOut(redeclare package Medium = GasMedium) annotation (
+        IdealGas.FlangeB gasOut(redeclare package Medium = GasMedium) annotation (
             Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
         Water.FlangeA waterIn(redeclare package Medium = WaterMedium) annotation (
            Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
@@ -1540,7 +1540,7 @@ Casella</a>:<br>
           TstartN=340) "Tube"
           annotation (Placement(transformation(extent={{-20,0},{20,-40}},
                 rotation=0)));
-        Gas.Flow1DFV GasSide(
+        IdealGas.Flow1DFV GasSide(
           redeclare package Medium = GasMedium,
           L=Lb,
           omega=St/Lb,
@@ -1698,11 +1698,11 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
         Water.FlangeB waterOut(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
                 rotation=0)));
-        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
+        IdealGas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
             Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-        Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
+        IdealGas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
             Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-        Gas.Flow1DFV
+        IdealGas.Flow1DFV
                    gasFlow(
           Dhyd=1,
           wnom=gasNomFlowRate,
@@ -1795,26 +1795,26 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
         Water.SinkPressure SinkP1(redeclare package Medium = WaterMedium, p0=100000)
           annotation (Placement(transformation(extent={{70,-70},{90,-50}},
                 rotation=0)));
-        Gas.SourceMassFlow SourceW2(
+        IdealGas.SourceMassFlow SourceW2(
           redeclare package Medium = GasMedium,
           w0=10,
           use_in_w0=true,
           p0=100000,
           T=670) annotation (Placement(transformation(extent={{-96,-10},{-76,10}},
                 rotation=0)));
-        Gas.SinkPressure
+        IdealGas.SinkPressure
                   SinkP2(redeclare package Medium = GasMedium, T=300) annotation (
            Placement(transformation(extent={{100,-10},{120,10}}, rotation=0)));
-        Gas.PressDropLin PressDropLin1(redeclare package Medium = GasMedium, R=
+        IdealGas.PressDropLin PressDropLin1(redeclare package Medium = GasMedium, R=
               1000/10) annotation (Placement(transformation(extent={{60,-10},{80,
                   10}}, rotation=0)));
         Water.SensT WaterIn(redeclare package Medium = WaterMedium) annotation (
             Placement(transformation(extent={{-40,44},{-20,64}}, rotation=0)));
         Water.SensT WaterOut(redeclare package Medium = WaterMedium) annotation (
             Placement(transformation(extent={{6,-66},{26,-46}}, rotation=0)));
-        Gas.SensT GasOut(redeclare package Medium = GasMedium) annotation (
+        IdealGas.SensT GasOut(redeclare package Medium = GasMedium) annotation (
             Placement(transformation(extent={{30,-6},{50,14}}, rotation=0)));
-        Gas.SensT GasIn(redeclare package Medium = GasMedium) annotation (
+        IdealGas.SensT GasIn(redeclare package Medium = GasMedium) annotation (
             Placement(transformation(extent={{-60,-6},{-40,14}}, rotation=0)));
         Water.SourcePressure SourceP1(redeclare package Medium = WaterMedium, p0=500000)
           annotation (Placement(transformation(extent={{-80,40},{-60,60}},
@@ -2491,9 +2491,9 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         parameter Boolean gasQuasiStatic=false
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         constant Real pi=Modelica.Constants.pi;
-        Gas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
+        IdealGas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
             Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-        Gas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
+        IdealGas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
             Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
         Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
            Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
@@ -2531,7 +2531,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           Nw=N_F - 1)         annotation (Placement(transformation(extent={{-20,0},
                   {20,-40}}, rotation=0)));
 
-        Gas.Flow1DFV gasFlow(
+        IdealGas.Flow1DFV gasFlow(
           Dhyd=1,
           wnom=gasNomFlowRate,
           N=N_G,
@@ -2984,14 +2984,14 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
               origin={-100,-140},
               extent={{-10,-10},{10,10}},
               rotation=90)));
-        ThermoPower.Gas.SourceMassFlow sourceW_gas(
+        ThermoPower.IdealGas.SourceMassFlow sourceW_gas(
           w0=500,
           redeclare package Medium = FlueGas,
           T=750,
           use_in_w0=true,
           use_in_T=true) annotation (Placement(
               transformation(extent={{-200,50},{-180,70}}, rotation=0)));
-        ThermoPower.Gas.SinkPressure sinkP_gas(
+        ThermoPower.IdealGas.SinkPressure sinkP_gas(
           T=400, redeclare package Medium = FlueGas)
           annotation (Placement(transformation(extent={{-40,-110},{-20,-90}},
                 rotation=0)));
@@ -3367,7 +3367,7 @@ This is a simple model of a steam plant.
           Placement(transformation(extent={{-210,-10},{-190,10}}, rotation=0)));
       Modelica.Blocks.Interfaces.RealOutput generatedPower annotation (
           Placement(transformation(extent={{196,-10},{216,10}}, rotation=0)));
-      Gas.Compressor compressor(
+      IdealGas.Compressor compressor(
         redeclare package Medium = Media.Air,
         tablePhic=tablePhicC,
         tableEta=tableEtaC,
@@ -3381,7 +3381,7 @@ This is a simple model of a steam plant.
         Tdes_in=244.4,
         Ndesign=157.08) annotation (Placement(transformation(extent={{-158,-90},
                 {-98,-30}}, rotation=0)));
-      Gas.Turbine turbine(
+      IdealGas.Turbine turbine(
         redeclare package Medium = Media.FlueGas,
         pstart_in=7.85e5,
         pstart_out=1.52e5,
@@ -3393,7 +3393,7 @@ This is a simple model of a steam plant.
         Tstart_in=1370,
         Ndesign=157.08) annotation (Placement(transformation(extent={{-6,-90},{
                 54,-30}}, rotation=0)));
-      Gas.CombustionChamber CombustionChamber1(
+      IdealGas.CombustionChamber CombustionChamber1(
         gamma=1,
         Cm=1,
         pstart=8.11e5,
@@ -3403,19 +3403,19 @@ This is a simple model of a steam plant.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HH=41.6e6) annotation (Placement(transformation(extent={{-72,20},{-32,
                 60}}, rotation=0)));
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP1(
         redeclare package Medium = Media.Air,
         p0=0.343e5,
         T=244.4) annotation (Placement(transformation(extent={{-188,-30},{-168,
                 -10}}, rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(
         redeclare package Medium = Media.FlueGas,
         p0=1.52e5,
         T=800) annotation (Placement(transformation(extent={{94,-10},{114,10}},
               rotation=0)));
-      Gas.SourceMassFlow
+      IdealGas.SourceMassFlow
                   SourceW1(
         redeclare package Medium = Media.NaturalGas,
         w0=2.02,
@@ -3424,7 +3424,7 @@ This is a simple model of a steam plant.
         use_in_w0=true)
                annotation (Placement(transformation(extent={{-100,70},{-80,90}},
               rotation=0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         redeclare package Medium = Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         wnom=102,
@@ -3436,7 +3436,7 @@ This is a simple model of a steam plant.
             origin={0,8},
             extent={{-10,-10},{10,10}},
             rotation=270)));
-      Gas.PressDrop PressDrop2(
+      IdealGas.PressDrop PressDrop2(
         pstart=8.3e5,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
@@ -3755,11 +3755,11 @@ This is a simple model of a steam plant.
         parameter Boolean allowFlowReversal=system.allowFlowReversal
           "= true to allow flow reversal, false restricts to design direction";
         outer ThermoPower.System system "System wide properties";
-        Gas.FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
+        IdealGas.FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
                 allowFlowReversal then -Modelica.Constants.inf else 0))
           annotation (Placement(transformation(extent={{-80,-20},{-40,20}},
                 rotation=0)));
-        Gas.FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
+        IdealGas.FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
                 allowFlowReversal then +Modelica.Constants.inf else 0))
           annotation (Placement(transformation(extent={{40,-20},{80,20}},
                 rotation=0)));

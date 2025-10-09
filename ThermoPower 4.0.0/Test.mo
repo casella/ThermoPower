@@ -3108,7 +3108,7 @@ this transient there is a net flow rate entering the expansion tank.
     model TestGasPlenum
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
-      Gas.ValveLin ValveLin1(redeclare package Medium = Medium, Kv=2.5e-5)
+      IdealGas.ValveLin ValveLin1(redeclare package Medium = Medium, Kv=2.5e-5)
         annotation (Placement(transformation(extent={{-42,-10},{-22,10}},
               rotation=0)));
       Modelica.Blocks.Sources.Ramp Ramp1(
@@ -3117,14 +3117,14 @@ this transient there is a net flow rate entering the expansion tank.
         duration=0.01,
         startTime=0.6) annotation (Placement(transformation(extent={{-60,20},{-40,
                 40}}, rotation=0)));
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP1(
         redeclare package Medium = Medium,
         use_in_p0=true,
         p0=500000,
         T=450) annotation (Placement(transformation(extent={{-78,-10},{-58,10}},
               rotation=0)));
-      Gas.Plenum Plenum1(
+      IdealGas.Plenum Plenum1(
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         V=0.1,
@@ -3137,13 +3137,13 @@ this transient there is a net flow rate entering the expansion tank.
         offset=5e5,
         duration=0.01) annotation (Placement(transformation(extent={{-100,20},{
                 -80,40}}, rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(
         redeclare package Medium = Medium,
         p0=2e5,
         T=300) annotation (Placement(transformation(extent={{80,-10},{100,10}},
               rotation=0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         redeclare package Medium = Medium,
         pstart=4e5,
         dpnom=2e5,
@@ -3189,7 +3189,7 @@ This model tests the <tt>Plenum</tt> model.
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.AirSteam;
       parameter Real Xnom[Medium.nX]={0.3,0.7};
-      Gas.Header Header1(
+      IdealGas.Header Header1(
         redeclare package Medium = Medium,
         Xstart=Xnom,
         Tmstart=300,
@@ -3201,17 +3201,17 @@ This model tests the <tt>Plenum</tt> model.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         V=1) annotation (Placement(transformation(extent={{-10,-10},{10,10}},
               rotation=0)));
-      Gas.ValveLin ValveLin1(redeclare package Medium = Medium, Kv=0.3e-3)
+      IdealGas.ValveLin ValveLin1(redeclare package Medium = Medium, Kv=0.3e-3)
         annotation (Placement(transformation(extent={{30,-10},{50,10}},
               rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP2(
         redeclare package Medium = Medium,
         Xnom=Xnom,
         p0=2e5,
         T=350) annotation (Placement(transformation(extent={{70,-10},{90,10}},
               rotation=0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         redeclare package Medium = Medium,
         Xstart=Xnom,
         rhonom=5,
@@ -3226,7 +3226,7 @@ This model tests the <tt>Plenum</tt> model.
         height=-0.3,
         startTime=0.1) annotation (Placement(transformation(extent={{10,20},{30,
                 40}}, rotation=0)));
-      Gas.SourceMassFlow
+      IdealGas.SourceMassFlow
                   SourceW1(
         redeclare package Medium = Medium,
         Xnom=Xnom,
@@ -3273,7 +3273,7 @@ This model tests the <tt>Header</tt> model.
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
       parameter Real wext=10;
-      Gas.Mixer Mixer1(
+      IdealGas.Mixer Mixer1(
         redeclare package Medium = Medium,
         gamma=0.8,
         S=1,
@@ -3282,7 +3282,7 @@ This model tests the <tt>Header</tt> model.
         Tstart=450,
         Tmstart=300)                                          annotation (
           Placement(transformation(extent={{-38,-10},{-18,10}}, rotation=0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         redeclare package Medium = Medium,
         A=0.1,
         dpnom=1e5,
@@ -3292,13 +3292,13 @@ This model tests the <tt>Header</tt> model.
         Tstart=400,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint) annotation (
           Placement(transformation(extent={{0,-10},{22,10}}, rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(
         redeclare package Medium = Medium,
         p0=1e5,
         T=350) annotation (Placement(transformation(extent={{76,-10},{96,10}},
               rotation=0)));
-      Gas.SourceMassFlow
+      IdealGas.SourceMassFlow
                   SourceW2(
         redeclare package Medium = Medium,
         w0=15,
@@ -3312,7 +3312,7 @@ This model tests the <tt>Header</tt> model.
         offset=1.5,
         startTime=15) annotation (Placement(transformation(extent={{20,30},{40,
                 50}}, rotation=0)));
-      Gas.Valve Valve1(
+      IdealGas.Valve Valve1(
         redeclare package Medium = Medium,
         wnom=wext,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
@@ -3332,7 +3332,7 @@ This model tests the <tt>Header</tt> model.
         duration=0.1,
         startTime=1) annotation (Placement(transformation(extent={{-100,40},{-80,
                 60}}, rotation=0)));
-      Gas.SourceMassFlow
+      IdealGas.SourceMassFlow
                   SourceW1(
         redeclare package Medium = Medium,
         p0=400000,
@@ -3382,25 +3382,25 @@ Simulate for 20 s. At time t=1 the first inlet flow rate is reduced. At time t=8
     model TestCC
       extends Modelica.Icons.Example;
 
-      ThermoPower.Gas.SourceMassFlow
+      ThermoPower.IdealGas.SourceMassFlow
                               Wcompressor(
         redeclare package Medium = ThermoPower.Media.Air,
         w0=158,
         T=616.95) annotation (Placement(transformation(extent={{-80,-10},{-60,
                 10}}, rotation=0)));
-      ThermoPower.Gas.CombustionChamber CombustionChamber1(
+      ThermoPower.IdealGas.CombustionChamber CombustionChamber1(
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HH=41.6e6,
         pstart=11.2e5,
         V=0.1,
         S=0.1) annotation (Placement(transformation(extent={{-38,-10},{-18,10}},
               rotation=0)));
-      ThermoPower.Gas.SourceMassFlow
+      ThermoPower.IdealGas.SourceMassFlow
                               Wfuel(redeclare package Medium =
             ThermoPower.Media.NaturalGas, use_in_w0=true)
                                           annotation (Placement(transformation(
               extent={{-50,28},{-30,48}}, rotation=0)));
-      ThermoPower.Gas.PressDrop PressDrop1(
+      ThermoPower.IdealGas.PressDrop PressDrop1(
         redeclare package Medium = ThermoPower.Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         rhonom=3.3,
@@ -3408,7 +3408,7 @@ Simulate for 20 s. At time t=1 the first inlet flow rate is reduced. At time t=8
         pstart=11.2e5,
         dpnom=0.426e5) annotation (Placement(transformation(extent={{-4,-10},{
                 16,10}}, rotation=0)));
-      ThermoPower.Gas.SensT SensT1(redeclare package Medium =
+      ThermoPower.IdealGas.SensT SensT1(redeclare package Medium =
             ThermoPower.Media.FlueGas) annotation (Placement(transformation(
               extent={{26,-6},{46,14}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step1(
@@ -3416,10 +3416,10 @@ Simulate for 20 s. At time t=1 the first inlet flow rate is reduced. At time t=8
         height=-0.3,
         offset=3.1) annotation (Placement(transformation(extent={{-78,56},{-58,
                 76}}, rotation=0)));
-      ThermoPower.Gas.ValveLin ValveLin1(redeclare package Medium =
+      ThermoPower.IdealGas.ValveLin ValveLin1(redeclare package Medium =
             ThermoPower.Media.FlueGas, Kv=161.1/9.77e5) annotation (Placement(
             transformation(extent={{54,-10},{74,10}}, rotation=0)));
-      ThermoPower.Gas.SinkPressure
+      ThermoPower.IdealGas.SinkPressure
                             SinkP1(redeclare package Medium =
             ThermoPower.Media.FlueGas) annotation (Placement(transformation(
               extent={{84,-10},{104,10}}, rotation=0)));
@@ -3467,7 +3467,7 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
     model TestGasPressDrop
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP1(
         redeclare package Medium = Medium,
         p0=500000,
@@ -3480,16 +3480,16 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
         height=-0.3,
         offset=1) annotation (Placement(transformation(extent={{20,40},{40,60}},
               rotation=0)));
-      Gas.PressDropLin PressDropLin1(redeclare package Medium = Medium, R=5.5e4)
+      IdealGas.PressDropLin PressDropLin1(redeclare package Medium = Medium, R=5.5e4)
         annotation (Placement(transformation(extent={{6,10},{26,30}}, rotation=
                 0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(
         redeclare package Medium = Medium,
         T=300,
         p0=3e5) annotation (Placement(transformation(extent={{70,10},{90,30}},
               rotation=0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         redeclare package Medium = Medium,
         rhonom=3,
         wnom=1,
@@ -3498,7 +3498,7 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
         pstart=500000,
         Tstart=400) annotation (Placement(transformation(extent={{-30,10},{-10,
                 30}}, rotation=0)));
-      Gas.Valve Valve1(
+      IdealGas.Valve Valve1(
         redeclare package Medium = Medium,
         dpnom=1.5e5,
         pnom=2.5e5,
@@ -3513,7 +3513,7 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
         f=0.2,
         amplitude=3e5) annotation (Placement(transformation(extent={{-94,40},{-74,
                 60}}, rotation=0)));
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP2(
         redeclare package Medium = Medium,
         p0=500000,
@@ -3526,16 +3526,16 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
         height=-0.3,
         offset=1) annotation (Placement(transformation(extent={{20,-30},{40,-10}},
               rotation=0)));
-      Gas.PressDropLin PressDropLin2(redeclare package Medium = Medium, R=0.5e5)
+      IdealGas.PressDropLin PressDropLin2(redeclare package Medium = Medium, R=0.5e5)
         annotation (Placement(transformation(extent={{6,-60},{26,-40}},
               rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP2(
         redeclare package Medium = Medium,
         T=300,
         p0=3e5) annotation (Placement(transformation(extent={{70,-60},{90,-40}},
               rotation=0)));
-      Gas.PressDrop PressDrop2(
+      IdealGas.PressDrop PressDrop2(
         redeclare package Medium = Medium,
         rhonom=3,
         wnom=1,
@@ -3545,7 +3545,7 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
         pstart=500000,
         Tstart=400) annotation (Placement(transformation(extent={{-30,-60},{-10,
                 -40}}, rotation=0)));
-      Gas.Valve Valve2(
+      IdealGas.Valve Valve2(
         redeclare package Medium = Medium,
         wnom=1,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
@@ -3615,23 +3615,23 @@ This model tests the <tt>PressDrop</tt>, <tt>PressDropLin</tt> and <tt>Valve</tt
       extends Modelica.Icons.Example;
 
       package Medium = Media.Air;
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP1(redeclare package Medium = Medium, p0=5e5)
         annotation (Placement(transformation(extent={{-80,10},{-60,30}},
               rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(redeclare package Medium = Medium,
         p0=250000,
         use_in_p0=true)                                             annotation (
          Placement(transformation(extent={{62,10},{82,30}}, rotation=0)));
-      Gas.Valve Valve1(
+      IdealGas.Valve Valve1(
         redeclare package Medium = Medium,
         pnom=5e5,
         dpnom=1e5,
         wnom=1,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint) annotation (Placement(
             transformation(extent={{-40,10},{-20,30}}, rotation=0)));
-      Gas.Valve Valve2(
+      IdealGas.Valve Valve2(
         redeclare package Medium = Medium,
         pnom=4e5,
         dpnom=1.5e5,
@@ -3654,23 +3654,23 @@ This model tests the <tt>PressDrop</tt>, <tt>PressDropLin</tt> and <tt>Valve</tt
         offset=1,
         startTime=0.7) annotation (Placement(transformation(extent={{-10,40},{
                 10,60}}, rotation=0)));
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP2(redeclare package Medium = Medium, p0=5e5)
         annotation (Placement(transformation(extent={{-80,-60},{-60,-40}},
               rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP2(redeclare package Medium = Medium,
         p0=250000,
         use_in_p0=true)                                             annotation (
          Placement(transformation(extent={{62,-60},{82,-40}}, rotation=0)));
-      Gas.Valve Valve3(
+      IdealGas.Valve Valve3(
         redeclare package Medium = Medium,
         pnom=5e5,
         dpnom=1e5,
         wnom=1,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint) annotation (Placement(
             transformation(extent={{-40,-60},{-20,-40}}, rotation=0)));
-      Gas.Valve Valve4(
+      IdealGas.Valve Valve4(
         redeclare package Medium = Medium,
         pnom=4e5,
         dpnom=1.5e5,
@@ -3751,13 +3751,13 @@ This models tests the Valve model in different operating conditions. The valve f
     model TestGasValve
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP1(
         redeclare package Medium = Medium,
         T=500,
         p0=5e5) annotation (Placement(transformation(extent={{-90,40},{-70,60}},
               rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(
         redeclare package Medium = Medium,
         p0=250000,
@@ -3765,7 +3765,7 @@ This models tests the Valve model in different operating conditions. The valve f
         use_in_p0=true)
                   annotation (Placement(transformation(extent={{70,40},{90,60}},
               rotation=0)));
-      Gas.Valve V1(
+      IdealGas.Valve V1(
         redeclare package Medium = Medium,
         dpnom=1e5,
         wnom=0.5,
@@ -3779,7 +3779,7 @@ This models tests the Valve model in different operating conditions. The valve f
         startTime=6,
         height=-0.5) annotation (Placement(transformation(extent={{-70,70},{-50,
                 90}}, rotation=0)));
-      Gas.Valve V2(
+      IdealGas.Valve V2(
         redeclare package Medium = Medium,
         dpnom=1e5,
         wnom=0.5,
@@ -3788,7 +3788,7 @@ This models tests the Valve model in different operating conditions. The valve f
         Av=30e-4,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
             transformation(extent={{-10,40},{10,60}}, rotation=0)));
-      Gas.Valve V3(
+      IdealGas.Valve V3(
         redeclare package Medium = Medium,
         wnom=0.5,
         Tstart=500,
@@ -3813,13 +3813,13 @@ This models tests the Valve model in different operating conditions. The valve f
         amplitude=2e5) annotation (Placement(transformation(extent={{46,70},{66,
                 90}}, rotation=0)));
 
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP2(
         redeclare package Medium = Medium,
         T=500,
         p0=5e5) annotation (Placement(transformation(extent={{-90,-30},{-70,-10}},
               rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP2(
         redeclare package Medium = Medium,
         p0=200000,
@@ -3832,7 +3832,7 @@ This models tests the Valve model in different operating conditions. The valve f
         startTime=6,
         height=-0.3) annotation (Placement(transformation(extent={{-70,0},{-50,
                 20}},  rotation=0)));
-      Gas.Valve V6(
+      IdealGas.Valve V6(
         redeclare package Medium = Medium,
         CheckValve=false,
         Av=12e-4,
@@ -3852,7 +3852,7 @@ This models tests the Valve model in different operating conditions. The valve f
         startTime=3,
         height=-0.5) annotation (Placement(transformation(extent={{10,0},{30,20}},
                        rotation=0)));
-      Gas.Valve V7(
+      IdealGas.Valve V7(
         redeclare package Medium = Medium,
         CheckValve=false,
         Kv=102,
@@ -3862,7 +3862,7 @@ This models tests the Valve model in different operating conditions. The valve f
         wnom=0.5,
         Tstart=500)                                  annotation (Placement(
             transformation(extent={{-10,-30},{10,-10}}, rotation=0)));
-      Gas.Valve V8(
+      IdealGas.Valve V8(
         redeclare package Medium = Medium,
         Cv=122,
         CheckValve=true,
@@ -3879,13 +3879,13 @@ This models tests the Valve model in different operating conditions. The valve f
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP3(
         redeclare package Medium = Medium,
         T=500,
         p0=5e5) annotation (Placement(transformation(extent={{-90,-80},{-70,-60}},
               rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP3(
         redeclare package Medium = Medium,
         p0=200000,
@@ -3893,7 +3893,7 @@ This models tests the Valve model in different operating conditions. The valve f
         use_in_p0=false)
                 annotation (Placement(transformation(extent={{70,-80},{90,-60}},
               rotation=0)));
-      Gas.Valve V9(
+      IdealGas.Valve V9(
         redeclare package Medium = Medium,
         CheckValve=false,
         Av=12e-4,
@@ -3986,19 +3986,19 @@ This model tests the <tt>Valve</tt> model, in each possible configuration, i.e. 
           26.6, 30.8; 3, 20.8, 25.5, 29; 4, 19, 24.3, 27.1; 5, 17, 21.5, 24.2];
 
     public
-      ThermoPower.Gas.SourcePressure
+      ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Medium,
         p0=0.35e5,
         T=244.4) annotation (Placement(transformation(extent={{-80,6},{-60,26}},
               rotation=0)));
-      ThermoPower.Gas.SinkPressure
+      ThermoPower.IdealGas.SinkPressure
                             SinkP1(
         redeclare package Medium = Medium,
         p0=8.3e5,
         T=691.4) annotation (Placement(transformation(extent={{40,6},{60,26}},
               rotation=0)));
-      ThermoPower.Gas.Compressor Compressor(
+      ThermoPower.IdealGas.Compressor Compressor(
         redeclare package Medium = Medium,
         pstart_in=0.35e5,
         pstart_out=8.3e5,
@@ -4055,13 +4055,13 @@ This model test the <tt>Compressor</tt> model at constant speed.
           26.6, 30.8; 3, 20.8, 25.5, 29; 4, 19, 24.3, 27.1; 5, 17, 21.5, 24.2];
 
     public
-      ThermoPower.Gas.SourcePressure
+      ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Medium,
         p0=0.35e5,
         T=244.4) annotation (Placement(transformation(extent={{-80,6},{-60,26}},
               rotation=0)));
-      ThermoPower.Gas.SinkPressure
+      ThermoPower.IdealGas.SinkPressure
                             SinkP1(
         redeclare package Medium = Medium,
         p0=8.3e5,
@@ -4070,7 +4070,7 @@ This model test the <tt>Compressor</tt> model at constant speed.
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=10000)
         annotation (Placement(transformation(extent={{10,-10},{30,10}},
               rotation=0)));
-      ThermoPower.Gas.Compressor Compressor(
+      ThermoPower.IdealGas.Compressor Compressor(
         redeclare package Medium = Medium,
         pstart_in=0.35e5,
         pstart_out=8.3e5,
@@ -4123,7 +4123,7 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
           89.3e-2; 2.88, 90e-2, 90.6e-2, 90.5e-2; 3.56, 90.5e-2, 90.6e-2,
           90.5e-2; 4.46, 90.2e-2, 90.3e-2, 90e-2];
     public
-      ThermoPower.Gas.SourcePressure
+      ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Medium,
         T=1270,
@@ -4132,7 +4132,7 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=10000)
         annotation (Placement(transformation(extent={{10,-10},{30,10}},
               rotation=0)));
-      Gas.Turbine Turbine1(
+      IdealGas.Turbine Turbine1(
         redeclare package Medium = Medium,
         tablePhic=tablePhic,
         tableEta=tableEta,
@@ -4144,7 +4144,7 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         Tdes_in=1400,
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix) annotation (
          Placement(transformation(extent={{-40,-20},{0,20}}, rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(
         redeclare package Medium = Medium,
         p0=1.52e5,
@@ -4188,7 +4188,7 @@ This model test the Turbine model with an inertial load. Boundary conditions and
           89.3e-2; 10, 90e-2, 90.6e-2, 90.5e-2; 12, 90.5e-2, 90.6e-2, 90.5e-2;
           15, 90.2e-2, 90.3e-2, 90e-2];
     public
-      ThermoPower.Gas.SourcePressure
+      ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Medium,
         T=1270,
@@ -4197,7 +4197,7 @@ This model test the Turbine model with an inertial load. Boundary conditions and
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=10000)
         annotation (Placement(transformation(extent={{30,-10},{50,10}},
               rotation=0)));
-      Gas.TurbineStodola Turbine1(
+      IdealGas.TurbineStodola Turbine1(
         redeclare package Medium = Medium,
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix,
         tableEta=tableEta,
@@ -4211,7 +4211,7 @@ This model test the Turbine model with an inertial load. Boundary conditions and
         Tstart_out=883)
                   annotation (Placement(transformation(extent={{-20,-20},{20,20}},
               rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(
         redeclare package Medium = Medium,
         p0=1.52e5,
@@ -4269,7 +4269,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
           89.3e-2; 2.88, 90e-2, 90.6e-2, 90.5e-2; 3.56, 90.5e-2, 90.6e-2,
           90.5e-2; 4.46, 90.2e-2, 90.3e-2, 90e-2];
     public
-      ThermoPower.Gas.Compressor Compressor1(
+      ThermoPower.IdealGas.Compressor Compressor1(
         redeclare package Medium = Media.Air,
         pstart_in=0.343e5,
         Tstart_in=244.4,
@@ -4283,7 +4283,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
         tableEta=tableEtaC,
         tablePR=tablePR) annotation (Placement(transformation(extent={{-46,-24},
                 {-26,-4}}, rotation=0)));
-      ThermoPower.Gas.TurbineStodola Turbine1(
+      ThermoPower.IdealGas.TurbineStodola Turbine1(
         redeclare package Medium = Media.FlueGas,
         pstart_in=7.85e5,
         pstart_out=1.52e5,
@@ -4296,7 +4296,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix,
         tableEta=tableEtaT) annotation (Placement(transformation(extent={{58,-24},
                 {78,-4}}, rotation=0)));
-      ThermoPower.Gas.CombustionChamber CombustionChamber1(
+      ThermoPower.IdealGas.CombustionChamber CombustionChamber1(
         gamma=1,
         Cm=1,
         pstart=8.11e5,
@@ -4306,19 +4306,19 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HH=HH) annotation (Placement(transformation(extent={{8,0},{28,20}},
               rotation=0)));
-      ThermoPower.Gas.SourcePressure
+      ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Media.Air,
         T=244.4,
         p0=0.3447e5) annotation (Placement(transformation(extent={{-100,-16},{-80,
                 4}}, rotation=0)));
-      ThermoPower.Gas.SinkPressure
+      ThermoPower.IdealGas.SinkPressure
                             SinkP1(
         redeclare package Medium = Media.FlueGas,
         p0=1.52e5,
         T=800) annotation (Placement(transformation(extent={{82,-16},{102,4}},
               rotation=0)));
-      ThermoPower.Gas.SourceMassFlow
+      ThermoPower.IdealGas.SourceMassFlow
                               SourceW1(
         redeclare package Medium = Media.NaturalGas,
         w0=2.02,
@@ -4328,7 +4328,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=50)
         annotation (Placement(transformation(extent={{6,-24},{26,-4}}, rotation=
                0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         redeclare package Medium = Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
@@ -4338,7 +4338,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
         pstart=811000,
         Tstart=1370) annotation (Placement(transformation(extent={{34,0},{54,20}},
               rotation=0)));
-      Gas.PressDrop PressDrop2(
+      IdealGas.PressDrop PressDrop2(
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
         redeclare package Medium = Media.Air,
@@ -4348,7 +4348,7 @@ This model test the Turbine model based on the Stodola's law at constant speed. 
         pstart=829000,
         Tstart=600) annotation (Placement(transformation(extent={{-20,0},{0,20}},
               rotation=0)));
-      Gas.PressDrop PressDrop3(
+      IdealGas.PressDrop PressDrop3(
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
         redeclare package Medium = Media.Air,
@@ -4441,7 +4441,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
           89.3e-2; 2.88, 90e-2, 90.6e-2, 90.5e-2; 3.56, 90.5e-2, 90.6e-2,
           90.5e-2; 4.46, 90.2e-2, 90.3e-2, 90e-2];
     public
-      ThermoPower.Gas.Compressor Compressor1(
+      ThermoPower.IdealGas.Compressor Compressor1(
         redeclare package Medium = Media.Air,
         tablePhic=tablePhicC,
         tableEta=tableEtaC,
@@ -4455,7 +4455,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
         Ndesign=523.3,
         Tdes_in=244.4) annotation (Placement(transformation(extent={{-66,-30},{
                 -46,-10}}, rotation=0)));
-      ThermoPower.Gas.Turbine Turbine1(
+      ThermoPower.IdealGas.Turbine Turbine1(
         redeclare package Medium = Media.FlueGas,
         pstart_in=7.85e5,
         pstart_out=1.52e5,
@@ -4468,7 +4468,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
         Tstart_in=1370) annotation (Placement(transformation(extent={{54,-30},{
                 74,-10}}, rotation=0)));
 
-      ThermoPower.Gas.CombustionChamber CombustionChamber1(
+      ThermoPower.IdealGas.CombustionChamber CombustionChamber1(
         gamma=1,
         Cm=1,
         pstart=8.11e5,
@@ -4478,19 +4478,19 @@ This is the full model of a turbojet-type engine at 11.000m [1].
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HH=41.6e6) annotation (Placement(transformation(extent={{-6,0},{14,20}},
               rotation=0)));
-      ThermoPower.Gas.SourcePressure
+      ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Media.Air,
         p0=0.343e5,
         T=244.4) annotation (Placement(transformation(extent={{-100,0},{-80,20}},
               rotation=0)));
-      ThermoPower.Gas.SinkPressure
+      ThermoPower.IdealGas.SinkPressure
                             SinkP1(
         redeclare package Medium = Media.FlueGas,
         p0=1.52e5,
         T=800) annotation (Placement(transformation(extent={{82,0},{102,20}},
               rotation=0)));
-      ThermoPower.Gas.SourceMassFlow
+      ThermoPower.IdealGas.SourceMassFlow
                               SourceW1(
         redeclare package Medium = Media.NaturalGas,
         w0=2.02,
@@ -4500,7 +4500,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=50)
         annotation (Placement(transformation(extent={{-6,-30},{14,-10}},
               rotation=0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         redeclare package Medium = Media.FlueGas,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
@@ -4510,7 +4510,7 @@ This is the full model of a turbojet-type engine at 11.000m [1].
         pstart=811000,
         Tstart=1370) annotation (Placement(transformation(extent={{28,0},{48,20}},
               rotation=0)));
-      Gas.PressDrop PressDrop2(
+      IdealGas.PressDrop PressDrop2(
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         A=1,
         redeclare package Medium = Media.Air,
@@ -4583,7 +4583,7 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at constant
           12, 18.7; 2e6, 8.5e6, 12.1, 18.65; 3e6, 10.8e6, 12.7, 18.6; 3.5e6,
           12.1e6, 13, 18.55; 4e6, 13.4e6, 13.2, 18.5; 4.5e6, 14.75e6, 13.5,
           18.45; 4.8e6, 15.5e6, 13.6, 18.43];
-      ThermoPower.Gas.GTunit_ISO GT(
+      ThermoPower.IdealGas.GTunit_ISO GT(
         tableData=tableData,
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix,
         constantCompositionExhaust=true,
@@ -4593,13 +4593,13 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at constant
         phi(start=0, fixed=true))
                     annotation (Placement(transformation(extent={{-30,-20},{10,
                 20}}, rotation=0)));
-      ThermoPower.Gas.SourcePressure
+      ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = ThermoPower.Media.Air,
         p0=1.011e5,
         T=288.15) annotation (Placement(transformation(extent={{-92,-4},{-72,16}},
               rotation=0)));
-      ThermoPower.Gas.SinkPressure
+      ThermoPower.IdealGas.SinkPressure
                             SinkP1(
         redeclare package Medium = ThermoPower.Media.FlueGas,
         p0=1e5,
@@ -4608,7 +4608,7 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at constant
       Modelica.Mechanics.Rotational.Sources.ConstantSpeed ConstantSpeed1(
           w_fixed=1819.6, useSupport=false) annotation (Placement(
             transformation(extent={{80,-10},{60,10}}, rotation=0)));
-      ThermoPower.Gas.SourceMassFlow
+      ThermoPower.IdealGas.SourceMassFlow
                               SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
         w0=0.317,
@@ -4617,7 +4617,7 @@ This is a simplified model of a turbojet-type engine at 11.000m [1], at constant
         use_in_w0=true)
                   annotation (Placement(transformation(extent={{-40,24},{-20,44}},
               rotation=0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         redeclare package Medium = ThermoPower.Media.Air,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         rhonom=1.2,
@@ -4688,7 +4688,7 @@ This model tests <tt>GTunit_ISO</tt>.
           16.848e6; 3.88e6, 16.38e6, 15.96e6, 16.38e6; 4.365e6, 16.224e6,
           15.58e6, 15.99e6; 4.85e6, 16.224e6, 15.2e6, 15.6e6]
         "table for HI_iso=h(ZLPout_iso,Tsync)";
-      ThermoPower.Gas.GTunit GTunit(
+      ThermoPower.IdealGas.GTunit GTunit(
         pstart=0.999e5,
         HH=42.53e6,
         Tstart=280.55,
@@ -4698,19 +4698,19 @@ This model tests <tt>GTunit_ISO</tt>.
         tableW=tabW,
         Table=ThermoPower.Choices.TurboMachinery.TableTypes.matrix) annotation (
          Placement(transformation(extent={{-72,-20},{-32,20}}, rotation=0)));
-      ThermoPower.Gas.SourcePressure
+      ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = ThermoPower.Media.Air,
         p0=0.999e5,
         T=280.55) annotation (Placement(transformation(extent={{-100,-4},{-80,
                 16}}, rotation=0)));
-      ThermoPower.Gas.SinkPressure
+      ThermoPower.IdealGas.SinkPressure
                             SinkP1(
         redeclare package Medium = ThermoPower.Media.FlueGas,
         p0=1e5,
         T=526 + 273) annotation (Placement(transformation(extent={{-22,20},{-2,
                 40}}, rotation=0)));
-      ThermoPower.Gas.SourceMassFlow
+      ThermoPower.IdealGas.SourceMassFlow
                               SourceW1(
         redeclare package Medium = ThermoPower.Media.NaturalGas,
         T=291.44,
@@ -4775,7 +4775,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     model TestFanMech
       extends Modelica.Icons.Example;
 
-      Gas.FanMech FanMech1(
+      IdealGas.FanMech FanMech1(
         redeclare package Medium = Modelica.Media.Air.SimpleAir,
         rho0=1.23,
         n0=590,
@@ -4785,11 +4785,11 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         w0=144,
         dp0=6000) annotation (Placement(transformation(extent={{-70,-24},{-30,
                 16}}, rotation=0)));
-      Gas.SinkPressure
+      IdealGas.SinkPressure
                 SinkP1(redeclare package Medium = Modelica.Media.Air.SimpleAir)
         annotation (Placement(transformation(extent={{0,20},{20,40}}, rotation=
                 0)));
-      Gas.SourcePressure
+      IdealGas.SourcePressure
                   SourceP1(redeclare package Medium =
             Modelica.Media.Air.SimpleAir) annotation (Placement(transformation(
               extent={{-98,-10},{-78,10}}, rotation=0)));
@@ -4822,7 +4822,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
               Modelica.Units.Conversions.from_rpm(590)), J=10000,
         phi(fixed=true, start=0))                                   annotation (
          Placement(transformation(extent={{-20,-10},{0,10}}, rotation=0)));
-      Gas.PressDrop PressDrop1(
+      IdealGas.PressDrop PressDrop1(
         wnom=2000*1.229,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         rhonom=1.229,
@@ -5759,7 +5759,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 </html>"));
     end TestWaterFlow1DFV_A_Fast;
 
-    model TestGasFlow1DFV_A "Test case for Gas.Flow1DFV"
+    model TestGasFlow1DFV_A "Test case for IdealGas.Flow1DFV"
       extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.IdealGases.SingleGases.N2
         constrainedby Modelica.Media.Interfaces.PartialMedium;
@@ -5787,7 +5787,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Gas.SourceMassFlow Source(
+      IdealGas.SourceMassFlow Source(
         redeclare package Medium = Medium,
         p0=phex,
         T=Tinhex,
@@ -5795,16 +5795,16 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         use_in_T=true)
                  annotation (Placement(transformation(extent={{-78,-10},{-58,10}},
               rotation=0)));
-      Gas.SinkPressure Sink(
+      IdealGas.SinkPressure Sink(
         redeclare package Medium = Medium,
         p0=10000,
         T=300) annotation (Placement(transformation(extent={{78,-10},{98,10}},
               rotation=0)));
-      Gas.SensT SensT1(redeclare package Medium = Medium) annotation (Placement(
+      IdealGas.SensT SensT1(redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{-50,-6},{-30,14}}, rotation=0)));
-      Gas.SensT SensT2(redeclare package Medium = Medium) annotation (Placement(
+      IdealGas.SensT SensT2(redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{50,-6},{70,14}}, rotation=0)));
-      Gas.Flow1DFV hex(
+      IdealGas.Flow1DFV hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -5820,7 +5820,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
-      Gas.ValveLin valve(redeclare package Medium = Medium, Kv=whex/phex)
+      IdealGas.ValveLin valve(redeclare package Medium = Medium, Kv=whex/phex)
         annotation (Placement(transformation(extent={{20,-10},{40,10}},
               rotation=0)));
       Thermal.HeatSource1DFV heatSource(Nw=Nnodes - 1)
@@ -5879,7 +5879,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         Diagram(graphics),
         experiment(StopTime=80, Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Gas.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes). A uniform prescribed heat flux is applied to the lateral boundary. The working fluid is pure nitrogen.</p>
+<p>The model is designed to test the component <code>IdealGas.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes). A uniform prescribed heat flux is applied to the lateral boundary. The working fluid is pure nitrogen.</p>
 <p>The model starts at steady state. </p>
 <p><ul>
 <li>At t = 10 s, step variation of the temperature of the fluid entering the heat exchanger. The temperature change is propagated at the outlet with a delay approximately equal to the residence time</li>
@@ -5893,7 +5893,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         __Dymola_experimentSetupOutput);
     end TestGasFlow1DFV_A;
 
-    model TestGasFlow1DFV_B "Test case for Gas.Flow1DFV"
+    model TestGasFlow1DFV_B "Test case for IdealGas.Flow1DFV"
       extends Modelica.Icons.Example;
       extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DFV_A(
           redeclare package Medium =
@@ -5917,7 +5917,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         __Dymola_experimentSetupOutput);
     end TestGasFlow1DFV_B;
 
-    model TestGasFlow1DFV_C "Test case for Gas.Flow1DFV"
+    model TestGasFlow1DFV_C "Test case for IdealGas.Flow1DFV"
       extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DFV_B(
           hex(UniformComposition=false));
       annotation (
@@ -5927,7 +5927,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 </html>"));
     end TestGasFlow1DFV_C;
 
-    model TestGasFlow1DFV_D "Test case for Gas.Flow1DFV"
+    model TestGasFlow1DFV_D "Test case for IdealGas.Flow1DFV"
       extends ThermoPower.Test.DistributedParameterComponents.TestGasFlow1DFV_B(
           hex(QuasiStatic=true));
       annotation (Documentation(info="<html>
@@ -9520,7 +9520,7 @@ Casella</a>:<br>
       Water.SinkPressure fluidSink(redeclare package Medium =
             Modelica.Media.R134a.R134a_ph, p0=3000000) annotation (Placement(
             transformation(extent={{50,-82},{70,-62}}, rotation=0)));
-      Gas.SinkPressure gasSink(redeclare package Medium = ThermoPower.Media.Air)
+      IdealGas.SinkPressure gasSink(redeclare package Medium = ThermoPower.Media.Air)
         annotation (Placement(transformation(extent={{-54,18},{-74,38}}, rotation=0)));
       Water.SourceMassFlow fluidSource(
         use_in_w0=true,
@@ -9533,9 +9533,9 @@ Casella</a>:<br>
             Modelica.Media.R134a.R134a_ph)
         annotation (Placement(transformation(extent={{-46,-78},{-26,-58}},
               rotation=0)));
-      Gas.SensT gas_T_in(redeclare package Medium = ThermoPower.Media.Air)
+      IdealGas.SensT gas_T_in(redeclare package Medium = ThermoPower.Media.Air)
         annotation (Placement(transformation(extent={{34,22},{14,42}}, rotation=0)));
-      Gas.SourceMassFlow gasSource(
+      IdealGas.SourceMassFlow gasSource(
         redeclare package Medium = ThermoPower.Media.Air,
         use_in_w0=true,
         T=423.15) annotation (Placement(transformation(extent={{64,18},{44,38}},
@@ -9544,11 +9544,11 @@ Casella</a>:<br>
             Modelica.Media.R134a.R134a_ph)
         annotation (Placement(transformation(extent={{20,-78},{40,-58}},
               rotation=0)));
-      Gas.SensT gas_T_out(redeclare package Medium = ThermoPower.Media.Air)
+      IdealGas.SensT gas_T_out(redeclare package Medium = ThermoPower.Media.Air)
         annotation (Placement(transformation(extent={{-24,22},{-44,42}}, rotation=0)));
       inner System system(allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Gas.Flow1DFV gasFlow(
+      IdealGas.Flow1DFV gasFlow(
         Nt=1,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,

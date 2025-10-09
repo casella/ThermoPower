@@ -1,5 +1,5 @@
 within ThermoPower;
-package Gas "Models of components with ideal gases as working fluid"
+package IdealGas "Models of components with ideal gases as working fluid"
   connector Flange "Flange connector for gas flows"
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium;
     flow Medium.MassFlowRate m_flow
@@ -48,7 +48,7 @@ package Gas "Models of components with ideal gases as working fluid"
   extends Modelica.Icons.Package;
 
   model SourcePressure "Pressure source for gas flows"
-    extends Icons.Gas.SourceP;
+    extends Icons.IdealGas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
@@ -147,7 +147,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end SourcePressure;
 
   model SinkPressure "Pressure sink for gas flows"
-    extends Icons.Gas.SourceP;
+    extends Icons.IdealGas.SourceP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
@@ -243,7 +243,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end SinkPressure;
 
   model SourceMassFlow "Flow rate source for gas flows"
-    extends Icons.Gas.SourceW;
+    extends Icons.IdealGas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
@@ -345,7 +345,7 @@ package Gas "Models of components with ideal gases as working fluid"
 
   model SinkMassFlow "Flow rate sink for gas flows"
 
-    extends Icons.Gas.SourceW;
+    extends Icons.IdealGas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
@@ -447,7 +447,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end SinkMassFlow;
 
   model ThroughMassFlow "Prescribes the mass flow rate across the component"
-    extends Icons.Gas.SourceW;
+    extends Icons.IdealGas.SourceW;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Medium.MassFlowRate w0=0 "Nominal mass flow rate";
@@ -511,7 +511,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end ThroughMassFlow;
 
   model Plenum "Rigid adiabatic volume"
-    extends Icons.Gas.Mixer;
+    extends Icons.IdealGas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
@@ -636,7 +636,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end Plenum;
 
   model Header "Header with metal walls for gas flows"
-    extends Icons.Gas.Mixer;
+    extends Icons.IdealGas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
@@ -782,7 +782,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end Header;
 
   model Mixer "Mixer with metal walls for gas flows"
-    extends Icons.Gas.Mixer;
+    extends Icons.IdealGas.Mixer;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Medium.BaseProperties gas(
@@ -1295,7 +1295,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end Flow1DFV2w;
 
   model FlowJoin "Joins two gas flows"
-    extends Icons.Gas.FlowJoin;
+    extends Icons.IdealGas.FlowJoin;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     constant Medium.MassFlowRate wzero=1e-9
@@ -1435,7 +1435,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end FlowJoin;
 
   model FlowSplit "Splits a gas flow in two"
-    extends Icons.Gas.FlowSplit;
+    extends Icons.IdealGas.FlowSplit;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     constant Medium.MassFlowRate wzero=1e-9
@@ -1571,7 +1571,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end FlowSplit;
 
   model PressDropLin "Linear pressure drop for gas flows"
-    extends Icons.Gas.Tube;
+    extends Icons.IdealGas.Tube;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Units.HydraulicResistance R "Hydraulic resistance";
@@ -1615,7 +1615,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end PressDropLin;
 
   model PressDrop "Pressure drop for gas flows"
-    extends Icons.Gas.Tube;
+    extends Icons.IdealGas.Tube;
     import ThermoPower.Choices.PressDrop.FFtypes;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
@@ -1731,7 +1731,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end PressDrop;
 
   model SensT "Temperature sensor for gas"
-    extends Icons.Gas.SensThrough;
+    extends Icons.IdealGas.SensThrough;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
@@ -1792,7 +1792,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end SensT;
 
   model SensT1 "Temperature sensor for gas flows, single port"
-    extends Icons.Gas.SensP;
+    extends Icons.IdealGas.SensP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Modelica.Blocks.Interfaces.RealOutput T annotation (Placement(
@@ -1830,7 +1830,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end SensT1;
 
   model SensW "Mass Flowrate sensor for gas flows"
-    extends Icons.Gas.SensThrough;
+    extends Icons.IdealGas.SensThrough;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
@@ -1882,7 +1882,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end SensW;
 
   model SensP "Pressure sensor for gas flows"
-    extends Icons.Gas.SensP;
+    extends Icons.IdealGas.SensP;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     Modelica.Blocks.Interfaces.RealOutput p annotation (Placement(
@@ -1917,7 +1917,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end SensP;
 
   model SensQ "Volume Flow Rate sensor for gas flows"
-    extends Icons.Gas.SensThrough;
+    extends Icons.IdealGas.SensThrough;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Boolean allowFlowReversal=system.allowFlowReversal
@@ -1974,7 +1974,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end SensQ;
 
   model ValveLin "Valve for gas flows with linear pressure drop"
-    extends Icons.Gas.Valve;
+    extends Icons.IdealGas.Valve;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation(choicesAllMatching = true);
     parameter Units.HydraulicConductance Kv "Hydraulic conductance";
@@ -2024,7 +2024,7 @@ package Gas "Models of components with ideal gases as working fluid"
   end ValveLin;
 
   model Valve "Valve for gas flow"
-    extends Icons.Gas.Valve;
+    extends Icons.IdealGas.Valve;
     replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
       annotation (choicesAllMatching=true);
     Medium.BaseProperties gas(
@@ -2836,7 +2836,7 @@ The packages Medium are redeclared and a mass balance determines the composition
     extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
       "Basic interface for 1-dimensional water/steam fluid flow models"
-      extends Icons.Gas.Tube;
+      extends Icons.IdealGas.Tube;
       import ThermoPower.Choices.Flow1D.FFtypes;
       import ThermoPower.Choices.Flow1D.HCtypes;
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
@@ -2949,7 +2949,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     end Flow1DBase;
 
     partial model CombustionChamberBase "Combustion Chamber"
-      extends Icons.Gas.Mixer;
+      extends Icons.IdealGas.Mixer;
       replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
       replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
       replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
@@ -3091,7 +3091,7 @@ This is the model-base of a Combustion Chamber, with a constant volume.
     end CombustionChamberBase;
 
     partial model CompressorBase "Gas compressor"
-      extends ThermoPower.Icons.Gas.Compressor;
+      extends ThermoPower.Icons.IdealGas.Compressor;
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
         annotation(choicesAllMatching = true);
       parameter Boolean explicitIsentropicEnthalpy=true
@@ -3225,7 +3225,7 @@ This is the model-base of a Combustion Chamber, with a constant volume.
     end CompressorBase;
 
     partial model TurbineBase "Gas Turbine"
-      extends ThermoPower.Icons.Gas.Turbine;
+      extends ThermoPower.Icons.IdealGas.Turbine;
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
         annotation(choicesAllMatching = true);
       parameter Boolean explicitIsentropicEnthalpy=true
@@ -3358,7 +3358,7 @@ This is the model-base of a Combustion Chamber, with a constant volume.
     end TurbineBase;
 
     partial model GTunitBase "Gas Turbine"
-      extends ThermoPower.Icons.Gas.GasTurbineUnit;
+      extends ThermoPower.Icons.IdealGas.GasTurbineUnit;
       replaceable package Air = Modelica.Media.Interfaces.PartialMedium;
       replaceable package Fuel = Modelica.Media.Interfaces.PartialMedium;
       replaceable package Exhaust = Modelica.Media.Interfaces.PartialMedium;
@@ -3532,7 +3532,7 @@ If <tt>constantCompositionExhaust = false</tt>, the exhaust composition is compu
     end GTunitExhaustBase;
 
     partial model FanBase "Base model for fans"
-      extends Icons.Gas.Fan;
+      extends Icons.IdealGas.Fan;
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
         "Medium model"
         annotation(choicesAllMatching = true);
@@ -3806,4 +3806,4 @@ This package contains models of physical processes and components using ideal ga
 </ul>
 The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
 </HTML>"));
-end Gas;
+end IdealGas;

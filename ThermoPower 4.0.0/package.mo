@@ -971,7 +971,7 @@ package Icons "Icons for ThermoPower library"
             fillPattern=FillPattern.Solid)}));
   end MetalWall;
 
-  package Gas "Icons for component using water/steam as working fluid"
+  package IdealGas "Icons for component using water/steam as working fluid"
     extends Modelica.Icons.Package;
     partial model SourceP
 
@@ -1208,7 +1208,7 @@ package Icons "Icons for ThermoPower library"
               lineColor={95,95,95},
               textString="%name")}));
     end Fan;
-  end Gas;
+  end IdealGas;
 end Icons;
 
 
