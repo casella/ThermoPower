@@ -86,9 +86,9 @@ package FluidPh "This package contains components that use a generic fluid with 
     parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
       "Use connector input for the temperature"
-      annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      annotation(Dialog(group="External inputs", enable = not use_in_h), choices(checkBox=true));
     parameter Boolean use_in_h = false
-      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs", enable = not use_in_T), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     Medium.AbsolutePressure p "Actual pressure";
     FlangeB flange(redeclare package Medium = Medium) annotation (
@@ -194,9 +194,9 @@ package FluidPh "This package contains components that use a generic fluid with 
     parameter Boolean use_in_p0 = false "Use connector input for the pressure" annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
       "Use connector input for the temperature"
-      annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      annotation(Dialog(group="External inputs", enable = not use_in_h), choices(checkBox=true));
     parameter Boolean use_in_h = false
-      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      "Use connector input for the specific enthalpy" annotation(Dialog(group="External inputs", enable = not use_in_T), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     Medium.AbsolutePressure p "Actual pressure";
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=if
@@ -304,10 +304,10 @@ package FluidPh "This package contains components that use a generic fluid with 
       annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
       "Use connector input for the temperature"
-      annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      annotation(Dialog(group="External inputs", enable = not use_in_h), choices(checkBox=true));
     parameter Boolean use_in_h = false
       "Use connector input for the specific enthalpy"
-      annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      annotation(Dialog(group="External inputs", enable = not use_in_T), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     Medium.MassFlowRate w "Mass flow rate";
     FlangeB flange(redeclare package Medium = Medium) annotation (
@@ -414,10 +414,10 @@ package FluidPh "This package contains components that use a generic fluid with 
       annotation(Dialog(group="External inputs"), choices(checkBox=true));
     parameter Boolean use_in_T = false
       "Use connector input for the temperature"
-      annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      annotation(Dialog(group="External inputs", enable = not use_in_h), choices(checkBox=true));
     parameter Boolean use_in_h = false
       "Use connector input for the specific enthalpy"
-      annotation(Dialog(group="External inputs"), choices(checkBox=true));
+      annotation(Dialog(group="External inputs", enable = not use_in_T), choices(checkBox=true));
     outer ThermoPower.System system "System wide properties";
     Medium.MassFlowRate w "Mass flow rate";
     FlangeA flange(
