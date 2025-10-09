@@ -2,6 +2,7 @@ within ThermoPower;
 package Choices "Choice enumerations for ThermoPower models"
   extends Modelica.Icons.TypesPackage;
   package CylinderFourier
+    extends Modelica.Icons.TypesPackage;
     type NodeDistribution = enumeration(
         uniform "Uniform distribution of node radii",
         thickInternal "Quadratically distributed node radii - thickest at rint",
@@ -13,6 +14,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end CylinderFourier;
 
   package CylinderMechanicalStress
+    extends Modelica.Icons.TypesPackage;
     type MechanicalStandard = enumeration(
         TRDstandard "TRD standard",
         ASMEstandard "Laborelec-ASME standard")
@@ -20,6 +22,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end CylinderMechanicalStress;
 
   package Flow1D
+    extends Modelica.Icons.TypesPackage;
     type FFtypes = enumeration(
         Kfnom "Kfnom friction factor",
         OpPoint "Friction factor defined by operating point",
@@ -36,6 +39,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end Flow1D;
 
   package PressDrop
+    extends Modelica.Icons.TypesPackage;
     type FFtypes = enumeration(
         Kf "Kf friction factor",
         OpPoint "Friction factor defined by operating point",
@@ -44,6 +48,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end PressDrop;
 
   package Valve
+    extends Modelica.Icons.TypesPackage;
     type CvTypes = enumeration(
         Av "Av (metric) flow coefficient",
         Kv "Kv (metric) flow coefficient",
@@ -53,6 +58,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end Valve;
 
   package TurboMachinery
+    extends Modelica.Icons.TypesPackage;
     type TableTypes = enumeration(
         matrix "Explicitly supplied as parameter matrix table",
         file "Read from a file")
@@ -60,6 +66,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end TurboMachinery;
 
   package Init "Options for initialisation"
+    extends Modelica.Icons.TypesPackage;
     type Options = enumeration(
         noInit "No initial equations",
         fixedState "Fixed initial state variables",
@@ -74,6 +81,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end Init;
 
   package FlowReversal "Options for flow reversal support"
+    extends Modelica.Icons.TypesPackage;
     type Options = enumeration(
         fullFlowReversal "Full flow reversal support",
         smallFlowReversal "Small flow reversal allowed (approx. model)",
@@ -82,6 +90,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end FlowReversal;
 
   package System
+    extends Modelica.Icons.TypesPackage;
     type Dynamics = enumeration(
         DynamicFreeInitial
           "DynamicFreeInitial -- Dynamic balance, Initial guess value",
@@ -94,6 +103,7 @@ package Choices "Choice enumerations for ThermoPower models"
   end System;
 
   package FluidPhase
+    extends Modelica.Icons.TypesPackage;
     type FluidPhases = enumeration(
         Liquid "Liquid",
         Steam "Steam",

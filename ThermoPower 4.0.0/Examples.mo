@@ -6,6 +6,7 @@ package Examples "Application examples"
     extends Modelica.Icons.ExamplesPackage;
 
     package Models
+      extends Modelica.Icons.Package;
       model CISEPlant "Model of the CISE lab steam generator"
         package Medium = Modelica.Media.Water.WaterIF97_ph (smoothModel=true);
         FluidPh.Drum Drum(

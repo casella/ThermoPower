@@ -2227,6 +2227,7 @@ package IdealGas "Models of components with ideal gases as working fluid"
   end Valve;
 
   function f_colebrook "Fanning friction factor for ideal gas flows"
+    extends Modelica.Icons.Function;
     input SI.MassFlowRate w;
     input Real D_A;
     input Real e;
@@ -2754,7 +2755,7 @@ The packages Medium are redeclared and a mass balance determines the composition
   end FanMech;
 
   package Utility "Utility models"
-
+  extends Modelica.Icons.UtilitiesPackage;
     model ClosedSystemInit
       "Component for the steady-state initialization of closed systems"
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium

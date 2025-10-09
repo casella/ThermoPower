@@ -8968,7 +8968,7 @@ Algorithm Tolerance = 1e-6
 
     model Flow1D_check
       "Extended Flow1D model with mass & energy balance computation"
-
+      extends Modelica.Icons.Example;
       extends FluidPh.Flow1D;
       SI.SpecificEnergy Etot;
       SI.SpecificEnergy Evol[N - 1];
@@ -9415,7 +9415,7 @@ Casella</a>:<br>
 
     model TestConstantHeatTransferTwoGrid_Wcoarse
       "Test of the ConstantHeatTransferTwoGrid component with coarser grid on the wall side"
-
+  extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.StandardWater
         constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium;
 
@@ -9485,6 +9485,7 @@ Casella</a>:<br>
 
     model TestConstantHeatTransferTwoGrid_Fcoarse
       "Test of the ConstantHeatTransferTwoGrid component with coarser grid on the wall side"
+      extends Modelica.Icons.Example;
       extends TestConstantHeatTransferTwoGrid_Wcoarse(
         Nf=4,
         Nw=6,
@@ -9498,6 +9499,7 @@ Casella</a>:<br>
 
     model TestRefrigerantEvaporator
       "Test case with once-through evaporator using Dittus-Boelter 2-phase heat transfer model"
+      extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
       parameter Integer Nnodes=10 "number of nodes";
