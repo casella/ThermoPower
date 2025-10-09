@@ -30,12 +30,26 @@ package IdealGas "Models of components with ideal gases as working fluid"
             extent={{-100,100},{100,-100}},
             lineColor={159,159,223},
             fillColor={159,159,223},
+            fillPattern=FillPattern.Solid)}),
+            Diagram(graphics={Ellipse(
+            extent={{-100,100},{100,-100}},
+            lineColor={159,159,223},
+            fillColor={159,159,223},
             fillPattern=FillPattern.Solid)}));
   end FlangeA;
 
   connector FlangeB "B-type flange connector for gas flows"
     extends Flange;
     annotation (Icon(graphics={Ellipse(
+            extent={{-100,100},{100,-100}},
+            lineColor={159,159,223},
+            fillColor={159,159,223},
+            fillPattern=FillPattern.Solid), Ellipse(
+            extent={{-40,40},{40,-40}},
+            lineColor={159,159,223},
+            fillColor={255,255,255},
+            fillPattern=FillPattern.Solid)}),
+            Diagram(graphics={Ellipse(
             extent={{-100,100},{100,-100}},
             lineColor={159,159,223},
             fillColor={159,159,223},

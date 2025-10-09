@@ -9,7 +9,12 @@ package Thermal "Thermal models of heat transfer"
     SI.Temperature T[N] "Temperature at the nodes";
     flow SI.HeatFlux phi[N] "Heat flux at the nodes";
     annotation (
-            Diagram(coordinateSystem(preserveAspectRatio=false)),
+            Diagram(coordinateSystem(preserveAspectRatio=false),
+            graphics={Rectangle(
+            extent={{-100,100},{100,-100}},
+            lineColor={255,127,0},
+            fillColor={255,127,0},
+            fillPattern=FillPattern.Solid)}),
             Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
@@ -22,7 +27,12 @@ package Thermal "Thermal models of heat transfer"
     SI.Temperature T[N] "Temperature at the volumes";
     flow SI.Power Q[N] "Heat flow at the volumes";
     annotation (
-            Diagram(coordinateSystem(preserveAspectRatio=false)),
+            Diagram(coordinateSystem(preserveAspectRatio=false),
+            graphics={Rectangle(
+            extent={{-100,100},{100,-100}},
+            lineColor={255,127,0},
+            fillColor={255,127,0},
+            fillPattern=FillPattern.Solid)}),
             Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
