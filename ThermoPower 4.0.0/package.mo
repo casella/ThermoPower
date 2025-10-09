@@ -1213,7 +1213,7 @@ end Icons;
 
 
 package Functions "Miscellaneous functions"
-  extends Modelica.Icons.Package;
+  extends Modelica.Icons.FunctionsPackage;
   function linear
     extends Modelica.Icons.Function;
     input Real x;
@@ -1363,6 +1363,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
 </ul>
 </html>"));
   function smoothSat "Smooth saturation function"
+    extends Modelica.Icons.Function;
     input Real x;
     input Real xmin "Lower bound of range where y = x";
     input Real xmax "Upper bound of range where y = x";
@@ -1381,6 +1382,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
   end smoothSat;
 
   function linspaceExt "Extended linspace function handling also the N=1 case"
+    extends Modelica.Icons.Function;
     input Real x1;
     input Real x2;
     input Integer N;
@@ -1451,7 +1453,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
   end OffsetController;
 
   package PumpCharacteristics "Functions for pump characteristics"
-
+  extends Modelica.Icons.FunctionsPackage;
     partial function baseFlow "Base class for pump flow characteristics"
       extends Modelica.Icons.Function;
       input SI.VolumeFlowRate q_flow "Volumetric flow rate";
@@ -1705,6 +1707,7 @@ With the default value of delta=0.01, the difference between sqrt(x) and sqrtReg
   end PumpCharacteristics;
 
   package ValveCharacteristics "Functions for valve characteristics"
+    extends Modelica.Icons.FunctionsPackage;
     partial function baseFun "Base class for valve characteristics"
       extends Modelica.Icons.Function;
       input Real pos "Stem position (per unit)";
@@ -1755,7 +1758,7 @@ This characteristic is such that the relative change of the flow coefficient is 
 
   package FanCharacteristics "Functions for fan characteristics"
     import NonSI = Modelica.Units.NonSI;
-
+  extends Modelica.Icons.FunctionsPackage;
     partial function baseFlow "Base class for fan flow characteristics"
       extends Modelica.Icons.Function;
       input SI.VolumeFlowRate q_flow "Volumetric flow rate";
@@ -1907,6 +1910,7 @@ This characteristic is such that the relative change of the flow coefficient is 
     end quadraticPower;
 
     package Utilities
+      extends Modelica.Icons.UtilitiesPackage;
       function quadraticFlowBlades
         "Quadratic flow characteristic, movable blades"
         extends Modelica.Icons.Function;
@@ -1965,7 +1969,7 @@ This characteristic is such that the relative change of the flow coefficient is 
 
     package Models
       "Models providing characteristic functions for Fans with statically initialized parameters"
-
+  extends Modelica.Icons.Package;
       model BaseFlow
         "Base class for models contaning flow characteristic functions with static parameters"
         replaceable function flowCharacteristic =

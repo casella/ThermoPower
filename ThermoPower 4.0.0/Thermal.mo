@@ -9,7 +9,12 @@ package Thermal "Thermal models of heat transfer"
     SI.Temperature T[N] "Temperature at the nodes";
     flow SI.HeatFlux phi[N] "Heat flux at the nodes";
     annotation (
-            Diagram(coordinateSystem(preserveAspectRatio=false)),
+            Diagram(coordinateSystem(preserveAspectRatio=false),
+            graphics={Rectangle(
+            extent={{-100,100},{100,-100}},
+            lineColor={255,127,0},
+            fillColor={255,127,0},
+            fillPattern=FillPattern.Solid)}),
             Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
@@ -22,7 +27,12 @@ package Thermal "Thermal models of heat transfer"
     SI.Temperature T[N] "Temperature at the volumes";
     flow SI.Power Q[N] "Heat flow at the volumes";
     annotation (
-            Diagram(coordinateSystem(preserveAspectRatio=false)),
+            Diagram(coordinateSystem(preserveAspectRatio=false),
+            graphics={Rectangle(
+            extent={{-100,100},{100,-100}},
+            lineColor={255,127,0},
+            fillColor={255,127,0},
+            fillPattern=FillPattern.Solid)}),
             Icon(graphics={Rectangle(
             extent={{-100,100},{100,-100}},
             lineColor={255,127,0},
@@ -936,6 +946,7 @@ The swapping is performed if the counterCurrent parameter is true (default value
   end ConvHTLumped;
 
   package HeatTransferFV "Heat transfer models for FV components"
+    extends Modelica.Icons.Package;
     model IdealHeatTransfer
       "Delta T across the boundary layer is zero (infinite h.t.c.)"
       extends BaseClasses.DistributedHeatTransferFV(final useAverageTemperature=false);
@@ -1466,6 +1477,7 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
   end HeatTransferFV;
 
   package HeatTransferFEM "Heat transfer models for FEM components"
+    extends Modelica.Icons.Package;
     model IdealHeatTransfer
       "Delta T across the boundary layer is zero (infinite h.t.c.)"
       extends BaseClasses.DistributedHeatTransferFEM;
@@ -1616,8 +1628,10 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
   end HeatTransferFEM;
 
   package MaterialProperties "Thermal and mechanical properties of materials"
+    extends Modelica.Icons.Package;
     package Interfaces
       "This package provides interfaces for material property models"
+      extends Modelica.Icons.InterfacesPackage;
       partial model PartialMaterial
         "Partial material properties (base model of all material models)"
 
@@ -1647,6 +1661,7 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
     end Interfaces;
 
     package Common "Implementation of material property models"
+      extends Modelica.Icons.Package;
       model MaterialTable
         "Material property model based on table data and polynomial interpolations"
 
@@ -1760,6 +1775,7 @@ This model computes the thermal and mechanical properties of a generic material.
 
     package Functions
       "Utility functions. Provide conversions and interpolation for table data."
+      extends Modelica.Icons.FunctionsPackage;
       function CtoKTable
         extends Modelica.Units.Icons.Conversion;
 
@@ -1817,6 +1833,7 @@ This model computes the thermal and mechanical properties of a generic material.
     end Functions;
 
     package Metals "Models of commonly used steel"
+      extends Modelica.Icons.Package;
       model StandardSteel
         extends Common.MaterialTable(
           final materialName="Standard Steel",
@@ -1936,8 +1953,10 @@ This model computes the thermal and mechanical properties of a generic material.
     end Metals;
 
     package Test "Test cases"
+      extends Modelica.Icons.ExamplesPackage;
       model TestMaterial
         //import Modelica.SIunits.*;
+        extends Modelica.Icons.Example;
         replaceable Metals.CarbonSteel_A106C Material(npol=3) constrainedby
           Interfaces.PartialMaterial "Material model";
         SI.Temperature T;
@@ -1966,6 +1985,7 @@ This package contains models to compute the material properties needed to model 
   end MaterialProperties;
 
   package HeatExchangerTopologies
+    extends Modelica.Icons.Package;
     model CoCurrentFlow "Co-current flow"
       extends BaseClasses.HeatExchangerTopologyData(
         final correspondingVolumes = 1:Nw);
@@ -2094,7 +2114,7 @@ This package contains models to compute the material properties needed to model 
   end HeatExchangerTopologies;
 
   package BaseClasses
-
+  extends Modelica.Icons.BasesPackage;
     partial model DistributedHeatTransferFV
       "Base class for distributed heat transfer models - finite volumes"
       extends ThermoPower.Icons.HeatFlow;

@@ -30,12 +30,26 @@ package IdealGas "Models of components with ideal gases as working fluid"
             extent={{-100,100},{100,-100}},
             lineColor={159,159,223},
             fillColor={159,159,223},
+            fillPattern=FillPattern.Solid)}),
+            Diagram(graphics={Ellipse(
+            extent={{-100,100},{100,-100}},
+            lineColor={159,159,223},
+            fillColor={159,159,223},
             fillPattern=FillPattern.Solid)}));
   end FlangeA;
 
   connector FlangeB "B-type flange connector for gas flows"
     extends Flange;
     annotation (Icon(graphics={Ellipse(
+            extent={{-100,100},{100,-100}},
+            lineColor={159,159,223},
+            fillColor={159,159,223},
+            fillPattern=FillPattern.Solid), Ellipse(
+            extent={{-40,40},{40,-40}},
+            lineColor={159,159,223},
+            fillColor={255,255,255},
+            fillPattern=FillPattern.Solid)}),
+            Diagram(graphics={Ellipse(
             extent={{-100,100},{100,-100}},
             lineColor={159,159,223},
             fillColor={159,159,223},
@@ -2227,6 +2241,7 @@ package IdealGas "Models of components with ideal gases as working fluid"
   end Valve;
 
   function f_colebrook "Fanning friction factor for ideal gas flows"
+    extends Modelica.Icons.Function;
     input SI.MassFlowRate w;
     input Real D_A;
     input Real e;
@@ -2754,7 +2769,7 @@ The packages Medium are redeclared and a mass balance determines the composition
   end FanMech;
 
   package Utility "Utility models"
-
+  extends Modelica.Icons.UtilitiesPackage;
     model ClosedSystemInit
       "Component for the steady-state initialization of closed systems"
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium

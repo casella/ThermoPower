@@ -34,12 +34,26 @@ package FluidPh "This package contains components that use a generic fluid with 
             extent={{-100,100},{100,-100}},
             lineColor={0,0,255},
             fillColor={0,0,255},
+            fillPattern=FillPattern.Solid)}),
+            Diagram(graphics={Ellipse(
+            extent={{-100,100},{100,-100}},
+            lineColor={0,0,255},
+            fillColor={0,0,255},
             fillPattern=FillPattern.Solid)}));
   end FlangeA;
 
   connector FlangeB "B-type flange connector for p-h fluid flows"
     extends ThermoPower.FluidPh.Flange;
     annotation (Icon(graphics={Ellipse(
+            extent={{-100,100},{100,-100}},
+            lineColor={0,0,255},
+            fillColor={0,0,255},
+            fillPattern=FillPattern.Solid), Ellipse(
+            extent={{-40,40},{40,-40}},
+            lineColor={0,0,255},
+            fillColor={255,255,255},
+            fillPattern=FillPattern.Solid)}),
+            Diagram(graphics={Ellipse(
             extent={{-100,100},{100,-100}},
             lineColor={0,0,255},
             fillColor={0,0,255},
@@ -5077,7 +5091,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
   end ExpansionTankIdeal;
 
   function f_chen "Chen's correlation for two-phase flow in a tube"
-
+  extends Modelica.Icons.Function;
     input SI.MassFlowRate w "Mass flowrate";
     input SI.Length D "Tube hydraulic diameter";
     input SI.Area A "Tube cross-section";
@@ -5130,6 +5144,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
   end f_chen;
 
   function f_colebrook "Fanning friction factor for p-h fluid flows"
+    extends Modelica.Icons.Function;
     input SI.MassFlowRate w;
     input Real D_A;
     input Real e;
@@ -5154,6 +5169,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
 
   function f_colebrook_2ph
     "Fanning friction factor for a two phase p-h fluid flow"
+    extends Modelica.Icons.Function;
     input SI.MassFlowRate w;
     input Real D_A;
     input Real e;
@@ -5183,7 +5199,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
 
   function f_dittus_boelter
     "Dittus-Boelter correlation for one-phase flow in a tube"
-
+  extends Modelica.Icons.Function;
     input SI.MassFlowRate w;
     input SI.Length D;
     input SI.Area A;
@@ -5368,7 +5384,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
   end SteamTurbineUnit;
 
   package Utility "Utility models"
-
+  extends Modelica.Icons.UtilitiesPackage;
     model ClosedSystemInit
       "Component for the steady-state initialization of closed systems"
       replaceable package Medium = StandardWater constrainedby
