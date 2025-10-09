@@ -7,40 +7,40 @@ package Test "Test cases for the ThermoPower models"
     extends Modelica.Icons.ExamplesPackage;
     model TestSources "Test source and sink components"
         extends Modelica.Icons.Example;
-      Water.SourceMassFlow source_w_h(use_in_T=false)
+      FluidPh.SourceMassFlow source_w_h(use_in_T=false)
         annotation (Placement(transformation(extent={{-50,130},{-30,150}})));
-      Water.SinkMassFlow sink_w_h
+      FluidPh.SinkMassFlow sink_w_h
         annotation (Placement(transformation(extent={{30,-20},{50,0}})));
-      Water.SourceMassFlow source_w_T(
+      FluidPh.SourceMassFlow source_w_T(
         use_T=true,
         use_in_T=false,
         T=323.15)
         annotation (Placement(transformation(extent={{-50,100},{-30,120}})));
-      Water.SourceMassFlow source_w_h_in(use_in_T=false, use_in_h=true)
+      FluidPh.SourceMassFlow source_w_h_in(use_in_T=false, use_in_h=true)
         annotation (Placement(transformation(extent={{-50,56},{-30,76}})));
-      Water.SourceMassFlow source_w_T_in(use_T=true, use_in_T=true)
+      FluidPh.SourceMassFlow source_w_T_in(use_T=true, use_in_T=true)
         annotation (Placement(transformation(extent={{-50,10},{-30,30}})));
-      Water.SinkMassFlow sink_w_T(use_T=true, T=323.15)
+      FluidPh.SinkMassFlow sink_w_T(use_T=true, T=323.15)
         annotation (Placement(transformation(extent={{30,-50},{50,-30}})));
-      Water.SinkMassFlow sink_w_h_in(use_in_h=true)
+      FluidPh.SinkMassFlow sink_w_h_in(use_in_h=true)
         annotation (Placement(transformation(extent={{30,-90},{50,-70}})));
-      Water.SinkMassFlow sink_w_T_in(use_T=true, use_in_T=true)
+      FluidPh.SinkMassFlow sink_w_T_in(use_T=true, use_in_T=true)
         annotation (Placement(transformation(extent={{30,-130},{50,-110}})));
-      Water.SinkPressure sink_P_h
+      FluidPh.SinkPressure sink_P_h
         annotation (Placement(transformation(extent={{30,130},{50,150}})));
-      Water.SourcePressure source_P_h
+      FluidPh.SourcePressure source_P_h
         annotation (Placement(transformation(extent={{-50,-20},{-30,0}})));
-      Water.SinkPressure sink_P_T(use_T=true, T=323.15)
+      FluidPh.SinkPressure sink_P_T(use_T=true, T=323.15)
         annotation (Placement(transformation(extent={{30,100},{50,120}})));
-      Water.SourcePressure source_P_T(use_T=true, T=323.15)
+      FluidPh.SourcePressure source_P_T(use_T=true, T=323.15)
         annotation (Placement(transformation(extent={{-50,-50},{-30,-30}})));
-      Water.SourcePressure source_P_h_in(use_in_h=true)
+      FluidPh.SourcePressure source_P_h_in(use_in_h=true)
         annotation (Placement(transformation(extent={{-50,-90},{-30,-70}})));
-      Water.SourcePressure source_P_T_in(use_T=true, use_in_T=true)
+      FluidPh.SourcePressure source_P_T_in(use_T=true, use_in_T=true)
         annotation (Placement(transformation(extent={{-50,-130},{-30,-110}})));
-      Water.SinkPressure sink_P_h_in(use_in_h=true)
+      FluidPh.SinkPressure sink_P_h_in(use_in_h=true)
         annotation (Placement(transformation(extent={{30,56},{50,76}})));
-      Water.SinkPressure sink_P_T_in(use_in_T=true, use_T=true)
+      FluidPh.SinkPressure sink_P_T_in(use_in_T=true, use_T=true)
         annotation (Placement(transformation(extent={{30,10},{50,30}})));
       Modelica.Blocks.Sources.RealExpression h_w(y=3e5)
         annotation (Placement(transformation(extent={{-76,68},{-56,88}})));
@@ -91,17 +91,17 @@ package Test "Test cases for the ThermoPower models"
     model TestMixer
         extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.StandardWater;
-      Water.SourceMassFlow
+      FluidPh.SourceMassFlow
                     SourceW1(w0=0.5, h=2.8e6) annotation (Placement(
             transformation(extent={{-90,40},{-70,60}}, rotation=0)));
-      Water.SourceMassFlow
+      FluidPh.SourceMassFlow
                     SourceW2(w0=0.5, h=3.0e6) annotation (Placement(
             transformation(extent={{-90,0},{-70,20}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP1(p0=100000)
                                annotation (Placement(transformation(extent={{50,
                 20},{70,40}}, rotation=0)));
-      Water.Mixer mixer(
+      FluidPh.Mixer mixer(
         V=1,
         Cm=0,
         redeclare package Medium = Medium,
@@ -110,24 +110,24 @@ package Test "Test cases for the ThermoPower models"
         pstart=100000)
         annotation (Placement(transformation(extent={{-52,20},{-32,40}},
               rotation=0)));
-      Water.ValveLin ValveLin1(Kv=1/1e5) annotation (Placement(transformation(
+      FluidPh.ValveLin ValveLin1(Kv=1/1e5) annotation (Placement(transformation(
               extent={{14,20},{34,40}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step1(
         height=-0.2,
         offset=1,
         startTime=2) annotation (Placement(transformation(extent={{-44,60},{-24,
                 80}}, rotation=0)));
-      Water.PressDrop pressDrop(
+      FluidPh.PressDrop pressDrop(
         wnom=1,
         dpnom=100,
         rhonom=1000,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint) annotation (
           Placement(transformation(extent={{-20,20},{0,40}}, rotation=0)));
-      Water.SourceMassFlow
+      FluidPh.SourceMassFlow
                     SourceW3(w0=0.5, h=2.8e6) annotation (Placement(
             transformation(extent={{-90,-40},{-70,-20}}, rotation=0)));
-      Water.Header header(
+      FluidPh.Header header(
         V=1,
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
@@ -135,9 +135,9 @@ package Test "Test cases for the ThermoPower models"
         pstart=100000)
         annotation (Placement(transformation(extent={{-40,-40},{-20,-20}},
               rotation=0)));
-      Water.ValveLin ValveLin2(Kv=1/1e5) annotation (Placement(transformation(
+      FluidPh.ValveLin ValveLin2(Kv=1/1e5) annotation (Placement(transformation(
               extent={{-2,-40},{18,-20}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP2(p0=100000)
                                annotation (Placement(transformation(extent={{40,
                 -40},{60,-20}}, rotation=0)));
@@ -199,31 +199,31 @@ Casella</a>:<br>
       extends Modelica.Icons.Example;
       package Medium=Modelica.Media.Water.StandardWater;
       // package Medium = Modelica.Media.Incompressible.Examples.Glycol47;
-      Water.SourceMassFlow
+      FluidPh.SourceMassFlow
                     SourceW1(
         w0=0.5,
         h=1e5,
         redeclare package Medium = Medium,
         use_in_h=true)                     annotation (Placement(transformation(
               extent={{-98,10},{-78,30}}, rotation=0)));
-      Water.SourceMassFlow
+      FluidPh.SourceMassFlow
                     SourceW2(
         w0=0.5,
         h=2e5,
         redeclare package Medium = Medium) annotation (Placement(transformation(
               extent={{-98,-30},{-78,-10}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP1(        redeclare package Medium = Medium, p0=100000)
                                                                     annotation (
          Placement(transformation(extent={{80,-10},{100,10}}, rotation=0)));
-      Water.Mixer Mixer1(
+      FluidPh.Mixer Mixer1(
         hstart=1e5,
         V=0.01,
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         pstart=100000)                                        annotation (
           Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
-      Water.ValveLin ValveLin1(Kv=1/1e5, redeclare package Medium = Medium)
+      FluidPh.ValveLin ValveLin1(Kv=1/1e5, redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{38,-10},{58,10}},
               rotation=0)));
       Modelica.Blocks.Sources.Step StepValv(
@@ -231,14 +231,14 @@ Casella</a>:<br>
         offset=1,
         startTime=2) annotation (Placement(transformation(extent={{14,30},{34,
                 50}}, rotation=0)));
-      Water.PressDrop PressDrop1(
+      FluidPh.PressDrop PressDrop1(
         wnom=1,
         dpnom=100,
         rhonom=1000,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint) annotation (
           Placement(transformation(extent={{-30,-10},{-10,10}}, rotation=0)));
-      Water.Header Header1(
+      FluidPh.Header Header1(
         hstart=1e5,
         V=0.01,
         redeclare package Medium = Medium,
@@ -301,7 +301,7 @@ Casella</a>:<br>
       extends Modelica.Icons.Example;
       package Medium=Modelica.Media.Water.StandardWater;
       // package Medium = Modelica.Media.Incompressible.Examples.Glycol47;
-      Water.SourceMassFlow
+      FluidPh.SourceMassFlow
                     SourceW1(
         w0=0.5,
         redeclare package Medium = Medium,
@@ -309,17 +309,17 @@ Casella</a>:<br>
         h=3.2e6)
           annotation (Placement(transformation(
               extent={{-98,10},{-78,30}}, rotation=0)));
-      Water.SourceMassFlow
+      FluidPh.SourceMassFlow
                     SourceW2(
         w0=0.5,
         redeclare package Medium = Medium,
         h=3.2e6)                           annotation (Placement(transformation(
               extent={{-98,-30},{-78,-10}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP1(        redeclare package Medium = Medium, p0=100000)
                                                                     annotation (
          Placement(transformation(extent={{80,-10},{100,10}}, rotation=0)));
-      Water.Mixer Mixer1(
+      FluidPh.Mixer Mixer1(
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
@@ -328,7 +328,7 @@ Casella</a>:<br>
         hstart=3.2e6,
         Tmstart=573.15)                                       annotation (
           Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
-      Water.ValveLin ValveLin1(Kv=1/1e5, redeclare package Medium = Medium)
+      FluidPh.ValveLin ValveLin1(Kv=1/1e5, redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{38,-10},{58,10}},
               rotation=0)));
       Modelica.Blocks.Sources.Step StepValv(
@@ -336,14 +336,14 @@ Casella</a>:<br>
         offset=1,
         startTime=2) annotation (Placement(transformation(extent={{14,30},{34,
                 50}}, rotation=0)));
-      Water.PressDrop PressDrop1(
+      FluidPh.PressDrop PressDrop1(
         wnom=1,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         dpnom=100,
         rhonom=1)                                             annotation (
           Placement(transformation(extent={{-30,-10},{-10,10}}, rotation=0)));
-      Water.Header Header1(
+      FluidPh.Header Header1(
         redeclare package Medium = Medium,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
@@ -408,40 +408,40 @@ Casella</a>:<br>
     model TestPressDrop
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.StandardWater;
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     SourceP1(p0=300000) annotation (Placement(transformation(
               extent={{-78,60},{-58,80}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP1(p0=100000) annotation (Placement(transformation(extent=
                {{40,60},{60,80}},rotation=0)));
       parameter Real Kf_unknown(fixed=false);
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     SourceP3(p0=3e5) annotation (Placement(transformation(
               extent={{-80,-20},{-60,0}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP3(p0=1e5) annotation (Placement(transformation(extent={{
                 40,-20},{60,0}}, rotation=0)));
-      Water.PressDrop PressDrop3a(
+      FluidPh.PressDrop PressDrop3a(
         redeclare package Medium = Medium,
         wnom=1,
         dpnom=1e5,
         rhonom=1000,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint) annotation (
           Placement(transformation(extent={{-40,-20},{-20,0}}, rotation=0)));
-      Water.PressDrop PressDrop3b(
+      FluidPh.PressDrop PressDrop3b(
         redeclare package Medium = Medium,
         wnom=1,
         dpnom=1e5,
         rhonom=1000,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint) annotation (
           Placement(transformation(extent={{0,-20},{20,0}}, rotation=0)));
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     SourceP4(p0=3e5) annotation (Placement(transformation(
               extent={{-80,-60},{-60,-40}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP4(p0=1e5) annotation (Placement(transformation(extent={{
                 40,-60},{60,-40}}, rotation=0)));
-      Water.PressDrop PressDrop4a(
+      FluidPh.PressDrop PressDrop4a(
         redeclare package Medium = Medium,
         K=1,
         A=1e-4,
@@ -449,7 +449,7 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic,
         dpnom=100000) annotation (Placement(transformation(extent={{-40,-60},{-20,
                 -40}}, rotation=0)));
-      Water.PressDrop PressDrop4b(
+      FluidPh.PressDrop PressDrop4b(
         redeclare package Medium = Medium,
         wnom=1,
         K=1,
@@ -457,34 +457,34 @@ Casella</a>:<br>
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kinetic,
         dpnom=100000) annotation (Placement(transformation(extent={{0,-60},{20,
                 -40}}, rotation=0)));
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     SourceP2(p0=3e5) annotation (Placement(transformation(
               extent={{-80,20},{-60,40}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP2(p0=1e5) annotation (Placement(transformation(extent={{
                 40,20},{60,40}}, rotation=0)));
-      Water.PressDrop PressDrop2a(
+      FluidPh.PressDrop PressDrop2a(
         redeclare package Medium = Medium,
         wnom=1,
         Kf=Kf_unknown,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
         dpnom=100000) annotation (Placement(transformation(extent={{-40,20},{-20,
                 40}}, rotation=0)));
-      Water.PressDrop PressDrop2b(
+      FluidPh.PressDrop PressDrop2b(
         redeclare package Medium = Medium,
         wnom=1,
         Kf=Kf_unknown,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
         dpnom=100000) annotation (Placement(transformation(extent={{0,20},{20,
                 40}}, rotation=0)));
-      Water.PressDrop PressDrop1a(
+      FluidPh.PressDrop PressDrop1a(
         wnom=1,
         Kf=1e8,
         redeclare package Medium = Medium,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.Kf,
         dpnom=100000) annotation (Placement(transformation(extent={{-40,60},{-20,
                 80}}, rotation=0)));
-      Water.PressDrop PressDrop1b(
+      FluidPh.PressDrop PressDrop1b(
         redeclare package Medium = Medium,
         wnom=1,
         Kf=1e8,
@@ -564,17 +564,17 @@ This test model demonstrate four possible ways of setting the friction coefficie
     model TestPressDropRev
       extends Modelica.Icons.Example;
 
-      Water.PressDrop pressDrop(
+      FluidPh.PressDrop pressDrop(
         wnom=1,
         FFtype=ThermoPower.Choices.PressDrop.FFtypes.OpPoint,
         wnf=0.02,
         rhonom=1000,
         dpnom=1000)
         annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               sinkP(p0=300000)
         annotation (Placement(transformation(extent={{30,-10},{50,10}})));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 sourceW(use_in_w0=true)
         annotation (Placement(transformation(extent={{-50,-10},{-30,10}})));
       Modelica.Blocks.Sources.Sine Cmd1(
@@ -613,27 +613,27 @@ This test model demonstrate four possible ways of setting the friction coefficie
     model TestThroughMassFlow "Test of the ThroughMassFlow component"
       extends Modelica.Icons.Example;
 
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     SourceP1 annotation (Placement(transformation(extent={{-80,
                 10},{-60,30}}, rotation=0)));
-      Water.PressDropLin PressDropLin1(R=1e5/1) annotation (Placement(
+      FluidPh.PressDropLin PressDropLin1(R=1e5/1) annotation (Placement(
             transformation(extent={{0,10},{20,30}}, rotation=0)));
-      Water.ThroughMassFlow
+      FluidPh.ThroughMassFlow
                      ThroughW1(w0=2) annotation (Placement(transformation(
               extent={{-40,10},{-20,30}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP1 annotation (Placement(transformation(extent={{40,10},{
                 60,30}}, rotation=0)));
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     SourceP2 annotation (Placement(transformation(extent={{-80,
                 -50},{-60,-30}}, rotation=0)));
-      Water.PressDropLin PressDropLin2(R=1e5/1) annotation (Placement(
+      FluidPh.PressDropLin PressDropLin2(R=1e5/1) annotation (Placement(
             transformation(extent={{0,-50},{20,-30}}, rotation=0)));
-      Water.ThroughMassFlow
+      FluidPh.ThroughMassFlow
                      ThroughW2(w0=2, use_in_w0=true)
                                      annotation (Placement(transformation(
               extent={{-40,-50},{-20,-30}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP2 annotation (Placement(transformation(extent={{40,-50},
                 {60,-30}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step1(
@@ -683,16 +683,16 @@ Casella</a>:<br>
     model TestValves "Test cases for valves"
       extends Modelica.Icons.Example;
 
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 SourceP1(p0=10e5) annotation (Placement(
             transformation(extent={{-100,40},{-80,60}}, rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 SourceP2(p0=8e5) annotation (Placement(
             transformation(extent={{-100,-60},{-80,-40}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP1(p0=1e5) annotation (Placement(
             transformation(extent={{70,-10},{90,10}}, rotation=0)));
-      ThermoPower.Water.ValveLiq V1(
+      ThermoPower.FluidPh.ValveLiq V1(
         dpnom=9e5,
         wnom=1.5,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
@@ -700,7 +700,7 @@ Casella</a>:<br>
         Kv=2,
         CvData=ThermoPower.Choices.Valve.CvTypes.Kv) annotation (Placement(
             transformation(extent={{-30,60},{-10,80}}, rotation=0)));
-      Water.ValveLiq V2(
+      FluidPh.ValveLiq V2(
         dpnom=5e5,
         wnom=1.2,
         pnom=10e5,
@@ -708,7 +708,7 @@ Casella</a>:<br>
         Av=5e-5,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
             transformation(extent={{-30,20},{-10,40}}, rotation=0)));
-      ThermoPower.Water.ValveLiq V3(
+      ThermoPower.FluidPh.ValveLiq V3(
         dpnom=3e5,
         wnom=1.1,
         pnom=10e5,
@@ -716,7 +716,7 @@ Casella</a>:<br>
         Av=5e-5,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
             transformation(extent={{-30,-40},{-10,-20}}, rotation=0)));
-      ThermoPower.Water.ValveLiq V4(
+      ThermoPower.FluidPh.ValveLiq V4(
         dpnom=8e5,
         wnom=1.3,
         pnom=10e5,
@@ -724,7 +724,7 @@ Casella</a>:<br>
         Cv=2,
         CvData=ThermoPower.Choices.Valve.CvTypes.Cv) annotation (Placement(
             transformation(extent={{-30,-80},{-10,-60}}, rotation=0)));
-      ThermoPower.Water.ValveLiq V5(
+      ThermoPower.FluidPh.ValveLiq V5(
         dpnom=4e5,
         wnom=2,
         pnom=5e5,
@@ -732,10 +732,10 @@ Casella</a>:<br>
         Av=1e-4,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
             transformation(extent={{40,-10},{60,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP2(p0=1e5) annotation (Placement(
             transformation(extent={{10,60},{30,80}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP3(p0=1e5) annotation (Placement(
             transformation(extent={{10,-80},{30,-60}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp CloseLoad(
@@ -837,14 +837,14 @@ Casella</a>:<br>
     model TestValveChoked "Test case for valves in choked flow"
       extends Modelica.Icons.Example;
 
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 SourceP1(p0=5e5, h=400e3) annotation (Placement(
             transformation(extent={{-50,30},{-30,50}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP1(use_in_p0=true)
                                      annotation (Placement(transformation(
               extent={{40,30},{60,50}}, rotation=0)));
-      ThermoPower.Water.ValveLiqChoked ValveLiqChocked(
+      ThermoPower.FluidPh.ValveLiqChoked ValveLiqChocked(
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         Av=5e-5,
@@ -861,14 +861,14 @@ Casella</a>:<br>
         phase=3.14159,
         startTime=1) annotation (Placement(transformation(extent={{10,60},{30,
                 80}}, rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 SourceP2(p0=60e5, h=2.9e6) annotation (
           Placement(transformation(extent={{-50,-50},{-30,-30}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP2(p0=100000, use_in_p0=true)
                                              annotation (Placement(
             transformation(extent={{40,-50},{60,-30}}, rotation=0)));
-      ThermoPower.Water.ValveVap ValveVap(
+      ThermoPower.FluidPh.ValveVap ValveVap(
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         Av=1e-4,
@@ -932,13 +932,13 @@ Casella</a>:<br>
     model TestCoeffValve "Test case for valve with different CvData settings"
       extends Modelica.Icons.Example;
 
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 SourceP1(p0=5e5, h=2e5) annotation (Placement(
             transformation(extent={{-50,50},{-30,70}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP1(p0=3e5) annotation (Placement(
             transformation(extent={{40,50},{60,70}}, rotation=0)));
-      Water.ValveLiq ValveLiq1(
+      FluidPh.ValveLiq ValveLiq1(
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av,
@@ -948,13 +948,13 @@ Casella</a>:<br>
         dpnom=200000)
                    annotation (Placement(transformation(extent={{-10,50},{10,70}},
               rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 SourceP2(p0=5e5, h=2e5) annotation (Placement(
             transformation(extent={{-50,10},{-30,30}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP2(p0=3e5) annotation (Placement(
             transformation(extent={{40,10},{60,30}}, rotation=0)));
-      Water.ValveLiq ValveLiq2(
+      FluidPh.ValveLiq ValveLiq2(
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CvData=ThermoPower.Choices.Valve.CvTypes.Kv,
@@ -964,13 +964,13 @@ Casella</a>:<br>
         dpnom=200000)
                   annotation (Placement(transformation(extent={{-10,10},{10,30}},
               rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 SourceP3(p0=5e5, h=2e5) annotation (Placement(
             transformation(extent={{-50,-30},{-30,-10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP3(p0=3e5) annotation (Placement(
             transformation(extent={{40,-30},{60,-10}}, rotation=0)));
-      Water.ValveLiq ValveLiq3(
+      FluidPh.ValveLiq ValveLiq3(
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CvData=ThermoPower.Choices.Valve.CvTypes.Cv,
@@ -980,13 +980,13 @@ Casella</a>:<br>
         dpnom=200000)
                   annotation (Placement(transformation(extent={{-10,-30},{10,-10}},
               rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 SourceP4(p0=5e5, h=2e5) annotation (Placement(
             transformation(extent={{-50,-70},{-30,-50}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP4(p0=3e5) annotation (Placement(
             transformation(extent={{40,-70},{60,-50}}, rotation=0)));
-      Water.ValveLiq ValveLiq4(
+      FluidPh.ValveLiq ValveLiq4(
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
         wnom=1.012,
@@ -1055,20 +1055,20 @@ Casella</a>:<br>
     model ValveZeroFlow "Test case for valves with zero flowrate"
       extends Modelica.Icons.Example;
 
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 Source(p0=5e5) annotation (Placement(
             transformation(extent={{-90,-10},{-70,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(p0=1e5) annotation (Placement(transformation(
               extent={{70,-10},{90,10}}, rotation=0)));
-      ThermoPower.Water.ValveLiq V1(
+      ThermoPower.FluidPh.ValveLiq V1(
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
         pnom=500000,
         dpnom=200000)                                     annotation (Placement(
             transformation(extent={{-50,-10},{-30,10}}, rotation=0)));
-      ThermoPower.Water.ValveLiq V2(
+      ThermoPower.FluidPh.ValveLiq V2(
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
@@ -1085,7 +1085,7 @@ Casella</a>:<br>
         offset=1,
         startTime=0.3) annotation (Placement(transformation(extent={{-30,20},{-10,
                 40}}, rotation=0)));
-      ThermoPower.Water.ValveLiq V3(
+      ThermoPower.FluidPh.ValveLiq V3(
         wnom=1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         CvData=ThermoPower.Choices.Valve.CvTypes.OpPoint,
@@ -1153,17 +1153,17 @@ Casella</a>:<br>
         offset=1,
         startTime=0) annotation (Placement(transformation(extent={{-40,20},{-20,
                 40}}, rotation=0)));
-      ThermoPower.Water.Tank Tank1(
+      ThermoPower.FluidPh.Tank Tank1(
         A=0.1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         ystart=2) annotation (Placement(transformation(extent={{-50,-14},{-30,6}},
               rotation=0)));
-      ThermoPower.Water.Tank Tank2(
+      ThermoPower.FluidPh.Tank Tank2(
         A=0.1,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         ystart=1) annotation (Placement(transformation(extent={{30,-14},{50,6}},
               rotation=0)));
-      ThermoPower.Water.ValveLiq Valve(
+      ThermoPower.FluidPh.ValveLiq Valve(
         dpnom=1e4,
         wnom=10,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
@@ -1171,10 +1171,10 @@ Casella</a>:<br>
         pnom=1e5,
         CvData=ThermoPower.Choices.Valve.CvTypes.Av) annotation (Placement(
             transformation(extent={{-10,-20},{10,0}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 SourceW1(w0=0) annotation (Placement(
             transformation(extent={{-90,-20},{-70,0}}, rotation=0)));
-      ThermoPower.Water.SinkMassFlow
+      ThermoPower.FluidPh.SinkMassFlow
                               SinkW1(w0=0) annotation (Placement(transformation(
               extent={{70,-20},{90,0}}, rotation=0)));
       inner System system
@@ -1219,34 +1219,34 @@ Casella</a>:<br>
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       constant Real pi=Modelica.Constants.pi;
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 S1(h=1e5, use_in_w0=true)
                                           annotation (Placement(transformation(
               extent={{-58,50},{-38,70}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 S2(h=2e5, use_in_w0=true)
                                           annotation (Placement(transformation(
               extent={{-58,10},{-38,30}}, rotation=0)));
-      ThermoPower.Water.SinkMassFlow
+      ThermoPower.FluidPh.SinkMassFlow
                               S5(h=2e5, use_in_w0=true)
                                         annotation (Placement(transformation(
               extent={{60,-44},{80,-24}}, rotation=0)));
-      ThermoPower.Water.SinkMassFlow
+      ThermoPower.FluidPh.SinkMassFlow
                               S6(h=3e5, use_in_w0=true)
                                         annotation (Placement(transformation(
               extent={{60,-96},{80,-76}}, rotation=0)));
-      ThermoPower.Water.FlowJoin FlowJoin1 annotation (Placement(transformation(
+      ThermoPower.FluidPh.FlowJoin FlowJoin1 annotation (Placement(transformation(
               extent={{-10,30},{10,50}}, rotation=0)));
-      ThermoPower.Water.FlowSplit FlowSplit1 annotation (Placement(
+      ThermoPower.FluidPh.FlowSplit FlowSplit1 annotation (Placement(
             transformation(extent={{-4,-70},{16,-50}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               S3(h=3e5) annotation (Placement(transformation(
               extent={{70,30},{90,50}}, rotation=0)));
-      ThermoPower.Water.PressDropLin LossP1(R=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.PressDropLin LossP1(R=1e-5) annotation (Placement(
             transformation(extent={{40,30},{60,50}}, rotation=0)));
-      ThermoPower.Water.PressDropLin LossP2(R=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.PressDropLin LossP2(R=1e-5) annotation (Placement(
             transformation(extent={{-60,-70},{-40,-50}}, rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 S4(h=1e5) annotation (Placement(transformation(
               extent={{-90,-70},{-70,-50}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine1(
@@ -1263,17 +1263,17 @@ Casella</a>:<br>
         offset=0,
         startTime=0) annotation (Placement(transformation(extent={{-90,30},{-70,
                 50}}, rotation=0)));
-      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T1(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-32,54},{-12,74}}, rotation=0)));
-      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T2(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-32,14},{-12,34}}, rotation=0)));
-      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T3(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{14,34},{34,54}}, rotation=0)));
-      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T4(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-30,-66},{-10,-46}}, rotation=0)));
-      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T5(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{20,-40},{40,-20}}, rotation=0)));
-      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T6(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{20,-92},{40,-72}}, rotation=0)));
       Modelica.Blocks.Sources.Sine Sine3(
         f=1,
@@ -1289,7 +1289,7 @@ Casella</a>:<br>
         offset=0,
         startTime=0) annotation (Placement(transformation(extent={{34,-66},{54,
                 -46}}, rotation=0)));
-      ThermoPower.Water.SensP P1 annotation (Placement(transformation(extent={{
+      ThermoPower.FluidPh.SensP P1 annotation (Placement(transformation(extent={{
                 -42,-48},{-22,-28}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -1384,26 +1384,26 @@ Casella</a>:<br>
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       constant Real pi=Modelica.Constants.pi;
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 S1(h=1e5, w0=2,
         use_in_w0=true)                         annotation (Placement(
             transformation(extent={{-58,50},{-38,70}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 S2(h=2e5, use_in_w0=true)
                                           annotation (Placement(transformation(
               extent={{-58,10},{-38,30}}, rotation=0)));
-      ThermoPower.Water.FlowJoin FlowJoin1 annotation (Placement(transformation(
+      ThermoPower.FluidPh.FlowJoin FlowJoin1 annotation (Placement(transformation(
               extent={{-10,30},{10,50}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               S3(h=3e5) annotation (Placement(transformation(
               extent={{70,30},{90,50}}, rotation=0)));
-      ThermoPower.Water.PressDropLin LossP1(R=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.PressDropLin LossP1(R=1e-5) annotation (Placement(
             transformation(extent={{40,30},{60,50}}, rotation=0)));
-      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T1(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-32,54},{-12,74}}, rotation=0)));
-      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T2(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-32,14},{-12,34}}, rotation=0)));
-      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T3(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{14,34},{34,54}}, rotation=0)));
       Modelica.Blocks.Sources.Trapezoid Sine1(
         nperiod=2,
@@ -1425,29 +1425,29 @@ Casella</a>:<br>
         period=2,
         amplitude=-1.2) annotation (Placement(transformation(extent={{-90,30},{
                 -70,50}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 S4(h=1e5, w0=2,
         use_in_w0=true)                         annotation (Placement(
             transformation(extent={{-58,-30},{-38,-10}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 S5(h=2e5, use_in_w0=true)
                                           annotation (Placement(transformation(
               extent={{-58,-70},{-38,-50}}, rotation=0)));
-      ThermoPower.Water.FlowJoin FlowJoin2(
+      ThermoPower.FluidPh.FlowJoin FlowJoin2(
         rev_in1=false,
         rev_in2=false,
         rev_out=false) annotation (Placement(transformation(extent={{-10,-50},{
                 10,-30}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               S6(h=3e5) annotation (Placement(transformation(
               extent={{70,-50},{90,-30}}, rotation=0)));
-      ThermoPower.Water.PressDropLin LossP2(R=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.PressDropLin LossP2(R=1e-5) annotation (Placement(
             transformation(extent={{40,-50},{60,-30}}, rotation=0)));
-      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T4(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-32,-26},{-12,-6}}, rotation=0)));
-      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T5(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-32,-66},{-12,-46}}, rotation=0)));
-      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T6(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{14,-46},{34,-26}}, rotation=0)));
       Modelica.Blocks.Sources.Trapezoid Sine3(
         nperiod=2,
@@ -1555,31 +1555,31 @@ Casella</a>:<br>
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph;
       constant Real pi=Modelica.Constants.pi;
-      ThermoPower.Water.SinkMassFlow
+      ThermoPower.FluidPh.SinkMassFlow
                               S5(h=2e5, use_in_w0=true)
                                         annotation (Placement(transformation(
               extent={{60,-44},{80,-24}}, rotation=0)));
-      ThermoPower.Water.SinkMassFlow
+      ThermoPower.FluidPh.SinkMassFlow
                               S6(h=3e5, use_in_w0=true)
                                         annotation (Placement(transformation(
               extent={{60,-96},{80,-76}}, rotation=0)));
-      ThermoPower.Water.FlowSplit FlowSplit2(
+      ThermoPower.FluidPh.FlowSplit FlowSplit2(
         rev_in1=false,
         rev_out1=false,
         rev_out2=false) annotation (Placement(transformation(extent={{-4,-70},{
                 16,-50}}, rotation=0)));
-      ThermoPower.Water.PressDropLin LossP2(R=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.PressDropLin LossP2(R=1e-5) annotation (Placement(
             transformation(extent={{-60,-70},{-40,-50}}, rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 S4(h=1e5) annotation (Placement(transformation(
               extent={{-90,-70},{-70,-50}}, rotation=0)));
-      ThermoPower.Water.SensT T4(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T4(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-30,-66},{-10,-46}}, rotation=0)));
-      ThermoPower.Water.SensT T5(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T5(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{20,-40},{40,-20}}, rotation=0)));
-      ThermoPower.Water.SensT T6(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T6(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{20,-92},{40,-72}}, rotation=0)));
-      ThermoPower.Water.SensP P1 annotation (Placement(transformation(extent={{
+      ThermoPower.FluidPh.SensP P1 annotation (Placement(transformation(extent={{
                 -50,-48},{-30,-28}}, rotation=0)));
       Modelica.Blocks.Sources.Trapezoid Sine3(
         nperiod=2,
@@ -1601,28 +1601,28 @@ Casella</a>:<br>
         period=2,
         amplitude=-1.2) annotation (Placement(transformation(extent={{40,-70},{
                 60,-50}}, rotation=0)));
-      ThermoPower.Water.SinkMassFlow
+      ThermoPower.FluidPh.SinkMassFlow
                               S1(h=2e5, use_in_w0=true)
                                         annotation (Placement(transformation(
               extent={{60,52},{80,72}}, rotation=0)));
-      ThermoPower.Water.SinkMassFlow
+      ThermoPower.FluidPh.SinkMassFlow
                               S2(h=3e5, use_in_w0=true)
                                         annotation (Placement(transformation(
               extent={{60,0},{80,20}}, rotation=0)));
-      ThermoPower.Water.FlowSplit FlowSplit1 annotation (Placement(
+      ThermoPower.FluidPh.FlowSplit FlowSplit1 annotation (Placement(
             transformation(extent={{-4,26},{16,46}}, rotation=0)));
-      ThermoPower.Water.PressDropLin LossP1(R=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.PressDropLin LossP1(R=1e-5) annotation (Placement(
             transformation(extent={{-60,26},{-40,46}}, rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 S3(h=1e5) annotation (Placement(transformation(
               extent={{-90,26},{-70,46}}, rotation=0)));
-      ThermoPower.Water.SensT T1(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T1(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{-30,30},{-10,50}}, rotation=0)));
-      ThermoPower.Water.SensT T2(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T2(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{20,56},{40,76}}, rotation=0)));
-      ThermoPower.Water.SensT T3(redeclare package Medium = Medium) annotation (
+      ThermoPower.FluidPh.SensT T3(redeclare package Medium = Medium) annotation (
          Placement(transformation(extent={{20,4},{40,24}}, rotation=0)));
-      ThermoPower.Water.SensP P2 annotation (Placement(transformation(extent={{
+      ThermoPower.FluidPh.SensP P2 annotation (Placement(transformation(extent={{
                 -50,48},{-30,68}}, rotation=0)));
       Modelica.Blocks.Sources.Trapezoid Sine1(
         nperiod=2,
@@ -1733,15 +1733,15 @@ Casella</a>:<br>
     model WaterPump "Test case for WaterPump"
       extends Modelica.Icons.Example;
 
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 Source(p0=1e5, h=1.5e5) annotation (Placement(
             transformation(extent={{-80,-20},{-60,0}}, rotation=0)));
-      ThermoPower.Water.ValveLin Valve(Kv=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin Valve(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,-20},{30,0}}, rotation=0)));
-      ThermoPower.Water.SinkPressure Sink(use_in_p0=true, p0=300000) annotation (
+      ThermoPower.FluidPh.SinkPressure Sink(use_in_p0=true, p0=300000) annotation (
           Placement(transformation(extent={{50,-20},{70,0}}, rotation=0)));
       /*
-  ThermoPower.Water.Pump Pump1(
+  ThermoPower.FluidPh.Pump Pump1(
     rho0=1000,
     pin_start=1e5,
     pout_start=4e5,
@@ -1758,7 +1758,7 @@ Casella</a>:<br>
     initOpt=ThermoPower.Choices.Init.Options.steadyState)
                         annotation (extent=[-54,26; -34,46]);
 */
-      Water.PumpNPSH Pump(
+      FluidPh.PumpNPSH Pump(
         rho0=1000,
         hstart=1e5,
         V=0.01,
@@ -1858,16 +1858,16 @@ Schiavo</a>:<br>
     model WaterPumps "Test case for WaterPump"
       extends Modelica.Icons.Example;
 
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 Source1(p0=1e5, h=1.5e5) annotation (Placement(
             transformation(extent={{-80,40},{-60,60}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin ValveLin1(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,40},{30,60}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP1(p0=300000, use_in_p0=true)
                                              annotation (Placement(
             transformation(extent={{50,40},{70,60}}, rotation=0)));
-      Water.PumpNPSH Pump1(
+      FluidPh.PumpNPSH Pump1(
         rho0=1000,
         V=0.01,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
@@ -1895,16 +1895,16 @@ Schiavo</a>:<br>
         offset=1e-6,
         duration=1) annotation (Placement(transformation(extent={{-20,60},{0,80}},
               rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 Source2(p0=1e5,h=1.5e5) annotation (Placement(
             transformation(extent={{-80,-10},{-60,10}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin2(Kv=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin ValveLin2(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,-10},{30,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP2(p0=300000, use_in_p0=true)
                                              annotation (Placement(
             transformation(extent={{50,-10},{70,10}}, rotation=0)));
-      Water.PumpNPSH Pump2(
+      FluidPh.PumpNPSH Pump2(
         rho0=1000,
         V=0.01,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
@@ -1920,16 +1920,16 @@ Schiavo</a>:<br>
         w0=1,
         dp0=200000) annotation (Placement(transformation(extent={{-40,-12},{-20,
                 8}}, rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 Source3(p0=1e5,h=1.5e5) annotation (Placement(
             transformation(extent={{-80,-60},{-60,-40}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin3(Kv=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin ValveLin3(Kv=1e-5) annotation (Placement(
             transformation(extent={{10,-60},{30,-40}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP3(p0=300000, use_in_p0=true)
                                              annotation (Placement(
             transformation(extent={{50,-60},{70,-40}}, rotation=0)));
-      Water.PumpNPSH Pump3(
+      FluidPh.PumpNPSH Pump3(
         rho0=1000,
         V=0.01,
         redeclare package Medium = Modelica.Media.Water.StandardWater,
@@ -2015,7 +2015,7 @@ Schiavo</a>:<br>
     model WaterPumpMech "Test case for WaterPumpMech"
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
-      Water.PumpMech Pump(
+      FluidPh.PumpMech Pump(
         rho0=1000,
         n0=100,
         V=0.001,
@@ -2032,10 +2032,10 @@ Schiavo</a>:<br>
         dp0=200000)
                  annotation (Placement(transformation(extent={{-40,-2},
                 {-20,18}}, rotation=0)));
-      ThermoPower.Water.SourcePressure
+      ThermoPower.FluidPh.SourcePressure
                                 Source annotation (Placement(transformation(
               extent={{-80,0},{-60,20}}, rotation=0)));
-      ThermoPower.Water.ValveLin Valve(Kv=1e-5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin Valve(Kv=1e-5) annotation (Placement(
             transformation(extent={{20,0},{40,20}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp Ramp1(
         duration=5,
@@ -2043,7 +2043,7 @@ Schiavo</a>:<br>
         offset=0,
         startTime=15) annotation (Placement(transformation(extent={{-20,40},{0,
                 60}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(p0=0.8e5) annotation (Placement(
             transformation(extent={{60,0},{80,20}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp Ramp2(
@@ -2209,7 +2209,7 @@ Schiavo</a>:<br>
     model TestAccumulator "Simple test for Water-Gas Accumulator component"
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.Water.WaterIF97_ph;
-      Water.Accumulator Accumulator1(
+      FluidPh.Accumulator Accumulator1(
         hl_start=1e5,
         Tg_start=300,
         Tgin=300,
@@ -2227,14 +2227,14 @@ Schiavo</a>:<br>
         redeclare package Medium = Modelica.Media.Water.StandardWater,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
           Placement(transformation(extent={{-10,-82},{30,-42}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 SourceW1(w0=0, use_in_w0=true)
                                                annotation (Placement(
             transformation(extent={{-38,-90},{-18,-70}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SinkP1(p0=1e5) annotation (Placement(
             transformation(extent={{70,-90},{90,-70}}, rotation=0)));
-      ThermoPower.Water.PressDropLin PressDropLin1(R=1e5) annotation (Placement(
+      ThermoPower.FluidPh.PressDropLin PressDropLin1(R=1e5) annotation (Placement(
             transformation(extent={{38,-90},{58,-70}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step1(height=2e-2, startTime=500)
         annotation (Placement(transformation(extent={{-90,0},{-70,20}},
@@ -2336,7 +2336,7 @@ Algorithm Tolerance = 1e-6
       parameter Units.HydraulicResistance Kv=1/2e5;
       parameter SI.PerUnit theta0(fixed=false, start = 1);
 
-      Water.SteamTurbineUnit ST(
+      FluidPh.SteamTurbineUnit ST(
         hpFraction=0.63,
         T_HP=0.2,
         T_LP=3.4,
@@ -2348,7 +2348,7 @@ Algorithm Tolerance = 1e-6
         eta_iso=eta_iso,
         redeclare package Medium = Medium) annotation (Placement(transformation(
               extent={{-20,-20},{20,20}}, rotation=0)));
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     SourceP1(p0=pin, h=hin) annotation (Placement(
             transformation(extent={{-100,4},{-80,24}}, rotation=0)));
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=J,
@@ -2357,10 +2357,10 @@ Algorithm Tolerance = 1e-6
         a(start=0, fixed=true))
         annotation (Placement(transformation(extent={{30,-10},{50,10}},
               rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP1(p0=pcond) annotation (Placement(transformation(extent=
                 {{60,-40},{80,-20}}, rotation=0)));
-      Water.ValveLin ValveLin1(Kv=1/Kv) annotation (Placement(transformation(
+      FluidPh.ValveLin ValveLin1(Kv=1/Kv) annotation (Placement(transformation(
               extent={{-70,4},{-50,24}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step1(
         height=-0.01,
@@ -2372,7 +2372,7 @@ Algorithm Tolerance = 1e-6
               rotation=0)));
       Modelica.Blocks.Sources.Constant TorqueLoad(k=-tau) annotation (Placement(
             transformation(extent={{60,20},{80,40}}, rotation=0)));
-      Water.SensT SensT1(redeclare package Medium = Medium) annotation (
+      FluidPh.SensT SensT1(redeclare package Medium = Medium) annotation (
           Placement(transformation(extent={{-46,8},{-26,28}}, rotation=0)));
       inner System system(initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -2451,7 +2451,7 @@ Algorithm Tolerance = 1e-4
       parameter Units.HydraulicResistance Kv=1/2e5;
       parameter SI.PerUnit theta0=0.3;
 
-      Water.SteamTurbineUnit ST(
+      FluidPh.SteamTurbineUnit ST(
         hpFraction=0.63,
         T_HP=0.2,
         T_LP=3.4,
@@ -2463,7 +2463,7 @@ Algorithm Tolerance = 1e-4
         eta_iso=eta_iso,
         redeclare package Medium = Medium) annotation (Placement(transformation(
               extent={{-20,-20},{20,20}}, rotation=0)));
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     SourceP1(p0=pin, h=hin) annotation (Placement(
             transformation(extent={{-96,4},{-76,24}}, rotation=0)));
       Modelica.Mechanics.Rotational.Components.Inertia Inertia1(J=J,
@@ -2472,10 +2472,10 @@ Algorithm Tolerance = 1e-4
         a(start=0, fixed=true))
         annotation (Placement(transformation(extent={{30,-10},{50,10}},
               rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   SinkP1(p0=pcond) annotation (Placement(transformation(extent=
                 {{60,-60},{80,-40}}, rotation=0)));
-      Water.ValveLin ValveLin1(Kv=1/Kv) annotation (Placement(transformation(
+      FluidPh.ValveLin ValveLin1(Kv=1/Kv) annotation (Placement(transformation(
               extent={{-60,4},{-40,24}}, rotation=0)));
       Modelica.Blocks.Sources.Step Step1(
         height=-0.1,
@@ -2546,17 +2546,17 @@ Algorithm Tolerance = 1e-4
     model TestTurbine "Test turbine with prescribed pressure conditions"
       extends Modelica.Icons.Example;
 
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     source(             h=3.3e6,
         p0=15000000,
         use_in_p0=true)
         annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   sink(         h=2e6,
         p0=8000,
         use_in_p0=true)
         annotation (Placement(transformation(extent={{20,20},{40,40}})));
-      Water.SteamTurbineStodola steamTurbineStodola(
+      FluidPh.SteamTurbineStodola steamTurbineStodola(
         wnom=70,
         PRstart=1500,
         pnom=15000000,
@@ -2606,7 +2606,7 @@ Algorithm Tolerance = 1e-4
 
     model TestSprayCondenser
       extends Modelica.Icons.Example;
-      Water.SprayCondenser condenser(
+      FluidPh.SprayCondenser condenser(
         y0=2,
         ystart=0,
         Vt=0.1,
@@ -2614,16 +2614,16 @@ Algorithm Tolerance = 1e-4
         A=0.025,
         pstart=50000)
         annotation (Placement(transformation(extent={{-20,-20},{20,20}})));
-      Water.SourceMassFlow steamFlow(h=3000e3, w0=0.1)
+      FluidPh.SourceMassFlow steamFlow(h=3000e3, w0=0.1)
         annotation (Placement(transformation(extent={{-60,30},{-40,50}})));
-      Water.SourceMassFlow coolingFlow(
+      FluidPh.SourceMassFlow coolingFlow(
         w0=1,
         h=100e3,
         use_in_w0=true)
         annotation (Placement(transformation(extent={{-60,-2},{-40,18}})));
-      Water.SinkPressure sinkPressure
+      FluidPh.SinkPressure sinkPressure
         annotation (Placement(transformation(extent={{30,-90},{50,-70}})));
-      Water.Flow1DFV pip(
+      FluidPh.Flow1DFV pip(
         L=5,
         H=-5,
         A=3e-4,
@@ -2647,11 +2647,11 @@ Algorithm Tolerance = 1e-4
         offset=1,
         startTime=10)
         annotation (Placement(transformation(extent={{-88,14},{-68,34}})));
-      Water.SensT1 steamTemperature
+      FluidPh.SensT1 steamTemperature
         annotation (Placement(transformation(extent={{-10,52},{10,72}})));
-      Water.SensT1 coolingWaterTemperature
+      FluidPh.SensT1 coolingWaterTemperature
         annotation (Placement(transformation(extent={{-40,14},{-20,34}})));
-      Water.SensT1 condensateTemperature
+      FluidPh.SensT1 condensateTemperature
         annotation (Placement(transformation(extent={{16,-26},{36,-6}})));
     equation
       connect(steamFlow.flange, condenser.condensingSteam) annotation (Line(
@@ -2682,11 +2682,11 @@ Algorithm Tolerance = 1e-4
 
     model TestBarometricCondenser
       extends Modelica.Icons.Example;
-      Water.SourceMassFlow steamFlow(h=3000e3,
+      FluidPh.SourceMassFlow steamFlow(h=3000e3,
         w0=0.1,
         use_in_w0=true)
         annotation (Placement(transformation(extent={{-60,30},{-40,50}})));
-      Water.SourceMassFlow coolingFlow(
+      FluidPh.SourceMassFlow coolingFlow(
         w0=1,
         h=100e3,
         use_in_w0=true,
@@ -2696,24 +2696,24 @@ Algorithm Tolerance = 1e-4
         annotation (Placement(transformation(extent={{-60,-2},{-40,18}})));
       inner System system(allowFlowReversal=false, initOpt=ThermoPower.Choices.Init.Options.steadyState)
         annotation (Placement(transformation(extent={{60,60},{80,80}})));
-      Water.SensT1 steamTemperature
+      FluidPh.SensT1 steamTemperature
         annotation (Placement(transformation(extent={{-10,52},{10,72}})));
-      Water.SensT1 coolingWaterTemperature
+      FluidPh.SensT1 coolingWaterTemperature
         annotation (Placement(transformation(extent={{-40,14},{-20,34}})));
-      Water.SensT1 condensateTemperature
+      FluidPh.SensT1 condensateTemperature
         annotation (Placement(transformation(extent={{12,-4},{32,16}})));
-      Water.BarometricCondenser barometricCondenser(
+      FluidPh.BarometricCondenser barometricCondenser(
         wnom=1,
         Tt=5,
         Tlstart=313.15)
         annotation (Placement(transformation(extent={{-12,-18},{12,14}})));
-      Water.Tank tank(
+      FluidPh.Tank tank(
         A=0.1,
         ystart=1,
         initOpt=ThermoPower.Choices.Init.Options.fixedState,
         hstart=168861)
         annotation (Placement(transformation(extent={{32,-24},{52,-4}})));
-      Water.SinkMassFlow sinkMassFlow(w0=1.03)
+      FluidPh.SinkMassFlow sinkMassFlow(w0=1.03)
         annotation (Placement(transformation(extent={{68,-30},{88,-10}})));
       Modelica.Blocks.Sources.TimeTable steamFlowRate(table=[0,0.07; 10,0.07;
             10,0.035; 40,0.035; 40,0; 100,0])
@@ -2760,7 +2760,7 @@ feature can be useful if one wants to simulate circuits where some condensers ma
       "Test of the dynamic cooling tower model with packing"
       extends Modelica.Icons.Example;
       package Water = Modelica.Media.Water.StandardWater;
-      ThermoPower.Water.CoolingTower coolingTower(
+      ThermoPower.FluidPh.CoolingTower coolingTower(
         Nt=5,
         M0=0.7*4300,
         Mnom=4300,
@@ -2778,11 +2778,11 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         nu_l=0,
         rhoanom=1.2)
         annotation (Placement(transformation(extent={{-20,0},{20,40}})));
-      ThermoPower.Water.SourceMassFlow sourceW(
+      ThermoPower.FluidPh.SourceMassFlow sourceW(
         h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
         w0=2520/3600*995)
         annotation (Placement(transformation(extent={{-52,50},{-32,70}})));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               sinkP
         annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
       Modelica.Blocks.Sources.Ramp fanRpm(
@@ -2821,7 +2821,7 @@ feature can be useful if one wants to simulate circuits where some condensers ma
     model TestCoolingTowerStatic "Test of the static cooling tower model"
       extends Modelica.Icons.Example;
       package Water = Modelica.Media.Water.StandardWater;
-      ThermoPower.Water.CoolingTower coolingTower(
+      ThermoPower.FluidPh.CoolingTower coolingTower(
         Nt=5,
         wlnom=504/3600*995,
         qanom=99,
@@ -2835,11 +2835,11 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         staticModel=true,
         rhoanom=1.2)
         annotation (Placement(transformation(extent={{-20,0},{20,40}})));
-      ThermoPower.Water.SourceMassFlow sourceW(
+      ThermoPower.FluidPh.SourceMassFlow sourceW(
         h = Water.specificEnthalpy_pT(1e5, 32.5 + 273.15),
         w0=2520/3600*995)
         annotation (Placement(transformation(extent={{-52,50},{-32,70}})));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               sinkP
         annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
       Modelica.Blocks.Sources.Ramp fanRpm(
@@ -2881,7 +2881,7 @@ feature can be useful if one wants to simulate circuits where some condensers ma
       import ThermoPower;
       extends Modelica.Icons.Example;
       package Water = Modelica.Media.Water.StandardWater;
-      ThermoPower.Water.CoolingTower coolingTower(
+      ThermoPower.FluidPh.CoolingTower coolingTower(
         nu_a=1,
         nu_l=0,
         Nt=1,
@@ -2897,13 +2897,13 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         k_wa_nom=0.024,
         qanom=7.3)
         annotation (Placement(transformation(extent={{-20,-2},{20,38}})));
-      ThermoPower.Water.SourceMassFlow sourceClosedCircuit(
+      ThermoPower.FluidPh.SourceMassFlow sourceClosedCircuit(
         use_T=true,
         w0=30/3600*995,
         p0=400000,
         T=308.15)
         annotation (Placement(transformation(extent={{-86,18},{-66,38}})));
-      ThermoPower.Water.SinkPressure towerDischarge
+      ThermoPower.FluidPh.SinkPressure towerDischarge
         annotation (Placement(transformation(extent={{12,-38},{32,-18}})));
       Modelica.Blocks.Sources.Ramp fanRpm(
         duration=1,
@@ -2914,7 +2914,7 @@ feature can be useful if one wants to simulate circuits where some condensers ma
         T_amb=303.15,
         T_wb=298.15)
         annotation (Placement(transformation(extent={{60,60},{80,80}})));
-      ThermoPower.Water.Flow1DFV cooledFlow(
+      ThermoPower.FluidPh.Flow1DFV cooledFlow(
         L=1,
         omega=100,
         wnom=8.33,
@@ -2927,9 +2927,9 @@ feature can be useful if one wants to simulate circuits where some condensers ma
             extent={{-10,-10},{10,10}},
             rotation=-90,
             origin={-52,12})));
-      ThermoPower.Water.SinkPressure closedCircuitDischarge(p0=300000)
+      ThermoPower.FluidPh.SinkPressure closedCircuitDischarge(p0=300000)
         annotation (Placement(transformation(extent={{-36,-36},{-16,-16}})));
-      ThermoPower.Water.SourceMassFlow sourceCoolingWater(
+      ThermoPower.FluidPh.SourceMassFlow sourceCoolingWater(
         use_T=true,
         w0=0.4,
         T=301.15)
@@ -2976,11 +2976,11 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
     model TestExpansionTankIdeal "Test case for ExpansionTankIdeal"
       extends Modelica.Icons.Example;
 
-      Water.ExpansionTankIdeal expTankIdeal(pf=700000)
+      FluidPh.ExpansionTankIdeal expTankIdeal(pf=700000)
         annotation (Placement(transformation(extent={{-10,-4},{10,16}})));
-      Water.ThroughMassFlow idealPump(w0=10)
+      FluidPh.ThroughMassFlow idealPump(w0=10)
         annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
-      Water.Flow1DFV boiler(
+      FluidPh.Flow1DFV boiler(
         A=3.1416*0.04^2,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
         L=10,
@@ -3000,7 +3000,7 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
         annotation (Placement(transformation(extent={{-26,-48},{-6,-68}})));
       Modelica.Blocks.Sources.RealExpression externalTemperature(y=system.T_amb)
         annotation (Placement(transformation(extent={{-78,-90},{-46,-70}})));
-      Water.Flow1DFV heater(
+      FluidPh.Flow1DFV heater(
         A=3.1416*0.04^2,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
         L=10,
@@ -3052,17 +3052,17 @@ this transient there is a net flow rate entering the expansion tank.
       "Test turbine with prescribed pressure conditions and with normalized partial arc variation"
       extends Modelica.Icons.Example;
 
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     source(             h=3.3e6,
         p0=15000000,
         use_in_p0=false)
         annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   sink(         h=2e6,
         p0=8000,
         use_in_p0=false)
         annotation (Placement(transformation(extent={{40,20},{60,40}})));
-      Water.SteamTurbineStodola steamTurbineStodola(
+      FluidPh.SteamTurbineStodola steamTurbineStodola(
         wnom=70,
         PRstart=1500,
         pnom=15000000,
@@ -4876,7 +4876,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     "Tests for thermo-hydraulic distributed parameter components"
     extends Modelica.Icons.ExamplesPackage;
 
-    model TestWaterFlow1DFV_A "Test case for Water.Flow1DFV"
+    model TestWaterFlow1DFV_A "Test case for FluidPh.Flow1DFV"
       extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
@@ -4902,7 +4902,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         "Height of power step";
 
       SI.Time tau "Transport time delay";
-      ThermoPower.Water.SourceMassFlow fluidSource(
+      ThermoPower.FluidPh.SourceMassFlow fluidSource(
         p0=phex,
         h=hinhex,
         w0=whex,
@@ -4911,13 +4911,13 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         redeclare package Medium = Medium)
                  annotation (Placement(transformation(extent={{-78,-10},{-58,10}},
               rotation=0)));
-      ThermoPower.Water.SinkPressure fluidSink(p0=phex/2, redeclare package
+      ThermoPower.FluidPh.SinkPressure fluidSink(p0=phex/2, redeclare package
           Medium = Medium)                          annotation (Placement(
             transformation(extent={{70,-10},{90,10}}, rotation=0)));
-      ThermoPower.Water.ValveLin valve(Kv=3e-6, redeclare package Medium =
+      ThermoPower.FluidPh.ValveLin valve(Kv=3e-6, redeclare package Medium =
             Medium)                             annotation (Placement(
             transformation(extent={{10,-10},{30,10}}, rotation=0)));
-      Water.Flow1DFV
+      FluidPh.Flow1DFV
                    hex(
         N=Nnodes,
         L=Lhex,
@@ -4936,7 +4936,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         redeclare package Medium = Medium)
                     annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
-      ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
       Thermal.HeatSource1DFV heatSource(Nw=Nnodes - 1)
@@ -4957,7 +4957,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                 80}}, rotation=0)));
       Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation (
          Placement(transformation(extent={{-40,40},{-20,60}}, rotation=0)));
-      ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
                0)));
       inner System system
@@ -4998,7 +4998,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         Diagram(graphics),
         experiment(StopTime=80, Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p>
+<p>The model is designed to test the component <code>FluidPh.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p>
 <p>This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.</p>
 <p>During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed. The outlet temperature can be predicted analytically assuming incompressible flow and constant cp.</p>
 <p><ul>
@@ -5017,7 +5017,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 </html>"));
     end TestWaterFlow1DFV_A;
 
-    model TestWaterFlow1DFV_B "Test case for Water.Flow1DFV"
+    model TestWaterFlow1DFV_B "Test case for FluidPh.Flow1DFV"
       extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
@@ -5044,14 +5044,14 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       Real alpha = 1-exp(-NTU)
         "Steady state gain of outlet temperature vs. external temperature";
 
-      Water.ValveLin valve(Kv=2*whex/phex)      annotation (
+      FluidPh.ValveLin valve(Kv=2*whex/phex)      annotation (
           Placement(transformation(extent={{14,-22},{34,-2}}, rotation=0)));
-      Water.SourceMassFlow fluidSource(
+      FluidPh.SourceMassFlow fluidSource(
         w0=whex,
         p0=phex,
         h=hs) annotation (Placement(transformation(extent={{-86,-22},{-66,-2}},
               rotation=0)));
-      Water.SinkPressure      fluidSink(p0=phex/2, h=hs) annotation (Placement(
+      FluidPh.SinkPressure      fluidSink(p0=phex/2, h=hs) annotation (Placement(
             transformation(extent={{74,-22},{94,-2}}, rotation=0)));
       Modelica.Blocks.Sources.Step Temperature(
         height=10,
@@ -5061,17 +5061,17 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
             transformation(extent={{-12,56},{8,76}},  rotation=0)));
-      Water.SensT T_in(redeclare package Medium = Medium)
+      FluidPh.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-56,-18},{-36,2}},
               rotation=0)));
-      Water.SensT T_out(redeclare package Medium = Medium)
+      FluidPh.SensT T_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{44,-18},{64,2}}, rotation=
                0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
       Thermal.TempSource1DFV tempSource(Nw=Nnodes - 1)
         annotation (Placement(transformation(extent={{-22,14},{-2,34}})));
-      Water.Flow1DFV hex(
+      FluidPh.Flow1DFV hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -5128,7 +5128,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         experiment(StopTime=40, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes). </p>
+<p>The model is designed to test the component <code>FluidPh.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes). </p>
 <p>This model represent the fluid side of a heat exchanger with convective exchange with an external source of uniform given temperature. The operating fluid is liquid water. The number of transfer units in the selected operating point is NTU = 0.73. Assuming incompressible fluid and constant cp, when the external temperature is raised at time t = 20 s, the outlet temperature should follow a ramp change, with a duration equal to the residence time of the fluid in the tubes, and an amplitude equal to a fraction exp(-NTU) of the external temperature change.</p>
 <p>Simulation Interval = [0...200] sec </p>
 <p>Integration Algorithm = DASSL </p>
@@ -5141,7 +5141,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 </html>"));
     end TestWaterFlow1DFV_B;
 
-    model TestWaterFlow1DFV_D "Test case for Water.Flow1DFV"
+    model TestWaterFlow1DFV_D "Test case for FluidPh.Flow1DFV"
       extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
@@ -5165,7 +5165,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       Real dw_dp = valve.Kv "sensitivity of valve flow to pressure";
       SI.Time tau = dMtot_dp/dw_dp "time constant of pressure transient";
 
-      Water.Flow1DFV
+      FluidPh.Flow1DFV
                    hex(
         N=Nnodes,
         L=Lhex,
@@ -5184,17 +5184,17 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         Nt=Nt,
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 MassFlowRateSource(w0=whex, h=hs,
         use_in_w0=true)                                           annotation (
           Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               FluidSink(
         p0=0,
         R=100,
         h=3e6) annotation (Placement(transformation(extent={{70,-10},{90,10}},
               rotation=0)));
-      ThermoPower.Water.ValveLin valve(Kv=1e-7)     annotation (Placement(
+      ThermoPower.FluidPh.ValveLin valve(Kv=1e-7)     annotation (Placement(
             transformation(extent={{34,-10},{54,10}}, rotation=0)));
       Modelica.Blocks.Sources.Step MassFlowRateStep(
         height=whex/10,
@@ -5209,7 +5209,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                 0,40}}, rotation=0)));
       Modelica.Blocks.Sources.Constant ExtPower(k=0) annotation (Placement(
             transformation(extent={{-50,60},{-30,80}}, rotation=0)));
-      Water.SensP sensP annotation (Placement(transformation(extent={{10,14},{
+      FluidPh.SensP sensP annotation (Placement(transformation(extent={{10,14},{
                 30,34}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -5242,7 +5242,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                 graphics),
         experiment(StopTime=6, Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. </p><p>At time t = 1 the inlet flow rate undergoes a step increase; the pressure follows a first order transient with time constant tau. </p>
+<p>The model is designed to test the component <code>FluidPh.Flow1DFV</code> (fluid side of a heat exchanger, finite volumes).</p><p>This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. </p><p>At time t = 1 the inlet flow rate undergoes a step increase; the pressure follows a first order transient with time constant tau. </p>
 <p>Simulation Interval = [0...6] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <p><ul>
@@ -5253,7 +5253,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         __Dymola_experimentSetupOutput);
     end TestWaterFlow1DFV_D;
 
-    model TestWaterFlow1DFV_E "Test case for Water.Flow1DFV"
+    model TestWaterFlow1DFV_E "Test case for FluidPh.Flow1DFV"
       extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
@@ -5278,19 +5278,19 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       parameter SI.SpecificEnthalpy houthex=1e5
         "initial outlet specific enthalpy";
 
-      Water.SinkPressure      SideA_FluidSink annotation (Placement(
+      FluidPh.SinkPressure      SideA_FluidSink annotation (Placement(
             transformation(extent={{74,-82},{94,-62}}, rotation=0)));
-      Water.SinkPressure      SideB_FluidSink annotation (Placement(
+      FluidPh.SinkPressure      SideB_FluidSink annotation (Placement(
             transformation(extent={{-76,18},{-96,38}},  rotation=0)));
-      Water.SourceMassFlow      SideA_MassFlowRate(w0=whex,
+      FluidPh.SourceMassFlow      SideA_MassFlowRate(w0=whex,
         p0=300000,
         use_in_h=true)                                              annotation (
          Placement(transformation(extent={{-70,-82},{-50,-62}}, rotation=0)));
-      Water.ValveLin             ValveLin1(Kv=whex/(2e5)) annotation (Placement(
+      FluidPh.ValveLin             ValveLin1(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{18,-82},{38,-62}}, rotation=0)));
-      Water.ValveLin             ValveLin2(Kv=whex/(2e5)) annotation (Placement(
+      FluidPh.ValveLin             ValveLin2(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{-26,18},{-46,38}}, rotation=0)));
-      Water.SensT             SensT_A_in(redeclare package Medium = Medium)
+      FluidPh.SensT             SensT_A_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-46,-78},{-26,-58}},
               rotation=0)));
       Modelica.Blocks.Sources.Step SideA_InSpecEnth(
@@ -5305,20 +5305,20 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                                                  annotation (Placement(
             transformation(extent={{4,-32},{24,-12}},
                                                     rotation=0)));
-      Water.SensT             SensT_B_in(redeclare package Medium = Medium)
+      FluidPh.SensT             SensT_B_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{34,22},{14,42}}, rotation=
                0)));
-      Water.SourceMassFlow      SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
+      FluidPh.SourceMassFlow      SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
          Placement(transformation(extent={{64,18},{44,38}}, rotation=0)));
-      Water.SensT             SensT_A_out(redeclare package Medium = Medium)
+      FluidPh.SensT             SensT_A_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{44,-78},{64,-58}},
               rotation=0)));
-      Water.SensT             SensT_B_out(redeclare package Medium = Medium)
+      FluidPh.SensT             SensT_B_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,22},{-70,42}},
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Water.Flow1DFV hexFVb(
+      FluidPh.Flow1DFV hexFVb(
         N=Nnodes,
         Nt=1,
         L=Lhex,
@@ -5338,7 +5338,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
             extent={{-10,-10},{10,10}},
             rotation=180,
             origin={-8,28})));
-      Water.Flow1DFV hexFVa(
+      FluidPh.Flow1DFV hexFVa(
         N=Nnodes,
         L=Lhex,
         Dhyd=Dihex,
@@ -5423,7 +5423,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         experiment(StopTime=1200, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
+<p>The model is designed to test the component <code>FluidPh.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
 <p>Simulation Interval = [0...1200] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
@@ -5434,7 +5434,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
 </html>"));
     end TestWaterFlow1DFV_E;
 
-    model TestWaterFlow1DFV_F "Test case for Water.Flow1DFV"
+    model TestWaterFlow1DFV_F "Test case for FluidPh.Flow1DFV"
       extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
@@ -5465,19 +5465,19 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       parameter SI.SpecificEnthalpy houthex=1e5
         "initial outlet specific enthalpy";
 
-      Water.SinkPressure      SideA_FluidSink annotation (Placement(
+      FluidPh.SinkPressure      SideA_FluidSink annotation (Placement(
             transformation(extent={{74,-82},{94,-62}}, rotation=0)));
-      Water.SinkPressure      SideB_FluidSink annotation (Placement(
+      FluidPh.SinkPressure      SideB_FluidSink annotation (Placement(
             transformation(extent={{-76,18},{-96,38}},  rotation=0)));
-      Water.SourceMassFlow      SideA_MassFlowRate(w0=whex,
+      FluidPh.SourceMassFlow      SideA_MassFlowRate(w0=whex,
         p0=300000,
         use_in_h=true)                                              annotation (
          Placement(transformation(extent={{-70,-82},{-50,-62}}, rotation=0)));
-      Water.ValveLin             ValveLin1(Kv=whex/(2e5)) annotation (Placement(
+      FluidPh.ValveLin             ValveLin1(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{18,-82},{38,-62}}, rotation=0)));
-      Water.ValveLin             ValveLin2(Kv=whex/(2e5)) annotation (Placement(
+      FluidPh.ValveLin             ValveLin2(Kv=whex/(2e5)) annotation (Placement(
             transformation(extent={{-26,18},{-46,38}}, rotation=0)));
-      Water.SensT             SensT_A_in(redeclare package Medium = Medium)
+      FluidPh.SensT             SensT_A_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-46,-78},{-26,-58}},
               rotation=0)));
       Modelica.Blocks.Sources.Step SideA_InSpecEnth(
@@ -5492,20 +5492,20 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                                                  annotation (Placement(
             transformation(extent={{4,-32},{24,-12}},
                                                     rotation=0)));
-      Water.SensT             SensT_B_in(redeclare package Medium = Medium)
+      FluidPh.SensT             SensT_B_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{34,22},{14,42}}, rotation=
                0)));
-      Water.SourceMassFlow      SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
+      FluidPh.SourceMassFlow      SideB_MassFlowRate(w0=whex, p0=3e5) annotation (
          Placement(transformation(extent={{64,18},{44,38}}, rotation=0)));
-      Water.SensT             SensT_A_out(redeclare package Medium = Medium)
+      FluidPh.SensT             SensT_A_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{44,-78},{64,-58}},
               rotation=0)));
-      Water.SensT             SensT_B_out(redeclare package Medium = Medium)
+      FluidPh.SensT             SensT_B_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,22},{-70,42}},
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Water.Flow1DFV hexFVb(
+      FluidPh.Flow1DFV hexFVb(
         Nt=1,
         L=Lhex,
         wnom=whex,
@@ -5525,7 +5525,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
             extent={{-10,-10},{10,10}},
             rotation=180,
             origin={-8,28})));
-      Water.Flow1DFV hexFVa(
+      FluidPh.Flow1DFV hexFVa(
         N=Nnodes,
         L=Lhex,
         Dhyd=Dihex,
@@ -5623,7 +5623,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         experiment(StopTime=1200, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
+<p>The model is designed to test the component <code>FluidPh.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
 <p>Simulation Interval = [0...1200] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>
@@ -5635,7 +5635,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
     end TestWaterFlow1DFV_F;
 
     model TestWaterFlow1DFV_DB
-      "Test case for Water.Flow1DFV with Dittus-Boelter heat transfer"
+      "Test case for FluidPh.Flow1DFV with Dittus-Boelter heat transfer"
       extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialMedium;
@@ -5654,7 +5654,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       parameter SI.SpecificEnthalpy hs=1e5
         "initial inlet specific enthalpy";
 
-      Water.Flow1DFV hexFV(
+      FluidPh.Flow1DFV hexFV(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -5676,14 +5676,14 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                            TempSource(Nw=Nnodes - 1)
                                                 annotation (Placement(
             transformation(extent={{-20,18},{0,38}}, rotation=0)));
-      Water.ValveLin valve(Kv=2*whex/phex)                 annotation (
+      FluidPh.ValveLin valve(Kv=2*whex/phex)                 annotation (
           Placement(transformation(extent={{14,-10},{34,10}}, rotation=0)));
-      Water.SourceMassFlow      FluidSource(
+      FluidPh.SourceMassFlow      FluidSource(
         w0=whex,
         p0=phex,
         h=hs) annotation (Placement(transformation(extent={{-80,-10},{-60,10}},
               rotation=0)));
-      Water.SinkPressure      FluidSink(p0=phex/2, h=hs) annotation (Placement(
+      FluidPh.SinkPressure      FluidSink(p0=phex/2, h=hs) annotation (Placement(
             transformation(extent={{70,-10},{90,10}}, rotation=0)));
       Modelica.Blocks.Sources.Step Temperature(
         height=10,
@@ -5694,10 +5694,10 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
             transformation(extent={{0,40},{20,60}},  rotation=0)));
-      Water.SensT             T_in(redeclare package Medium = Medium)
+      FluidPh.SensT             T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
-      Water.SensT             T_out(redeclare package Medium = Medium)
+      FluidPh.SensT             T_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
                0)));
       inner System system
@@ -5737,7 +5737,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         experiment(StopTime=40, Tolerance=1e-006),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes), with Dittus-Boelter heat transfer coefficient computation.</p>This model represent the fluid side of a heat exchanger with convective exchange with an external source of uniform given temperature.</p><p>At time t = 10 s, the external temperature is raised.</p>
+<p>The model is designed to test the component <code>FluidPh.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes), with Dittus-Boelter heat transfer coefficient computation.</p>This model represent the fluid side of a heat exchanger with convective exchange with an external source of uniform given temperature.</p><p>At time t = 10 s, the external temperature is raised.</p>
 <p>Simulation Interval = [0...40] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>"));
     end TestWaterFlow1DFV_DB;
@@ -5968,7 +5968,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       //height of power step
       parameter SI.EnergyFlowRate W=41800*whex;
 
-      ThermoPower.Water.SourceMassFlow Fluid_Source(
+      ThermoPower.FluidPh.SourceMassFlow Fluid_Source(
         redeclare package Medium = Medium,
         p0=phex,
         h=hinhex,
@@ -5977,15 +5977,15 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         use_in_h=true)
                  annotation (Placement(transformation(extent={{-76,-10},{-56,10}},
               rotation=0)));
-      ThermoPower.Water.SinkPressure Fluid_Sink(
+      ThermoPower.FluidPh.SinkPressure Fluid_Sink(
         p0=phex/2,
         redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{64,-10},{84,10}}, rotation=0)));
-      ThermoPower.Water.ValveLin Valve(
+      ThermoPower.FluidPh.ValveLin Valve(
         Kv=3e-6,
         redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{12,-10},{32,10}}, rotation=0)));
-      Water.Flow1DFEM hex(
+      FluidPh.Flow1DFEM hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -6001,7 +6001,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         dpnom=10000)                                          annotation (
           Placement(transformation(extent={{-20,-10},{0,10}}, rotation=0)));
-      ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-48,-6},{-28,14}},
               rotation=0)));
       Thermal.HeatSource1DFEM HeatSource1D1(
@@ -6024,7 +6024,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
                 70}}, rotation=0)));
       Modelica.Blocks.Sources.Step ExtPower(height=W, startTime=30) annotation (
          Placement(transformation(extent={{-40,40},{-20,60}}, rotation=0)));
-      ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{38,-6},{58,14}}, rotation=
                0)));
       inner System system
@@ -6113,7 +6113,7 @@ Algorithm Tolerance = 1e-6
       parameter SI.Pressure phex=3e5;
       // initial inlet specific enthalpy
       parameter SI.SpecificEnthalpy hs=1e5;
-      Water.Flow1DFEM hex(
+      FluidPh.Flow1DFEM hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -6136,17 +6136,17 @@ Algorithm Tolerance = 1e-6
               rotation=0)));
       Thermal.TempSource1DFEM          TempSource(N=Nnodes) annotation (
           Placement(transformation(extent={{-20,10},{0,30}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(
+      ThermoPower.FluidPh.ValveLin ValveLin1(
         Kv=2*whex/phex,
         redeclare package Medium = Medium) annotation (
           Placement(transformation(extent={{10,-10},{30,10}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow FluidSource(
+      ThermoPower.FluidPh.SourceMassFlow FluidSource(
         redeclare package Medium = Medium,
         w0=whex,
         p0=phex,
         h=hs) annotation (Placement(transformation(extent={{-80,-10},{-60,10}},
               rotation=0)));
-      ThermoPower.Water.SinkPressure FluidSink(
+      ThermoPower.FluidPh.SinkPressure FluidSink(
         p0=phex/2,
         h=hs,
         redeclare package Medium = Medium) annotation (Placement(
@@ -6160,10 +6160,10 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
             transformation(extent={{-10,70},{10,90}}, rotation=0)));
-      ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
-      ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{40,-6},{60,14}}, rotation=
                0)));
       inner System system
@@ -6253,7 +6253,7 @@ Algorithm Tolerance = 1e-6
       parameter SI.Pressure phex=1e5;
       // initial specific enthalpy
       parameter SI.SpecificEnthalpy hs=1e5;
-      Water.Flow1DFEM hex(
+      FluidPh.Flow1DFEM hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -6272,16 +6272,16 @@ Algorithm Tolerance = 1e-6
         dpnom=10000)
         annotation (Placement(transformation(extent={{-20,-10},{0,10}},
               rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(
+      ThermoPower.FluidPh.ValveLin ValveLin1(
         redeclare package Medium = Medium,
         Kv=2*whex/phex) annotation (
           Placement(transformation(extent={{40,-10},{60,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure SinkP1(
+      ThermoPower.FluidPh.SinkPressure SinkP1(
         h=hs,
         p0=4*phex,
         redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{70,-10},{90,10}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow SourceW1(
+      ThermoPower.FluidPh.SourceMassFlow SourceW1(
         redeclare package Medium = Medium,
         w0=whex,
         G=0,
@@ -6299,10 +6299,10 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
             transformation(extent={{10,50},{30,70}}, rotation=0)));
-      ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-6},{-30,14}},
               rotation=0)));
-      ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{10,-6},{30,14}}, rotation=
                0)));
       inner System system
@@ -6387,7 +6387,7 @@ Algorithm Tolerance = 1e-6
       parameter SI.Pressure phex=0.2e5;
       // initial specific enthalpy
       parameter SI.SpecificEnthalpy hs=3e6;
-      Water.Flow1DFEM hex(
+      FluidPh.Flow1DFEM hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -6405,20 +6405,20 @@ Algorithm Tolerance = 1e-6
         dpnom=10000)
         annotation (Placement(transformation(extent={{-20,-10},{0,10}},
               rotation=0)));
-      ThermoPower.Water.SourceMassFlow MassFlowRateSource(
+      ThermoPower.FluidPh.SourceMassFlow MassFlowRateSource(
         w0=whex, h=hs,
         use_in_w0=true,
         redeclare package Medium = Medium)
         annotation (
           Placement(transformation(extent={{-60,-10},{-40,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure FluidSink(
+      ThermoPower.FluidPh.SinkPressure FluidSink(
         redeclare package Medium = Medium,
         R=100,
         h=3e6,
         p0=5000)
                annotation (Placement(transformation(extent={{76,-10},{96,10}},
               rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(
+      ThermoPower.FluidPh.ValveLin ValveLin1(
         Kv=1e-7,
         redeclare package Medium = Medium) annotation (Placement(
             transformation(extent={{40,-10},{60,10}}, rotation=0)));
@@ -6430,7 +6430,7 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant1(k=1)
                                                  annotation (Placement(
             transformation(extent={{20,40},{40,60}}, rotation=0)));
-      Water.SensP SensP annotation (Placement(transformation(extent={{12,4},{32,
+      FluidPh.SensP SensP annotation (Placement(transformation(extent={{12,4},{32,
                 24}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
@@ -6508,7 +6508,7 @@ Algorithm Tolerance = 1e-6
       parameter SI.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
       parameter SI.SpecificEnthalpy houthex=1e5;
-      Water.Flow1DFEM hexA(
+      FluidPh.Flow1DFEM hexA(
         N=Nnodes,
         Nt=1,
         L=Lhex,
@@ -6526,29 +6526,29 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-20,-50},{0,-30}},
               rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SideA_FluidSink(redeclare package Medium = Medium)
                                               annotation (Placement(
             transformation(extent={{70,-50},{90,-30}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SideB_FluidSink(redeclare package Medium = Medium)
                                               annotation (Placement(
             transformation(extent={{-80,40},{-100,60}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 SideA_MassFlowRate(w0=whex,
         p0=300000,
         use_in_h=true,
         redeclare package Medium = Medium)                          annotation (
          Placement(transformation(extent={{-78,-50},{-58,-30}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5), redeclare package
+      ThermoPower.FluidPh.ValveLin ValveLin1(Kv=whex/(2e5), redeclare package
           Medium =
             Medium)                                       annotation (Placement(
             transformation(extent={{20,-50},{40,-30}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5), redeclare package
+      ThermoPower.FluidPh.ValveLin ValveLin2(Kv=whex/(2e5), redeclare package
           Medium =
             Medium)                                       annotation (Placement(
             transformation(extent={{-30,40},{-50,60}}, rotation=0)));
-      Water.Flow1DFEM hexB(
+      FluidPh.Flow1DFEM hexB(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -6568,7 +6568,7 @@ Algorithm Tolerance = 1e-6
         redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{0,60},{-20,40}}, rotation=
                0)));
-      ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT SensT_A_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-50,-46},{-30,-26}},
               rotation=0)));
       Modelica.Blocks.Sources.Step SideA_InSpecEnth(
@@ -6582,17 +6582,17 @@ Algorithm Tolerance = 1e-6
       Modelica.Blocks.Sources.Constant Constant2(k=1)
                                                  annotation (Placement(
             transformation(extent={{4,-20},{24,0}}, rotation=0)));
-      ThermoPower.Water.SensT SensT_B_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT SensT_B_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
                0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 SideB_MassFlowRate(w0=whex, p0=3e5,
         redeclare package Medium = Medium)                          annotation (
          Placement(transformation(extent={{60,40},{40,60}}, rotation=0)));
-      ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT SensT_A_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{46,-46},{66,-26}},
               rotation=0)));
-      ThermoPower.Water.SensT SensT_B_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT SensT_B_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-54,44},{-74,64}},
               rotation=0)));
       Thermal.CounterCurrentFEM
@@ -6717,7 +6717,7 @@ Casella</a>:<br>
       parameter SI.SpecificEnthalpy hinhex=1e5;
       // initial outlet specific enthalpy
       parameter SI.SpecificEnthalpy houthex=1e5;
-      Water.Flow1DFEM hexA(
+      FluidPh.Flow1DFEM hexA(
         N=Nnodes,
         Nt=1,
         L=Lhex,
@@ -6738,29 +6738,29 @@ Casella</a>:<br>
         redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-20,-60},{0,-40}},
               rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SideA_FluidSink(redeclare package Medium = Medium)
                                               annotation (Placement(
             transformation(extent={{70,-60},{90,-40}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               SideB_FluidSink(redeclare package Medium = Medium)
                                               annotation (Placement(
             transformation(extent={{-80,40},{-100,60}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 SideA_MassFlowRate(w0=whex,
         p0=300000,
         use_in_h=true,
         redeclare package Medium = Medium)                          annotation (
          Placement(transformation(extent={{-82,-60},{-62,-40}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin1(Kv=whex/(2e5), redeclare package
+      ThermoPower.FluidPh.ValveLin ValveLin1(Kv=whex/(2e5), redeclare package
           Medium =
             Medium)                                       annotation (Placement(
             transformation(extent={{20,-60},{40,-40}}, rotation=0)));
-      ThermoPower.Water.ValveLin ValveLin2(Kv=whex/(2e5), redeclare package
+      ThermoPower.FluidPh.ValveLin ValveLin2(Kv=whex/(2e5), redeclare package
           Medium =
             Medium)                                       annotation (Placement(
             transformation(extent={{-30,40},{-50,60}}, rotation=0)));
-      Water.Flow1DFEM hexB(
+      FluidPh.Flow1DFEM hexB(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -6791,7 +6791,7 @@ Casella</a>:<br>
         TstartN=297,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
           Placement(transformation(extent={{-20,0},{0,-20}}, rotation=0)));
-      ThermoPower.Water.SensT SensT_A_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT SensT_A_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-52,-56},{-32,-36}},
               rotation=0)));
       Modelica.Blocks.Sources.Step SideA_InSpecEnth(
@@ -6805,17 +6805,17 @@ Casella</a>:<br>
       Modelica.Blocks.Sources.Constant Constant2(k=1)
                                                  annotation (Placement(
             transformation(extent={{4,-40},{24,-20}}, rotation=0)));
-      ThermoPower.Water.SensT SensT_B_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT SensT_B_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{30,44},{10,64}}, rotation=
                0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 SourceW1(w0=whex, p0=3e5,
         redeclare package Medium = Medium)                annotation (Placement(
             transformation(extent={{60,40},{40,60}}, rotation=0)));
-      ThermoPower.Water.SensT SensT_A_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT SensT_A_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{46,-56},{66,-36}},
               rotation=0)));
-      ThermoPower.Water.SensT SensT_B_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT SensT_B_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-54,44},{-74,64}},
               rotation=0)));
       Thermal.CounterCurrentFEM
@@ -6946,7 +6946,7 @@ Casella</a>:<br>
       //height of power step
       parameter SI.EnergyFlowRate W=41800*whex;
 
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Fluid_Source(
         p0=phex,
         w0=whex,
@@ -6955,11 +6955,11 @@ Casella</a>:<br>
         redeclare package Medium = Medium)
                            annotation (Placement(transformation(extent={{-76,-10},
                 {-56,10}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Fluid_Sink(p0=phex/2, h=hinhex,
         redeclare package Medium = Medium)                    annotation (
           Placement(transformation(extent={{64,-10},{84,10}}, rotation=0)));
-      Water.Flow1DFEM hex(
+      FluidPh.Flow1DFEM hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -6978,7 +6978,7 @@ Casella</a>:<br>
         redeclare package Medium = Medium)
                       annotation (Placement(transformation(extent={{-8,-10},{12,
                 10}}, rotation=0)));
-      ThermoPower.Water.SensT T_in(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-48,-6},{-28,14}},
               rotation=0)));
       Modelica.Blocks.Sources.TimeTable MassFlowRate(
@@ -6987,7 +6987,7 @@ Casella</a>:<br>
         table=[0, whex; 19.5, whex; 20.5, -whex; 40, -whex; 41, 0; 100, 0])
         annotation (Placement(transformation(extent={{-94,20},{-74,40}},
               rotation=0)));
-      ThermoPower.Water.SensT T_out(redeclare package Medium = Medium)
+      ThermoPower.FluidPh.SensT T_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{38,-6},{58,14}}, rotation=
                0)));
       inner System system
@@ -7078,11 +7078,11 @@ Casella</a>:<br>
       // Approximated value of flow rate at each end
       final parameter SI.MassFlowRate wout=0.5*dM_dT;
 
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               sink1(p0=phex, h=hhex,
         redeclare package Medium = Medium)           annotation (Placement(
             transformation(extent={{66,-10},{86,10}}, rotation=0)));
-      Water.Flow1DFEM pipe1(
+      FluidPh.Flow1DFEM pipe1(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -7105,7 +7105,7 @@ Casella</a>:<br>
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     source1(h=hhex, p0=phex,
         redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-72,-10},{-52,10}})));
@@ -7191,12 +7191,12 @@ Casella</a>:<br>
           Medium.specificHeatCapacityCv(Medium.setState_pT(phex, Thex));
       //height of power step
 
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               sink1(p0=phex, h=hhex,
         use_in_p0=true,
         redeclare package Medium = Medium)           annotation (Placement(
             transformation(extent={{66,-10},{86,10}}, rotation=0)));
-      Water.Flow1DFEM pipe1(
+      FluidPh.Flow1DFEM pipe1(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -7219,7 +7219,7 @@ Casella</a>:<br>
               rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Water.SourcePressure
+      FluidPh.SourcePressure
                     source1(h=hhex, p0=phex + 150,
         use_in_p0=true,
         redeclare package Medium = Medium)
@@ -7287,9 +7287,9 @@ Casella</a>:<br>
       parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
       parameter SI.PerUnit Cfhex=0.005;
-      Water.ValveLin             valve(Kv=0.05/60e5) annotation (Placement(
+      FluidPh.ValveLin             valve(Kv=0.05/60e5) annotation (Placement(
             transformation(extent={{30,-70},{50,-50}}, rotation=0)));
-      Water.SinkPressure      Sink(p0=10000)
+      FluidPh.SinkPressure      Sink(p0=10000)
                                          annotation (Placement(transformation(
               extent={{70,-70},{90,-50}}, rotation=0)));
       Modelica.Blocks.Sources.Step hIn(
@@ -7297,7 +7297,7 @@ Casella</a>:<br>
         startTime=30,
         offset=1e6)   annotation (Placement(transformation(extent={{-80,-40},{-60,-20}},
                        rotation=0)));
-      Water.SourceMassFlow      Source(
+      FluidPh.SourceMassFlow      Source(
         w0=0.05,
         G=0.05/600e5,
         use_in_h=true,
@@ -7308,7 +7308,7 @@ Casella</a>:<br>
           Placement(transformation(extent={{10,-40},{30,-20}}, rotation=0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
-      Water.Flow1DFV2ph hexFV(
+      FluidPh.Flow1DFV2ph hexFV(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -7431,7 +7431,7 @@ Casella</a>:<br>
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Water.Flow1DFV2ph
+      FluidPh.Flow1DFV2ph
                       hex(
         N=Nnodes,
         L=Lhex,
@@ -7449,13 +7449,13 @@ Casella</a>:<br>
         pstart=1000000)
                     annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
               rotation=0)));
-      ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
+      ThermoPower.FluidPh.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.4/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
                 -10}}, rotation=0)));
       Thermal.HeatSource1DFV           heatSource(Nw=Nnodes - 1)
                         annotation (Placement(transformation(extent={{-20,0},{0,
                 20}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(redeclare package Medium = Medium, p0=100000)
         annotation (Placement(transformation(extent={{60,-30},{80,-10}},
               rotation=0)));
@@ -7470,7 +7470,7 @@ Casella</a>:<br>
         duration=50,
         height=12e5) annotation (Placement(transformation(extent={{-80,26},{-60,
                 46}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Source(redeclare package Medium = Medium, w0=
             0.4,
         use_in_h=true)
@@ -7577,7 +7577,7 @@ Casella</a>:<br>
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Water.Flow1DFV2ph
+      FluidPh.Flow1DFV2ph
                       hex(
         N=Nnodes,
         L=Lhex,
@@ -7597,13 +7597,13 @@ Casella</a>:<br>
         pstart=1000000)
                     annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
               rotation=0)));
-      ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
+      ThermoPower.FluidPh.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.4/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
                 -10}}, rotation=0)));
       Thermal.HeatSource1DFV           heatSource(Nw=Nnodes - 1)
                         annotation (Placement(transformation(extent={{-20,0},{0,
                 20}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(p0=1e5, redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{60,-30},{80,-10}},
               rotation=0)));
@@ -7617,7 +7617,7 @@ Casella</a>:<br>
         duration=50,
         height=12e5) annotation (Placement(transformation(extent={{-80,26},{-60,
                 46}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Source(redeclare package Medium = Medium, w0=
             0.4,
         use_in_h=true)
@@ -7718,7 +7718,7 @@ Algorithm Tolerance = 1e-9
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Water.Flow1DFV2ph
+      FluidPh.Flow1DFV2ph
                       hex(
         N=Nnodes,
         L=Lhex,
@@ -7738,7 +7738,7 @@ Algorithm Tolerance = 1e-9
       Thermal.HeatSource1DFV           heatSource(Nw=Nnodes - 1)
                         annotation (Placement(transformation(extent={{-10,0},{
                 10,20}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(redeclare package Medium = Medium, p0=11e5)
         annotation (Placement(transformation(extent={{60,-30},{80,-10}},
               rotation=0)));
@@ -7753,7 +7753,7 @@ Algorithm Tolerance = 1e-9
         duration=50,
         height=12e5) annotation (Placement(transformation(extent={{-80,26},{-60,
                 46}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Source(redeclare package Medium = Medium, w0=
             0.4,
         use_in_h=true)
@@ -7857,7 +7857,7 @@ Algorithm Tolerance = 1e-9
       SI.Mass Mbal "Mass resulting from the mass balance";
       SI.Mass Merr(min = -1e9) "Mass balance error";
 
-      Water.Flow1DFV2ph
+      FluidPh.Flow1DFV2ph
                       hex(
         N=Nnodes,
         L=Lhex,
@@ -7876,13 +7876,13 @@ Algorithm Tolerance = 1e-9
         pstart=1000000)
                     annotation (Placement(transformation(extent={{-20,-30},{0,-10}},
               rotation=0)));
-      ThermoPower.Water.ValveLin valve(redeclare package Medium = Medium, Kv=
+      ThermoPower.FluidPh.ValveLin valve(redeclare package Medium = Medium, Kv=
             0.2/10e5) annotation (Placement(transformation(extent={{20,-30},{40,
                 -10}}, rotation=0)));
       Thermal.HeatSource1DFV           heatSource(Nw=Nnodes - 1)
                         annotation (Placement(transformation(extent={{-20,0},{0,
                 20}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(p0=1e5, redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{60,-30},{80,-10}},
               rotation=0)));
@@ -7897,7 +7897,7 @@ Algorithm Tolerance = 1e-9
         height=-6e5,
         duration=200) annotation (Placement(transformation(extent={{-80,26},{-60,
                 46}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Source(redeclare package Medium = Medium, w0=
             0.2,
         use_in_h=true)
@@ -7989,7 +7989,7 @@ Algorithm Tolerance = 1e-9
     model CheckFlow1DFV2phMassBalance
       "Checks Flow1DFV2ph equations for mass conservation"
       extends Modelica.Icons.Example;
-      package Medium = ThermoPower.Water.StandardWater;
+      package Medium = ThermoPower.FluidPh.StandardWater;
       package SmoothMedium = Medium (final smoothModel=true);
       parameter Integer N=2;
       constant SI.Pressure pzero=10 "Small deltap for calculations";
@@ -8205,7 +8205,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
       parameter SI.PerUnit Cfhex=0.005;
-      Water.Flow1D2phDB hex(
+      FluidPh.Flow1D2phDB hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -8223,9 +8223,9 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-70},{0,
                 -50}},
               rotation=0)));
-      ThermoPower.Water.ValveLin valve(Kv=0.05/60e5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin valve(Kv=0.05/60e5) annotation (Placement(
             transformation(extent={{30,-70},{50,-50}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(p0=1000)
                                          annotation (Placement(transformation(
               extent={{70,-70},{90,-50}}, rotation=0)));
@@ -8240,7 +8240,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
         offset=540,
         startTime=100) annotation (Placement(transformation(extent={{-100,20},{
                 -80,40}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Source(
         w0=0.05,
         G=0.05/600e5,
@@ -8369,7 +8369,7 @@ Algorithm Tolerance = 1e-8
       parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
       parameter Real Cfhex=0.005;
-      Water.Flow1D2phDB hex(
+      FluidPh.Flow1D2phDB hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -8385,14 +8385,14 @@ Algorithm Tolerance = 1e-8
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         dpnom=1000) annotation (Placement(transformation(extent={{-30,-50},{-10,
                 -30}}, rotation=0)));
-      ThermoPower.Water.ValveLin valve(Kv=0.1/15e5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin valve(Kv=0.1/15e5) annotation (Placement(
             transformation(extent={{20,-50},{40,-30}}, rotation=0)));
       ThermoPower.Thermal.HeatSource1Dhtc heatSource(
         N=Nnodes,
         L=Lhex,
         omega=omegahex) annotation (Placement(transformation(extent={{-30,-28},
                 {-10,-8}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(p0=1e5) annotation (Placement(transformation(
               extent={{60,-50},{80,-30}}, rotation=0)));
       Modelica.Blocks.Sources.Ramp extPower(
@@ -8400,7 +8400,7 @@ Algorithm Tolerance = 1e-8
         height=3e5,
         startTime=10) annotation (Placement(transformation(extent={{-80,44},{-60,
                 64}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Source(w0=0.1, use_in_h=true)
                                                annotation (Placement(
             transformation(extent={{-68,-50},{-48,-30}}, rotation=0)));
@@ -8518,7 +8518,7 @@ Algorithm Tolerance = 1e-7
       parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
       parameter SI.PerUnit Cfhex=0.005;
-      Water.Flow1D2phChen hex(
+      FluidPh.Flow1D2phChen hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -8534,9 +8534,9 @@ Algorithm Tolerance = 1e-7
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         pstart=6000000)                                        annotation (
           Placement(transformation(extent={{-20,-70},{0,-50}}, rotation=0)));
-      ThermoPower.Water.ValveLin valve(Kv=0.05/60e5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin valve(Kv=0.05/60e5) annotation (Placement(
             transformation(extent={{30,-70},{50,-50}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(p0=10000)
                                          annotation (Placement(transformation(
               extent={{70,-70},{90,-50}}, rotation=0)));
@@ -8551,7 +8551,7 @@ Algorithm Tolerance = 1e-7
         offset=540,
         startTime=100) annotation (Placement(transformation(extent={{-100,20},{
                 -80,40}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Source(
         w0=0.05,
         G=0.05/600e5,
@@ -8680,7 +8680,7 @@ Algorithm Tolerance = 1e-8
       parameter SI.Area Ahex=pi*rhex^2;
       // friction factor
       parameter Real Cfhex=0.005;
-      Water.Flow1D2phChen hex(
+      FluidPh.Flow1D2phChen hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -8695,14 +8695,14 @@ Algorithm Tolerance = 1e-8
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
         initOpt=ThermoPower.Choices.Init.Options.steadyState) annotation (
           Placement(transformation(extent={{-30,-50},{-10,-30}}, rotation=0)));
-      ThermoPower.Water.ValveLin valve(Kv=0.1/15e5) annotation (Placement(
+      ThermoPower.FluidPh.ValveLin valve(Kv=0.1/15e5) annotation (Placement(
             transformation(extent={{20,-50},{40,-30}}, rotation=0)));
       ThermoPower.Thermal.HeatSource1Dhtc heatSource(
         N=Nnodes,
         L=Lhex,
         omega=omegahex) annotation (Placement(transformation(extent={{-30,-28},
                 {-10,-8}}, rotation=0)));
-      ThermoPower.Water.SinkPressure
+      ThermoPower.FluidPh.SinkPressure
                               Sink(p0=10000)
                                            annotation (Placement(transformation(
               extent={{60,-50},{80,-30}}, rotation=0)));
@@ -8711,7 +8711,7 @@ Algorithm Tolerance = 1e-8
         height=3e5,
         startTime=10) annotation (Placement(transformation(extent={{-80,44},{-60,
                 64}}, rotation=0)));
-      ThermoPower.Water.SourceMassFlow
+      ThermoPower.FluidPh.SourceMassFlow
                                 Source(w0=0.1, use_in_h=true)
                                                annotation (Placement(
             transformation(extent={{-68,-50},{-48,-30}}, rotation=0)));
@@ -8834,7 +8834,7 @@ Algorithm Tolerance = 1e-7
       parameter SI.Pressure phex=1e6;
       parameter SI.MassFlowRate whex=1;
 
-      Water.Flow1Dfem2ph hex(
+      FluidPh.Flow1Dfem2ph hex(
         N=Nnodes,
         L=Lhex,
         omega=omegahex,
@@ -8852,9 +8852,9 @@ Algorithm Tolerance = 1e-7
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=1000) annotation (Placement(transformation(extent={{-30,-50},{-10,
                 -30}}, rotation=0)));
-      Water.ValveLin valve(Kv=whex/(phex)) annotation (Placement(transformation(
+      FluidPh.ValveLin valve(Kv=whex/(phex)) annotation (Placement(transformation(
               extent={{20,-50},{40,-30}}, rotation=0)));
-      Water.SinkPressure
+      FluidPh.SinkPressure
                   Sink(p0=0) annotation (Placement(transformation(extent={{60,-50},
                 {80,-30}}, rotation=0)));
       Modelica.Blocks.Sources.Step hIn(
@@ -8867,7 +8867,7 @@ Algorithm Tolerance = 1e-7
         height=3e6,
         startTime=10) annotation (Placement(transformation(extent={{-90,24},{-70,
                 44}}, rotation=0)));
-      Water.SourceMassFlow
+      FluidPh.SourceMassFlow
                     Source(
         h=hin,
         w0=whex,
@@ -8969,7 +8969,7 @@ Algorithm Tolerance = 1e-6
     model Flow1D_check
       "Extended Flow1D model with mass & energy balance computation"
 
-      extends Water.Flow1D;
+      extends FluidPh.Flow1D;
       SI.SpecificEnergy Etot;
       SI.SpecificEnergy Evol[N - 1];
       SI.Mass Mtot;
@@ -8991,7 +8991,7 @@ Algorithm Tolerance = 1e-6
         outfl.h_outflow) else outfl.h_outflow) + sum(wall.phi[1:N - 1] + wall.phi[
         2:N])/2*omega*l;
       annotation (Documentation(info="<HTML>
-<p>This model extends <tt>Water.Flow1D</tt> by adding the computation of mass and energy flows and buildups. It can be used to check the correctness of the <tt>Water.Flow1D</tt> model.</p>
+<p>This model extends <tt>FluidPh.Flow1D</tt> by adding the computation of mass and energy flows and buildups. It can be used to check the correctness of the <tt>FluidPh.Flow1D</tt> model.</p>
 </HTML>", revisions="<html>
 <ul>
 <li><i>1 Oct 2003</i>
@@ -9216,7 +9216,7 @@ Casella</a>:<br>
           __Dymola_NumberOfIntervals=10000,
           Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the evaporation process, using water as a test medium.</p>
+<p>The model is designed to test the component <code>FluidPh.HeatTransfer2phDB</code> during the evaporation process, using water as a test medium.</p>
 <p>The wall temperature is fixed and uniform. The fluid enthalpy spatial distribution is linear: the inlet condition is subcooled fluid, while the outlet condition is progressively increased from subcooled to superheated. The ensuing heat flows do not show any discontinuity when the phase boundaries cross the volume boundaries.</p>
 <p>Simulation Interval = [0...1] sec </p>
 </html>", revisions="<html>
@@ -9242,7 +9242,7 @@ Casella</a>:<br>
           __Dymola_NumberOfIntervals=10000,
           Tolerance=1e-006),
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.HeatTransfer2phDB</code> during the condensation process, using water as a test medium.</p>
+<p>The model is designed to test the component <code>FluidPh.HeatTransfer2phDB</code> during the condensation process, using water as a test medium.</p>
 <p>The wall temperature is fixed and uniform. The fluid enthalpy spatial distribution is linear: the inlet condition is subcooled fluid, while the outlet condition is progressively increased from subcooled to superheated. The ensuing heat flows do not show any discontinuity when the phase boundaries cross the volume boundaries.</p>
 <p>Simulation Interval = [0...1] sec </p>
 </html>", revisions="<html>
@@ -9278,7 +9278,7 @@ Casella</a>:<br>
     end TestFlowDependentHeatTransferCoefficient2ph;
 
     model TestWaterFlow1DFV_AdaptiveAverageTemp
-      "Test case for Water.Flow1DFV"
+      "Test case for FluidPh.Flow1DFV"
       extends Modelica.Icons.Example;
       replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph
         constrainedby Modelica.Media.Interfaces.PartialPureSubstance;
@@ -9305,32 +9305,32 @@ Casella</a>:<br>
       Real alpha = 1-exp(-NTU)
         "Steady state gain of outlet temperature vs. external temperature";
 
-      Water.ValveLin valve(Kv=2*whex/phex)      annotation (
+      FluidPh.ValveLin valve(Kv=2*whex/phex)      annotation (
           Placement(transformation(extent={{26,-22},{46,-2}}, rotation=0)));
-      Water.SourceMassFlow fluidSource(
+      FluidPh.SourceMassFlow fluidSource(
         w0=whex,
         p0=phex,
         h=hs,
         use_in_w0=true)
               annotation (Placement(transformation(extent={{-70,-22},{-50,-2}},
               rotation=0)));
-      Water.SinkPressure      fluidSink(p0=phex/2, h=hs) annotation (Placement(
+      FluidPh.SinkPressure      fluidSink(p0=phex/2, h=hs) annotation (Placement(
             transformation(extent={{74,-22},{94,-2}}, rotation=0)));
       Modelica.Blocks.Sources.Constant temperature(k=293.15 + 50) annotation (
           Placement(transformation(extent={{-34,16},{-18,32}}, rotation=0)));
       Modelica.Blocks.Sources.Constant valveOpening(k=1) annotation (Placement(
             transformation(extent={{12,12},{28,28}}, rotation=0)));
-      Water.SensT T_in(redeclare package Medium = Medium)
+      FluidPh.SensT T_in(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{-40,-18},{-20,2}},
               rotation=0)));
-      Water.SensT T_out(redeclare package Medium = Medium)
+      FluidPh.SensT T_out(redeclare package Medium = Medium)
         annotation (Placement(transformation(extent={{50,-18},{70,2}}, rotation=
                0)));
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
       Thermal.TempSource1DFV tempSource(Nw=Nnodes - 1)
         annotation (Placement(transformation(extent={{-12,2},{8,22}})));
-      Water.Flow1DFV hex(
+      FluidPh.Flow1DFV hex(
         redeclare package Medium = Medium,
         N=Nnodes,
         L=Lhex,
@@ -9517,19 +9517,19 @@ Casella</a>:<br>
       SI.SpecificEnthalpy hl[:] = fluidFlow.hl*ones(Nnodes);
       SI.SpecificEnthalpy hv[:] = fluidFlow.hv*ones(Nnodes);
 
-      Water.SinkPressure fluidSink(redeclare package Medium =
+      FluidPh.SinkPressure fluidSink(redeclare package Medium =
             Modelica.Media.R134a.R134a_ph, p0=3000000) annotation (Placement(
             transformation(extent={{50,-82},{70,-62}}, rotation=0)));
       IdealGas.SinkPressure gasSink(redeclare package Medium = ThermoPower.Media.Air)
         annotation (Placement(transformation(extent={{-54,18},{-74,38}}, rotation=0)));
-      Water.SourceMassFlow fluidSource(
+      FluidPh.SourceMassFlow fluidSource(
         use_in_w0=true,
         use_in_h=false,
         redeclare package Medium = Modelica.Media.R134a.R134a_ph,
         h=250e3,
         p0=300000)      annotation (Placement(transformation(extent={{-70,-82},{-50,
                 -62}}, rotation=0)));
-      Water.SensT             fluid_T_in(redeclare package Medium =
+      FluidPh.SensT             fluid_T_in(redeclare package Medium =
             Modelica.Media.R134a.R134a_ph)
         annotation (Placement(transformation(extent={{-46,-78},{-26,-58}},
               rotation=0)));
@@ -9540,7 +9540,7 @@ Casella</a>:<br>
         use_in_w0=true,
         T=423.15) annotation (Placement(transformation(extent={{64,18},{44,38}},
               rotation=0)));
-      Water.SensT             fluid_T_out(redeclare package Medium =
+      FluidPh.SensT             fluid_T_out(redeclare package Medium =
             Modelica.Media.R134a.R134a_ph)
         annotation (Placement(transformation(extent={{20,-78},{40,-58}},
               rotation=0)));
@@ -9569,7 +9569,7 @@ Casella</a>:<br>
             extent={{-10,-10},{10,10}},
             rotation=180,
             origin={-8,28})));
-      Water.Flow1DFV2ph fluidFlow(
+      FluidPh.Flow1DFV2ph fluidFlow(
         N=Nnodes,
         Cfnom=0.005,
         FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
@@ -9671,7 +9671,7 @@ Casella</a>:<br>
                 -100},{100,100}}), graphics),
         __Dymola_experimentSetupOutput,
         Documentation(info="<html>
-<p>The model is designed to test the component <code>Water.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
+<p>The model is designed to test the component <code>FluidPh.Flow1DFV</code> (fluid side of a heat exchanger, model uses finite volumes).</p><p>This model represent the two fluid sides of a heat exchanger made by two concentric tubes in counterflow configuration. The thickness of the wall separating the two tubes is negligible. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. </p><p>During the simulation, the inlet specific enthalpy for hexA (&QUOT;hot side&QUOT;) is changed at time t = 50 s. The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately. </p>
 <p>Simulation Interval = [0...1200] sec </p><p>Integration Algorithm = DASSL </p><p>Algorithm Tolerance = 1e-6 </p>
 </html>", revisions="<html>
 <ul>

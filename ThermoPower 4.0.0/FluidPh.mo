@@ -1,6 +1,6 @@
 within ThermoPower;
-package Water "Models of components with water/steam as working fluid"
-  connector Flange "Flange connector for water/steam flows"
+package FluidPh "This package contains components that use a generic fluid with p,h as states, possibly undergoing phase transition."
+  connector Flange "Flange connector for p-h fluid flows"
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model";
     flow Medium.MassFlowRate m_flow
@@ -28,8 +28,8 @@ package Water "Models of components with water/steam as working fluid"
       Icon(graphics));
   end Flange;
 
-  connector FlangeA "A-type flange connector for water/steam flows"
-    extends ThermoPower.Water.Flange;
+  connector FlangeA "A-type flange connector for p-h fluid flows"
+    extends ThermoPower.FluidPh.Flange;
     annotation (Icon(graphics={Ellipse(
             extent={{-100,100},{100,-100}},
             lineColor={0,0,255},
@@ -37,8 +37,8 @@ package Water "Models of components with water/steam as working fluid"
             fillPattern=FillPattern.Solid)}));
   end FlangeA;
 
-  connector FlangeB "B-type flange connector for water/steam flows"
-    extends ThermoPower.Water.Flange;
+  connector FlangeB "B-type flange connector for p-h fluid flows"
+    extends ThermoPower.FluidPh.Flange;
     annotation (Icon(graphics={Ellipse(
             extent={{-100,100},{100,-100}},
             lineColor={0,0,255},
@@ -52,8 +52,8 @@ package Water "Models of components with water/steam as working fluid"
   extends Modelica.Icons.Package;
 
   package StandardWater = Modelica.Media.Water.StandardWater;
-  model SourcePressure "Pressure source for water/steam flows"
-    extends Icons.Water.SourceP;
+  model SourcePressure "Pressure source for p-h fluid flows"
+    extends Icons.FluidPh.SourceP;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -159,8 +159,8 @@ package Water "Models of components with water/steam as working fluid"
 </html>"));
   end SourcePressure;
 
-  model SinkPressure "Pressure sink for water/steam flows"
-    extends Icons.Water.SourceP;
+  model SinkPressure "Pressure sink for p-h fluid flows"
+    extends Icons.FluidPh.SourceP;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -270,8 +270,8 @@ package Water "Models of components with water/steam as working fluid"
 </html>"));
   end SinkPressure;
 
-  model SourceMassFlow "Flowrate source for water/steam flows"
-    extends Icons.Water.SourceW;
+  model SourceMassFlow "Flowrate source for p-h fluid flows"
+    extends Icons.FluidPh.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -380,8 +380,8 @@ package Water "Models of components with water/steam as working fluid"
 </html>"));
   end SourceMassFlow;
 
-  model SinkMassFlow "Flowrate sink for water/steam flows"
-    extends Icons.Water.SourceW;
+  model SinkMassFlow "Flowrate sink for p-h fluid flows"
+    extends Icons.FluidPh.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -495,7 +495,7 @@ package Water "Models of components with water/steam as working fluid"
   end SinkMassFlow;
 
   model ThroughMassFlow "Prescribes the flow rate across the component"
-    extends Icons.Water.SourceW;
+    extends Icons.FluidPh.SourceW;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -554,8 +554,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       Diagram(graphics));
   end ThroughMassFlow;
 
-  model PressDropLin "Linear pressure drop for water/steam flows"
-    extends Icons.Water.PressDrop;
+  model PressDropLin "Linear pressure drop for p-h fluid flows"
+    extends Icons.FluidPh.PressDrop;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -593,8 +593,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 "),   Diagram(graphics));
   end PressDropLin;
 
-  model PressDrop "Pressure drop for water/steam flows"
-    extends Icons.Water.PressDrop;
+  model PressDrop "Pressure drop for p-h fluid flows"
+    extends Icons.FluidPh.PressDrop;
     import ThermoPower.Choices.PressDrop.FFtypes;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
@@ -700,8 +700,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 "),   Diagram(graphics));
   end PressDrop;
 
-  model Header "Header with metal walls for water/steam flows"
-    extends Icons.Water.Header;
+  model Header "Header with metal walls for p-h fluid flows"
+    extends Icons.FluidPh.Header;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -882,8 +882,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 "),   Diagram(graphics));
   end Header;
 
-  model Mixer "Mixer with metal walls for water/steam flows"
-    extends Icons.Water.Mixer;
+  model Mixer "Mixer with metal walls for p-h fluid flows"
+    extends Icons.FluidPh.Mixer;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -1051,7 +1051,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   end Mixer;
 
   model Tank "Open tank with free surface"
-    extends Icons.Water.Tank;
+    extends Icons.FluidPh.Tank;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -1153,7 +1153,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   end Tank;
 
   model Flow1DFV
-    "1-dimensional fluid flow model for water/steam (finite volumes)"
+    "1-dimensional fluid flow model for p-h fluid (finite volumes)"
     extends BaseClasses.Flow1DBase;
     import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
@@ -1466,7 +1466,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   end Flow1DFV2w;
 
   model Flow1DFV2ph
-    "1-dimensional fluid flow model for water/steam (finite volumes, 2-phase)"
+    "1-dimensional fluid flow model for p-h fluid (finite volumes, 2-phase)"
     extends BaseClasses.Flow1DBase(redeclare replaceable package Medium =
           StandardWater "Medium model" constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium,
@@ -1880,7 +1880,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   end Flow1DFV2ph2w;
 
   model Flow1DFEM
-    "1-dimensional fluid flow model for water/steam (finite elements)"
+    "1-dimensional fluid flow model for p-h fluid (finite elements)"
     extends BaseClasses.Flow1DBase(Nw = N);
     replaceable model HeatTransfer = Thermal.HeatTransferFEM.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFEM
@@ -2352,7 +2352,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   end Flow1DFEM;
 
   model Flow1DFEM2ph
-    "1-dimensional fluid flow model for water/steam (finite elements)"
+    "1-dimensional fluid flow model for p-h fluid (finite elements)"
     extends BaseClasses.Flow1DBase(
       Nw = N,
       redeclare replaceable package Medium = StandardWater "Medium model"
@@ -3127,8 +3127,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 "));
   end Flow1DFEM2ph;
 
-  model FlowJoin "Joins two water/steam flows"
-    extends Icons.Water.FlowJoin;
+  model FlowJoin "Joins two p-h fluid flows"
+    extends Icons.FluidPh.FlowJoin;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -3230,7 +3230,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   end FlowJoin;
 
   model FlowSplit "Splits a flow in two"
-    extends Icons.Water.FlowSplit;
+    extends Icons.FluidPh.FlowSplit;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -3330,7 +3330,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   end FlowSplit;
 
   model SensT "Temperature sensor for water-steam"
-    extends Icons.Water.SensThrough;
+    extends Icons.FluidPh.SensThrough;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -3384,9 +3384,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </html>"));
   end SensT;
 
-  model SensT1 "Temperature sensor for water/steam flows, single port"
-    extends ThermoPower.Icons.Water.SensP;
-    replaceable package Medium = ThermoPower.Water.StandardWater constrainedby
+  model SensT1 "Temperature sensor for p-h fluid flows, single port"
+    extends ThermoPower.Icons.FluidPh.SensP;
+    replaceable package Medium = ThermoPower.FluidPh.StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
     Modelica.Blocks.Interfaces.RealOutput T annotation (Placement(
@@ -3418,8 +3418,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </html>"));
   end SensT1;
 
-  model SensW "Mass Flowrate sensor for water/steam"
-    extends Icons.Water.SensThrough;
+  model SensW "Mass Flowrate sensor for p-h fluid"
+    extends Icons.FluidPh.SensThrough;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -3465,8 +3465,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 "));
   end SensW;
 
-  model SensP "Pressure sensor for water/steam flows"
-    extends Icons.Water.SensP;
+  model SensP "Pressure sensor for p-h fluid flows"
+    extends Icons.FluidPh.SensP;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -3500,7 +3500,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   end SensP;
 
   model Accumulator "Water-Gas Accumulator"
-    extends ThermoPower.Icons.Water.Accumulator;
+    extends ThermoPower.Icons.FluidPh.Accumulator;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Liquid medium model"
       annotation(choicesAllMatching = true);
@@ -3675,7 +3675,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
   end Accumulator;
 
   model Drum "Drum for circulation boilers"
-    extends Icons.Water.Drum;
+    extends Icons.FluidPh.Drum;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -3993,7 +3993,7 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
   end Drum;
 
   model DrumEquilibrium
-    extends Icons.Water.Drum;
+    extends Icons.FluidPh.Drum;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -4121,8 +4121,8 @@ adding a specific geometry and the computation of the level from the liquid volu
       Icon(graphics));
   end DrumEquilibrium;
 
-  model ValveLin "Valve for water/steam flows with linear pressure drop"
-    extends Icons.Water.Valve;
+  model ValveLin "Valve for p-h fluid flows with linear pressure drop"
+    extends Icons.FluidPh.Valve;
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
@@ -4411,7 +4411,7 @@ li><i>1 Jul 2004</i>
 
   model PumpMech "Centrifugal pump with mechanical connector for the shaft"
     extends BaseClasses.PumpBase;
-    extends Icons.Water.PumpMech;
+    extends Icons.FluidPh.PumpMech;
     SI.Angle phi "Shaft angle";
     SI.AngularVelocity omega "Shaft angular velocity";
     Modelica.Mechanics.Rotational.Interfaces.Flange_a MechPort annotation (
@@ -4772,9 +4772,9 @@ li><i>1 Jul 2004</i>
 
     outer ThermoPower.System system "System object";
 
-    ThermoPower.Water.FlangeA waterInlet annotation (Placement(transformation(
+    ThermoPower.FluidPh.FlangeA waterInlet annotation (Placement(transformation(
             extent={{-10,80},{10,100}}), iconTransformation(extent={{-10,80},{10,100}})));
-    ThermoPower.Water.FlangeB waterOutlet annotation (Placement(transformation(
+    ThermoPower.FluidPh.FlangeB waterOutlet annotation (Placement(transformation(
             extent={{-10,-100},{10,-80}}), iconTransformation(extent={{-10,-100},{
               10,-80}})));
     Modelica.Blocks.Interfaces.RealInput fanRpm "Fan rotational speed in rpm"
@@ -5036,7 +5036,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
   end CoolingTower;
 
   model ExpansionTankIdeal "Ideal expansion tank with prescribed pressure"
-    extends Icons.Water.ExpansionTankIdeal;
+    extends Icons.FluidPh.ExpansionTankIdeal;
     replaceable package Medium = Modelica.Media.Water.StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium  "Liquid medium model" annotation (
        choicesAllMatching = true);
@@ -5046,10 +5046,10 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
     parameter SI.Pressure pf "Fixed flange pressure";
     Medium.MassFlowRate wn "Net entering mass flow rate";
 
-    ThermoPower.Water.FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min = if allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
+    ThermoPower.FluidPh.FlangeA WaterInfl(redeclare package Medium = Medium, m_flow(min = if allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
       Placement(transformation(extent={{-60,-80},{-20,-40}},       rotation = 0),
           iconTransformation(extent={{-60,-80},{-20,-40}})));
-    ThermoPower.Water.FlangeB WaterOutfl(redeclare package Medium = Medium, m_flow(max = if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
+    ThermoPower.FluidPh.FlangeB WaterOutfl(redeclare package Medium = Medium, m_flow(max = if allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
       Placement(transformation(extent={{20,-80},{60,-40}},       rotation = 0),
           iconTransformation(extent={{20,-80},{60,-40}})));
 
@@ -5129,7 +5129,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
 </HTML>"));
   end f_chen;
 
-  function f_colebrook "Fanning friction factor for water/steam flows"
+  function f_colebrook "Fanning friction factor for p-h fluid flows"
     input SI.MassFlowRate w;
     input Real D_A;
     input Real e;
@@ -5153,7 +5153,7 @@ The dry and wet bulb temperatures of incoming air are given by the settings of t
   end f_colebrook;
 
   function f_colebrook_2ph
-    "Fanning friction factor for a two phase water/steam flow"
+    "Fanning friction factor for a two phase p-h fluid flow"
     input SI.MassFlowRate w;
     input Real D_A;
     input Real e;
@@ -5243,7 +5243,7 @@ Input variables changed. This function now computes the heat transfer coefficien
     replaceable package Medium = StandardWater constrainedby
       Modelica.Media.Interfaces.PartialMedium "Medium model"
       annotation(choicesAllMatching = true);
-    extends Icons.Water.SteamTurbineUnit;
+    extends Icons.FluidPh.SteamTurbineUnit;
     parameter Medium.AbsolutePressure pnom "Inlet nominal pressure";
     parameter Medium.MassFlowRate wnom "Inlet nominal flow rate";
     parameter SI.PerUnit eta_iso "Isentropic efficiency [PerUnit]";
@@ -5447,12 +5447,12 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
   package BaseClasses "Contains partial models"
     extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
-      "Basic interface for 1-dimensional water/steam fluid flow models"
+      "Basic interface for 1-dimensional p-h fluid fluid flow models"
       import ThermoPower.Choices.Flow1D.FFtypes;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
-      extends Icons.Water.Tube;
+      extends Icons.FluidPh.Tube;
       constant Real pi = Modelica.Constants.pi;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
       parameter Integer Nw = N - 1 "Number of volumes on the wall interface";
@@ -5579,7 +5579,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     end Flow1DBase;
 
     partial model ValveBase "Base model for valves"
-      extends Icons.Water.Valve;
+      extends Icons.FluidPh.Valve;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
@@ -5706,10 +5706,10 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 <p>An optional heat loss to the ambient can be included, proportional to the mass flow rate; <tt>Qnom</tt> specifies the heat loss at nominal flow rate.</p>
 <p><b>Modelling options</b></p>
 <p>The following options are available to specify the valve flow coefficient in fully open conditions:
-<ul><li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.Av</tt>: the flow coefficient is given by the metric <tt>Av</tt> coefficient (m^2).
-<li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.Kv</tt>: the flow coefficient is given by the metric <tt>Kv</tt> coefficient (m^3/h).
-<li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.Cv</tt>: the flow coefficient is given by the US <tt>Cv</tt> coefficient (USG/min).
-<li><tt>CvData = ThermoPower.Water.ValveBase.CvTypes.OpPoint</tt>: the flow coefficient is specified by the nominal operating point:  <tt>pnom</tt>, <tt>dpnom</tt>, <tt>wnom</tt>, <tt>rhonom</tt>, <tt>thetanom</tt> (in forward flow).
+<ul><li><tt>CvData = ThermoPower.FluidPh.ValveBase.CvTypes.Av</tt>: the flow coefficient is given by the metric <tt>Av</tt> coefficient (m^2).
+<li><tt>CvData = ThermoPower.FluidPh.ValveBase.CvTypes.Kv</tt>: the flow coefficient is given by the metric <tt>Kv</tt> coefficient (m^3/h).
+<li><tt>CvData = ThermoPower.FluidPh.ValveBase.CvTypes.Cv</tt>: the flow coefficient is given by the US <tt>Cv</tt> coefficient (USG/min).
+<li><tt>CvData = ThermoPower.FluidPh.ValveBase.CvTypes.OpPoint</tt>: the flow coefficient is specified by the nominal operating point:  <tt>pnom</tt>, <tt>dpnom</tt>, <tt>wnom</tt>, <tt>rhonom</tt>, <tt>thetanom</tt> (in forward flow).
 </ul>
 <p>The nominal pressure drop <tt>dpnom</tt> must always be specified; to avoid numerical singularities, the flow characteristic is modified for pressure drops less than <tt>b*dpnom</tt> (the default value is 1% of the nominal pressure drop). Increase this parameter if numerical instabilities occur in valves with very low pressure drops.
 <p>If <tt>CheckValve</tt> is true, then the flow is stopped when the outlet pressure is higher than the inlet pressure; otherwise, reverse flow takes place.
@@ -5747,7 +5747,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     end ValveBase;
 
     partial model PumpBase "Base model for centrifugal pumps"
-      extends Icons.Water.Pump;
+      extends Icons.FluidPh.Pump;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
@@ -5990,7 +5990,7 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     end PumpBase;
 
     partial model SteamTurbineBase "Steam turbine"
-      replaceable package Medium = ThermoPower.Water.StandardWater
+      replaceable package Medium = ThermoPower.FluidPh.StandardWater
         constrainedby Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
       parameter Boolean explicitIsentropicEnthalpy=true
@@ -6130,13 +6130,13 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
     end SteamTurbineBase;
 
     partial model EvaporatorBase
-      "Basic interface for 1-dimensional water/steam fluid flow models"
+      "Basic interface for 1-dimensional p-h fluid fluid flow models"
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model";
       Medium.BaseProperties fluid_in "Fluid properties at the inlet";
       Medium.BaseProperties fluid_out "Fluid properties at the outlet";
       Medium.SaturationProperties sat "Saturation properties";
-      extends Icons.Water.Tube;
+      extends Icons.FluidPh.Tube;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
       parameter Integer Nt=1 "Number of tubes in parallel";
       parameter SI.Distance L "Tube length";
@@ -6298,7 +6298,7 @@ This model is not yet complete
 
   annotation (Documentation(info="<HTML>
 This package contains models of physical processes and components using water or steam as working fluid.
-<p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.Water.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
+<p>All models use the <tt>StandardWater</tt> medium model by default, which is in turn set to <tt>Modelica.Media.FluidPh.StandardWater</tt> at the library level. It is of course possible to redeclare the medium model to any model extending <tt>Modelica.Media.Interfaces.PartialMedium</tt> (or <tt>PartialTwoPhaseMedium</tt> for 2-phase models). This can be done by directly setting Medium in the parameter dialog, or through a local package definition, as shown e.g. in <tt>Test.TestMixerSlowFast</tt>. The latter solution allows to easily replace the medium model for an entire set of components.
 <p>All models with dynamic equations provide initialisation support. Set the <tt>initOpt</tt> parameter to the appropriate value:
 <ul>
 <li><tt>Choices.Init.Options.noInit</tt>: no initialisation
@@ -6308,4 +6308,4 @@ This package contains models of physical processes and components using water or
 </ul>
 The latter options can be useful when two or more components are connected directly so that they will have the same pressure or temperature, to avoid over-specified systems of initial equations.
 </HTML>"));
-end Water;
+end FluidPh;

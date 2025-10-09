@@ -2226,7 +2226,7 @@ package IdealGas "Models of components with ideal gases as working fluid"
 "),   DymolaStoredErrors);
   end Valve;
 
-  function f_colebrook "Fanning friction factor for water/steam flows"
+  function f_colebrook "Fanning friction factor for ideal gas flows"
     input SI.MassFlowRate w;
     input Real D_A;
     input Real e;
@@ -2835,7 +2835,7 @@ The packages Medium are redeclared and a mass balance determines the composition
   package BaseClasses
     extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
-      "Basic interface for 1-dimensional water/steam fluid flow models"
+      "Basic interface for 1-dimensional ideal gas flow models"
       extends Icons.IdealGas.Tube;
       import ThermoPower.Choices.Flow1D.FFtypes;
       import ThermoPower.Choices.Flow1D.HCtypes;

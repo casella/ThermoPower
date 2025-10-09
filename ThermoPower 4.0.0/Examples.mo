@@ -8,7 +8,7 @@ package Examples "Application examples"
     package Models
       model CISEPlant "Model of the CISE lab steam generator"
         package Medium = Modelica.Media.Water.WaterIF97_ph (smoothModel=true);
-        Water.Drum Drum(
+        FluidPh.Drum Drum(
           redeclare package Medium = Medium,
           rint=0.115,
           rext=0.125,
@@ -27,12 +27,12 @@ package Examples "Application examples"
           hlstart=1.15e5,
           pstart=6000000)                                       annotation (
             Placement(transformation(extent={{-120,6},{-60,66}},  rotation=0)));
-        Water.SourceMassFlow
+        FluidPh.SourceMassFlow
                       FeedWater(h=1.1059e6,
           use_in_w0=true,
           use_in_h=true)                    annotation (Placement(transformation(
                 extent={{-176,16},{-146,46}}, rotation=0)));
-        Water.Flow1DFV2ph
+        FluidPh.Flow1DFV2ph
                         Downcomer(
           redeclare package Medium = Medium,
           N=2,
@@ -57,7 +57,7 @@ package Examples "Application examples"
               origin={-149,-60},
               extent={{-20,-19},{20,19}},
               rotation=270)));
-        Water.Flow1DFV2ph
+        FluidPh.Flow1DFV2ph
                         Risers(
           redeclare package Medium = Medium,
           Nt=6,
@@ -83,7 +83,7 @@ package Examples "Application examples"
               origin={-22,-129},
               extent={{-19,18},{19,-18}},
               rotation=90)));
-        Water.Flow1DFV2ph
+        FluidPh.Flow1DFV2ph
                         Pipe2Drum(
           redeclare package Medium = Medium,
           N=2,
@@ -110,10 +110,10 @@ package Examples "Application examples"
               origin={-22,-25},
               extent={{-19,18},{19,-18}},
               rotation=90)));
-        Water.SinkMassFlow
+        FluidPh.SinkMassFlow
                     Blowdown(w0=0) annotation (Placement(transformation(extent={{-80,-38},
                   {-50,-8}},          rotation=0)));
-        Water.Flow1DFV
+        FluidPh.Flow1DFV
                      Pipe2SH(
           redeclare package Medium = Medium,
           N=2,
@@ -135,7 +135,7 @@ package Examples "Application examples"
           dpnom=2000,
           pstart=6000000) annotation (Placement(transformation(extent={{-56,44},{
                   -18,80}},  rotation=0)));
-        Water.Flow1DFV2ph SH(
+        FluidPh.Flow1DFV2ph SH(
           redeclare package Medium = Medium,
           Nt=1,
           L=30,
@@ -158,7 +158,7 @@ package Examples "Application examples"
           noInitialPressure=true)
                           annotation (Placement(transformation(extent={{-4,44},{
                   32,80}},  rotation=0)));
-        Water.Flow1DFV2ph
+        FluidPh.Flow1DFV2ph
                         Pipe2Valve(
           redeclare package Medium = Medium,
           N=2,
@@ -181,7 +181,7 @@ package Examples "Application examples"
           dpnom=1000,
           pstart=5600000) annotation (Placement(transformation(extent={{48,44},{
                   86,80}},  rotation=0)));
-        Water.ValveVap Valve(
+        FluidPh.ValveVap Valve(
           redeclare package Medium = Medium,
           pnom=54.497e5,
           wnom=2*0.06,
@@ -189,7 +189,7 @@ package Examples "Application examples"
           CvData=ThermoPower.Choices.Valve.CvTypes.Av,
           dpnom=4899700) annotation (Placement(transformation(extent={{100,44},{
                   136,80}},  rotation=0)));
-        Water.SinkPressure
+        FluidPh.SinkPressure
                     Sink(p0=5.5e5) annotation (Placement(transformation(extent={{156,48},
                   {186,78}},          rotation=0)));
         Thermal.HeatSource1DFV
@@ -202,7 +202,7 @@ package Examples "Application examples"
               origin={42,-130},
               extent={{-20,-18},{20,18}},
               rotation=270)));
-        Water.Header HeaderLower(
+        FluidPh.Header HeaderLower(
           redeclare package Medium = Medium,
           V=8.372e-4,
           S=7.184e-2,
@@ -213,7 +213,7 @@ package Examples "Application examples"
           Tmstart=540,
           noInitialPressure=true)                                  annotation (
             Placement(transformation(extent={{-128,-186},{-88,-146}},  rotation=0)));
-        Water.Header HeaderUpper(
+        FluidPh.Header HeaderUpper(
           redeclare package Medium = Medium,
           V=8.372e-4,
           S=7.184e-2,
@@ -318,7 +318,7 @@ package Examples "Application examples"
               origin={67,87},
               extent={{-21,-19},{21,19}},
               rotation=180)));
-        Water.PressDrop PressDrop(
+        FluidPh.PressDrop PressDrop(
           redeclare package Medium = Medium,
           wnom=0.23,
           wnf=0.1,
@@ -507,12 +507,12 @@ Casella</a>:<br>
         parameter SI.Length H=1.455 "Drum height";
         SI.Pressure DrumPressure;
         SI.Length DrumLevel;
-        Water.SourceMassFlow
+        FluidPh.SourceMassFlow
                       FeedWater(h=1.1059e6,
           use_in_w0=true,
           use_in_h=true)                    annotation (Placement(transformation(
                 extent={{-92,0},{-72,20}}, rotation=0)));
-        Water.Flow1DFV
+        FluidPh.Flow1DFV
                      Pipe2SH(
           redeclare package Medium = Medium,
           Nt=1,
@@ -537,7 +537,7 @@ Casella</a>:<br>
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000))
                           annotation (Placement(transformation(extent={{-38,20},{
                   -18,40}}, rotation=0)));
-        Water.Flow1DFV2ph SH(
+        FluidPh.Flow1DFV2ph SH(
           redeclare package Medium = Medium,
           Nt=1,
           L=30,
@@ -561,7 +561,7 @@ Casella</a>:<br>
           pstart=5900000) annotation (Placement(transformation(extent={{-8,20},{
                   12,40}}, rotation=0)));
 
-        Water.Flow1DFV  Pipe2Valve(
+        FluidPh.Flow1DFV  Pipe2Valve(
           redeclare package Medium = Medium,
           N=2,
           Nt=1,
@@ -585,7 +585,7 @@ Casella</a>:<br>
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000))
                           annotation (Placement(transformation(extent={{22,20},{
                   42,40}}, rotation=0)));
-        Water.ValveVap Valve(
+        FluidPh.ValveVap Valve(
           redeclare package Medium = Medium,
           pnom=54.497e5,
           wnom=2*0.06,
@@ -594,7 +594,7 @@ Casella</a>:<br>
           CvData=ThermoPower.Choices.Valve.CvTypes.Av,
           dpnom=4899700) annotation (Placement(transformation(extent={{50,40},{70,
                   20}}, rotation=0)));
-        Water.SinkPressure
+        FluidPh.SinkPressure
                     Sink(p0=5.5e5) annotation (Placement(transformation(extent={{
                   80,20},{100,40}}, rotation=0)));
         Thermal.HeatSource1DFV
@@ -1082,7 +1082,7 @@ Casella</a>:<br>
       end CISESim2States;
 
         model Drum2States
-          extends Icons.Water.Drum;
+          extends Icons.FluidPh.Drum;
           replaceable package Medium = Modelica.Media.Water.StandardWater constrainedby
             Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
             annotation(choicesAllMatching = true);
@@ -1108,10 +1108,10 @@ Casella</a>:<br>
             annotation (Dialog(tab="Initialisation"),choices(checkBox=true));
       
           Medium.SaturationProperties sat "Saturation conditions";
-          Water.FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
+          FluidPh.FlangeA feed(redeclare package Medium = Medium, m_flow(min=if
                   allowFlowReversal then -Modelica.Constants.inf else 0)) annotation (
              Placement(transformation(extent={{-110,-64},{-70,-24}}, rotation=0)));
-          Water.FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
+          FluidPh.FlangeB steam(redeclare package Medium = Medium, m_flow(max=if
                   allowFlowReversal then +Modelica.Constants.inf else 0)) annotation (
              Placement(transformation(extent={{48,52},{88,92}}, rotation=0)));
           Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a heat
@@ -1483,7 +1483,7 @@ Casella</a>:<br>
         replaceable package GasMedium =
             Modelica.Media.IdealGases.MixtureGases.CombustionAir constrainedby
           Modelica.Media.Interfaces.PartialMedium;
-        replaceable package WaterMedium = Water.StandardWater constrainedby
+        replaceable package WaterMedium = FluidPh.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialMedium;
         parameter Boolean StaticGasBalances=false;
         parameter Integer Nr = 2 "Number of tube rows";
@@ -1507,12 +1507,12 @@ Casella</a>:<br>
             Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
         IdealGas.FlangeB gasOut(redeclare package Medium = GasMedium) annotation (
             Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-        Water.FlangeA waterIn(redeclare package Medium = WaterMedium) annotation (
+        FluidPh.FlangeA waterIn(redeclare package Medium = WaterMedium) annotation (
            Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
-        Water.FlangeB waterOut(redeclare package Medium = WaterMedium)
+        FluidPh.FlangeB waterOut(redeclare package Medium = WaterMedium)
           annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
                 rotation=0)));
-        Water.Flow1DFV WaterSide(
+        FluidPh.Flow1DFV WaterSide(
           redeclare package Medium = WaterMedium,
           Nt=Nt,
           A=pi*Dint^2/4,
@@ -1637,7 +1637,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas
           constrainedby Modelica.Media.Interfaces.PartialMedium
           "Flue gas model";
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater
+        replaceable package FluidMedium = ThermoPower.FluidPh.StandardWater
           constrainedby Modelica.Media.Interfaces.PartialPureSubstance
           "Fluid model";
 
@@ -1679,7 +1679,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
         parameter Boolean gasQuasiStatic=false
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         constant Real pi=Modelica.Constants.pi;
-        Water.DrumEquilibrium water(
+        FluidPh.DrumEquilibrium water(
           cm=cm,
           redeclare package Medium = FluidMedium,
           Vd=fluidVol,
@@ -1693,9 +1693,9 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
               origin={0,-8},
               extent={{-10,-10},{10,10}},
               rotation=270)));
-        Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
+        FluidPh.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
            Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
-        Water.FlangeB waterOut(redeclare package Medium = FluidMedium)
+        FluidPh.FlangeB waterOut(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
                 rotation=0)));
         IdealGas.FlangeA gasIn(redeclare package Medium = FlueGasMedium) annotation (
@@ -1789,10 +1789,10 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
           StaticGasBalances=false,
           Nt=250)                  annotation (Placement(transformation(extent={{
                   -20,-20},{20,20}}, rotation=0)));
-        Water.ValveLin Valve(Kv=20/4e5, redeclare package Medium = WaterMedium)
+        FluidPh.ValveLin Valve(Kv=20/4e5, redeclare package Medium = WaterMedium)
           annotation (Placement(transformation(extent={{36,-50},{56,-70}},
                 rotation=0)));
-        Water.SinkPressure SinkP1(redeclare package Medium = WaterMedium, p0=100000)
+        FluidPh.SinkPressure SinkP1(redeclare package Medium = WaterMedium, p0=100000)
           annotation (Placement(transformation(extent={{70,-70},{90,-50}},
                 rotation=0)));
         IdealGas.SourceMassFlow SourceW2(
@@ -1808,15 +1808,15 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
         IdealGas.PressDropLin PressDropLin1(redeclare package Medium = GasMedium, R=
               1000/10) annotation (Placement(transformation(extent={{60,-10},{80,
                   10}}, rotation=0)));
-        Water.SensT WaterIn(redeclare package Medium = WaterMedium) annotation (
+        FluidPh.SensT WaterIn(redeclare package Medium = WaterMedium) annotation (
             Placement(transformation(extent={{-40,44},{-20,64}}, rotation=0)));
-        Water.SensT WaterOut(redeclare package Medium = WaterMedium) annotation (
+        FluidPh.SensT WaterOut(redeclare package Medium = WaterMedium) annotation (
             Placement(transformation(extent={{6,-66},{26,-46}}, rotation=0)));
         IdealGas.SensT GasOut(redeclare package Medium = GasMedium) annotation (
             Placement(transformation(extent={{30,-6},{50,14}}, rotation=0)));
         IdealGas.SensT GasIn(redeclare package Medium = GasMedium) annotation (
             Placement(transformation(extent={{-60,-6},{-40,14}}, rotation=0)));
-        Water.SourcePressure SourceP1(redeclare package Medium = WaterMedium, p0=500000)
+        FluidPh.SourcePressure SourceP1(redeclare package Medium = WaterMedium, p0=500000)
           annotation (Placement(transformation(extent={{-80,40},{-60,60}},
                 rotation=0)));
         Modelica.Blocks.Interfaces.RealInput ValveOpening annotation (Placement(
@@ -2427,7 +2427,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         replaceable package FlueGasMedium = ThermoPower.Media.FlueGas
           constrainedby Modelica.Media.Interfaces.PartialMedium
           "Flue gas model";
-        replaceable package FluidMedium = ThermoPower.Water.StandardWater
+        replaceable package FluidMedium = ThermoPower.FluidPh.StandardWater
           constrainedby Modelica.Media.Interfaces.PartialPureSubstance
           "Fluid model";
 
@@ -2495,12 +2495,12 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
             Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
         IdealGas.FlangeB gasOut(redeclare package Medium = FlueGasMedium) annotation (
             Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-        Water.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
+        FluidPh.FlangeA waterIn(redeclare package Medium = FluidMedium) annotation (
            Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
-        Water.FlangeB waterOut(redeclare package Medium = FluidMedium)
+        FluidPh.FlangeB waterOut(redeclare package Medium = FluidMedium)
           annotation (Placement(transformation(extent={{-20,-120},{20,-80}},
                 rotation=0)));
-        Water.Flow1DFV fluidFlow(
+        FluidPh.Flow1DFV fluidFlow(
           Nt=1,
           N=N_F,
           wnom=fluidNomFlowRate,
@@ -2634,11 +2634,11 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
             ThermoPower.Functions.PumpCharacteristics.quadraticFlow (q_nom=q_nom,
               head_nom=head_nom);
 
-        Water.FlangeA inlet(redeclare package Medium = FluidMedium) annotation (
+        FluidPh.FlangeA inlet(redeclare package Medium = FluidMedium) annotation (
             Placement(transformation(extent={{-120,-20},{-80,20}}, rotation=0)));
-        Water.FlangeB outlet(redeclare package Medium = FluidMedium) annotation (
+        FluidPh.FlangeB outlet(redeclare package Medium = FluidMedium) annotation (
             Placement(transformation(extent={{80,-20},{120,20}}, rotation=0)));
-        Water.Pump feedWaterPump(
+        FluidPh.Pump feedWaterPump(
           redeclare function flowCharacteristic = flowCharacteristic,
           n0=n0,
           redeclare package Medium = FluidMedium,
@@ -2694,7 +2694,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
 
       model PrescribedPressureCondenser
         "Ideal condenser with prescribed pressure"
-        replaceable package Medium = Water.StandardWater constrainedby
+        replaceable package Medium = FluidPh.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialMedium "Medium model";
         //Parameters
         parameter SI.Pressure p "Nominal inlet pressure";
@@ -2724,9 +2724,9 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         SI.Power Q "Thermal power";
 
 //Connectors
-        Water.FlangeA steamIn(redeclare package Medium = Medium) annotation (
+        FluidPh.FlangeA steamIn(redeclare package Medium = Medium) annotation (
             Placement(transformation(extent={{-20,80},{20,120}}, rotation=0)));
-        Water.FlangeB waterOut(redeclare package Medium = Medium) annotation (
+        FluidPh.FlangeB waterOut(redeclare package Medium = Medium) annotation (
             Placement(transformation(extent={{-20,-120},{20,-80}}, rotation=0)));
 
       equation
@@ -2796,7 +2796,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
         import ThermoPower;
         replaceable package FlueGas = ThermoPower.Media.FlueGas constrainedby
           Modelica.Media.Interfaces.PartialMedium "Flue gas model";
-        replaceable package Water = ThermoPower.Water.StandardWater
+        replaceable package Water = ThermoPower.FluidPh.StandardWater
           constrainedby Modelica.Media.Interfaces.PartialPureSubstance
           "Fluid model";
         ThermoPower.Examples.RankineCycle.Models.PrescribedPressureCondenser condenser(
@@ -2859,7 +2859,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           initType=Modelica.Blocks.Types.Init.SteadyState,
           y_start=0.2) annotation (Placement(transformation(extent={{240,-110},{
                   260,-90}}, rotation=0)));
-        ThermoPower.Water.SteamTurbineStodola steamTurbine(
+        ThermoPower.FluidPh.SteamTurbineStodola steamTurbine(
           wstart=55,
           wnom=55,
           Kt=0.0104,
@@ -3699,17 +3699,17 @@ This is a simple model of a steam plant.
 	  
       model BaseReader_water
         "Base reader for the visualization of the state in the simulation (water)"
-        replaceable package Medium = Water.StandardWater constrainedby
+        replaceable package Medium = FluidPh.StandardWater constrainedby
           Modelica.Media.Interfaces.PartialPureSubstance "Medium model";
         parameter Boolean allowFlowReversal=system.allowFlowReversal
           "= true to allow flow reversal, false restricts to design direction";
         outer ThermoPower.System system "System wide properties";
 
-        Water.FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
+        FluidPh.FlangeA inlet(redeclare package Medium = Medium, m_flow(min=if
                 allowFlowReversal then -Modelica.Constants.inf else 0))
           annotation (Placement(transformation(extent={{-80,-20},{-40,20}},
                 rotation=0)));
-        Water.FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
+        FluidPh.FlangeB outlet(redeclare package Medium = Medium, m_flow(max=if
                 allowFlowReversal then +Modelica.Constants.inf else 0))
           annotation (Placement(transformation(extent={{40,-20},{80,20}},
                 rotation=0)));

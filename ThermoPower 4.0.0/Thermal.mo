@@ -1262,14 +1262,14 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
       cp_dew = Medium.heatCapacity_cp(dew);
 
       // Heat transfer coefficient at bubble/dew point
-      gamma_bubble = Water.f_dittus_boelter(
+      gamma_bubble = FluidPh.f_dittus_boelter(
         w[1],
         Dhyd,
         A,
         mu_bubble,
         k_bubble,
         cp_bubble);
-      gamma_dew = Water.f_dittus_boelter(
+      gamma_dew = FluidPh.f_dittus_boelter(
         w[1],
         Dhyd,
         A,
@@ -1284,7 +1284,7 @@ the global nominal thermal conductance UAnom is given instead of the nominal spe
         mu[j] = Medium.dynamicViscosity(fluidState[j]);  //not all nodes, only 1-phase nodes
         k[j] = Medium.thermalConductivity(fluidState[j]); //not all nodes, only 1-phase nodes
         cp[j] = Medium.heatCapacity_cp(fluidState[j]); //not all nodes, only 1-phase nodes
-        gamma1ph[j] = Water.f_dittus_boelter(
+        gamma1ph[j] = FluidPh.f_dittus_boelter(
           w[j],
           Dhyd,
           A,
