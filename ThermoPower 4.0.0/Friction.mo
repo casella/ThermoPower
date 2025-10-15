@@ -3,6 +3,10 @@ within ThermoPower;
 package Friction "Friction models"
   extends Modelica.Icons.Package;
 
+  package Friction1D "Friction models for 1D components"
+    extends Modelica.Icons.Package;
+  end Friction1D;
+
   package BaseClasses
   extends Modelica.Icons.BasesPackage;
 
