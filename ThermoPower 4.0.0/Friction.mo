@@ -3,8 +3,24 @@ within ThermoPower;
 package Friction "Friction models"
   extends Modelica.Icons.Package;
 
+  model NoFriction "No friction is applied"
+    extends ThermoPower.Friction.BaseClasses.FrictionBase1D;
+
+  equation
+    Kf=0;
+
+  annotation(
+      Documentation(info = "<html><head></head><body> Model to be used to <code>redeclare</code> the fricion model in 1D components if no friction should be applied;</body></html>", revisions = "<html><head></head><body><ul>
+  <li><i>15 Oct 2025</i>
+  by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+     First release.</li>
+  </ul>
+  </body></html>"));
+  end NoFriction;
+
   package Friction1D "Friction models for 1D components"
-    extends Modelica.Icons.Package;
+  extends Modelica.Icons.Package;
+
   end Friction1D;
 
   package BaseClasses
