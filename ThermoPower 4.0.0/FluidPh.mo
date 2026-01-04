@@ -2378,7 +2378,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     import ThermoPower.Choices.Flow1D.HCtypes;
     Medium.ThermodynamicState fluidState[N] "Thermodynamic state of the fluid at the nodes";
     parameter Modelica.Units.SI.PerUnit alpha(min = 0, max = 1) = 1 "Numerical stabilization coefficient";
-    parameter Modelica.Units.SI.PerUnit ML(min = 0, max = 1) = 0 "Mass Lumping Coefficient";
     parameter Modelica.Units.SI.PerUnit wnf_bc = 0.01 "Fraction of the nominal total mass flow rate for boundary condition FEM regularization";
     parameter Modelica.Units.SI.PerUnit wnf_alpha = 0.01 "Fraction of the nominal total mass flow rate for stabilization parameter regularization";
     parameter Boolean regularizeBoundaryConditions = false "Regularize boundary condition matrices";
@@ -2402,21 +2401,16 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.Density rho[N] "Fluid density";
     Modelica.Units.SI.SpecificVolume v[N] "Fluid specific volume";
     Modelica.Units.SI.Mass Mtot "Total mass of fluid";
+  
   protected
     Modelica.Units.SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     Modelica.Units.SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
     Real dvdt[N] "Time derivatives of specific volume";
-    //Real Y[N, N];
-    //Real M[N, N];
     Real D[N];
     Real D1[N];
     Real D2[N];
-    //Real G[N];
-    //Real B[N, N];
-    //Real C[N, N];
-    //Real K[N, N];
     Real alpha_sgn[N];
-    //Real YY[N, N];
+  
   equation
   //All equations are referred to a single tube
   // Selection of representative pressure variable
@@ -2471,11 +2465,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if "Pressure drop due to friction";
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D "Pressure drop due to static head";
   
-  
-  
-  
-  
-  
   // Fluid property calculations
     for j in 1:N loop
       fluidState[j] = Medium.setState_phX(p, h[j]);
@@ -2504,22 +2493,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end if;
     end for;
   
+  // Energy balance equations in matrices form (see Flow1DFEM)
+  //  Y*der(h) + B/A*h + C*h/A = der(p)*G + M*(omega/A)*phi + K*w/A;
   
-  
-  
-  /*
-    "Energy balance equation";
-    Y*der(h)
-    + B/A*h
-    + C*h/A
-    =
-    der(p)*G
-    + M*(omega/A)*phi
-    + K*w/A;
-    
-  */
-  
-  // Energy balance equations
+  //  expansion in single-equations form
   
   /* first equation
     Y[1,1]*der(h[1]) + Y[1,2]*der(h[2])
@@ -2531,25 +2508,43 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     + der(p)*G[1];
   */
   
-  if regularizeBoundaryConditions then
-    (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]))*der(h[1]) + (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]))*der(h[2])
-    + (((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12)*h[1] + ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12)*h[2])/A
-    + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*w[1], 0, wnom*wnf_bc))*h[1]/A 
-    =
-    (((4 - 3*alpha_sgn[1])*l/12)*phi[1] + ((2 - 3*alpha_sgn[1])*l/12)*phi[2])*(omega/A)
-    + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow), 0, wnom*wnf_bc))*w[1]/A
-    + (if Medium.singleState then 0 else der(p)*(l/2*(1 - alpha_sgn[1])));
+    if regularizeBoundaryConditions then
+      (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]))*der(h[1]) + (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]))*der(h[2])
+      + (((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12)*h[1] + ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12)*h[2])/A
+      + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*w[1], 0, wnom*wnf_bc))*h[1]/A 
+      =
+      (((4 - 3*alpha_sgn[1])*l/12)*phi[1] + ((2 - 3*alpha_sgn[1])*l/12)*phi[2])*(omega/A)
+      + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow), 0, wnom*wnf_bc))*w[1]/A
+      + (if Medium.singleState then 0 else der(p)*(l/2*(1 - alpha_sgn[1])));
+    
+    else
+      (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]))*der(h[1]) + (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]))*der(h[2])
+      + (((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12)*h[1] + ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12)*h[2])/A
+      + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*w[1] else 0))*h[1]/A 
+      =
+      (((4 - 3*alpha_sgn[1])*l/12)*phi[1] + ((2 - 3*alpha_sgn[1])*l/12)*phi[2])*(omega/A)
+      + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow) else 0))*w[1]/A
+      + (if Medium.singleState then 0 else der(p)*(l/2*(1 - alpha_sgn[1])));
+    
+    end if;
   
-  else
-    (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]))*der(h[1]) + (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]))*der(h[2])
-    + (((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12)*h[1] + ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12)*h[2])/A
-    + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*w[1] else 0))*h[1]/A 
-    =
-    (((4 - 3*alpha_sgn[1])*l/12)*phi[1] + ((2 - 3*alpha_sgn[1])*l/12)*phi[2])*(omega/A)
-    + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow) else 0))*w[1]/A
-    + (if Medium.singleState then 0 else der(p)*(l/2*(1 - alpha_sgn[1])));
-  
-  end if;
+  /* Intermediate equations, if N>2
+    for i in 2:(N-1)
+      Y[i,i-1]*der(h[i-1]) + Y[i,i]*der(h[i]) + Y[i,i+1]*der(h[i+1])
+      + (B[i,i-1]*h[i-1] + B[i,i]*h[i] + B[i,i+1]*h[i+1])/A
+      =
+      (M[i,i-1]*phi[i-1] + M[i,i]*phi[i] + M[i,i+1]*phi[i+1])*(omega/A)
+      + der(p)*G[i];
+  */
+    if N>2 then
+      for i in 2:(N-1) loop
+        (rho[i - 1]*(l/12)*(1 + 2*alpha_sgn[i]) + rho[i]*(l/12)*(1 + alpha_sgn[i]))*der(h[i-1]) + (rho[i - 1]*(l/12)*(1 + alpha_sgn[i]) + rho[i]*(l/12)*6 + rho[i + 1]*(l/12)*(1 - alpha_sgn[i]))*der(h[i]) + (rho[i]*(l/12)*(1 - alpha_sgn[i]) + rho[i + 1]*(l/12)*(1 - 2*alpha_sgn[i]))*der(h[i+1])
+        + (((-w[i - 1]*(2 + 3*alpha_sgn[i]) - w[i]*(4 + 3*alpha_sgn[i]))/12)*h[i-1] + ((w[i - 1]*(2 + 3*alpha_sgn[i]) + w[i]*6*alpha_sgn[i] + w[i + 1]*(3*alpha_sgn[i] - 2))/12)*h[i] + ((w[i]*(4 - 3*alpha_sgn[i]) + w[i + 1]*(2 - 3*alpha_sgn[i]))/12)*h[i+1])/A
+        =
+        (((2 + 3*alpha_sgn[i])*l/12)*phi[i-1] + (8*l/12)*phi[i] + ((2 - 3*alpha_sgn[i])*l/12)*phi[i+1])*(omega/A)
+        + (if Medium.singleState then 0 else der(p)*l);
+      end for;
+    end if;
   
   /* last equation
     Y[N,N-1]*der(h[N-1]) + Y[N,N]*der(h[N])
@@ -2561,169 +2556,27 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     + der(p)*G[N];
   */
   
-  if regularizeBoundaryConditions then
-    (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]))*der(h[N-1]) + (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]))*der(h[N])
-    + (((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N-1] + ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N])/A
-    + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*w[N], 0, wnom*wnf_bc))*h[N]/A 
-    =
-    (((2 + 3*alpha_sgn[N])*l/12)*phi[N-1] + ((4 + 3*alpha_sgn[N])*l/12)*phi[N])*(omega/A)
-    + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow), 0, wnom*wnf_bc))*w[N]/A
-    + (if Medium.singleState then 0 else der(p)*(l/2*(1 + alpha_sgn[1])));
-  
-  else
-    (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]))*der(h[N-1]) + (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]))*der(h[N])
-    + (((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N-1] + ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N])/A
-    + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*w[N] else 0))*h[N]/A 
-    =
-    (((2 + 3*alpha_sgn[N])*l/12)*phi[N-1] + ((4 + 3*alpha_sgn[N])*l/12)*phi[N])*(omega/A)
-    + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow) else 0))*w[N]/A
-    + (if Medium.singleState then 0 else der(p)*(l/2*(1 + alpha_sgn[1])));
-  
-  end if;
-  
-  /* Intermediate equations, if N>2
-    for i in 2:(N-1)
-      Y[i,i-1]*der(h[i-1]) + Y[i,i]*der(h[i]) + Y[i,i+1]*der(h[i+1])
-      + (B[i,i-1]*h[i-1] + B[i,i]*h[i] + B[i,i+1]*h[i+1])/A
-      =
-      (M[i,i-1]*phi[i-1] + M[i,i]*phi[i] + M[i,i+1]*phi[i+1])*(omega/A)
-      + der(p)*G[i];
-  */
-  if N>2 then
-    for i in 2:(N-1) loop
-      (rho[i - 1]*(l/12)*(1 + 2*alpha_sgn[i]) + rho[i]*(l/12)*(1 + alpha_sgn[i]))*der(h[i-1]) + (rho[i - 1]*(l/12)*(1 + alpha_sgn[i]) + rho[i]*(l/12)*6 + rho[i + 1]*(l/12)*(1 - alpha_sgn[i]))*der(h[i]) + (rho[i]*(l/12)*(1 - alpha_sgn[i]) + rho[i + 1]*(l/12)*(1 - 2*alpha_sgn[i]))*der(h[i+1])
-      + (((-w[i - 1]*(2 + 3*alpha_sgn[i]) - w[i]*(4 + 3*alpha_sgn[i]))/12)*h[i-1] + ((w[i - 1]*(2 + 3*alpha_sgn[i]) + w[i]*6*alpha_sgn[i] + w[i + 1]*(3*alpha_sgn[i] - 2))/12)*h[i] + ((w[i]*(4 - 3*alpha_sgn[i]) + w[i + 1]*(2 - 3*alpha_sgn[i]))/12)*h[i+1])/A
-      =
-      (((2 + 3*alpha_sgn[i])*l/12)*phi[i-1] + (8*l/12)*phi[i] + ((2 - 3*alpha_sgn[i])*l/12)*phi[i+1])*(omega/A)
-      + (if Medium.singleState then 0 else der(p)*l);
-    end for;
-    
-  end if;
-  
-  // Energy equation FEM matrices
-  
-  /* 
-    -- Y --
-    Y[1, 1] = (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]));
-    Y[1, 2] = (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]));
-    Y[N, N - 1] = (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]));
-    Y[N, N] = (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]));
-    if N > 2 then
-      for i in 2:N - 1 loop
-        Y[i, i - 1] = (rho[i - 1]*(l/12)*(1 + 2*alpha_sgn[i]) + rho[i]*(l/12)*(1 + alpha_sgn[i]));
-        Y[i, i] = (rho[i - 1]*(l/12)*(1 + alpha_sgn[i]) + rho[i]*(l/12)*6 + rho[i + 1]*(l/12)*(1 - alpha_sgn[i]));
-        Y[i, i + 1] = (rho[i]*(l/12)*(1 - alpha_sgn[i]) + rho[i + 1]*(l/12)*(1 - 2*alpha_sgn[i]));
-        Y[1, i + 1] = 0;
-        Y[N, i - 1] = 0;
-        for j in 1:(i - 2) loop
-          Y[i, j] = 0;
-        end for;
-        for j in (i + 2):N loop
-          Y[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    
-    -- M --
-    M[1, 1] = ((4 - 3*alpha_sgn[1])*l/12);
-    M[1, 2] = ((2 - 3*alpha_sgn[1])*l/12);
-    M[N, N - 1] = ((2 + 3*alpha_sgn[N])*l/12);
-    M[N, N] = ((4 + 3*alpha_sgn[N])*l/12);
-    if N > 2 then
-      for i in 2:N - 1 loop
-        M[i, i - 1] = ((2 + 3*alpha_sgn[i])*l/12);
-        M[i, i] = (8*l/12);
-        M[i, i + 1] = ((2 - 3*alpha_sgn[i])*l/12);
-        M[1, i + 1] = 0;
-        M[N, i - 1] = 0;
-        for j in 1:(i - 2) loop
-          M[i, j] = 0;
-        end for;
-        for j in (i + 2):N loop
-          M[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    -- B --
-    B[1, 1] = ((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12);
-    B[1, 2] = ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12);
-    B[N, N - 1] = ((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12);
-    B[N, N] = ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12);
-    if N > 2 then
-      for i in 2:N - 1 loop
-        B[i, i - 1] = ((-w[i - 1]*(2 + 3*alpha_sgn[i]) - w[i]*(4 + 3*alpha_sgn[i]))/12);
-        B[i, i] = ((w[i - 1]*(2 + 3*alpha_sgn[i]) + w[i]*6*alpha_sgn[i] + w[i + 1]*(3*alpha_sgn[i] - 2))/12);
-        B[i, i + 1] = ((w[i]*(4 - 3*alpha_sgn[i]) + w[i + 1]*(2 - 3*alpha_sgn[i]))/12);
-        B[1, i + 1] = 0;
-        B[N, i - 1] = 0;
-        for j in 1:(i - 2) loop
-          B[i, j] = 0;
-        end for;
-        for j in (i + 2):N loop
-          B[i, j] = 0;
-        end for;
-      end for;
-    end if;
-    
-    -- G --
-    if Medium.singleState then
-      G = zeros(N) "No influence of pressure";
-    else
-      G[1] = (l/2*(1 - alpha_sgn[1]));
-      G[N] = (l/2*(1 + alpha_sgn[1]));
-      if N > 2 then
-        for i in 2:N - 1 loop
-          G[i] = l;
-        end for;
-      end if;
-    end if;
-    
-  // boundary condition matrices
-    
-    -- C --
     if regularizeBoundaryConditions then
-      C[1, 1] = (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*w[1], 0, wnom*wnf_bc));
-      C[N, N] = (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*w[N], 0, wnom*wnf_bc));
-    else
-      C[1, 1] = (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*w[1] else 0));
-      C[N, N] = (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*w[N] else 0));
-    end if;
-    C[N, 1] = 0;
-    C[1, N] = 0;
-    if (N > 2) then
-      for i in 2:(N - 1) loop
-        C[1, i] = 0;
-        C[N, i] = 0;
-        for j in 1:N loop
-          C[i, j] = 0;
-        end for;
-      end for;
-    end if;
+      (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]))*der(h[N-1]) + (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]))*der(h[N])
+      + (((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N-1] + ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N])/A
+      + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*w[N], 0, wnom*wnf_bc))*h[N]/A 
+      =
+      (((2 + 3*alpha_sgn[N])*l/12)*phi[N-1] + ((4 + 3*alpha_sgn[N])*l/12)*phi[N])*(omega/A)
+      + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow), 0, wnom*wnf_bc))*w[N]/A
+      + (if Medium.singleState then 0 else der(p)*(l/2*(1 + alpha_sgn[1])));
     
-    -- K --
-    if regularizeBoundaryConditions then
-      K[1, 1] = (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow), 0, wnom*wnf_bc));
-      K[N, N] = (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow), 0, wnom*wnf_bc));
     else
-      K[1, 1] = (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow) else 0));
-      K[N, N] = (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow) else 0));
-    end if;
-    K[N, 1] = 0;
-    K[1, N] = 0;
-    if (N > 2) then
-      for i in 2:(N - 1) loop
-        K[1, i] = 0;
-        K[N, i] = 0;
-        for j in 1:N loop
-          K[i, j] = 0;
-        end for;
-      end for;
-    end if;
-  */  
+      (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]))*der(h[N-1]) + (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]))*der(h[N])
+      + (((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N-1] + ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N])/A
+      + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*w[N] else 0))*h[N]/A 
+      =
+      (((2 + 3*alpha_sgn[N])*l/12)*phi[N-1] + ((4 + 3*alpha_sgn[N])*l/12)*phi[N])*(omega/A)
+      + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow) else 0))*w[N]/A
+      + (if Medium.singleState then 0 else der(p)*(l/2*(1 + alpha_sgn[1])));
     
-  // Momentum and Mass balance equation matrices
+    end if;
+  
+  // Momentum and Mass balance equation arrays
     D[1] = l/2;
     D[N] = l/2;
     for i in 2:N - 1 loop
@@ -2745,6 +2598,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
     Mtot = Nt*D*rho*A "Total mass of fluid";
     Tr = noEvent(Mtot/max(abs(infl.m_flow), Modelica.Constants.eps)) "Residence time";
+  
   initial equation
     if initOpt == Choices.Init.Options.noInit then
   // do nothing
