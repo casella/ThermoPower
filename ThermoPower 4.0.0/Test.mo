@@ -9684,6 +9684,947 @@ Casella</a>:<br>
 </html>"),
         experiment(StopTime=1e+006, Interval=200));
     end TestRefrigerantEvaporator;
+    
+    model TestWaterFlow1DFEMnm_A "Test case for Flow1DFEM"
+      
+      TestWaterFlow1DFEM_A refData;
+    
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 12;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 10;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex = 0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 0.3;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 2e5;
+      // initial inlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy hinhex = 1e5;
+      // initial outlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy houthex = 1e5;
+      //height of enthalpy step
+      parameter Modelica.Units.SI.SpecificEnthalpy deltah = 41800;
+      //height of power step
+      parameter Modelica.Units.SI.EnergyFlowRate W = 41800*whex;
+      FluidPh.SourceMassFlow Fluid_Source(redeclare package Medium = Medium, p0 = phex, h = hinhex, w0 = whex, use_in_w0 = true, use_in_h = true) annotation(
+        Placement(transformation(extent = {{-76, -10}, {-56, 10}}, rotation = 0)));
+      FluidPh.SinkPressure Fluid_Sink(p0 = phex/2, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{64, -10}, {84, 10}}, rotation = 0)));
+      FluidPh.ValveLin Valve(Kv = 3e-6, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{12, -10}, {32, 10}}, rotation = 0)));
+      FluidPh.Flow1DFEMnm hex(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, DynamicMomentum = false, hstartin = hinhex, hstartout = houthex, redeclare package Medium = Medium, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, dpnom = 10000) annotation(
+        Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
+      FluidPh.SensT T_in(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-48, -6}, {-28, 14}}, rotation = 0)));
+      Thermal.HeatSource1DFEM HeatSource1D1(N = Nnodes, L = Lhex, omega = omegahex) annotation(
+        Placement(transformation(extent = {{-20, 22}, {0, 42}}, rotation = 0)));
+      Modelica.Blocks.Sources.Step MassFlowRate(height = -0.02, offset = whex, startTime = 50) annotation(
+        Placement(transformation(extent = {{-94, 20}, {-74, 40}}, rotation = 0)));
+      Modelica.Blocks.Sources.Constant Constant1(k = 1) annotation(
+        Placement(transformation(extent = {{-10, 60}, {10, 80}}, rotation = 0)));
+      Modelica.Blocks.Sources.Step InSpecEnthalpy(height = deltah, offset = hinhex, startTime = 1) annotation(
+        Placement(transformation(extent = {{-94, 50}, {-74, 70}}, rotation = 0)));
+      Modelica.Blocks.Sources.Step ExtPower(height = W, startTime = 30) annotation(
+        Placement(transformation(extent = {{-40, 40}, {-20, 60}}, rotation = 0)));
+      FluidPh.SensT T_out(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{38, -6}, {58, 14}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+    
+      // check reference data
+      SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
+      SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
+      SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
+      SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.1;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+    
+    equation
+      connect(hex.outfl, Valve.inlet) annotation(
+        Line(points = {{0, 0}, {12, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(T_in.outlet, hex.infl) annotation(
+        Line(points = {{-32, 0}, {-20, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(Fluid_Source.flange, T_in.inlet) annotation(
+        Line(points = {{-56, 0}, {-44, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(HeatSource1D1.wall, hex.wall) annotation(
+        Line(points = {{-10, 29}, {-10, 5}}, color = {255, 127, 0}));
+      connect(T_out.outlet, Fluid_Sink.flange) annotation(
+        Line(points = {{54, 0}, {64, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(Valve.outlet, T_out.inlet) annotation(
+        Line(points = {{32, 0}, {42, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(MassFlowRate.y, Fluid_Source.in_w0) annotation(
+        Line(points = {{-73, 30}, {-70, 30}, {-70, 6}}, color = {0, 0, 127}));
+      connect(InSpecEnthalpy.y, Fluid_Source.in_h) annotation(
+        Line(points = {{-73, 60}, {-62, 60}, {-62, 6}}, color = {0, 0, 127}));
+      connect(ExtPower.y, HeatSource1D1.power) annotation(
+        Line(points = {{-19, 50}, {-10, 50}, {-10, 36}}, color = {0, 0, 127}));
+      connect(Constant1.y, Valve.cmd) annotation(
+        Line(points = {{11, 70}, {22, 70}, {22, 8}}, color = {0, 0, 127}));
+      annotation(
+        Diagram(graphics),
+        experiment(StopTime = 80, Tolerance = 1e-006),
+        Documentation(info = "<HTML>
+    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+    This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
+    During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
+    <ul>
+        <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
+        <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
+        <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
+    </ul>
+    <p>
+    Simulation Interval = [0...80] sec <br>
+    Integration Algorithm = DASSL <br>
+    Algorithm Tolerance = 1e-6
+    </p>
+    </HTML>", revisions = "<html>
+    <ul>
+        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+    </ul>
+    <ul>
+        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        First release.</li>
+    </ul>
+    </html>"));
+    end TestWaterFlow1DFEMnm_A;
+    
+    model TestWaterFlow1DFEMnm_B "Test case for Flow1DFEM"
+    
+      TestWaterFlow1DFEM_B refData;
+    
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 12;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 200;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex = 0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 0.31;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 3e5;
+      // initial inlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy hs = 1e5;
+      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hs, hstartout = hs, alpha = 1, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400)) annotation(
+        Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
+      Thermal.TempSource1DFEM TempSource(N = Nnodes) annotation(
+        Placement(transformation(extent = {{-20, 10}, {0, 30}}, rotation = 0)));
+      FluidPh.ValveLin ValveLin1(Kv = 2*whex/phex, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{10, -10}, {30, 10}}, rotation = 0)));
+      FluidPh.SourceMassFlow FluidSource(redeclare package Medium = Medium, w0 = whex, p0 = phex, h = hs) annotation(
+        Placement(transformation(extent = {{-80, -10}, {-60, 10}}, rotation = 0)));
+      FluidPh.SinkPressure FluidSink(p0 = phex/2, h = hs, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{70, -10}, {90, 10}}, rotation = 0)));
+      Modelica.Blocks.Sources.Step Temperature(height = 10, offset = 297, startTime = 20) annotation(
+        Placement(transformation(extent = {{-50, 30}, {-30, 50}}, rotation = 0)));
+      Modelica.Blocks.Sources.Constant Constant1(k = 1) annotation(
+        Placement(transformation(extent = {{-10, 70}, {10, 90}}, rotation = 0)));
+      FluidPh.SensT T_in(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-50, -6}, {-30, 14}}, rotation = 0)));
+      FluidPh.SensT T_out(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{40, -6}, {60, 14}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+    
+      // check reference data
+      SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
+      SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
+      SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
+      SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.1;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+    
+    equation
+      connect(hex.outfl, ValveLin1.inlet) annotation(
+        Line(points = {{0, 0}, {10, 0}}, thickness = 0.5, color = {0, 0, 255}));
+      connect(T_in.inlet, FluidSource.flange) annotation(
+        Line(points = {{-46, 0}, {-60, 0}}, thickness = 0.5, color = {0, 0, 255}));
+      connect(T_in.outlet, hex.infl) annotation(
+        Line(points = {{-34, 0}, {-20, 0}}, thickness = 0.5, color = {0, 0, 255}));
+      connect(ValveLin1.outlet, T_out.inlet) annotation(
+        Line(points = {{30, 0}, {44, 0}}, thickness = 0.5, color = {0, 0, 255}));
+      connect(T_out.outlet, FluidSink.flange) annotation(
+        Line(points = {{56, 0}, {70, 0}}, thickness = 0.5, color = {0, 0, 255}));
+      connect(Temperature.y, TempSource.temperature) annotation(
+        Line(points = {{-29, 40}, {-10, 40}, {-10, 24}}, color = {0, 0, 127}));
+      connect(Constant1.y, ValveLin1.cmd) annotation(
+        Line(points = {{11, 80}, {20, 80}, {20, 8}}, color = {0, 0, 127}));
+      connect(TempSource.wall, hex.wall) annotation(
+        Line(points = {{-10, 17}, {-10, 5}}, color = {255, 127, 0}, smooth = Smooth.None));
+      annotation(
+        Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics),
+        experiment(StopTime = 200, Tolerance = 1e-006),
+        Documentation(info = "<HTML>
+    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method). <br>
+    This model represent the fluid side of a heat exchanger with convective exchange with an external source at a given temperature.<br>
+    The operating fluid is liquid water.<br>
+    During the experiment the external (fixed) temperature changes:
+    <ul>
+            <li>t=20 s, Step variation of the external temperature. Heat exchanger outlet temperature should vary accordingly to the transfer function (K1/(1+s*tau1))*(1-exp(-K2-s*tau2)), where the parameters K1, K2, tau1, tau1 depend on exchanger geometry, the fluid heat transfer coefficient and operating conditions.</li>
+    </ul>
+    </p>
+    </p>
+    <p>
+    Simulation Interval = [0...200] sec <br>
+    Integration Algorithm = DASSL <br>
+    Algorithm Tolerance = 1e-6
+    </p>
+    </HTML>", revisions = "<html>
+    <ul>
+        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+    </ul>
+    <ul>
+        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        First release.</li>
+    </ul>
+    </html>"));
+    end TestWaterFlow1DFEMnm_B;
+    
+    model TestWaterFlow1DFEMnm_C "Test case for Flow1Dfem"
+      
+      TestWaterFlow1DFEM_C refData;
+      
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 12;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 200;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex = 0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 0.3;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 1e5;
+      // initial specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy hs = 1e5;
+      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hs, hstartout = hs, DynamicMomentum = false, alpha = 1, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000) annotation(
+        Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
+      FluidPh.ValveLin ValveLin1(redeclare package Medium = Medium, Kv = 2*whex/phex) annotation(
+        Placement(transformation(extent = {{40, -10}, {60, 10}}, rotation = 0)));
+      FluidPh.SinkPressure SinkP1(h = hs, p0 = 4*phex, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{70, -10}, {90, 10}}, rotation = 0)));
+      FluidPh.SourceMassFlow SourceW1(redeclare package Medium = Medium, w0 = whex, G = 0, p0 = 2*phex, h = 2*hs, use_in_w0 = true) annotation(
+        Placement(transformation(extent = {{-78, -10}, {-58, 10}}, rotation = 0)));
+      Modelica.Blocks.Sources.Ramp Ramp1(duration = 20, height = -2*whex, offset = whex, startTime = 500) annotation(
+        Placement(transformation(extent = {{-100, 26}, {-80, 46}}, rotation = 0)));
+      Modelica.Blocks.Sources.Constant Constant1(k = 1) annotation(
+        Placement(transformation(extent = {{10, 50}, {30, 70}}, rotation = 0)));
+      FluidPh.SensT T_in(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-50, -6}, {-30, 14}}, rotation = 0)));
+      FluidPh.SensT T_out(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{10, -6}, {30, 14}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+    
+      // check reference data
+      SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
+      SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
+      SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
+      SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.1;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+    
+    equation
+      connect(ValveLin1.outlet, SinkP1.flange) annotation(
+        Line(points = {{60, 0}, {70, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SourceW1.flange, T_in.inlet) annotation(
+        Line(points = {{-58, 0}, {-46, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(T_in.outlet, hex.infl) annotation(
+        Line(points = {{-34, 0}, {-20, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(hex.outfl, T_out.inlet) annotation(
+        Line(points = {{0, 0}, {14, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(T_out.outlet, ValveLin1.inlet) annotation(
+        Line(points = {{26, 0}, {40, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(Ramp1.y, SourceW1.in_w0) annotation(
+        Line(points = {{-79, 36}, {-72, 36}, {-72, 6}}, color = {0, 0, 127}));
+      connect(Constant1.y, ValveLin1.cmd) annotation(
+        Line(points = {{31, 60}, {50, 60}, {50, 8}}, color = {0, 0, 127}));
+      annotation(
+        Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics),
+        experiment(StopTime = 1000, Tolerance = 1e-006),
+        Documentation(info = "<HTML>
+    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method). <br>
+    This model is designed to simulate the flow reversal througth the heat exchanger. The operating fluid is liquid water; the heat flux entering the heat exchanger is set to zero. <br>
+    During the simulation, flow reversal is achieved:
+    <ul>
+            <li>t=500 s, Negative ramp variation (duration = 20 s) of the mass flow rate trough the heat exchanger. The final mass flow rate has the same magnitude and opposite direction with respect to the initial one.</li>
+    </ul>
+    </p>
+    </p>
+    <p>
+    Simulation Interval = [0...1000] sec <br>
+    Integration Algorithm = DASSL <br>
+    Algorithm Tolerance = 1e-6
+    </p>
+    </HTML>", revisions = "<html>
+    <ul>
+        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+    </ul>
+    <ul>
+        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        First release.</li>
+    </ul>
+    </html>"));
+    end TestWaterFlow1DFEMnm_C;
+    
+    model TestWaterFlow1DFEMnm_D "Test case for Flow1DFEM"
+      
+      TestWaterFlow1DFEM_D refData;
+      
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 12;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 10;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex = 0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 1e-2;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 0.2e5;
+      // initial specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy hs = 3e6;
+      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, alpha = 1, hstartin = hs, hstartout = hs, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000) annotation(
+        Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
+      FluidPh.SourceMassFlow MassFlowRateSource(w0 = whex, h = hs, use_in_w0 = true, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-60, -10}, {-40, 10}}, rotation = 0)));
+      FluidPh.SinkPressure FluidSink(redeclare package Medium = Medium, R = 100, h = 3e6, p0 = 5000) annotation(
+        Placement(transformation(extent = {{76, -10}, {96, 10}}, rotation = 0)));
+      FluidPh.ValveLin ValveLin1(Kv = 1e-7, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{40, -10}, {60, 10}}, rotation = 0)));
+      Modelica.Blocks.Sources.Step MassFlowRateStep(height = whex/10, offset = whex, startTime = 0.5) annotation(
+        Placement(transformation(extent = {{-86, 20}, {-66, 40}}, rotation = 0)));
+      Modelica.Blocks.Sources.Constant Constant1(k = 1) annotation(
+        Placement(transformation(extent = {{20, 40}, {40, 60}}, rotation = 0)));
+      FluidPh.SensP SensP annotation(
+        Placement(transformation(extent = {{12, 4}, {32, 24}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+    
+      // check reference data
+      SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
+      SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e6;
+      SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
+      SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.01;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+    
+    
+    equation
+      connect(ValveLin1.inlet, hex.outfl) annotation(
+        Line(points = {{40, 0}, {0, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(ValveLin1.outlet, FluidSink.flange) annotation(
+        Line(points = {{60, 0}, {76, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(MassFlowRateSource.flange, hex.infl) annotation(
+        Line(points = {{-40, 0}, {-20, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensP.flange, ValveLin1.inlet) annotation(
+        Line(points = {{22, 10}, {40, 10}, {40, 0}}));
+      connect(MassFlowRateStep.y, MassFlowRateSource.in_w0) annotation(
+        Line(points = {{-65, 30}, {-54, 30}, {-54, 6}}, color = {0, 0, 127}));
+      connect(Constant1.y, ValveLin1.cmd) annotation(
+        Line(points = {{41, 50}, {50, 50}, {50, 8}}, color = {0, 0, 127}));
+      annotation(
+        Diagram(graphics),
+        experiment(StopTime = 2, Tolerance = 1e-006),
+        Documentation(info = "<HTML>
+    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+    This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. <br>
+    During simulation mass flow rate changes:
+    <ul>
+            <li>t=2 s, Step variation of the inlet mass flow rate. The pressure increases with a first order dynamics, the tube actually behaving like a pressurized tank.</li>
+    </ul>
+    </p>
+    </p>
+    <p>
+    Simulation Interval = [0...2] sec <br>
+    Integration Algorithm = DASSL <br>
+    Algorithm Tolerance = 1e-6
+    </p>
+    </HTML>", revisions = "<html>
+    <ul>
+        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+    </ul>
+    <ul>
+        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        First release.</li>
+    </ul>
+    </html>"));
+    end TestWaterFlow1DFEMnm_D;
+    
+    model TestWaterFlow1DFEMnm_E "Test case for Flow1DFEM"
+      
+      TestWaterFlow1DFEM_E refData;
+      
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 12;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 200;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex = 0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 0.31;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 3e5;
+      // initial inlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy hinhex = 1e5;
+      // initial outlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy houthex = 1e5;
+      FluidPh.Flow1DFEMnm hexA(N = Nnodes, Nt = 1, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-20, -50}, {0, -30}}, rotation = 0)));
+      FluidPh.SinkPressure SideA_FluidSink(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{70, -50}, {90, -30}}, rotation = 0)));
+      FluidPh.SinkPressure SideB_FluidSink(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-80, 40}, {-100, 60}}, rotation = 0)));
+      FluidPh.SourceMassFlow SideA_MassFlowRate(w0 = whex, p0 = 300000, use_in_h = true, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-78, -50}, {-58, -30}}, rotation = 0)));
+      FluidPh.ValveLin ValveLin1(Kv = whex/(2e5), redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{20, -50}, {40, -30}}, rotation = 0)));
+      FluidPh.ValveLin ValveLin2(Kv = whex/(2e5), redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-30, 40}, {-50, 60}}, rotation = 0)));
+      FluidPh.Flow1DFEMnm hexB(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{0, 60}, {-20, 40}}, rotation = 0)));
+      FluidPh.SensT SensT_A_in(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-50, -46}, {-30, -26}}, rotation = 0)));
+      Modelica.Blocks.Sources.Step SideA_InSpecEnth(height = 1e5, offset = 1e5, startTime = 50) annotation(
+        Placement(transformation(extent = {{-94, -20}, {-74, 0}}, rotation = 0)));
+      Modelica.Blocks.Sources.Constant Constant1(k = 1) annotation(
+        Placement(transformation(extent = {{-70, 70}, {-50, 90}}, rotation = 0)));
+      Modelica.Blocks.Sources.Constant Constant2(k = 1) annotation(
+        Placement(transformation(extent = {{4, -20}, {24, 0}}, rotation = 0)));
+      FluidPh.SensT SensT_B_in(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{30, 44}, {10, 64}}, rotation = 0)));
+      FluidPh.SourceMassFlow SideB_MassFlowRate(w0 = whex, p0 = 3e5, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{60, 40}, {40, 60}}, rotation = 0)));
+      FluidPh.SensT SensT_A_out(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{46, -46}, {66, -26}}, rotation = 0)));
+      FluidPh.SensT SensT_B_out(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-54, 44}, {-74, 64}}, rotation = 0)));
+      Thermal.CounterCurrentFEM CounterCurrent1(N = Nnodes) annotation(
+        Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+    
+      // check reference data
+      SI.Pressure delta_pA = (refData.hexA.p - hexA.p)/1e5;
+      SI.SpecificEnthalpy[hexA.N] delta_hA = (refData.hexA.h - hexA.h)/1e5;
+      SI.TemperatureDifference[hexA.N] delta_TA = (refData.hexA.T - hexA.T)/1e2;
+      SI.MassFlowRate[hexA.N] delta_wA = (refData.hexA.w - hexA.w)/0.1;
+      SI.HeatFlux[hexA.N] delta_phiA = (refData.hexA.phi - hexA.phi)/1e4;
+    
+      SI.Pressure delta_pB = (refData.hexB.p - hexB.p)/1e5;
+      SI.SpecificEnthalpy[hexB.N] delta_hB = (refData.hexB.h - hexB.h)/1e5;
+      SI.TemperatureDifference[hexB.N] delta_TB = (refData.hexB.T - hexB.T)/1e2;
+      SI.MassFlowRate[hexB.N] delta_wB = (refData.hexB.w - hexB.w)/0.1;
+      SI.HeatFlux[hexB.N] delta_phiB = (refData.hexB.phi - hexB.phi)/1e4;
+    
+    equation
+      connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) annotation(
+        Line(points = {{-58, -40}, {-46, -40}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_A_in.outlet, hexA.infl) annotation(
+        Line(points = {{-34, -40}, {-20, -40}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(hexA.outfl, ValveLin1.inlet) annotation(
+        Line(points = {{0, -40}, {20, -40}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(ValveLin2.inlet, hexB.outfl) annotation(
+        Line(points = {{-30, 50}, {-20, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_B_in.outlet, hexB.infl) annotation(
+        Line(points = {{14, 50}, {0, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SideB_MassFlowRate.flange, SensT_B_in.inlet) annotation(
+        Line(points = {{40, 50}, {26, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(ValveLin1.outlet, SensT_A_out.inlet) annotation(
+        Line(points = {{40, -40}, {50, -40}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_A_out.outlet, SideA_FluidSink.flange) annotation(
+        Line(points = {{62, -40}, {70, -40}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SideB_FluidSink.flange, SensT_B_out.outlet) annotation(
+        Line(points = {{-80, 50}, {-70, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_B_out.inlet, ValveLin2.outlet) annotation(
+        Line(points = {{-58, 50}, {-50, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(hexB.wall, CounterCurrent1.side1) annotation(
+        Line(points = {{-10, 45}, {-10, 26}, {-10, 3}}, color = {255, 127, 0}));
+      connect(SideA_InSpecEnth.y, SideA_MassFlowRate.in_h) annotation(
+        Line(points = {{-73, -10}, {-64, -10}, {-64, -34}}, color = {0, 0, 127}));
+      connect(Constant1.y, ValveLin2.cmd) annotation(
+        Line(points = {{-49, 80}, {-40, 80}, {-40, 58}}, color = {0, 0, 127}));
+      connect(Constant2.y, ValveLin1.cmd) annotation(
+        Line(points = {{25, -10}, {30, -10}, {30, -32}}, color = {0, 0, 127}));
+      connect(CounterCurrent1.side2, hexA.wall) annotation(
+        Line(points = {{-10, -3.1}, {-10, -35}}, color = {255, 127, 0}, smooth = Smooth.None));
+      annotation(
+        Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics),
+        experiment(StopTime = 900, Tolerance = 1e-006),
+        Documentation(info = "<HTML>
+    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+    This model represent the two fluid sides of a heat exchanger in counterflow configuration. The operating fluid is liquid water.<br>
+    The mass flow rate during the experiment and initial conditions are the same for the two sides. <br>
+    During the simulation, the inlet specific enthalpy for hexA (\"hot side\") is changed:
+    <ul>
+        <li>t=50 s, Step variation of the specific enthalpy of the fluid entering hexA .</li>
+    </ul>
+    The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately.
+    </p>
+    </p>
+    <p>
+    Simulation Interval = [0...900] sec <br>
+    Integration Algorithm = DASSL <br>
+    Algorithm Tolerance = 1e-6
+    </p>
+    </HTML>", revisions = "<html>
+    <ul>
+        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+    <li><i>20 Dec 2004</i>
+        by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+    Casella</a>:<br>
+           New heat transfer components.</li>
+        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        First release.</li>
+    </ul>
+    
+    </html>
+        "));
+    end TestWaterFlow1DFEMnm_E;
+    
+    model TestWaterFlow1DFEMnm_F "Test case for Flow1DFEM"
+      
+      TestWaterFlow1DFEM_F refData;
+      
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 16;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 200;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Real Cfhex = 0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 0.31;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 3e5;
+      // initial inlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy hinhex = 1e5;
+      // initial outlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy houthex = 1e5;
+      FluidPh.Flow1DFEMnm hexA(N = Nnodes, Nt = 1, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-20, -60}, {0, -40}}, rotation = 0)));
+      FluidPh.SinkPressure SideA_FluidSink(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{70, -60}, {90, -40}}, rotation = 0)));
+      FluidPh.SinkPressure SideB_FluidSink(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-80, 40}, {-100, 60}}, rotation = 0)));
+      FluidPh.SourceMassFlow SideA_MassFlowRate(w0 = whex, p0 = 300000, use_in_h = true, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-82, -60}, {-62, -40}}, rotation = 0)));
+      FluidPh.ValveLin ValveLin1(Kv = whex/(2e5), redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{20, -60}, {40, -40}}, rotation = 0)));
+      FluidPh.ValveLin ValveLin2(Kv = whex/(2e5), redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-30, 40}, {-50, 60}}, rotation = 0)));
+      FluidPh.Flow1DFEMnm hexB(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{0, 60}, {-20, 40}}, rotation = 0)));
+      Thermal.MetalTubeFEM MetalWall(N = Nnodes, L = Lhex, lambda = 20, rint = rhex, rext = rhex + 1e-3, rhomcm = 4.9e6, Tstart1 = 297, TstartN = 297, initOpt = Choices.Init.Options.steadyState) annotation(
+        Placement(transformation(extent = {{-20, 0}, {0, -20}}, rotation = 0)));
+      FluidPh.SensT SensT_A_in(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-52, -56}, {-32, -36}}, rotation = 0)));
+      Modelica.Blocks.Sources.Step SideA_InSpecEnth(height = 1e5, offset = 1e5, startTime = 50) annotation(
+        Placement(transformation(extent = {{-96, -34}, {-76, -14}}, rotation = 0)));
+      Modelica.Blocks.Sources.Constant Constant1(k = 1) annotation(
+        Placement(transformation(extent = {{-70, 70}, {-50, 90}}, rotation = 0)));
+      Modelica.Blocks.Sources.Constant Constant2(k = 1) annotation(
+        Placement(transformation(extent = {{4, -40}, {24, -20}}, rotation = 0)));
+      FluidPh.SensT SensT_B_in(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{30, 44}, {10, 64}}, rotation = 0)));
+      FluidPh.SourceMassFlow SourceW1(w0 = whex, p0 = 3e5, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{60, 40}, {40, 60}}, rotation = 0)));
+      FluidPh.SensT SensT_A_out(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{46, -56}, {66, -36}}, rotation = 0)));
+      FluidPh.SensT SensT_B_out(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-54, 44}, {-74, 64}}, rotation = 0)));
+      Thermal.CounterCurrentFEM CounterCurrent1(N = Nnodes) annotation(
+        Placement(transformation(extent = {{-20, 24}, {0, 44}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+    
+      // check reference data
+      SI.Pressure delta_pA = (refData.hexA.p - hexA.p)/1e5;
+      SI.SpecificEnthalpy[hexA.N] delta_hA = (refData.hexA.h - hexA.h)/1e5;
+      SI.TemperatureDifference[hexA.N] delta_TA = (refData.hexA.T - hexA.T)/1e2;
+      SI.MassFlowRate[hexA.N] delta_wA = (refData.hexA.w - hexA.w)/0.1;
+      SI.HeatFlux[hexA.N] delta_phiA = (refData.hexA.phi - hexA.phi)/1e4;
+    
+      SI.Pressure delta_pB = (refData.hexB.p - hexB.p)/1e5;
+      SI.SpecificEnthalpy[hexB.N] delta_hB = (refData.hexB.h - hexB.h)/1e5;
+      SI.TemperatureDifference[hexB.N] delta_TB = (refData.hexB.T - hexB.T)/1e2;
+      SI.MassFlowRate[hexB.N] delta_wB = (refData.hexB.w - hexB.w)/0.1;
+      SI.HeatFlux[hexB.N] delta_phiB = (refData.hexB.phi - hexB.phi)/1e4;
+    
+    equation
+      connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) annotation(
+        Line(points = {{-62, -50}, {-48, -50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_A_in.outlet, hexA.infl) annotation(
+        Line(points = {{-36, -50}, {-20, -50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(hexA.outfl, ValveLin1.inlet) annotation(
+        Line(points = {{0, -50}, {20, -50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(ValveLin2.inlet, hexB.outfl) annotation(
+        Line(points = {{-30, 50}, {-20, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_B_in.outlet, hexB.infl) annotation(
+        Line(points = {{14, 50}, {0, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SourceW1.flange, SensT_B_in.inlet) annotation(
+        Line(points = {{40, 50}, {26, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_A_out.inlet, ValveLin1.outlet) annotation(
+        Line(points = {{50, -50}, {40, -50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_A_out.outlet, SideA_FluidSink.flange) annotation(
+        Line(points = {{62, -50}, {70, -50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_B_out.outlet, SideB_FluidSink.flange) annotation(
+        Line(points = {{-70, 50}, {-80, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(SensT_B_out.inlet, ValveLin2.outlet) annotation(
+        Line(points = {{-58, 50}, {-50, 50}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(CounterCurrent1.side2, MetalWall.ext) annotation(
+        Line(points = {{-10, 30.9}, {-10, 10}, {-10, -6.9}}, color = {255, 127, 0}));
+      connect(SideA_InSpecEnth.y, SideA_MassFlowRate.in_h) annotation(
+        Line(points = {{-75, -24}, {-68, -24}, {-68, -44}}, color = {0, 0, 127}));
+      connect(Constant2.y, ValveLin1.cmd) annotation(
+        Line(points = {{25, -30}, {30, -30}, {30, -42}}, color = {0, 0, 127}));
+      connect(Constant1.y, ValveLin2.cmd) annotation(
+        Line(points = {{-49, 80}, {-40, 80}, {-40, 58}}, color = {0, 0, 127}));
+      connect(hexB.wall, CounterCurrent1.side1) annotation(
+        Line(points = {{-10, 45}, {-10, 37}}, color = {255, 127, 0}, smooth = Smooth.None));
+      connect(MetalWall.int, hexA.wall) annotation(
+        Line(points = {{-10, -13}, {-10, -45}}, color = {255, 127, 0}, smooth = Smooth.None));
+      annotation(
+        Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics),
+        experiment(StopTime = 900, Tolerance = 1e-006),
+        Documentation(info = "<HTML>
+    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+    This model represent the two fluid sides of a heat exchanger in counterflow configuration. The two sides are divided by a metal wall. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. <br>
+    During the simulation, the inlet specific enthalpy for hexA (\"hot side\") is changed:
+    <ul>
+        <li>t=50 s, Step variation of the specific enthalpy of the fluid entering hexA .</li>
+    </ul>
+    The outlet temperature of the hot side changes after the fluid transport time delay and the first order delay due to the wall's thermal inertia. The outlet temperature of the cold side starts changing after the thermal inertia delay. </p>
+    <p>
+    Simulation Interval = [0...900] sec <br>
+    Integration Algorithm = DASSL <br>
+    Algorithm Tolerance = 1e-6
+    </HTML>", revisions = "<html>
+    <ul>
+    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+    <li><i>20 Dec 2004</i>
+        by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
+    Casella</a>:<br>
+           New heat transfer components.</li>
+        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        First release.</li>
+    </ul>
+    
+    </html>"));
+    end TestWaterFlow1DFEMnm_F;
+    
+    model TestWaterFlow1DFEMnm_G "Test case for Flow1DFEM"
+      
+      TestWaterFlow1DFEM_G refData;
+      
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.WaterIF97OnePhase_ph constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 6;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 10;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Modelica.Units.SI.PerUnit Cfhex = 0.005;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 0.3;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 2e5;
+      // initial inlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy hinhex = 1e5;
+      // initial outlet specific enthalpy
+      parameter Modelica.Units.SI.SpecificEnthalpy houthex = 1e5;
+      //height of enthalpy step
+      parameter Modelica.Units.SI.SpecificEnthalpy deltah = 41800;
+      //height of power step
+      parameter Modelica.Units.SI.EnergyFlowRate W = 41800*whex;
+      FluidPh.SourceMassFlow Fluid_Source(p0 = phex, w0 = whex, h = hinhex + deltah, use_in_w0 = true, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-76, -10}, {-56, 10}}, rotation = 0)));
+      FluidPh.SinkPressure Fluid_Sink(p0 = phex/2, h = hinhex, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{64, -10}, {84, 10}}, rotation = 0)));
+      FluidPh.Flow1DFEMnm hex(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, DynamicMomentum = false, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.noInit, dpnom = 100000, alpha = 1, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-8, -10}, {12, 10}}, rotation = 0)));
+      FluidPh.SensT T_in(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-48, -6}, {-28, 14}}, rotation = 0)));
+      Modelica.Blocks.Sources.TimeTable MassFlowRate(offset = 0, startTime = 0, table = [0, whex; 19.5, whex; 20.5, -whex; 40, -whex; 41, 0; 100, 0]) annotation(
+        Placement(transformation(extent = {{-94, 20}, {-74, 40}}, rotation = 0)));
+      FluidPh.SensT T_out(redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{38, -6}, {58, 14}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+    
+      // check reference data
+      SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
+      SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
+      SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
+      SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.1;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+    
+    equation
+      connect(T_in.outlet, hex.infl) annotation(
+        Line(points = {{-32, 0}, {-20, 0}, {-8, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(Fluid_Source.flange, T_in.inlet) annotation(
+        Line(points = {{-56, 0}, {-44, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(T_out.outlet, Fluid_Sink.flange) annotation(
+        Line(points = {{54, 0}, {64, 0}}, color = {0, 0, 255}, thickness = 0.5));
+      connect(MassFlowRate.y, Fluid_Source.in_w0) annotation(
+        Line(points = {{-73, 30}, {-70, 30}, {-70, 6}}, color = {0, 0, 127}));
+      connect(hex.outfl, T_out.inlet) annotation(
+        Line(points = {{12, 0}, {42, 0}}, color = {0, 0, 255}, smooth = Smooth.None));
+      annotation(
+        Diagram(graphics),
+        experiment(StopTime = 50, Tolerance = 1e-006),
+        Documentation(info = "<html>
+    <p>The model is designed to test the component <code>Flow1DFEM</code> (fluid side of a heat exchanger, finite element method) under reversing and zero flow conditions.</p>
+    <p>The simulation starts with cold fluid in the pipe and with positive flow from the hot source on the left. Around t = 20, the flow is reversed, and cold fluid enters the pipe from the cold source on the right. Around t = 40, the flow is brought to zero and stays there.</p>
+    <p>Simulation Interval = [0...50] sec </p>
+    <p>Integration Algorithm = DASSL </p>
+    <p>Algorithm Tolerance = 1e-6 </p>
+    </html>", revisions = "<html>
+    <ul>
+        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+        <li><i>23 Lug 2011</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        First release.</li>
+    </ul>
+    </html>"),
+        __Dymola_experimentSetupOutput);
+    end TestWaterFlow1DFEMnm_G;
+    
+    model TestWaterFlow1DFEMnm_K "Test case for Flow1DFEM"
+      
+      TestWaterFlow1DFEM_K refData;
+      
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.StandardWater constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 11;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 10;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Modelica.Units.SI.PerUnit Cfhex = 0.05;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 0.3;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 30e5;
+      // initial temperature
+      parameter Modelica.Units.SI.Temperature Thex = 700;
+      // initial specific enthalpy
+      final parameter Modelica.Units.SI.SpecificEnthalpy hhex = Medium.specificEnthalpy_pT(phex, Thex);
+      // initial density
+      final parameter Modelica.Units.SI.Density rhohex = Medium.density_pT(phex, Thex);
+      // Cv of fluid
+      final parameter Modelica.Units.SI.SpecificHeatCapacity cp = Medium.specificHeatCapacityCp(Medium.setState_pT(phex, Thex));
+      //height of power step
+      parameter Modelica.Units.SI.EnergyFlowRate W = 100;
+      // prediction of the flow rate going out the pipe from each side
+      // Approximated value of drho/dT, assuming ideal gas
+      final parameter Real drho_dT = rhohex/Thex;
+      // Initial mass
+      final parameter Modelica.Units.SI.Mass M = rhohex*Ahex*Lhex;
+      // Approximated value of temperature derivative (isobaric expansion)
+      final parameter Real dT_dt = W/(cp*M);
+      // Approximated dM/dT = V*drho_dT*dT_dt
+      final parameter Modelica.Units.SI.MassFlowRate dM_dT = Ahex*Lhex*drho_dT*dT_dt;
+      // Approximated value of flow rate at each end
+      final parameter Modelica.Units.SI.MassFlowRate wout = 0.5*dM_dT;
+      FluidPh.SinkPressure sink1(p0 = phex, h = hhex, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{66, -10}, {86, 10}}, rotation = 0)));
+      FluidPh.Flow1DFEMnm pipe1(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, DynamicMomentum = false, FFtype = Choices.Flow1D.FFtypes.Cfnom, HydraulicCapacitance = Choices.Flow1D.HCtypes.Middle, hstartin = hhex, hstartout = hhex, initOpt = Choices.Init.Options.noInit, alpha = 0, pstart = phex, wnf = 1, dpnom = 10000, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-12, -10}, {8, 10}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+      FluidPh.SourcePressure source1(h = hhex, p0 = phex, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-72, -10}, {-52, 10}})));
+      Thermal.HeatSource1DFEM heatSource1D(L = Lhex, omega = Dihex*3.14159, N = Nnodes) annotation(
+        Placement(transformation(extent = {{-12, 12}, {8, 32}})));
+      Modelica.Blocks.Sources.Step step(height = W) annotation(
+        Placement(transformation(extent = {{-38, 30}, {-18, 50}})));
+    
+      // check reference data
+      SI.Pressure delta_p = (refData.pipe1.p - pipe1.p)/1e5;
+      SI.SpecificEnthalpy[pipe1.N] delta_h = (refData.pipe1.h - pipe1.h)/1e5;
+      SI.TemperatureDifference[pipe1.N] delta_T = (refData.pipe1.T - pipe1.T)/1e2;
+      SI.MassFlowRate[pipe1.N] delta_w = (refData.pipe1.w - pipe1.w)/0.1;
+      SI.HeatFlux[pipe1.N] delta_phi = (refData.pipe1.phi - pipe1.phi)/1e4;
+    
+    equation
+      connect(source1.flange, pipe1.infl) annotation(
+        Line(points = {{-52, 0}, {-12, 0}}, color = {0, 0, 255}, smooth = Smooth.None));
+      connect(pipe1.outfl, sink1.flange) annotation(
+        Line(points = {{8, 0}, {66, 0}}, color = {0, 0, 255}, smooth = Smooth.None));
+      connect(heatSource1D.wall, pipe1.wall) annotation(
+        Line(points = {{-2, 19}, {-2, 5}}, color = {255, 127, 0}, smooth = Smooth.None));
+      connect(step.y, heatSource1D.power) annotation(
+        Line(points = {{-17, 40}, {-2, 40}, {-2, 26}}, color = {0, 0, 127}, smooth = Smooth.None));
+      annotation(
+        experiment(StartTime = -10, StopTime = 10, Tolerance = 1e-006),
+        Documentation(info = "<html>
+    <p>The model is designed to test the coupling between the mass and energy balance equations in the component <code>Flow1DFEM</code> (fluid side of a heat exchanger, finite element method).</p>
+    <p>The pipe is connected to two pressure source at the same pressure, with initial conditions corresponding to superheated steam @ 30 bar, 700 K. </p>
+    <p>At time t = 0, a constant uniform heat flux is applied to the lateral boundary of the pipe. The steam heats up and expands uniformly; since the configuration is symmetric, there is a backflow in the left half of the pipe and a forward flow on the right half of the pipe. The parameter wout is an analytical estimate of the flow rate going out each end of the pipe, which is in a good agreement with the actual solution.</p>
+    </html>", revisions = "<html>
+    <ul>
+        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+        <li><i>23 Aug 2011</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        First release.</li>
+    </ul>
+    </html>"),
+        __Dymola_experimentSetupOutput(doublePrecision = true, equdistant = false),
+        Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics));
+    end TestWaterFlow1DFEMnm_K;
+    
+    model TestWaterFlow1DFEMnm_J "Test case for Flow1Dfem"
+      
+      TestWaterFlow1DFEM_J refData;
+      
+      extends Modelica.Icons.Example;
+      replaceable package Medium = Modelica.Media.Water.StandardWater constrainedby Modelica.Media.Interfaces.PartialMedium;
+      // number of Nodes
+      parameter Integer Nnodes = 11;
+      // total length
+      parameter Modelica.Units.SI.Length Lhex = 10;
+      // internal diameter
+      parameter Modelica.Units.SI.Diameter Dihex = 0.02;
+      // internal radius
+      parameter Modelica.Units.SI.Radius rhex = Dihex/2;
+      // internal perimeter
+      parameter Modelica.Units.SI.Length omegahex = Modelica.Constants.pi*Dihex;
+      // internal cross section
+      parameter Modelica.Units.SI.Area Ahex = Modelica.Constants.pi*rhex^2;
+      // friction coefficient
+      parameter Modelica.Units.SI.PerUnit Cfhex = 0.05;
+      // nominal (and initial) mass flow rate
+      parameter Modelica.Units.SI.MassFlowRate whex = 0.03;
+      // initial pressure
+      parameter Modelica.Units.SI.Pressure phex = 30e5;
+      // initial temperature
+      parameter Modelica.Units.SI.Temperature Thex = 700;
+      // initial specific enthalpy
+      final parameter Modelica.Units.SI.SpecificEnthalpy hhex = Medium.specificEnthalpy_pT(phex, Thex);
+      // initial density
+      final parameter Modelica.Units.SI.Density rhohex = Medium.density_pT(phex, Thex);
+      // Cv of fluid
+      final parameter Modelica.Units.SI.SpecificHeatCapacity cv = Medium.specificHeatCapacityCv(Medium.setState_pT(phex, Thex));
+      //height of power step
+      FluidPh.SinkPressure sink1(p0 = phex, h = hhex, use_in_p0 = true, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{66, -10}, {86, 10}}, rotation = 0)));
+      FluidPh.Flow1DFEMnm pipe1(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, DynamicMomentum = false, FFtype = Choices.Flow1D.FFtypes.Cfnom, HydraulicCapacitance = Choices.Flow1D.HCtypes.Middle, hstartin = hhex, hstartout = hhex, initOpt = Choices.Init.Options.noInit, alpha = 0, pstart = phex, dpnom = 10000, wnf = 1, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-12, -10}, {8, 10}}, rotation = 0)));
+      inner System system annotation(
+        Placement(transformation(extent = {{80, 80}, {100, 100}})));
+      FluidPh.SourcePressure source1(h = hhex, p0 = phex + 150, use_in_p0 = true, redeclare package Medium = Medium) annotation(
+        Placement(transformation(extent = {{-72, -10}, {-52, 10}})));
+      Modelica.Blocks.Sources.Ramp ramp(height = phex, duration = 10, offset = phex) annotation(
+        Placement(transformation(extent = {{-94, 28}, {-74, 48}})));
+    
+      // check reference data
+      SI.Pressure delta_p = (refData.pipe1.p - pipe1.p)/1e5;
+      SI.SpecificEnthalpy[pipe1.N] delta_h = (refData.pipe1.h - pipe1.h)/1e6;
+      SI.TemperatureDifference[pipe1.N] delta_T = (refData.pipe1.T - pipe1.T)/1e2;
+      SI.MassFlowRate[pipe1.N] delta_w = (refData.pipe1.w - pipe1.w)/0.1;
+      SI.HeatFlux[pipe1.N] delta_phi = (refData.pipe1.phi - pipe1.phi)/1e4;
+    
+    equation
+      connect(source1.flange, pipe1.infl) annotation(
+        Line(points = {{-52, 0}, {-12, 0}}, color = {0, 0, 255}, smooth = Smooth.None));
+      connect(pipe1.outfl, sink1.flange) annotation(
+        Line(points = {{8, 0}, {66, 0}}, color = {0, 0, 255}, smooth = Smooth.None));
+      connect(ramp.y, source1.in_p0) annotation(
+        Line(points = {{-73, 38}, {-66, 38}, {-66, 9.2}}, color = {0, 0, 127}, smooth = Smooth.None));
+      connect(ramp.y, sink1.in_p0) annotation(
+        Line(points = {{-73, 38}, {72, 38}, {72, 8.8}}, color = {0, 0, 127}, smooth = Smooth.None));
+      annotation(
+        experiment(StartTime = -10, StopTime = 10, __Dymola_NumberOfIntervals = 10000, Tolerance = 1e-007),
+        Documentation(info = "<html>
+    <p>The model is designed to test the coupling between the mass and energy balance equations in the component <code>Flow1DFEM</code> (fluid side of a heat exchanger, finite element method).</p>
+    <p>The pipe is connected to two pressure sources at the same pressure, with initial conditions corresponding to superheated steam @ 30 bar, 700 K. </p>
+    <p>At time t = 0, the two pressures start to increase, so that the fluid is compressed into the pipe. Since the configuration is symmetric, there is a forward flow in the left half of the pipe and a backward flow on the right half of the pipe. The parameter wout is an analytical estimate of the flow rate going out each end of the pipe, which is in a good agreement with the actual solution.</p>
+    </html>", revisions = "<html>
+    <ul>
+        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        Updated to new FEM model.</li>
+        <li><i>23 Aug 2011</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        First release.</li>
+    </ul>
+    </html>"),
+        __Dymola_experimentSetupOutput(doublePrecision = true, equdistant = false));
+    end TestWaterFlow1DFEMnm_J;
   end DistributedParameterComponents;
 
   package ElectricalComponents "Test for Electrical package components"
