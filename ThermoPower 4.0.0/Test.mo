@@ -3561,7 +3561,6 @@ This model tests the <tt>CombustionChamber</tt> model. The model start at steady
                 -12}}, rotation=0)));
       //initial equation
       //Valve2.w=1;
-
       inner System system
         annotation (Placement(transformation(extent={{80,80},{100,100}})));
     equation
@@ -3984,8 +3983,6 @@ This model tests the <tt>Valve</tt> model, in each possible configuration, i.e. 
 
       parameter Real tablePR[6, 4]=[0, 95, 100, 105; 1, 22.6, 27, 32; 2, 22,
           26.6, 30.8; 3, 20.8, 25.5, 29; 4, 19, 24.3, 27.1; 5, 17, 21.5, 24.2];
-
-    public
       ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Medium,
@@ -4053,8 +4050,6 @@ This model test the <tt>Compressor</tt> model at constant speed.
 
       parameter Real tablePR[6, 4]=[0, 95, 100, 105; 1, 22.6, 27, 32; 2, 22,
           26.6, 30.8; 3, 20.8, 25.5, 29; 4, 19, 24.3, 27.1; 5, 17, 21.5, 24.2];
-
-    public
       ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Medium,
@@ -4115,14 +4110,12 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
     model TestGasTurbine
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
-    protected
       parameter Real tablePhic[5, 4]=[1, 90, 100, 110; 2.36, 4.68e-3, 4.68e-3,
           4.68e-3; 2.88, 4.68e-3, 4.68e-3, 4.68e-3; 3.56, 4.68e-3, 4.68e-3,
           4.68e-3; 4.46, 4.68e-3, 4.68e-3, 4.68e-3];
       parameter Real tableEta[5, 4]=[1, 90, 100, 110; 2.36, 89e-2, 89.5e-2,
           89.3e-2; 2.88, 90e-2, 90.6e-2, 90.5e-2; 3.56, 90.5e-2, 90.6e-2,
           90.5e-2; 4.46, 90.2e-2, 90.3e-2, 90e-2];
-    public
       ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Medium,
@@ -4151,7 +4144,7 @@ This model test the <tt>Compressor</tt> model with an inertial load. Boundary co
         T=883) annotation (Placement(transformation(extent={{40,6},{60,26}},
               rotation=0)));
       inner System system
-        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));protected
     equation
       connect(SourceP1.flange, Turbine1.inlet) annotation (Line(
           points={{-60,16},{-36,16}},
@@ -4182,12 +4175,9 @@ This model test the Turbine model with an inertial load. Boundary conditions and
     model TestGasTurbineStodola
       extends Modelica.Icons.Example;
       package Medium = Modelica.Media.IdealGases.MixtureGases.CombustionAir;
-
-    protected
       parameter Real tableEta[5, 4]=[1, 90, 100, 110; 7, 89e-2, 89.5e-2,
           89.3e-2; 10, 90e-2, 90.6e-2, 90.5e-2; 12, 90.5e-2, 90.6e-2, 90.5e-2;
           15, 90.2e-2, 90.3e-2, 90e-2];
-    public
       ThermoPower.IdealGas.SourcePressure
                               SourceP1(
         redeclare package Medium = Medium,
@@ -4221,7 +4211,7 @@ This model test the Turbine model with an inertial load. Boundary conditions and
           w_fixed=523.3, useSupport=false) annotation (Placement(transformation(
               extent={{-50,-10},{-30,10}}, rotation=0)));
       inner System system
-        annotation (Placement(transformation(extent={{80,80},{100,100}})));
+        annotation (Placement(transformation(extent={{80,80},{100,100}})));protected
     equation
       connect(SourceP1.flange, Turbine1.inlet) annotation (Line(
           points={{-60,16},{-16,16}},
@@ -5962,10 +5952,10 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
       // initial outlet specific enthalpy
       parameter SI.SpecificEnthalpy houthex=1e5;
 
-      //height of enthalpy step
+//height of enthalpy step
       parameter SI.SpecificEnthalpy deltah=41800;
 
-      //height of power step
+//height of power step
       parameter SI.EnergyFlowRate W=41800*whex;
 
       ThermoPower.FluidPh.SourceMassFlow Fluid_Source(
@@ -6688,7 +6678,7 @@ Casella</a>:<br>
 </ul>
 
 </html>
-"));
+        "));
     end TestWaterFlow1DFEM_E;
 
     model TestWaterFlow1DFEM_F "Test case for Flow1DFEM"
@@ -6940,10 +6930,10 @@ Casella</a>:<br>
       // initial outlet specific enthalpy
       parameter SI.SpecificEnthalpy houthex=1e5;
 
-      //height of enthalpy step
+//height of enthalpy step
       parameter SI.SpecificEnthalpy deltah=41800;
 
-      //height of power step
+//height of power step
       parameter SI.EnergyFlowRate W=41800*whex;
 
       ThermoPower.FluidPh.SourceMassFlow
@@ -7190,7 +7180,6 @@ Casella</a>:<br>
       final parameter SI.SpecificHeatCapacity cv=
           Medium.specificHeatCapacityCv(Medium.setState_pT(phex, Thex));
       //height of power step
-
       ThermoPower.FluidPh.SinkPressure
                               sink1(p0=phex, h=hhex,
         use_in_p0=true,
@@ -8058,7 +8047,7 @@ Algorithm Tolerance = 1e-9
       for j in 1:(N - 1) loop
         if noEvent((h[j] < hl and h[j + 1] < hl) or (h[j] > hv and h[j + 1] >
             hv) or p >= (pc - pzero) or abs(h[j + 1] - h[j]) < hzero) then
-          // 1-phase or almost uniform properties
+// 1-phase or almost uniform properties
           rhobar[j] = (rho[j] + rho[j + 1])/2;
           drbdp[j] = (drdp[j] + drdp[j + 1])/2;
           drbdh1[j] = drdh[j]/2;
@@ -8066,7 +8055,7 @@ Algorithm Tolerance = 1e-9
           case[j] = 0;
         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] >= hl and h[j + 1]
              <= hv) then
-          // 2-phase
+// 2-phase
           rhobar[j] = AA*log(rho[j]/rho[j + 1])/(h[j + 1] - h[j]);
           drbdp[j] = (AA1*log(rho[j]/rho[j + 1]) + AA*(1/rho[j]*drdp[j] - 1/rho[
             j + 1]*drdp[j + 1]))/(h[j + 1] - h[j]);
@@ -8074,7 +8063,7 @@ Algorithm Tolerance = 1e-9
           drbdh2[j] = (rho[j + 1] - rhobar[j])/(h[j + 1] - h[j]);
           case[j] = 1;
         elseif noEvent(h[j] < hl and h[j + 1] >= hl and h[j + 1] <= hv) then
-          // liquid/2-phase
+// liquid/2-phase
           rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + AA*log(rhol/rho[j + 1]))
             /(h[j + 1] - h[j]);
           drbdp[j] = ((drdp[j] + drldp)*(hl - h[j])/2 + (rho[j] + rhol)/2*dhldp
@@ -8085,7 +8074,7 @@ Algorithm Tolerance = 1e-9
           drbdh2[j] = (rho[j + 1] - rhobar[j])/(h[j + 1] - h[j]);
           case[j] = 2;
         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] > hv) then
-          // 2-phase/vapour
+// 2-phase/vapour
           rhobar[j] = (AA*log(rho[j]/rhov) + (rhov + rho[j + 1])*(h[j + 1] - hv)
             /2)/(h[j + 1] - h[j]);
           drbdp[j] = (AA1*log(rho[j]/rhov) + AA*(1/rho[j]*drdp[j] - 1/rhov*
@@ -8096,7 +8085,7 @@ Algorithm Tolerance = 1e-9
              - hv)/2)/(h[j + 1] - h[j]);
           case[j] = 3;
         elseif noEvent(h[j] < hl and h[j + 1] > hv) then
-          // liquid/2-phase/vapour
+// liquid/2-phase/vapour
           rhobar[j] = ((rho[j] + rhol)*(hl - h[j])/2 + AA*log(rhol/rhov) + (
             rhov + rho[j + 1])*(h[j + 1] - hv)/2)/(h[j + 1] - h[j]);
           drbdp[j] = ((drdp[j] + drldp)*(hl - h[j])/2 + (rho[j] + rhol)/2*dhldp
@@ -8109,7 +8098,7 @@ Algorithm Tolerance = 1e-9
              - hv)/2)/(h[j + 1] - h[j]);
           case[j] = 4;
         elseif noEvent(h[j] >= hl and h[j] <= hv and h[j + 1] < hl) then
-          // 2-phase/liquid
+// 2-phase/liquid
           rhobar[j] = (AA*log(rho[j]/rhol) + (rhol + rho[j + 1])*(h[j + 1] - hl)
             /2)/(h[j + 1] - h[j]);
           drbdp[j] = (AA1*log(rho[j]/rhol) + AA*(1/rho[j]*drdp[j] - 1/rhol*
@@ -8120,7 +8109,7 @@ Algorithm Tolerance = 1e-9
              - hl)/2)/(h[j + 1] - h[j]);
           case[j] = 5;
         elseif noEvent(h[j] > hv and h[j + 1] < hl) then
-          // vapour/2-phase/liquid
+// vapour/2-phase/liquid
           rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + AA*log(rhov/rhol) + (
             rhol + rho[j + 1])*(h[j + 1] - hl)/2)/(h[j + 1] - h[j]);
           drbdp[j] = ((drdp[j] + drvdp)*(hv - h[j])/2 + (rho[j] + rhov)/2*dhvdp
@@ -8133,7 +8122,7 @@ Algorithm Tolerance = 1e-9
              - hl)/2)/(h[j + 1] - h[j]);
           case[j] = 6;
         else
-          // vapour/2-phase
+// vapour/2-phase
           rhobar[j] = ((rho[j] + rhov)*(hv - h[j])/2 + AA*log(rhov/rho[j + 1]))
             /(h[j + 1] - h[j]);
           drbdp[j] = ((drdp[j] + drvdp)*(hv - h[j])/2 + (rho[j] + rhov)/2*dhvdp
@@ -8145,8 +8134,7 @@ Algorithm Tolerance = 1e-9
           case[j] = 7;
         end if;
       end for;
-
-      // Saturated fluid property calculations
+// Saturated fluid property calculations
       sat = Medium.setSat_p(p);
       Ts = sat.Tsat;
       bubble = Medium.setBubbleState(sat, 1);
@@ -8162,8 +8150,7 @@ Algorithm Tolerance = 1e-9
       AA = (hv - hl)/(1/rhov - 1/rhol);
       AA1 = ((dhvdp - dhldp)*(rhol - rhov)*rhol*rhov - (hv - hl)*(rhov^2*drldp
          - rhol^2*drvdp))/(rhol - rhov)^2;
-
-      // Fluid property calculations
+// Fluid property calculations
       for j in 1:N loop
         fluid[j].p = p;
         fluid[j].h = h[j];
@@ -8981,7 +8968,7 @@ Algorithm Tolerance = 1e-6
         Mvol[j] = A*l*rhobar[j];
         Evol[j] = Mvol[j]*((h[j] + h[j + 1])/2 - p/rhobar[j]);
       end for;
-      // M is computed in base class
+// M is computed in base class
       Mtot = M;
       Etot = sum(Evol);
       balM = infl.m_flow + outfl.m_flow;
@@ -9741,8 +9728,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{38, -6}, {58, 14}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
@@ -9773,11 +9759,19 @@ Casella</a>:<br>
       annotation(
         Diagram(graphics),
         experiment(StopTime = 80, Tolerance = 1e-006),
-        Documentation(info = "<HTML>
-    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
-    This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the component  <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method).</p>
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_p</tt> (pressure)</li>
+<li><tt>delta_h</tt> (specific enthalpy profile)</li>
+<li><tt>delta_T</tt> (semperature profile)</li>
+<li><tt>delta_w</tt> (mass flowrate profile)</li>
+<li><tt>delta_phi</tt> (heat flux profile)</li>
+</ul>
+
+<p>    This model represent the fluid side of a heat exchanger with an applied external heat flow. The operating fluid is liquid water.<br>
     During the simulation, the inlet specific enthalpy, heat flux and mass flow rate are changed:
-    <ul>
+    </p><ul>
         <li>t=0 s, Step variation of the specific enthalpy of the fluid entering the heat exchanger. The outlet temperature should undergo a step change 10 s later.</li>
         <li>t=30 s, Step variation of the thermal flow entering the heat exchanger lateral surface. The outlet temperature should undergo a ramp change lasting 10 s</li>
         <li>t=50 s, Step variation of the mass flow rate entering the heat exchanger. Again, the outlet temperature should undergo a ramp change lasting 10s</li>
@@ -9787,16 +9781,12 @@ Casella</a>:<br>
     Integration Algorithm = DASSL <br>
     Algorithm Tolerance = 1e-6
     </p>
-    </HTML>", revisions = "<html>
+    </body></html>", revisions = "<html><head></head><body>
     <ul>
-        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-    </ul>
-    <ul>
-        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    </html>"));
+    </body></html>"));
     end TestWaterFlow1DFEMnm_A;
     
     model TestWaterFlow1DFEMnm_B "Test case for Flow1DFEM"
@@ -9845,8 +9835,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{40, -6}, {60, 14}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
@@ -9873,31 +9862,36 @@ Casella</a>:<br>
       annotation(
         Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics),
         experiment(StopTime = 200, Tolerance = 1e-006),
-        Documentation(info = "<HTML>
-    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method). <br>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the component  <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method). </p>
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_p</tt> (pressure)</li>
+<li><tt>delta_h</tt> (specific enthalpy profile)</li>
+<li><tt>delta_T</tt> (semperature profile)</li>
+<li><tt>delta_w</tt> (mass flowrate profile)</li>
+<li><tt>delta_phi</tt> (heat flux profile)</li>
+</ul>
+
+<p>
     This model represent the fluid side of a heat exchanger with convective exchange with an external source at a given temperature.<br>
     The operating fluid is liquid water.<br>
     During the experiment the external (fixed) temperature changes:
-    <ul>
+    </p><ul>
             <li>t=20 s, Step variation of the external temperature. Heat exchanger outlet temperature should vary accordingly to the transfer function (K1/(1+s*tau1))*(1-exp(-K2-s*tau2)), where the parameters K1, K2, tau1, tau1 depend on exchanger geometry, the fluid heat transfer coefficient and operating conditions.</li>
     </ul>
-    </p>
-    </p>
+    <p></p>
+    <p></p>
     <p>
     Simulation Interval = [0...200] sec <br>
     Integration Algorithm = DASSL <br>
     Algorithm Tolerance = 1e-6
     </p>
-    </HTML>", revisions = "<html>
+    </body></html>", revisions = "<html><head></head><body>
     <ul>
-        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-    </ul>
-    <ul>
-        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    </html>"));
+    </body></html>"));
     end TestWaterFlow1DFEMnm_B;
     
     model TestWaterFlow1DFEMnm_C "Test case for Flow1Dfem"
@@ -9944,8 +9938,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{10, -6}, {30, 14}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
@@ -9970,30 +9963,35 @@ Casella</a>:<br>
       annotation(
         Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics),
         experiment(StopTime = 1000, Tolerance = 1e-006),
-        Documentation(info = "<HTML>
-    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method). <br>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the component  <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method). </p>
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_p</tt> (pressure)</li>
+<li><tt>delta_h</tt> (specific enthalpy profile)</li>
+<li><tt>delta_T</tt> (semperature profile)</li>
+<li><tt>delta_w</tt> (mass flowrate profile)</li>
+<li><tt>delta_phi</tt> (heat flux profile)</li>
+</ul>
+
+<p>
     This model is designed to simulate the flow reversal througth the heat exchanger. The operating fluid is liquid water; the heat flux entering the heat exchanger is set to zero. <br>
     During the simulation, flow reversal is achieved:
-    <ul>
+    </p><ul>
             <li>t=500 s, Negative ramp variation (duration = 20 s) of the mass flow rate trough the heat exchanger. The final mass flow rate has the same magnitude and opposite direction with respect to the initial one.</li>
     </ul>
-    </p>
-    </p>
+    <p></p>
+    <p></p>
     <p>
     Simulation Interval = [0...1000] sec <br>
     Integration Algorithm = DASSL <br>
     Algorithm Tolerance = 1e-6
     </p>
-    </HTML>", revisions = "<html>
+    </body></html>", revisions = "<html><head></head><body>
     <ul>
-        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-    </ul>
-    <ul>
-        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    </html>"));
+    </body></html>"));
     end TestWaterFlow1DFEMnm_C;
     
     model TestWaterFlow1DFEMnm_D "Test case for Flow1DFEM"
@@ -10038,8 +10036,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{12, 4}, {32, 24}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e6;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
@@ -10063,30 +10060,35 @@ Casella</a>:<br>
       annotation(
         Diagram(graphics),
         experiment(StopTime = 2, Tolerance = 1e-006),
-        Documentation(info = "<HTML>
-    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the component  <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method).</p>
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_p</tt> (pressure)</li>
+<li><tt>delta_h</tt> (specific enthalpy profile)</li>
+<li><tt>delta_T</tt> (semperature profile)</li>
+<li><tt>delta_w</tt> (mass flowrate profile)</li>
+<li><tt>delta_phi</tt> (heat flux profile)</li>
+</ul>
+
+<p>
     This model is designed to the test compressibility effects. The operating fluid is superheated vapour; the heat flow entering the heat exchanger is set to zero. <br>
     During simulation mass flow rate changes:
-    <ul>
+    </p><ul>
             <li>t=2 s, Step variation of the inlet mass flow rate. The pressure increases with a first order dynamics, the tube actually behaving like a pressurized tank.</li>
     </ul>
-    </p>
-    </p>
+    <p></p>
+    <p></p>
     <p>
     Simulation Interval = [0...2] sec <br>
     Integration Algorithm = DASSL <br>
     Algorithm Tolerance = 1e-6
     </p>
-    </HTML>", revisions = "<html>
+    </body></html>", revisions = "<html><head></head><body>
     <ul>
-        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-    </ul>
-    <ul>
-        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    </html>"));
+    </body></html>"));
     end TestWaterFlow1DFEMnm_D;
     
     model TestWaterFlow1DFEMnm_E "Test case for Flow1DFEM"
@@ -10151,8 +10153,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_pA = (refData.hexA.p - hexA.p)/1e5;
       SI.SpecificEnthalpy[hexA.N] delta_hA = (refData.hexA.h - hexA.h)/1e5;
       SI.TemperatureDifference[hexA.N] delta_TA = (refData.hexA.T - hexA.T)/1e2;
@@ -10199,36 +10200,37 @@ Casella</a>:<br>
       annotation(
         Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics),
         experiment(StopTime = 900, Tolerance = 1e-006),
-        Documentation(info = "<HTML>
-    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the component  <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method).</p>
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_pA/B</tt> (pressure)</li>
+<li><tt>delta_hA/B</tt> (specific enthalpy profile)</li>
+<li><tt>delta_TA/B</tt> (semperature profile)</li>
+<li><tt>delta_wA/B</tt> (mass flowrate profile)</li>
+<li><tt>delta_phiA/B</tt> (heat flux profile)</li>
+</ul>
+
+<p>
     This model represent the two fluid sides of a heat exchanger in counterflow configuration. The operating fluid is liquid water.<br>
     The mass flow rate during the experiment and initial conditions are the same for the two sides. <br>
     During the simulation, the inlet specific enthalpy for hexA (\"hot side\") is changed:
-    <ul>
+    </p><ul>
         <li>t=50 s, Step variation of the specific enthalpy of the fluid entering hexA .</li>
     </ul>
     The outlet temperature of the hot side starts changing after the fluid transport time delay, while the outlet temperature of the cold side starts changing immediately.
-    </p>
-    </p>
+    <p></p>
+    <p></p>
     <p>
     Simulation Interval = [0...900] sec <br>
     Integration Algorithm = DASSL <br>
     Algorithm Tolerance = 1e-6
     </p>
-    </HTML>", revisions = "<html>
+    </body></html>", revisions = "<html><head></head><body>
     <ul>
-        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-    <li><i>20 Dec 2004</i>
-        by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
-    Casella</a>:<br>
-           New heat transfer components.</li>
-        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    
-    </html>
-        "));
+    </body></html>"));
     end TestWaterFlow1DFEMnm_E;
     
     model TestWaterFlow1DFEMnm_F "Test case for Flow1DFEM"
@@ -10295,8 +10297,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{-20, 24}, {0, 44}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_pA = (refData.hexA.p - hexA.p)/1e5;
       SI.SpecificEnthalpy[hexA.N] delta_hA = (refData.hexA.h - hexA.h)/1e5;
       SI.TemperatureDifference[hexA.N] delta_TA = (refData.hexA.T - hexA.T)/1e2;
@@ -10345,31 +10346,33 @@ Casella</a>:<br>
       annotation(
         Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics),
         experiment(StopTime = 900, Tolerance = 1e-006),
-        Documentation(info = "<HTML>
-    <p>The model is designed to test the component  <tt>Flow1Dfem</tt> (fluid side of a heat exchanger, finite element method).<br>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the component  <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method).</p>
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_pA/B</tt> (pressure)</li>
+<li><tt>delta_hA/B</tt> (specific enthalpy profile)</li>
+<li><tt>delta_TA/B</tt> (semperature profile)</li>
+<li><tt>delta_wA/B</tt> (mass flowrate profile)</li>
+<li><tt>delta_phiA/B</tt> (heat flux profile)</li>
+</ul>
+
+<p>
     This model represent the two fluid sides of a heat exchanger in counterflow configuration. The two sides are divided by a metal wall. The operating fluid is liquid water. The mass flow rate during the experiment and initial conditions are the same for the two sides. <br>
     During the simulation, the inlet specific enthalpy for hexA (\"hot side\") is changed:
-    <ul>
+    </p><ul>
         <li>t=50 s, Step variation of the specific enthalpy of the fluid entering hexA .</li>
     </ul>
-    The outlet temperature of the hot side changes after the fluid transport time delay and the first order delay due to the wall's thermal inertia. The outlet temperature of the cold side starts changing after the thermal inertia delay. </p>
+    The outlet temperature of the hot side changes after the fluid transport time delay and the first order delay due to the wall's thermal inertia. The outlet temperature of the cold side starts changing after the thermal inertia delay. <p></p>
     <p>
     Simulation Interval = [0...900] sec <br>
     Integration Algorithm = DASSL <br>
     Algorithm Tolerance = 1e-6
-    </HTML>", revisions = "<html>
+    </p></body></html>", revisions = "<html><head></head><body>
     <ul>
-    <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-    <li><i>20 Dec 2004</i>
-        by <a href=\"mailto:francesco.casella@polimi.it\">Francesco
-    Casella</a>:<br>
-           New heat transfer components.</li>
-        <li><i>1 Oct 2003</i> by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    
-    </html>"));
+    </body></html>"));
     end TestWaterFlow1DFEMnm_F;
     
     model TestWaterFlow1DFEMnm_G "Test case for Flow1DFEM"
@@ -10418,8 +10421,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{38, -6}, {58, 14}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_p = (refData.hex.p - hex.p)/1e5;
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
@@ -10440,20 +10442,26 @@ Casella</a>:<br>
       annotation(
         Diagram(graphics),
         experiment(StopTime = 50, Tolerance = 1e-006),
-        Documentation(info = "<html>
-    <p>The model is designed to test the component <code>Flow1DFEM</code> (fluid side of a heat exchanger, finite element method) under reversing and zero flow conditions.</p>
-    <p>The simulation starts with cold fluid in the pipe and with positive flow from the hot source on the left. Around t = 20, the flow is reversed, and cold fluid enters the pipe from the cold source on the right. Around t = 40, the flow is brought to zero and stays there.</p>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the component <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method) under reversing and zero flow conditions.</p>
+
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_p</tt> (pressure)</li>
+<li><tt>delta_h</tt> (specific enthalpy profile)</li>
+<li><tt>delta_T</tt> (semperature profile)</li>
+<li><tt>delta_w</tt> (mass flowrate profile)</li>
+<li><tt>delta_phi</tt> (heat flux profile)</li>
+</ul>
+<p>The simulation starts with cold fluid in the pipe and with positive flow from the hot source on the left. Around t = 20, the flow is reversed, and cold fluid enters the pipe from the cold source on the right. Around t = 40, the flow is brought to zero and stays there.</p>
     <p>Simulation Interval = [0...50] sec </p>
     <p>Integration Algorithm = DASSL </p>
     <p>Algorithm Tolerance = 1e-6 </p>
-    </html>", revisions = "<html>
+    </body></html>", revisions = "<html><head></head><body>
     <ul>
-        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-        <li><i>23 Lug 2011</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    </html>"),
+    </body></html>"),
         __Dymola_experimentSetupOutput);
     end TestWaterFlow1DFEMnm_G;
     
@@ -10514,8 +10522,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{-12, 12}, {8, 32}})));
       Modelica.Blocks.Sources.Step step(height = W) annotation(
         Placement(transformation(extent = {{-38, 30}, {-18, 50}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_p = (refData.pipe1.p - pipe1.p)/1e5;
       SI.SpecificEnthalpy[pipe1.N] delta_h = (refData.pipe1.h - pipe1.h)/1e5;
       SI.TemperatureDifference[pipe1.N] delta_T = (refData.pipe1.T - pipe1.T)/1e2;
@@ -10533,18 +10540,23 @@ Casella</a>:<br>
         Line(points = {{-17, 40}, {-2, 40}, {-2, 26}}, color = {0, 0, 127}, smooth = Smooth.None));
       annotation(
         experiment(StartTime = -10, StopTime = 10, Tolerance = 1e-006),
-        Documentation(info = "<html>
-    <p>The model is designed to test the coupling between the mass and energy balance equations in the component <code>Flow1DFEM</code> (fluid side of a heat exchanger, finite element method).</p>
-    <p>The pipe is connected to two pressure source at the same pressure, with initial conditions corresponding to superheated steam @ 30 bar, 700 K. </p>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the coupling between the mass and energy balance equations in the component <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method).</p>
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_p</tt> (pressure)</li>
+<li><tt>delta_h</tt> (specific enthalpy profile)</li>
+<li><tt>delta_T</tt> (semperature profile)</li>
+<li><tt>delta_w</tt> (mass flowrate profile)</li>
+<li><tt>delta_phi</tt> (heat flux profile)</li>
+</ul>
+<p>The pipe is connected to two pressure source at the same pressure, with initial conditions corresponding to superheated steam @ 30 bar, 700 K. </p>
     <p>At time t = 0, a constant uniform heat flux is applied to the lateral boundary of the pipe. The steam heats up and expands uniformly; since the configuration is symmetric, there is a backflow in the left half of the pipe and a forward flow on the right half of the pipe. The parameter wout is an analytical estimate of the flow rate going out each end of the pipe, which is in a good agreement with the actual solution.</p>
-    </html>", revisions = "<html>
+    </body></html>", revisions = "<html><head></head><body>
     <ul>
-        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-        <li><i>23 Aug 2011</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    </html>"),
+    </body></html>"),
         __Dymola_experimentSetupOutput(doublePrecision = true, equdistant = false),
         Diagram(coordinateSystem(preserveAspectRatio = false, extent = {{-100, -100}, {100, 100}}), graphics));
     end TestWaterFlow1DFEMnm_K;
@@ -10592,8 +10604,7 @@ Casella</a>:<br>
         Placement(transformation(extent = {{-72, -10}, {-52, 10}})));
       Modelica.Blocks.Sources.Ramp ramp(height = phex, duration = 10, offset = phex) annotation(
         Placement(transformation(extent = {{-94, 28}, {-74, 48}})));
-    
-      // check reference data
+    // check reference data
       SI.Pressure delta_p = (refData.pipe1.p - pipe1.p)/1e5;
       SI.SpecificEnthalpy[pipe1.N] delta_h = (refData.pipe1.h - pipe1.h)/1e6;
       SI.TemperatureDifference[pipe1.N] delta_T = (refData.pipe1.T - pipe1.T)/1e2;
@@ -10611,18 +10622,26 @@ Casella</a>:<br>
         Line(points = {{-73, 38}, {72, 38}, {72, 8.8}}, color = {0, 0, 127}, smooth = Smooth.None));
       annotation(
         experiment(StartTime = -10, StopTime = 10, __Dymola_NumberOfIntervals = 10000, Tolerance = 1e-007),
-        Documentation(info = "<html>
-    <p>The model is designed to test the coupling between the mass and energy balance equations in the component <code>Flow1DFEM</code> (fluid side of a heat exchanger, finite element method).</p>
+        Documentation(info = "<html><head></head><body><p>The model is designed to test the coupling between the mass and energy balance equations in the component <tt>Flow1DFEMnm</tt> vs the reference model <tt>Flow1DFEM</tt> (fluid side of a heat exchanger, finite element method).</p>
+
+<p> The following relative errors can be used to check the results vs the reference model:</p>
+<ul>
+<li><tt>delta_p</tt> (pressure)</li>
+<li><tt>delta_h</tt> (specific enthalpy profile)</li>
+<li><tt>delta_T</tt> (semperature profile)</li>
+<li><tt>delta_w</tt> (mass flowrate profile)</li>
+<li><tt>delta_phi</tt> (heat flux profile)</li>
+</ul>
+
+
     <p>The pipe is connected to two pressure sources at the same pressure, with initial conditions corresponding to superheated steam @ 30 bar, 700 K. </p>
     <p>At time t = 0, the two pressures start to increase, so that the fluid is compressed into the pipe. Since the configuration is symmetric, there is a forward flow in the left half of the pipe and a backward flow on the right half of the pipe. The parameter wout is an analytical estimate of the flow rate going out each end of the pipe, which is in a good agreement with the actual solution.</p>
-    </html>", revisions = "<html>
+    </body></html>", revisions = "<html><head></head><body>
     <ul>
-        <li><i>7 Jan 2015</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
-        Updated to new FEM model.</li>
-        <li><i>23 Aug 2011</i> by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
+        <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
     </ul>
-    </html>"),
+    </body></html>"),
         __Dymola_experimentSetupOutput(doublePrecision = true, equdistant = false));
     end TestWaterFlow1DFEMnm_J;
   end DistributedParameterComponents;
@@ -11359,7 +11378,7 @@ i.e. 0.25 Hz. Electro-mechanical oscillations are also triggered, but eventually
       der(powerOffset) = 5*Pnom/(Ts*droop)*(frequency-f0)/f0;
     initial equation
       if initOpt == ThermoPower.Choices.Init.Options.noInit then
-        // do nothing
+// do nothing
       elseif initOpt == ThermoPower.Choices.Init.Options.steadyState then
         der(powerOffset) = 0;
       elseif initOpt == ThermoPower.Choices.Init.Options.fixedState then
