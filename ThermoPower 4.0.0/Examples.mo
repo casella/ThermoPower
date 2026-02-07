@@ -3145,9 +3145,9 @@ This is a simple model of a steam plant.
         parameter SI.Time Ti "Integral time";
         parameter Boolean integralAction = true "Use integral action";
         parameter SI.Time Td=0 "Derivative time";
+        parameter SI.Time Ttr=Ti/100 "Time constant used to track the integrator in case of external track";
         parameter Real Nd=1 "Derivative action up to Nd / Td rad/s";
-        parameter Real Ni=1
-          "Ni*Ti is the time constant of anti-windup compensation";
+        parameter Real Ni=1 "Ni*Ti is the time constant of anti-windup compensation";
         parameter Real b=1 "Setpoint weight on proportional action";
         parameter Real c=0 "Setpoint weight on derivative action";
         parameter Real PVmin "Minimum value of process variable for scaling";
@@ -3159,9 +3159,12 @@ This is a simple model of a steam plant.
         parameter Boolean holdWhenSimplified=false
           "Hold CSs at start value when homotopy=simplified";
         parameter Boolean steadyStateInit=false "Initialize in steady state";
-        Real CSs_hom
-          "Control signal scaled in per units, used when homotopy=simplified";
-
+        parameter Boolean useBias = false "use connector input for BIAS" annotation (
+          Dialog(group = "External input"), choices(checkBox=true));
+        parameter Boolean useTrack = false "use connectors input for Track" annotation (
+          Dialog(group = "External input"), choices(checkBox=true));
+        
+        Real CSs_hom "Control signal scaled in per units, used when homotopy=simplified";
         Real P "Proportional action / Kp";
         Real I(start=CSstart/Kp) "Integral action / Kp";
         Real D "Derivative action / Kp";
@@ -3173,13 +3176,25 @@ This is a simple model of a steam plant.
           "Control signal scaled in per unit before saturation";
         Real track "Tracking signal for anti-windup integral action";
 
-        Modelica.Blocks.Interfaces.RealInput PV "Process variable signal"
-          annotation (Placement(transformation(extent={{-112,-52},{-88,-28}},
+        Modelica.Blocks.Interfaces.RealInput PV "Process variable signal" annotation (
+          Placement(transformation(extent={{-112,-52},{-88,-28}},
                 rotation=0)));
         Modelica.Blocks.Interfaces.RealOutput CS "Control signal" annotation (
             Placement(transformation(extent={{88,-12},{112,12}}, rotation=0)));
         Modelica.Blocks.Interfaces.RealInput SP "Set point signal" annotation (
             Placement(transformation(extent={{-112,28},{-88,52}}, rotation=0)));
+        Modelica.Blocks.Interfaces.RealInput BIAS = BIAS_int if useBias "BIAS" annotation(
+          Placement( transformation(origin = {-52, 106}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {-60, 100}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
+        Modelica.Blocks.Interfaces.RealInput TV = TV_int if useTrack "Track Value" annotation(
+          Placement(transformation(origin = {60, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {60, 102}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
+        Modelica.Blocks.Interfaces.BooleanInput TS = TS_int if useTrack "Track Signal" annotation(
+          Placement(transformation(origin = {20, 108}, extent = {{-20, -20}, {20, 20}}, rotation = -90), iconTransformation(origin = {20, 102}, extent = {{-12, -12}, {12, 12}}, rotation = -90)));
+      
+      protected
+        Real BIAS_int "internal BIAS";
+        Real TV_int "internal Track Value";
+        Boolean TS_int "internal Track Signal";
+      
       equation
 // Scaling
         SPs = (SP - PVmin)/(PVmax - PVmin);
@@ -3189,7 +3204,11 @@ This is a simple model of a steam plant.
         P = b*SPs - PVs;
         if integralAction then
           assert(Ti>0, "Integral time must be positive");
-          Ti*der(I) = SPs - PVs + track;
+          if not TS_int then
+            Ti*der(I) = SPs - PVs + track;
+          else
+            Ttr*der(I) = -I + TV_int;
+          end if;
         else
           I = 0;
         end if;
@@ -3207,10 +3226,21 @@ This is a simple model of a steam plant.
         else
           CSs_hom = CSbs;
         end if;
-        CSbs = Kp*(P + I + D) "Control signal before saturation";
+        CSbs = if not TS_int then Kp*(P + I + D) + BIAS_int else TV_int "Control signal before saturation";
         CSs = homotopy(smooth(0, if CSbs > 1 then 1 else if CSbs < 0 then 0 else
           CSbs), CSs_hom) "Saturated control signal";
         track = (CSs - CSbs)/(Kp*Ni);
+        
+        // conditional connectors
+        if not useBias then
+          BIAS_int = 0;
+        end if;
+        
+        if not useTrack then
+          TS_int = false;
+          TV_int = 0;
+        end if;
+        
       initial equation
         if steadyStateInit then
           if Ti > 0 then
