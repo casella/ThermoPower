@@ -6115,6 +6115,8 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       constant SI.Acceleration g=Modelica.Constants.g_n;
       parameter Medium.MassFlowRate w0 "Nominal mass flow rate"
         annotation (Dialog(group="Characteristics"));
+      parameter Modelica.Units.SI.MassFlowRate w_min = w0/1e4 "minimum flow for hin computation if internal h state is used" annotation (
+         Dialog(group="Characteristics"));
       parameter SI.Pressure dp0 "Nominal pressure increase"
         annotation (Dialog(group="Characteristics"));
       final parameter SI.VolumeFlowRate q_single0=w0/(Np0*rho0)
@@ -6209,10 +6211,16 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       // Boundary conditions
       dp = outfl.p - infl.p;
       w = infl.m_flow "Pump total flow rate";
-      hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
-                     else if w >= 0 then inStream(infl.h_outflow)
-                     else inStream(outfl.h_outflow),
-                     inStream(infl.h_outflow));
+    
+      if abs(w) > w_min or not (V > 0) then
+        hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
+                       else if w >= 0 then inStream(infl.h_outflow)
+                       else inStream(outfl.h_outflow),
+                       inStream(infl.h_outflow));
+      else
+        hin = h;
+      end if;
+    
       infl.h_outflow = hout;
       outfl.h_outflow = hout;
       h = hout;
@@ -6269,12 +6277,14 @@ PumpMech</tt> pump models.
 Several functions are provided in the package <tt>Functions.PumpCharacteristics</tt> to specify the characteristics as a function of some operating points at nominal conditions.
 <p>Depending on the value of the <tt>checkValve</tt> parameter, the model either supports reverse flow conditions, or includes a built-in check valve to avoid flow reversal.
 
-<p>If the <tt>in_Np</tt> input connector is wired, it provides the number of pumps in parallel; otherwise,  <tt>Np0</tt> parallel pumps are assumed.</p>
-<p>It is possible to take into account the heat capacity of the fluid inside the pump by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
-<p>The <tt>CheckValve</tt> parameter determines whether the pump has a built-in check valve or not.
-<p>If <tt>computeNPSHa = true</tt>, the available net positive suction head is also computed; this requires a two-phase medium model to provide the fluid saturation pressure.
-</HTML>", revisions="<html>
-<ul>
+</p><p>If the <tt>in_Np</tt> input connector is wired, it provides the number of pumps in parallel; otherwise,  <tt>Np0</tt> parallel pumps are assumed.</p>
+<p>It is possible to take into account the heat capacity of the fluid inside the pump by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. The parameter <code>w_min</code> is used to define the flow dead band in which the inlet flow is set equal to the internal enthalpy in zero flow rate condition. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
+</p><p>The <tt>CheckValve</tt> parameter determines whether the pump has a built-in check valve or not.
+</p><p>If <tt>computeNPSHa = true</tt>, the available net positive suction head is also computed; this requires a two-phase medium model to provide the fluid saturation pressure.
+</p></html>", revisions= "<html><ul>
+<li><i>23 Feb 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+      Added parameter <tt>w_min</tt>.</li>
 <li><i>31 Oct 2006</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
       Added initialisation parameter <tt>wstart</tt>.</li>
