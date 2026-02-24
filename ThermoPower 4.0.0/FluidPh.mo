@@ -5948,6 +5948,9 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         "= true to allow flow reversal, false restricts to design direction"
       annotation(Evaluate=true);
       outer ThermoPower.System system "System wide properties";
+      parameter Choices.Init.Options initOpt=system.initOpt
+        "Initialisation option"
+        annotation (Dialog(tab="Initialisation"));
       parameter Medium.AbsolutePressure pin_start=pnom
         "Inlet pressure start value"
         annotation (Dialog(tab="Initialisation"));
@@ -5998,6 +6001,21 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         Av = 2.4027e-5*Cv;
       end if;
       // assert(CvData>=0 and CvData<=3, "Invalid CvData");
+    
+      if initOpt == Choices.Init.Options.noInit then
+        // do nothing
+      elseif initOpt == Choices.Init.Options.fixedState then
+        if V > 0 then
+          h = hstart;
+        end if;
+      elseif initOpt == Choices.Init.Options.steadyState then
+        if V > 0 then
+          der(h) = 0;
+        end if;
+      else
+        assert(false, "Unsupported initialisation option");
+      end if;
+    
     equation
       inlet.m_flow + outlet.m_flow = 0 "Mass balance";
       w = inlet.m_flow;
