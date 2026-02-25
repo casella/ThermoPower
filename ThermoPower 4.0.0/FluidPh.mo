@@ -6004,11 +6004,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 
       // Fluid properties
       if V > 0 then
-        if dp > 0 then
-          fluidState = Medium.setState_phX(inlet.p, h);
-        else
-          fluidState = Medium.setState_phX(outlet.p, h);
-        end if;
+        fluidState = Medium.setState_phX((inlet.p+outlet.p)/2, h);
       else
         if dp > 0 then
           fluidState = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
@@ -6028,7 +6024,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         hin = actualStream(inlet.h_outflow);
         hout = actualStream(outlet.h_outflow);
       else
-        h = if dp > 0 then hin else hout;
+        h = if noEvent(dp > 0) then hin else hout;
         outlet.h_outflow = hin - Qnom/wnom;
         inlet.h_outflow = hout - Qnom/wnom;
         hin = inStream(inlet.h_outflow);
@@ -6248,14 +6244,10 @@ It is possible to take into account the heat capacity of the fluid inside the va
       dp = outfl.p - infl.p;
       w = infl.m_flow "Pump total flow rate";
     
-      if abs(w) > w_min or not (V > 0) then
-        hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
-                       else if w >= 0 then inStream(infl.h_outflow)
-                       else inStream(outfl.h_outflow),
-                       inStream(infl.h_outflow));
-      else
-        hin = h;
-      end if;
+      hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
+                     else if w >= 0 then inStream(infl.h_outflow)
+                     else inStream(outfl.h_outflow),
+                     inStream(infl.h_outflow));
     
       infl.h_outflow = hout;
       outfl.h_outflow = hout;
@@ -6314,13 +6306,13 @@ Several functions are provided in the package <tt>Functions.PumpCharacteristics<
 <p>Depending on the value of the <tt>checkValve</tt> parameter, the model either supports reverse flow conditions, or includes a built-in check valve to avoid flow reversal.
 
 </p><p>If the <tt>in_Np</tt> input connector is wired, it provides the number of pumps in parallel; otherwise,  <tt>Np0</tt> parallel pumps are assumed.</p>
-<p>It is possible to take into account the heat capacity of the fluid inside the pump by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. The parameter <code>w_min</code> is used to define the flow dead band in which the inlet flow is set equal to the internal enthalpy in zero flow rate condition. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
+<p>It is possible to take into account the heat capacity of the fluid inside the pump by specifying its volume <tt>V</tt> at nominal conditions; this is necessary to avoid singularities in the computation of the outlet enthalpy in case of zero flow rate. If zero flow rate conditions are always avoided, this dynamic effect can be neglected by leaving the default value <tt>V = 0</tt>, thus avoiding a fast state variable in the model.
 </p><p>The <tt>CheckValve</tt> parameter determines whether the pump has a built-in check valve or not.
 </p><p>If <tt>computeNPSHa = true</tt>, the available net positive suction head is also computed; this requires a two-phase medium model to provide the fluid saturation pressure.
 </p></html>", revisions= "<html><ul>
 <li><i>23 Feb 2026</i>
     by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
-      Added parameter <tt>w_min</tt>.</li>
+      Modified equation in case of V>0 in order to manage the zero-flow condition.</li>
 <li><i>31 Oct 2006</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
       Added initialisation parameter <tt>wstart</tt>.</li>
