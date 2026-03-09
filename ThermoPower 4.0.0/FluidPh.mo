@@ -6036,7 +6036,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
 
       // Energy balance
       if V > 0 then
-        rho*V*der(h) = inlet.m_flow*hin + outlet.m_flow*hout - Qnom/wnom;
+        rho*V*der(h) = inlet.m_flow*hin + outlet.m_flow*hout - Qnom;
         outlet.h_outflow = h;
         inlet.h_outflow = h;
         hin = actualStream(inlet.h_outflow);
