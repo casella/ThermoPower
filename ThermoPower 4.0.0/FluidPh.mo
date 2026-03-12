@@ -1233,6 +1233,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       N = N,
       L = L,
       A = A,
+      wnom = wnom,
+      dpnom = dpnom,
       fluidState = fluidState,
       w = w) "Instantiated friction model";
   
@@ -1266,7 +1268,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
-    if FFtype == FFtypes.NoFriction then
+    if friction.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     elseif HydraulicCapacitance == HCtypes.Middle then
@@ -1288,6 +1290,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
+    
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*l*dzdx*sum(rhobar)
       "Pressure drop due to static head";
     for j in 1:N-1 loop
@@ -5774,20 +5777,27 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
         "Perimeter of heat transfer surface (single tube)";
       parameter SI.Length Dhyd = omega/pi "Hydraulic Diameter (single tube)";
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
+      parameter SI.PressureDifference dpnom = 0 "Nominal pressure drop (friction term only!)";
+    
+    /*  -----------------   to be deleted ------------------------
       parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
         "Friction Factor Type"
         annotation (Evaluate=true);
-      parameter SI.PressureDifference dpnom = 0
-        "Nominal pressure drop (friction term only!)";
+    
       parameter Real Kfnom = 0
         "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)"
        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
+    
       parameter Medium.Density rhonom=0 "Nominal inlet density"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint)));
+    
       parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
+    
       parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)"
         annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)));
+    -------------------------------------------------------------------*/
+    
       parameter SI.PerUnit Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
         "Inertial phenomena accounted for"
@@ -5848,6 +5858,8 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       final parameter SI.Volume V = Nt*A*L "Total volume (all Nt tubes)";
     initial equation
         assert(wnom > 0, "Please set a positive value for wnom");
+    
+    /* ----------------------  to be deleted ---------------------------
         assert(FFtype == FFtypes.NoFriction or dpnom > 0,
         "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
         assert(not
@@ -5860,6 +5872,10 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
                   (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
         assert(not
                   (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
+    
+    
+    -----------------------------------------------------------------------*/
+    
         annotation (Evaluate=true,
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
