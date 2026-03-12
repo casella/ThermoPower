@@ -38,6 +38,84 @@ package Friction "Friction models"
     </ul>
     </body></html>"));
     end NominalKf;
+    
+    model OperatingPoint "Operating point"
+      extends Friction.Interfaces.FrictionBase1DFV;
+      parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
+      parameter SI.PressureDifference dpnom "Nominal pressure drop";
+      parameter Medium.Density rhonom "Nominal inlet density";
+      
+    equation
+      Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
+      Cf = 2*Kf*A^3/(omega_hyd*L);
+      
+      annotation(
+        Documentation(info = "<html><head></head><body>Friction factor is calculated starting from a nominal operating point;</body></html>", revisions = "<html><head></head><body><ul>
+        <li><i>12 Mar 2026</i>
+        by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+           First release.</li>
+        </ul>
+        </body></html>"));
+    end OperatingPoint;
+    
+    model NominalCf "Nominal Cf Fanning friction factor"
+      extends Friction.Interfaces.FrictionBase1DFV;
+      parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor";
+    
+    equation
+      Kf = Cf*omega_hyd*L/(2*A^3);
+      Cf = Cfnom*Kfc;
+      
+      annotation(
+        Documentation(info = "<html><head></head><body>Nominal Cf Fanning friction factor is applied;</body></html>", revisions = "<html><head></head><body><ul>
+        <li><i>15 Oct 2025</i>
+        by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+           First release.</li>
+        </ul>
+        </body></html>"));
+    end NominalCf;
+    
+    model Colebrook_ph "Colebrook's equation"
+      extends Friction.Interfaces.FrictionBase1DFV;
+      parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
+    
+    equation
+      Kf = Cf*omega_hyd*L/(2*A^3);
+      Cf = ThermoPower.FluidPh.f_colebrook(
+             w,
+             Dhyd/A,
+             e,
+             Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
+      
+      annotation(
+        Documentation(info = "<html><head></head><body><p>This friction model can be used with the <code>Fow1DFV</code> model in the <code>FluidPh</code> package.</p><p>Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).</p></body></html>", revisions = "<html><head></head><body><ul>
+            <li><i>12 Mar 2026</i>
+            by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+               First release.</li>
+            </ul>
+            </body></html>"));
+    end Colebrook_ph;
+    
+    model Colebrook_gas "Colebrook's equation"
+      extends Friction.Interfaces.FrictionBase1DFV;
+      parameter Modelica.Units.SI.PerUnit e = 0 "Relative roughness (ratio roughness/diameter)";
+    
+    equation
+      Kf = Cf*omega_hyd*L/(2*A^3);
+      Cf = ThermoPower.IdealGas.f_colebrook(
+             w,
+             Dhyd/A,
+             e,
+             Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
+      
+      annotation(
+        Documentation(info = "<html><head></head><body><p>This friction model can be used with the <code>Fow1DFV</code> model in the <code>IdealGas</code> package.</p><p>Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).</p></body></html>", revisions = "<html><head></head><body><ul>
+                <li><i>12 Mar 2026</i>
+                by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+                   First release.</li>
+                </ul>
+                </body></html>"));
+    end Colebrook_gas;
 
   end Friction1DFV;
 
