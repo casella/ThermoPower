@@ -1178,7 +1178,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     SI.Pressure Dpfric "Pressure drop due to friction (total)";
     SI.Pressure Dpfric1
       "Pressure drop due to friction (from inlet to capacitance)";
@@ -1187,9 +1186,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.Pressure Dpstat "Pressure drop due to static head";
     Medium.MassFlowRate win "Flow rate at the inlet (single tube)";
     Medium.MassFlowRate wout "Flow rate at the outlet (single tube)";
-    Real Kf "Hydraulic friction coefficient";
     Real dwdt "Dynamic momentum term";
-    SI.PerUnit Cf "Fanning friction factor";
     Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
       "Fluid pressure for property calculations";
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flow rate (single tube)";
@@ -1225,9 +1222,24 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       final w=w*ones(N),
       final fluidState=fluidState) "Instantiated heat transfer model";
 
+    replaceable model Friction = ThermoPower.Friction.Friction1DFV.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFV
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      fluidState = fluidState,
+      w = w) "Instantiated friction model";
+  
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw)
       annotation (Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
+  
   protected
     Medium.Density rhobar[N - 1] "Fluid average density";
     SI.SpecificVolume vbar[N - 1] "Fluid average specific volume";
@@ -1238,28 +1250,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
     SI.DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
+  
   equation
     //All equations are referred to a single tube
-    // Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    if FFtype == FFtypes.Kfnom then
-      Kf = Kfnom*Kfc;
-    elseif FFtype == FFtypes.OpPoint then
-      Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-    elseif FFtype == FFtypes.Cfnom then
-      Cf = Cfnom*Kfc;
-    elseif FFtype == FFtypes.Colebrook then
-      Cf = f_colebrook(
-          w,
-          Dhyd/A,
-          e,
-          Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
-    else  // if FFtype == FFtypes.NoFriction then
-      Cf = 0;
-    end if;
-    Kf = Cf*omega_hyd*L/(2*A^3)
-      "Relationship between friction coefficient and Fanning friction factor";
-    assert(Kf >= 0, "Negative friction coefficient");
+  
+    assert(friction.Kf >= 0, "Negative friction coefficient");
 
     // Dynamic momentum term
     if DynamicMomentum then
@@ -1276,19 +1271,19 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       Dpfric2 = 0;
     elseif HydraulicCapacitance == HCtypes.Middle then
       //assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
-      Dpfric1 = homotopy(Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar[1:integer((N
+      Dpfric1 = homotopy(friction.Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar[1:integer((N
          - 1)/2)])/(N - 1), dpnom/2/(wnom/Nt)*win)
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar[1 + integer((
+      Dpfric2 = homotopy(friction.Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar[1 + integer((
         N - 1)/2):N - 1])/(N - 1), dpnom/2/(wnom/Nt)*wout)
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == HCtypes.Upstream then
       Dpfric1 = 0 "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar)/(N - 1),
+      Dpfric2 = homotopy(friction.Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar)/(N - 1),
                          dpnom/(wnom/Nt)*wout)
         "Pressure drop from capacitance to outlet";
     else // if HydraulicCapacitance == HCtypes.Downstream then
-      Dpfric1 = homotopy(Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar)/(N - 1),
+      Dpfric1 = homotopy(friction.Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar)/(N - 1),
                          dpnom/(wnom/Nt)*win)
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
@@ -5766,7 +5761,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       import ThermoPower.Choices.Flow1D.FFtypes;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
-        annotation(choicesAllMatching = true);
+        annotation(choicesAllMatching = true);  
       extends Icons.FluidPh.Tube;
       constant Real pi = Modelica.Constants.pi;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
