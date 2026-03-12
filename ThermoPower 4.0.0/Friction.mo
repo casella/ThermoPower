@@ -10,6 +10,7 @@ package Friction "Friction models"
       extends ThermoPower.Friction.Interfaces.FrictionBase1DFV;
     
     equation
+      NoFriction = true;
       Kf=0;
       Cf=0;
     
@@ -27,6 +28,7 @@ package Friction "Friction models"
       parameter Real Kfnom "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)";
     
     equation
+      NoFriction = false;
       Kf = Kfnom*Kfc;
       Cf = 2*Kf*A^3/(omega_hyd*L);
     
@@ -41,11 +43,10 @@ package Friction "Friction models"
     
     model OperatingPoint "Operating point"
       extends Friction.Interfaces.FrictionBase1DFV;
-      parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
-      parameter SI.PressureDifference dpnom "Nominal pressure drop";
       parameter Medium.Density rhonom "Nominal inlet density";
       
     equation
+      NoFriction = false;
       Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
       Cf = 2*Kf*A^3/(omega_hyd*L);
       
@@ -63,6 +64,7 @@ package Friction "Friction models"
       parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor";
     
     equation
+      NoFriction = false;
       Kf = Cf*omega_hyd*L/(2*A^3);
       Cf = Cfnom*Kfc;
       
@@ -80,6 +82,7 @@ package Friction "Friction models"
       parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
     
     equation
+      NoFriction = false;
       Kf = Cf*omega_hyd*L/(2*A^3);
       Cf = ThermoPower.FluidPh.f_colebrook(
              w,
@@ -98,9 +101,10 @@ package Friction "Friction models"
     
     model Colebrook_gas "Colebrook's equation"
       extends Friction.Interfaces.FrictionBase1DFV;
-      parameter Modelica.Units.SI.PerUnit e = 0 "Relative roughness (ratio roughness/diameter)";
+      parameter SI.PerUnit e = 0 "Relative roughness (ratio roughness/diameter)";
     
     equation
+      NoFriction = false;
       Kf = Cf*omega_hyd*L/(2*A^3);
       Cf = ThermoPower.IdealGas.f_colebrook(
              w,
@@ -134,6 +138,9 @@ package Friction "Friction models"
       parameter SI.Length L "Tube length";
       parameter SI.Area A "Cross-sectional area (single element in parallel)";
 
+      parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
+      parameter SI.PressureDifference dpnom "Nominal pressure drop";
+
       final parameter SI.Length omega_hyd = 4*A/Dhyd "Wet perimeter (single tube)";
 
       input Medium.ThermodynamicState[N] fluidState;
@@ -141,6 +148,7 @@ package Friction "Friction models"
 
       output Real Kf "Hydraulic friction coefficient";
       output SI.PerUnit Cf "Fanning friction factor";
+      output Boolean NoFriction "=true, if no friction is used";
 
       annotation(
         Documentation(info = "<html><head></head><body>Base model for <code>replaceable</code> friction models to be used to <code>redeclare</code> the fricion model in the <code>Flow1DFV</code> components;</body></html>", revisions = "<html><head></head><body><ul>
