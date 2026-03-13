@@ -143,6 +143,44 @@ package Friction "Friction models"
     </ul>
     </body></html>"));
     end NoFriction;
+
+    model NominalKf "Nominal Kf friction factor"
+      extends ThermoPower.Friction.Interfaces.FrictionBase1DFV2ph;
+      parameter Real Kfnom "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)";
+    
+    equation
+      NoFriction = false;
+      Kf = fill(Kfnom*Kfc/(N-1),(N-1));
+      Cf = {2*Kf[j]*A^3/(omega_hyd*l) for j in 1:N-1};
+      Kfl = {wnom/Nt*wnf*Kf[j] for j in 1:N-1};
+    
+    annotation(
+        Documentation(info = "<html><head></head><body>Nominal Kf friction factor is applied;</body></html>", revisions = "<html><head></head><body><ul>
+    <li><i>13 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       First release.</li>
+    </ul>
+    </body></html>"));
+    end NominalKf;
+
+    model OperatingPoint "Operating point"
+      extends Friction.Interfaces.FrictionBase1DFV2ph;
+      parameter Medium.Density rhonom "Nominal inlet density";
+    
+    equation
+      NoFriction = false;
+      Kf = fill(dpnom*rhonom/(wnom/Nt)^2/(N-1)*Kfc,(N-1));
+      Cf = {2*Kf[j]*A^3/(omega_hyd*l) for j in 1:N-1};
+      Kfl = {wnom/Nt*wnf*Kf[j] for j in 1:N-1};
+      
+      annotation(
+        Documentation(info = "<html><head></head><body>Friction factor is calculated starting from a nominal operating point;</body></html>", revisions = "<html><head></head><body><ul>
+        <li><i>12 Mar 2026</i>
+        by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+           First release.</li>
+        </ul>
+        </body></html>"));
+    end OperatingPoint;
   end Friction1DFV2ph;
 
   package Interfaces
