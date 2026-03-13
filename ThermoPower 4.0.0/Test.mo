@@ -2629,8 +2629,7 @@ Algorithm Tolerance = 1e-4
         A=3e-4,
         omega=0.1,
         wnom=1,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        Cfnom=0.005,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=0.005),
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         hstartin=300e3,
         hstartout=300e3,
@@ -2982,7 +2981,7 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
         annotation (Placement(transformation(extent={{-40,-10},{-20,10}})));
       FluidPh.Flow1DFV boiler(
         A=3.1416*0.04^2,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.OperatingPoint(rhonom=999),
         L=10,
         hstartin=134.11e3,
         hstartout=134.11e3,
@@ -2990,7 +2989,6 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
         wnom=10,
         N=2,
         dpnom=200000,
-        rhonom=999,
         pstart=700000)
         annotation (Placement(transformation(extent={{22,-10},{42,10}})));
       inner System system(
@@ -3002,7 +3000,7 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
         annotation (Placement(transformation(extent={{-78,-90},{-46,-70}})));
       FluidPh.Flow1DFV heater(
         A=3.1416*0.04^2,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.OperatingPoint(rhonom=999),
         L=10,
         hstartin=134.11e3,
         hstartout=134.11e3,
@@ -3010,7 +3008,6 @@ at 35 degC is cooled down to 30 degC using using air with wet bulb temperature a
         wnom=10,
         N=2,
         dpnom=200000,
-        rhonom=999,
         pstart=700000,
         redeclare model HeatTransfer =
             Thermal.HeatTransferFV.ConstantThermalConductance (UA=50000))
@@ -9332,8 +9329,7 @@ Casella</a>:<br>
         omega=omegahex,
         Dhyd=Dihex,
         wnom=whex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        Cfnom=Cfhex,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=Cfhex),
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Liquid,
         pstart=phex,
