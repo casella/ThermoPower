@@ -4925,15 +4925,14 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         DynamicMomentum=false,
         hstartin=hinhex,
         hstartout=houthex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         pstart=phex,
         dpnom=1000,
-        redeclare package Medium = Medium)
+        redeclare package Medium = Medium,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=Cfhex))
                     annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
       ThermoPower.FluidPh.SensT T_in(redeclare package Medium = Medium)
@@ -5079,8 +5078,6 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         omega=omegahex,
         Dhyd=Dihex,
         wnom=whex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
-        Cfnom=Cfhex,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Liquid,
         pstart=phex,
@@ -5089,6 +5086,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=gamma),
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=Cfhex),
         Nt=Nt,
         dpnom=1000)
         annotation (Placement(transformation(extent={{-22,-22},{-2,-2}})));
@@ -5173,11 +5171,10 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hs,
         hstartout=hs,
         redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
@@ -5331,7 +5328,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         pstart=phex,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=800),
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NoFriction,
         A=Aext,
         omega=omegahex)
                      annotation (Placement(transformation(
@@ -5343,11 +5340,10 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         L=Lhex,
         Dhyd=Dihex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
         redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
@@ -5517,7 +5513,7 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         pstart=phex,
         redeclare model HeatTransfer =
           ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=800),
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NoFriction,
         A=Aext,
         omega=omegaext,
         Dhyd=Dehex,
@@ -5530,11 +5526,10 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         L=Lhex,
         Dhyd=Dihex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
         redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         pstart=phex,
@@ -5661,11 +5656,10 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hs,
         hstartout=hs,
         redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         redeclare model HeatTransfer =
