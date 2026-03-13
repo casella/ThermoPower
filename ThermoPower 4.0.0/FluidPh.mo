@@ -1237,11 +1237,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       dpnom = dpnom,
       fluidState = fluidState,
       w = w) "Instantiated friction model";
-  
+
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw)
       annotation (Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
-  
+
   protected
     Medium.Density rhobar[N - 1] "Fluid average density";
     SI.SpecificVolume vbar[N - 1] "Fluid average specific volume";
@@ -1252,10 +1252,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
     SI.DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
-  
+
   equation
     //All equations are referred to a single tube
-  
+
     assert(friction.Kf >= 0, "Negative friction coefficient");
 
     // Dynamic momentum term
@@ -1290,7 +1290,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
-    
+
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*l*dzdx*sum(rhobar)
       "Pressure drop due to static head";
     for j in 1:N-1 loop
@@ -1572,18 +1572,24 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.MassFlowRate dMdt[N - 1] "Derivative of fluid mass in each volume";
   equation
     //All equations are referred to a single tube
+
+
+
     omega_hyd = 4*A/Dhyd;
     // Friction factor selection
     for j in 1:(N - 1) loop
       if FFtype == FFtypes.Kfnom then
         Kf[j] = Kfnom*Kfc/(N - 1);
         Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
+
       elseif FFtype == FFtypes.OpPoint then
         Kf[j] = dpnom*rhonom/(wnom/Nt)^2/(N - 1)*Kfc;
         Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
+
       elseif FFtype == FFtypes.Cfnom then
         Kf[j] = Cfnom*omega_hyd*l/(2*A^3)*Kfc;
         Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
+
       elseif FFtype == FFtypes.Colebrook then
         Cf[j] = if noEvent(htilde[j] < hl or htilde[j] > hv) then f_colebrook(
             w,
@@ -1597,17 +1603,25 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
             Medium.dynamicViscosity(Medium.setDewState(sat, 1)),
             x[j])*Kfc;
         Kf[j] = Cf[j]*omega_hyd*l/(2*A^3);
+
       elseif FFtype == FFtypes.NoFriction then
         Cf[j] = 0;
         Kf[j] = 0;
+
       else
         assert(FFtype <> FFtypes.NoFriction, "Unsupported FFtype");
         Cf[j] = 0;
         Kf[j] = 0;
+
       end if;
+
       assert(Kf[j] >= 0, "Negative friction coefficient");
+
       Kfl[j] = wnom/Nt*wnf*Kf[j];
     end for;
+
+
+
 
     // Dynamic momentum term
     if DynamicMomentum then
@@ -2362,7 +2376,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </ul>
 </html>"));
   end Flow1DFEM;
-  
+
   model Flow1DFEMnm
     "1-dimensional fluid flow model for p-h fluid (finite elements)"
     extends BaseClasses.Flow1DBase(Nw = N);
@@ -2399,7 +2413,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.Density rho[N] "Fluid density";
     Modelica.Units.SI.SpecificVolume v[N] "Fluid specific volume";
     Modelica.Units.SI.Mass Mtot "Total mass of fluid";
-  
+
   protected
     Modelica.Units.SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     Modelica.Units.SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
@@ -2408,7 +2422,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real D1[N];
     Real D2[N];
     Real alpha_sgn[N];
-  
+
   equation
   //All equations are referred to a single tube
   // Selection of representative pressure variable
@@ -2462,7 +2476,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[N]) "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D "Pressure drop due to static head";
-  
+
   // Fluid property calculations
     for j in 1:N loop
       fluidState[j] = Medium.setState_phX(p, h[j]);
@@ -2490,42 +2504,42 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         (w[i + 1] - w[i]) = -A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[i])*(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i + 1]))) "Mass balance equations";
       end if;
     end for;
-  
+
   // Energy balance equations in matrices form (see Flow1DFEM)
   //  Y*der(h) + B/A*h + C*h/A = der(p)*G + M*(omega/A)*phi + K*w/A;
-  
+
   //  expansion in single-equations form
-  
+
   /* first equation
     Y[1,1]*der(h[1]) + Y[1,2]*der(h[2])
     + (B[1,1]*h[1] + B[1,2]*h[2])/A
-    + C[1,1]*h[1]/A 
+    + C[1,1]*h[1]/A
     =
     (M[1,1]*phi[1] + M[1,2]*phi[2])*(omega/A)
     + K[1,1]*w[1]/A
     + der(p)*G[1];
   */
-  
+
     if regularizeBoundaryConditions then
       (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]))*der(h[1]) + (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]))*der(h[2])
       + (((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12)*h[1] + ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12)*h[2])/A
-      + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*w[1], 0, wnom*wnf_bc))*h[1]/A 
+      + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*w[1], 0, wnom*wnf_bc))*h[1]/A
       =
       (((4 - 3*alpha_sgn[1])*l/12)*phi[1] + ((2 - 3*alpha_sgn[1])*l/12)*phi[2])*(omega/A)
       + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow), 0, wnom*wnf_bc))*w[1]/A
       + (if Medium.singleState then 0 else der(p)*(l/2*(1 - alpha_sgn[1])));
-    
+
     else
       (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]))*der(h[1]) + (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]))*der(h[2])
       + (((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12)*h[1] + ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12)*h[2])/A
-      + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*w[1] else 0))*h[1]/A 
+      + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*w[1] else 0))*h[1]/A
       =
       (((4 - 3*alpha_sgn[1])*l/12)*phi[1] + ((2 - 3*alpha_sgn[1])*l/12)*phi[2])*(omega/A)
       + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow) else 0))*w[1]/A
       + (if Medium.singleState then 0 else der(p)*(l/2*(1 - alpha_sgn[1])));
-    
+
     end if;
-  
+
   /* Intermediate equations, if N>2
     for i in 2:(N-1)
       Y[i,i-1]*der(h[i-1]) + Y[i,i]*der(h[i]) + Y[i,i+1]*der(h[i+1])
@@ -2543,37 +2557,37 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         + (if Medium.singleState then 0 else der(p)*l);
       end for;
     end if;
-  
+
   /* last equation
     Y[N,N-1]*der(h[N-1]) + Y[N,N]*der(h[N])
     + (B[N,N-1]*h[N-1] + B[N,N]*h[N])/A
-    + C[N,N]*h[N]/A 
+    + C[N,N]*h[N]/A
     =
     (M[N,N-1]*phi[N-1] + M[N,N]*phi[N])*(omega/A)
     + K[N,N]*w[N]/A
     + der(p)*G[N];
   */
-  
+
     if regularizeBoundaryConditions then
       (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]))*der(h[N-1]) + (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]))*der(h[N])
       + (((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N-1] + ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N])/A
-      + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*w[N], 0, wnom*wnf_bc))*h[N]/A 
+      + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*w[N], 0, wnom*wnf_bc))*h[N]/A
       =
       (((2 + 3*alpha_sgn[N])*l/12)*phi[N-1] + ((4 + 3*alpha_sgn[N])*l/12)*phi[N])*(omega/A)
       + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow), 0, wnom*wnf_bc))*w[N]/A
       + (if Medium.singleState then 0 else der(p)*(l/2*(1 + alpha_sgn[1])));
-    
+
     else
       (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]))*der(h[N-1]) + (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]))*der(h[N])
       + (((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N-1] + ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N])/A
-      + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*w[N] else 0))*h[N]/A 
+      + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*w[N] else 0))*h[N]/A
       =
       (((2 + 3*alpha_sgn[N])*l/12)*phi[N-1] + ((4 + 3*alpha_sgn[N])*l/12)*phi[N])*(omega/A)
       + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow) else 0))*w[N]/A
       + (if Medium.singleState then 0 else der(p)*(l/2*(1 + alpha_sgn[1])));
-    
+
     end if;
-  
+
   // Momentum and Mass balance equation arrays
     D[1] = l/2;
     D[N] = l/2;
@@ -2596,7 +2610,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
     Mtot = Nt*D*rho*A "Total mass of fluid";
     Tr = noEvent(Mtot/max(abs(infl.m_flow), Modelica.Constants.eps)) "Residence time";
-  
+
   initial equation
     if initOpt == Choices.Init.Options.noInit then
   // do nothing
@@ -5330,7 +5344,7 @@ transfer between the packing and the evaporating water.</p>
 external circuit, which is thermally connected through the 1D distributed heat port <code>wallPort</code>, representing the tube external surface.</p>
 <p>The heat transfer between the packing or the tube surface and the evaporating water is computed by a specific
 heat transfer coefficient, whose nominal value is <code>gamma_wp_nom</code>, and which varies with the <code>nu_l</code>-th power
-of the liquid flow.</p>  
+of the liquid flow.</p>
 <p>The mass and heat transfer from the hot water to humid ambient air is modelled according to Merkel&apos;s equation: the driving force for heat and mass transfer is the difference between the specific enthalpy of saturated humid air at the water temperature per unit dry air mass, and the specific enthalpy of saturated humid air at the wet bulb temperature Twb per unit dry air mass.
 The dry and wet bulb temperatures of incoming air are given by the settings of the system object.</p>
 <p>The 1D counter-current heat and mass transfer equations are discretized by the finite volume method, with <code>N-1</code> volumes; average quantities between volume inlet and volume outlet are used to compute the driving force of the mass and energy transfer.</p>
@@ -5764,7 +5778,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       import ThermoPower.Choices.Flow1D.FFtypes;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
-        annotation(choicesAllMatching = true);  
+        annotation(choicesAllMatching = true);
       extends Icons.FluidPh.Tube;
       constant Real pi = Modelica.Constants.pi;
       parameter Integer N(min=2) = 2 "Number of nodes for thermal variables";
@@ -5778,26 +5792,6 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       parameter SI.Length Dhyd = omega/pi "Hydraulic Diameter (single tube)";
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter SI.PressureDifference dpnom = 0 "Nominal pressure drop (friction term only!)";
-    
-    /*  -----------------   to be deleted ------------------------
-      parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
-        "Friction Factor Type"
-        annotation (Evaluate=true);
-    
-      parameter Real Kfnom = 0
-        "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)"
-       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
-    
-      parameter Medium.Density rhonom=0 "Nominal inlet density"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint)));
-    
-      parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
-    
-      parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)));
-    -------------------------------------------------------------------*/
-    
       parameter SI.PerUnit Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
         "Inertial phenomena accounted for"
@@ -5858,24 +5852,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       final parameter SI.Volume V = Nt*A*L "Total volume (all Nt tubes)";
     initial equation
         assert(wnom > 0, "Please set a positive value for wnom");
-    
-    /* ----------------------  to be deleted ---------------------------
-        assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-        "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
-        assert(not
-                  (FFtype == FFtypes.Kfnom     and not Kfnom > 0),  "Kfnom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.OpPoint   and not rhonom > 0), "rhonom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Cfnom     and not Cfnom > 0),  "Cfnom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
-    
-    
-    -----------------------------------------------------------------------*/
-    
+
         annotation (Evaluate=true,
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
@@ -6012,7 +5989,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         Av = 2.4027e-5*Cv;
       end if;
       // assert(CvData>=0 and CvData<=3, "Invalid CvData");
-    
+
       if initOpt == Choices.Init.Options.noInit then
         // do nothing
       elseif initOpt == Choices.Init.Options.fixedState then
@@ -6026,7 +6003,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       else
         assert(false, "Unsupported initialisation option");
       end if;
-    
+
     equation
       inlet.m_flow + outlet.m_flow = 0 "Mass balance";
       w = inlet.m_flow;
@@ -6041,7 +6018,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
           fluidState = Medium.setState_phX(outlet.p, inStream(outlet.h_outflow));
         end if;
       end if;
-      
+
       Tin = Medium.temperature(fluidState);
       rho = Medium.density(fluidState);
 
@@ -6059,7 +6036,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         hin = inStream(inlet.h_outflow);
         hout = inStream(outlet.h_outflow);
       end if;
-    
+
       dp = inlet.p - outlet.p "Definition of dp";
 
       // Valve opening
@@ -6272,12 +6249,12 @@ It is possible to take into account the heat capacity of the fluid inside the va
       // Boundary conditions
       dp = outfl.p - infl.p;
       w = infl.m_flow "Pump total flow rate";
-    
+
       hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
                      else if w >= 0 then inStream(infl.h_outflow)
                      else inStream(outfl.h_outflow),
                      inStream(infl.h_outflow));
-    
+
       infl.h_outflow = hout;
       outfl.h_outflow = hout;
       h = hout;
