@@ -1499,10 +1499,31 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       final w=w*ones(N),
       final fluidState=fluidState) "Instantiated heat transfer model";
 
+    replaceable model Friction = ThermoPower.Friction.Friction1DFV2ph.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFV2ph
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnf = wnf,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      sat = sat,
+      w = w,
+      hl = hl,
+      hv = hv,
+      htilde = htilde,
+      x = x) "Instantiated friction model";
+
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     // package SmoothMedium = Medium (final smoothModel=true);
     constant SI.Pressure pzero=10 "Small deltap for calculations";
@@ -1517,12 +1538,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     SI.Pressure Dpfric "Pressure drop due to friction";
     SI.Pressure Dpstat "Pressure drop due to static head";
-    Real Kf[N - 1] "Friction coefficient";
-    Real Kfl[N - 1] "Linear friction coefficient";
-    Real Cf[N - 1] "Fanning friction factor";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p(start=pstart)
       "Fluid pressure for property calculations";
@@ -1573,55 +1590,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   equation
     //All equations are referred to a single tube
 
-
-
-    omega_hyd = 4*A/Dhyd;
-    // Friction factor selection
-    for j in 1:(N - 1) loop
-      if FFtype == FFtypes.Kfnom then
-        Kf[j] = Kfnom*Kfc/(N - 1);
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
-
-      elseif FFtype == FFtypes.OpPoint then
-        Kf[j] = dpnom*rhonom/(wnom/Nt)^2/(N - 1)*Kfc;
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
-
-      elseif FFtype == FFtypes.Cfnom then
-        Kf[j] = Cfnom*omega_hyd*l/(2*A^3)*Kfc;
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
-
-      elseif FFtype == FFtypes.Colebrook then
-        Cf[j] = if noEvent(htilde[j] < hl or htilde[j] > hv) then f_colebrook(
-            w,
-            Dhyd/A,
-            e,
-            Medium.dynamicViscosity(fluidState[j]))*Kfc else f_colebrook_2ph(
-            w,
-            Dhyd/A,
-            e,
-            Medium.dynamicViscosity(Medium.setBubbleState(sat, 1)),
-            Medium.dynamicViscosity(Medium.setDewState(sat, 1)),
-            x[j])*Kfc;
-        Kf[j] = Cf[j]*omega_hyd*l/(2*A^3);
-
-      elseif FFtype == FFtypes.NoFriction then
-        Cf[j] = 0;
-        Kf[j] = 0;
-
-      else
-        assert(FFtype <> FFtypes.NoFriction, "Unsupported FFtype");
-        Cf[j] = 0;
-        Kf[j] = 0;
-
-      end if;
-
-      assert(Kf[j] >= 0, "Negative friction coefficient");
-
-      Kfl[j] = wnom/Nt*wnf*Kf[j];
+    for j in 1:N-1 loop
+      assert(friction.Kf[j] >= 0, "Negative friction coefficient");
     end for;
-
-
-
 
     // Dynamic momentum term
     if DynamicMomentum then
@@ -1647,8 +1618,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       else
         wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
       end if;
-      dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else homotopy(smooth(1,
-        Kf[j]*squareReg(w, wnom/Nt*wnf))*vbar[j], dpnom/(N - 1)/(wnom/Nt)*w));
+      dpf[j] = (if friction.NoFriction then 0 else homotopy(smooth(1,
+        friction.Kf[j]*squareReg(w, wnom/Nt*wnf))*vbar[j], dpnom/(N - 1)/(wnom/Nt)*w));
       if avoidInletEnthalpyDerivative and j == 1 then
         // first volume properties computed by the outlet properties
         rhobar[j] = rho[j + 1];
