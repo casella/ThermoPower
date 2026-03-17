@@ -42,7 +42,7 @@ package Friction "Friction models"
     end NominalKf;
 
     model OperatingPoint "Operating point"
-      extends Friction.Interfaces.FrictionBase1DFV;
+      extends ThermoPower.Friction.Interfaces.FrictionBase1DFV;
       parameter Medium.Density rhonom "Nominal inlet density";
 
     equation
@@ -60,7 +60,7 @@ package Friction "Friction models"
     end OperatingPoint;
 
     model NominalCf "Nominal Cf Fanning friction factor"
-      extends Friction.Interfaces.FrictionBase1DFV;
+      extends ThermoPower.Friction.Interfaces.FrictionBase1DFV;
       parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor";
 
     equation
@@ -78,7 +78,7 @@ package Friction "Friction models"
     end NominalCf;
 
     model Colebrook_ph "Colebrook's equation"
-      extends Friction.Interfaces.FrictionBase1DFV;
+      extends ThermoPower.Friction.Interfaces.FrictionBase1DFV;
       parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
 
     equation
@@ -100,7 +100,7 @@ package Friction "Friction models"
     end Colebrook_ph;
 
     model Colebrook_gas "Colebrook's equation"
-      extends Friction.Interfaces.FrictionBase1DFV;
+      extends ThermoPower.Friction.Interfaces.FrictionBase1DFV;
       parameter SI.PerUnit e = 0 "Relative roughness (ratio roughness/diameter)";
 
     equation
@@ -123,7 +123,7 @@ package Friction "Friction models"
 
   end Friction1DFV;
 
-  package Friction1DFV2ph
+  package Friction1DFV2ph "Friction models for 1DFV2ph components"
   extends Modelica.Icons.Package;
 
     model NoFriction "No friction is applied"
@@ -164,7 +164,7 @@ package Friction "Friction models"
     end NominalKf;
 
     model OperatingPoint "Operating point"
-      extends Friction.Interfaces.FrictionBase1DFV2ph;
+      extends ThermoPower.Friction.Interfaces.FrictionBase1DFV2ph;
       parameter Medium.Density rhonom "Nominal inlet density";
     
     equation
@@ -181,6 +181,58 @@ package Friction "Friction models"
         </ul>
         </body></html>"));
     end OperatingPoint;
+
+    model NominalCf "Nominal Cf Fanning friction factor"
+      extends ThermoPower.Friction.Interfaces.FrictionBase1DFV2ph;
+      parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor";
+    
+    equation
+      NoFriction = false;
+      Kf = fill(Cfnom*omega_hyd*l/(2*A^3)*Kfc,(N-1));
+      Cf = fill(Cfnom*Kfc,(N-1));
+      Kfl = {wnom/Nt*wnf*Kf[j] for j in 1:N-1};
+    
+      annotation(
+        Documentation(info = "<html><head></head><body>Nominal Cf Fanning friction factor is applied;</body></html>", revisions = "<html><head></head><body><ul>
+        <li><i>17 Mar 2026</i>
+        by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+           First release.</li>
+        </ul>
+        </body></html>"));
+    end NominalCf;
+
+    model Colebrook_ph "Colebrook's equation"
+      extends ThermoPower.Friction.Interfaces.FrictionBase1DFV2ph;
+      parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
+    
+    equation
+      NoFriction = false;
+      for j in 1:N-1 loop
+        Kf[j] = Cf[j]*omega_hyd*l/(2*A^3);
+        Cf[j] = if noEvent(htilde[j] < hl or htilde[j] > hv) 
+                then ThermoPower.FluidPh.f_colebrook(
+                    w,
+                    Dhyd/A,
+                    e,
+                    Medium.dynamicViscosity(fluidState[j]))*Kfc 
+                else ThermoPower.FluidPh.f_colebrook_2ph(
+                    w,
+                    Dhyd/A,
+                    e,
+                    Medium.dynamicViscosity(Medium.setBubbleState(sat, 1)),
+                    Medium.dynamicViscosity(Medium.setDewState(sat, 1)),
+                    x[j])*Kfc;
+        Kfl[j] = wnom/Nt*wnf*Kf[j];
+      end for;
+    
+      annotation(
+        Documentation(info = "<html><head></head><body><p>Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).</p></body></html>", revisions = "<html><head></head><body><ul>
+            <li><i>17 Mar 2026</i>
+            by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+               First release.</li>
+            </ul>
+            </body></html>"));
+    end Colebrook_ph;
   end Friction1DFV2ph;
 
   package Interfaces
@@ -220,8 +272,8 @@ package Friction "Friction models"
     end FrictionBase1DFV;
 
     partial model FrictionBase1DFV2ph "Friction base model for 1DFV2ph components"
-      replaceable package Medium = Modelica.Media.Interfaces.PartialMedium "Medium model"
-        constrainedby Modelica.Media.Interfaces.PartialMedium
+      replaceable package Medium = Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium
         annotation(choicesAllMatching = true);
 
       parameter SI.Length Dhyd "Hydraulic Diameter (single element in parallel)";
@@ -237,12 +289,14 @@ package Friction "Friction models"
       final parameter SI.Length omega_hyd = 4*A/Dhyd "Wet perimeter (single tube)";
       final parameter SI.Length l=L/(N-1) "Length of a single volume";
 
+      input Medium.ThermodynamicState[N] fluidState "Thermodynamic state of the fluid at the nodes";
       input Medium.SaturationProperties sat "Properties of saturated fluid";
       input Medium.MassFlowRate w "Mass flowrate (single tube)";
       input Medium.SpecificEnthalpy hl "Saturated liquid temperature";
       input Medium.SpecificEnthalpy hv "Saturated vapour temperature";
-      input Medium.SpecificEnthalpy htilde[N - 1] "Enthalpy state variables";
-
+      input Medium.SpecificEnthalpy htilde[N-1] "Enthalpy state variables";
+      input SI.PerUnit x[N] "Steam quality";
+      
       output Real Kf[N-1] "Friction coefficient";
       output Real Kfl[N-1] "Linear friction coefficient";
       output Real Cf[N-1] "Fanning friction factor";
