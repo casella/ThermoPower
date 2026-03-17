@@ -1233,6 +1233,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       N = N,
       L = L,
       A = A,
+      wnf = wnf,
       wnom = wnom,
       dpnom = dpnom,
       fluidState = fluidState,

@@ -12,6 +12,7 @@ package Friction "Friction models"
     equation
       NoFriction = true;
       Kf=0;
+      Kfl=0;
       Cf=0;
 
     annotation(
@@ -30,6 +31,7 @@ package Friction "Friction models"
     equation
       NoFriction = false;
       Kf = Kfnom*Kfc;
+      Kfl = wnom/Nt*wnf*Kf;
       Cf = 2*Kf*A^3/(omega_hyd*L);
 
     annotation(
@@ -48,6 +50,7 @@ package Friction "Friction models"
     equation
       NoFriction = false;
       Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
+      Kfl = wnom/Nt*wnf*Kf;
       Cf = 2*Kf*A^3/(omega_hyd*L);
 
       annotation(
@@ -66,6 +69,7 @@ package Friction "Friction models"
     equation
       NoFriction = false;
       Kf = Cf*omega_hyd*L/(2*A^3);
+      Kfl = wnom/Nt*wnf*Kf;
       Cf = Cfnom*Kfc;
 
       annotation(
@@ -84,6 +88,7 @@ package Friction "Friction models"
     equation
       NoFriction = false;
       Kf = Cf*omega_hyd*L/(2*A^3);
+      Kfl = wnom/Nt*wnf*Kf;
       Cf = ThermoPower.FluidPh.f_colebrook(
              w,
              Dhyd/A,
@@ -106,6 +111,7 @@ package Friction "Friction models"
     equation
       NoFriction = false;
       Kf = Cf*omega_hyd*L/(2*A^3);
+      Kfl = wnom/Nt*wnf*Kf;
       Cf = ThermoPower.IdealGas.f_colebrook(
              w,
              Dhyd/A,
@@ -249,7 +255,7 @@ package Friction "Friction models"
       parameter Integer N(min = 2) = 2 "Number of nodes for thermal variables";
       parameter SI.Length L "Tube length";
       parameter SI.Area A "Cross-sectional area (single element in parallel)";
-
+      parameter SI.PerUnit wnf "Fraction of nominal flow rate at which linear friction equals turbulent friction";
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
       parameter SI.PressureDifference dpnom "Nominal pressure drop";
 
@@ -259,6 +265,7 @@ package Friction "Friction models"
       input Medium.MassFlowRate w "Mass flowrate (single tube)";
 
       output Real Kf "Hydraulic friction coefficient";
+      output Real Kfl "Linear friction factor";
       output SI.PerUnit Cf "Fanning friction factor";
       output Boolean NoFriction "=true, if no friction is used";
 
