@@ -5803,11 +5803,10 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         omega=omegahex,
         Dhyd=Dihex,
         wnom=whex,
-        Cfnom=Cfhex,
         Tstartin=Tinhex,
         Tstartout=Touthex,
         pstart=phex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         dpnom=1000) annotation (Placement(transformation(extent={{-20,-10},{0,
                 10}}, rotation=0)));
@@ -9538,7 +9537,7 @@ Casella</a>:<br>
       IdealGas.Flow1DFV gasFlow(
         Nt=1,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV.NoFriction,
         N=Nnodes,
         redeclare package Medium = ThermoPower.Media.Air,
         L=L,
@@ -9558,8 +9557,7 @@ Casella</a>:<br>
             origin={-8,28})));
       FluidPh.Flow1DFV2ph fluidFlow(
         N=Nnodes,
-        Cfnom=0.005,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFV2ph.NominalCf(Cfnom=0.005),
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         redeclare package Medium = Modelica.Media.R134a.R134a_ph,
         L=L,

@@ -978,17 +978,30 @@ package IdealGas "Models of components with ideal gases as working fluid"
       final w=w*ones(N),
       final fluidState=gas.state) "Instantiated heat transfer model";
 
+    replaceable model Friction = ThermoPower.Friction.Friction1DFV.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFV
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnf = wnf,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = gas.state,
+      w = w) "Instantiated friction model";
+
     parameter SI.PerUnit wnm = 1e-2 "Maximum fraction of the nominal flow rate allowed as reverse flow";
     parameter Boolean fixedMassFlowSimplified = false "Fix flow rate = wnom for simplified homotopy model"
         annotation (Dialog(tab="Initialisation"));
 
     Medium.BaseProperties gas[N] "Gas nodal properties";
     SI.Pressure Dpfric "Pressure drop due to friction";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
-    Real Kf "Friction factor";
-    Real Kfl "Linear friction factor";
     Real dwdt "Time derivative of mass flow rate";
-    SI.PerUnit Cf "Fanning friction factor";
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flowrate (single tube)";
     SI.Temperature Ttilde[N - 1](start = Tstart[2:N],each stateSelect=StateSelect.prefer)
       "Temperature state variables";
@@ -1032,42 +1045,16 @@ package IdealGas "Models of components with ideal gases as working fluid"
     assert(FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction or dpnom > 0,
       "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
-    // Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    if FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom then
-      Kf = Kfnom*Kfc;
-      Cf = 2*Kf*A^3/(omega_hyd*L);
-    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint then
-      Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-      Cf = 2*Kf*A^3/(omega_hyd*L);
-    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom then
-      Kf = Cfnom*omega_hyd*L/(2*A^3)*Kfc;
-      Cf = Cfnom*Kfc;
-    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook then
-      Cf = f_colebrook(
-          w,
-          Dhyd/A,
-          e,
-          Medium.dynamicViscosity(gas[integer(N/2)].state))*Kfc;
-      Kf = Cf*omega_hyd*L/(2*A^3);
-    elseif FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction then
-      Cf = 0;
-      Kf = 0;
-    else
-      assert(false, "Unsupported FFtype");
-      Cf = 0;
-      Kf = 0;
-    end if;
-    assert(Kf >= 0, "Negative friction coefficient");
-    Kfl = wnom/Nt*wnf*Kf "Linear friction factor";
+
+    assert(friction.Kf >= 0, "Negative friction coefficient");
 
     // Dynamic momentum term
     dwdt = if DynamicMomentum and not QuasiStatic then der(w) else 0;
 
     sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpfric = 0 "Momentum balance";
-    Dpfric = (if FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction then 0
-              else homotopy((smooth(1, Kf*squareReg(w, wnom/Nt*wnf))*sum(vbar)/(N - 1)),
+    Dpfric = (if friction.NoFriction then 0
+              else homotopy((smooth(1, friction.Kf*squareReg(w, wnom/Nt*wnf))*sum(vbar)/(N - 1)),
                              dpnom/(wnom/Nt)*w))
       "Pressure drop due to friction";
     for j in 1:N - 1 loop
@@ -3090,7 +3077,7 @@ This is the model-base of a Combustion Chamber, with a constant volume.
 <p>This model has three different Medium models to characterize the inlet air, fuel, and flue gas exhaust.
 <p>If <tt>gamma = 0</tt>, the thermal effects of the surrounding walls are neglected.</p>
 <p>There are two ways to obtain correct energy balances. The first is to explicitly set the lower heating value of the fuel <tt>HH</tt>, and use medium models that do not include the enthalpy of formation, by setting <tt>excludeEnthalpyOfFormation = true</tt>, which is the default option in Modelica.Media. As the heating value is usually provided at 25 degC temperature, it is also necessary to set <tt>referenceChoice =ReferenceEnthalpy.ZeroAt25C</tt> in all medium models for consistency. This is done in the medium models contained within <a href=\"modelica://ThermoPower.Media\">ThermoPower.Media</a>.</p>
-<p>Alternatively, one can set <tt>excludeEnthalpyOfFormation = false</tt> in all media and set <tt>HH = 0</tt>. By doing so, the heating value is automatically accounted for by the difference in the enthalpy of formation. 
+<p>Alternatively, one can set <tt>excludeEnthalpyOfFormation = false</tt> in all media and set <tt>HH = 0</tt>. By doing so, the heating value is automatically accounted for by the difference in the enthalpy of formation.
 </html>",   revisions="<html>
 <ul>
 <li><i>30 May 2005</i>
