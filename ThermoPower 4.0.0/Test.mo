@@ -5982,12 +5982,11 @@ This model tests a simple power plant based on a <tt>GTunit</tt>.
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         DynamicMomentum=false,
         hstartin=hinhex,
         hstartout=houthex,
         redeclare package Medium = Medium,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         dpnom=10000)                                          annotation (
           Placement(transformation(extent={{-20,-10},{0,10}}, rotation=0)));
@@ -6111,11 +6110,10 @@ Algorithm Tolerance = 1e-6
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hs,
         hstartout=hs,
         alpha=1,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=10000,
@@ -6251,12 +6249,11 @@ Algorithm Tolerance = 1e-6
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hs,
         hstartout=hs,
         DynamicMomentum=false,
         alpha=1,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=10000)
@@ -6385,11 +6382,10 @@ Algorithm Tolerance = 1e-6
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         alpha=1,
         hstartin=hs,
         hstartout=hs,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=10000)
@@ -6506,10 +6502,9 @@ Algorithm Tolerance = 1e-6
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=10000,
@@ -6545,10 +6540,9 @@ Algorithm Tolerance = 1e-6
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=10000,
@@ -6715,10 +6709,9 @@ Casella</a>:<br>
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=10000,
@@ -6757,10 +6750,9 @@ Casella</a>:<br>
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         hstartin=hinhex,
         hstartout=houthex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.steadyState,
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
         dpnom=10000,
@@ -6956,11 +6948,10 @@ Casella</a>:<br>
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         DynamicMomentum=false,
         hstartin=hinhex,
         hstartout=houthex,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         initOpt=ThermoPower.Choices.Init.Options.noInit,
         ML=0,
         dpnom=100000,
@@ -7079,9 +7070,8 @@ Casella</a>:<br>
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         DynamicMomentum=false,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Middle,
         hstartin=hhex,
         hstartout=hhex,
@@ -7193,9 +7183,8 @@ Casella</a>:<br>
         Dhyd=Dihex,
         A=Ahex,
         wnom=whex,
-        Cfnom=Cfhex,
         DynamicMomentum=false,
-        FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+        redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom=Cfhex),
         HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Middle,
         hstartin=hhex,
         hstartout=hhex,
@@ -8889,7 +8878,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
         Placement(transformation(extent = {{64, -10}, {84, 10}}, rotation = 0)));
       FluidPh.ValveLin Valve(Kv = 3e-6, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{12, -10}, {32, 10}}, rotation = 0)));
-      FluidPh.Flow1DFEMnm hex(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, DynamicMomentum = false, hstartin = hinhex, hstartout = houthex, redeclare package Medium = Medium, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, dpnom = 10000) annotation(
+      FluidPh.Flow1DFEMnm hex(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, DynamicMomentum = false, hstartin = hinhex, hstartout = houthex, redeclare package Medium = Medium, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.steadyState, dpnom = 10000) annotation(
         Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
       FluidPh.SensT T_in(redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-48, -6}, {-28, 14}}, rotation = 0)));
@@ -8995,7 +8984,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       parameter Modelica.Units.SI.Pressure phex = 3e5;
       // initial inlet specific enthalpy
       parameter Modelica.Units.SI.SpecificEnthalpy hs = 1e5;
-      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hs, hstartout = hs, alpha = 1, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400)) annotation(
+      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, hstartin = hs, hstartout = hs, alpha = 1, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400)) annotation(
         Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
       Thermal.TempSource1DFEM TempSource(N = Nnodes) annotation(
         Placement(transformation(extent = {{-20, 10}, {0, 30}}, rotation = 0)));
@@ -9101,7 +9090,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       parameter Modelica.Units.SI.Pressure phex = 1e5;
       // initial specific enthalpy
       parameter Modelica.Units.SI.SpecificEnthalpy hs = 1e5;
-      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hs, hstartout = hs, DynamicMomentum = false, alpha = 1, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000) annotation(
+      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, hstartin = hs, hstartout = hs, DynamicMomentum = false, alpha = 1, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000) annotation(
         Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
       FluidPh.ValveLin ValveLin1(redeclare package Medium = Medium, Kv = 2*whex/phex) annotation(
         Placement(transformation(extent = {{40, -10}, {60, 10}}, rotation = 0)));
@@ -9202,7 +9191,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       parameter Modelica.Units.SI.Pressure phex = 0.2e5;
       // initial specific enthalpy
       parameter Modelica.Units.SI.SpecificEnthalpy hs = 3e6;
-      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, alpha = 1, hstartin = hs, hstartout = hs, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000) annotation(
+      FluidPh.Flow1DFEMnm hex(redeclare package Medium = Medium, N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, alpha = 1, hstartin = hs, hstartout = hs, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000) annotation(
         Placement(transformation(extent = {{-20, -10}, {0, 10}}, rotation = 0)));
       FluidPh.SourceMassFlow MassFlowRateSource(w0 = whex, h = hs, use_in_w0 = true, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-60, -10}, {-40, 10}}, rotation = 0)));
@@ -9302,7 +9291,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       parameter Modelica.Units.SI.SpecificEnthalpy hinhex = 1e5;
       // initial outlet specific enthalpy
       parameter Modelica.Units.SI.SpecificEnthalpy houthex = 1e5;
-      FluidPh.Flow1DFEMnm hexA(N = Nnodes, Nt = 1, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare package Medium = Medium) annotation(
+      FluidPh.Flow1DFEMnm hexA(N = Nnodes, Nt = 1, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, hstartin = hinhex, hstartout = houthex, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-20, -50}, {0, -30}}, rotation = 0)));
       FluidPh.SinkPressure SideA_FluidSink(redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{70, -50}, {90, -30}}, rotation = 0)));
@@ -9314,7 +9303,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
         Placement(transformation(extent = {{20, -50}, {40, -30}}, rotation = 0)));
       FluidPh.ValveLin ValveLin2(Kv = whex/(2e5), redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-30, 40}, {-50, 60}}, rotation = 0)));
-      FluidPh.Flow1DFEMnm hexB(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
+      FluidPh.Flow1DFEMnm hexB(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, hstartin = hinhex, hstartout = houthex, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{0, 60}, {-20, 40}}, rotation = 0)));
       FluidPh.SensT SensT_A_in(redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-50, -46}, {-30, -26}}, rotation = 0)));
@@ -9445,7 +9434,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       parameter Modelica.Units.SI.SpecificEnthalpy hinhex = 1e5;
       // initial outlet specific enthalpy
       parameter Modelica.Units.SI.SpecificEnthalpy houthex = 1e5;
-      FluidPh.Flow1DFEMnm hexA(N = Nnodes, Nt = 1, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
+      FluidPh.Flow1DFEMnm hexA(N = Nnodes, Nt = 1, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, hstartin = hinhex, hstartout = houthex, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-20, -60}, {0, -40}}, rotation = 0)));
       FluidPh.SinkPressure SideA_FluidSink(redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{70, -60}, {90, -40}}, rotation = 0)));
@@ -9457,7 +9446,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
         Placement(transformation(extent = {{20, -60}, {40, -40}}, rotation = 0)));
       FluidPh.ValveLin ValveLin2(Kv = whex/(2e5), redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-30, 40}, {-50, 60}}, rotation = 0)));
-      FluidPh.Flow1DFEMnm hexB(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
+      FluidPh.Flow1DFEMnm hexB(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, hstartin = hinhex, hstartout = houthex, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.steadyState, HydraulicCapacitance = Choices.Flow1D.HCtypes.Downstream, dpnom = 10000, redeclare model HeatTransfer = Thermal.HeatTransferFEM.ConstantHeatTransferCoefficient(gamma = 400), redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{0, 60}, {-20, 40}}, rotation = 0)));
       Thermal.MetalTubeFEM MetalWall(N = Nnodes, L = Lhex, lambda = 20, rint = rhex, rext = rhex + 1e-3, rhomcm = 4.9e6, Tstart1 = 297, TstartN = 297, initOpt = Choices.Init.Options.steadyState) annotation(
         Placement(transformation(extent = {{-20, 0}, {0, -20}}, rotation = 0)));
@@ -9596,7 +9585,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
         Placement(transformation(extent = {{-76, -10}, {-56, 10}}, rotation = 0)));
       FluidPh.SinkPressure Fluid_Sink(p0 = phex/2, h = hinhex, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{64, -10}, {84, 10}}, rotation = 0)));
-      FluidPh.Flow1DFEMnm hex(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, DynamicMomentum = false, hstartin = hinhex, hstartout = houthex, FFtype = Choices.Flow1D.FFtypes.Cfnom, initOpt = Choices.Init.Options.noInit, dpnom = 100000, alpha = 1, redeclare package Medium = Medium) annotation(
+      FluidPh.Flow1DFEMnm hex(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, DynamicMomentum = false, hstartin = hinhex, hstartout = houthex, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), initOpt = Choices.Init.Options.noInit, dpnom = 100000, alpha = 1, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-8, -10}, {12, 10}}, rotation = 0)));
       FluidPh.SensT T_in(redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-48, -6}, {-28, 14}}, rotation = 0)));
@@ -9698,7 +9687,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       final parameter Modelica.Units.SI.MassFlowRate wout = 0.5*dM_dT;
       FluidPh.SinkPressure sink1(p0 = phex, h = hhex, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{66, -10}, {86, 10}}, rotation = 0)));
-      FluidPh.Flow1DFEMnm pipe1(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, DynamicMomentum = false, FFtype = Choices.Flow1D.FFtypes.Cfnom, HydraulicCapacitance = Choices.Flow1D.HCtypes.Middle, hstartin = hhex, hstartout = hhex, initOpt = Choices.Init.Options.noInit, alpha = 0, pstart = phex, wnf = 1, dpnom = 10000, redeclare package Medium = Medium) annotation(
+      FluidPh.Flow1DFEMnm pipe1(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, DynamicMomentum = false, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), HydraulicCapacitance = Choices.Flow1D.HCtypes.Middle, hstartin = hhex, hstartout = hhex, initOpt = Choices.Init.Options.noInit, alpha = 0, pstart = phex, wnf = 1, dpnom = 10000, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-12, -10}, {8, 10}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));
@@ -9783,7 +9772,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       //height of power step
       FluidPh.SinkPressure sink1(p0 = phex, h = hhex, use_in_p0 = true, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{66, -10}, {86, 10}}, rotation = 0)));
-      FluidPh.Flow1DFEMnm pipe1(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, Cfnom = Cfhex, DynamicMomentum = false, FFtype = Choices.Flow1D.FFtypes.Cfnom, HydraulicCapacitance = Choices.Flow1D.HCtypes.Middle, hstartin = hhex, hstartout = hhex, initOpt = Choices.Init.Options.noInit, alpha = 0, pstart = phex, dpnom = 10000, wnf = 1, redeclare package Medium = Medium) annotation(
+      FluidPh.Flow1DFEMnm pipe1(N = Nnodes, L = Lhex, omega = omegahex, Dhyd = Dihex, A = Ahex, wnom = whex, DynamicMomentum = false, redeclare model Friction = ThermoPower.Friction.Friction1DFEM.NominalCf(Cfnom = Cfhex), HydraulicCapacitance = Choices.Flow1D.HCtypes.Middle, hstartin = hhex, hstartout = hhex, initOpt = Choices.Init.Options.noInit, alpha = 0, pstart = phex, dpnom = 10000, wnf = 1, redeclare package Medium = Medium) annotation(
         Placement(transformation(extent = {{-12, -10}, {8, 10}}, rotation = 0)));
       inner System system annotation(
         Placement(transformation(extent = {{80, 80}, {100, 100}})));

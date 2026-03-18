@@ -1895,10 +1895,26 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       final wnom=wnom/Nt,
       final w=w,
       final fluidState=fluidState) "Instantiated heat transfer model";
+
+    replaceable model Friction = ThermoPower.Friction.Friction1DFEM.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFEM
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      w = w) "Instantiated friction model";
+
     ThermoPower.Thermal.DHTNodes wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
@@ -1919,9 +1935,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     constant SI.Acceleration g=Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
       "The number of nodes is even";
-    SI.Length omega_hyd "Hydraulic perimeter (single tube)";
-    Real Kf[N] "Friction coefficients";
-    Real Cf[N] "Fanning friction factors";
+
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p(start=pstart) "Fluid pressure";
     SI.Pressure Dpfric "Pressure drop due to friction (total)";
@@ -1960,6 +1974,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   equation
     //All equations are referred to a single tube
 
+    for j in 1:N-1 loop
+      assert(friction.Kf[j] >= 0, "Negative friction coefficient");
+    end for;
+
     // Selection of representative pressure variable
     if HydraulicCapacitance == HCtypes.Middle then
       p = infl.p - Dpfric1 - Dpstat/2;
@@ -1970,29 +1988,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     else
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
-
-    //Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    for i in 1:N loop
-      if FFtype == FFtypes.Kfnom then
-        Kf[i] = Kfnom*Kfc;
-      elseif FFtype == FFtypes.OpPoint then
-        Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-      elseif FFtype == FFtypes.Cfnom then
-        Cf[i] = Cfnom*Kfc;
-      elseif FFtype == FFtypes.Colebrook then
-        Cf[i] = f_colebrook(
-            w[i],
-            Dhyd/A,
-            e,
-            Medium.dynamicViscosity(fluidState[i]))*Kfc;
-      elseif FFtype == FFtypes.NoFriction then
-        Cf[i] = 0;
-      end if;
-      assert(Kf[i] >= 0, "Negative friction coefficient");
-      Kf[i] = Cf[i]*omega_hyd*L/(2*A^3)
-        "Relationship between friction coefficient and Fanning friction factor";
-    end for;
 
     //Dynamic Momentum [not] accounted for
     if DynamicMomentum then
@@ -2016,14 +2011,14 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
 
-    if FFtype == FFtypes.NoFriction then
+    if friction.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     else
-      Dpfric1 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i]
+      Dpfric1 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i]
         for i in 1:N), dpnom/2/(wnom/Nt)*w[1])
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i]
+      Dpfric2 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i]
         for i in 1:N), dpnom/2/(wnom/Nt)*w[N])
         "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
@@ -2352,13 +2347,42 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model Flow1DFEMnm
     "1-dimensional fluid flow model for p-h fluid (finite elements)"
     extends BaseClasses.Flow1DBase(Nw = N);
-    replaceable model HeatTransfer = Thermal.HeatTransferFEM.IdealHeatTransfer constrainedby Thermal.BaseClasses.DistributedHeatTransferFEM annotation(
+    replaceable model HeatTransfer = Thermal.HeatTransferFEM.IdealHeatTransfer
+      constrainedby Thermal.BaseClasses.DistributedHeatTransferFEM
+      annotation(
        choicesAllMatching = true);
-    HeatTransfer heatTransfer(redeclare package Medium = Medium, final Nf = N, final Nw = Nw, final Nt = Nt, final L = L, final A = A, final Dhyd = Dhyd, final omega = omega, final wnom = wnom/Nt, final w = w, final fluidState = fluidState) "Instantiated heat transfer model";
+    HeatTransfer heatTransfer(
+      redeclare package Medium = Medium,
+      final Nf = N,
+      final Nw = Nw,
+      final Nt = Nt,
+      final L = L,
+      final A = A,
+      final Dhyd = Dhyd,
+      final omega = omega,
+      final wnom = wnom/Nt,
+      final w = w,
+      final fluidState = fluidState) "Instantiated heat transfer model";
+
+    replaceable model Friction = ThermoPower.Friction.Friction1DFEM.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFEM
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      w = w) "Instantiated friction model";
+
     Thermal.DHTNodes wall(N = N) annotation(
       Dialog(enable = false),
       Placement(transformation(extent = {{-40, 40}, {40, 60}}, rotation = 0)));
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     Medium.ThermodynamicState fluidState[N] "Thermodynamic state of the fluid at the nodes";
     parameter Modelica.Units.SI.PerUnit alpha(min = 0, max = 1) = 1 "Numerical stabilization coefficient";
@@ -2368,9 +2392,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean idealGasDensityDistribution = false "Assume ideal-gas-type density distributions for mass balances";
     constant Modelica.Units.SI.Acceleration g = Modelica.Constants.g_n;
     final parameter Boolean evenN = (div(N, 2)*2 == N) "The number of nodes is even";
-    Modelica.Units.SI.Length omega_hyd "Hydraulic perimeter (single tube)";
-    Real Kf[N] "Friction coefficients";
-    Real Cf[N] "Fanning friction factors";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p(start = pstart) "Fluid pressure";
     Modelica.Units.SI.Pressure Dpfric "Pressure drop due to friction (total)";
@@ -2397,6 +2418,11 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
   equation
   //All equations are referred to a single tube
+
+    for j in 1:N-1 loop
+      assert(friction.Kf[j] >= 0, "Negative friction coefficient");
+    end for;
+
   // Selection of representative pressure variable
     if HydraulicCapacitance == HCtypes.Middle then
       p = infl.p - Dpfric1 - Dpstat/2;
@@ -2407,23 +2433,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     else
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
-  //Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    for i in 1:N loop
-      if FFtype == FFtypes.Kfnom then
-        Kf[i] = Kfnom*Kfc;
-      elseif FFtype == FFtypes.OpPoint then
-        Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-      elseif FFtype == FFtypes.Cfnom then
-        Cf[i] = Cfnom*Kfc;
-      elseif FFtype == FFtypes.Colebrook then
-        Cf[i] = f_colebrook(w[i], Dhyd/A, e, Medium.dynamicViscosity(fluidState[i]))*Kfc;
-      elseif FFtype == FFtypes.NoFriction then
-        Cf[i] = 0;
-      end if;
-      assert(Kf[i] >= 0, "Negative friction coefficient");
-      Kf[i] = Cf[i]*omega_hyd*L/(2*A^3) "Relationship between friction coefficient and Fanning friction factor";
-    end for;
+
   //Dynamic Momentum [not] accounted for
     if DynamicMomentum then
       if HydraulicCapacitance == HCtypes.Upstream then
@@ -2437,15 +2447,17 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       dwdt = 0;
     end if;
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance equation";
+
     w[1] = infl.m_flow/Nt "Inlet flow rate - single tube";
     w[N] = -outfl.m_flow/Nt "Outlet flow rate - single tube";
+
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
-    if FFtype == FFtypes.NoFriction then
+    if friction.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     else
-      Dpfric1 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[1]) "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[N]) "Pressure drop from capacitance to outlet";
+      Dpfric1 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[1]) "Pressure drop from inlet to capacitance";
+      Dpfric2 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[N]) "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D "Pressure drop due to static head";
 
@@ -5747,7 +5759,6 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
       "Basic interface for 1-dimensional p-h fluid fluid flow models"
-      import ThermoPower.Choices.Flow1D.FFtypes;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
