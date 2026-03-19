@@ -44,13 +44,11 @@ package Examples "Application examples"
           wnom=0.23,
           wnf=0.3,
           H=-15.923,
-          Cfnom=0.01,
           Kfc=1,
-          e=6.1e-4,
           hstartin=1.15e6,
           hstartout=1.15e6,
           DynamicMomentum=false,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV2ph.Colebrook_ph(e=6.1e-4),
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=1800),
           dpnom=100,
@@ -68,14 +66,12 @@ package Examples "Application examples"
           omega=0.06584,
           wnf=0.3,
           Kfc=1,
-          Cfnom=0.013,
           hstartout=1.5e6,
           A=3.45e-4,
           N=7,
-          e=1.2e-3,
           wnom=0.23,
           hstartin=1.15e6,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV2ph.Colebrook_ph(e=1.2e-3),
           HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=10000),
@@ -96,11 +92,9 @@ package Examples "Application examples"
           A=5.557e-4,
           wnom=0.23,
           wnf=0.1,
-          Cfnom=0.01,
-          e=9.9e-4,
           hstartin=1.6e6,
           hstartout=1.6e6,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV2ph.NominalCf(Cfnom=0.01),
           HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=10000),
@@ -128,9 +122,8 @@ package Examples "Application examples"
           H=0,
           hstartin=2.777e6,
           hstartout=2.777e6,
-          Cfnom=0.004,
           HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=0.004),
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000),
           dpnom=2000,
@@ -143,14 +136,12 @@ package Examples "Application examples"
           Dhyd=0.011,
           omega=0.0346,
           A=9.503e-5,
-          Cfnom=0.0059,
           DynamicMomentum=false,
           wnom=0.06,
           hstartin=2.8e6,
           hstartout=2.8e6,
           N=5,
-          e=1.7e-3,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV2ph.Colebrook_ph(e=1.7e-3),
           HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.HeatTransfer2phDB(gamma_b=20000),
@@ -174,8 +165,7 @@ package Examples "Application examples"
           H=0,
           hstartin=2.8e6,
           hstartout=2.8e6,
-          Cfnom=0.004,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV2ph.NominalCf(Cfnom=0.004),
           HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=3000),
@@ -526,9 +516,8 @@ Casella</a>:<br>
           H=0,
           hstartin=2.777e6,
           hstartout=2.777e6,
-          Cfnom=0.004,
           wnf=1,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=0.004),
           N=2,
           initOpt=ThermoPower.Choices.Init.Options.steadyState,
           HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
@@ -545,15 +534,13 @@ Casella</a>:<br>
           Dhyd=0.011,
           omega=0.0346,
           A=9.503e-5,
-          Cfnom=0.0059,
           DynamicMomentum=false,
           wnom=0.06,
           hstartin=2.8e6,
           hstartout=2.8e6,
           N=5,
-          e=1.7e-3,
           wnf=0.1,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Colebrook,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV2ph.Colebrook_ph(e=1.7e-3),
           initOpt=ThermoPower.Choices.Init.Options.steadyState,
           HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Downstream,
           redeclare model HeatTransfer =
@@ -575,9 +562,8 @@ Casella</a>:<br>
           H=0,
           hstartin=2.8e6,
           hstartout=2.8e6,
-          Cfnom=0.004,
           wnf=1,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=0.004),
           initOpt=ThermoPower.Choices.Init.Options.steadyState,
           HydraulicCapacitance=ThermoPower.Choices.Flow1D.HCtypes.Upstream,
           dpnom=10000,
@@ -1520,12 +1506,11 @@ Casella</a>:<br>
           omega=pi*Dint,
           Dhyd=Dint,
           wnom=20,
-          Cfnom=0.005,
           L=Lt*Nr,
           N=Nr + 1,
           hstartin=1e5,
           hstartout=2.7e5,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.Cfnom,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalCf(Cfnom=0.005),
           redeclare model HeatTransfer =
               ThermoPower.Thermal.HeatTransferFV.DittusBoelter,
           dpnom=1000) annotation (Placement(
@@ -1549,7 +1534,7 @@ Casella</a>:<br>
           A=Sb,
           Dhyd=St/Lb,
           N=Nr + 1,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV.NoFriction,
           QuasiStatic=StaticGasBalances,
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.FlowDependentHeatTransferCoefficient(gamma_nom=gamma_nom, alpha=0.6),
@@ -1707,7 +1692,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
                    gasFlow(
           Dhyd=1,
           wnom=gasNomFlowRate,
-          FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction,
+          redeclare model Friction = ThermoPower.Friction.Friction1DFV.NoFriction,
           redeclare package Medium = FlueGasMedium,
           QuasiStatic=gasQuasiStatic,
           N=N,
@@ -2470,22 +2455,10 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           "Constant heat transfer coefficient in the gas side";
         parameter SI.CoefficientOfHeatTransfer gamma_F
           "Constant heat transfer coefficient in the fluid side";
-        parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
-          "Friction Factor Type, gas side";
-        parameter Real Kfnom_G=0
-          "Nominal hydraulic resistance coefficient, gas side";
         parameter SI.PressureDifference dpnom_G=0
           "Nominal pressure drop, gas side (friction term only!)";
-        parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
-        parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
-        parameter Choices.Flow1D.FFtypes FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
-          "Friction Factor Type, fluid side";
-        parameter Real Kfnom_F=0
-          "Nominal hydraulic resistance coefficient, fluid side";
         parameter SI.PressureDifference dpnom_F=0
           "Nominal pressure drop, fluid side (friction term only!)";
-        parameter SI.Density rhonom_F=0 "Nominal inlet density, fluid side";
-        parameter Real Cfnom_F=0 "Nominal Fanning friction factor, fluid side";
         parameter Choices.Flow1D.HCtypes HCtype_F=ThermoPower.Choices.Flow1D.HCtypes.Downstream
           "Location of the hydraulic capacitance, fluid side";
         parameter Boolean counterCurrent=true "Counter-current flow";
@@ -2510,12 +2483,9 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           A=(fluidVol*4/exchSurface_F)^2/4*pi,
           omega=fluidVol*4/exchSurface_F*pi,
           Dhyd=fluidVol*4/exchSurface_F,
-          FFtype=FFtype_F,
+          redeclare replaceable model Friction = ThermoPower.Friction.Friction1DFV.NoFriction,
           dpnom=dpnom_F,
-          rhonom=rhonom_F,
           HydraulicCapacitance=HCtype_F,
-          Kfnom=Kfnom_F,
-          Cfnom=Cfnom_F,
           FluidPhaseStart=FluidPhaseStart,
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=gamma_F))   annotation (Placement(transformation(
@@ -2543,10 +2513,7 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           omega=exchSurface_G/L,
           Tstartbar=Tstart_G,
           dpnom=dpnom_G,
-          rhonom=rhonom_G,
-          Kfnom=Kfnom_G,
-          Cfnom=Cfnom_G,
-          FFtype=FFtype_G,
+          redeclare replaceable model Friction = ThermoPower.Friction.Friction1DFV.NoFriction,
           redeclare model HeatTransfer =
             ThermoPower.Thermal.HeatTransferFV.ConstantHeatTransferCoefficient(gamma=gamma_G))
                            annotation (Placement(transformation(extent={{-20,60},
@@ -2888,10 +2855,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           fluidNomFlowRate=55,
           gamma_G=30,
           gamma_F=3000,
-          rhonom_G=1,
-          Kfnom_F=150,
-          FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-          FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+          gasFlow(redeclare model Friction = ThermoPower.Friction.Friction1DFV.OperatingPoint(rhonom=1)),
+          fluidFlow(redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalKf(Kfnom=150)),
           N_G=6,
           gasNomPressure=101325,
           fluidNomPressure=3000000,
@@ -2916,9 +2881,8 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           gasNomPressure=101325,
           fluidNomPressure=3000000,
           Tstart=623.15,
-          FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-          dpnom_G=1000,
-          rhonom_G=1) annotation (Placement(transformation(extent={{-120,0},{-80,
+          gasFlow(redeclare model Friction = ThermoPower.Friction.Friction1DFV.OperatingPoint(rhonom=1)),
+          dpnom_G=1000) annotation (Placement(transformation(extent={{-120,0},{-80,
                   -40}}, rotation=0)));
         ThermoPower.Examples.RankineCycle.Models.HE superheater(
           redeclare package FluidMedium = Water,
@@ -2936,11 +2900,9 @@ This package contains models of a simple Heat Recovery Boiler. Different simulat
           gamma_G=90,
           gamma_F=6000,
           fluidNomFlowRate=55,
-          rhonom_G=1,
-          Kfnom_F=150,
           FluidPhaseStart=ThermoPower.Choices.FluidPhase.FluidPhases.Steam,
-          FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.OpPoint,
-          FFtype_F=ThermoPower.Choices.Flow1D.FFtypes.Kfnom,
+          gasFlow(redeclare model Friction = ThermoPower.Friction.Friction1DFV.OperatingPoint(rhonom=1)),
+          fluidFlow(redeclare model Friction = ThermoPower.Friction.Friction1DFV.NominalKf(Kfnom=150)),
           N_G=7,
           gasNomPressure=101325,
           fluidNomPressure=3000000,
