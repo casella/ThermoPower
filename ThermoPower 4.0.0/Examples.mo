@@ -1654,14 +1654,8 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
           annotation (Dialog(tab="Initialization"));
         parameter SI.CoefficientOfHeatTransfer gamma
           "Constant heat transfer coefficient in the gas side";
-        parameter Choices.Flow1D.FFtypes FFtype_G=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
-          "Friction Factor Type, gas side";
-        parameter Real Kfnom_G=0
-          "Nominal hydraulic resistance coefficient, gas side";
         parameter SI.PressureDifference dpnom_G=0
           "Nominal pressure drop, gas side (friction term only!)";
-        parameter SI.Density rhonom_G=0 "Nominal inlet density, gas side";
-        parameter Real Cfnom_G=0 "Nominal Fanning friction factor, gsa side";
         parameter Boolean gasQuasiStatic=false
           "Quasi-static model of the flue gas (mass, energy and momentum static balances";
         constant Real pi=Modelica.Constants.pi;
