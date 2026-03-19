@@ -2682,6 +2682,26 @@ The basic modelling assumptions are:
       final w=w,
       final fluidState=fluidState) "Instantiated heat transfer model";
 
+    replaceable model Friction = ThermoPower.Friction.Friction1DFEM2ph.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFEM2ph
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      sat = sat,
+      w = w,
+      hl = hl,
+      hv = hv,
+      x = x) "Instantiated friction model";
+
     ThermoPower.Thermal.DHTNodes wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
@@ -2707,7 +2727,6 @@ The basic modelling assumptions are:
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
     Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
-    SI.Length omega_hyd "Hydraulic perimeter (single tube)";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p "Fluid pressure";
     SI.Pressure Dpfric "Pressure drop due to friction";
@@ -2732,9 +2751,6 @@ The basic modelling assumptions are:
     Real x[N] "Steam quality";
     Units.LiquidDensity rhol "Saturated liquid density";
     Units.GasDensity rhov "Saturated vapour density";
-
-    Real Kf[N] "Friction coefficient";
-    Real Cf[N] "Fanning friction factor";
     Real Phi[N] "Two-phase friction multiplier";
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
@@ -2796,6 +2812,10 @@ The basic modelling assumptions are:
   equation
     //All equations are referred to a single tube
 
+    for j in 1:N-1 loop
+      assert(friction.Kf[j] >= 0, "Negative friction coefficient");
+    end for;
+
     // Selection of representative pressure variable
     if HydraulicCapacitance == HCtypes.Middle then
       p = infl.p - Dpfric1 - Dpstat/2;
@@ -2806,20 +2826,6 @@ The basic modelling assumptions are:
     else
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
-
-    //Friction factor calculation
-    omega_hyd = 4*A/Dhyd;
-    for i in 1:N loop
-      if FFtype == FFtypes.NoFriction then
-        Cf[i] = 0;
-      elseif FFtype == FFtypes.Cfnom then
-        Cf[i] = Cfnom*Kfc;
-      else
-        assert(true, "Unsupported friction factor selection");
-      end if;
-      Kf[i] = Cf[i]*omega_hyd*L/(2*A^3)
-        "Relationship between friction coefficient and Fanning friction factor";
-    end for;
 
     //Dynamic Momentum [not] accounted for
     if DynamicMomentum then
@@ -2841,20 +2847,20 @@ The basic modelling assumptions are:
 
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
 
-    if FFtype == FFtypes.NoFriction then
+    if friction.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     else
-      Dpfric1 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i]*
+      Dpfric1 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i]*
         Phi[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[1])
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i]*
+      Dpfric2 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i]*
         Phi[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[N])
         "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
 
     for i in 1:N loop
-      if FFtype == FFtypes.NoFriction or noEvent(h[i] <= hl or h[i] >= hv) then
+      if friction.NoFriction or noEvent(h[i] <= hl or h[i] >= hv) then
         Phi[i] = 1;
       else
         // Chisholm-Laird formulation of Martinelli-Lockhart correlation for turbulent-turbulent flow

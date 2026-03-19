@@ -339,6 +339,46 @@ package Friction "Friction models"
     end Colebrook_ph;
   end Friction1DFEM;
 
+  package Friction1DFEM2ph
+  extends Modelica.Icons.Package;
+
+    model NoFriction
+  extends ThermoPower.Friction.Interfaces.FrictionBase1DFEM2ph;
+
+    equation
+      NoFriction = true;
+      Kf=zeros(N);
+      Cf=zeros(N);
+
+    annotation(
+        Documentation(info = "<html><head></head><body>No friction is applied;</body></html>", revisions = "<html><head></head><body><ul>
+    <li><i>18 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       First release.</li>
+    </ul>
+    </body></html>"));
+
+    end NoFriction;
+
+    model NominalCf "Nominal Cf Fanning friction factor"
+    extends ThermoPower.Friction.Interfaces.FrictionBase1DFEM2ph;
+      parameter SI.PerUnit Cfnom = 0 "Nominal Fanning friction factor";
+
+    equation
+      NoFriction = false;
+      Kf = Cf*omega_hyd*L/(2*A^3);
+      Cf = fill(Cfnom*Kfc, (N));
+
+      annotation(
+        Documentation(info = "<html><head></head><body>Nominal Cf Fanning friction factor is applied;</body></html>", revisions = "<html><head></head><body><ul>
+        <li><i>18 Mar 2026</i>
+        by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+           First release.</li>
+        </ul>
+        </body></html>"));
+    end NominalCf;
+  end Friction1DFEM2ph;
+
   package Interfaces
   extends Modelica.Icons.InterfacesPackage;
 
@@ -448,5 +488,41 @@ package Friction "Friction models"
     </body></html>"));
 
     end FrictionBase1DFEM;
+
+    partial model FrictionBase1DFEM2ph "Friction base model for 1DFEM2ph components"
+      replaceable package Medium = Modelica.Media.Interfaces.PartialTwoPhaseMedium "Medium model"
+        constrainedby Modelica.Media.Interfaces.PartialTwoPhaseMedium
+        annotation(choicesAllMatching = true);
+
+      parameter SI.Length Dhyd "Hydraulic Diameter (single element in parallel)";
+      parameter SI.PerUnit Kfc "Friction factor correction coefficient";
+      parameter Integer Nt = 1 "Number of tubes in parallel";
+      parameter Integer N(min = 2) = 2 "Number of nodes for thermal variables";
+      parameter SI.Length L "Tube length";
+      parameter SI.Area A "Cross-sectional area (single element in parallel)";
+      parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
+      parameter SI.PressureDifference dpnom "Nominal pressure drop";
+
+      final parameter SI.Length omega_hyd = 4*A/Dhyd "Wet perimeter (single tube)";
+
+      input Medium.ThermodynamicState[N] fluidState "Thermodynamic state of the fluid at the nodes";
+      input Medium.SaturationProperties sat "Properties of saturated fluid";
+      input Medium.MassFlowRate w[N] "Mass flowrate (single tube)";
+      input Medium.SpecificEnthalpy hl "Saturated liquid temperature";
+      input Medium.SpecificEnthalpy hv "Saturated vapour temperature";
+      input SI.PerUnit x[N] "Steam quality";
+
+      output Real Kf[N] "Friction coefficient";
+      output Real Cf[N] "Fanning friction factor";
+      output Boolean NoFriction "=true, if no friction is used";
+
+      annotation(
+        Documentation(info = "<html><head></head><body>Base model for <code>replaceable</code> friction models to be used to <code>redeclare</code> the fricion model in the <code>Flow1DFEM2ph</code> components;</body></html>", revisions = "<html><head></head><body><ul>
+    <li><i>18 Mar 2026</i>
+        by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+           First release.</li>
+    </ul>
+    </body></html>"));
+    end FrictionBase1DFEM2ph;
   end Interfaces;
 end Friction;
