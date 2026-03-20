@@ -1042,8 +1042,6 @@ package IdealGas "Models of components with ideal gases as working fluid"
     Medium.DerDensityByPressure dddp[N] "Derivative of density by pressure";
     Real dddX[N, nX](each unit="kg/m3") "Derivative of density by composition";
   equation
-    assert(FFtype == ThermoPower.Choices.Flow1D.FFtypes.NoFriction or dpnom > 0,
-      "dpnom=0 not supported, it is also used in the homotopy trasformation during the inizialization");
     //All equations are referred to a single tube
 
     assert(friction.Kf >= 0, "Negative friction coefficient");
@@ -2837,7 +2835,6 @@ The packages Medium are redeclared and a mass balance determines the composition
     partial model Flow1DBase
       "Basic interface for 1-dimensional ideal gas flow models"
       extends Icons.IdealGas.Tube;
-      import ThermoPower.Choices.Flow1D.FFtypes;
       import ThermoPower.Choices.Flow1D.HCtypes;
       replaceable package Medium = Modelica.Media.Interfaces.PartialMedium
         annotation(choicesAllMatching = true);
@@ -2851,16 +2848,7 @@ The packages Medium are redeclared and a mass balance determines the composition
         "Perimeter of heat transfer surface (single tube)";
       parameter SI.Length Dhyd "Hydraulic Diameter (single tube)";
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
-      parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
-        "Friction Factor Type"
-        annotation(Evaluate=true);
       parameter SI.PressureDifference dpnom = 0 "Nominal pressure drop";
-      parameter Real Kfnom=0 "Nominal hydraulic resistance coefficient"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
-      parameter Medium.Density rhonom=0 "Nominal inlet density"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint)));
-      parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
       parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)";
       parameter Real Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
@@ -2920,30 +2908,19 @@ The packages Medium are redeclared and a mass balance determines the composition
                0)));
     initial equation
         assert(wnom > 0, "Please set a positive value for wnom");
-        assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-        "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
-        assert(not
-                  (FFtype == FFtypes.Kfnom     and not Kfnom > 0),  "Kfnom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.OpPoint   and not rhonom > 0), "rhonom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Cfnom     and not Cfnom > 0),  "Cfnom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)),
-        Documentation(info="<HTML>
+
+        annotation(Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
-</HTML>
-",     revisions="<html>
-<ul>
+</HTML>",     revisions="<html><head></head><body><ul>
+<li><i>19 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       Replaceable friction support added.</li>
 <li><i>7 Apr 2014</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Added base class.</li>
 
 </ul>
-</html>"),
+</body></html>"),
         Diagram(graphics),
         Icon(graphics));
     end Flow1DBase;

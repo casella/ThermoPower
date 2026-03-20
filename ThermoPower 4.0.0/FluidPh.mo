@@ -1169,7 +1169,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   model Flow1DFV
     "1-dimensional fluid flow model for p-h fluid (finite volumes)"
     extends BaseClasses.Flow1DBase;
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
 
     parameter SI.PerUnit wnm = 1e-3 "Maximum fraction of the nominal flow rate allowed as reverse flow";
@@ -2674,7 +2673,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
 
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
 
     parameter Real alpha(
@@ -5811,10 +5809,11 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
         annotation (Evaluate=true,
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
-</HTML>
-",     revisions=
-             "<html>
-<ul>
+</HTML>",     revisions=
+"<html><head></head><body><ul>
+<li><i>19 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       Replaceable friction support added.</li>
 <li><i>23 Jul 2007</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Added hstart for more detailed initialization of enthalpy vector.</li>
@@ -5831,7 +5830,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Created.</li>
 </ul>
-</html>"),
+</body></html>"),
         Diagram(graphics),
         Icon(graphics));
     end Flow1DBase;
