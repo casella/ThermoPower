@@ -3207,7 +3207,7 @@ This is a simple model of a steam plant.
           if not TS_int then
             Ti*der(I) = SPs - PVs + track;
           else
-            Ttr*der(I) = -I + TV_int;
+            Ttr*der(I) = -I + TV_int/Kp;
           end if;
         else
           I = 0;
