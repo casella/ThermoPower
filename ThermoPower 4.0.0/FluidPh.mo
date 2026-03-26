@@ -1169,7 +1169,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
   model Flow1DFV
     "1-dimensional fluid flow model for p-h fluid (finite volumes)"
     extends BaseClasses.Flow1DBase;
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
 
     parameter SI.PerUnit wnm = 1e-3 "Maximum fraction of the nominal flow rate allowed as reverse flow";
@@ -1178,7 +1177,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     SI.Pressure Dpfric "Pressure drop due to friction (total)";
     SI.Pressure Dpfric1
       "Pressure drop due to friction (from inlet to capacitance)";
@@ -1187,9 +1185,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.Pressure Dpstat "Pressure drop due to static head";
     Medium.MassFlowRate win "Flow rate at the inlet (single tube)";
     Medium.MassFlowRate wout "Flow rate at the outlet (single tube)";
-    Real Kf "Hydraulic friction coefficient";
     Real dwdt "Dynamic momentum term";
-    SI.PerUnit Cf "Fanning friction factor";
     Medium.AbsolutePressure p(start=pstart,stateSelect=StateSelect.prefer)
       "Fluid pressure for property calculations";
     Medium.MassFlowRate w(start=wnom/Nt) "Mass flow rate (single tube)";
@@ -1225,9 +1221,27 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       final w=w*ones(N),
       final fluidState=fluidState) "Instantiated heat transfer model";
 
+    replaceable model Friction = ThermoPower.Friction.Friction1DFV.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFV
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnf = wnf,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      w = w) "Instantiated friction model";
+
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw)
       annotation (Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
+
   protected
     Medium.Density rhobar[N - 1] "Fluid average density";
     SI.SpecificVolume vbar[N - 1] "Fluid average specific volume";
@@ -1238,28 +1252,11 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
     SI.DerDensityByPressure drbdp[N - 1]
       "Derivative of average density by pressure";
+
   equation
     //All equations are referred to a single tube
-    // Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    if FFtype == FFtypes.Kfnom then
-      Kf = Kfnom*Kfc;
-    elseif FFtype == FFtypes.OpPoint then
-      Kf = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-    elseif FFtype == FFtypes.Cfnom then
-      Cf = Cfnom*Kfc;
-    elseif FFtype == FFtypes.Colebrook then
-      Cf = f_colebrook(
-          w,
-          Dhyd/A,
-          e,
-          Medium.dynamicViscosity(fluidState[integer(N/2)]))*Kfc;
-    else  // if FFtype == FFtypes.NoFriction then
-      Cf = 0;
-    end if;
-    Kf = Cf*omega_hyd*L/(2*A^3)
-      "Relationship between friction coefficient and Fanning friction factor";
-    assert(Kf >= 0, "Negative friction coefficient");
+
+    assert(friction.Kf >= 0, "Negative friction coefficient");
 
     // Dynamic momentum term
     if DynamicMomentum then
@@ -1271,28 +1268,29 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     sum(dMdt) = (infl.m_flow + outfl.m_flow)/Nt "Mass balance";
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
-    if FFtype == FFtypes.NoFriction then
+    if friction.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     elseif HydraulicCapacitance == HCtypes.Middle then
       //assert((N-1)-integer((N-1)/2)*2 == 0, "N must be odd");
-      Dpfric1 = homotopy(Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar[1:integer((N
+      Dpfric1 = homotopy(friction.Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar[1:integer((N
          - 1)/2)])/(N - 1), dpnom/2/(wnom/Nt)*win)
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar[1 + integer((
+      Dpfric2 = homotopy(friction.Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar[1 + integer((
         N - 1)/2):N - 1])/(N - 1), dpnom/2/(wnom/Nt)*wout)
         "Pressure drop from capacitance to outlet";
     elseif HydraulicCapacitance == HCtypes.Upstream then
       Dpfric1 = 0 "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar)/(N - 1),
+      Dpfric2 = homotopy(friction.Kf*squareReg(wout, wnom/Nt*wnf)*sum(vbar)/(N - 1),
                          dpnom/(wnom/Nt)*wout)
         "Pressure drop from capacitance to outlet";
     else // if HydraulicCapacitance == HCtypes.Downstream then
-      Dpfric1 = homotopy(Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar)/(N - 1),
+      Dpfric1 = homotopy(friction.Kf*squareReg(win, wnom/Nt*wnf)*sum(vbar)/(N - 1),
                          dpnom/(wnom/Nt)*win)
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
+
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*l*dzdx*sum(rhobar)
       "Pressure drop due to static head";
     for j in 1:N-1 loop
@@ -1388,36 +1386,32 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-60},{100,-100}},textString="%name")}),
-      Documentation(info="<HTML>
-<p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
-<ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
-<li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
-<li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
-<li>The longitudinal heat diffusion term is neglected.
-<li>The energy balance equation is written by assuming a uniform pressure distribution; the compressibility effects are lumped at the inlet, at the outlet, or at the middle of the pipe.
-<li>The fluid flow can exchange thermal power through the lateral tube boundary, by means of the <tt>wall</tt> connector, that actually represents the wall surface with its temperature. The heat flow is computed by an instance of the replaceable HeatTransfer model; various heat transfer models are available in the ThermoPower.Thermal.HeatTransferFV package.
-</ul>
+      Documentation(info="<html><head></head><body><p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
+</p><ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
+</li><li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
+</li><li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
+</li><li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
+</li><li>The longitudinal heat diffusion term is neglected.
+</li><li>The energy balance equation is written by assuming a uniform pressure distribution; the compressibility effects are lumped at the inlet, at the outlet, or at the middle of the pipe.
+</li><li>The fluid flow can exchange thermal power through the lateral tube boundary, by means of the <tt>wall</tt> connector, that actually represents the wall surface with its temperature. The heat flow is computed by an instance of the replaceable HeatTransfer model; various heat transfer models are available in the ThermoPower.Thermal.HeatTransferFV package.
+</li>
+<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFV package</li></ul>
 <p>The mass, momentum and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional) and N-1 specific enthalpies.
-<p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
-<p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
-<p>Flow reversal is not supported by this model; if you need flow reversal, please consider using the Flow1DFEM model.
-<p><b>Modelling options</b></p>
+</p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
+</p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
+</p><p>Flow reversal is not supported by this model; if you need flow reversal, please consider using the Flow1DFEM model.
+</p><p><b>Modelling options</b></p>
 <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater than or equal to 2.
-<p>The following options are available to specify the friction coefficient:
-<ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
-<li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
-<li><tt>FFtype = FFtypes.Cfnom</tt>: the friction coefficient is computed by giving the (constant) value of the Fanning friction factor <tt>Cfnom</tt>.
-<li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).
-<li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul>
-<p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
-<p>If <tt>HydraulicCapacitance = HCtypes.Downstream</tt> (default option) then the compressibility effect depending on the pressure derivative is lumped at the outlet, while the optional dynamic momentum term depending on the flowrate is lumped at the inlet; therefore, the state variables are the outlet pressure and the inlet flowrate. If <tt>HydraulicCapacitance = HCtypes.Upstream</tt> the reverse takes place.
+</p><p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
+</p><p>If <tt>HydraulicCapacitance = HCtypes.Downstream</tt> (default option) then the compressibility effect depending on the pressure derivative is lumped at the outlet, while the optional dynamic momentum term depending on the flowrate is lumped at the inlet; therefore, the state variables are the outlet pressure and the inlet flowrate. If <tt>HydraulicCapacitance = HCtypes.Upstream</tt> the reverse takes place.
  If <tt>HydraulicCapacitance = HCtypes.Middle</tt>, the compressibility effect is lumped at the middle of the pipe; to use this option, an odd number of nodes N is required.
-<p>Start values for the pressure and flowrate state variables are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
-<p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt > 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
-<p>This models makes the temperature and external heat flow distributions available to connected components through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
-</HTML>", revisions="<html>
-<ul>
+</p><p>Start values for the pressure and flowrate state variables are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
+</p><p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt &gt; 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
+</p><p>This models makes the temperature and external heat flow distributions available to connected components through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
+</p></body></html>", revisions="<html><head></head><body><ul>
+<li><i>19 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       Replaceable friction support added.</li>
 <li><i>16 Sep 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Option to lump compressibility at the middle added.</li>
@@ -1433,21 +1427,20 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 <li><i>8 Oct 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Model now based on <tt>Flow1DBase</tt>.
-<li><i>24 Sep 2004</i>
+</li><li><i>24 Sep 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Removed <tt>wstart</tt>, <tt>pstart</tt>. Added <tt>pstartin</tt>, <tt>pstartout</tt>.
-<li><i>22 Jun 2004</i>
+</li><li><i>22 Jun 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to Modelica.Media.
-<li><i>15 Jan 2004</i>
+</li><li><i>15 Jan 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Computation of fluid velocity <i>u</i> added. Improved treatment of geometric parameters</li>.
 <li><i>1 Oct 2003</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>
-"));
+</body></html>"));
   end Flow1DFV;
 
   model Flow1DFV2w "Same as Flow1DFV with two walls and heat transfer models"
@@ -1501,10 +1494,31 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       final w=w*ones(N),
       final fluidState=fluidState) "Instantiated heat transfer model";
 
+    replaceable model Friction = ThermoPower.Friction.Friction1DFV2ph.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFV2ph
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnf = wnf,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      sat = sat,
+      w = w,
+      hl = hl,
+      hv = hv,
+      htilde = htilde,
+      x = x) "Instantiated friction model";
+
     ThermoPower.Thermal.DHTVolumes wall(final N=Nw) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     // package SmoothMedium = Medium (final smoothModel=true);
     constant SI.Pressure pzero=10 "Small deltap for calculations";
@@ -1519,12 +1533,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
     Medium.SaturationProperties sat "Properties of saturated fluid";
-    SI.Length omega_hyd "Wet perimeter (single tube)";
     SI.Pressure Dpfric "Pressure drop due to friction";
     SI.Pressure Dpstat "Pressure drop due to static head";
-    Real Kf[N - 1] "Friction coefficient";
-    Real Kfl[N - 1] "Linear friction coefficient";
-    Real Cf[N - 1] "Fanning friction factor";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p(start=pstart)
       "Fluid pressure for property calculations";
@@ -1574,41 +1584,9 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.MassFlowRate dMdt[N - 1] "Derivative of fluid mass in each volume";
   equation
     //All equations are referred to a single tube
-    omega_hyd = 4*A/Dhyd;
-    // Friction factor selection
-    for j in 1:(N - 1) loop
-      if FFtype == FFtypes.Kfnom then
-        Kf[j] = Kfnom*Kfc/(N - 1);
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
-      elseif FFtype == FFtypes.OpPoint then
-        Kf[j] = dpnom*rhonom/(wnom/Nt)^2/(N - 1)*Kfc;
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
-      elseif FFtype == FFtypes.Cfnom then
-        Kf[j] = Cfnom*omega_hyd*l/(2*A^3)*Kfc;
-        Cf[j] = 2*Kf[j]*A^3/(omega_hyd*l);
-      elseif FFtype == FFtypes.Colebrook then
-        Cf[j] = if noEvent(htilde[j] < hl or htilde[j] > hv) then f_colebrook(
-            w,
-            Dhyd/A,
-            e,
-            Medium.dynamicViscosity(fluidState[j]))*Kfc else f_colebrook_2ph(
-            w,
-            Dhyd/A,
-            e,
-            Medium.dynamicViscosity(Medium.setBubbleState(sat, 1)),
-            Medium.dynamicViscosity(Medium.setDewState(sat, 1)),
-            x[j])*Kfc;
-        Kf[j] = Cf[j]*omega_hyd*l/(2*A^3);
-      elseif FFtype == FFtypes.NoFriction then
-        Cf[j] = 0;
-        Kf[j] = 0;
-      else
-        assert(FFtype <> FFtypes.NoFriction, "Unsupported FFtype");
-        Cf[j] = 0;
-        Kf[j] = 0;
-      end if;
-      assert(Kf[j] >= 0, "Negative friction coefficient");
-      Kfl[j] = wnom/Nt*wnf*Kf[j];
+
+    for j in 1:N-1 loop
+      assert(friction.Kf[j] >= 0, "Negative friction coefficient");
     end for;
 
     // Dynamic momentum term
@@ -1635,8 +1613,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
       else
         wbar[j] = infl.m_flow/Nt - sum(dMdt[1:j - 1]) - dMdt[j]/2;
       end if;
-      dpf[j] = (if FFtype == FFtypes.NoFriction then 0 else homotopy(smooth(1,
-        Kf[j]*squareReg(w, wnom/Nt*wnf))*vbar[j], dpnom/(N - 1)/(wnom/Nt)*w));
+      dpf[j] = (if friction.NoFriction then 0 else homotopy(smooth(1,
+        friction.Kf[j]*squareReg(w, wnom/Nt*wnf))*vbar[j], dpnom/(N - 1)/(wnom/Nt)*w));
       if avoidInletEnthalpyDerivative and j == 1 then
         // first volume properties computed by the outlet properties
         rhobar[j] = rho[j + 1];
@@ -1801,37 +1779,39 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-60},{100,-100}},textString="%name")}),
-      Documentation(info="<HTML>
-<p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
-<ul><li>The fluid state is either one-phase, or a two-phase mixture.
-<li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
-<li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
-<li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
-<li>The longitudinal heat diffusion term is neglected.
-<li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
-<li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
+      Documentation(info= "<html><head></head><body><p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
+</p><ul><li>The fluid state is either one-phase, or a two-phase mixture.
+</li><li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
+</li><li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
+</li><li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
+</li><li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
+</li><li>The longitudinal heat diffusion term is neglected.
+</li><li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
+</li><li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
+</li>
+<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFV2ph package</li>
+
 </ul>
 <p>The mass, momentum, and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional) and N-1 specific enthalpies.
-<p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
-<p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
-<p>The model assumes that the mass flow rate is always from the inlet to the outlet. Small reverse flow is allowed (e.g. when closing a valve at the outlet), but the model will not account for it explicitly.
-<p><b>Modelling options</b></p>
+</p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
+</p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
+</p><p>The model assumes that the mass flow rate is always from the inlet to the outlet. Small reverse flow is allowed (e.g. when closing a valve at the outlet), but the model will not account for it explicitly.
+</p><p><b>Modelling options</b></p>
 <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater than or equal to 2.
-<p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
-<p>The density is computed assuming a linear distribution of the specific
+</p><p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
+</p><p>The density is computed assuming a linear distribution of the specific
 enthalpy between the nodes; this requires the availability of the time derivative of the inlet enthalpy. If this is not available, it is possible to set <tt>avoidInletEnthalpyDerivative</tt> to true, which will cause the mean density of the first volume to be approximated as its outlet density, thus avoiding the need of the inlet enthalpy derivative.
-<p>The following options are available to specify the friction coefficient:
-<ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
-<li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
-<li><tt>FFtype = FFtypes.Cfnom</tt>: the friction coefficient is computed by giving the (constant) value of the Fanning friction factor <tt>Cfnom</tt>.
-<li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).
-<li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul><p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass storage term depending on the pressure is lumped at the outlet, while the optional momentum storage term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
-<p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
-<p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt > 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
-<p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
-</HTML>", revisions="<html>
-<ul>
+
+</p>
+
+<p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass storage term depending on the pressure is lumped at the outlet, while the optional momentum storage term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
+</p><p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
+</p><p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt &gt; 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
+</p><p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
+</p></body></html>", revisions= "<html><head></head><body><ul>
+<li><i>19 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       Replaceable friction support added.</li>
 <li><i>27 Jul 2007</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Corrected error in the mass balance equation, which lead to loss/gain of
@@ -1848,20 +1828,20 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 <li><i>8 Oct 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Model now based on <tt>Flow1DBase</tt>.
-<li><i>24 Sep 2004</i>
+</li><li><i>24 Sep 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Removed <tt>wstart</tt>, <tt>pstart</tt>. Added <tt>pstartin</tt>, <tt>pstartout</tt>.
-<li><i>28 Jul 2004</i>
+</li><li><i>28 Jul 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to <tt>Modelica.Media</tt>.
-<li><i>15 Jan 2004</i>
+</li><li><i>15 Jan 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Computation of fluid velocity <i>u</i> added. Improved treatment of geometric parameters</li>
 <li><i>1 Oct 2003</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</body></html>"));
   end Flow1DFV2ph;
 
   model Flow1DFV2ph2w
@@ -1911,10 +1891,26 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       final wnom=wnom/Nt,
       final w=w,
       final fluidState=fluidState) "Instantiated heat transfer model";
+
+    replaceable model Friction = ThermoPower.Friction.Friction1DFEM.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFEM
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      w = w) "Instantiated friction model";
+
     ThermoPower.Thermal.DHTNodes wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     Medium.ThermodynamicState fluidState[N]
       "Thermodynamic state of the fluid at the nodes";
@@ -1935,9 +1931,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     constant SI.Acceleration g=Modelica.Constants.g_n;
     final parameter Boolean evenN=(div(N, 2)*2 == N)
       "The number of nodes is even";
-    SI.Length omega_hyd "Hydraulic perimeter (single tube)";
-    Real Kf[N] "Friction coefficients";
-    Real Cf[N] "Fanning friction factors";
+
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p(start=pstart) "Fluid pressure";
     SI.Pressure Dpfric "Pressure drop due to friction (total)";
@@ -1976,6 +1970,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   equation
     //All equations are referred to a single tube
 
+    for j in 1:N-1 loop
+      assert(friction.Kf[j] >= 0, "Negative friction coefficient");
+    end for;
+
     // Selection of representative pressure variable
     if HydraulicCapacitance == HCtypes.Middle then
       p = infl.p - Dpfric1 - Dpstat/2;
@@ -1986,29 +1984,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     else
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
-
-    //Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    for i in 1:N loop
-      if FFtype == FFtypes.Kfnom then
-        Kf[i] = Kfnom*Kfc;
-      elseif FFtype == FFtypes.OpPoint then
-        Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-      elseif FFtype == FFtypes.Cfnom then
-        Cf[i] = Cfnom*Kfc;
-      elseif FFtype == FFtypes.Colebrook then
-        Cf[i] = f_colebrook(
-            w[i],
-            Dhyd/A,
-            e,
-            Medium.dynamicViscosity(fluidState[i]))*Kfc;
-      elseif FFtype == FFtypes.NoFriction then
-        Cf[i] = 0;
-      end if;
-      assert(Kf[i] >= 0, "Negative friction coefficient");
-      Kf[i] = Cf[i]*omega_hyd*L/(2*A^3)
-        "Relationship between friction coefficient and Fanning friction factor";
-    end for;
 
     //Dynamic Momentum [not] accounted for
     if DynamicMomentum then
@@ -2032,14 +2007,14 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
 
-    if FFtype == FFtypes.NoFriction then
+    if friction.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     else
-      Dpfric1 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i]
+      Dpfric1 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i]
         for i in 1:N), dpnom/2/(wnom/Nt)*w[1])
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i]
+      Dpfric2 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i]
         for i in 1:N), dpnom/2/(wnom/Nt)*w[N])
         "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
@@ -2304,36 +2279,35 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-60},{100,-100}},textString="%name")}),
-      Documentation(info="<HTML>
-<p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
-<ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
-<li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
-<li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
-<li>The longitudinal heat diffusion term is neglected.
-<li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
-<li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
+      Documentation(info= "<html><head></head><body><p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
+</p><ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
+</li><li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
+</li><li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
+</li><li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
+</li><li>The longitudinal heat diffusion term is neglected.
+</li><li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
+</li><li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
+</li>
+<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFEM package</li>
+
 </ul>
 <p>The mass, momentum, and energy balance equation are discretised with the finite element method. The state variables are one pressure, one flowrate (optional) and N specific enthalpies.
-<p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
-<p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
-<p>Flow reversal is fully supported.
-<p><b>Modelling options</b></p>
+</p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
+</p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
+</p><p>Flow reversal is fully supported.
+</p><p><b>Modelling options</b></p>
 <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater or equal than 2.
-<p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
-<p> Two parameters are available to tune the numerical method. The stabilisation coefficient <tt>alpha</tt> varies from 0.0 to 1.0; <tt>alpha=0.0</tt> corresponds to a non-stabilised method, which gives rise to non-physical oscillations; the default value of 1.0 corresponds to a stabilised method, with well-damped oscillations. The mass lumping coefficient (<tt>ML</tt>) allows to use a hybrid finite-element/finite-volume discretisation method for the dynamic matrix; the default value <tt>ML=0.0</tt> corresponds to a standard FEM model, <tt>ML=1.0</tt> corresponds to a full finite-volume method, with the associated numerical diffusion effects. Intermediate values can be used.
-<p>The following options are available to specify the friction coefficient:
-<ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
-<li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
-<li><tt>FFtype = FFtypes.Cfnom</tt>: the friction coefficient is computed by giving the (constant) value of the Fanning friction factor <tt>Cfnom</tt>.
-<li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).
-<li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul>
+</p><p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
+</p><p> Two parameters are available to tune the numerical method. The stabilisation coefficient <tt>alpha</tt> varies from 0.0 to 1.0; <tt>alpha=0.0</tt> corresponds to a non-stabilised method, which gives rise to non-physical oscillations; the default value of 1.0 corresponds to a stabilised method, with well-damped oscillations. The mass lumping coefficient (<tt>ML</tt>) allows to use a hybrid finite-element/finite-volume discretisation method for the dynamic matrix; the default value <tt>ML=0.0</tt> corresponds to a standard FEM model, <tt>ML=1.0</tt> corresponds to a full finite-volume method, with the associated numerical diffusion effects. Intermediate values can be used.
+</p>
 <p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass buildup term depending on the pressure is lumped at the outlet, while the optional momentum buildup term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
-<p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
-<p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt > 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
-<p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
-</HTML>", revisions="<html>
-<ul>
+</p><p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
+</p><p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt &gt; 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
+</p><p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
+</p></body></html>", revisions= "<html><head></head><body><ul>
+<li><i>19 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       Replaceable friction support added.</li>
 <li><i>24 Mar 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        <tt>FFtypes</tt> package and <tt>NoFriction</tt> option added.</li>
@@ -2346,10 +2320,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 <li><i>8 Oct 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Model now based on <tt>Flow1DBase</tt>.
-<li><i>24 Sep 2004</i>
+</li><li><i>24 Sep 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Removed <tt>wstart</tt>, <tt>pstart</tt>. Added <tt>pstartin</tt>, <tt>pstartout</tt>.
-<li><i>23 Jul 2004</i>
+</li><li><i>23 Jul 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to Modelica.Media.</li>
 <li><i>1 Jul 2004</i>
@@ -2362,19 +2336,48 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
        First release.</li>
 </ul>
-</html>"));
+</body></html>"));
   end Flow1DFEM;
-  
+
   model Flow1DFEMnm
     "1-dimensional fluid flow model for p-h fluid (finite elements)"
     extends BaseClasses.Flow1DBase(Nw = N);
-    replaceable model HeatTransfer = Thermal.HeatTransferFEM.IdealHeatTransfer constrainedby Thermal.BaseClasses.DistributedHeatTransferFEM annotation(
+    replaceable model HeatTransfer = Thermal.HeatTransferFEM.IdealHeatTransfer
+      constrainedby Thermal.BaseClasses.DistributedHeatTransferFEM
+      annotation(
        choicesAllMatching = true);
-    HeatTransfer heatTransfer(redeclare package Medium = Medium, final Nf = N, final Nw = Nw, final Nt = Nt, final L = L, final A = A, final Dhyd = Dhyd, final omega = omega, final wnom = wnom/Nt, final w = w, final fluidState = fluidState) "Instantiated heat transfer model";
+    HeatTransfer heatTransfer(
+      redeclare package Medium = Medium,
+      final Nf = N,
+      final Nw = Nw,
+      final Nt = Nt,
+      final L = L,
+      final A = A,
+      final Dhyd = Dhyd,
+      final omega = omega,
+      final wnom = wnom/Nt,
+      final w = w,
+      final fluidState = fluidState) "Instantiated heat transfer model";
+
+    replaceable model Friction = ThermoPower.Friction.Friction1DFEM.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFEM
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      w = w) "Instantiated friction model";
+
     Thermal.DHTNodes wall(N = N) annotation(
       Dialog(enable = false),
       Placement(transformation(extent = {{-40, 40}, {40, 60}}, rotation = 0)));
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
     Medium.ThermodynamicState fluidState[N] "Thermodynamic state of the fluid at the nodes";
     parameter Modelica.Units.SI.PerUnit alpha(min = 0, max = 1) = 1 "Numerical stabilization coefficient";
@@ -2384,9 +2387,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     parameter Boolean idealGasDensityDistribution = false "Assume ideal-gas-type density distributions for mass balances";
     constant Modelica.Units.SI.Acceleration g = Modelica.Constants.g_n;
     final parameter Boolean evenN = (div(N, 2)*2 == N) "The number of nodes is even";
-    Modelica.Units.SI.Length omega_hyd "Hydraulic perimeter (single tube)";
-    Real Kf[N] "Friction coefficients";
-    Real Cf[N] "Fanning friction factors";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p(start = pstart) "Fluid pressure";
     Modelica.Units.SI.Pressure Dpfric "Pressure drop due to friction (total)";
@@ -2401,7 +2401,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.Density rho[N] "Fluid density";
     Modelica.Units.SI.SpecificVolume v[N] "Fluid specific volume";
     Modelica.Units.SI.Mass Mtot "Total mass of fluid";
-  
+
   protected
     Modelica.Units.SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     Modelica.Units.SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
@@ -2410,9 +2410,14 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Real D1[N];
     Real D2[N];
     Real alpha_sgn[N];
-  
+
   equation
   //All equations are referred to a single tube
+
+    for j in 1:N-1 loop
+      assert(friction.Kf[j] >= 0, "Negative friction coefficient");
+    end for;
+
   // Selection of representative pressure variable
     if HydraulicCapacitance == HCtypes.Middle then
       p = infl.p - Dpfric1 - Dpstat/2;
@@ -2423,23 +2428,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     else
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
-  //Friction factor selection
-    omega_hyd = 4*A/Dhyd;
-    for i in 1:N loop
-      if FFtype == FFtypes.Kfnom then
-        Kf[i] = Kfnom*Kfc;
-      elseif FFtype == FFtypes.OpPoint then
-        Kf[i] = dpnom*rhonom/(wnom/Nt)^2*Kfc;
-      elseif FFtype == FFtypes.Cfnom then
-        Cf[i] = Cfnom*Kfc;
-      elseif FFtype == FFtypes.Colebrook then
-        Cf[i] = f_colebrook(w[i], Dhyd/A, e, Medium.dynamicViscosity(fluidState[i]))*Kfc;
-      elseif FFtype == FFtypes.NoFriction then
-        Cf[i] = 0;
-      end if;
-      assert(Kf[i] >= 0, "Negative friction coefficient");
-      Kf[i] = Cf[i]*omega_hyd*L/(2*A^3) "Relationship between friction coefficient and Fanning friction factor";
-    end for;
+
   //Dynamic Momentum [not] accounted for
     if DynamicMomentum then
       if HydraulicCapacitance == HCtypes.Upstream then
@@ -2453,18 +2442,20 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       dwdt = 0;
     end if;
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance equation";
+
     w[1] = infl.m_flow/Nt "Inlet flow rate - single tube";
     w[N] = -outfl.m_flow/Nt "Outlet flow rate - single tube";
+
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
-    if FFtype == FFtypes.NoFriction then
+    if friction.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     else
-      Dpfric1 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[1]) "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[N]) "Pressure drop from capacitance to outlet";
+      Dpfric1 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[1]) "Pressure drop from inlet to capacitance";
+      Dpfric2 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[N]) "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
     Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D "Pressure drop due to static head";
-  
+
   // Fluid property calculations
     for j in 1:N loop
       fluidState[j] = Medium.setState_phX(p, h[j]);
@@ -2492,42 +2483,42 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         (w[i + 1] - w[i]) = -A*l*(der(p)*1/2*(drdp[i + 1] + drdp[i]) + 1/6*(der(h[i])*(2*drdh[i] + drdh[i + 1]) + der(h[i + 1])*(drdh[i] + 2*drdh[i + 1]))) "Mass balance equations";
       end if;
     end for;
-  
+
   // Energy balance equations in matrices form (see Flow1DFEM)
   //  Y*der(h) + B/A*h + C*h/A = der(p)*G + M*(omega/A)*phi + K*w/A;
-  
+
   //  expansion in single-equations form
-  
+
   /* first equation
     Y[1,1]*der(h[1]) + Y[1,2]*der(h[2])
     + (B[1,1]*h[1] + B[1,2]*h[2])/A
-    + C[1,1]*h[1]/A 
+    + C[1,1]*h[1]/A
     =
     (M[1,1]*phi[1] + M[1,2]*phi[2])*(omega/A)
     + K[1,1]*w[1]/A
     + der(p)*G[1];
   */
-  
+
     if regularizeBoundaryConditions then
       (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]))*der(h[1]) + (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]))*der(h[2])
       + (((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12)*h[1] + ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12)*h[2])/A
-      + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*w[1], 0, wnom*wnf_bc))*h[1]/A 
+      + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*w[1], 0, wnom*wnf_bc))*h[1]/A
       =
       (((4 - 3*alpha_sgn[1])*l/12)*phi[1] + ((2 - 3*alpha_sgn[1])*l/12)*phi[2])*(omega/A)
       + (Functions.stepReg(infl.m_flow - wnom*wnf_bc, (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow), 0, wnom*wnf_bc))*w[1]/A
       + (if Medium.singleState then 0 else der(p)*(l/2*(1 - alpha_sgn[1])));
-    
+
     else
       (rho[1]*(l/12)*(3 - 2*alpha_sgn[1]) + rho[2]*(l/12)*(1 - alpha_sgn[1]))*der(h[1]) + (rho[1]*(l/12)*(1 - alpha_sgn[1]) + rho[2]*(l/12)*(1 - 2*alpha_sgn[1]))*der(h[2])
       + (((w[1]*(3*alpha_sgn[1] - 4) + w[2]*(3*alpha_sgn[1] - 2))/12)*h[1] + ((w[1]*(4 - 3*alpha_sgn[1]) + w[2]*(2 - 3*alpha_sgn[1]))/12)*h[2])/A
-      + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*w[1] else 0))*h[1]/A 
+      + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*w[1] else 0))*h[1]/A
       =
       (((4 - 3*alpha_sgn[1])*l/12)*phi[1] + ((2 - 3*alpha_sgn[1])*l/12)*phi[2])*(omega/A)
       + (noEvent(if infl.m_flow >= 0 then (1 - alpha_sgn[1]/2)*inStream(infl.h_outflow) else 0))*w[1]/A
       + (if Medium.singleState then 0 else der(p)*(l/2*(1 - alpha_sgn[1])));
-    
+
     end if;
-  
+
   /* Intermediate equations, if N>2
     for i in 2:(N-1)
       Y[i,i-1]*der(h[i-1]) + Y[i,i]*der(h[i]) + Y[i,i+1]*der(h[i+1])
@@ -2545,37 +2536,37 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         + (if Medium.singleState then 0 else der(p)*l);
       end for;
     end if;
-  
+
   /* last equation
     Y[N,N-1]*der(h[N-1]) + Y[N,N]*der(h[N])
     + (B[N,N-1]*h[N-1] + B[N,N]*h[N])/A
-    + C[N,N]*h[N]/A 
+    + C[N,N]*h[N]/A
     =
     (M[N,N-1]*phi[N-1] + M[N,N]*phi[N])*(omega/A)
     + K[N,N]*w[N]/A
     + der(p)*G[N];
   */
-  
+
     if regularizeBoundaryConditions then
       (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]))*der(h[N-1]) + (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]))*der(h[N])
       + (((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N-1] + ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N])/A
-      + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*w[N], 0, wnom*wnf_bc))*h[N]/A 
+      + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*w[N], 0, wnom*wnf_bc))*h[N]/A
       =
       (((2 + 3*alpha_sgn[N])*l/12)*phi[N-1] + ((4 + 3*alpha_sgn[N])*l/12)*phi[N])*(omega/A)
       + (Functions.stepReg(outfl.m_flow - wnom*wnf_bc, -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow), 0, wnom*wnf_bc))*w[N]/A
       + (if Medium.singleState then 0 else der(p)*(l/2*(1 + alpha_sgn[1])));
-    
+
     else
       (rho[N - 1]*(l/12)*(1 + 2*alpha_sgn[N]) + rho[N]*(l/12)*(1 + alpha_sgn[N]))*der(h[N-1]) + (rho[N - 1]*(l/12)*(1 + alpha_sgn[N]) + rho[N]*(l/12)*(3 + 2*alpha_sgn[N]))*der(h[N])
       + (((-w[N - 1]*(2 + 3*alpha_sgn[N]) - w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N-1] + ((w[N - 1]*(2 + 3*alpha_sgn[N]) + w[N]*(4 + 3*alpha_sgn[N]))/12)*h[N])/A
-      + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*w[N] else 0))*h[N]/A 
+      + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*w[N] else 0))*h[N]/A
       =
       (((2 + 3*alpha_sgn[N])*l/12)*phi[N-1] + ((4 + 3*alpha_sgn[N])*l/12)*phi[N])*(omega/A)
       + (noEvent(if outfl.m_flow >= 0 then -(1 + alpha_sgn[N]/2)*inStream(outfl.h_outflow) else 0))*w[N]/A
       + (if Medium.singleState then 0 else der(p)*(l/2*(1 + alpha_sgn[1])));
-    
+
     end if;
-  
+
   // Momentum and Mass balance equation arrays
     D[1] = l/2;
     D[N] = l/2;
@@ -2598,7 +2589,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
     Mtot = Nt*D*rho*A "Total mass of fluid";
     Tr = noEvent(Mtot/max(abs(infl.m_flow), Modelica.Constants.eps)) "Residence time";
-  
+
   initial equation
     if initOpt == Choices.Init.Options.noInit then
   // do nothing
@@ -2627,35 +2618,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 <p> It implements the same model of the <a href=\"modelica://ThermoPower.FluidPh.Flow1DFEM\">Flow1DFEM</a> but written without the use of matrices, thus increasing the efficiency in terms of translation time in case of a large number of nodes.</p>
 <p>The only difference to the model <a href=\"modelica://ThermoPower.FluidPh.Flow1DFEM\">Flow1DFEM</a> is that this implementation is pure FEM only, so it is no possible to switch to pure Finite Volume or mixed FEM/Finite Volume configurations.
 </p>
-<p>
-The basic modelling assumptions are:
-  </p><ul><li>The fluid state is always one-phase (i.e. subcooled liquid or superheated steam).
-  </li><li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
-  </li><li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-  </li><li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
-  </li><li>The longitudinal heat diffusion term is neglected.
-  </li><li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
-  </li><li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
-  </li></ul>
-  <p>The mass, momentum, and energy balance equation are discretised with the finite element method. The state variables are one pressure, one flowrate (optional) and N specific enthalpies.
-  </p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
-  </p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
-  </p><p>Flow reversal is fully supported.
-  </p><p><b>Modelling options</b></p>
-  <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater or equal than 2.
-  </p><p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
-  </p><p>The stabilisation coefficient <tt>alpha</tt> is available to tune the numerical method. It varies from 0.0 to 1.0; <tt>alpha=0.0</tt> corresponds to a non-stabilised method, which gives rise to non-physical oscillations; the default value of 1.0 corresponds to a stabilised method, with well-damped oscillations.
-  </p><p>The following options are available to specify the friction coefficient:
-  </p><ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
-  </li><li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
-  </li><li><tt>FFtype = FFtypes.Cfnom</tt>: the friction coefficient is computed by giving the (constant) value of the Fanning friction factor <tt>Cfnom</tt>.
-  </li><li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re &gt; 2100, e.g. turbulent flow).
-  </li><li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</li></ul>
-  <p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass buildup term depending on the pressure is lumped at the outlet, while the optional momentum buildup term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
-  </p><p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
-  </p><p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt &gt; 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
-  </p><p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
-  </p></body></html>", revisions = "<html><head></head><body>
+</body></html>", revisions = "<html><head></head><body>
     <ul>
         <li><i>5 Jan 2026</i> by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Giorgio Bartolini</a>:<br>
         First release.</li>
@@ -2686,11 +2649,30 @@ The basic modelling assumptions are:
       final w=w,
       final fluidState=fluidState) "Instantiated heat transfer model";
 
+    replaceable model Friction = ThermoPower.Friction.Friction1DFEM2ph.NoFriction
+      constrainedby ThermoPower.Friction.Interfaces.FrictionBase1DFEM2ph
+      annotation (choicesAllMatching = true);
+    Friction friction(
+      redeclare package Medium = Medium,
+      Dhyd = Dhyd,
+      Kfc = Kfc,
+      Nt = Nt,
+      N = N,
+      L = L,
+      A = A,
+      wnom = wnom,
+      dpnom = dpnom,
+      fluidState = fluidState,
+      sat = sat,
+      w = w,
+      hl = hl,
+      hv = hv,
+      x = x) "Instantiated friction model";
+
     ThermoPower.Thermal.DHTNodes wall(N=N) annotation (Dialog(enable=
             false), Placement(transformation(extent={{-40,40},{40,60}},
             rotation=0)));
 
-    import ThermoPower.Choices.Flow1D.FFtypes;
     import ThermoPower.Choices.Flow1D.HCtypes;
 
     parameter Real alpha(
@@ -2711,7 +2693,6 @@ The basic modelling assumptions are:
     Medium.SaturationProperties sat "Properties of saturated fluid";
     Medium.ThermodynamicState dew "Thermodynamic state at dewpoint";
     Medium.ThermodynamicState bubble "Thermodynamic state at bubblepoint";
-    SI.Length omega_hyd "Hydraulic perimeter (single tube)";
     Real dwdt "Dynamic momentum term";
     Medium.AbsolutePressure p "Fluid pressure";
     SI.Pressure Dpfric "Pressure drop due to friction";
@@ -2736,9 +2717,6 @@ The basic modelling assumptions are:
     Real x[N] "Steam quality";
     Units.LiquidDensity rhol "Saturated liquid density";
     Units.GasDensity rhov "Saturated vapour density";
-
-    Real Kf[N] "Friction coefficient";
-    Real Cf[N] "Fanning friction factor";
     Real Phi[N] "Two-phase friction multiplier";
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
@@ -2800,6 +2778,10 @@ The basic modelling assumptions are:
   equation
     //All equations are referred to a single tube
 
+    for j in 1:N-1 loop
+      assert(friction.Kf[j] >= 0, "Negative friction coefficient");
+    end for;
+
     // Selection of representative pressure variable
     if HydraulicCapacitance == HCtypes.Middle then
       p = infl.p - Dpfric1 - Dpstat/2;
@@ -2810,20 +2792,6 @@ The basic modelling assumptions are:
     else
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
-
-    //Friction factor calculation
-    omega_hyd = 4*A/Dhyd;
-    for i in 1:N loop
-      if FFtype == FFtypes.NoFriction then
-        Cf[i] = 0;
-      elseif FFtype == FFtypes.Cfnom then
-        Cf[i] = Cfnom*Kfc;
-      else
-        assert(true, "Unsupported friction factor selection");
-      end if;
-      Kf[i] = Cf[i]*omega_hyd*L/(2*A^3)
-        "Relationship between friction coefficient and Fanning friction factor";
-    end for;
 
     //Dynamic Momentum [not] accounted for
     if DynamicMomentum then
@@ -2845,20 +2813,20 @@ The basic modelling assumptions are:
 
     Dpfric = Dpfric1 + Dpfric2 "Total pressure drop due to friction";
 
-    if FFtype == FFtypes.NoFriction then
+    if friction.NoFriction then
       Dpfric1 = 0;
       Dpfric2 = 0;
     else
-      Dpfric1 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i]*
+      Dpfric1 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i]*
         Phi[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[1])
         "Pressure drop from inlet to capacitance";
-      Dpfric2 = homotopy(sum(Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i]*
+      Dpfric2 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i]*
         Phi[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[N])
         "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
 
     for i in 1:N loop
-      if FFtype == FFtypes.NoFriction or noEvent(h[i] <= hl or h[i] >= hv) then
+      if friction.NoFriction or noEvent(h[i] <= hl or h[i] >= hv) then
         Phi[i] = 1;
       else
         // Chisholm-Laird formulation of Martinelli-Lockhart correlation for turbulent-turbulent flow
@@ -3382,36 +3350,35 @@ The basic modelling assumptions are:
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
-      Documentation(info="<HTML>
-<p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
-<ul><li>The fluid state is either one-phase, or a two-phase mixture.
-<li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
-<li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
-<li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
-<li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
-<li>The longitudinal heat diffusion term is neglected.
-<li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
-<li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
+      Documentation(info="<html><head></head><body><p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
+</p><ul><li>The fluid state is either one-phase, or a two-phase mixture.
+</li><li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
+</li><li>Uniform velocity is assumed on the cross section, leading to a 1-D distributed parameter model.
+</li><li>Turbulent friction is always assumed; a small linear term is added to avoid numerical singularities at zero flowrate. The friction effects are not accurately computed in the laminar and transitional flow regimes, which however should not be an issue in most applications using water or steam as a working fluid.
+</li><li>The model is based on dynamic mass, momentum, and energy balances. The dynamic momentum term can be switched off, to avoid the fast oscillations that can arise from its coupling with the mass balance (sound wave dynamics).
+</li><li>The longitudinal heat diffusion term is neglected.
+</li><li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
+</li><li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
+</li>
+<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFEM2ph package</li>
 </ul>
 <p>The mass, momentum, and energy balance equation are discretised with the Finite Element Method (Stabilised Galerkin Least Squares). The state variables are one pressure, one flowrate (optional) and N specific enthalpies.
-<p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
-<p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
-<p>Flow reversal is fully supported.
-<p><b>Modelling options</b></p>
+</p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
+</p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
+</p><p>Flow reversal is fully supported.
+</p><p><b>Modelling options</b></p>
 <p>Thermal variables (enthalpy, temperature, density) are computed in <tt>N</tt> equally spaced nodes, including the inlet (node 1) and the outlet (node N); <tt>N</tt> must be greater or equal than 2.
-<p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
-<p> Two parameters are available to tune the numerical method. The stabilisation coefficient <tt>alpha</tt> varies from 0.0 to 1.0; <tt>alpha=0.0</tt> corresponds to a non-stabilised method, which gives rise to non-physical oscillations; the default value of 1.0 corresponds to a stabilised method, with well-damped oscillations. The mass lumping coefficient (<tt>ML</tt>) allows to use a hybrid finite-element/finite-volume discretisation method for the dynamic matrix; the default value <tt>ML=0.0</tt> corresponds to a standard FEM model, <tt>ML=1.0</tt> corresponds to a full finite-volume method, with the associated numerical diffusion effects. Intermediate values can be used.
-<p>The following options are available to specify the friction coefficient:
-<ul><li><tt>FFtype = FFtypes.Kfnom</tt>: the hydraulic friction coefficient <tt>Kf</tt> is set directly to <tt>Kfnom</tt>.
-<li><tt>FFtype = FFtypes.OpPoint</tt>: the hydraulic friction coefficient is specified by a nominal operating point (<tt>wnom</tt>,<tt>dpnom</tt>, <tt>rhonom</tt>).
-<li><tt>FFtype = FFtypes.Cfnom</tt>: the friction coefficient is computed by giving the (constant) value of the Fanning friction factor <tt>Cfnom</tt>.
-<li><tt>FFtype = FFtypes.Colebrook</tt>: the Fanning friction factor is computed by Colebrook's equation (assuming Re > 2100, e.g. turbulent flow).
-<li><tt>FFtype = FFtypes.NoFriction</tt>: no friction is assumed across the pipe.</ul><p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass buildup term depending on the pressure is lumped at the outlet, while the optional momentum buildup term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
-<p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
-<p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt > 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
-<p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
-</HTML>", revisions="<html>
-<ul>
+</p><p>The dynamic momentum term is included or neglected depending on the <tt>DynamicMomentum</tt> parameter.
+</p><p> Two parameters are available to tune the numerical method. The stabilisation coefficient <tt>alpha</tt> varies from 0.0 to 1.0; <tt>alpha=0.0</tt> corresponds to a non-stabilised method, which gives rise to non-physical oscillations; the default value of 1.0 corresponds to a stabilised method, with well-damped oscillations. The mass lumping coefficient (<tt>ML</tt>) allows to use a hybrid finite-element/finite-volume discretisation method for the dynamic matrix; the default value <tt>ML=0.0</tt> corresponds to a standard FEM model, <tt>ML=1.0</tt> corresponds to a full finite-volume method, with the associated numerical diffusion effects. Intermediate values can be used.
+</p>
+<p>If <tt>HydraulicCapacitance = 2</tt> (default option) then the mass buildup term depending on the pressure is lumped at the outlet, while the optional momentum buildup term depending on the flowrate is lumped at the inlet. If <tt>HydraulicCapacitance = 1</tt> the reverse takes place.
+</p><p>Start values for pressure and flowrate are specified by <tt>pstart</tt>, <tt>wstart</tt>. The start values for the node enthalpies are linearly distributed from <tt>hstartin</tt> at the inlet to <tt>hstartout</tt> at the outlet.
+</p><p>A bank of <tt>Nt</tt> identical tubes working in parallel can be modelled by setting <tt>Nt &gt; 1</tt>. The geometric parameters always refer to a <i>single</i> tube.
+</p><p>This models makes the temperature and external heat flow distributions visible through the <tt>wall</tt> connector. If other variables (e.g. the heat transfer coefficient) are needed by external components to compute the actual heat flow, the <tt>wall</tt> connector can be replaced by an extended version of the <tt>DHT</tt> connector.
+</p></body></html>", revisions= "<html><head></head><body><ul>
+<li><i>19 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       Replaceable friction support added.</li>
 <li><i>30 May 2005</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Initialisation support added.</li>
@@ -3425,18 +3392,17 @@ The basic modelling assumptions are:
 <li><i>8 Oct 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Model now based on <tt>Flow1DBase</tt>.
-<li><i>24 Sep 2004</i>
+</li><li><i>24 Sep 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Removed <tt>wstart</tt>, <tt>pstart</tt>. Added <tt>pstartin</tt>, <tt>pstartout</tt>.
-<li><i>23 Jul 2004</i>
+</li><li><i>23 Jul 2004</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Adapted to Modelica.Media.</li>
 <li><i>1 Jul 2004</i>
     by <a href=\"mailto:francesco.schiavo@polimi.it\">Francesco Schiavo</a>:<br>
        First release.</li>
 </ul>
-</html>
-"));
+</body></html>"));
   end Flow1DFEM2ph;
 
   model FlowJoin "Joins two p-h fluid flows"
@@ -5332,7 +5298,7 @@ transfer between the packing and the evaporating water.</p>
 external circuit, which is thermally connected through the 1D distributed heat port <code>wallPort</code>, representing the tube external surface.</p>
 <p>The heat transfer between the packing or the tube surface and the evaporating water is computed by a specific
 heat transfer coefficient, whose nominal value is <code>gamma_wp_nom</code>, and which varies with the <code>nu_l</code>-th power
-of the liquid flow.</p>  
+of the liquid flow.</p>
 <p>The mass and heat transfer from the hot water to humid ambient air is modelled according to Merkel&apos;s equation: the driving force for heat and mass transfer is the difference between the specific enthalpy of saturated humid air at the water temperature per unit dry air mass, and the specific enthalpy of saturated humid air at the wet bulb temperature Twb per unit dry air mass.
 The dry and wet bulb temperatures of incoming air are given by the settings of the system object.</p>
 <p>The 1D counter-current heat and mass transfer equations are discretized by the finite volume method, with <code>N-1</code> volumes; average quantities between volume inlet and volume outlet are used to compute the driving force of the mass and energy transfer.</p>
@@ -5763,7 +5729,6 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
     extends Modelica.Icons.BasesPackage;
     partial model Flow1DBase
       "Basic interface for 1-dimensional p-h fluid fluid flow models"
-      import ThermoPower.Choices.Flow1D.FFtypes;
       replaceable package Medium = StandardWater constrainedby
         Modelica.Media.Interfaces.PartialMedium "Medium model"
         annotation(choicesAllMatching = true);
@@ -5779,20 +5744,7 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
         "Perimeter of heat transfer surface (single tube)";
       parameter SI.Length Dhyd = omega/pi "Hydraulic Diameter (single tube)";
       parameter Medium.MassFlowRate wnom "Nominal mass flowrate (total)";
-      parameter ThermoPower.Choices.Flow1D.FFtypes FFtype=ThermoPower.Choices.Flow1D.FFtypes.NoFriction
-        "Friction Factor Type"
-        annotation (Evaluate=true);
-      parameter SI.PressureDifference dpnom = 0
-        "Nominal pressure drop (friction term only!)";
-      parameter Real Kfnom = 0
-        "Nominal hydraulic resistance coefficient (DP = Kfnom*w^2/rho)"
-       annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Kfnom)));
-      parameter Medium.Density rhonom=0 "Nominal inlet density"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.OpPoint)));
-      parameter SI.PerUnit Cfnom=0 "Nominal Fanning friction factor"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Cfnom)));
-      parameter SI.PerUnit e=0 "Relative roughness (ratio roughness/diameter)"
-        annotation(Dialog(enable = (FFtype == ThermoPower.Choices.Flow1D.FFtypes.Colebrook)));
+      parameter SI.PressureDifference dpnom = 0 "Nominal pressure drop (friction term only!)";
       parameter SI.PerUnit Kfc=1 "Friction factor correction coefficient";
       parameter Boolean DynamicMomentum=false
         "Inertial phenomena accounted for"
@@ -5853,25 +5805,15 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
       final parameter SI.Volume V = Nt*A*L "Total volume (all Nt tubes)";
     initial equation
         assert(wnom > 0, "Please set a positive value for wnom");
-        assert(FFtype == FFtypes.NoFriction or dpnom > 0,
-        "dpnom=0 not valid, it is also used in the homotopy trasformation during the inizialization");
-        assert(not
-                  (FFtype == FFtypes.Kfnom     and not Kfnom > 0),  "Kfnom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.OpPoint   and not rhonom > 0), "rhonom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Cfnom     and not Cfnom > 0),  "Cfnom = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Colebrook and not Dhyd > 0),   "Dhyd = 0 not valid, please set a positive value");
-        assert(not
-                  (FFtype == FFtypes.Colebrook and not e > 0),      "e = 0 not valid, please set a positive value");
+
         annotation (Evaluate=true,
         Documentation(info="<HTML>
 Basic interface of the <tt>Flow1D</tt> models, containing the common parameters and connectors.
-</HTML>
-",     revisions=
-             "<html>
-<ul>
+</HTML>",     revisions=
+"<html><head></head><body><ul>
+<li><i>19 Mar 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       Replaceable friction support added.</li>
 <li><i>23 Jul 2007</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Added hstart for more detailed initialization of enthalpy vector.</li>
@@ -5888,7 +5830,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        Created.</li>
 </ul>
-</html>"),
+</body></html>"),
         Diagram(graphics),
         Icon(graphics));
     end Flow1DBase;
@@ -6001,7 +5943,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         Av = 2.4027e-5*Cv;
       end if;
       // assert(CvData>=0 and CvData<=3, "Invalid CvData");
-    
+
       if initOpt == Choices.Init.Options.noInit then
         // do nothing
       elseif initOpt == Choices.Init.Options.fixedState then
@@ -6015,7 +5957,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       else
         assert(false, "Unsupported initialisation option");
       end if;
-    
+
     equation
       inlet.m_flow + outlet.m_flow = 0 "Mass balance";
       w = inlet.m_flow;
@@ -6030,7 +5972,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
           fluidState = Medium.setState_phX(outlet.p, inStream(outlet.h_outflow));
         end if;
       end if;
-      
+
       Tin = Medium.temperature(fluidState);
       rho = Medium.density(fluidState);
 
@@ -6048,7 +5990,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         hin = inStream(inlet.h_outflow);
         hout = inStream(outlet.h_outflow);
       end if;
-    
+
       dp = inlet.p - outlet.p "Definition of dp";
 
       // Valve opening
@@ -6261,12 +6203,12 @@ It is possible to take into account the heat capacity of the fluid inside the va
       // Boundary conditions
       dp = outfl.p - infl.p;
       w = infl.m_flow "Pump total flow rate";
-    
+
       hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
                      else if w >= 0 then inStream(infl.h_outflow)
                      else inStream(outfl.h_outflow),
                      inStream(infl.h_outflow));
-    
+
       infl.h_outflow = hout;
       outfl.h_outflow = hout;
       h = hout;
