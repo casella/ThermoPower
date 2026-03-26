@@ -2005,8 +2005,7 @@ end Functions;
 
 
 annotation (
-  Documentation(info="<html>
-<h2>General Information</h2>
+  Documentation(info="<html><head></head><body><h2>General Information</h2>
 <p>The ThermoPower library is an open-source <a href=\"http://www.modelica.org/libraries\">Modelica library</a> for the dynamic modelling of thermal power plants and energy conversion systems. It provides basic components for system-level modelling, in particular for the study of control systems in traditional and innovative power plants and energy conversion systems.</p>
 <p>The libray has been under continuous development at Politecnico di Milano since 2002. It has been applied to the dynamic modelling of steam generators, combined-cycle power plants, III- and IV-generation nuclear power plants, direct steam generation solar plants, organic Rankine cycle plants, and cryogenic circuits for nuclear fusion applications. The main author is Francesco Casella, with contributions from Alberto Leva, Matilde Ratti, Luca Savoldelli, Roberto Bonifetto, Stefano Boni, Leonardo Pierobon, and many others. The library is licensed under the <b><a href=\"http://www.modelica.org/licenses/ModelicaLicense2\">Modelica License 2</a></b>. The library has been developed as a tool for research in the field of energy system control at the Dipartimento di Elettronica, Informazione e Bioingegneria of Politecnico di Milano and progressively enhanced as new projects were undertaken there. It has been released as open source for the benefit of the community, but without any guarantee of support or completeness of documentation.</p>
 <p>The latest released version is 3.1 Beta 0. which uses Modelica 3.2 revision 2 and Modelica Standard Library 3.2.1. If you have used the development version of ThermoPower since 2011 to develop your models, then they should run with version 3.1 of the library with little or no modification.</p>
@@ -2017,53 +2016,65 @@ annotation (
 <p>If you want to get involved in the development, or you need some further information, please contact the main developer <a href=\"mailto://francesco.casella@polimi.it\">francesco.casella@polimi.it</a>.</p>
 <h2>References</h2>
 <p>A general description of the library and on the modelling principles can be found in the papers: </p>
-<p><ul>
-<li>F. Casella, A. Leva, &QUOT;Modelling of distributed thermo-hydraulic processes using Modelica&QUOT;, <i>Proceedings of the MathMod &apos;03 Conference</i>, Wien , Austria, February 2003. </li>
-<li>F. Casella, A. Leva, &QUOT;Modelica open library for power plant simulation: design and experimental validation&QUOT;, <i>Proceedings of the 2003 Modelica Conference</i>, Link&ouml;ping, Sweden, November 2003, pp. 41-50. (<a href=\"http://www.modelica.org/Conference2003/papers/h08_Leva.pdf\">Available online</a>) </li>
-<li>F. Casella, A. Leva, &QUOT;Simulazione di impianti termoidraulici con strumenti object-oriented&QUOT;, <i>Atti convegno ANIPLA Enersis 2004,</i> Milano, Italy, April 2004 (in Italian). </li>
-<li>F. Casella, A. Leva, &QUOT;Object-oriented library for thermal power plant simulation&QUOT;, <i>Proceedings of the Eurosis Industrial Simulation Conference 2004 (ISC-2004)</i>, Malaga, Spain, June 2004. </li>
-<li>F. Casella, A. Leva, &QUOT;Simulazione object-oriented di impianti di generazione termoidraulici per studi di sistema&QUOT;, <i>Atti convegno nazionale ANIPLA 2004</i>, Milano, Italy, September 2004 (in Italian).</li>
-<li>Francesco Casella and Alberto Leva, &ldquo;Modelling of Thermo-Hydraulic Power Generation Processes Using Modelica&rdquo;. <i>Mathematical and Computer Modeling of Dynamical Systems</i>, vol. 12, n. 1, pp. 19-33, Feb. 2006. <a href=\"http://dx.doi.org/10.1080/13873950500071082\">Online</a>. </li>
-<li>Francesco Casella, J. G. van Putten and Piero Colonna, &ldquo;Dynamic Simulation of a Biomass-Fired Power Plant: a Comparison Between Causal and A-Causal Modular Modeling&rdquo;. In <i>Proceedings of 2007 ASME International Mechanical Engineering Congress and Exposition</i>, Seattle, Washington, USA, Nov. 11-15, 2007, paper IMECE2007-41091 (Best paper award). </li>
-</ul></p>
-<p><br/>Other papers about the library and its applications:</p>
-<p><ul>
-<li>F. Casella, F. Schiavo, &QUOT;Modelling and Simulation of Heat Exchangers in Modelica with Finite Element Methods&QUOT;, <i>Proceedings of the 2003 Modelica Conference</i>, Link&ouml;ping, Sweden, 2003, pp. 343-352. (<a href=\"http://www.modelica.org/Conference2003/papers/h22_Schiavo.pdf\">Available online</a>) </li>
-<li>A. Cammi, M.E. Ricotti, F. Casella, F. Schiavo, &QUOT;New modelling strategy for IRIS dynamic response simulation&QUOT;, <i>Proc. 5th International Conference on Nuclear Option in Countries with Small and Medium Electricity Grids</i>, Dubrovnik, Croatia, May 2004.</li>
-<li>A. Cammi, F. Casella, M.E. Ricotti, F. Schiavo, &QUOT;Object-oriented Modelling for Integral Nuclear Reactors Dynamic Simulation&QUOT;, <i>Proceedings of the International Conference on Integrated Modeling &AMP; Analysis in Applied Control &AMP; Automation</i>, Genova, Italy, October 2004. </li>
-<li>Antonio Cammi, Francesco Casella, Marco Ricotti and Francesco Schiavo, &ldquo;Object-Oriented Modeling, Simulation and Control of the IRIS Nuclear Power Plant with Modelica&rdquo;. In <i>Proceedings 4th International Modelica Conference</i>, Hamburg, Germany,Mar. 7-8, 2005, pp. 423-432. <a href=\"http://www.modelica.org/events/Conference2005/online_proceedings/Session5/Session5b3.pdf\">Online</a>. </li>
-<li>A. Cammi, F. Casella, M. E. Ricotti, F. Schiavo, G. D. Storrick, &QUOT;Object-oriented Simulation for the Control of the IRIS Nuclear Power Plant&QUOT;, <i>Proceedings of the IFAC World Congress, </i>Prague, Czech Republic, July 2005 </li>
-<li>Francesco Casella and Francesco Pretolani, &ldquo;Fast Start-up of a Combined-Cycle Power Plant: a Simulation Study with Modelica&rdquo;. In <i>Proceedings 5th International Modelica Conference</i>, Vienna, Austria, Sep. 6-8, 2006, pp. 3-10. <a href=\"http://www.modelica.org/events/modelica2006/Proceedings/sessions/Session1a1.pdf\">Online</a>. </li>
-<li>Francesco Casella, &ldquo;Object-Oriented Modelling of Two-Phase Fluid Flows by the Finite Volume Method&rdquo;. In <i>Proceedings 5th Mathmod Vienna</i>, Vienna, Austria, Feb. 8-10, 2006. </li>
-<li>Andrea Bartolini, Francesco Casella, Alberto Leva and Valeria Motterle, &ldquo;A Simulation Study of the Flue Gas Path Control System in a Coal-Fired Power Plant&rdquo;. In <i>Proceedings ANIPLA International Congress 2006</i>, Rome, Italy,vNov. 13-15, 2006. </li>
-<li>Francesco Schiavo and Francesco Casella, &ldquo;Object-oriented modelling and simulation of heat exchangers with finite element methods&rdquo;. <i>Mathematical and Computer Modeling of Dynamical Sytems</i>, vol. 13, n. 3, pp. 211-235, Jun. 2007. <a href=\"http://dx.doi.org/10.1080/13873950600821766\">Online</a>. </li>
-<li>Laura Savoldi Richard, Francesco Casella, Barbara Fiori and Roberto Zanino, &ldquo;Development of the Cryogenic Circuit Conductor and Coil (4C) Code for thermal-hydraulic modelling of ITER superconducting coils&rdquo;. In <i>Presented at the 22nd International Cryogenic Engineering Conference ICEC22</i>, Seoul, Korea, July 21-25, 2008. </li>
-<li>Francesco Casella, &ldquo;Object-Oriented Modelling of Power Plants: a Structured Approach&rdquo;. In <i>Proceedings of the IFAC Symposium on Power Plants and Power Systems Control</i>, Tampere, Finland, July 5-8, 2009. </li>
-<li>Laura Savoldi Richard, Francesco Casella, Barbara Fiori and Roberto Zanino, &ldquo;The 4C code for the cryogenic circuit conductor and coil modeling in ITER&rdquo;. <i>Cryogenics</i>, vol. 50, n. 3, pp. 167-176, Mar 2010. <a href=\"http://dx.doi.org/10.1016/j.cryogenics.2009.07.008\">Online</a>. </li>
-<li>Antonio Cammi, Francesco Casella, Marco Enrico Ricotti and Francesco Schiavo, &ldquo;An object-oriented approach to simulation of IRIS dynamic response&rdquo;. <i>Progress in Nuclear Energy</i>, vol. 53, n. 1, pp. 48-58, Jan. 2011. <a href=\"http://dx.doi.org/10.1016/j.pnucene.2010.09.004\">Online</a>. </li>
-<li>Francesco Casella and Piero Colonna, &ldquo;Development of a Modelica dynamic model of solar supercritical CO2 Brayton cycle power plants for control studies&rdquo;. In <i>Proceedings of the Supercritical CO2 Power Cycle Symposium</i>, Boulder, Colorado, USA, May 24-25, 2011, pp. 1-7. <a href=\"http://www.sco2powercyclesymposium.org/resource_center/system_modeling_control\">Online</a>. </li>
-<li>Roberto Bonifetto, Francesco Casella, Laura Savoldi Richard and Roberto Zanino, &ldquo;Dynamic modeling of a SHe closed loop with the 4C code&rdquo;. In <i>Transactions of the Cryogenic Engineering Conference - CEC: Advances in Cryogenic Engineering</i>, Spokane, Washington, USA, Jun. 13-17, 2011, pp. 1-8. </li>
-<li>Roberto Zanino, Roberto Bonifetto, Francesco Casella and Laura Savoldi Richard, &ldquo;Validation of the 4C code against data from the HELIOS loop at CEA Grenoble&rdquo;. <i>Cryogenics</i>, vol. 0, pp. 1-6, 2012. In press; available online 6 May 2012. <a href=\"http://dx.doi.org/10.1016/j.cryogenics.2012.04.010\">Online</a>. </li>
-<li>Francesco Casella and Piero Colonna, &ldquo;Dynamic modelling of IGCC power plants&rdquo;. <i>Applied Thermal Engineering</i>, vol. 35, pp. 91-111, 2012. <a href=\"http://dx.doi.org/10.1016/j.applthermaleng.2011.10.011\">Online</a>. </li>
-</ul></p>
+<p></p><ul>
+<li>F. Casella, A. Leva, \"Modelling of distributed thermo-hydraulic processes using Modelica\", <i>Proceedings of the MathMod '03 Conference</i>, Wien , Austria, February 2003. </li>
+<li>F. Casella, A. Leva, \"Modelica open library for power plant simulation: design and experimental validation\", <i>Proceedings of the 2003 Modelica Conference</i>, Linköping, Sweden, November 2003, pp. 41-50. (<a href=\"http://www.modelica.org/Conference2003/papers/h08_Leva.pdf\">Available online</a>) </li>
+<li>F. Casella, A. Leva, \"Simulazione di impianti termoidraulici con strumenti object-oriented\", <i>Atti convegno ANIPLA Enersis 2004,</i> Milano, Italy, April 2004 (in Italian). </li>
+<li>F. Casella, A. Leva, \"Object-oriented library for thermal power plant simulation\", <i>Proceedings of the Eurosis Industrial Simulation Conference 2004 (ISC-2004)</i>, Malaga, Spain, June 2004. </li>
+<li>F. Casella, A. Leva, \"Simulazione object-oriented di impianti di generazione termoidraulici per studi di sistema\", <i>Atti convegno nazionale ANIPLA 2004</i>, Milano, Italy, September 2004 (in Italian).</li>
+<li>Francesco Casella and Alberto Leva, “Modelling of Thermo-Hydraulic Power Generation Processes Using Modelica”. <i>Mathematical and Computer Modeling of Dynamical Systems</i>, vol. 12, n. 1, pp. 19-33, Feb. 2006. <a href=\"http://dx.doi.org/10.1080/13873950500071082\">Online</a>. </li>
+<li>Francesco Casella, J. G. van Putten and Piero Colonna, “Dynamic Simulation of a Biomass-Fired Power Plant: a Comparison Between Causal and A-Causal Modular Modeling”. In <i>Proceedings of 2007 ASME International Mechanical Engineering Congress and Exposition</i>, Seattle, Washington, USA, Nov. 11-15, 2007, paper IMECE2007-41091 (Best paper award). </li>
+</ul><p></p>
+<p><br>Other papers about the library and its applications:</p>
+<p></p><ul>
+<li>F. Casella, F. Schiavo, \"Modelling and Simulation of Heat Exchangers in Modelica with Finite Element Methods\", <i>Proceedings of the 2003 Modelica Conference</i>, Linköping, Sweden, 2003, pp. 343-352. (<a href=\"http://www.modelica.org/Conference2003/papers/h22_Schiavo.pdf\">Available online</a>) </li>
+<li>A. Cammi, M.E. Ricotti, F. Casella, F. Schiavo, \"New modelling strategy for IRIS dynamic response simulation\", <i>Proc. 5th International Conference on Nuclear Option in Countries with Small and Medium Electricity Grids</i>, Dubrovnik, Croatia, May 2004.</li>
+<li>A. Cammi, F. Casella, M.E. Ricotti, F. Schiavo, \"Object-oriented Modelling for Integral Nuclear Reactors Dynamic Simulation\", <i>Proceedings of the International Conference on Integrated Modeling &amp; Analysis in Applied Control &amp; Automation</i>, Genova, Italy, October 2004. </li>
+<li>Antonio Cammi, Francesco Casella, Marco Ricotti and Francesco Schiavo, “Object-Oriented Modeling, Simulation and Control of the IRIS Nuclear Power Plant with Modelica”. In <i>Proceedings 4th International Modelica Conference</i>, Hamburg, Germany,Mar. 7-8, 2005, pp. 423-432. <a href=\"http://www.modelica.org/events/Conference2005/online_proceedings/Session5/Session5b3.pdf\">Online</a>. </li>
+<li>A. Cammi, F. Casella, M. E. Ricotti, F. Schiavo, G. D. Storrick, \"Object-oriented Simulation for the Control of the IRIS Nuclear Power Plant\", <i>Proceedings of the IFAC World Congress, </i>Prague, Czech Republic, July 2005 </li>
+<li>Francesco Casella and Francesco Pretolani, “Fast Start-up of a Combined-Cycle Power Plant: a Simulation Study with Modelica”. In <i>Proceedings 5th International Modelica Conference</i>, Vienna, Austria, Sep. 6-8, 2006, pp. 3-10. <a href=\"http://www.modelica.org/events/modelica2006/Proceedings/sessions/Session1a1.pdf\">Online</a>. </li>
+<li>Francesco Casella, “Object-Oriented Modelling of Two-Phase Fluid Flows by the Finite Volume Method”. In <i>Proceedings 5th Mathmod Vienna</i>, Vienna, Austria, Feb. 8-10, 2006. </li>
+<li>Andrea Bartolini, Francesco Casella, Alberto Leva and Valeria Motterle, “A Simulation Study of the Flue Gas Path Control System in a Coal-Fired Power Plant”. In <i>Proceedings ANIPLA International Congress 2006</i>, Rome, Italy,vNov. 13-15, 2006. </li>
+<li>Francesco Schiavo and Francesco Casella, “Object-oriented modelling and simulation of heat exchangers with finite element methods”. <i>Mathematical and Computer Modeling of Dynamical Sytems</i>, vol. 13, n. 3, pp. 211-235, Jun. 2007. <a href=\"http://dx.doi.org/10.1080/13873950600821766\">Online</a>. </li>
+<li>Laura Savoldi Richard, Francesco Casella, Barbara Fiori and Roberto Zanino, “Development of the Cryogenic Circuit Conductor and Coil (4C) Code for thermal-hydraulic modelling of ITER superconducting coils”. In <i>Presented at the 22nd International Cryogenic Engineering Conference ICEC22</i>, Seoul, Korea, July 21-25, 2008. </li>
+<li>Francesco Casella, “Object-Oriented Modelling of Power Plants: a Structured Approach”. In <i>Proceedings of the IFAC Symposium on Power Plants and Power Systems Control</i>, Tampere, Finland, July 5-8, 2009. </li>
+<li>Laura Savoldi Richard, Francesco Casella, Barbara Fiori and Roberto Zanino, “The 4C code for the cryogenic circuit conductor and coil modeling in ITER”. <i>Cryogenics</i>, vol. 50, n. 3, pp. 167-176, Mar 2010. <a href=\"http://dx.doi.org/10.1016/j.cryogenics.2009.07.008\">Online</a>. </li>
+<li>Antonio Cammi, Francesco Casella, Marco Enrico Ricotti and Francesco Schiavo, “An object-oriented approach to simulation of IRIS dynamic response”. <i>Progress in Nuclear Energy</i>, vol. 53, n. 1, pp. 48-58, Jan. 2011. <a href=\"http://dx.doi.org/10.1016/j.pnucene.2010.09.004\">Online</a>. </li>
+<li>Francesco Casella and Piero Colonna, “Development of a Modelica dynamic model of solar supercritical CO2 Brayton cycle power plants for control studies”. In <i>Proceedings of the Supercritical CO2 Power Cycle Symposium</i>, Boulder, Colorado, USA, May 24-25, 2011, pp. 1-7. <a href=\"http://www.sco2powercyclesymposium.org/resource_center/system_modeling_control\">Online</a>. </li>
+<li>Roberto Bonifetto, Francesco Casella, Laura Savoldi Richard and Roberto Zanino, “Dynamic modeling of a SHe closed loop with the 4C code”. In <i>Transactions of the Cryogenic Engineering Conference - CEC: Advances in Cryogenic Engineering</i>, Spokane, Washington, USA, Jun. 13-17, 2011, pp. 1-8. </li>
+<li>Roberto Zanino, Roberto Bonifetto, Francesco Casella and Laura Savoldi Richard, “Validation of the 4C code against data from the HELIOS loop at CEA Grenoble”. <i>Cryogenics</i>, vol. 0, pp. 1-6, 2012. In press; available online 6 May 2012. <a href=\"http://dx.doi.org/10.1016/j.cryogenics.2012.04.010\">Online</a>. </li>
+<li>Francesco Casella and Piero Colonna, “Dynamic modelling of IGCC power plants”. <i>Applied Thermal Engineering</i>, vol. 35, pp. 91-111, 2012. <a href=\"http://dx.doi.org/10.1016/j.applthermaleng.2011.10.011\">Online</a>. </li>
+</ul><p></p>
 
 <h2>Release notes:</h2>
+<p><b>Version 4.0.0</b></p>
+This is a major new release. The 4.0.0 release is not compatible with 3.1 and previous. It has many new features:<p></p>
+<ul>
+  <li>Use of Modelica 3.6 and Modelica Standard Library 4.0.0 or 4.0.1, ensuring full compatibility with all compliant Modelica tools</li>
+<li>the <code>Gas</code> package has been renamed as <code>IdealGas</code> and the <code>Water</code> package as <code>FluidPh</code>. <code>IdealGas</code> contains components that assume ideal gas fluid a priori, hence dh/dp|T == 0, and use p,T, X as states. <code>FluidPh</code> contains components that use a generic fluid with p,h as states, possibly undergoing phase transition. The default will still be IF97 water, but other fluids can be used, such as organic fluids, high-pressure CO2, cryogenic hydrogen, etc.</li>  
+  <li>The <code>Flow1Dxx</code> models have now embedded replaceable friction models, allowing a much easier customization of friction correlations. All the friction models previously present in the Version 3.1 are now available in the <code>Friction</code> Package</li>
+  <li>The manging of the \"zero-flow\" condition has been improved in some components like Pumps and Valves</li>
+  <li>Deprecated components and related examples have been removed</li>
+  <li><code>PowerPlants</code> package has been removed</li>
+  <li>Many bug fixes</li>
+</ul>
+
 <p><b>Version 3.1</b></p>
 <p>
 This is a major new release, that has been in the making for 5 years. The new release is not compatible with 2.1. However, models built using the development version of the library after 2011 should compile with little or no adjustments. It has many new features:
-<ul>
+</p><ul>
   <li>Use of Modelica 3.2 revision 2 and Modelica Standard Library 3.2.1, ensuring full compatibility with all compliant Modelica tools</li>
   <li>Tested with Dymola and OpenModelica.</li>
   <li>Use of stream connectors, compatible with the Modelica.Fluid library, allowing multiple-way connections (see <a href=\"http://dx.doi.org/10.3384/ecp09430078\">paper</a>).</li>
   <li>Use of the homotopy operator for improved convergence of steady-state initialization problems(see <a href=\"https://www.modelica.org/events/modelica2011/Proceedings/pages/papers/04_2_ID_131_a_fv.pdf\">paper</a>).</li>
   <li>Improved Flow1D models with embedded replaceable heat transfer models, allowing a much easier customization of heat transfer correlations</li>
   <li>Many bug fixes</li>
-</ul></p>
+</ul><p></p>
 
 <p><b>Version 2.1 (<i>6 Jul 2009</i>)</b></p>
 <p>The 2.1 release of ThermoPower contains several additions and a few bug fixes with respect to version 2.0. We tried to keep the new version backwards-compatible with the old one, but there might be a few cases where small adaptations could be required.</p><p>ThermoPower 2.1 requires the Modelica Standard Library version 2.2.1 or 2.2.2. It has been tested with Dymola 6.1 (using MSL 2.2.1) and with Dymola 7.1 (using MSL 2.2.2). It is planned to be usable also with other tools, in particular OpenModelica, MathModelica and SimulationX, but this is not possible with the currently released versions of those tools. It is expected that this should become at least partially possible within the year 2009. </p><p>ThermoPower 2.1 is the last major revision compatible with Modelica 2.1 and the Modelica Standard Library 2.2.x. The next version is planned to use Modelica 3.1 and the Modelica Standard Library 3.1. It will use use stream connectors, which generalize the concept of Flange connectors, lifting the restrictions that only two complementary connectors can be bound.</p>
 <p>This is a list of the main changes with respect to v. 2.0</p>
-<p><ul>
+<p></p><ul>
 <li>New PowerPlants package, containing a library of high-level reusable components for the modelling of combined-cycle power plants, including full models that can be simulated. </li>
 <li>New examples cases in the Examples package. </li>
 <li>New components in the Electrical package, to model the generator-grid connection by the swing equation </li>
@@ -2071,9 +2082,9 @@ This is a major new release, that has been in the making for 5 years. The new re
 <li>The Flow1D and Flow1D2ph models are now restricted to positive flow direction, since it was found that it is not possible to describe flow reversal consistently with the average-density approach adopted in this library. For full flow reversal support please use the Flow1Dfem model, which does not have any restriction in this respect. </li>
 <li>A bug in Flow1D and Flow1D2ph has been corrected, which caused significant errors in the mass balance under dynamic conditions; this was potentially critical in closed-loop models, but has now been resolved.&nbsp; </li>
 <li>The connectors for lumped- and distribute-parameters heat transfer with variable heat transfer coefficients have been split: HThtc and DHThtc now have an output qualifier on the h.t.c., while HThtc_in and DHThtc_in have an input qualifier. This was necessary to avoid incorrect connections, and is also required by tools to correctly checked if a model is balanced. This change should have no impact on most user-developed models. </li>
-</ul></p>
+</ul><p></p>
 <p><b>Version 2.0 (<i>10 Jun 2005</i>)</b></p>
-<p><ul>
+<p></p><ul>
 <li>The new Modelica 2.2 standard library is used. </li>
 <li>The ThermoPower library is now based on the Modelica.Media standard library for fluid property calculations. All the component models use a Modelica.Media compliant interface to specify the medium model. Standard water and gas models from the Modelica.Media library can be used, as well as custom-built water and gas models, compliant with the Modelica.Media interfaces. </li>
 <li>Fully functional gas components are now available, including model for gas compressors and turbines, as well as compact gas turbine unit models. </li>
@@ -2081,18 +2092,18 @@ This is a major new release, that has been in the making for 5 years. The new re
 <li>Some components are still under development, and could be changed in the final 2.0 release: </li>
 <li>Moving boundary model for two-phase flow in once-through evaporators. </li>
 <li>Stress models for headers and turbines. </li>
-</ul></p>
+</ul><p></p>
 <p><b>Version 1.2 (<i>18 Nov 2004</i>)</b></p>
-<p><ul>
+<p></p><ul>
 <li>Valve and pump models restructured using inheritance. </li>
 <li>Simple model of a steam turbine unit added (requires the Modelica.Media library). </li>
 <li>CISE example restructured and moved to the <code>Examples</code> package. </li>
 <li>Preliminary version of gas components added in the <code>Gas</code> package. </li>
 <li>Finite element model of thermohydraulic two-phase flow added. </li>
 <li>Simplified models for the connection to the power system added in the <code>Electrical</code> package. </li>
-</ul></p>
+</ul><p></p>
 <p><b>Version 1.1 (<i>15 Feb 2004</i>)</b></p>
-<p><ul>
+<p></p><ul>
 <li>No default values for parameters whose values must be set explicitly by the user. </li>
 <li>Description of the meaning of the model variables added. </li>
 <li><code>Pump</code>, <code>PumpMech</code>, <code>Accumulator</code> models added. </li>
@@ -2100,15 +2111,15 @@ This is a major new release, that has been in the making for 5 years. The new re
 <li><code>Flow1D</code> model corrected to avoid numerical problems when the phase transition boundaries cross the nodes. </li>
 <li><code>Flow1D2phDB</code> model updated. </li>
 <li><code>Flow1D2phChen</code> models with two-phase heat transfer added. </li>
-</ul></p>
+</ul><p></p>
 <p><b>Version 1.0 (<i>20 Oct 2003</i>)</b></p>
-<p><ul>
+<p></p><ul>
 <li>First release in the public domain</li>
-</ul></p>
-<p><b></font><font style=\"font-size: 12pt; \">License agreement</b></p>
+</ul><p></p>
+<p><b><font style=\"font-size: 12pt; \">License agreement</font></b></p><font style=\"font-size: 12pt; \">
 <p>The ThermoPower package is licensed by Politecnico di Milano under the <b><a href=\"http://www.modelica.org/licenses/ModelicaLicense2\">Modelica License 2</a></b>. </p>
-<p><h4>Copyright &copy; 2002-2014, Politecnico di Milano.</h4></p>
-</html>"),
+<p></p><h4>Copyright © 2002-2014, Politecnico di Milano.</h4><p></p>
+</font></body></html>"),
   uses(Modelica(version="4.0.0")),
   version="4.0.0");
 end ThermoPower;
