@@ -1451,18 +1451,21 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
-    HeatTransfer heatTransfer2(
+    HeatTransfer2 heatTransfer2(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
       final Nt=Nt,
       final L=L,
       final A=A,
-      final Dhyd=Dhyd,
-      final omega=omega,
+      final Dhyd=Dhyd2,
+      final omega=omega2,
       final wnom=wnom/Nt,
       final w=w*ones(N),
       final fluidState=fluidState) "Instantiated heat transfer model";
+
+    parameter SI.Length omega2 = omega "Perimeter of heat transfer surface wall 2 (single tube)";
+    parameter SI.Length Dhyd2 = omega2/pi "Hydraulic Diameter wall2 (single tube)";
 
     Thermal.DHTVolumes wall2(final N=Nw)
       annotation (Placement(transformation(extent={{-60,-60},{60,-40}},
@@ -1855,18 +1858,21 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
-    HeatTransfer heatTransfer2(
+    HeatTransfer2 heatTransfer2(
       redeclare package Medium = Medium,
       final Nf=N,
       final Nw=Nw,
       final Nt=Nt,
       final L=L,
       final A=A,
-      final Dhyd=Dhyd,
-      final omega=omega,
+      final Dhyd=Dhyd2,
+      final omega=omega2,
       final wnom=wnom/Nt,
       final w=w*ones(N),
       final fluidState=fluidState) "Instantiated heat transfer model";
+
+    parameter SI.Length omega2 = omega "Perimeter of heat transfer surface wall 2 (single tube)";
+    parameter SI.Length Dhyd2 = omega2/pi "Hydraulic Diameter wall2 (single tube)";
 
     Thermal.DHTVolumes wall2(final N=Nw)
       annotation (Placement(transformation(extent={{-60,-60},{60,-40}},rotation=0)));
@@ -1946,13 +1952,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     SI.Pressure Dpstat "Pressure drop due to static head";
     Medium.MassFlowRate w[N](each start=wnom/Nt) "Mass flowrate (single tube)";
     SI.Velocity u[N] "Fluid velocity";
-    SI.HeatFlux phi[N] "Heat flux entering the fluid";
     Medium.Temperature T[N] "Fluid temperature";
     Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
     Medium.Density rho[N] "Fluid density";
     SI.SpecificVolume v[N] "Fluid specific volume";
     SI.Mass Mtot "Total mass of fluid";
-    SI.Power Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
+    ThermoPower.Units.PowerDensity QvolSingle[N] = M*(omega/A)*heatTransfer.phi_f "Power density entering the fluid - single pipe";
+    SI.Power Q = Nt*omega*D*heatTransfer.phi_f "Total heat flow through lateral boundary";
 
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
@@ -2025,10 +2031,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
 
-    Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D
-      "Pressure drop due to static head";
-    ((1 - ML)*Y + ML*YY)*der(h) + B/A*h + C*h/A = der(p)*G + M*(omega/A)*phi +
-      K*w/A "Energy balance equation";
+    Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D "Pressure drop due to static head";
+    ((1 - ML)*Y + ML*YY)*der(h) + B/A*h + C*h/A = der(p)*G + QvolSingle + K*w/A "Energy balance equation";
 
     // Fluid property calculations
     for j in 1:N loop
@@ -2046,9 +2050,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     //Boundary Values of outflowing fluid enthalpies
     h[1] = infl.h_outflow;
     h[N] = outfl.h_outflow;
-
-    // Boundary values of heat flux
-    phi = heatTransfer.phi_f;
 
     // Stabilization parameters depending of flow direction
     for i in 1:N loop
@@ -2344,6 +2345,38 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </body></html>"));
   end Flow1DFEM;
 
+  model Flow1DFEM2w "Same as Flow1DFEM with two walls and heat transfer models"
+    extends ThermoPower.FluidPh.Flow1DFEM(
+      QvolSingle = M*(omega/A)*heatTransfer.phi_f + M*(omega2/A)*heatTransfer2.phi_f,
+      Q = Nt*omega*D*heatTransfer.phi_f + Nt*omega2*D*heatTransfer2.phi_f);
+
+    replaceable model HeatTransfer2 = Thermal.HeatTransferFEM.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFEM
+      annotation (choicesAllMatching=true);
+    HeatTransfer2 heatTransfer2(
+      redeclare package Medium = Medium,
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd2,
+      final omega=omega2,
+      final wnom=wnom/Nt,
+      final w=w,
+      final fluidState=fluidState) "Instantiated heat transfer model";
+
+    parameter SI.Length omega2 = omega "Perimeter of heat transfer surface wall 2 (single tube)";
+    parameter SI.Length Dhyd2 = omega2/pi "Hydraulic Diameter wall2 (single tube)";
+
+    ThermoPower.Thermal.DHTNodes wall2(N=N) annotation (
+      Placement(transformation(origin = {0, -100}, extent = {{-40, 40}, {40, 60}}), iconTransformation(origin = {0, -100}, extent = {{-40, 40}, {40, 60}})));
+
+  equation
+    connect(wall2,heatTransfer2.wall);
+
+  end Flow1DFEM2w;
+
   model Flow1DFEMnm
     "1-dimensional fluid flow model for p-h fluid (finite elements)"
     extends BaseClasses.Flow1DBase(Nw = N);
@@ -2406,7 +2439,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.Density rho[N] "Fluid density";
     Modelica.Units.SI.SpecificVolume v[N] "Fluid specific volume";
     Modelica.Units.SI.Mass Mtot "Total mass of fluid";
-    Modelica.Units.SI.Power Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
+    Modelica.Units.SI.Power Q "Total heat flow through lateral boundary";
 
   protected
     Modelica.Units.SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
@@ -2593,6 +2626,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
     connect(wall, heatTransfer.wall);
 
+    Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
     Mtot = Nt*D*rho*A "Total mass of fluid";
     Tr = noEvent(Mtot/max(abs(infl.m_flow), Modelica.Constants.eps)) "Residence time";
 
@@ -2709,7 +2743,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     SI.Pressure Dpstat "Pressure drop due to static head";
     Medium.MassFlowRate w[N](start=wnom*ones(N)) "Mass flowrate (single tube)";
     SI.Velocity u[N] "Fluid velocity";
-    SI.HeatFlux phi[N] "External heat flux";
     Medium.Temperature T[N] "Fluid temperature";
     Medium.SpecificEnthalpy h[N](start=hstart) "Fluid specific enthalpy";
     Medium.Density rho[N] "Fluid density";
@@ -2724,7 +2757,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Units.LiquidDensity rhol "Saturated liquid density";
     Units.GasDensity rhov "Saturated vapour density";
     Real Phi[N] "Two-phase friction multiplier";
-    SI.Power Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
+    ThermoPower.Units.PowerDensity QvolSingle[N] = M*(omega/A)*heatTransfer.phi_f "Power density entering the fluid - single pipe";
+    SI.Power Q = Nt*omega*D*heatTransfer.phi_f "Total heat flow through lateral boundary";
 
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
@@ -2845,12 +2879,11 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       end if;
     end for;
 
-    Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D
-      "Pressure drop due to static head";
+    Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D "Pressure drop due to static head";
 
     //Energy balance equations
     l/12*((1 - ML)*Y + ML*YY + 0*Y2ph)*der(h) + (1/A)*(B + 0*B2ph)*h + C*h/A =
-      der(p)*G + M*(omega/A)*phi + K*w/A;
+      der(p)*G + QvolSingle + K*w/A;
 
     //  (Ts,rhol,rhov,hl,hv,drl_dp,drv_dp,drl_dh,drv_dh,dhl,dhv,drl,drv) =
     //  propsat_p_2der(noEvent(min(p, pc - pzero)));
@@ -2896,7 +2929,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     //Boundary Values
     h[1] = infl.h_outflow;
     h[N] = outfl.h_outflow;
-    phi = heatTransfer.phi_f;
     connect(wall, heatTransfer.wall);
 
     alpha_sgn = alpha*sign(infl.m_flow - outfl.m_flow);
@@ -3357,7 +3389,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     end if;
     annotation (
       Diagram(graphics),
-      Icon(graphics={Text(extent={{-100,-40},{100,-80}}, textString="%name")}),
+      Icon(graphics={Text(origin = {4, -18},extent={{-100,-40},{100,-80}}, textString="%name")}),
       Documentation(info="<html><head></head><body><p>This model describes the flow of water or steam in a rigid tube. The basic modelling assumptions are:
 </p><ul><li>The fluid state is either one-phase, or a two-phase mixture.
 </li><li>In case of two-phase flow, the same velocity is assumed for both phases (homogeneous model).
@@ -3412,6 +3444,38 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </ul>
 </body></html>"));
   end Flow1DFEM2ph;
+
+  model Flow1DFEM2ph2w "Same as Flow1DFEM2ph with two walls and heat transfer models"
+    extends ThermoPower.FluidPh.Flow1DFEM2ph(
+      QvolSingle = M*(omega/A)*heatTransfer.phi_f + M*(omega2/A)*heatTransfer2.phi_f,
+      Q = Nt*omega*D*heatTransfer.phi_f + Nt*omega2*D*heatTransfer2.phi_f);
+
+    replaceable model HeatTransfer2 = Thermal.HeatTransferFEM.IdealHeatTransfer
+      constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFEM
+      annotation (choicesAllMatching=true);
+    HeatTransfer2 heatTransfer2(
+      redeclare package Medium = Medium,
+      final Nf=N,
+      final Nw=Nw,
+      final Nt=Nt,
+      final L=L,
+      final A=A,
+      final Dhyd=Dhyd2,
+      final omega=omega2,
+      final wnom=wnom/Nt,
+      final w=w,
+      final fluidState=fluidState) "Instantiated heat transfer model";
+
+    parameter SI.Length omega2 = omega "Perimeter of heat transfer surface wall 2 (single tube)";
+    parameter SI.Length Dhyd2 = omega2/pi "Hydraulic Diameter wall2 (single tube)";
+
+    ThermoPower.Thermal.DHTNodes wall2(N=N) annotation (
+      Placement(transformation(origin = {0, -100}, extent = {{-40, 40}, {40, 60}}), iconTransformation(origin = {0, -100}, extent = {{-40, 40}, {40, 60}})));
+
+  equation
+    connect(wall2,heatTransfer2.wall);
+
+  end Flow1DFEM2ph2w;
 
   model FlowJoin "Joins two p-h fluid flows"
     extends Icons.FluidPh.FlowJoin;

@@ -13,4 +13,5 @@ package Units "Types with custom units"
     "Absolute temperature";
   type AbsolutePressure = SI.Pressure (start=1e5, min = 0) "generic pressure";
   type SpecificThermalResistance = Real(unit="m2.K/W") "Unit for fouling factors";
+  type PowerDensity = Real(final quantity="PowerDensity", final unit="W/m3");
 end Units;
