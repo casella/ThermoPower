@@ -1019,7 +1019,8 @@ package IdealGas "Models of components with ideal gases as working fluid"
     SI.Time Tr "Residence time";
     SI.Mass M "Gas Mass (single tube)";
     SI.Mass Mtot "Gas Mass (total)";
-    SI.Power Q "Total heat flow through the wall (all Nt tubes)";
+    SI.Power Q = heatTransfer.Q "Total heat flow through the lateral boundary";
+
   protected
     parameter SI.Length l=L/(N - 1) "Length of a single volume";
     Medium.Density rhobar[N - 1] "Fluid average density";
@@ -1114,7 +1115,7 @@ package IdealGas "Models of components with ideal gases as working fluid"
         cvbar[j] = 0;
       end if;
     end for;
-    Q = heatTransfer.Q "Total heat flow through the lateral boundary";
+
     if Medium.fixedX then
       Xtilde = fill(Medium.reference_X, 1);
     elseif QuasiStatic then
@@ -1264,7 +1265,8 @@ package IdealGas "Models of components with ideal gases as working fluid"
 
   model Flow1DFV2w "Same as Flow1DFV with two walls and heat transfer models"
     extends Flow1DFV(
-      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt);
+      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt,
+      Q = heatTransfer.Q + heatTransfer2.Q);
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
