@@ -1277,11 +1277,14 @@ package IdealGas "Models of components with ideal gases as working fluid"
       final Nt=Nt,
       final L=L,
       final A=A,
-      final Dhyd=Dhyd,
-      final omega=omega,
+      final Dhyd=Dhyd2,
+      final omega=omega2,
       final wnom=wnom/Nt,
       final w=w*ones(N),
       final fluidState=gas.state) "Instantiated heat transfer model";
+
+    parameter SI.Length omega2 = omega "Perimeter of heat transfer surface wall 2 (single tube)";
+    parameter SI.Length Dhyd2 = omega2/Modelica.Constants.pi "Hydraulic Diameter wall2 (single tube)";
 
     Thermal.DHTVolumes wall2(final N=Nw)
       annotation (Placement(transformation(extent={{-60,-60},{60,-40}},
