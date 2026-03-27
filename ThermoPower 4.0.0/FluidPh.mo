@@ -1205,6 +1205,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     SI.Mass Mtot "Fluid mass (total)";
     SI.MassFlowRate dMdt[N - 1]
       "Time derivative of mass in each cell between two nodes";
+    SI.Power Q = heatTransfer.Q "Total heat flow through the lateral boundary (all Nt tubes)";
+
     replaceable model HeatTransfer = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
@@ -1356,7 +1358,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     connect(wall,heatTransfer.wall);
 
-    Q = heatTransfer.Q "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Fluid mass (single tube)";
     Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(win, Modelica.Constants.eps)) "Residence time";
@@ -1445,7 +1446,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
   model Flow1DFV2w "Same as Flow1DFV with two walls and heat transfer models"
     extends Flow1DFV(
-      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt);
+      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt,
+      Q = heatTransfer.Q + heatTransfer2.Q);
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
@@ -1560,6 +1562,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
     Units.GasDensity rhov "Saturated vapour density";
     SI.Mass M "Fluid mass";
     SI.Mass Mtot "Fluid mass (total)";
+    SI.Power Q = heatTransfer.Q"Total heat flow through the lateral boundary (all Nt tubes)";
+
   protected
     SI.DerEnthalpyByPressure dhldp
       "Derivative of saturated liquid enthalpy by pressure";
@@ -1747,7 +1751,6 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     connect(wall,heatTransfer.wall);
 
-    Q = heatTransfer.Q "Total heat flow through lateral boundary";
     M = sum(rhobar)*A*l "Fluid mass (single tube)";
     Mtot = M*Nt "Fluid mass (total)";
     Tr = noEvent(M/max(infl.m_flow/Nt, Modelica.Constants.eps))
@@ -1847,7 +1850,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
   model Flow1DFV2ph2w
     "Same as Flow1DFV with two walls and heat transfer models"
     extends Flow1DFV2ph(
-      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt);
+      Q_single = heatTransfer.Qvol/Nt + heatTransfer2.Qvol/Nt,
+      Q = heatTransfer.Q + heatTransfer2.Q);
     replaceable model HeatTransfer2 = Thermal.HeatTransferFV.IdealHeatTransfer
       constrainedby ThermoPower.Thermal.BaseClasses.DistributedHeatTransferFV
       annotation (choicesAllMatching=true);
@@ -1948,6 +1952,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.Density rho[N] "Fluid density";
     SI.SpecificVolume v[N] "Fluid specific volume";
     SI.Mass Mtot "Total mass of fluid";
+    SI.Power Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
+
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
@@ -2251,7 +2257,6 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 
     connect(wall,heatTransfer.wall);
 
-    Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
     Mtot = Nt*D*rho*A "Total mass of fluid";
     Tr = noEvent(Mtot/max(abs(infl.m_flow), Modelica.Constants.eps))
       "Residence time";
@@ -2401,6 +2406,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Medium.Density rho[N] "Fluid density";
     Modelica.Units.SI.SpecificVolume v[N] "Fluid specific volume";
     Modelica.Units.SI.Mass Mtot "Total mass of fluid";
+    Modelica.Units.SI.Power Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
 
   protected
     Modelica.Units.SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
@@ -2586,7 +2592,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       assert(false, "Unsupported HydraulicCapacitance option");
     end if;
     connect(wall, heatTransfer.wall);
-    Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
+
     Mtot = Nt*D*rho*A "Total mass of fluid";
     Tr = noEvent(Mtot/max(abs(infl.m_flow), Modelica.Constants.eps)) "Residence time";
 
@@ -2718,6 +2724,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     Units.LiquidDensity rhol "Saturated liquid density";
     Units.GasDensity rhov "Saturated vapour density";
     Real Phi[N] "Two-phase friction multiplier";
+    SI.Power Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
+
   protected
     SI.DerDensityByEnthalpy drdh[N] "Derivative of density by enthalpy";
     SI.DerDensityByPressure drdp[N] "Derivative of density by pressure";
@@ -3324,7 +3332,7 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         end for;
       end for;
     end if;
-    Q = Nt*omega*D*phi "Total heat flow through lateral boundary";
+
     Tr = noEvent(sum(rho)*A*l/max(infl.m_flow/Nt, Modelica.Constants.eps));
   initial equation
     if initOpt == Choices.Init.Options.noInit then
@@ -5798,7 +5806,6 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
         m_flow(start=-wnom, max=if allowFlowReversal then +Modelica.Constants.inf
                else 0)) annotation (Placement(transformation(extent={{80,-20},{
                 120,20}}, rotation=0)));
-      SI.Power Q "Total heat flow through the lateral boundary (all Nt tubes)";
       SI.Time Tr "Residence time";
       final parameter SI.PerUnit dzdx=H/L "Slope" annotation (Evaluate=true);
       final parameter SI.Length l=L/(N - 1) "Length of a single volume";
