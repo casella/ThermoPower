@@ -8902,7 +8902,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
       SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.1;
-      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.heatTransfer.phi_f - hex.phi)/1e4;
     
     equation
       connect(hex.outfl, Valve.inlet) annotation(
@@ -9010,7 +9010,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
       SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.1;
-      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.heatTransfer.phi_f - hex.phi)/1e4;
     
     equation
       connect(hex.outfl, ValveLin1.inlet) annotation(
@@ -9114,7 +9114,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
       SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.1;
-      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.heatTransfer.phi_f - hex.phi)/1e4;
     
     equation
       connect(ValveLin1.outlet, SinkP1.flange) annotation(
@@ -9213,7 +9213,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e6;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
       SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.01;
-      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.heatTransfer.phi_f - hex.phi)/1e4;
     
     
     equation
@@ -9331,13 +9331,13 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[hexA.N] delta_hA = (refData.hexA.h - hexA.h)/1e5;
       SI.TemperatureDifference[hexA.N] delta_TA = (refData.hexA.T - hexA.T)/1e2;
       SI.MassFlowRate[hexA.N] delta_wA = (refData.hexA.w - hexA.w)/0.1;
-      SI.HeatFlux[hexA.N] delta_phiA = (refData.hexA.phi - hexA.phi)/1e4;
+      SI.HeatFlux[hexA.N] delta_phiA = (refData.hexA.heatTransfer.phi_f - hexA.phi)/1e4;
     
       SI.Pressure delta_pB = (refData.hexB.p - hexB.p)/1e5;
       SI.SpecificEnthalpy[hexB.N] delta_hB = (refData.hexB.h - hexB.h)/1e5;
       SI.TemperatureDifference[hexB.N] delta_TB = (refData.hexB.T - hexB.T)/1e2;
       SI.MassFlowRate[hexB.N] delta_wB = (refData.hexB.w - hexB.w)/0.1;
-      SI.HeatFlux[hexB.N] delta_phiB = (refData.hexB.phi - hexB.phi)/1e4;
+      SI.HeatFlux[hexB.N] delta_phiB = (refData.hexB.heatTransfer.phi_f - hexB.phi)/1e4;
     
     equation
       connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) annotation(
@@ -9476,13 +9476,13 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[hexA.N] delta_hA = (refData.hexA.h - hexA.h)/1e5;
       SI.TemperatureDifference[hexA.N] delta_TA = (refData.hexA.T - hexA.T)/1e2;
       SI.MassFlowRate[hexA.N] delta_wA = (refData.hexA.w - hexA.w)/0.1;
-      SI.HeatFlux[hexA.N] delta_phiA = (refData.hexA.phi - hexA.phi)/1e4;
+      SI.HeatFlux[hexA.N] delta_phiA = (refData.hexA.heatTransfer.phi_f - hexA.phi)/1e4;
     
       SI.Pressure delta_pB = (refData.hexB.p - hexB.p)/1e5;
       SI.SpecificEnthalpy[hexB.N] delta_hB = (refData.hexB.h - hexB.h)/1e5;
       SI.TemperatureDifference[hexB.N] delta_TB = (refData.hexB.T - hexB.T)/1e2;
       SI.MassFlowRate[hexB.N] delta_wB = (refData.hexB.w - hexB.w)/0.1;
-      SI.HeatFlux[hexB.N] delta_phiB = (refData.hexB.phi - hexB.phi)/1e4;
+      SI.HeatFlux[hexB.N] delta_phiB = (refData.hexB.heatTransfer.phi_f - hexB.phi)/1e4;
     
     equation
       connect(SideA_MassFlowRate.flange, SensT_A_in.inlet) annotation(
@@ -9601,7 +9601,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[hex.N] delta_h = (refData.hex.h - hex.h)/1e5;
       SI.TemperatureDifference[hex.N] delta_T = (refData.hex.T - hex.T)/1e2;
       SI.MassFlowRate[hex.N] delta_w = (refData.hex.w - hex.w)/0.1;
-      SI.HeatFlux[hex.N] delta_phi = (refData.hex.phi - hex.phi)/1e4;
+      SI.HeatFlux[hex.N] delta_phi = (refData.hex.heatTransfer.phi_f - hex.phi)/1e4;
     
     equation
       connect(T_in.outlet, hex.infl) annotation(
@@ -9703,7 +9703,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[pipe1.N] delta_h = (refData.pipe1.h - pipe1.h)/1e5;
       SI.TemperatureDifference[pipe1.N] delta_T = (refData.pipe1.T - pipe1.T)/1e2;
       SI.MassFlowRate[pipe1.N] delta_w = (refData.pipe1.w - pipe1.w)/0.1;
-      SI.HeatFlux[pipe1.N] delta_phi = (refData.pipe1.phi - pipe1.phi)/1e4;
+      SI.HeatFlux[pipe1.N] delta_phi = (refData.pipe1.heatTransfer.phi_f - pipe1.phi)/1e4;
     
     equation
       connect(source1.flange, pipe1.infl) annotation(
@@ -9786,7 +9786,7 @@ This model checks the dynamic mass balance equations of Flow1DFV2ph, by prescrib
       SI.SpecificEnthalpy[pipe1.N] delta_h = (refData.pipe1.h - pipe1.h)/1e6;
       SI.TemperatureDifference[pipe1.N] delta_T = (refData.pipe1.T - pipe1.T)/1e2;
       SI.MassFlowRate[pipe1.N] delta_w = (refData.pipe1.w - pipe1.w)/0.1;
-      SI.HeatFlux[pipe1.N] delta_phi = (refData.pipe1.phi - pipe1.phi)/1e4;
+      SI.HeatFlux[pipe1.N] delta_phi = (refData.pipe1.heatTransfer.phi_f - pipe1.phi)/1e4;
     
     equation
       connect(source1.flange, pipe1.infl) annotation(
