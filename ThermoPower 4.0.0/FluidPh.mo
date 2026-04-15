@@ -5952,6 +5952,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         annotation (Dialog(group="Nominal operating point"), Evaluate=true);
       parameter Boolean CheckValve=false "Reverse flow stopped";
       parameter Real b=0.01 "Regularisation factor";
+      parameter SI.PressureDifference dpMin(min = 0) = 0 "minimum dp to be used for reversal flow calculation";
       replaceable function FlowChar =
           ThermoPower.Functions.ValveCharacteristics.linear
         constrainedby ThermoPower.Functions.ValveCharacteristics.baseFun
@@ -6052,10 +6053,18 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         rho*V*der(h) = inlet.m_flow*hin + outlet.m_flow*hout - Qnom;
         outlet.h_outflow = h;
         inlet.h_outflow = h;
-        hin = actualStream(inlet.h_outflow);
-        hout = actualStream(outlet.h_outflow);
+        if dp > dpMin then
+          hin = inStream(inlet.h_outflow);
+          hout = h;
+        elseif dp < -dpMin then
+          hin = h;
+          hout = inStream(outlet.h_outflow);
+        else
+          hin=h;
+          hout=h;
+        end if;
       else
-        h = if noEvent(dp > 0) then hin else hout;
+        h = if dp > 0 then hin else hout;
         outlet.h_outflow = hin - Qnom/wnom;
         inlet.h_outflow = hout - Qnom/wnom;
         hin = inStream(inlet.h_outflow);
@@ -6182,6 +6191,7 @@ It is possible to take into account the heat capacity of the fluid inside the va
          Dialog(group="Characteristics"));
       parameter SI.Pressure dp0 "Nominal pressure increase"
         annotation (Dialog(group="Characteristics"));
+      parameter SI.PressureDifference dpMin(min = 0) = 0 "minimum dp to be used for reversal flow calculation";
       final parameter SI.VolumeFlowRate q_single0=w0/(Np0*rho0)
         "Nominal volume flow rate (single pump)"
         annotation(Evaluate = true);
@@ -6275,11 +6285,6 @@ It is possible to take into account the heat capacity of the fluid inside the va
       dp = outfl.p - infl.p;
       w = infl.m_flow "Pump total flow rate";
 
-      hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
-                     else if w >= 0 then inStream(infl.h_outflow)
-                     else inStream(outfl.h_outflow),
-                     inStream(infl.h_outflow));
-
       infl.h_outflow = hout;
       outfl.h_outflow = hout;
       h = hout;
@@ -6289,9 +6294,23 @@ It is possible to take into account the heat capacity of the fluid inside the va
       if V > 0 then
         (rho*V*der(h)) = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin +
           W_single - Qloss "Energy balance";
+
+        hin = homotopy(if not allowFlowReversal then
+                         (if dp > dpMin then inStream(infl.h_outflow) else h)
+                       else
+                         (if dp > dpMin then inStream(infl.h_outflow)
+                          elseif dp < -dpMin then inStream(outfl.h_outflow)
+                          else h),
+                       h);
+
       else
         0 = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single - Qloss
           "Energy balance";
+
+        hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
+                       else if w >= 0 then inStream(infl.h_outflow)
+                       else inStream(outfl.h_outflow),
+                       inStream(infl.h_outflow));
       end if;
 
       // Number of pumps in parallel
