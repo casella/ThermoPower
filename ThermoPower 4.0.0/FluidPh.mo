@@ -6064,7 +6064,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
           hout=h;
         end if;
       else
-        h = if dp > dpMin then hin else hout;
+        h = if dp > 0 then hin else hout;
         outlet.h_outflow = hin - Qnom/wnom;
         inlet.h_outflow = hout - Qnom/wnom;
         hin = inStream(inlet.h_outflow);
@@ -6297,8 +6297,10 @@ It is possible to take into account the heat capacity of the fluid inside the va
 
         hin = homotopy(if not allowFlowReversal then
                          (if dp > dpMin then inStream(infl.h_outflow) else h)
-                       else if w >= 0 then inStream(infl.h_outflow)
-                       else inStream(outfl.h_outflow),
+                       else
+                         (if dp > dpMin then inStream(infl.h_outflow)
+                          elseif dp < -dpMin then inStream(outfl.h_outflow)
+                          else h),
                        h);
 
       else
