@@ -5975,7 +5975,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         "Specific Enthalpy Start Value"
         annotation (Dialog(tab="Initialisation"));
       parameter SI.Volume V=0 "Valve Internal Volume" annotation (Evaluate=true);
-      parameter Boolean useNoEvents = false "=true, to avoid events in case of chattering in zero-flow condition" annotation(evaluate=true);
+      parameter Boolean useNoEvent = false "=true, to avoid events in case of chattering in zero-flow condition" annotation(evaluate=true);
       Medium.MassFlowRate w "Mass flow rate";
       Units.LiquidDensity rho "Inlet density";
       Medium.Temperature Tin;
@@ -6054,7 +6054,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         rho*V*der(h) = inlet.m_flow*hin + outlet.m_flow*hout - Qnom;
         outlet.h_outflow = h;
         inlet.h_outflow = h;
-        if useNoEvents then
+        if useNoEvent then
           if noEvent(dp > dpMin) then
             hin = inStream(inlet.h_outflow);
             hout = h;
@@ -6078,7 +6078,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
           end if;
         end if;  
       else
-        if useNoEvents then
+        if useNoEvent then
           h = if noEvent(dp > 0) then hin else hout;
         else
           h = if dp > 0 then hin else hout;
@@ -6223,7 +6223,7 @@ It is possible to take into account the heat capacity of the fluid inside the va
       final parameter Real d_head_dn_0 = 2/n0*head0 - q_single0/n0*d_head_dq_0
         "Approximate derivative of the flow characteristic w.r.t. rotational speed"
         annotation(Evaluate = true);
-  parameter Boolean useNoEvents = false "=true, to avoid events in case of chattering in zero-flow condition" annotation(evaluate=true);
+    parameter Boolean useNoEvent = false "=true, to avoid events in case of chattering in zero-flow condition" annotation(evaluate=true);
     
       Medium.MassFlowRate w_single(start=wstart/Np0)
         "Mass flow rate (single pump)";
@@ -6314,7 +6314,7 @@ It is possible to take into account the heat capacity of the fluid inside the va
         (rho*V*der(h)) = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin +
           W_single - Qloss "Energy balance";
 
-        if useNoEvents then
+        if useNoEvent then
           hin = homotopy(if not allowFlowReversal then
                            (if noEvent(dp > dpMin) then inStream(infl.h_outflow) else h)
                          else
@@ -6335,7 +6335,7 @@ It is possible to take into account the heat capacity of the fluid inside the va
         0 = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single - Qloss
           "Energy balance";
 
-        if useNoEvents then
+        if useNoEvent then
           hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
                          else if noEvent(w >= 0) then inStream(infl.h_outflow)
                          else inStream(outfl.h_outflow),
