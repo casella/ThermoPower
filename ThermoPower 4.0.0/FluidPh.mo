@@ -5975,6 +5975,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         "Specific Enthalpy Start Value"
         annotation (Dialog(tab="Initialisation"));
       parameter SI.Volume V=0 "Valve Internal Volume" annotation (Evaluate=true);
+      parameter Boolean useNoEvents = false "=true, to avoid events in case of chattering in zero-flow condition" annotation(evaluate=true);
       Medium.MassFlowRate w "Mass flow rate";
       Units.LiquidDensity rho "Inlet density";
       Medium.Temperature Tin;
@@ -6053,18 +6054,35 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         rho*V*der(h) = inlet.m_flow*hin + outlet.m_flow*hout - Qnom;
         outlet.h_outflow = h;
         inlet.h_outflow = h;
-        if dp > dpMin then
-          hin = inStream(inlet.h_outflow);
-          hout = h;
-        elseif dp < -dpMin then
-          hin = h;
-          hout = inStream(outlet.h_outflow);
+        if useNoEvents then
+          if noEvent(dp > dpMin) then
+            hin = inStream(inlet.h_outflow);
+            hout = h;
+          elseif noEvent(dp < -dpMin) then
+            hin = h;
+            hout = inStream(outlet.h_outflow);
+          else
+            hin=h;
+            hout=h;
+          end if;
         else
-          hin=h;
-          hout=h;
-        end if;
+          if dp > dpMin then
+            hin = inStream(inlet.h_outflow);
+            hout = h;
+          elseif dp < -dpMin then
+            hin = h;
+            hout = inStream(outlet.h_outflow);
+          else
+            hin=h;
+            hout=h;
+          end if;
+        end if;  
       else
-        h = if dp > 0 then hin else hout;
+        if useNoEvents then
+          h = if noEvent(dp > 0) then hin else hout;
+        else
+          h = if dp > 0 then hin else hout;
+        end if;
         outlet.h_outflow = hin - Qnom/wnom;
         inlet.h_outflow = hout - Qnom/wnom;
         hin = inStream(inlet.h_outflow);
@@ -6205,7 +6223,8 @@ It is possible to take into account the heat capacity of the fluid inside the va
       final parameter Real d_head_dn_0 = 2/n0*head0 - q_single0/n0*d_head_dq_0
         "Approximate derivative of the flow characteristic w.r.t. rotational speed"
         annotation(Evaluate = true);
-
+  parameter Boolean useNoEvents = false "=true, to avoid events in case of chattering in zero-flow condition" annotation(evaluate=true);
+    
       Medium.MassFlowRate w_single(start=wstart/Np0)
         "Mass flow rate (single pump)";
       Medium.MassFlowRate w=Np*w_single "Mass flow rate (total)";
@@ -6295,22 +6314,38 @@ It is possible to take into account the heat capacity of the fluid inside the va
         (rho*V*der(h)) = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin +
           W_single - Qloss "Energy balance";
 
-        hin = homotopy(if not allowFlowReversal then
-                         (if dp > dpMin then inStream(infl.h_outflow) else h)
-                       else
-                         (if dp > dpMin then inStream(infl.h_outflow)
-                          elseif dp < -dpMin then inStream(outfl.h_outflow)
-                          else h),
-                       h);
-
+        if useNoEvents then
+          hin = homotopy(if not allowFlowReversal then
+                           (if noEvent(dp > dpMin) then inStream(infl.h_outflow) else h)
+                         else
+                           (if noEvent(dp > dpMin) then inStream(infl.h_outflow)
+                            elseif noEvent(dp < -dpMin) then inStream(outfl.h_outflow)
+                            else h),
+                         h);    
+        else
+          hin = homotopy(if not allowFlowReversal then
+                           (if dp > dpMin then inStream(infl.h_outflow) else h)
+                         else
+                           (if dp > dpMin then inStream(infl.h_outflow)
+                            elseif dp < -dpMin then inStream(outfl.h_outflow)
+                            else h),
+                         h);
+    end if;
       else
         0 = (outfl.m_flow/Np)*hout + (infl.m_flow/Np)*hin + W_single - Qloss
           "Energy balance";
 
-        hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
-                       else if w >= 0 then inStream(infl.h_outflow)
-                       else inStream(outfl.h_outflow),
-                       inStream(infl.h_outflow));
+        if useNoEvents then
+          hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
+                         else if noEvent(w >= 0) then inStream(infl.h_outflow)
+                         else inStream(outfl.h_outflow),
+                         inStream(infl.h_outflow));
+        else
+          hin = homotopy(if not allowFlowReversal then inStream(infl.h_outflow)
+                         else if w >= 0 then inStream(infl.h_outflow)
+                         else inStream(outfl.h_outflow),
+                         inStream(infl.h_outflow));
+        end if;
       end if;
 
       // Number of pumps in parallel
