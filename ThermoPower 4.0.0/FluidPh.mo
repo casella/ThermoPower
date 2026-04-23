@@ -6039,10 +6039,18 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       if V > 0 then
         fluidState = Medium.setState_phX((inlet.p+outlet.p)/2, h);
       else
-        if dp > 0 then
-          fluidState = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
+        if useNoEvent then
+          if noEvent(dp > 0) then
+            fluidState = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
+          else
+            fluidState = Medium.setState_phX(outlet.p, inStream(outlet.h_outflow));
+          end if;
         else
-          fluidState = Medium.setState_phX(outlet.p, inStream(outlet.h_outflow));
+          if dp > 0 then
+            fluidState = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
+          else
+            fluidState = Medium.setState_phX(outlet.p, inStream(outlet.h_outflow));
+          end if;
         end if;
       end if;
 
