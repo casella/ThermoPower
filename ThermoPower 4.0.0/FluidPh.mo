@@ -6062,7 +6062,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
         rho*V*der(h) = inlet.m_flow*hin + outlet.m_flow*hout - Qnom;
         outlet.h_outflow = h;
         inlet.h_outflow = h;
-        if theta > 0 then
+        if theta_int > 0 then
           if useNoEvent then
             if noEvent(dp > dpMin) then
               hin = inStream(inlet.h_outflow);
