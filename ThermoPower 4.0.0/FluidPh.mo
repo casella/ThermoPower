@@ -3744,10 +3744,13 @@ enthalpy between the nodes; this requires the availability of the time derivativ
     FlangeA flange(redeclare package Medium = Medium, m_flow(min=0))
       annotation (Placement(transformation(extent={{-20,-60},{20,-20}},
             rotation=0)));
+    Medium.SpecificEnthalpy h;
+
   equation
     flange.m_flow = 0;
     flange.h_outflow = 0;
-    T = Medium.temperature(Medium.setState_phX(flange.p, inStream(flange.h_outflow)));
+    h = inStream(flange.h_outflow);
+    T = Medium.temperature(Medium.setState_phX(flange.p, h));
     annotation (
       Diagram(graphics),
       Icon(graphics={Text(
@@ -5986,6 +5989,7 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       SI.PerUnit theta_act "Actual valve opening";
     protected
       function sqrtR = Functions.sqrtReg (delta=b*dpnom);
+
     public
       FlangeA inlet(
         m_flow(start=wnom, min=if allowFlowReversal then -Modelica.Constants.inf
@@ -6041,15 +6045,15 @@ Basic interface of the <tt>Flow1D</tt> models, containing the common parameters 
       else
         if useNoEvent then
           if noEvent(dp > 0) then
-            fluidState = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
+            fluidState = Medium.setState_phX(inlet.p, hin);
           else
-            fluidState = Medium.setState_phX(outlet.p, inStream(outlet.h_outflow));
+            fluidState = Medium.setState_phX(outlet.p, hout);
           end if;
         else
           if dp > 0 then
-            fluidState = Medium.setState_phX(inlet.p, inStream(inlet.h_outflow));
+            fluidState = Medium.setState_phX(inlet.p, hin);
           else
-            fluidState = Medium.setState_phX(outlet.p, inStream(outlet.h_outflow));
+            fluidState = Medium.setState_phX(outlet.p, hout);
           end if;
         end if;
       end if;
