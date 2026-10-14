@@ -220,7 +220,17 @@ package Thermal "Thermal models of heat transfer"
   model ConstTempSource1DFEM
     extends TempSource1DFEM(final useTin = false);
     annotation(
-      Icon(graphics = {Text(origin = {0, 54}, extent = {{-80, 26}, {80, -26}}, textString = "T=%T")}));
+      Icon(graphics = {Text(origin = {0, 54}, extent = {{-80, 26}, {80, -26}}, textString = "T=%T")}),
+            Documentation(info="<HTML>
+<p>Model of an ideal 1D uniform constant temperature source. The actual temperature can be provided by the parameter <code>T</code>.</p>
+</HTML>", revisions="<html>
+<ul>
+<li><i>14 Oct 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       First release.</li>
+</ul>
+</html>
+"));
   end ConstTempSource1DFEM;
 
   model TempSource1DFEM "Distributed Temperature Source for FEM models"
@@ -254,10 +264,13 @@ package Thermal "Thermal models of heat transfer"
 <p>Model of an ideal 1D uniform temperature source. The actual temperature can be provided by one of the following ways:</p>
 <ul>
 <li>by using the <tt>temperature</tt> signal connector, if the flag <code>useTin = true</code> (default).</li>
-<li>by using the parameter <code>T</ceode>, if the flag <code>useTin = false</code>.</li>
+<li>by using the parameter <code>T</code>, if the flag <code>useTin = false</code>.</li>
 </ul>
 </HTML>", revisions="<html>
 <ul>
+<li><i>14 Oct 2026</i>
+    by <a href=\"mailto:andrea.bartolini@dynamica-it.com\">Andrea Bartolini</a>:<br>
+       Made the temperature input conditional.</li>
 <li><i>1 Oct 2003</i>
     by <a href=\"mailto:francesco.casella@polimi.it\">Francesco Casella</a>:<br>
        First release.</li>
