@@ -217,28 +217,45 @@ package Thermal "Thermal models of heat transfer"
             textString="%name")}));
   end TempSource1DlinFV;
 
+  model ConstTempSource1DFEM
+    extends TempSource1DFEM(final useTin = false);
+    annotation(
+      Icon(graphics = {Text(origin = {0, 54}, extent = {{-80, 26}, {80, -26}}, textString = "T=%T")}));
+  end ConstTempSource1DFEM;
+
   model TempSource1DFEM "Distributed Temperature Source for FEM models"
     extends Icons.HeatFlow;
-    parameter Integer N=2 "Number of nodes";
-    Thermal.DHTNodes wall(N=N) annotation (Placement(transformation(
-            extent={{-40,-40},{40,-20}}, rotation=0)));
-    Modelica.Blocks.Interfaces.RealInput temperature annotation (Placement(
-          transformation(
-          origin={0,40},
-          extent={{-20,-20},{20,20}},
-          rotation=270)));
+    parameter Integer N = 2 "Number of nodes";
+    parameter Boolean useTin = true "use input for the temperature value" annotation(
+      choices(checkBox = true));
+    parameter SI.Temperature T = 293.15 "temperature value (if exetrnal input is not used)" annotation(
+      Dialog(enable = not useTin));
+    Thermal.DHTNodes wall(N = N) annotation(
+      Placement(transformation(extent = {{-40, -40}, {40, -20}}, rotation = 0)));
+    Modelica.Blocks.Interfaces.RealInput temperature if useTin annotation(
+      Placement(transformation(origin = {0, 40}, extent = {{-20, -20}, {20, 20}}, rotation = 270)));
+  protected
+    Modelica.Blocks.Interfaces.RealInput temperature_int "internal temperature value";
   equation
     for i in 1:N loop
-      wall.T[i] = temperature;
+      wall.T[i] = temperature_int;
     end for;
-    annotation (
+    connect(temperature_int, temperature);
+    if not useTin then
+      temperature_int = T;
+    end if;
+    annotation(
       Diagram(graphics),
       Icon(graphics={Text(
             extent={{-100,-46},{100,-70}},
             lineColor={191,95,0},
             textString="%name")}),
       Documentation(info="<HTML>
-<p>Model of an ideal 1D uniform temperature source. The actual temperature is provided by the <tt>temperature</tt> signal connector.
+<p>Model of an ideal 1D uniform temperature source. The actual temperature can be provided by one of the following ways:</p>
+<ul>
+<li>by using the <tt>temperature</tt> signal connector, if the flag <code>useTin = true</code> (default).</li>
+<li>by using the parameter <code>T</ceode>, if the flag <code>useTin = false</code>.</li>
+</ul>
 </HTML>", revisions="<html>
 <ul>
 <li><i>1 Oct 2003</i>
