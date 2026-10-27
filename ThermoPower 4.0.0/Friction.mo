@@ -406,7 +406,9 @@ package Friction "Friction models"
       output Real Kfl "Linear friction factor";
       output SI.PerUnit Cf "Fanning friction factor";
       output Boolean NoFriction "=true, if no friction is used";
-
+equation
+      assert(Kf > 0 or NoFriction, "Friction coefficient Kf must be positive");
+    
       annotation(
         Documentation(info = "<html><head></head><body>Base model for <code>replaceable</code> friction models to be used to <code>redeclare</code> the fricion model in the <code>Flow1DFV</code> components;</body></html>", revisions = "<html><head></head><body><ul>
 <li><i>15 Oct 2025</i>
@@ -446,7 +448,9 @@ package Friction "Friction models"
       output Real Kfl[N-1] "Linear friction coefficient";
       output Real Cf[N-1] "Fanning friction factor";
       output Boolean NoFriction "=true, if no friction is used";
-
+equation
+      assert(min(Kf) > 0 or NoFriction, "Friction coefficient Kf must be positive");
+    
       annotation(
         Documentation(info = "<html><head></head><body>Base model for <code>replaceable</code> friction models to be used to <code>redeclare</code> the fricion model in the <code>Flow1DFV2ph</code> components;</body></html>", revisions = "<html><head></head><body><ul>
     <li><i>15 Oct 2025</i>
@@ -478,7 +482,9 @@ package Friction "Friction models"
       output Real Kf[N] "Friction coefficient";
       output Real Cf[N] "Fanning friction factor";
       output Boolean NoFriction "=true, if no friction is used";
-
+equation
+      assert(min(Kf) > 0 or NoFriction, "Friction coefficient Kf must be positive");
+    
       annotation(
         Documentation(info = "<html><head></head><body>Base model for <code>replaceable</code> friction models to be used to <code>redeclare</code> the fricion model in the <code>Flow1DFEM</code> components;</body></html>", revisions = "<html><head></head><body><ul>
     <li><i>18 Mar 2025</i>
@@ -515,7 +521,9 @@ package Friction "Friction models"
       output Real Kf[N] "Friction coefficient";
       output Real Cf[N] "Fanning friction factor";
       output Boolean NoFriction "=true, if no friction is used";
-
+equation
+      assert(min(Kf) > 0 or NoFriction, "Friction coefficient Kf must be positive");
+    
       annotation(
         Documentation(info = "<html><head></head><body>Base model for <code>replaceable</code> friction models to be used to <code>redeclare</code> the fricion model in the <code>Flow1DFEM2ph</code> components;</body></html>", revisions = "<html><head></head><body><ul>
     <li><i>18 Mar 2026</i>

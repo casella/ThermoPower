@@ -1695,7 +1695,7 @@ This is the model of a very simple heat exchanger. The modelling assumptions are
           omega=exchSurface/L,
           Tstartbar=Tstart,
           redeclare model HeatTransfer =
-              Thermal.HeatTransferFV.ConstantHeatTransferCoefficient (gamma=gamma))
+              Thermal.HeatTransferFV.ConstantHeatTransferCoefficient (gamma=gamma), dpnom = dpnom_G)
                             annotation (Placement(transformation(
               origin={0,-40},
               extent={{14,14},{-14,-14}},
