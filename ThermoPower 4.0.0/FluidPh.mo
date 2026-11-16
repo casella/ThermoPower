@@ -4206,9 +4206,9 @@ The gas is supposed to flow in at constant temperature (parameter <tt>Tgin</tt>)
       hvs - hls)) "Steam quality in the vapour volume";
     xl = homotopy(if hl <= hls then 0 else (hl - hls)/(hvs - hls), 0)
       "Steam quality in the liquid volume";
-    gml = if gl == 0 then 0 else 1/(1/gl + a*rint/lm)
+    gml = if gl <= 0 then 0 else 1/(1/gl + a*rint/lm)
       "Total Heat conductance metal-liquid";
-    gmv = if gv == 0 then 0 else 1/(1/gv + a*rint/lm)
+    gmv = if gv <= 0 then 0 else 1/(1/gv + a*rint/lm)
       "Total Heat conductance metal-vapour";
     a = rext^2/(rext^2 - rint^2)*log(rext/rint) - 0.5;
     if DrumOrientation == 0 then
