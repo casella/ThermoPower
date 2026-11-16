@@ -2120,6 +2120,6 @@ This is a major new release, that has been in the making for 5 years. The new re
 <p>The ThermoPower package is licensed by Politecnico di Milano under the <b><a href=\"http://www.modelica.org/licenses/ModelicaLicense2\">Modelica License 2</a></b>. </p>
 <p></p><h4>Copyright © 2002-2014, Politecnico di Milano.</h4><p></p>
 </font></body></html>"),
-  uses(Modelica(version="4.0.0")),
+  uses(Modelica(version="4.1.0")),
   version="4.0.0");
 end ThermoPower;
