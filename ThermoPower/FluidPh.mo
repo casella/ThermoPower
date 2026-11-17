@@ -1292,8 +1292,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
         "Pressure drop from inlet to capacitance";
       Dpfric2 = 0 "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
-
-    Dpstat = if abs(dzdx) < 1e-6 then 0 else g*l*dzdx*sum(rhobar)
+  
+    Dpstat = if abs(dzdx) < 1e-6 then 0 else homotopy(g*l*dzdx*sum(rhobar), g*L*dzdx*rhostart)
       "Pressure drop due to static head";
     for j in 1:N-1 loop
       if Medium.singleState then
@@ -1605,7 +1605,7 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 
     sum(dMdt) = (infl.m_flow/Nt + outfl.m_flow/Nt) "Mass balance";
     sum(dpf) = Dpfric "Total pressure drop due to friction";
-    Dpstat = if abs(dzdx) < 1e-6 then 0 else g*l*dzdx*sum(rhobar)
+    Dpstat = if abs(dzdx) < 1e-6 then 0 else homotopy(g*l*dzdx*sum(rhobar), g*L*dzdx*rhostart)
       "Pressure drop due to static head";
     L/A*dwdt + (outfl.p - infl.p) + Dpstat + Dpfric = 0 "Momentum balance";
     for j in 1:(N - 1) loop
@@ -2031,7 +2031,8 @@ enthalpy between the nodes; this requires the availability of the time derivativ
         "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
 
-    Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D "Pressure drop due to static head";
+    Dpstat = if abs(dzdx) < 1e-6 then 0 else homotopy(g*dzdx*rho*D, g*L*dzdx*rhostart)
+      "Pressure drop due to static head";
     ((1 - ML)*Y + ML*YY)*der(h) + B/A*h + C*h/A = der(p)*G + QvolSingle + K*w/A "Energy balance equation";
 
     // Fluid property calculations
@@ -2493,8 +2494,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
       Dpfric1 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D1[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[1]) "Pressure drop from inlet to capacitance";
       Dpfric2 = homotopy(sum(friction.Kf[i]/L*squareReg(w[i], wnom/Nt*wnf)*D2[i]/rho[i] for i in 1:N), dpnom/2/(wnom/Nt)*w[N]) "Pressure drop from capacitance to outlet";
     end if "Pressure drop due to friction";
-    Dpstat = if abs(dzdx) < 1e-6 then 0 else g*dzdx*rho*D "Pressure drop due to static head";
-
+    Dpstat = if abs(dzdx) < 1e-6 then 0 else homotopy(g*dzdx*rho*D, g*L*dzdx*rhostart)
+      "Pressure drop due to static head";
+  
   // Fluid property calculations
     for j in 1:N loop
       fluidState[j] = Medium.setState_phX(p, h[j]);
@@ -5852,6 +5854,9 @@ The inlet flowrate is proportional to the inlet pressure, and to the <tt>partial
         annotation (Dialog(tab="Initialisation"));
       parameter SI.PerUnit wnf=0.02
         "Fraction of nominal flow rate at which linear friction equals turbulent friction";
+      parameter SI.Density rhostart = Medium.density(Medium.setState_phX(pstart, 0.5*(hstart[1]+hstart[N])))
+        "density used to initialize the simplified model in the homotopy of the static head"
+        annotation (Dialog(tab="Initialisation"));
       parameter Choices.Init.Options initOpt=system.initOpt
         "Initialisation option"
         annotation (Dialog(tab="Initialisation"));
