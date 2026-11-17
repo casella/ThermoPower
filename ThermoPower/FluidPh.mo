@@ -1396,9 +1396,8 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </li><li>The energy balance equation is written by assuming a uniform pressure distribution; the compressibility effects are lumped at the inlet, at the outlet, or at the middle of the pipe.
 </li><li>The fluid flow can exchange thermal power through the lateral tube boundary, by means of the <tt>wall</tt> connector, that actually represents the wall surface with its temperature. The heat flow is computed by an instance of the replaceable HeatTransfer model; various heat transfer models are available in the ThermoPower.Thermal.HeatTransferFV package.
 </li>
-<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFV package</li></ul>
+<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFV package. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.</li></ul>
 <p>The mass, momentum and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional) and N-1 specific enthalpies.
-</p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
 </p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
 </p><p>Flow reversal is not supported by this model; if you need flow reversal, please consider using the Flow1DFEM model.
 </p><p><b>Modelling options</b></p>
@@ -1795,11 +1794,10 @@ outlet is ignored; use <t>Pump</t> models if this has to be taken into account c
 </li><li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 </li><li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
 </li>
-<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFV2ph package</li>
+<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFV2ph package. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.</li>
 
 </ul>
 <p>The mass, momentum, and energy balance equation are discretised with the finite volume method. The state variables are one pressure, one flowrate (optional) and N-1 specific enthalpies.
-</p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
 </p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
 </p><p>The model assumes that the mass flow rate is always from the inlet to the outlet. Small reverse flow is allowed (e.g. when closing a valve at the outlet), but the model will not account for it explicitly.
 </p><p><b>Modelling options</b></p>
@@ -2295,11 +2293,10 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </li><li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 </li><li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
 </li>
-<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFEM package</li>
+<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFEM package. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.</li>
 
 </ul>
 <p>The mass, momentum, and energy balance equation are discretised with the finite element method. The state variables are one pressure, one flowrate (optional) and N specific enthalpies.
-</p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
 </p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
 </p><p>Flow reversal is fully supported.
 </p><p><b>Modelling options</b></p>
@@ -3402,10 +3399,9 @@ enthalpy between the nodes; this requires the availability of the time derivativ
 </li><li>The energy balance equation is written by assuming a uniform pressure distribution; the pressure drop is lumped either at the inlet or at the outlet.
 </li><li>The fluid flow can exchange thermal power through the lateral surface, which is represented by the <tt>wall</tt> connector. The actual heat flux must be computed by a connected component (heat transfer computation module).
 </li>
-<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFEM2ph package</li>
+<li>The friction coefficient is computed by an instance of the replaceable <code>Friction</code> model. Various friction models are available in the ThermoPower.Friction.Friction1DFEM2ph package. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.</li>
 </ul>
 <p>The mass, momentum, and energy balance equation are discretised with the Finite Element Method (Stabilised Galerkin Least Squares). The state variables are one pressure, one flowrate (optional) and N specific enthalpies.
-</p><p>The turbulent friction factor can be either assumed as a constant, or computed by Colebrook's equation. In the former case, the friction factor can be supplied directly, or given implicitly by a specified operating point. In any case, the multiplicative correction coefficient <tt>Kfc</tt> can be used to modify the friction coefficient, e.g. to fit experimental data.
 </p><p>A small linear pressure drop is added to avoid numerical singularities at low or zero flowrate. The <tt>wnom</tt> parameter must be always specified: the additional linear pressure drop is such that it is equal to the turbulent pressure drop when the flowrate is equal to <tt>wnf*wnom</tt> (the default value is 1% of the nominal flowrate). Increase <tt>wnf</tt> if numerical instabilities occur in tubes with very low pressure drops.
 </p><p>Flow reversal is fully supported.
 </p><p><b>Modelling options</b></p>
